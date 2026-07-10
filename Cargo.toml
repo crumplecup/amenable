@@ -1,0 +1,14 @@
+[package]
+name = "amenable"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/crumplecup/amenable"
+authors = ["Erik Rose <erik.w.rose@gmail.com>"]
+homepage = "https://github.com/crumplecup/amenable"
+documentation = "https://docs.rs/amenable"
+readme = "README.md"
+
+description = "Constitutional trait family for lawful proof-carrying software structure"
+
+[dependencies]
