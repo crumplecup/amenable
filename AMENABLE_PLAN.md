@@ -356,10 +356,19 @@ checklist below.
   `Provenance`-bound root/init claim (see "States Are Roots, Transitions Are
   Relations" above), distinct from the `Witness`-backed transitions
   `Amenable` proves over.
-- [ ] Change `Provenance::metadata()` to return `BTreeSet<MetadataEntry>`
-  instead of `Vec<MetadataEntry>`.
-- [ ] Change `MetadataEntry`'s fields from `&'static str` to owned `String`,
+- [x] Redesign `Provenance` as a capability interface rather than a fixed
+  collection type: `fn iter(&self) -> impl Iterator<Item = MetadataEntry>` is
+  the only required method, with `get`/`contains_key`/`len`/`is_empty` as
+  defaults derived from it. Superseded the earlier `BTreeSet<MetadataEntry>`
+  plan — locking in any concrete collection, `BTreeSet` included, would
+  still describe structure rather than capability.
+- [x] Change `MetadataEntry`'s fields from `&'static str` to owned `String`,
   with a `new(impl Into<String>, impl Into<String>)` constructor.
+- [x] Keep the verifier metadata marker structs (`KaniVerifierMetadata`,
+  `CreusotVerifierMetadata`, `VerusVerifierMetadata`) zero-sized despite the
+  move to owned `MetadataEntry`, by yielding owned entries lazily from a
+  `const` slice inside `iter()` rather than storing a field — the "promise"
+  of provenance stays zero-sized; the data materializes only on request.
 - [ ] Design the `AuditRecord` registry for rule-to-dependents audit
   inversion (see "Audit Inversion: From Rule to Dependents" above): literal
   source capture plus a compile-time registry keyed by `Standard`/
@@ -428,7 +437,7 @@ not copied from the existing `elicitation` code.
   collapsing into a shapeless metadata surface.
 - [ ] `elicitation`'s proof machinery shrinks as `amenable` absorbs it, rather
   than the two surfaces persisting in parallel indefinitely.
-- [ ] Struct fields holding runtime-populated data own their data (`String`,
+- [x] Struct fields holding runtime-populated data own their data (`String`,
   `Vec<T>`); `&'static str`/`&'static [T]` is reserved for no-`&self` trait
   methods describing a fixed, compile-time-known fact about a type.
 - [ ] Every state a `StateMachine` claims to occupy is backed by `Provenance`

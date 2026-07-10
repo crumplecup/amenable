@@ -6,15 +6,17 @@ use crate::{MetadataEntry, Provenance};
 pub trait Verifier: 'static {
     /// Structured reporting surface for backend-specific provenance and
     /// configuration disclosure.
-    type Metadata: Provenance;
+    type Metadata: Provenance + Default;
 
     /// Canonical backend name for audit and display purposes.
     fn name() -> &'static str;
 
     /// Provenance metadata describing the verifier backend and its reporting
-    /// surface.
-    fn metadata() -> Vec<MetadataEntry> {
-        <Self::Metadata as Provenance>::metadata()
+    /// surface. Query the result through the [`Provenance`] interface
+    /// (`iter`, `get`, `contains_key`, ...) rather than expecting a
+    /// particular collection back.
+    fn metadata() -> Self::Metadata {
+        Self::Metadata::default()
     }
 }
 
@@ -26,21 +28,22 @@ pub struct KaniVerifier;
 pub struct KaniVerifierMetadata;
 
 impl Provenance for KaniVerifierMetadata {
-    fn metadata() -> Vec<MetadataEntry> {
-        vec![
-            MetadataEntry::new("verifier_family", "kani"),
-            MetadataEntry::new("authority", "Kani Rust Verifier"),
-            MetadataEntry::new("source_url", "https://model-checking.github.io/kani/"),
-            MetadataEntry::new("proof_artifact", "Rust proof harness token stream"),
-            MetadataEntry::new(
+    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+        const FACTS: &[(&str, &str)] = &[
+            ("verifier_family", "kani"),
+            ("authority", "Kani Rust Verifier"),
+            ("source_url", "https://model-checking.github.io/kani/"),
+            ("proof_artifact", "Rust proof harness token stream"),
+            (
                 "configuration_channel",
                 "CLI arguments and KANI_* or PROVE_* environment variables",
             ),
-            MetadataEntry::new(
+            (
                 "configuration_surface",
                 "package selection, flags, timeout, and report output",
             ),
-        ]
+        ];
+        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
     }
 }
 
@@ -60,21 +63,22 @@ pub struct CreusotVerifier;
 pub struct CreusotVerifierMetadata;
 
 impl Provenance for CreusotVerifierMetadata {
-    fn metadata() -> Vec<MetadataEntry> {
-        vec![
-            MetadataEntry::new("verifier_family", "creusot"),
-            MetadataEntry::new("authority", "Creusot project"),
-            MetadataEntry::new("source_url", "https://creusot-rs.github.io/creusot/"),
-            MetadataEntry::new("proof_artifact", "Why3-oriented proof token stream"),
-            MetadataEntry::new(
+    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+        const FACTS: &[(&str, &str)] = &[
+            ("verifier_family", "creusot"),
+            ("authority", "Creusot project"),
+            ("source_url", "https://creusot-rs.github.io/creusot/"),
+            ("proof_artifact", "Why3-oriented proof token stream"),
+            (
                 "configuration_channel",
                 "CLI arguments and CREUSOT_* or PROVE_* environment variables",
             ),
-            MetadataEntry::new(
+            (
                 "configuration_surface",
                 "package selection, flags, binary path, timeout, and report output",
             ),
-        ]
+        ];
+        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
     }
 }
 
@@ -94,21 +98,22 @@ pub struct VerusVerifier;
 pub struct VerusVerifierMetadata;
 
 impl Provenance for VerusVerifierMetadata {
-    fn metadata() -> Vec<MetadataEntry> {
-        vec![
-            MetadataEntry::new("verifier_family", "verus"),
-            MetadataEntry::new("authority", "Verus project"),
-            MetadataEntry::new("source_url", "https://verus-lang.github.io/verus/"),
-            MetadataEntry::new("proof_artifact", "Verus proof module token stream"),
-            MetadataEntry::new(
+    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+        const FACTS: &[(&str, &str)] = &[
+            ("verifier_family", "verus"),
+            ("authority", "Verus project"),
+            ("source_url", "https://verus-lang.github.io/verus/"),
+            ("proof_artifact", "Verus proof module token stream"),
+            (
                 "configuration_channel",
                 "CLI arguments and VERUS_* environment variables",
             ),
-            MetadataEntry::new(
+            (
                 "configuration_surface",
                 "binary path, source selection, flags, timeout, and report output",
             ),
-        ]
+        ];
+        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
     }
 }
 
