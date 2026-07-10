@@ -1,4 +1,4 @@
-use amenable::{KaniVerifier, KaniVerifierMetadata, Provenance, Verifier};
+use amenable_core::{KaniVerifier, KaniVerifierMetadata, Provenance, Verifier};
 
 #[test]
 fn verifier_metadata_marker_is_zero_sized() {

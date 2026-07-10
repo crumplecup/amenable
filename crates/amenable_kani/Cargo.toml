@@ -1,0 +1,16 @@
+[package]
+name = "amenable_kani"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+description = "Kani verifier backend for the amenable constitutional trait family"
+keywords = ["formal-verification", "kani", "proof"]
+categories = ["development-tools"]
+
+[dependencies]
+amenable_core = { workspace = true }

@@ -1,5 +1,16 @@
-[package]
-name = "amenable"
+[workspace]
+members = [
+  "crates/amenable",
+  "crates/amenable_core",
+  "crates/amenable_code",
+  "crates/amenable_std",
+  "crates/amenable_kani",
+  "crates/amenable_creusot",
+  "crates/amenable_verus",
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0 OR MIT"
@@ -7,8 +18,12 @@ repository = "https://github.com/crumplecup/amenable"
 authors = ["Erik Rose <erik.w.rose@gmail.com>"]
 homepage = "https://github.com/crumplecup/amenable"
 documentation = "https://docs.rs/amenable"
-readme = "README.md"
 
-description = "Constitutional trait family for lawful proof-carrying software structure"
-
-[dependencies]
+[workspace.dependencies]
+amenable = { path = "crates/amenable", version = "0.1.0" }
+amenable_core = { path = "crates/amenable_core", version = "0.1.0" }
+amenable_code = { path = "crates/amenable_code", version = "0.1.0" }
+amenable_std = { path = "crates/amenable_std", version = "0.1.0" }
+amenable_kani = { path = "crates/amenable_kani", version = "0.1.0" }
+amenable_creusot = { path = "crates/amenable_creusot", version = "0.1.0" }
+amenable_verus = { path = "crates/amenable_verus", version = "0.1.0" }

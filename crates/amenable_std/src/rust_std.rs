@@ -1,4 +1,12 @@
-//! Provenance registrations for Rust standard-library-backed carriers.
+//! `RustStdType`: interface and concrete registrations for Rust
+//! standard-library carriers, defined together in one crate.
+//!
+//! `RustStdType` is implemented directly on foreign standard-library types
+//! (`bool`, `i32`, `String`, ...), which Rust's orphan rules only permit
+//! from the crate that defines the trait. So unlike the core constitutional
+//! roles in `amenable`, this trait and its std-lib coverage live together
+//! here rather than split across an interface crate and a downstream
+//! consumer.
 
 /// Provenance helper for Rust standard-library-backed carriers.
 ///

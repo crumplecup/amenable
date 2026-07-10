@@ -1,0 +1,15 @@
+[package]
+name = "amenable_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+description = "Constitutional trait family for lawful proof-carrying software structure"
+keywords = ["formal-verification", "proof", "provenance", "constitutional", "audit"]
+categories = ["development-tools", "rust-patterns"]
+
+[dependencies]
