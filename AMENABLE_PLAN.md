@@ -21,16 +21,74 @@ dependency the wrong way, and any future bridge from `elicitation` into
 
 ## Status
 
+- `amenable` is a Cargo workspace, not a single crate. See "Workspace
+  Architecture" below for the full layout and the constraint that drove it.
 - Core trait family (`Verifier`, `Witness`, `Witnessed`, `Evidence`,
   `Standard`, `Objective`, `AsStandard`, `AsObjective`, `ProofToken`,
   `Sidecar`, `Establish`, `Exchange`, `StateMachine`, `Amenable`,
-  `Provenance`, `MetadataEntry`, `RustStdType`) is implemented, split into
-  focused modules, and compiles with zero runtime dependencies.
+  `Provenance`, `MetadataEntry`) lives in `amenable_core`, split into focused
+  modules, zero runtime dependencies. The top-level `amenable` facade crate
+  re-exports it (plus `amenable_std`) for user convenience.
+- `RustStdType` (trait and its full std-lib registrations, necessarily
+  together — see Workspace Architecture) lives in `amenable_std`.
+- `amenable_kani`/`amenable_creusot`/`amenable_verus` are scaffolded stub
+  crates with no content — the concrete `WitnessSource<V>` proof-emission
+  machinery per backend is Phase 4 work, not started.
+- Source-code capture (`Code`/`Fragment`) has moved out of this workspace
+  entirely, into its own repository, `homecoming` — see "Relationship to
+  `homecoming`" below. It is not a dependency of `amenable` yet.
 - `elicitation` no longer contains any `amenable`-adjacent code. It has not
   yet been updated to depend on `amenable`.
-- No proof-emission backend (Kani/Creusot/Verus token-stream generation) has
-  been rebuilt here yet. `WitnessSource` implementations do not exist for any
-  concrete type in this crate today.
+
+## Workspace Architecture
+
+`amenable` is a workspace of six crates, driven by two forces: a per-role
+split so each concern gets its own dependency-scoped home, and a hard Rust
+constraint that overrides the split wherever it applies.
+
+**The orphan-rule constraint.** Rust forbids `impl ForeignTrait for
+ForeignType` — at least one of the trait or the type must be local to the
+crate doing the `impl`. Any trait meant to be implemented *directly* on a
+standard-library type (`bool`, `i32`, `String`, ...) therefore cannot be
+split across an interface crate and a downstream consumer crate the way
+`elicitation`'s shadow-crate pattern normally works: the trait and its
+std-lib registrations have to live in the same crate, because no other crate
+can ever legally supply the `impl`. This is not a style preference — it is
+enforced by the compiler and discovered the hard way (see the abandoned
+`amenable_std`-as-downstream-consumer attempt in git history, which failed
+to compile with `E0117` for exactly this reason). This constraint has a
+second-order effect: it justifies a crate-per-trait architecture for any
+trait carrying std-lib coverage, since each such crate ends up owning a
+genuinely large proof/registration surface for the standard library on top
+of its trait definition.
+
+The layout:
+
+- **`amenable_core`** — the constitutional trait family that is *not*
+  implemented directly on foreign types (`Verifier`, `Witness`, `Evidence`,
+  `Standard`, `Objective`, `Provenance`, `Sidecar`, `Establish`, `Exchange`,
+  `StateMachine`, `Amenable`). Zero runtime dependencies.
+- **`amenable_std`** — `RustStdType`: interface and its complete std-lib
+  registrations together, per the orphan-rule constraint above.
+- **`amenable_kani`** / **`amenable_creusot`** / **`amenable_verus`** —
+  concrete `WitnessSource<V>` proof-emission machinery per verifier backend.
+  Depend on `amenable_core` directly, never on the facade.
+- **`amenable`** — the top-level facade, re-exporting `amenable_core` and
+  `amenable_std` (and, once they have content, the verifier-backend crates)
+  for user convenience. This is the single sanctioned exception to "no
+  re-exports between workspace crates" — see `CLAUDE.md`'s Workspace
+  Organization section. Satellite crates depend on `amenable_core`, never on
+  this facade, to avoid a circular dependency.
+
+Source-code capture (`Code`/`Fragment`, the lateralizing composition traits)
+was scaffolded here as `amenable_code`, then split out entirely into its own
+repository, `homecoming` (`github.com/crumplecup/homecoming`) — see
+"Relationship to `homecoming`" below. It is not part of this workspace.
+
+Verified end to end: a throwaway smoke-test crate depending only on
+`amenable` successfully called `amenable::KaniVerifier::metadata()` and read
+a fact through the re-exported `Provenance` interface, confirming the facade
+re-exports are load-bearing, not just declared.
 
 ## Architectural Thesis
 
@@ -291,6 +349,47 @@ Audit methods remain role-specific and jurisdiction-specific. `amenable`
 should not collapse auditing into one vague metadata trait; each
 constitutional role exposes the audit surface proper to that role.
 
+## Relationship to `homecoming`
+
+Source-code capture (originally sketched here as `Code`, in the scaffolded
+`amenable_code` crate) has moved to its own repository,
+[`homecoming`](https://github.com/crumplecup/homecoming). Full design
+detail — the `Homecoming` trait, `Fragment` as a `syn`-typed,
+`petgraph`-backed graph, the lateralizing composition traits, and the
+round-trip proof obligation — lives in that repository's
+`HOMECOMING_PLAN.md`, not here. `homecoming` does not depend on `amenable`
+and never will; the dependency runs the other way once `homecoming`'s
+design stabilizes (Phase 3 below).
+
+Two points from that design are load-bearing for `amenable` specifically
+and worth restating here rather than only in the other repo:
+
+- **Why this matters for `Witness`, not just for agent tooling.** A
+  solver's verdict is only meaningful relative to the exact statement it
+  checked. The code a `Witness` proof ran over — the receipt establishing
+  what, precisely, was verified — has to be *exact* to be of any value at
+  all. An approximate or reconstructed rendering of "what the code probably
+  looked like" breaks the chain of custody between what was verified and
+  what ships, silently, in a way that looks like assurance while providing
+  none.
+- **`Witness::proof()` and `Homecoming::code()` must never independently
+  drift apart**, once `amenable` depends on `homecoming` — a structurally
+  real proof over the *wrong* code is more dangerous than an obviously
+  vacuous one, because it does not look suspicious. The fix is not to
+  hard-couple the two traits architecturally; it is to make their agreement
+  a checkable claim, the same discipline the rest of the family runs on.
+  Reconstruct a whole program from its emitted fragments, regenerate its
+  proofs, and compare them to the original program's proofs: if
+  round-tripping through `Homecoming` always yields the same proof, the two
+  traits are provably in agreement despite being independently implemented.
+
+Once `Homecoming` exists as a dependency, `Evidence::audit_surface()` (and
+the `AuditRecord` registry below) will not need a separate
+proc-macro-stringify capture mechanism of their own — they can call
+`.code()` on whatever produced the claim and get the real, live fragment
+back, rather than a hand-maintained string that can silently drift from the
+code it describes.
+
 ## Audit Inversion: From Rule to Dependents
 
 Auditing a `Standard` or `Objective` should not be limited to reading the
@@ -308,9 +407,11 @@ Two distinct mechanisms are needed, not one:
    under `Evidence` — "produce the source code associated with computing the
    result." For a reviewer to judge whether the code actually upholds a
    cited rule without leaving the report, the audit surface needs to carry
-   literal source text, not a name to go look up. This is capturable at
-   compile time (a proc-macro reads and stringifies the annotated function
-   body, the automated equivalent of `stringify!`).
+   literal source text, not a name to go look up. `homecoming`'s
+   `Homecoming` trait (see "Relationship to `homecoming`" above) will supply
+   this directly once `amenable` depends on it — no separate
+   proc-macro-stringify mechanism of our own needed; the audit surface can
+   call `.code()` on whatever produced the claim.
 2. **A reverse index from root to dependents.** Forward, a derived `Evidence`
    names the `Standard`/`Objective` roots it relies on. Backward — "given
    this rule, show every dependent" — requires each dependent to register
@@ -325,7 +426,9 @@ Any record type built for this (working name `AuditRecord`) must own its
 data — `String` for dependent identity and captured audit code, not
 `&'static str` — since captured source and formatted identities are
 runtime-computed, not literals. See the struct-ownership rule in the design
-checklist below.
+checklist below. Once `homecoming` is a dependency, `AuditRecord`'s "audit
+code" field is most naturally a captured `homecoming::Fragment` rather than
+a bare `String`.
 
 ## Phased Implementation Plan
 
@@ -347,8 +450,10 @@ checklist below.
   heuristics against both a real and a deliberately vacuous proof body, to
   confirm the heuristic actually distinguishes them.
 - [ ] Confirm `Standard`/`Objective` disclosure methods are sufficient to
-  register a Rust-standard-library trust decision as a certification
-  (the `RustStdType` surface already carried over is the first test case).
+  register a Rust-standard-library trust decision as a certification (the
+  `RustStdType` surface now lives in `amenable_std`, which is the first
+  test case; `Standard`/`Objective` impls for std types are not yet
+  written).
 - [ ] Reject any blanket impl of `Standard`, `Objective`, or `Evidence` that
   would let a type earn certification without an explicit, per-type
   registration.
@@ -374,26 +479,46 @@ checklist below.
   source capture plus a compile-time registry keyed by `Standard`/
   `Objective` root type.
 
-### Phase 3: Proof-emission upgrade
+### Phase 3: Depend on `homecoming`
+
+Not started; blocked on `homecoming`'s own design stabilizing (`Fragment`,
+`Homecoming`, and the lateralizing composition traits — see that
+repository's `HOMECOMING_PLAN.md`). Tracked here only from `amenable`'s side
+of the dependency.
+
+- [ ] Add `homecoming` as a dependency once its `Homecoming` trait and
+  `Fragment` type exist.
+- [ ] Decide which `amenable` traits implement or require `Homecoming`
+  (`Witness` is the leading candidate).
+- [ ] Decide whether `Evidence::audit_surface()` should be redefined in
+  terms of `Homecoming::code()` now that the capability exists elsewhere,
+  superseding the `&'static [&'static str]` shape.
+- [ ] Exercise the strong-form round-trip check (reconstruct a program,
+  regenerate its proofs, compare to the original program's proofs) against
+  at least one `Witness`-bearing example, once both `WitnessSource` (Phase 4
+  below) and `Homecoming` exist.
+
+### Phase 4: Proof-emission upgrade
 
 Rebuild the concrete proof-emission surface — the successor to
 `elicitation`'s `Prop::kani_proof`/`creusot_proof`/`verus_proof` — as a
-`WitnessSource` implementation story native to `amenable`, informed by but
-not copied from the existing `elicitation` code.
+`WitnessSource` implementation story in `amenable_kani`/`amenable_creusot`/
+`amenable_verus`, informed by but not copied from the existing `elicitation`
+code.
 
 - [ ] Decide the shape of the leaf proof-emission trait(s) implementers
   write against (successor to `Prop`).
-- [ ] Decide how token-stream generation is represented without pulling in
-  `proc-macro2`/`quote` as a hard dependency of the constitutional core —
-  or decide that a thin, optional feature-gated dependency is warranted here.
 - [ ] Rebuild the `Established<P>`-equivalent proof-sidecar token as a
   concrete `ProofToken`/`Sidecar` implementation.
 - [ ] Rebuild the `ProvableFrom<C>`-equivalent exchange relation as a
   concrete `Establish<C>` implementation.
 - [ ] Rebuild the `VerifiedStateMachine`-equivalent closed-world story as a
   concrete `Amenable` implementation.
+- [ ] Confirm `Witness::proof()` for a concrete example can be validated
+  against `Homecoming::code()` for the same example via the strong-form
+  round-trip check from Phase 3.
 
-### Phase 4: `elicitation` becomes a consumer
+### Phase 5: `elicitation` becomes a consumer
 
 - [ ] Add `amenable` as a dependency of `elicitation`.
 - [ ] Migrate `elicitation`'s proof-carrying types onto `amenable`'s traits.
@@ -404,7 +529,7 @@ not copied from the existing `elicitation` code.
 - [ ] Confirm the elicitation test suite and verification coverage checks
   still pass against the new foundation.
 
-### Phase 5: Downstream proving grounds
+### Phase 6: Downstream proving grounds
 
 - [ ] Re-evaluate whether `elicit_temporal` is the best first external
   proving ground for `Standard`/`Objective` root-role registrations anchored
@@ -444,6 +569,15 @@ not copied from the existing `elicitation` code.
   (a `Standard`/`Objective` root), the same as any other claim with no
   mathematical shape to prove — states are never silently exempted from the
   certification requirement just because they "aren't really proofs."
+- [x] Traits meant to be implemented directly on foreign standard-library
+  types live in the same crate as their std-lib registrations, never split
+  across an interface crate and a downstream consumer — the orphan rule
+  leaves no other option, discovered the hard way via `E0117`.
+- [ ] `Witness` and `homecoming::Homecoming` are never allowed to
+  independently drift apart on the same claim, once `homecoming` is a
+  dependency — verified via the strong-form round-trip check (reconstruct,
+  re-verify, compare proofs), not by a structural coupling between the two
+  traits.
 
 ## Open Questions
 
@@ -452,9 +586,11 @@ not copied from the existing `elicitation` code.
 - [ ] Can triviality detection work generically over an opaque proof artifact
   type, or does it need backend-specific knowledge (a Kani token stream and a
   Verus token stream fail differently)?
-- [ ] Does token-stream generation belong in the dependency-light core, or in
+- [x] Does token-stream generation belong in the dependency-light core, or in
   an optional feature-gated module, given `proc-macro2`/`quote` are real
-  runtime dependencies?
+  runtime dependencies? — Resolved: neither. It lives in an entirely
+  separate repository, `homecoming`, not depended on by `amenable_core` and
+  not part of this workspace.
 - [ ] What is the smallest first-pass method surface that meaningfully raises
   proof quality for `Standard` and `Objective` without prematurely freezing
   the design?
@@ -470,9 +606,12 @@ not copied from the existing `elicitation` code.
   relation `Amenable` proves over — or is that better left as an
   implementation-side convention than a trait-level requirement?
 - [ ] What is the return shape for an `AuditRecord` (dependent identity,
-  captured audit code, citation), and does the root-to-dependents registry
-  belong in the dependency-light core or an optional feature-gated module —
-  the same dependency question as token-stream generation?
+  captured audit code, citation) now that "audit code" is naturally a
+  `homecoming::Fragment`? Depends on `homecoming`'s design settling first;
+  see that repository's `HOMECOMING_PLAN.md` for the composition-trait
+  questions (arity, node-shape count, round-trip return shape) that gate
+  this — they are no longer tracked here since they are no longer this
+  repository's design surface to resolve.
 
 ## Success Condition
 
@@ -484,6 +623,9 @@ and when:
   certification of provenance, with no silent third option
 - proof-quality heuristics catch the specific corner-cutting failure modes
   that motivated building them
+- `homecoming::Homecoming` produces an exact receipt of what a `Witness`
+  proof ran over, not an approximation — verified by round-trip checks, not
+  trusted by convention
 - `elicitation`'s ad hoc proof machinery has measurably shrunk because
   `amenable` absorbed its responsibilities
 - the trait family remains small, dependency-light, and teachable
