@@ -22,13 +22,19 @@ dependency the wrong way, and any future bridge from `elicitation` into
 ## Status
 
 - `amenable` is a Cargo workspace, not a single crate. See "Workspace
-  Architecture" below for the full layout and the constraint that drove it.
+  Architecture" below for the full layout, the orphan-rule constraint that
+  drove it, and the planned `amenable_derive` proc-macro crate that will
+  host derive support such as `#[derive(Provenance)]`.
 - Core trait family (`Verifier`, `Witness`, `Witnessed`, `Evidence`,
   `Standard`, `Objective`, `AsStandard`, `AsObjective`, `ProofToken`,
   `Sidecar`, `Establish`, `Exchange`, `StateMachine`, `Amenable`,
   `Provenance`, `MetadataEntry`) lives in `amenable_core`, split into focused
   modules, zero runtime dependencies. The top-level `amenable` facade crate
   re-exports it (plus `amenable_std`) for user convenience.
+- Current code still carries separate `Standard` and `Objective` root roles,
+  but the next design pass is expected to collapse them into a single
+  `Standard` obligation category whose source distinction lives in
+  `Provenance`, not in sibling root traits.
 - `RustStdType` (trait and its full std-lib registrations, necessarily
   together — see Workspace Architecture) lives in `amenable_std`.
 - `amenable_kani`/`amenable_creusot`/`amenable_verus` are scaffolded stub
@@ -66,10 +72,15 @@ The layout:
 
 - **`amenable_core`** — the constitutional trait family that is *not*
   implemented directly on foreign types (`Verifier`, `Witness`, `Evidence`,
-  `Standard`, `Objective`, `Provenance`, `Sidecar`, `Establish`, `Exchange`,
-  `StateMachine`, `Amenable`). Zero runtime dependencies.
+  `Standard`, `Provenance`, `Certificate`, `Registry`, `Sidecar`,
+  `Establish`, `Exchange`, `StateMachine`, `Amenable`). It owns the
+  abstract trait interfaces only, not the default concrete certificate or
+  registry implementations. Zero runtime dependencies.
 - **`amenable_std`** — `RustStdType`: interface and its complete std-lib
-  registrations together, per the orphan-rule constraint above.
+  registrations together, per the orphan-rule constraint above, plus the
+  default concrete `Certificate`/`Registry` implementation and the local
+  newtype wrappers used to promote supported std-lib carriers into the
+  `Standard` role lawfully.
 - **`amenable_kani`** / **`amenable_creusot`** / **`amenable_verus`** —
   concrete `WitnessSource<V>` proof-emission machinery per verifier backend.
   Depend on `amenable_core` directly, never on the facade.
@@ -132,7 +143,8 @@ The eventual shape:
   elicitation of strongly-typed values; its proof-carrying types are built on
   top of `amenable`'s traits rather than defining their own parallel scheme
 - interface crates such as `elicit_temporal`: domain law anchored in external
-  standards, expressed through `amenable`'s `Standard`/`Objective` roles
+  standards, expressed through `amenable`'s `Standard` role plus
+  source-specific `Provenance`
 
 As `amenable` absorbs proof infrastructure, the corresponding code in
 `elicitation` (`Prop`, `kani_proof`/`creusot_proof`/`verus_proof` glue,
@@ -222,9 +234,9 @@ anything prior; it is asserted. This is not a gap that more proof effort
 closes. It is categorically the same shape as the MUTCD dwell-time example
 from the certification section below: an externally-sourced or by-design
 fact the program relies on but cannot derive. A state claim is therefore
-also a `Provenance` object — a `Standard` or `Objective` certification,
-subject to the same discipline (who decided this, why, what is the
-citation) as any other trusted assumption.
+also a `Provenance` object — a `Standard` certification, subject to the same
+discipline (who decided this, why, what is the citation) as any other
+trusted assumption.
 
 This mirrors the classic TLA+ specification shape, `Init ∧ □[Next]_vars`:
 `Init` is an assumed starting condition, asserted rather than proven; `Next`
@@ -269,8 +281,8 @@ Every `Evidence`-bearing claim must be backed by exactly one of:
 
 1. A genuine machine-checked proof, emitted through `Witness` and consumed by
    a `Verifier` backend.
-2. An explicit `Standard` or `Objective` certification of provenance — a
-   metadata record naming the authority, source, and rationale for a human
+2. An explicit `Standard` certification of provenance — a metadata-carrying
+   root obligation naming the authority, source, and rationale for a human
    trust decision.
 
 There is no third option where a claim is silently or implicitly trusted
@@ -279,13 +291,43 @@ cannot currently support a mathematical proof, the obligation does not
 disappear — it converts into an obligation to produce a certification of
 provenance instead. Relying on the Rust standard library's documented
 guarantees, for example, is a legitimate trust decision, but it must be
-registered as a `Standard` certification (naming the Rust project as
-authorizing body, the relevant doc page as authoritative source, and so on)
-rather than assumed for free by a blanket impl. This is the specific failure
-mode the previous `elicitation`-side bridge fell into — a blanket
-`AsStandard<Is<T>>: Standard` impl for every `T: RustStdType` — and it is
-exactly what the certification requirement is designed to prevent: trust
-without a registered record of the decision to trust.
+registered as a `Standard` certification whose `Provenance` names the Rust
+project as authorizing body, the relevant doc page as authoritative source,
+and so on, rather than assumed for free by a blanket impl. This is the
+specific failure mode the previous `elicitation`-side bridge fell into — a
+blanket `AsStandard<Is<T>>: Standard` impl for every `T: RustStdType` — and
+it is exactly what the certification requirement is designed to prevent:
+trust without a registered record of the decision to trust.
+
+For standard-library-backed trust decisions, the lawful carrier is a local
+wrapper type in `amenable_std`, not a direct `impl Standard for i32` in that
+crate. Rust's orphan rules forbid implementing the foreign `Standard` trait
+from `amenable_core` directly for a foreign type like `i32` in
+`amenable_std`. The design therefore uses explicit newtype carriers such as
+`RustStdStandard<T>` to say "this program accepts Rust's documented
+semantics for `T` as a standard," while keeping the trust decision
+auditable and explicit in code.
+
+### Direction of construction: provenance first, evidence later
+
+The causal direction is:
+
+`Provenance` -> `Standard` -> `Evidence` -> `Witness`
+
+not the reverse.
+
+`Provenance` is a metadata-carrying type. It records where a standard came
+from and why that standard is trusted: the authority, source document,
+clause or scope, and rationale for the code-level encoding. A `Standard`
+selects and upholds that provenance-backed obligation. `Evidence` is then
+produced from the standard plus the action taken to uphold it. A `Witness`
+is the verifier-facing proof artifact for evidence that has mathematical
+shape.
+
+This matters because it rules out designs where `Standard` is derived from
+`Evidence`, or where a root trust assumption quietly inherits certification
+just by existing. Certification begins with an explicit provenance record and
+only then becomes a standard the program claims to uphold.
 
 ### Proof-quality heuristics and diagnostics on `Witness`
 
@@ -307,29 +349,49 @@ can still write a bad proof that passes every heuristic. The goal is to raise
 the cost of cutting corners and to give reviewers (human or agent) a fast,
 structural signal, not to replace review.
 
-### Why the metadata methods are the gold standard
+### Structured provenance, projected predictably
 
-The `Standard` and `Objective` disclosure methods (authorizing body,
-authoritative source, source scope, normative summary, fidelity rationale /
-design authority, architectural context, intended invariant, rationale) are
-not incidental documentation. They are the mechanism by which a trust
-decision about a Rust program invariant becomes an auditable, first-class
-artifact instead of an implicit assumption baked silently into a blanket impl
-or a comment. Registering this metadata inside the formal verification
-framework itself — rather than in a README or a commit message — is what
-makes it a certification rather than a note.
+The auditable object is not a loose map built by hand, and not a cluster of
+special-case getter methods bolted directly onto `Standard`. The primary
+object is a user-defined Rust struct or enum describing the provenance schema
+itself. `Provenance` is the common projection trait over that structured
+object.
+
+The intended model:
+
+- users define a concrete provenance type as a normal struct or enum
+- the fields of that type define the authoritative provenance schema
+- `#[derive(Provenance)]` in `amenable_derive` projects that schema into
+  deterministic metadata entries
+- a `Standard` implementation selects a concrete provenance instance and says
+  "this is the obligation being upheld"
+
+`Standard` should therefore produce provenance by value, not by borrowed
+reference. That shape works for ordinary stored provenance records, but it
+also works for zero-sized wrapper carriers such as `RustStdStandard<T>`,
+whose provenance is computed from the wrapped type's registration rather
+than stored in a field.
+
+That keeps provenance flexible and strongly typed without sacrificing the
+predictable key/value audit surface tools and reviewers need.
+
+Enum support is first-class in this design, not optional icing. Closed
+vocabularies such as authorizing body, source kind, or trust mode often want
+enum structure, and different sources legitimately need different payload
+fields. Derived enum provenance should therefore emit a deterministic tag plus
+the variant payload fields, rather than collapsing everything into ad hoc
+strings.
 
 ## Auditing as a First-Class Constitutional Concern
 
 Auditing lives inside the very traits that define proof roles and exchange
 roles, not as a bolted-on concern.
 
-- `Standard` audits external authority, source, clause scope, summary, and
-  fidelity rationale
-- `Objective` audits design authority, authorship, architectural fit, intended
-  invariant, and rationale
-- `Evidence` audits dependency lineage back to the `Standard` and `Objective`
-  roots that justify it
+- `Provenance` audits authority, source, scope, and rationale
+- `Standard` audits which provenance-backed obligation the program accepts and
+  must uphold
+- `Evidence` audits dependency lineage and concrete action taken to uphold the
+  relevant `Standard`
 - `Witness` audits proof-quality heuristics alongside the raw proof artifact
 - `Exchange` audits the lawful transformation from one proof state to another,
   including the preconditions relied on and the postconditions established
@@ -392,12 +454,12 @@ code it describes.
 
 ## Audit Inversion: From Rule to Dependents
 
-Auditing a `Standard` or `Objective` should not be limited to reading the
-citation forward, from a dependent claim back to the root it names. The more
-useful review question often runs the other way: given a specific rule (the
-MUTCD 10-second/5-second dwell-time minimum, say), show every piece of code
-in the system that relies on it, for direct review — the code "inside the
-unsafe block," not just a pointer to it.
+Auditing a `Standard` should not be limited to reading the citation forward,
+from a dependent claim back to the root it names. The more useful review
+question often runs the other way: given a specific rule (the MUTCD
+10-second/5-second dwell-time minimum, say), show every piece of code in the
+system that relies on it, for direct review — the code "inside the unsafe
+block," not just a pointer to it.
 
 Two distinct mechanisms are needed, not one:
 
@@ -413,14 +475,14 @@ Two distinct mechanisms are needed, not one:
    proc-macro-stringify mechanism of our own needed; the audit surface can
    call `.code()` on whatever produced the claim.
 2. **A reverse index from root to dependents.** Forward, a derived `Evidence`
-   names the `Standard`/`Objective` roots it relies on. Backward — "given
-   this rule, show every dependent" — requires each dependent to register
-   itself against the root it cites in a way the root can enumerate without
-   any static knowledge of who depends on it. That is a compile-time
-   registry keyed by the root type, collecting `(dependent identity, audit
-   code, citation)` records — the shape this workspace already uses
-   elsewhere for exactly this kind of static-submission/runtime-enumeration
-   problem (an `inventory`-crate pattern is the leading candidate).
+   names the `Standard` root it relies on. Backward — "given this rule, show
+   every dependent" — requires each dependent to register itself against the
+   root it cites in a way the root can enumerate without any static
+   knowledge of who depends on it. That is a compile-time registry keyed by
+   the root type, collecting `(dependent identity, audit code, citation)`
+   records — the shape this workspace already uses elsewhere for exactly
+   this kind of static-submission/runtime-enumeration problem (an
+   `inventory`-crate pattern is the leading candidate).
 
 Any record type built for this (working name `AuditRecord`) must own its
 data — `String` for dependent identity and captured audit code, not
@@ -449,24 +511,38 @@ a bare `String`.
 - [ ] Write at least one concrete `Witness` implementation exercising the
   heuristics against both a real and a deliberately vacuous proof body, to
   confirm the heuristic actually distinguishes them.
-- [ ] Confirm `Standard`/`Objective` disclosure methods are sufficient to
-  register a Rust-standard-library trust decision as a certification (the
-  `RustStdType` surface now lives in `amenable_std`, which is the first
-  test case; `Standard`/`Objective` impls for std types are not yet
-  written).
-- [ ] Reject any blanket impl of `Standard`, `Objective`, or `Evidence` that
+- [x] Collapse `Standard` and `Objective` into a single root-obligation
+  category, with the distinction between external standards and local design
+  intent carried entirely by `Provenance`.
+- [ ] Redesign `Evidence` around rich associated output types (`type Lineage`,
+  `type Audit`) rather than a fixed `&'static str`/`&'static [&'static str]`
+  reporting shape.
+- [ ] Redesign `Provenance` from the current iter-only capability into a
+  richer trait over concrete user-defined structs and enums, with predictable
+  metadata projection plus convenience methods built from it.
+- [ ] Add `amenable_derive` as a proc-macro crate hosting
+  `#[derive(Provenance)]`, starting with struct support.
+- [ ] Extend `#[derive(Provenance)]` to enums, including tagged variants and
+  payload fields, with explicit collision rules and deterministic lowering.
+- [x] Confirm the derive-based provenance model is sufficient to register a
+  Rust-standard-library trust decision as a certification (the `RustStdType`
+  surface in `amenable_std` is the first proving ground).
+- [x] Decide the lawful std-lib `Standard` carrier shape: use explicit local
+  wrapper/newtype carriers in `amenable_std` (for example,
+  `RustStdStandard<T>`) rather than trying to implement the foreign
+  `Standard` trait directly for foreign std-lib types in that crate.
+- [ ] Reject any blanket impl of `Standard`, `Evidence`, or `Provenance` that
   would let a type earn certification without an explicit, per-type
   registration.
 - [ ] Decide whether `StateMachine` gains an explicit associated
   `Provenance`-bound root/init claim (see "States Are Roots, Transitions Are
   Relations" above), distinct from the `Witness`-backed transitions
   `Amenable` proves over.
-- [x] Redesign `Provenance` as a capability interface rather than a fixed
-  collection type: `fn iter(&self) -> impl Iterator<Item = MetadataEntry>` is
-  the only required method, with `get`/`contains_key`/`len`/`is_empty` as
-  defaults derived from it. Superseded the earlier `BTreeSet<MetadataEntry>`
-  plan — locking in any concrete collection, `BTreeSet` included, would
-  still describe structure rather than capability.
+- [x] Redesign `Provenance` away from a fixed collection type and toward a
+  capability interface. The current `fn iter(&self) -> impl Iterator<Item =
+  MetadataEntry>` surface is the transitional form; the next step is to make
+  that interface derive-friendly over concrete user-defined schemas rather
+  than freezing `iter()` itself as the end-state API.
 - [x] Change `MetadataEntry`'s fields from `&'static str` to owned `String`,
   with a `new(impl Into<String>, impl Into<String>)` constructor.
 - [x] Keep the verifier metadata marker structs (`KaniVerifierMetadata`,
@@ -476,8 +552,7 @@ a bare `String`.
   of provenance stays zero-sized; the data materializes only on request.
 - [ ] Design the `AuditRecord` registry for rule-to-dependents audit
   inversion (see "Audit Inversion: From Rule to Dependents" above): literal
-  source capture plus a compile-time registry keyed by `Standard`/
-  `Objective` root type.
+  source capture plus a compile-time registry keyed by `Standard` root type.
 
 ### Phase 3: Depend on `homecoming`
 
@@ -492,7 +567,7 @@ of the dependency.
   (`Witness` is the leading candidate).
 - [ ] Decide whether `Evidence::audit_surface()` should be redefined in
   terms of `Homecoming::code()` now that the capability exists elsewhere,
-  superseding the `&'static [&'static str]` shape.
+  superseding the current fixed audit-reporting shape.
 - [ ] Exercise the strong-form round-trip check (reconstruct a program,
   regenerate its proofs, compare to the original program's proofs) against
   at least one `Witness`-bearing example, once both `WitnessSource` (Phase 4
@@ -532,8 +607,8 @@ code.
 ### Phase 6: Downstream proving grounds
 
 - [ ] Re-evaluate whether `elicit_temporal` is the best first external
-  proving ground for `Standard`/`Objective` root-role registrations anchored
-  in an external spec (ISO 8601 / RFC 3339 / IXDTF).
+  proving ground for `Standard` registrations anchored in an external spec
+  (ISO 8601 / RFC 3339 / IXDTF).
 - [ ] Adopt only the smallest useful subset of the family in a downstream
   crate at first.
 
@@ -549,7 +624,7 @@ code.
 - [ ] Backend-verifier coupling stays out of the constitutional core unless it
   is proven necessary.
 - [ ] Every `Evidence`-bearing claim is backed by either a `Witness` proof or
-  a `Standard`/`Objective` certification — never a blanket impl that grants
+  a `Standard` certification — never a blanket impl that grants
   trust for free.
 - [ ] `Witness` proof-quality heuristics catch at least the vacuous-proof
   failure mode that motivated adding them.
@@ -558,21 +633,24 @@ code.
   separate or rival design.
 - [ ] Auditing is built into the constitutional roles themselves rather than
   bolted on later as an afterthought.
-- [ ] Audit methods remain role-specific and jurisdiction-specific instead of
-  collapsing into a shapeless metadata surface.
+- [ ] Audit methods remain role-specific and jurisdiction-specific while the
+  underlying provenance projection stays deterministic and predictable.
 - [ ] `elicitation`'s proof machinery shrinks as `amenable` absorbs it, rather
   than the two surfaces persisting in parallel indefinitely.
 - [x] Struct fields holding runtime-populated data own their data (`String`,
   `Vec<T>`); `&'static str`/`&'static [T]` is reserved for no-`&self` trait
   methods describing a fixed, compile-time-known fact about a type.
 - [ ] Every state a `StateMachine` claims to occupy is backed by `Provenance`
-  (a `Standard`/`Objective` root), the same as any other claim with no
+  (a `Standard` root), the same as any other claim with no
   mathematical shape to prove — states are never silently exempted from the
   certification requirement just because they "aren't really proofs."
 - [x] Traits meant to be implemented directly on foreign standard-library
   types live in the same crate as their std-lib registrations, never split
   across an interface crate and a downstream consumer — the orphan rule
   leaves no other option, discovered the hard way via `E0117`.
+- [ ] Derived provenance stays flexible at the schema level (user-defined
+  structs and enums) while remaining predictable at the reporting level
+  (deterministic tag/field lowering and stable key/value projection).
 - [ ] `Witness` and `homecoming::Homecoming` are never allowed to
   independently drift apart on the same claim, once `homecoming` is a
   dependency — verified via the strong-form round-trip check (reconstruct,
@@ -591,18 +669,22 @@ code.
   runtime dependencies? — Resolved: neither. It lives in an entirely
   separate repository, `homecoming`, not depended on by `amenable_core` and
   not part of this workspace.
-- [ ] What is the smallest first-pass method surface that meaningfully raises
-  proof quality for `Standard` and `Objective` without prematurely freezing
-  the design?
-- [ ] Should `Standard` and `Objective` be subtraits of `Evidence`, or should
-  they remain distinct constitutional roles that merely participate in the
-  broader proof economy?
+- [ ] What is the smallest first-pass method surface for `Provenance` and
+  `Standard` that remains rich enough for audit use without prematurely
+  freezing the design?
+- [x] Should `Standard` expose provenance by reference, by value, or through
+  an associated constructor pattern, once standards carry concrete provenance
+  instances instead of only type-level facts? — Resolved: by value. This is
+  the only shape that works cleanly for both stored provenance records and
+  zero-sized wrapper carriers such as `RustStdStandard<T>`.
+- [ ] What is the exact derive contract for enum provenance: required tag key,
+  tuple-variant policy, flattening, and collision handling?
 - [ ] Does `Sidecar` need to be a first-class trait, or is payload plus a
   proof token sufficient as the canonical shape?
 - [ ] Should `Amenable` name a general closed proof system, or specifically
   the closed-world state-machine story?
 - [ ] Should `StateMachine` gain an explicit associated root/init claim bound
-  to `Standard`/`Objective`, distinct from the `Witness`-backed transition
+  to `Standard`, distinct from the `Witness`-backed transition
   relation `Amenable` proves over — or is that better left as an
   implementation-side convention than a trait-level requirement?
 - [ ] What is the return shape for an `AuditRecord` (dependent identity,
@@ -618,6 +700,16 @@ code.
 This plan succeeds when `amenable` is the load-bearing proof foundation that
 `elicitation` and other frameworks depend on — not the other way around —
 and when:
+
+- provenance is defined as a structured user-facing Rust type, not an ad hoc
+  string bag
+- `#[derive(Provenance)]` in `amenable_derive` makes that structure
+  predictably auditable across structs and enums
+- `Standard` is the single root-obligation role, with external-vs-local
+  source distinctions carried by provenance rather than by sibling root
+  traits
+- `Evidence` and `Witness` sit downstream of that root-obligation story
+  rather than being used to retroactively justify it
 
 - every trust decision in the system is either a real proof or a registered
   certification of provenance, with no silent third option
