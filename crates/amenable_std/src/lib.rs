@@ -6,13 +6,18 @@
 //! other option, since neither the trait nor `bool`/`i32`/`String`/etc. is
 //! local anywhere else. So rather than an interface crate plus a downstream
 //! consumer, this crate defines `RustStdType` and its full std-lib coverage
-//! together, serving as the canonical gold-standard registrations other
-//! crates can depend on instead of re-registering the same std types
-//! themselves.
+//! together, alongside the default concrete certificate and registry types,
+//! serving as the canonical gold-standard registrations other crates can
+//! depend on instead of re-registering the same std types themselves.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod cert;
 mod rust_std;
 
-pub use rust_std::RustStdType;
+pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
+pub use rust_std::{
+    RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
+    write_rust_std_certificate_artifacts,
+};

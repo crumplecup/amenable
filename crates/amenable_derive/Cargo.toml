@@ -1,0 +1,21 @@
+[package]
+name = "amenable_derive"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+description = "Proc macros for the amenable constitutional trait family"
+keywords = ["formal-verification", "proc-macro", "provenance", "derive"]
+categories = ["development-tools::procedural-macro-helpers", "rust-patterns"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full"] }

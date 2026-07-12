@@ -20,6 +20,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod cert;
 mod evidence;
 mod exchange;
 mod provenance;
@@ -28,10 +29,11 @@ mod state_machine;
 mod verifier;
 mod witness;
 
+pub use cert::{Certificate, Registry, RegistryReport};
 pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
-pub use provenance::{MetadataEntry, Provenance};
-pub use roles::{AsObjective, AsStandard, Objective, Standard};
+pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
+pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
 pub use verifier::{
     CreusotVerifier, CreusotVerifierMetadata, KaniVerifier, KaniVerifierMetadata, Verifier,

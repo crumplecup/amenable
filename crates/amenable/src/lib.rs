@@ -19,9 +19,13 @@
 #![warn(missing_docs)]
 
 pub use amenable_core::{
-    Amenable, AsObjective, AsStandard, CreusotVerifier, CreusotVerifierMetadata, Establish,
-    Evidence, Exchange, KaniVerifier, KaniVerifierMetadata, MetadataEntry, Objective, ProofToken,
-    Provenance, Sidecar, Standard, StateMachine, Verifier, VerusVerifier, VerusVerifierMetadata,
-    Witness, WitnessSource, Witnessed,
+    Amenable, AsStandard, Certificate, CreusotVerifier, CreusotVerifierMetadata, Establish,
+    Evidence, Exchange, KaniVerifier, KaniVerifierMetadata, MetadataEntry, OwnedProvenanceReport,
+    ProofToken, Provenance, ProvenanceReport, Registry, RegistryReport, Sidecar, Standard,
+    StateMachine, Verifier, VerusVerifier, VerusVerifierMetadata, Witness, WitnessSource,
+    Witnessed,
 };
-pub use amenable_std::RustStdType;
+pub use amenable_std::{
+    CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
+    RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,
+};

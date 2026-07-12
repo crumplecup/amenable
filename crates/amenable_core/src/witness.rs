@@ -25,14 +25,14 @@ pub trait Witness<V: Verifier> {
     /// Emit the verifier-facing proof artifact for this backend.
     fn proof() -> Self::ProofArtifact;
 
-    /// Concise description of the evidence lineage behind this proof.
-    fn lineage_summary() -> &'static str {
-        <Self::SupportingEvidence as Evidence>::lineage_summary()
+    /// Produce the evidence-lineage artifact behind this proof.
+    fn lineage() -> <Self::SupportingEvidence as Evidence>::Lineage {
+        <Self::SupportingEvidence as Evidence>::lineage()
     }
 
-    /// Code-level audit surface responsible for upholding this proof.
-    fn audit_surface() -> &'static [&'static str] {
-        <Self::SupportingEvidence as Evidence>::audit_surface()
+    /// Produce the audit artifact responsible for upholding this proof.
+    fn audit() -> <Self::SupportingEvidence as Evidence>::Audit {
+        <Self::SupportingEvidence as Evidence>::audit()
     }
 }
 

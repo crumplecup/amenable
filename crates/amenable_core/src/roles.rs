@@ -1,40 +1,64 @@
 //! Explicit root-role wrappers and their governing traits.
 
-use std::marker::PhantomData;
+use std::{fmt::Display, marker::PhantomData};
 
-use crate::{Evidence, Provenance};
+use crate::{MetadataEntry, OwnedProvenanceReport, Provenance, Registry};
 
-/// A proposition rooted in an external normative authority.
-pub trait Standard: Evidence + Provenance {
-    /// The authorizing body for the standard.
-    fn authorizing_body() -> &'static str;
+/// A provenance-backed root obligation the program claims it will uphold.
+pub trait Standard {
+    /// Structured provenance for this root obligation.
+    type Provenance: Provenance;
 
-    /// A canonical link or citation for the authoritative source text.
-    fn authoritative_source() -> &'static str;
+    /// Produce the provenance record describing this standard.
+    fn provenance(&self) -> Self::Provenance;
 
-    /// The clause, section, or scope represented by this proposition.
-    fn source_scope() -> &'static str;
+    /// Iterate over the projected metadata for the backing provenance.
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        self.provenance().metadata().collect::<Vec<_>>().into_iter()
+    }
 
-    /// Concise summary of the normative language being encoded.
-    fn normative_summary() -> &'static str;
+    /// Look up the fact for a given metadata key.
+    fn get(&self, key: &str) -> Option<MetadataEntry> {
+        self.provenance().get(key)
+    }
 
-    /// Why the code-level proposition faithfully represents the source text.
-    fn fidelity_rationale() -> &'static str;
-}
+    /// Return whether the backing provenance contains a given key.
+    fn contains_key(&self, key: &str) -> bool {
+        self.provenance().contains_key(key)
+    }
 
-/// A proposition rooted in architectural design authority.
-pub trait Objective: Evidence + Provenance {
-    /// The design authority, owner, or originating author.
-    fn design_authority() -> &'static str;
+    /// Count the projected provenance facts.
+    fn len(&self) -> usize {
+        self.provenance().len()
+    }
 
-    /// Where this objective fits within the larger architecture.
-    fn architectural_context() -> &'static str;
+    /// Return whether the backing provenance yields no facts.
+    fn is_empty(&self) -> bool {
+        self.provenance().is_empty()
+    }
 
-    /// The intended guarantee or invariant being claimed.
-    fn intended_invariant() -> &'static str;
+    /// Iterate over every projected provenance key.
+    fn keys(&self) -> impl Iterator<Item = String> {
+        self.provenance().keys().collect::<Vec<_>>().into_iter()
+    }
 
-    /// Why this objective is necessary in the design.
-    fn rationale() -> &'static str;
+    /// Iterate over every projected provenance value.
+    fn values(&self) -> impl Iterator<Item = String> {
+        self.provenance().values().collect::<Vec<_>>().into_iter()
+    }
+
+    /// Render the backing provenance as an owned audit surface.
+    fn report(&self) -> OwnedProvenanceReport<Self::Provenance> {
+        OwnedProvenanceReport::new(self.provenance())
+    }
+
+    /// Issue a tracked provenance certificate for this standard.
+    fn certification<R>(&self, registry: &mut R, subject: impl Display) -> R::Certificate
+    where
+        R: Registry,
+    {
+        registry.issue_standard_certificate(subject, self)
+    }
 }
 
 /// Explicit refinement of a type into a standard-root role.
@@ -56,29 +80,6 @@ impl<P> AsStandard<P> {
 }
 
 impl<P> From<P> for AsStandard<P> {
-    fn from(_value: P) -> Self {
-        Self::new()
-    }
-}
-
-/// Explicit refinement of a type into an objective-root role.
-///
-/// This wrapper is purely type-level. It does not carry a value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct AsObjective<P> {
-    _marker: PhantomData<fn() -> P>,
-}
-
-impl<P> AsObjective<P> {
-    /// Promote type `P` into the objective-root role.
-    pub const fn new() -> Self {
-        Self {
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<P> From<P> for AsObjective<P> {
     fn from(_value: P) -> Self {
         Self::new()
     }

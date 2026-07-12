@@ -28,7 +28,7 @@ pub struct KaniVerifier;
 pub struct KaniVerifierMetadata;
 
 impl Provenance for KaniVerifierMetadata {
-    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "kani"),
             ("authority", "Kani Rust Verifier"),
@@ -63,7 +63,7 @@ pub struct CreusotVerifier;
 pub struct CreusotVerifierMetadata;
 
 impl Provenance for CreusotVerifierMetadata {
-    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "creusot"),
             ("authority", "Creusot project"),
@@ -98,7 +98,7 @@ pub struct VerusVerifier;
 pub struct VerusVerifierMetadata;
 
 impl Provenance for VerusVerifierMetadata {
-    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "verus"),
             ("authority", "Verus project"),

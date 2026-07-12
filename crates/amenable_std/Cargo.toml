@@ -13,3 +13,5 @@ keywords = ["formal-verification", "proof", "std", "provenance"]
 categories = ["development-tools", "rust-patterns"]
 
 [dependencies]
+amenable_core = { workspace = true }
+amenable_derive = { workspace = true }

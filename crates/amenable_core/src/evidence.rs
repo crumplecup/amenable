@@ -2,21 +2,28 @@
 
 use crate::{CreusotVerifier, KaniVerifier, VerusVerifier, Witness, WitnessSource};
 
-/// A proposition with explicit audit lineage.
+/// A proposition with explicit lineage and audit artifacts.
 ///
-/// Root propositions may implement this directly. Derived propositions should
-/// use it to disclose the upstream roots and code surface that justify them.
+/// Evidence is produced downstream of a root `Standard`: it reports the
+/// lineage of standards and intermediate claims that justify it, plus the
+/// audit artifact describing what was done to uphold those obligations.
 pub trait Evidence {
+    /// Rich lineage artifact for this claim.
+    type Lineage;
+
+    /// Rich audit artifact for this claim.
+    type Audit;
+
     /// Concrete witness carrier referenced for downstream proof reporting.
     type WitnessType: WitnessSource<KaniVerifier>
         + WitnessSource<CreusotVerifier>
         + WitnessSource<VerusVerifier>;
 
-    /// Concise description of the evidence lineage behind this claim.
-    fn lineage_summary() -> &'static str;
+    /// Produce the lineage artifact behind this claim.
+    fn lineage() -> Self::Lineage;
 
-    /// Code-level audit surface responsible for upholding the claim.
-    fn audit_surface() -> &'static [&'static str];
+    /// Produce the audit artifact responsible for upholding the claim.
+    fn audit() -> Self::Audit;
 
     /// Human-readable identifier for the witness carrier.
     fn witness_type_name() -> &'static str {
