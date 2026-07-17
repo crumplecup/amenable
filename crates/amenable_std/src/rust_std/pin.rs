@@ -2,7 +2,7 @@
 
 use std::pin::Pin;
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Pin,
@@ -11,3 +11,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/core/pin/struct.Pin.html",
     "The Pin carrier wraps a pointer and asserts that its pointee will not move in memory for the wrapper's lifetime."
 );
+
+register_rust_std_standard_evidence!(Pin<Box<i32>>);

@@ -1,9 +1,10 @@
 //! `RustStdType` registrations for `core::task`.
 
-use std::task::{Context, Poll};
+use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime0,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_lifetime0!(
@@ -23,7 +24,7 @@ impl_rust_std_type_generic1!(
 );
 
 impl_rust_std_type!(
-    core::task::RawWaker,
+    RawWaker,
     "core",
     "core::task",
     "https://doc.rust-lang.org/core/task/struct.RawWaker.html",
@@ -31,7 +32,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::task::RawWakerVTable,
+    RawWakerVTable,
     "core",
     "core::task",
     "https://doc.rust-lang.org/core/task/struct.RawWakerVTable.html",
@@ -39,9 +40,13 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::task::Waker,
+    Waker,
     "core",
     "core::task",
     "https://doc.rust-lang.org/core/task/struct.Waker.html",
     "The Waker carrier lets an async task's executor be notified when the task should be polled again."
 );
+
+// `'static` is the representative lifetime for `Context` (see
+// `register_rust_std_standard_evidence!`'s own doc comment).
+register_rust_std_standard_evidence!(Context<'static>, Poll<i32>, RawWaker, RawWakerVTable, Waker,);

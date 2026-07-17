@@ -4,7 +4,9 @@ use std::panic::AssertUnwindSafe;
 
 use core::panic::{Location, PanicInfo, PanicMessage};
 
-use crate::rust_std::macros::{impl_rust_std_type_generic1, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type_generic1, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_generic1!(
     AssertUnwindSafe,
@@ -36,4 +38,14 @@ impl_rust_std_type_lifetime0!(
     "core::panic",
     "https://doc.rust-lang.org/core/panic/struct.PanicMessage.html",
     "The PanicMessage carrier holds the formatted message passed to a panic."
+);
+
+// `'static` is the representative lifetime for the three borrowing
+// carriers here (see `register_rust_std_standard_evidence!`'s own doc
+// comment).
+register_rust_std_standard_evidence!(
+    AssertUnwindSafe<i32>,
+    Location<'static>,
+    PanicInfo<'static>,
+    PanicMessage<'static>,
 );

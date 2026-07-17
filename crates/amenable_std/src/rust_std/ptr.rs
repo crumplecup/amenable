@@ -8,7 +8,7 @@
 
 use std::ptr::NonNull;
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     NonNull,
@@ -17,3 +17,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/core/ptr/struct.NonNull.html",
     "The NonNull carrier stores a raw pointer statically known to never be null."
 );
+
+register_rust_std_standard_evidence!(NonNull<i32>);

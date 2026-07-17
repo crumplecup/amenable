@@ -20,7 +20,11 @@ mod mem;
 mod net;
 mod num;
 mod ops;
+mod panic;
+mod pin;
 mod primitives;
+mod ptr;
+mod task;
 mod time;
 
 pub use macros::CheckedProof;
