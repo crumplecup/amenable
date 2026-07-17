@@ -1,6 +1,6 @@
 //! Lawful proof-token exchange machinery.
 
-use crate::Evidence;
+use crate::{Evidence, Verifier, Witness};
 
 /// Opaque proof token carried through lawful exchanges.
 pub trait ProofToken {
@@ -27,7 +27,13 @@ pub trait Sidecar {
 }
 
 /// Constitutional alias for lawful proof minting from an existing credential.
-pub trait Establish<C>: Evidence + Sized {
+///
+/// Requiring `Witness<V>` here is a compile-time obligation, not a runtime
+/// call: establishing a token never invokes a verifier (proving is a
+/// different mode than doing), but it does mean an `Establish` impl cannot
+/// exist unless a matching `Witness<V>` impl — naming which proof backs
+/// it — exists alongside it.
+pub trait Establish<C, V: Verifier>: Evidence + Witness<V> + Sized {
     /// Concrete proof token minted for this evidence.
     type Token: ProofToken<Proposition = Self>;
 

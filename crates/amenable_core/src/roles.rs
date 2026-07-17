@@ -2,10 +2,14 @@
 
 use std::{fmt::Display, marker::PhantomData};
 
-use crate::{MetadataEntry, OwnedProvenanceReport, Provenance, Registry};
+use crate::{Evidence, MetadataEntry, OwnedProvenanceReport, Provenance, Registry};
 
 /// A provenance-backed root obligation the program claims it will uphold.
-pub trait Standard {
+///
+/// Every `Standard` is also `Evidence`: it terminates an evidence chain by
+/// naming itself as its own [`Basis`](Evidence::Basis), since nothing
+/// stands behind a root obligation but the provenance that grounds it.
+pub trait Standard: Evidence {
     /// Structured provenance for this root obligation.
     type Provenance: Provenance;
 

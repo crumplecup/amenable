@@ -1,48 +1,28 @@
 //! Verifier-facing proof-emission roles.
 
-use crate::{CreusotVerifier, Evidence, KaniVerifier, Verifier, VerusVerifier};
-
-/// Leaf proof emitter for a verifier backend.
-pub trait WitnessSource<V: Verifier> {
-    /// Backend-facing proof artifact emitted by this source.
-    type ProofArtifact;
-
-    /// Emit the verifier-facing proof artifact for this backend.
-    fn proof() -> Self::ProofArtifact;
-}
+use crate::{Evidence, Verifier};
 
 /// Constitutional extraction of verifier-facing proof emission.
 ///
-/// A witness consumes an evidence stack and emits the verifier-facing proof
-/// artifact that backend consumes.
+/// A witness names which proof (if any) backs a piece of evidence for a
+/// given verifier — a descriptor, discoverable without running anything.
+/// Proving is a separate mode from doing: `proof` never executes a
+/// verifier, it identifies the harness/contract that a separate tool
+/// invocation (`cargo kani`, etc.) would check. Like `Evidence::basis`,
+/// this is a static fact about the type, true for every instance.
 pub trait Witness<V: Verifier> {
-    /// Evidence stack used to justify this verifier-facing proof surface.
+    /// Evidence this witness backs.
     type SupportingEvidence: Evidence;
 
-    /// Backend-facing proof artifact emitted for this verifier.
+    /// Descriptor of the backend-facing proof for this verifier.
     type ProofArtifact;
 
-    /// Emit the verifier-facing proof artifact for this backend.
+    /// Identify the proof artifact relevant to this evidence, for this
+    /// verifier.
     fn proof() -> Self::ProofArtifact;
 
-    /// Produce the evidence-lineage artifact behind this proof.
-    fn lineage() -> <Self::SupportingEvidence as Evidence>::Lineage {
-        <Self::SupportingEvidence as Evidence>::lineage()
+    /// Produce the basis behind this proof's supporting evidence.
+    fn basis() -> <Self::SupportingEvidence as Evidence>::Basis {
+        <Self::SupportingEvidence as Evidence>::basis()
     }
-
-    /// Produce the audit artifact responsible for upholding this proof.
-    fn audit() -> <Self::SupportingEvidence as Evidence>::Audit {
-        <Self::SupportingEvidence as Evidence>::audit()
-    }
-}
-
-/// Alias over the builtin verifier trio carried by the constitutional surface.
-pub trait Witnessed:
-    Witness<KaniVerifier> + Witness<CreusotVerifier> + Witness<VerusVerifier>
-{
-}
-
-impl<T> Witnessed for T where
-    T: Witness<KaniVerifier> + Witness<CreusotVerifier> + Witness<VerusVerifier>
-{
 }

@@ -1,10 +1,10 @@
 use amenable_core::{
-    Certificate, KaniVerifier, KaniVerifierMetadata, MetadataEntry, Provenance, Registry, Standard,
-    Verifier,
+    Certificate, Evidence, EvidenceLink, MetadataEntry, Provenance, Registry, Standard, Verifier,
 };
+use amenable_derive::Standard;
 use std::fmt::{self, Display, Formatter};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct ManualProvenance {
     authority_kind: String,
     authority: String,
@@ -22,17 +22,14 @@ impl Provenance for ManualProvenance {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Standard)]
+#[standard(
+    basis = "Self",
+    provenance = "self.provenance.clone()",
+    provenance_type = "ManualProvenance"
+)]
 struct ManualStandard {
     provenance: ManualProvenance,
-}
-
-impl Standard for ManualStandard {
-    type Provenance = ManualProvenance;
-
-    fn provenance(&self) -> Self::Provenance {
-        self.provenance.clone()
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -122,14 +119,35 @@ impl Registry for ManualRegistry {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+struct ManualVerifierMetadata;
+
+impl Provenance for ManualVerifierMetadata {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        const FACTS: &[(&str, &str)] =
+            &[("verifier_family", "manual"), ("authority", "Test Fixture")];
+        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+    }
+}
+
+struct ManualVerifier;
+
+impl Verifier for ManualVerifier {
+    type Metadata = ManualVerifierMetadata;
+
+    fn name() -> &'static str {
+        "manual"
+    }
+}
+
 #[test]
 fn verifier_metadata_marker_is_zero_sized() {
-    assert_eq!(std::mem::size_of::<KaniVerifierMetadata>(), 0);
+    assert_eq!(std::mem::size_of::<ManualVerifierMetadata>(), 0);
 }
 
 #[test]
 fn verifier_metadata_iterates_lazily_generated_entries() {
-    let metadata = KaniVerifier::metadata();
+    let metadata = ManualVerifier::metadata();
 
     assert!(!metadata.is_empty());
     assert_eq!(metadata.len(), metadata.metadata().count());
@@ -137,7 +155,7 @@ fn verifier_metadata_iterates_lazily_generated_entries() {
     let entry = metadata
         .get("verifier_family")
         .expect("verifier_family fact present");
-    assert_eq!(entry.value(), "kani");
+    assert_eq!(entry.value(), "manual");
 
     assert!(metadata.contains_key("authority"));
     assert!(!metadata.contains_key("nonexistent_key"));
@@ -276,4 +294,23 @@ authority_kind: external_standard\n\
 authority: Rust Project Developers\n\
 source: https://doc.rust-lang.org/std/primitive.i32.html"
     );
+}
+
+#[test]
+fn evidence_link_is_discoverable_through_inventory() {
+    let link = inventory::iter::<EvidenceLink>()
+        .into_iter()
+        .find(|link| link.name.ends_with("ManualStandard"))
+        .expect("ManualStandard's evidence link is registered");
+
+    // ManualStandard is a root: its basis is itself.
+    assert_eq!(link.basis, link.name);
+}
+
+#[test]
+fn a_root_standards_chain_is_just_itself() {
+    let chain = ManualStandard::chain();
+
+    assert_eq!(chain.len(), 1);
+    assert!(chain[0].ends_with("ManualStandard"));
 }

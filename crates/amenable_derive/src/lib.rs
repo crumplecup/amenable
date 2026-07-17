@@ -1,18 +1,87 @@
 //! Proc macros for the `amenable` constitutional trait family.
 
+mod calculation;
+mod evidence;
+mod harness;
+mod standard;
+
 use proc_macro::TokenStream;
 
 use quote::quote;
 use syn::{
-    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, LitStr, Path, Type, Variant,
-    WherePredicate, parse_macro_input, parse_quote,
+    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, ItemFn, ItemImpl, LitStr, Path,
+    Type, Variant, WherePredicate, parse_macro_input, parse_quote,
 };
+
+use calculation::{CalculationArgs, expand_calculation};
+use evidence::expand_evidence;
+use harness::expand_harness;
+use standard::expand_standard;
+
+/// Define a `#[cfg(...)]`-gated proof harness item and, alongside it, an
+/// always-available `&'static str` constant holding the harness's verbatim
+/// source — whitespace and all.
+///
+/// `harness!(cfg_name, CONST_NAME, { item })` expands to `#[cfg(cfg_name)]
+/// item` plus `const CONST_NAME: &str = "...";`. Both come from the same
+/// braced group of tokens (captured via `Span::source_text`, which needs a
+/// contiguous, human-authored span — this is why the item must be written
+/// directly at the call site, not threaded through an intermediate
+/// `macro_rules!` layer), so an audit report can show a proof exactly as
+/// its author wrote it, and the two can never drift apart the way a
+/// hand-maintained description could. Falls back to reconstructing the
+/// source from tokens (losing original formatting) if `source_text` is
+/// unavailable for the span.
+#[proc_macro]
+pub fn harness(input: TokenStream) -> TokenStream {
+    match expand_harness(input.into()) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
 
 #[proc_macro_derive(Provenance, attributes(provenance))]
 pub fn derive_provenance(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     match expand_provenance(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Turn a method into a chain link in the evidence graph: it knows it has a
+/// method, knows it yields a token (named here), and registers itself.
+#[proc_macro_attribute]
+pub fn calculation(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(attr as CalculationArgs);
+    let input = parse_macro_input!(item as ItemFn);
+
+    match expand_calculation(&args, &input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Compute `is_root` for an `impl Evidence` block from its own `Basis`
+/// declaration, at compile time — no `TypeId`, no `'static`.
+#[proc_macro_attribute]
+pub fn evidence(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as ItemImpl);
+
+    match expand_evidence(input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate both `Standard` and `Evidence` impls from a `#[standard(...)]`
+/// attribute, since they always share the same provenance value.
+#[proc_macro_derive(Standard, attributes(standard))]
+pub fn derive_standard(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_standard(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

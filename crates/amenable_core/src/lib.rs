@@ -20,23 +20,28 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod calculation;
 mod cert;
+mod chain;
 mod evidence;
 mod exchange;
+mod link;
 mod provenance;
 mod roles;
 mod state_machine;
 mod verifier;
 mod witness;
 
+pub use calculation::{Calculation, CarriesToken};
 pub use cert::{Certificate, Registry, RegistryReport};
+pub use chain::{
+    ChainError, ChainGap, ChainNode, ProofChainReport, proof_chain, proof_chain_for_verifiers,
+};
 pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
+pub use link::{EvidenceLink, ProofRecord};
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
-pub use verifier::{
-    CreusotVerifier, CreusotVerifierMetadata, KaniVerifier, KaniVerifierMetadata, Verifier,
-    VerusVerifier, VerusVerifierMetadata,
-};
-pub use witness::{Witness, WitnessSource, Witnessed};
+pub use verifier::Verifier;
+pub use witness::Witness;
