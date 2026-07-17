@@ -1,9 +1,11 @@
 //! `RustStdType` registrations for `core::time`.
 
-use crate::rust_std::macros::impl_rust_std_type;
+use std::time::{Duration, TryFromFloatSecsError};
+
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
-    core::time::Duration,
+    Duration,
     "core",
     "core::time",
     "https://doc.rust-lang.org/core/time/struct.Duration.html",
@@ -11,9 +13,11 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::time::TryFromFloatSecsError,
+    TryFromFloatSecsError,
     "core",
     "core::time",
     "https://doc.rust-lang.org/core/time/struct.TryFromFloatSecsError.html",
     "The TryFromFloatSecsError carrier reports that a floating-point seconds value could not be converted into a Duration."
 );
+
+register_rust_std_standard_evidence!(Duration, TryFromFloatSecsError);

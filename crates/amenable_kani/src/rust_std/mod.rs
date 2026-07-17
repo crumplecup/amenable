@@ -14,8 +14,10 @@
 mod cmp;
 mod convert;
 mod macros;
+mod net;
 mod num;
 mod ops;
 mod primitives;
+mod time;
 
 pub use macros::CheckedProof;

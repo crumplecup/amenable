@@ -4,10 +4,14 @@
 //! the unstable `ip` feature (rust-lang/rust#27709), not nameable from a
 //! stable toolchain.
 
-use crate::rust_std::macros::impl_rust_std_type;
+use std::net::{
+    AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
+};
+
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
-    core::net::IpAddr,
+    IpAddr,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/enum.IpAddr.html",
@@ -15,7 +19,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::Ipv4Addr,
+    Ipv4Addr,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/struct.Ipv4Addr.html",
@@ -23,7 +27,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::Ipv6Addr,
+    Ipv6Addr,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/struct.Ipv6Addr.html",
@@ -31,7 +35,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::SocketAddr,
+    SocketAddr,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/enum.SocketAddr.html",
@@ -39,7 +43,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::SocketAddrV4,
+    SocketAddrV4,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/struct.SocketAddrV4.html",
@@ -47,7 +51,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::SocketAddrV6,
+    SocketAddrV6,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/struct.SocketAddrV6.html",
@@ -55,9 +59,19 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::net::AddrParseError,
+    AddrParseError,
     "core",
     "core::net",
     "https://doc.rust-lang.org/core/net/struct.AddrParseError.html",
     "The AddrParseError carrier reports that a string could not be parsed as an IP address or socket address."
+);
+
+register_rust_std_standard_evidence!(
+    IpAddr,
+    Ipv4Addr,
+    Ipv6Addr,
+    SocketAddr,
+    SocketAddrV4,
+    SocketAddrV6,
+    AddrParseError,
 );
