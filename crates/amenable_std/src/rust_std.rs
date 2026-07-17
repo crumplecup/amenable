@@ -15,7 +15,7 @@ use std::{
 };
 
 use amenable_core::{OwnedProvenanceReport, Provenance as _, Registry, Standard};
-use amenable_derive::Provenance;
+use amenable_derive::{Provenance, Standard};
 
 /// Shared provenance for Rust-authored documented semantics.
 #[derive(Debug, Clone, PartialEq, Eq, Provenance)]
@@ -100,7 +100,14 @@ impl RustStdProvenance {
 }
 
 /// Explicit standard-role wrapper for a Rust standard-library-backed type.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Standard)]
+#[standard(
+    basis = "Self",
+    basis_ctor = "Self::new()",
+    provenance = "<T as RustStdType>::provenance()",
+    provenance_type = "RustStdProvenance",
+    bound = "T: RustStdType"
+)]
 pub struct RustStdStandard<T> {
     _marker: PhantomData<fn() -> T>,
 }
@@ -111,17 +118,6 @@ impl<T> RustStdStandard<T> {
         Self {
             _marker: PhantomData,
         }
-    }
-}
-
-impl<T> Standard for RustStdStandard<T>
-where
-    T: RustStdType,
-{
-    type Provenance = RustStdProvenance;
-
-    fn provenance(&self) -> Self::Provenance {
-        <T as RustStdType>::provenance()
     }
 }
 
@@ -379,3 +375,32 @@ impl RustStdType for String {
         "The String carrier stores owned UTF-8 text as defined by Rust's standard library."
     }
 }
+
+/// Register `RustStdStandard<T>`'s evidence link once per concrete `T`.
+///
+/// `RustStdStandard<T>` is generic, so `#[derive(Standard)]`'s own
+/// auto-registration can't cover it — `inventory::submit!` needs one
+/// concrete registration per call site, not one for the whole generic
+/// family (see `amenable_core::link`). The naming convention here
+/// (`concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">")`)
+/// is deliberately hardcoded rather than built from `module_path!()`, so
+/// that downstream verifier crates registering `ProofRecord`s against the
+/// same evidence can reproduce an identical string from their own module
+/// without needing to agree on anything beyond this literal convention.
+macro_rules! register_rust_std_standard_evidence {
+    ($($ty:ty),* $(,)?) => {
+        $(
+            inventory::submit! {
+                amenable_core::EvidenceLink {
+                    name: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    basis: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    index: 0,
+                }
+            }
+        )*
+    };
+}
+
+register_rust_std_standard_evidence!(
+    bool, char, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64, String,
+);
