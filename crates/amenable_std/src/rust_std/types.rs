@@ -98,6 +98,16 @@ impl RustStdProvenance {
 }
 
 /// Explicit standard-role wrapper for a Rust standard-library-backed type.
+///
+/// `T: ?Sized` so unsized carriers (`CStr`, and any other DST) can be
+/// wrapped directly: the marker is `PhantomData<*const T>` rather than
+/// `PhantomData<fn() -> T>` specifically because a `fn() -> T` function
+/// pointer type requires `T: Sized` on its own (you cannot return an
+/// unsized value by value) — a restriction independent of, and stricter
+/// than, anything this struct itself needs. `*const T` is a fat pointer
+/// for unsized `T` and carries the same covariant variance over `T` that
+/// `fn() -> T` did, so this is a pure widening, not a behavior change for
+/// the sized carriers already using it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Standard)]
 #[standard(
     basis = "Self",
@@ -106,11 +116,11 @@ impl RustStdProvenance {
     provenance_type = "RustStdProvenance",
     bound = "T: RustStdType"
 )]
-pub struct RustStdStandard<T> {
-    _marker: PhantomData<fn() -> T>,
+pub struct RustStdStandard<T: ?Sized> {
+    _marker: PhantomData<*const T>,
 }
 
-impl<T> RustStdStandard<T> {
+impl<T: ?Sized> RustStdStandard<T> {
     /// Promote a Rust standard-library-backed type into the standard role.
     pub const fn new() -> Self {
         Self {
