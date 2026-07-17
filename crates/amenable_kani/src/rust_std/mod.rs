@@ -25,6 +25,7 @@ mod panic;
 mod pin;
 mod primitives;
 mod ptr;
+mod slice;
 mod task;
 mod time;
 

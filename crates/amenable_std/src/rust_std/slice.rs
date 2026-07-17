@@ -5,14 +5,16 @@
 //! module's macros model a const parameter).
 
 use std::slice::{
-    ChunkBy, ChunkByMut, Chunks, ChunksExact, ChunksExactMut, ChunksMut, EscapeAscii, Iter,
-    IterMut, RChunks, RChunksExact, RChunksExactMut, RChunksMut, RSplit, RSplitMut, RSplitN,
-    RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut, SplitN, SplitNMut, Windows,
+    ChunkBy, ChunkByMut, Chunks, ChunksExact, ChunksExactMut, ChunksMut, EscapeAscii,
+    GetDisjointMutError, Iter, IterMut, RChunks, RChunksExact, RChunksExactMut, RChunksMut, RSplit,
+    RSplitMut, RSplitN, RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut, SplitN,
+    SplitNMut, Windows,
 };
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_lifetime0, impl_rust_std_type_lifetime1,
     impl_rust_std_type_lifetime2_pred1, impl_rust_std_type_lifetime2_pred2,
+    register_rust_std_standard_evidence,
 };
 
 macro_rules! slice_iter1 {
@@ -171,9 +173,42 @@ impl_rust_std_type_lifetime0!(
 );
 
 impl_rust_std_type!(
-    core::slice::GetDisjointMutError,
+    GetDisjointMutError,
     "core",
     "core::slice",
     "https://doc.rust-lang.org/core/slice/enum.GetDisjointMutError.html",
     "The GetDisjointMutError carrier reports why a request for multiple disjoint mutable slice elements failed."
+);
+
+// `'static` and `i32` are the representative lifetime/element type this
+// module's proof batch covers; `fn(&i32) -> bool` / `fn(&i32, &i32) -> bool`
+// stand in for the split/chunk-by families' predicate closures, which have
+// no nameable type of their own (see `register_rust_std_standard_evidence!`'s
+// own doc comment).
+register_rust_std_standard_evidence!(
+    Chunks<'static, i32>,
+    ChunksExact<'static, i32>,
+    ChunksExactMut<'static, i32>,
+    ChunksMut<'static, i32>,
+    Iter<'static, i32>,
+    IterMut<'static, i32>,
+    RChunks<'static, i32>,
+    RChunksExact<'static, i32>,
+    RChunksExactMut<'static, i32>,
+    RChunksMut<'static, i32>,
+    Windows<'static, i32>,
+    ChunkBy<'static, i32, fn(&i32, &i32) -> bool>,
+    ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>,
+    RSplit<'static, i32, fn(&i32) -> bool>,
+    RSplitMut<'static, i32, fn(&i32) -> bool>,
+    RSplitN<'static, i32, fn(&i32) -> bool>,
+    RSplitNMut<'static, i32, fn(&i32) -> bool>,
+    Split<'static, i32, fn(&i32) -> bool>,
+    SplitInclusive<'static, i32, fn(&i32) -> bool>,
+    SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
+    SplitMut<'static, i32, fn(&i32) -> bool>,
+    SplitN<'static, i32, fn(&i32) -> bool>,
+    SplitNMut<'static, i32, fn(&i32) -> bool>,
+    EscapeAscii<'static>,
+    GetDisjointMutError,
 );
