@@ -1,0 +1,578 @@
+//! `KaniWitness` impls for `core::str`.
+//!
+//! `Bytes`/`CharIndices`/`Chars`/`EncodeUtf16` check a symbolic ASCII byte
+//! (`byte as char` is a valid, safe conversion for `byte < 128`, giving a
+//! genuinely symbolic single-character `str` without needing to construct
+//! arbitrary `String` content). The escaping/splitting/UTF-8-validation
+//! adapters instead check fixed representative examples: their behavior
+//! turns on specific character classes (whitespace, control characters,
+//! invalid byte sequences) that don't reduce to a single symbolic byte the
+//! way plain iteration does.
+
+use std::str::{
+    Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode, Lines,
+    ParseBoolError, SplitAsciiWhitespace, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
+};
+
+use amenable_core::Evidence;
+use amenable_std::RustStdStandard;
+
+use super::CheckedProof;
+use crate::KaniWitness;
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+
+impl KaniWitness for RustStdStandard<Bytes<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_bytes_yields_the_utf8_encoding",
+            claim: VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Bytes<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Bytes<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Bytes<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC, {
+        /// `.bytes()` yields the UTF-8 encoding of the str, checked for
+        /// any single-byte (ASCII) character.
+        #[kani::proof]
+        fn verify_bytes_yields_the_utf8_encoding() {
+            let byte: u8 = kani::any();
+            kani::assume(byte < 128);
+            let s = (byte as char).to_string();
+            let mut it = s.bytes();
+            assert_eq!(it.next(), Some(byte), "bytes yields the str's UTF-8 encoding");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<CharIndices<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_char_indices_pairs_each_char_with_its_byte_offset",
+            claim: VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<CharIndices<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<CharIndices<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<CharIndices<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC, {
+        /// `.char_indices()` pairs the first char with byte offset 0.
+        #[kani::proof]
+        fn verify_char_indices_pairs_each_char_with_its_byte_offset() {
+            let byte: u8 = kani::any();
+            kani::assume(byte < 128);
+            let c = byte as char;
+            let s = c.to_string();
+            let mut it = s.char_indices();
+            assert_eq!(it.next(), Some((0, c)), "the first char is paired with byte offset 0");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Chars<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_chars_yields_the_str_characters",
+            claim: VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Chars<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Chars<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Chars<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC, {
+        /// `.chars()` yields the str's characters, for any (symbolic)
+        /// single-character str.
+        #[kani::proof]
+        fn verify_chars_yields_the_str_characters() {
+            let byte: u8 = kani::any();
+            kani::assume(byte < 128);
+            let c = byte as char;
+            let s = c.to_string();
+            let mut it = s.chars();
+            assert_eq!(it.next(), Some(c), "chars yields the str's characters");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<EncodeUtf16<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_encode_utf16_yields_utf16_code_units",
+            claim: VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<EncodeUtf16<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeUtf16<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<EncodeUtf16<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC, {
+        /// `.encode_utf16()` yields UTF-16 code units; for an ASCII
+        /// character, the code unit numerically equals the byte.
+        #[kani::proof]
+        fn verify_encode_utf16_yields_utf16_code_units() {
+            let byte: u8 = kani::any();
+            kani::assume(byte < 128);
+            let s = (byte as char).to_string();
+            let mut it = s.encode_utf16();
+            assert_eq!(
+                it.next(),
+                Some(byte as u16),
+                "an ASCII character's UTF-16 code unit equals its byte value"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<EscapeDebug<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_escape_debug_escapes_control_characters",
+            claim: VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<EscapeDebug<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EscapeDebug<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<EscapeDebug<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC, {
+        /// `.escape_debug()` renders a newline as the two-character
+        /// escape sequence `\n`, matching `Debug`'s formatting.
+        #[kani::proof]
+        fn verify_escape_debug_escapes_control_characters() {
+            let s = "\n";
+            let out: String = s.escape_debug().collect();
+            assert_eq!(out, "\\n", "escape_debug renders \\n as a two-character escape");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<EscapeDefault<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_escape_default_escapes_control_characters",
+            claim: VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<EscapeDefault<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EscapeDefault<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<EscapeDefault<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC, {
+        /// `.escape_default()` renders a newline the same way a Rust
+        /// string literal would: the two-character escape `\n`.
+        #[kani::proof]
+        fn verify_escape_default_escapes_control_characters() {
+            let s = "\n";
+            let out: String = s.escape_default().collect();
+            assert_eq!(out, "\\n", "escape_default renders \\n as a two-character escape");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<EscapeUnicode<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_escape_unicode_renders_the_codepoint_escape",
+            claim: VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<EscapeUnicode<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EscapeUnicode<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<EscapeUnicode<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC, {
+        /// `.escape_unicode()` renders every character as a
+        /// `\u{...}` codepoint escape, even a plain ASCII letter.
+        #[kani::proof]
+        fn verify_escape_unicode_renders_the_codepoint_escape() {
+            let s = "a";
+            let out: String = s.escape_unicode().collect();
+            assert_eq!(out, "\\u{61}", "escape_unicode renders every char as \\u{...}");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Lines<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_lines_splits_on_line_endings",
+            claim: VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Lines<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Lines<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Lines<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC, {
+        /// `.lines()` splits on `\n`, without yielding a trailing empty
+        /// line.
+        #[kani::proof]
+        fn verify_lines_splits_on_line_endings() {
+            let s = "a\nb";
+            let mut it = s.lines();
+            assert_eq!(it.next(), Some("a"));
+            assert_eq!(it.next(), Some("b"));
+            assert_eq!(it.next(), None);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace",
+            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SplitAsciiWhitespace<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SplitAsciiWhitespace<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SplitAsciiWhitespace<'static>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC, {
+        /// `.split_ascii_whitespace()` collapses runs of whitespace and
+        /// drops leading/trailing whitespace entirely.
+        #[kani::proof]
+        fn verify_split_ascii_whitespace_collapses_runs_of_whitespace() {
+            let s = " a  b ";
+            let parts: Vec<&str> = s.split_ascii_whitespace().collect();
+            assert_eq!(parts, vec!["a", "b"], "runs of whitespace collapse to a single split point");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SplitWhitespace<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_whitespace_collapses_runs_of_whitespace",
+            claim: VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SplitWhitespace<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SplitWhitespace<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SplitWhitespace<'static>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC, {
+        /// Same collapsing behavior as `SplitAsciiWhitespace`, over
+        /// Unicode whitespace.
+        #[kani::proof]
+        fn verify_split_whitespace_collapses_runs_of_whitespace() {
+            let s = " a  b ";
+            let parts: Vec<&str> = s.split_whitespace().collect();
+            assert_eq!(parts, vec!["a", "b"], "runs of whitespace collapse to a single split point");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Utf8Chunks<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input",
+            claim: VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Utf8Chunks<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Utf8Chunks<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Utf8Chunks<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC, {
+        /// Re-validating wholly valid UTF-8 bytes yields exactly one
+        /// chunk, with no trailing invalid bytes and nothing left over.
+        #[kani::proof]
+        fn verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input() {
+            let bytes = b"ab";
+            let mut chunks = bytes.utf8_chunks();
+            let first = chunks.next().unwrap();
+            assert_eq!(first.valid(), "ab");
+            assert!(first.invalid().is_empty(), "wholly valid input has no invalid bytes");
+            assert!(chunks.next().is_none(), "wholly valid input is exactly one chunk");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Utf8Chunk<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes",
+            claim: VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Utf8Chunk<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Utf8Chunk<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Utf8Chunk<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC, {
+        /// A `Utf8Chunk`'s `.valid()`/`.invalid()` split a byte
+        /// sequence containing one bad byte into its valid-UTF-8 prefix
+        /// and the trailing invalid byte.
+        #[kani::proof]
+        fn verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes() {
+            let bytes = b"ab\xFFcd";
+            let mut chunks = bytes.utf8_chunks();
+            let first = chunks.next().unwrap();
+            assert_eq!(first.valid(), "ab", "the chunk's valid() is the UTF-8 prefix before the bad byte");
+            assert_eq!(first.invalid(), &[0xFFu8][..], "the chunk's invalid() is the bad byte itself");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Utf8Error> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_utf8_error_reports_the_valid_prefix_length_and_error_span",
+            claim: VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Utf8Error>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Utf8Error>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Utf8Error> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC, {
+        /// `str::from_utf8`'s error reports exactly how much of the
+        /// input was valid (`valid_up_to`) and the width of the single
+        /// bad byte (`error_len`).
+        #[kani::proof]
+        fn verify_utf8_error_reports_the_valid_prefix_length_and_error_span() {
+            let bytes = [b'a', b'b', 0xFFu8, b'c'];
+            let err = std::str::from_utf8(&bytes).unwrap_err();
+            assert_eq!(err.valid_up_to(), 2, "two leading bytes were valid UTF-8");
+            assert_eq!(err.error_len(), Some(1), "the single bad byte has error_len 1");
+        }
+    }
+}
+
+impl_kani_witness_trusted!(ParseBoolError);
+
+// `LinesAny` is deprecated (in favor of `Lines`) but still stable and real;
+// covering it is a coverage-completeness question, not a call to use it.
+// `#[expect(deprecated)]` on a macro invocation is silently ignored by
+// rustc (confirmed empirically) rather than suppressing warnings from
+// inside its expansion, so `bridge_kani_witness!`/`inventory::submit!`
+// below would otherwise warn on every mention of the type name. Routing
+// through this locally `#[expect(deprecated)]`-attributed alias hides the
+// deprecation at every downstream use site instead, confirmed the same way.
+#[expect(
+    deprecated,
+    reason = "LinesAny is stable, only deprecated in favor of Lines; covering it is a coverage-completeness question, not a call to use it"
+)]
+type LinesAnyStatic = std::str::LinesAny<'static>;
+
+impl KaniWitness for RustStdStandard<LinesAnyStatic> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_lines_any_splits_on_any_line_ending",
+            claim: VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<LinesAnyStatic>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LinesAny<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<LinesAnyStatic> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC, {
+        /// Unlike `Lines` (which splits on `\n` alone, treating a
+        /// preceding `\r` as part of the line's own trimming),
+        /// `LinesAny` is documented to split on either `\n` or `\r\n` —
+        /// deprecated in favor of `Lines`, but a real, distinct, still-
+        /// stable carrier worth covering. Deprecated: only the call
+        /// site needs `#[expect(deprecated)]`, not the whole module.
+        #[expect(
+            deprecated,
+            reason = "LinesAny is stable, only deprecated in favor of Lines; covering it is a coverage-completeness question, not a call to use it"
+        )]
+        #[kani::proof]
+        fn verify_lines_any_splits_on_any_line_ending() {
+            let s = "a\r\nb";
+            let mut it = s.lines_any();
+            assert_eq!(it.next(), Some("a"));
+            assert_eq!(it.next(), Some("b"));
+            assert_eq!(it.next(), None);
+        }
+    }
+}

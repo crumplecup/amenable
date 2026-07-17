@@ -18,10 +18,12 @@
 
 use std::str::{
     Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode, Lines,
-    SplitAsciiWhitespace, SplitWhitespace, Utf8Chunk, Utf8Chunks,
+    ParseBoolError, SplitAsciiWhitespace, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 macro_rules! str_iter0 {
     ($ty:ident, $summary:expr) => {
@@ -86,7 +88,7 @@ str_iter0!(
 );
 
 impl_rust_std_type!(
-    core::str::ParseBoolError,
+    ParseBoolError,
     "core",
     "core::str",
     "https://doc.rust-lang.org/core/str/struct.ParseBoolError.html",
@@ -94,7 +96,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    core::str::Utf8Error,
+    Utf8Error,
     "core",
     "core::str",
     "https://doc.rust-lang.org/core/str/struct.Utf8Error.html",
@@ -120,3 +122,23 @@ impl<'a> crate::RustStdType for std::str::LinesAny<'a> {
         "The LinesAny carrier lazily yields the lines of a str split on any of \\n, \\r\\n; deprecated in favor of Lines, but still a real, stable carrier."
     }
 }
+
+// `'static` is the representative lifetime this module's proof batch
+// covers.
+register_rust_std_standard_evidence!(
+    Bytes<'static>,
+    CharIndices<'static>,
+    Chars<'static>,
+    EncodeUtf16<'static>,
+    EscapeDebug<'static>,
+    EscapeDefault<'static>,
+    EscapeUnicode<'static>,
+    Lines<'static>,
+    SplitAsciiWhitespace<'static>,
+    SplitWhitespace<'static>,
+    Utf8Chunk<'static>,
+    Utf8Chunks<'static>,
+    ParseBoolError,
+    Utf8Error,
+    LinesAny<'static>,
+);

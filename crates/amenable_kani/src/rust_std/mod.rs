@@ -26,6 +26,7 @@ mod pin;
 mod primitives;
 mod ptr;
 mod slice;
+mod str;
 mod task;
 mod time;
 
