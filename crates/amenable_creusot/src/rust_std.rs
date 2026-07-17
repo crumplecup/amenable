@@ -126,10 +126,27 @@ bridge_creusot_witness!(RustStdStandard<char>);
 
 amenable_derive::harness! {
     creusot, VERIFY_CHAR_ROUNDTRIP_SRC, {
-        /// `char` round-trips through itself as an identity — Creusot's
-        /// contract surface for scalar carriers.
+        /// `char` is constrained to Unicode scalar values (excludes the
+        /// surrogate range `0xD800..=0xDFFF`) and round-trips through
+        /// itself — the same claim the Kani harness checks by symbolic
+        /// exploration, restated as a Creusot postcondition.
+        ///
+        /// NOTE: this deliberately goes further than the reference pattern
+        /// in `elicitation`'s `verification::proof_helpers::creusot_char`,
+        /// which states only `ensures(result == c)` — identity, no range
+        /// check — and does the same for every other stdlib opaque type it
+        /// covers this way (`String`, `PathBuf`, `Duration`, `SystemTime`).
+        /// The `c as u32` cast and `u32` range comparisons below are, as
+        /// far as I can tell, ordinary Pearlite (simple numeric casts and
+        /// comparisons, the same shape Creusot handles routinely for
+        /// user-defined numeric wrappers elsewhere in that codebase) — but
+        /// this has NOT been checked against a real Creusot toolchain (none
+        /// installed on this machine). Verify this actually compiles/proves
+        /// under `cargo creusot` before trusting it; if it doesn't, the
+        /// identity-only fallback is the known-safe alternative.
         #[requires(true)]
         #[ensures(result == c)]
+        #[ensures((c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32))]
         fn verify_char_roundtrip(c: char) -> char {
             c
         }
@@ -161,10 +178,23 @@ bridge_creusot_witness!(RustStdStandard<String>);
 
 amenable_derive::harness! {
     creusot, VERIFY_STRING_ROUNDTRIP_SRC, {
-        /// `String` round-trips through itself as an identity — Creusot's
-        /// contract surface for owned UTF-8 carriers.
+        /// `String` round-trips through itself and preserves length.
+        ///
+        /// This is deliberately weaker than the Kani harness, which checks
+        /// UTF-8 validity directly (`std::str::from_utf8`), but deliberately
+        /// stronger than `elicitation`'s reference `creusot_string` (plain
+        /// `ensures(result == s)`, no length claim). Stating "these bytes
+        /// are valid UTF-8" as a first-class Pearlite predicate would need
+        /// either a modeled builtin for UTF-8 well-formedness or a
+        /// byte-level encoding lemma; without a Creusot toolchain on this
+        /// machine to check that syntax against, claiming that content here
+        /// would be guessing rather than proving. `.len()` comparison is
+        /// ordinary and low-risk by contrast — real, honestly-scoped
+        /// content, not fabricated, but still unverified against a real
+        /// toolchain; check it on your main machine before trusting it.
         #[requires(true)]
         #[ensures(result == s)]
+        #[ensures(result.len() == s.len())]
         fn verify_string_roundtrip(s: String) -> String {
             s
         }

@@ -128,11 +128,28 @@ bridge_verus_witness!(RustStdStandard<char>);
 // hasn't been verified against a real Verus install.
 amenable_derive::harness! {
     verus, VERIFY_CHAR_ROUNDTRIP_SRC, {
-        // `char` round-trips through itself as an identity — Verus's spec
-        // surface for scalar carriers.
+        // `char` is constrained to Unicode scalar values (excludes the
+        // surrogate range `0xD800..=0xDFFF`) and round-trips through
+        // itself — the same claim the Kani harness checks by symbolic
+        // exploration, restated as a Verus postcondition.
+        //
+        // NOTE: this deliberately goes further than the reference pattern
+        // in `elicitation`'s `verification::proof_helpers::verus_char`,
+        // which states only `ensures result == c` — identity, no range
+        // check — and does the same for every other stdlib opaque type it
+        // covers this way. The `c as u32` cast and `u32` range comparisons
+        // below are, as far as I can tell, ordinary Verus spec syntax (the
+        // same shape Verus handles routinely for user-defined numeric
+        // wrappers elsewhere in that codebase) — but this has NOT been
+        // checked against a real Verus toolchain (none installed on this
+        // machine). Verify this actually compiles/verifies under `verus`
+        // before trusting it; if it doesn't, the identity-only fallback is
+        // the known-safe alternative.
         verus! {
             fn verify_char_roundtrip(c: char) -> (result: char)
-                ensures result == c,
+                ensures
+                    result == c,
+                    (c as u32) <= 0xD7FF || ((c as u32) >= 0xE000 && (c as u32) <= 0x10FFFF),
             {
                 c
             }
@@ -163,13 +180,27 @@ bridge_verus_witness!(RustStdStandard<String>);
     }
 }
 
-// `String` round-trips through itself as an identity — Verus's spec
+// `String` round-trips through itself and preserves length — Verus's spec
 // surface for owned UTF-8 carriers.
+//
+// This is deliberately weaker than the Kani harness (which checks UTF-8
+// validity directly) but stronger than `elicitation`'s reference
+// `verus_string` (plain `ensures result == s`, no length claim). Stating
+// UTF-8 well-formedness as a first-class Verus predicate would need either
+// a modeled builtin for it or a byte-level encoding lemma; without a Verus
+// toolchain on this machine to check that syntax against, claiming that
+// content here would be guessing rather than proving. The length
+// comparison below is also unverified — Verus's `String`/`Vec` methods
+// sometimes need a `@` ghost-view projection (e.g. `s@.len()`) rather than
+// a direct `.len()` call inside a spec clause, and which of the two this
+// needs hasn't been checked against a real toolchain either.
 amenable_derive::harness! {
     verus, VERIFY_STRING_ROUNDTRIP_SRC, {
         verus! {
             fn verify_string_roundtrip(s: String) -> (result: String)
-                ensures result == s,
+                ensures
+                    result == s,
+                    result.len() == s.len(),
             {
                 s
             }
