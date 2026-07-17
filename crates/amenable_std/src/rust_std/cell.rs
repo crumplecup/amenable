@@ -8,7 +8,7 @@ use std::cell::{Cell, LazyCell, OnceCell, Ref, RefCell, RefMut, UnsafeCell};
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
-    impl_rust_std_type_lifetime1,
+    impl_rust_std_type_lifetime1, register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -81,4 +81,25 @@ impl_rust_std_type!(
     "core::cell",
     "https://doc.rust-lang.org/core/cell/struct.BorrowMutError.html",
     "The BorrowMutError carrier reports that a RefCell was already borrowed when a mutable borrow was requested."
+);
+
+// Evidence registration is per concrete type (see `register_rust_std_
+// standard_evidence!`'s own doc comment) — `i32` is the one concrete
+// element type this module's proof batch covers. `Ref`/`RefMut` need a
+// concrete lifetime to be nameable at all; `'static` is the
+// representative choice, though the harnesses themselves borrow from a
+// local (non-'static) `RefCell` — the claim they check holds uniformly
+// over every lifetime. `LazyCell`'s initializer is a bare `fn` pointer
+// (`fn() -> i32`) rather than a closure, since closures have no
+// nameable type to register evidence against.
+register_rust_std_standard_evidence!(
+    Cell<i32>,
+    RefCell<i32>,
+    Ref<'static, i32>,
+    RefMut<'static, i32>,
+    OnceCell<i32>,
+    UnsafeCell<i32>,
+    LazyCell<i32, fn() -> i32>,
+    BorrowError,
+    BorrowMutError,
 );

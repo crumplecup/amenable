@@ -11,9 +11,12 @@
 //! harness, captured verbatim via `amenable_derive::harness!` so it can
 //! never drift from what `cargo kani` would actually run).
 
+mod cell;
 mod cmp;
 mod convert;
 mod macros;
+mod marker;
+mod mem;
 mod net;
 mod num;
 mod ops;

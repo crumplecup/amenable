@@ -7,7 +7,7 @@
 
 use std::mem::{Discriminant, ManuallyDrop};
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     ManuallyDrop,
@@ -24,3 +24,7 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/core/mem/struct.Discriminant.html",
     "The Discriminant carrier identifies which variant of an enum a value holds, without holding the value itself."
 );
+
+// `Option<i32>` is the one concrete carrier this module's proof batch
+// covers `Discriminant` for.
+register_rust_std_standard_evidence!(ManuallyDrop<i32>, Discriminant<Option<i32>>);
