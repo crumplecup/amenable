@@ -8,7 +8,9 @@ use core::fmt::{
     Alignment, Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Error, Formatter,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type!(
     Alignment,
@@ -87,4 +89,19 @@ impl_debug_builder!(
 impl_debug_builder!(
     DebugTuple,
     "The DebugTuple carrier incrementally builds a Debug-formatted tuple representation."
+);
+
+// `'static` is the representative lifetime this module's proof batch
+// covers (the Debug*-builder family needs two, `'a, 'b`, per its own
+// `impl<'a, 'b: 'a>` shape above).
+register_rust_std_standard_evidence!(
+    Alignment,
+    Arguments<'static>,
+    Error,
+    Formatter<'static>,
+    DebugList<'static, 'static>,
+    DebugMap<'static, 'static>,
+    DebugSet<'static, 'static>,
+    DebugStruct<'static, 'static>,
+    DebugTuple<'static, 'static>,
 );

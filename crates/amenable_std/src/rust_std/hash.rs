@@ -2,7 +2,7 @@
 
 use std::hash::BuildHasherDefault;
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     BuildHasherDefault,
@@ -31,3 +31,11 @@ impl crate::RustStdType for std::hash::SipHasher {
         "The SipHasher carrier implements the SipHash 2-4 algorithm; deprecated in favor of DefaultHasher, but still a real, stable carrier."
     }
 }
+
+// `DefaultHasher` is the representative `H` this module's proof batch
+// covers `BuildHasherDefault<H>` for. Neither `DefaultHasher` nor
+// `SipHasher` needs an import here: `register_rust_std_standard_evidence!`
+// only ever stringifies its argument, never uses it in a real type
+// position, so nothing gets resolved — and unresolved names don't trigger
+// `SipHasher`'s deprecation lint either, confirmed empirically.
+register_rust_std_standard_evidence!(BuildHasherDefault<DefaultHasher>, SipHasher,);

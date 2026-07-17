@@ -5,6 +5,7 @@ use std::result::{IntoIter as ResultIntoIter, Iter as ResultIter, IterMut as Res
 
 use crate::rust_std::macros::{
     impl_rust_std_type_generic1, impl_rust_std_type_generic2, impl_rust_std_type_lifetime1,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -69,4 +70,21 @@ impl_rust_std_type_lifetime1!(
     "core::result",
     "https://doc.rust-lang.org/core/result/struct.IterMut.html",
     "The IterMut carrier mutably borrows a Result, yielding zero or one mutable reference to its Ok value."
+);
+
+// `i32` (and `'static` for the borrowing iterators) is the representative
+// element type/lifetime this module's proof batch covers. The
+// `Option`/`Result`-prefixed names here are this file's own import
+// aliases (see the `use` block above), not the real Rust type names —
+// `rust_std::option_result`'s Kani proofs import with the same aliases,
+// so the evidence strings still match exactly.
+register_rust_std_standard_evidence!(
+    Option<i32>,
+    Result<i32, i32>,
+    OptionIntoIter<i32>,
+    OptionIter<'static, i32>,
+    OptionIterMut<'static, i32>,
+    ResultIntoIter<i32>,
+    ResultIter<'static, i32>,
+    ResultIterMut<'static, i32>,
 );

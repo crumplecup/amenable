@@ -8,7 +8,7 @@
 
 use core::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError, c_void};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     CStr,
@@ -41,3 +41,10 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/core/ffi/enum.c_void.html",
     "The c_void carrier is Rust's FFI-compatible representation of C's incomplete void type, used only behind a pointer."
 );
+
+// CStr is unsized (a DST): RustStdStandard<T> now supports T: ?Sized (see
+// its own doc comment), so CStr gets a proof registered directly, no
+// reference wrapper needed. c_void is intentionally excluded here — it is
+// only ever used behind a raw pointer and, unlike CStr, has no safe
+// constructor or accessor to write a checked proof against.
+register_rust_std_standard_evidence!(CStr, FromBytesUntilNulError, FromBytesWithNulError, c_void,);

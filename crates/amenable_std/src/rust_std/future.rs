@@ -2,7 +2,7 @@
 
 use std::future::{Pending, PollFn, Ready};
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Pending,
@@ -26,4 +26,14 @@ impl_rust_std_type_generic1!(
     "core::future",
     "https://doc.rust-lang.org/core/future/struct.Ready.html",
     "The Ready carrier is a Future that resolves immediately with an already-computed value."
+);
+
+// `fn(&mut Context<'_>) -> Poll<i32>` stands in for `PollFn`'s closure
+// parameter, which has no nameable type of its own; `Context`/`Poll`
+// don't need importing here for the same reason `DefaultHasher`/
+// `SipHasher` didn't in `rust_std::hash` — this macro only stringifies.
+register_rust_std_standard_evidence!(
+    Pending<i32>,
+    PollFn<fn(&mut Context<'_>) -> Poll<i32>>,
+    Ready<i32>,
 );
