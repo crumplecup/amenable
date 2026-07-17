@@ -13,7 +13,9 @@
 
 use std::num::{NonZero, Saturating, Wrapping};
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_generic1};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_generic1, register_rust_std_standard_evidence,
+};
 
 macro_rules! impl_rust_std_nonzero {
     ($($ty:ty),* $(,)?) => {
@@ -35,6 +37,21 @@ macro_rules! impl_rust_std_nonzero {
 
 impl_rust_std_nonzero!(
     i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
+);
+
+register_rust_std_standard_evidence!(
+    NonZero<i8>,
+    NonZero<i16>,
+    NonZero<i32>,
+    NonZero<i64>,
+    NonZero<i128>,
+    NonZero<isize>,
+    NonZero<u8>,
+    NonZero<u16>,
+    NonZero<u32>,
+    NonZero<u64>,
+    NonZero<u128>,
+    NonZero<usize>,
 );
 
 impl_rust_std_type_generic1!(
