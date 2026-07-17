@@ -1,0 +1,209 @@
+//! `RustStdType` registrations for `core::iter`.
+//!
+//! `Intersperse`, `IntersperseWith`, `MapWindows`, `ArrayChunks`, and
+//! `ByRefSized` are deliberately not covered here — all sit behind unstable
+//! feature gates (`iter_intersperse`, `iter_map_windows`,
+//! `iter_array_chunks`, `std_internals`), not nameable from a stable
+//! toolchain.
+//!
+//! `Flatten`, `Peekable`, and `FlatMap` get hand-written impls instead of
+//! the generic macros: unlike most adapters (whose bounds live only on
+//! their `Iterator` trait impl, not the struct itself), these three carry
+//! a real bound on the struct definition itself (e.g. `Peekable<I:
+//! Iterator>`, since it stores `Option<I::Item>`), so an unconstrained
+//! `impl<T> RustStdType for Peekable<T>` doesn't type-check.
+
+use std::iter::{
+    Chain, Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten, FromFn,
+    Fuse, Inspect, Map, MapWhile, Once, OnceWith, Peekable, Repeat, RepeatN, RepeatWith, Rev, Scan,
+    Skip, SkipWhile, StepBy, Successors, Take, TakeWhile, Zip,
+};
+
+use crate::rust_std::macros::{
+    impl_rust_std_type_generic1, impl_rust_std_type_generic2, impl_rust_std_type_generic3,
+};
+
+macro_rules! iter_adapter1 {
+    ($ty:ident, $summary:expr) => {
+        impl_rust_std_type_generic1!(
+            $ty,
+            "core",
+            "core::iter",
+            concat!(
+                "https://doc.rust-lang.org/core/iter/struct.",
+                stringify!($ty),
+                ".html"
+            ),
+            $summary
+        );
+    };
+}
+
+macro_rules! iter_adapter2 {
+    ($ty:ident, $summary:expr) => {
+        impl_rust_std_type_generic2!(
+            $ty,
+            "core",
+            "core::iter",
+            concat!(
+                "https://doc.rust-lang.org/core/iter/struct.",
+                stringify!($ty),
+                ".html"
+            ),
+            $summary
+        );
+    };
+}
+
+iter_adapter2!(
+    Map,
+    "The Map carrier lazily applies a closure to each item of an underlying iterator."
+);
+iter_adapter2!(
+    Filter,
+    "The Filter carrier lazily yields only the items of an underlying iterator that satisfy a predicate."
+);
+iter_adapter2!(
+    FilterMap,
+    "The FilterMap carrier lazily applies a closure that both filters and maps each item of an underlying iterator."
+);
+
+impl<I, U: IntoIterator, F> crate::RustStdType for FlatMap<I, U, F> {
+    fn rust_language_provenance() -> crate::RustLanguageProvenance {
+        crate::RustLanguageProvenance::for_source("core", "core::iter")
+    }
+
+    fn rust_doc_url() -> &'static str {
+        "https://doc.rust-lang.org/core/iter/struct.FlatMap.html"
+    }
+
+    fn rust_semantics_summary() -> &'static str {
+        "The FlatMap carrier lazily maps each item to an iterator and flattens the results into one sequence."
+    }
+}
+
+impl<I: Iterator> crate::RustStdType for Flatten<I>
+where
+    I::Item: IntoIterator,
+{
+    fn rust_language_provenance() -> crate::RustLanguageProvenance {
+        crate::RustLanguageProvenance::for_source("core", "core::iter")
+    }
+
+    fn rust_doc_url() -> &'static str {
+        "https://doc.rust-lang.org/core/iter/struct.Flatten.html"
+    }
+
+    fn rust_semantics_summary() -> &'static str {
+        "The Flatten carrier lazily flattens an iterator of iterators into one sequence."
+    }
+}
+
+iter_adapter2!(
+    Chain,
+    "The Chain carrier lazily sequences two iterators end to end."
+);
+iter_adapter1!(
+    Cloned,
+    "The Cloned carrier lazily clones each item of an underlying iterator of references."
+);
+iter_adapter1!(
+    Copied,
+    "The Copied carrier lazily copies each item of an underlying iterator of references."
+);
+iter_adapter1!(
+    Cycle,
+    "The Cycle carrier lazily repeats an underlying iterator's sequence forever."
+);
+iter_adapter1!(
+    Enumerate,
+    "The Enumerate carrier lazily pairs each item of an underlying iterator with its index."
+);
+iter_adapter1!(
+    Fuse,
+    "The Fuse carrier guarantees an underlying iterator keeps returning None once it has done so once."
+);
+iter_adapter2!(
+    Inspect,
+    "The Inspect carrier lazily calls a closure on each item of an underlying iterator without changing it."
+);
+impl<I: Iterator> crate::RustStdType for Peekable<I> {
+    fn rust_language_provenance() -> crate::RustLanguageProvenance {
+        crate::RustLanguageProvenance::for_source("core", "core::iter")
+    }
+
+    fn rust_doc_url() -> &'static str {
+        "https://doc.rust-lang.org/core/iter/struct.Peekable.html"
+    }
+
+    fn rust_semantics_summary() -> &'static str {
+        "The Peekable carrier lets an underlying iterator's next item be inspected without consuming it."
+    }
+}
+
+iter_adapter1!(
+    Rev,
+    "The Rev carrier lazily reverses the direction of a double-ended iterator."
+);
+impl_rust_std_type_generic3!(
+    Scan,
+    "core",
+    "core::iter",
+    "https://doc.rust-lang.org/core/iter/struct.Scan.html",
+    "The Scan carrier lazily maps each item of an underlying iterator while threading mutable state through the closure."
+);
+iter_adapter1!(
+    Skip,
+    "The Skip carrier lazily discards a fixed number of items from the start of an underlying iterator."
+);
+iter_adapter2!(
+    SkipWhile,
+    "The SkipWhile carrier lazily discards items from the start of an underlying iterator while a predicate holds."
+);
+iter_adapter1!(
+    StepBy,
+    "The StepBy carrier lazily yields every nth item of an underlying iterator."
+);
+iter_adapter1!(
+    Take,
+    "The Take carrier lazily yields at most a fixed number of items from an underlying iterator."
+);
+iter_adapter2!(
+    TakeWhile,
+    "The TakeWhile carrier lazily yields items from an underlying iterator while a predicate holds."
+);
+iter_adapter2!(
+    MapWhile,
+    "The MapWhile carrier lazily maps items from an underlying iterator while the closure keeps returning Some."
+);
+iter_adapter2!(
+    Zip,
+    "The Zip carrier lazily pairs up items from two iterators, stopping when either is exhausted."
+);
+
+iter_adapter1!(
+    Once,
+    "The Once carrier yields exactly one value then stops."
+);
+iter_adapter1!(
+    OnceWith,
+    "The OnceWith carrier lazily calls a closure exactly once to produce its single value."
+);
+iter_adapter1!(Repeat, "The Repeat carrier yields the same value forever.");
+iter_adapter1!(
+    RepeatWith,
+    "The RepeatWith carrier lazily calls a closure to produce a value forever."
+);
+iter_adapter1!(
+    RepeatN,
+    "The RepeatN carrier yields the same value a fixed number of times."
+);
+iter_adapter1!(Empty, "The Empty carrier yields no values at all.");
+iter_adapter2!(
+    Successors,
+    "The Successors carrier lazily generates a sequence where each item is computed from the previous one."
+);
+iter_adapter1!(
+    FromFn,
+    "The FromFn carrier turns a closure returning Option into an iterator."
+);
