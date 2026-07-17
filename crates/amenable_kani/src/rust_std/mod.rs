@@ -15,6 +15,7 @@ mod cmp;
 mod convert;
 mod macros;
 mod num;
+mod ops;
 mod primitives;
 
 pub use macros::CheckedProof;

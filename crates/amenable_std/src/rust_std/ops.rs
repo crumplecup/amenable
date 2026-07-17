@@ -8,6 +8,7 @@ use std::ops::{Bound, ControlFlow, Range, RangeFrom, RangeInclusive, RangeTo, Ra
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -72,4 +73,18 @@ impl_rust_std_type_generic2!(
     "core::ops",
     "https://doc.rust-lang.org/core/ops/enum.ControlFlow.html",
     "The ControlFlow carrier represents an early-exit decision as Continue or Break."
+);
+
+// Evidence registration is per concrete type (see `register_rust_std_
+// standard_evidence!`'s own doc comment) — `i32` is the one concrete
+// element type this module's proof batch covers.
+register_rust_std_standard_evidence!(
+    Range<i32>,
+    RangeFrom<i32>,
+    RangeTo<i32>,
+    RangeToInclusive<i32>,
+    RangeInclusive<i32>,
+    RangeFull,
+    Bound<i32>,
+    ControlFlow<i32, i32>,
 );
