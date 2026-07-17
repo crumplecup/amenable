@@ -1,0 +1,69 @@
+Proof chain for amenable_kani::calculator::AddEvidence (complete for: kani)
+
+amenable_kani::calculator::AddEvidence
+  basis: amenable_kani::calculator::Debit, amenable_kani::calculator::Credit
+  proof [kani]:
+    harness: add_impl_computes_exact_sum
+    claim: /// For any `Debit`/`Credit` whose values don't overflow when added,
+            /// `add_impl` computes the exact sum. This never runs under normal
+            /// `cargo test` — only under `cargo kani`, which provides
+            /// `#[cfg(kani)]` and the `kani` crate itself.
+            #[kani::proof]
+            fn add_impl_computes_exact_sum() {
+                let a = Debit { value: kani::any() };
+                let b = Credit { value: kani::any() };
+    
+                kani::assume(a.value.checked_add(b.value).is_some());
+    
+                let sum = add_impl(a.clone(), b.clone());
+    
+                assert_eq!(sum.value, a.value + b.value);
+            }
+  amenable_kani::calculator::Debit
+    basis: amenable_std::rust_std::RustStdStandard<i64>
+    proof [kani]:
+      harness: verify_debit_access_preserves_value
+      claim: /// `Debit::new` preserves the underlying `i64` unchanged — the
+              /// access path used wherever a `Debit`'s `.value` is read as
+              /// evidence (e.g. inside `add_impl`) is faithful to what was
+              /// constructed.
+              #[kani::proof]
+              fn verify_debit_access_preserves_value() {
+                  let x: i64 = kani::any();
+                  let debit = Debit::new(x);
+      
+                  assert_eq!(debit.value, x);
+              }
+    amenable_std::rust_std::RustStdStandard<i64> (root)
+      proof [kani]:
+        rust.authority_kind: external_standard
+        rust.authority: Rust Project Developers
+        rust.source_crate: core
+        rust.source_module: core::primitive
+        source_url: https://doc.rust-lang.org/std/primitive.i64.html
+        type_name: i64
+        semantic_summary: The signed 64-bit integer carrier stores values in the i64 range defined by Rust.
+  amenable_kani::calculator::Credit
+    basis: amenable_std::rust_std::RustStdStandard<i64>
+    proof [kani]:
+      harness: verify_credit_access_preserves_value
+      claim: /// `Credit::new` preserves the underlying `i64` unchanged — the
+              /// access path used wherever a `Credit`'s `.value` is read as
+              /// evidence (e.g. inside `add_impl`) is faithful to what was
+              /// constructed.
+              #[kani::proof]
+              fn verify_credit_access_preserves_value() {
+                  let x: i64 = kani::any();
+                  let credit = Credit::new(x);
+      
+                  assert_eq!(credit.value, x);
+              }
+    amenable_std::rust_std::RustStdStandard<i64> (root)
+      proof [kani]:
+        rust.authority_kind: external_standard
+        rust.authority: Rust Project Developers
+        rust.source_crate: core
+        rust.source_module: core::primitive
+        source_url: https://doc.rust-lang.org/std/primitive.i64.html
+        type_name: i64
+        semantic_summary: The signed 64-bit integer carrier stores values in the i64 range defined by Rust.

@@ -1,0 +1,8 @@
+Provenance certificate 7 for i128
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i128.html
+type_name: i128
+semantic_summary: The signed 128-bit integer carrier stores values in the i128 range defined by Rust.

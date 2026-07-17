@@ -1,0 +1,8 @@
+Provenance certificate 9 for u8
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u8.html
+type_name: u8
+semantic_summary: The unsigned 8-bit integer carrier stores values in the u8 range defined by Rust.

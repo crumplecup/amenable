@@ -1,0 +1,8 @@
+Provenance certificate 6 for i64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i64.html
+type_name: i64
+semantic_summary: The signed 64-bit integer carrier stores values in the i64 range defined by Rust.

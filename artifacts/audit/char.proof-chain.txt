@@ -1,0 +1,61 @@
+Proof chain for amenable_std::rust_std::RustStdStandard<char> (complete for: creusot, kani, verus)
+
+amenable_std::rust_std::RustStdStandard<char> (root)
+  proof [creusot]:
+    harness: verify_char_roundtrip
+    claim: /// `char` round-trips through itself as an identity — Creusot's
+            /// contract surface for scalar carriers.
+            #[requires(true)]
+            #[ensures(result == c)]
+            fn verify_char_roundtrip(c: char) -> char {
+                c
+            }
+    rust.authority_kind: external_standard
+    rust.authority: Rust Project Developers
+    rust.source_crate: core
+    rust.source_module: core::primitive
+    source_url: https://doc.rust-lang.org/std/primitive.char.html
+    type_name: char
+    semantic_summary: The character carrier stores a Unicode scalar value.
+  proof [kani]:
+    harness: verify_char_unicode_scalar
+    claim: /// `char` is constrained to Unicode scalar values (excludes the
+            /// surrogate range `0xD800..=0xDFFF`) and round-trips through `u32`.
+            #[kani::proof]
+            fn verify_char_unicode_scalar() {
+                let c: char = kani::any();
+                let u = c as u32;
+    
+                assert!(
+                    u <= 0xD7FF || (0xE000..=0x10FFFF).contains(&u),
+                    "char is a valid Unicode scalar value"
+                );
+    
+                let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
+                assert!(c == c2, "char round-trips through u32");
+            }
+    rust.authority_kind: external_standard
+    rust.authority: Rust Project Developers
+    rust.source_crate: core
+    rust.source_module: core::primitive
+    source_url: https://doc.rust-lang.org/std/primitive.char.html
+    type_name: char
+    semantic_summary: The character carrier stores a Unicode scalar value.
+  proof [verus]:
+    harness: verify_char_roundtrip
+    claim: // `char` round-trips through itself as an identity — Verus's spec
+            // surface for scalar carriers.
+            verus! {
+                fn verify_char_roundtrip(c: char) -> (result: char)
+                    ensures result == c,
+                {
+                    c
+                }
+            }
+    rust.authority_kind: external_standard
+    rust.authority: Rust Project Developers
+    rust.source_crate: core
+    rust.source_module: core::primitive
+    source_url: https://doc.rust-lang.org/std/primitive.char.html
+    type_name: char
+    semantic_summary: The character carrier stores a Unicode scalar value.

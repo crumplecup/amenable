@@ -1,0 +1,8 @@
+Provenance certificate 16 for f64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.f64.html
+type_name: f64
+semantic_summary: The 64-bit floating-point carrier follows Rust's f64 semantics.

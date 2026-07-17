@@ -1,0 +1,8 @@
+Provenance certificate 3 for i8
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i8.html
+type_name: i8
+semantic_summary: The signed 8-bit integer carrier stores values in the i8 range defined by Rust.

@@ -1,0 +1,8 @@
+Provenance certificate 5 for i32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i32.html
+type_name: i32
+semantic_summary: The signed 32-bit integer carrier stores values in the i32 range defined by Rust.

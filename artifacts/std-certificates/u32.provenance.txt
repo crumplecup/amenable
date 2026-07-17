@@ -1,0 +1,8 @@
+Provenance certificate 11 for u32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u32.html
+type_name: u32
+semantic_summary: The unsigned 32-bit integer carrier stores values in the u32 range defined by Rust.

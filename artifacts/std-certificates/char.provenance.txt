@@ -1,0 +1,8 @@
+Provenance certificate 2 for char
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.char.html
+type_name: char
+semantic_summary: The character carrier stores a Unicode scalar value.

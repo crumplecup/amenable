@@ -1,0 +1,8 @@
+Provenance certificate 17 for alloc::string::String
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: alloc
+rust.source_module: alloc::string
+source_url: https://doc.rust-lang.org/std/string/struct.String.html
+type_name: alloc::string::String
+semantic_summary: The String carrier stores owned UTF-8 text as defined by Rust's standard library.

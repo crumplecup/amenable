@@ -19,13 +19,23 @@
 #![warn(missing_docs)]
 
 pub use amenable_core::{
-    Amenable, AsStandard, Certificate, CreusotVerifier, CreusotVerifierMetadata, Establish,
-    Evidence, Exchange, KaniVerifier, KaniVerifierMetadata, MetadataEntry, OwnedProvenanceReport,
-    ProofToken, Provenance, ProvenanceReport, Registry, RegistryReport, Sidecar, Standard,
-    StateMachine, Verifier, VerusVerifier, VerusVerifierMetadata, Witness, WitnessSource,
-    Witnessed,
+    Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
+    Establish, Evidence, EvidenceLink, Exchange, MetadataEntry, OwnedProvenanceReport,
+    ProofChainReport, ProofRecord, ProofToken, Provenance, ProvenanceReport, Registry,
+    RegistryReport, Sidecar, Standard, StateMachine, Verifier, Witness, proof_chain,
+    proof_chain_for_verifiers,
+};
+pub use amenable_creusot::{
+    CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
+};
+pub use amenable_kani::{
+    AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Credit, Debit,
+    KaniVerifier, KaniVerifierMetadata, KaniWitness, Sum, add,
 };
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
     RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,
+};
+pub use amenable_verus::{
+    CheckedProof as VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness,
 };

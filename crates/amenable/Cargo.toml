@@ -15,3 +15,9 @@ categories = ["development-tools", "rust-patterns"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_std = { workspace = true }
+amenable_kani = { workspace = true }
+amenable_creusot = { workspace = true }
+amenable_verus = { workspace = true }
+inventory = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

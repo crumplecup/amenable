@@ -1,0 +1,6 @@
+proof chain for amenable_kani::calculator::AddEvidence is incomplete for verifier(s): creusot
+
+missing proofs:
+  amenable_kani::calculator::AddEvidence has no proof registered for verifier "creusot"
+  amenable_kani::calculator::Debit has no proof registered for verifier "creusot"
+  amenable_kani::calculator::Credit has no proof registered for verifier "creusot"

@@ -1,0 +1,8 @@
+Provenance certificate 15 for f32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.f32.html
+type_name: f32
+semantic_summary: The 32-bit floating-point carrier follows Rust's f32 semantics.

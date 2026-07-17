@@ -1,0 +1,152 @@
+Provenance certificate 1 for bool
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.bool.html
+type_name: bool
+semantic_summary: The boolean carrier admits exactly the truth values false and true.
+
+Provenance certificate 2 for char
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.char.html
+type_name: char
+semantic_summary: The character carrier stores a Unicode scalar value.
+
+Provenance certificate 3 for i8
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i8.html
+type_name: i8
+semantic_summary: The signed 8-bit integer carrier stores values in the i8 range defined by Rust.
+
+Provenance certificate 4 for i16
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i16.html
+type_name: i16
+semantic_summary: The signed 16-bit integer carrier stores values in the i16 range defined by Rust.
+
+Provenance certificate 5 for i32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i32.html
+type_name: i32
+semantic_summary: The signed 32-bit integer carrier stores values in the i32 range defined by Rust.
+
+Provenance certificate 6 for i64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i64.html
+type_name: i64
+semantic_summary: The signed 64-bit integer carrier stores values in the i64 range defined by Rust.
+
+Provenance certificate 7 for i128
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i128.html
+type_name: i128
+semantic_summary: The signed 128-bit integer carrier stores values in the i128 range defined by Rust.
+
+Provenance certificate 8 for isize
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.isize.html
+type_name: isize
+semantic_summary: The pointer-sized signed integer carrier stores values in the isize range defined by Rust.
+
+Provenance certificate 9 for u8
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u8.html
+type_name: u8
+semantic_summary: The unsigned 8-bit integer carrier stores values in the u8 range defined by Rust.
+
+Provenance certificate 10 for u16
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u16.html
+type_name: u16
+semantic_summary: The unsigned 16-bit integer carrier stores values in the u16 range defined by Rust.
+
+Provenance certificate 11 for u32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u32.html
+type_name: u32
+semantic_summary: The unsigned 32-bit integer carrier stores values in the u32 range defined by Rust.
+
+Provenance certificate 12 for u64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u64.html
+type_name: u64
+semantic_summary: The unsigned 64-bit integer carrier stores values in the u64 range defined by Rust.
+
+Provenance certificate 13 for u128
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u128.html
+type_name: u128
+semantic_summary: The unsigned 128-bit integer carrier stores values in the u128 range defined by Rust.
+
+Provenance certificate 14 for usize
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.usize.html
+type_name: usize
+semantic_summary: The pointer-sized unsigned integer carrier stores values in the usize range defined by Rust.
+
+Provenance certificate 15 for f32
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.f32.html
+type_name: f32
+semantic_summary: The 32-bit floating-point carrier follows Rust's f32 semantics.
+
+Provenance certificate 16 for f64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.f64.html
+type_name: f64
+semantic_summary: The 64-bit floating-point carrier follows Rust's f64 semantics.
+
+Provenance certificate 17 for alloc::string::String
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: alloc
+rust.source_module: alloc::string
+source_url: https://doc.rust-lang.org/std/string/struct.String.html
+type_name: alloc::string::String
+semantic_summary: The String carrier stores owned UTF-8 text as defined by Rust's standard library.

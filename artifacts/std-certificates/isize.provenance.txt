@@ -1,0 +1,8 @@
+Provenance certificate 8 for isize
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.isize.html
+type_name: isize
+semantic_summary: The pointer-sized signed integer carrier stores values in the isize range defined by Rust.

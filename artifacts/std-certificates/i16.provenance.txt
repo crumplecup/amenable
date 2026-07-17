@@ -1,0 +1,8 @@
+Provenance certificate 4 for i16
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.i16.html
+type_name: i16
+semantic_summary: The signed 16-bit integer carrier stores values in the i16 range defined by Rust.

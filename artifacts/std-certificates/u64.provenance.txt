@@ -1,0 +1,8 @@
+Provenance certificate 12 for u64
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u64.html
+type_name: u64
+semantic_summary: The unsigned 64-bit integer carrier stores values in the u64 range defined by Rust.

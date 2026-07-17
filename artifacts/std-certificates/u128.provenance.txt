@@ -1,0 +1,8 @@
+Provenance certificate 13 for u128
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.u128.html
+type_name: u128
+semantic_summary: The unsigned 128-bit integer carrier stores values in the u128 range defined by Rust.

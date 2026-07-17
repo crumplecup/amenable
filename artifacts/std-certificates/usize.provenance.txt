@@ -1,0 +1,8 @@
+Provenance certificate 14 for usize
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.usize.html
+type_name: usize
+semantic_summary: The pointer-sized unsigned integer carrier stores values in the usize range defined by Rust.

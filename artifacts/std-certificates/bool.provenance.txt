@@ -1,0 +1,8 @@
+Provenance certificate 1 for bool
+rust.authority_kind: external_standard
+rust.authority: Rust Project Developers
+rust.source_crate: core
+rust.source_module: core::primitive
+source_url: https://doc.rust-lang.org/std/primitive.bool.html
+type_name: bool
+semantic_summary: The boolean carrier admits exactly the truth values false and true.
