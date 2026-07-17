@@ -21,6 +21,7 @@ use std::iter::{
 
 use crate::rust_std::macros::{
     impl_rust_std_type_generic1, impl_rust_std_type_generic2, impl_rust_std_type_generic3,
+    register_rust_std_standard_evidence,
 };
 
 macro_rules! iter_adapter1 {
@@ -206,4 +207,48 @@ iter_adapter2!(
 iter_adapter1!(
     FromFn,
     "The FromFn carrier turns a closure returning Option into an iterator."
+);
+
+// `Range<i32>` (or `Iter<'static, i32>`/`IntoIter<Range<i32>>` where an
+// adapter wraps an iterator of iterators or a borrowing source) is the one
+// representative source iterator this module's proof batch covers; closure
+// parameters use a bare `fn` pointer type rather than a closure, since
+// closures have no nameable type to register evidence against (see
+// `LazyCell<i32, fn() -> i32>` in `rust_std::cell` for the same pattern).
+// `Range`/`IntoIter`/`Iter` are named here without importing them: a
+// `$ty:ty` macro fragment is purely syntactic (it doesn't need to resolve
+// to a real item, confirmed empirically), and this macro only ever
+// stringifies its argument — never uses it in a real type position — so
+// there is nothing to import.
+register_rust_std_standard_evidence!(
+    Map<Range<i32>, fn(i32) -> i32>,
+    Filter<Range<i32>, fn(&i32) -> bool>,
+    FilterMap<Range<i32>, fn(i32) -> Option<i32>>,
+    FlatMap<Range<i32>, Range<i32>, fn(i32) -> Range<i32>>,
+    Flatten<IntoIter<Range<i32>>>,
+    Chain<Range<i32>, Range<i32>>,
+    Zip<Range<i32>, Range<i32>>,
+    Enumerate<Range<i32>>,
+    Rev<Range<i32>>,
+    Cloned<Iter<'static, i32>>,
+    Copied<Iter<'static, i32>>,
+    Cycle<Range<i32>>,
+    Fuse<Range<i32>>,
+    Inspect<Range<i32>, fn(&i32)>,
+    Peekable<Range<i32>>,
+    Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>,
+    Skip<Range<i32>>,
+    SkipWhile<Range<i32>, fn(&i32) -> bool>,
+    StepBy<Range<i32>>,
+    Take<Range<i32>>,
+    TakeWhile<Range<i32>, fn(&i32) -> bool>,
+    MapWhile<Range<i32>, fn(i32) -> Option<i32>>,
+    Once<i32>,
+    OnceWith<fn() -> i32>,
+    Repeat<i32>,
+    RepeatWith<fn() -> i32>,
+    RepeatN<i32>,
+    Empty<i32>,
+    Successors<i32, fn(&i32) -> Option<i32>>,
+    FromFn<fn() -> Option<i32>>,
 );

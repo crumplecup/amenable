@@ -14,6 +14,7 @@
 mod cell;
 mod cmp;
 mod convert;
+mod iter;
 mod macros;
 mod marker;
 mod mem;
