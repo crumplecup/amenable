@@ -24,7 +24,7 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveErr
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
-    impl_rust_std_type_lifetime1,
+    impl_rust_std_type_lifetime1, register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic2!(
@@ -208,4 +208,29 @@ impl_rust_std_type_generic1!(
     "alloc::collections::vec_deque",
     "https://doc.rust-lang.org/alloc/collections/vec_deque/struct.IntoIter.html",
     "The IntoIter carrier consumes a VecDeque, yielding its elements in order."
+);
+
+// `i32` (and `'static` for the borrowing carriers) is the representative
+// element type/lifetime this module's proof batch covers.
+// `fn(&mut i32) -> bool` stands in for `LinkedListExtractIf`'s predicate
+// closure, which has no nameable type of its own.
+register_rust_std_standard_evidence!(
+    BTreeMap<i32, i32>,
+    BTreeSet<i32>,
+    BinaryHeap<i32>,
+    LinkedList<i32>,
+    VecDeque<i32>,
+    TryReserveError,
+    BinaryHeapDrain<'static, i32>,
+    BinaryHeapIntoIter<i32>,
+    BinaryHeapIter<'static, i32>,
+    BinaryHeapPeekMut<'static, i32>,
+    LinkedListIter<'static, i32>,
+    LinkedListIterMut<'static, i32>,
+    LinkedListIntoIter<i32>,
+    LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    VecDequeDrain<'static, i32>,
+    VecDequeIter<'static, i32>,
+    VecDequeIterMut<'static, i32>,
+    VecDequeIntoIter<i32>,
 );

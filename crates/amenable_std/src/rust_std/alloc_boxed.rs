@@ -19,7 +19,7 @@
 
 use std::boxed::Box;
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Box,
@@ -28,3 +28,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/alloc/boxed/struct.Box.html",
     "The Box carrier is a unique, heap-allocated owner of its contents."
 );
+
+register_rust_std_standard_evidence!(Box<i32>);

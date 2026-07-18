@@ -6,7 +6,7 @@
 
 use std::vec::{Drain as VecDrain, ExtractIf as VecExtractIf, IntoIter as VecIntoIter, Vec};
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Vec,
@@ -65,3 +65,17 @@ impl<I: Iterator> crate::RustStdType for std::vec::Splice<'_, I> {
         "The Splice carrier removes a range from a Vec and replaces it with a given iterator's elements, yielding the removed elements."
     }
 }
+
+// `i32` (and `'static` for the borrowing carriers) is the representative
+// element type/lifetime this module's proof batch covers.
+// `IntoIter<i32>` stands in for Splice's replacement-iterator parameter —
+// the one concrete iterator type this batch exercises it with.
+// `fn(&mut i32) -> bool` stands in for ExtractIf's predicate closure,
+// which has no nameable type of its own.
+register_rust_std_standard_evidence!(
+    Vec<i32>,
+    VecDrain<'static, i32>,
+    VecIntoIter<i32>,
+    VecExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    Splice<'static, VecIntoIter<i32>>,
+);

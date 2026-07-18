@@ -6,7 +6,7 @@
 
 use std::rc::{Rc, Weak as RcWeak};
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Rc,
@@ -23,3 +23,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/alloc/rc/struct.Weak.html",
     "The Weak carrier is a non-owning reference to an Rc's contents that does not keep them alive."
 );
+
+register_rust_std_standard_evidence!(Rc<i32>, RcWeak<i32>);

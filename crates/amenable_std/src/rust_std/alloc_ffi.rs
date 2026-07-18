@@ -2,7 +2,7 @@
 
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     CString,
@@ -35,3 +35,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/alloc/ffi/struct.NulError.html",
     "The NulError carrier reports that a byte vector contained an interior nul byte when constructing a CString."
 );
+
+register_rust_std_standard_evidence!(CString, FromVecWithNulError, IntoStringError, NulError,);

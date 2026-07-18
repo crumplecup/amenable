@@ -6,7 +6,7 @@
 
 use std::sync::{Arc, Weak as ArcWeak};
 
-use crate::rust_std::macros::impl_rust_std_type_generic1;
+use crate::rust_std::macros::{impl_rust_std_type_generic1, register_rust_std_standard_evidence};
 
 impl_rust_std_type_generic1!(
     Arc,
@@ -23,3 +23,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/alloc/sync/struct.Weak.html",
     "The Weak carrier is a non-owning reference to an Arc's contents that does not keep them alive."
 );
+
+register_rust_std_standard_evidence!(Arc<i32>, ArcWeak<i32>);

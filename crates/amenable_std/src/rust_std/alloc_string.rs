@@ -6,7 +6,9 @@
 
 use std::string::{Drain, FromUtf8Error, FromUtf16Error};
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_lifetime0!(
     Drain,
@@ -31,3 +33,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/alloc/string/struct.FromUtf8Error.html",
     "The FromUtf8Error carrier reports that a byte vector was not valid UTF-8 when converting it into a String, and returns the original bytes."
 );
+
+register_rust_std_standard_evidence!(Drain<'static>, FromUtf16Error, FromUtf8Error);
