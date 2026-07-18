@@ -40,6 +40,8 @@ mod primitives;
 mod ptr;
 mod slice;
 mod str;
+mod sync_lock;
+mod sync_mpsc;
 mod task;
 mod time;
 

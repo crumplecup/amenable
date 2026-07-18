@@ -14,7 +14,7 @@ use std::sync::{
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
-    impl_rust_std_type_lifetime1,
+    impl_rust_std_type_lifetime1, register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -135,4 +135,26 @@ impl_rust_std_type!(
     "std::sync",
     "https://doc.rust-lang.org/std/sync/struct.WaitTimeoutResult.html",
     "The WaitTimeoutResult carrier reports whether a Condvar wait timed out before being notified."
+);
+
+// `i32` (and `'static` for the borrowing guards) is the representative
+// element type/lifetime this module's proof batch covers.
+// `LazyLock`'s initializer is a bare `fn` pointer, which has no nameable
+// type of its own as a closure.
+register_rust_std_standard_evidence!(
+    Mutex<i32>,
+    MutexGuard<'static, i32>,
+    RwLock<i32>,
+    RwLockReadGuard<'static, i32>,
+    RwLockWriteGuard<'static, i32>,
+    Once,
+    OnceState,
+    OnceLock<i32>,
+    LazyLock<i32, fn() -> i32>,
+    Barrier,
+    BarrierWaitResult,
+    Condvar,
+    PoisonError<MutexGuard<'static, i32>>,
+    TryLockError<MutexGuard<'static, i32>>,
+    WaitTimeoutResult,
 );

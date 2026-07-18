@@ -7,6 +7,7 @@ use std::sync::mpsc::{
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime1,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -95,4 +96,20 @@ impl_rust_std_type!(
     "std::sync::mpsc",
     "https://doc.rust-lang.org/std/sync/mpsc/enum.TryRecvError.html",
     "The TryRecvError carrier reports why a non-blocking receive failed: Empty or Disconnected."
+);
+
+// `i32` (and `'static` for the borrowing iterators) is the representative
+// element type/lifetime this module's proof batch covers.
+register_rust_std_standard_evidence!(
+    Sender<i32>,
+    SyncSender<i32>,
+    Receiver<i32>,
+    IntoIter<i32>,
+    Iter<'static, i32>,
+    TryIter<'static, i32>,
+    RecvError,
+    RecvTimeoutError,
+    SendError<i32>,
+    TrySendError<i32>,
+    TryRecvError,
 );
