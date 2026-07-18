@@ -125,15 +125,21 @@ impl<'a> crate::RustStdType for std::str::LinesAny<'a> {
 
 // `'static` is the representative lifetime this module's proof batch
 // covers.
+//
+// Bytes/Lines/EscapeDebug/EscapeDefault/EscapeUnicode are written
+// fully-qualified: each bare name is shared by another module (e.g.
+// `std::io::Bytes`/`std::io::Lines`, `char`'s escape iterators) — only the
+// qualified path disambiguates which one a given registration means for
+// tooling reading the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
-    Bytes<'static>,
+    std::str::Bytes<'static>,
     CharIndices<'static>,
     Chars<'static>,
     EncodeUtf16<'static>,
-    EscapeDebug<'static>,
-    EscapeDefault<'static>,
-    EscapeUnicode<'static>,
-    Lines<'static>,
+    std::str::EscapeDebug<'static>,
+    std::str::EscapeDefault<'static>,
+    std::str::EscapeUnicode<'static>,
+    std::str::Lines<'static>,
     SplitAsciiWhitespace<'static>,
     SplitWhitespace<'static>,
     Utf8Chunk<'static>,

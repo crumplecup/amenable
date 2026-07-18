@@ -161,16 +161,22 @@ impl_rust_std_type!(
 // `&'static [u8]` (an in-memory Read+BufRead source) and `Vec<u8>` (an
 // in-memory Write sink) are the representative reader/writer types this
 // module's proof batch covers.
+//
+// Bytes/Lines/Split are written fully-qualified: all three bare names are
+// shared by other modules (e.g. `std::str::Bytes`, `std::str::Lines`,
+// `std::slice::Split`) — only the qualified path disambiguates which one a
+// given registration means for tooling reading the registry (e.g.
+// `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     BufReader<&'static [u8]>,
     BufWriter<Vec<u8>>,
-    Bytes<&'static [u8]>,
+    std::io::Bytes<&'static [u8]>,
     IntoInnerError<BufWriter<Vec<u8>>>,
     LineWriter<Vec<u8>>,
-    Lines<&'static [u8]>,
+    std::io::Lines<&'static [u8]>,
     PipeReader,
     PipeWriter,
-    Split<&'static [u8]>,
+    std::io::Split<&'static [u8]>,
     Stderr,
     StderrLock<'static>,
     Stdin,

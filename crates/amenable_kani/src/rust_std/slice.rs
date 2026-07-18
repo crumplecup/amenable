@@ -11,9 +11,8 @@
 
 use std::slice::{
     ChunkBy, ChunkByMut, Chunks, ChunksExact, ChunksExactMut, ChunksMut, EscapeAscii,
-    GetDisjointMutError, Iter, IterMut, RChunks, RChunksExact, RChunksExactMut, RChunksMut, RSplit,
-    RSplitMut, RSplitN, RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut, SplitN,
-    SplitNMut, Windows,
+    GetDisjointMutError, RChunks, RChunksExact, RChunksExactMut, RChunksMut, RSplitMut, RSplitNMut,
+    SplitInclusiveMut, SplitMut, SplitNMut, Windows,
 };
 
 use amenable_core::Evidence;
@@ -23,7 +22,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Iter<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -36,13 +35,13 @@ impl KaniWitness for RustStdStandard<Iter<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Iter<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Iter<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Iter<'static, i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::slice::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -60,7 +59,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<IterMut<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -73,13 +72,13 @@ impl KaniWitness for RustStdStandard<IterMut<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<IterMut<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IterMut<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<IterMut<'static, i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::slice::IterMut<'static, i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -600,7 +599,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Split<'static, i32, fn(&i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -613,13 +612,13 @@ impl KaniWitness for RustStdStandard<Split<'static, i32, fn(&i32) -> bool>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Split<'static, i32, fn(&i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Split<'static, i32, fn(&i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Split<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -695,7 +694,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<SplitInclusive<'static, i32, fn(&i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -708,13 +707,13 @@ impl KaniWitness for RustStdStandard<SplitInclusive<'static, i32, fn(&i32) -> bo
     }
 }
 
-bridge_kani_witness!(RustStdStandard<SplitInclusive<'static, i32, fn(&i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitInclusive<'static, i32, fn(&i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<SplitInclusive<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -788,7 +787,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<SplitN<'static, i32, fn(&i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -801,13 +800,13 @@ impl KaniWitness for RustStdStandard<SplitN<'static, i32, fn(&i32) -> bool>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<SplitN<'static, i32, fn(&i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitN<'static, i32, fn(&i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<SplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -890,7 +889,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RSplit<'static, i32, fn(&i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -903,13 +902,13 @@ impl KaniWitness for RustStdStandard<RSplit<'static, i32, fn(&i32) -> bool>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RSplit<'static, i32, fn(&i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RSplit<'static, i32, fn(&i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RSplit<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -985,7 +984,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RSplitN<'static, i32, fn(&i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -998,13 +997,13 @@ impl KaniWitness for RustStdStandard<RSplitN<'static, i32, fn(&i32) -> bool>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RSplitN<'static, i32, fn(&i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RSplitN<'static, i32, fn(&i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RSplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }

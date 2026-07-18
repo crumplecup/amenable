@@ -93,12 +93,18 @@ impl_rust_std_type!(
 // covers. `Prefix`/`PrefixComponent` are only meaningfully exercised on
 // Windows targets, since Unix path parsing never produces a prefix
 // component.
+//
+// Display/Iter are written fully-qualified: both bare names are shared by
+// several other modules (e.g. `core::fmt::Display`, `std::slice::Iter`) —
+// only the qualified path disambiguates which one a given registration
+// means for tooling reading the registry (e.g. `elicit_doc`'s coverage
+// report).
 register_rust_std_standard_evidence!(
     Ancestors<'static>,
     Component<'static>,
     Components<'static>,
-    Display<'static>,
-    Iter<'static>,
+    std::path::Display<'static>,
+    std::path::Iter<'static>,
     Path,
     PathBuf,
     Prefix<'static>,

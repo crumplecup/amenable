@@ -185,13 +185,21 @@ impl_rust_std_type!(
 // stand in for the split/chunk-by families' predicate closures, which have
 // no nameable type of their own (see `register_rust_std_standard_evidence!`'s
 // own doc comment).
+//
+// Iter/IterMut/RSplit/RSplitN/Split/SplitInclusive/SplitN are written
+// fully-qualified: each bare name is shared by another module (e.g.
+// `core::str`'s pattern-generic siblings, `core::option`/`core::result`'s
+// `IterMut`) — only the qualified path disambiguates which one a given
+// registration means for tooling reading the registry (e.g. `elicit_doc`'s
+// coverage report). The `*Mut` split variants have no such collision, since
+// `core::str` never yields mutable subslices.
 register_rust_std_standard_evidence!(
     Chunks<'static, i32>,
     ChunksExact<'static, i32>,
     ChunksExactMut<'static, i32>,
     ChunksMut<'static, i32>,
-    Iter<'static, i32>,
-    IterMut<'static, i32>,
+    std::slice::Iter<'static, i32>,
+    std::slice::IterMut<'static, i32>,
     RChunks<'static, i32>,
     RChunksExact<'static, i32>,
     RChunksExactMut<'static, i32>,
@@ -199,15 +207,15 @@ register_rust_std_standard_evidence!(
     Windows<'static, i32>,
     ChunkBy<'static, i32, fn(&i32, &i32) -> bool>,
     ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>,
-    RSplit<'static, i32, fn(&i32) -> bool>,
+    std::slice::RSplit<'static, i32, fn(&i32) -> bool>,
     RSplitMut<'static, i32, fn(&i32) -> bool>,
-    RSplitN<'static, i32, fn(&i32) -> bool>,
+    std::slice::RSplitN<'static, i32, fn(&i32) -> bool>,
     RSplitNMut<'static, i32, fn(&i32) -> bool>,
-    Split<'static, i32, fn(&i32) -> bool>,
-    SplitInclusive<'static, i32, fn(&i32) -> bool>,
+    std::slice::Split<'static, i32, fn(&i32) -> bool>,
+    std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>,
     SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
     SplitMut<'static, i32, fn(&i32) -> bool>,
-    SplitN<'static, i32, fn(&i32) -> bool>,
+    std::slice::SplitN<'static, i32, fn(&i32) -> bool>,
     SplitNMut<'static, i32, fn(&i32) -> bool>,
     EscapeAscii<'static>,
     GetDisjointMutError,

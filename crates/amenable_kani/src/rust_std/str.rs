@@ -10,8 +10,8 @@
 //! way plain iteration does.
 
 use std::str::{
-    Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode, Lines,
-    ParseBoolError, SplitAsciiWhitespace, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
+    CharIndices, Chars, EncodeUtf16, ParseBoolError, SplitAsciiWhitespace, SplitWhitespace,
+    Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
 use amenable_core::Evidence;
@@ -21,7 +21,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 
-impl KaniWitness for RustStdStandard<Bytes<'static>> {
+impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -34,13 +34,13 @@ impl KaniWitness for RustStdStandard<Bytes<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Bytes<'static>>);
+bridge_kani_witness!(RustStdStandard<std::str::Bytes<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Bytes<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Bytes<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Bytes<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::str::Bytes<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -178,7 +178,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<EscapeDebug<'static>> {
+impl KaniWitness for RustStdStandard<std::str::EscapeDebug<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -191,13 +191,13 @@ impl KaniWitness for RustStdStandard<EscapeDebug<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<EscapeDebug<'static>>);
+bridge_kani_witness!(RustStdStandard<std::str::EscapeDebug<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EscapeDebug<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDebug<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<EscapeDebug<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::str::EscapeDebug<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -214,7 +214,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<EscapeDefault<'static>> {
+impl KaniWitness for RustStdStandard<std::str::EscapeDefault<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -227,13 +227,13 @@ impl KaniWitness for RustStdStandard<EscapeDefault<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<EscapeDefault<'static>>);
+bridge_kani_witness!(RustStdStandard<std::str::EscapeDefault<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EscapeDefault<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDefault<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<EscapeDefault<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::str::EscapeDefault<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -250,7 +250,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<EscapeUnicode<'static>> {
+impl KaniWitness for RustStdStandard<std::str::EscapeUnicode<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -263,13 +263,13 @@ impl KaniWitness for RustStdStandard<EscapeUnicode<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<EscapeUnicode<'static>>);
+bridge_kani_witness!(RustStdStandard<std::str::EscapeUnicode<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EscapeUnicode<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeUnicode<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<EscapeUnicode<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::str::EscapeUnicode<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -286,7 +286,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Lines<'static>> {
+impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -299,13 +299,13 @@ impl KaniWitness for RustStdStandard<Lines<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Lines<'static>>);
+bridge_kani_witness!(RustStdStandard<std::str::Lines<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Lines<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Lines<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Lines<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::str::Lines<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 

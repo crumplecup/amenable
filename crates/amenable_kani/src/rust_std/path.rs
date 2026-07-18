@@ -7,8 +7,7 @@
 //! gated on `#[cfg(windows)]`.
 
 use std::path::{
-    Ancestors, Component, Components, Display, Iter, Path, PathBuf, Prefix, PrefixComponent,
-    StripPrefixError,
+    Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
 };
 
 use amenable_core::Evidence;
@@ -144,7 +143,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Display<'static>> {
+impl KaniWitness for RustStdStandard<std::path::Display<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -157,13 +156,13 @@ impl KaniWitness for RustStdStandard<Display<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Display<'static>>);
+bridge_kani_witness!(RustStdStandard<std::path::Display<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Display<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Display<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Display<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::path::Display<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -179,7 +178,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Iter<'static>> {
+impl KaniWitness for RustStdStandard<std::path::Iter<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -192,13 +191,13 @@ impl KaniWitness for RustStdStandard<Iter<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Iter<'static>>);
+bridge_kani_witness!(RustStdStandard<std::path::Iter<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Iter<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Iter<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Iter<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::path::Iter<'static>> as KaniWitness>::proof().to_string(),
     }
 }
 
