@@ -7,7 +7,6 @@
 
 use std::fs::{
     DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
-    TryLockError,
 };
 
 use amenable_core::Evidence;
@@ -471,7 +470,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<TryLockError> {
+impl KaniWitness for RustStdStandard<std::fs::TryLockError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -484,13 +483,15 @@ impl KaniWitness for RustStdStandard<TryLockError> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<TryLockError>);
+bridge_kani_witness!(RustStdStandard<std::fs::TryLockError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryLockError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
         verifier: "kani",
-        describe: || <RustStdStandard<TryLockError> as KaniWitness>::proof().to_string(),
+        describe: || {
+            <RustStdStandard<std::fs::TryLockError> as KaniWitness>::proof().to_string()
+        },
     }
 }
 

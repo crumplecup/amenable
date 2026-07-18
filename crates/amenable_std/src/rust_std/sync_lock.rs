@@ -141,20 +141,28 @@ impl_rust_std_type!(
 // element type/lifetime this module's proof batch covers.
 // `LazyLock`'s initializer is a bare `fn` pointer, which has no nameable
 // type of its own as a closure.
+//
+// Condvar/Mutex/MutexGuard/Once/RwLock/RwLockReadGuard/RwLockWriteGuard/
+// TryLockError are written fully-qualified: `std::sync::nonpoison`
+// (unstable, but already present in rustdoc's own inventory) defines its
+// own types with the exact same bare names, and `std::fs::TryLockError`
+// shares its name with `std::sync::TryLockError` too — only the qualified
+// path disambiguates which one a given registration means for tooling
+// reading the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
-    Mutex<i32>,
-    MutexGuard<'static, i32>,
-    RwLock<i32>,
-    RwLockReadGuard<'static, i32>,
-    RwLockWriteGuard<'static, i32>,
-    Once,
+    std::sync::Mutex<i32>,
+    std::sync::MutexGuard<'static, i32>,
+    std::sync::RwLock<i32>,
+    std::sync::RwLockReadGuard<'static, i32>,
+    std::sync::RwLockWriteGuard<'static, i32>,
+    std::sync::Once,
     OnceState,
     OnceLock<i32>,
     LazyLock<i32, fn() -> i32>,
     Barrier,
     BarrierWaitResult,
-    Condvar,
+    std::sync::Condvar,
     PoisonError<MutexGuard<'static, i32>>,
-    TryLockError<MutexGuard<'static, i32>>,
+    std::sync::TryLockError<MutexGuard<'static, i32>>,
     WaitTimeoutResult,
 );

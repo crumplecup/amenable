@@ -6,10 +6,7 @@
 //! own contract — the channel's transport behavior, not cross-thread
 //! scheduling.
 
-use std::sync::mpsc::{
-    IntoIter, Iter, Receiver, RecvError, RecvTimeoutError, SendError, Sender, SyncSender, TryIter,
-    TryRecvError, TrySendError,
-};
+use std::sync::mpsc::{RecvError, SendError, SyncSender, TrySendError};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -18,7 +15,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Sender<i32>> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::Sender<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -31,13 +28,13 @@ impl KaniWitness for RustStdStandard<Sender<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Sender<i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Sender<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Sender<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Sender<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Sender<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::Sender<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -92,7 +89,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Receiver<i32>> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -105,13 +102,13 @@ impl KaniWitness for RustStdStandard<Receiver<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Receiver<i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Receiver<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Receiver<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::Receiver<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -132,7 +129,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<IntoIter<i32>> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -145,13 +142,13 @@ impl KaniWitness for RustStdStandard<IntoIter<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<IntoIter<i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::IntoIter<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IntoIter<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::IntoIter<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<IntoIter<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -173,7 +170,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Iter<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -186,13 +183,13 @@ impl KaniWitness for RustStdStandard<Iter<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Iter<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Iter<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Iter<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Iter<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Iter<'static, i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -213,7 +210,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<TryIter<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -226,13 +223,13 @@ impl KaniWitness for RustStdStandard<TryIter<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<TryIter<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryIter<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<TryIter<'static, i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -289,7 +286,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RecvTimeoutError> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::RecvTimeoutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -302,13 +299,13 @@ impl KaniWitness for RustStdStandard<RecvTimeoutError> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RecvTimeoutError>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::RecvTimeoutError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RecvTimeoutError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::RecvTimeoutError>",
         verifier: "kani",
-        describe: || <RustStdStandard<RecvTimeoutError> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::RecvTimeoutError> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -319,6 +316,8 @@ amenable_derive::harness! {
         /// channel fails immediately as `Disconnected` instead.
         #[kani::proof]
         fn verify_recv_timeout_error_distinguishes_timeout_from_disconnected() {
+            use std::sync::mpsc::RecvTimeoutError;
+
             let (tx, rx) = std::sync::mpsc::channel::<i32>();
             assert_eq!(
                 rx.recv_timeout(std::time::Duration::from_millis(0)),
@@ -417,7 +416,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<TryRecvError> {
+impl KaniWitness for RustStdStandard<std::sync::mpsc::TryRecvError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -430,13 +429,13 @@ impl KaniWitness for RustStdStandard<TryRecvError> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<TryRecvError>);
+bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryRecvError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryRecvError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryRecvError>",
         verifier: "kani",
-        describe: || <RustStdStandard<TryRecvError> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::mpsc::TryRecvError> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -447,6 +446,8 @@ amenable_derive::harness! {
         /// disconnected one is `Disconnected` instead.
         #[kani::proof]
         fn verify_try_recv_error_distinguishes_empty_from_disconnected() {
+            use std::sync::mpsc::TryRecvError;
+
             let (tx, rx) = std::sync::mpsc::channel::<i32>();
             assert_eq!(rx.try_recv(), Err(TryRecvError::Empty));
 

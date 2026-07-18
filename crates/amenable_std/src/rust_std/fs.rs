@@ -87,6 +87,10 @@ impl_rust_std_type!(
     "The TryLockError carrier reports why a non-blocking file lock attempt failed."
 );
 
+// `TryLockError` is written fully-qualified: `std::sync::TryLockError`
+// shares its bare name, and only the qualified path disambiguates which
+// one a given registration means for tooling reading the registry (e.g.
+// `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     DirBuilder,
     DirEntry,
@@ -97,5 +101,5 @@ register_rust_std_standard_evidence!(
     OpenOptions,
     Permissions,
     ReadDir,
-    TryLockError,
+    std::fs::TryLockError,
 );

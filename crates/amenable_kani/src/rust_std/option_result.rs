@@ -1,8 +1,5 @@
 //! `KaniWitness` impls for `core::option` and `core::result`.
 
-use std::option::{IntoIter as OptionIntoIter, Iter as OptionIter, IterMut as OptionIterMut};
-use std::result::{IntoIter as ResultIntoIter, Iter as ResultIter, IterMut as ResultIterMut};
-
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -93,7 +90,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<OptionIntoIter<i32>> {
+impl KaniWitness for RustStdStandard<core::option::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -106,13 +103,13 @@ impl KaniWitness for RustStdStandard<OptionIntoIter<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<OptionIntoIter<i32>>);
+bridge_kani_witness!(RustStdStandard<core::option::IntoIter<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OptionIntoIter<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::option::IntoIter<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<OptionIntoIter<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<core::option::IntoIter<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -133,7 +130,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<OptionIter<'static, i32>> {
+impl KaniWitness for RustStdStandard<core::option::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -146,13 +143,13 @@ impl KaniWitness for RustStdStandard<OptionIter<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<OptionIter<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<core::option::Iter<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OptionIter<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::option::Iter<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<OptionIter<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<core::option::Iter<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -172,7 +169,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<OptionIterMut<'static, i32>> {
+impl KaniWitness for RustStdStandard<core::option::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -185,13 +182,13 @@ impl KaniWitness for RustStdStandard<OptionIterMut<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<OptionIterMut<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<core::option::IterMut<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OptionIterMut<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::option::IterMut<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<OptionIterMut<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<core::option::IterMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -218,7 +215,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<ResultIntoIter<i32>> {
+impl KaniWitness for RustStdStandard<core::result::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -231,13 +228,13 @@ impl KaniWitness for RustStdStandard<ResultIntoIter<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<ResultIntoIter<i32>>);
+bridge_kani_witness!(RustStdStandard<core::result::IntoIter<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ResultIntoIter<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::result::IntoIter<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<ResultIntoIter<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<core::result::IntoIter<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -260,7 +257,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<ResultIter<'static, i32>> {
+impl KaniWitness for RustStdStandard<core::result::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -273,13 +270,13 @@ impl KaniWitness for RustStdStandard<ResultIter<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<ResultIter<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<core::result::Iter<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ResultIter<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::result::Iter<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<ResultIter<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<core::result::Iter<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -299,7 +296,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<ResultIterMut<'static, i32>> {
+impl KaniWitness for RustStdStandard<core::result::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -312,13 +309,13 @@ impl KaniWitness for RustStdStandard<ResultIterMut<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<ResultIterMut<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<core::result::IterMut<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ResultIterMut<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::result::IterMut<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<ResultIterMut<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<core::result::IterMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }

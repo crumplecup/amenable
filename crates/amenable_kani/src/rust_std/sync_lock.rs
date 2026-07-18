@@ -7,8 +7,8 @@
 //! specifically a *cross-thread* panic).
 
 use std::sync::{
-    Barrier, BarrierWaitResult, Condvar, LazyLock, Mutex, MutexGuard, Once, OnceLock, OnceState,
-    PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard, TryLockError, WaitTimeoutResult,
+    Barrier, BarrierWaitResult, LazyLock, MutexGuard, OnceLock, OnceState, PoisonError,
+    WaitTimeoutResult,
 };
 
 use amenable_core::Evidence;
@@ -18,7 +18,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Mutex<i32>> {
+impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -31,13 +31,13 @@ impl KaniWitness for RustStdStandard<Mutex<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Mutex<i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::Mutex<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Mutex<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Mutex<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Mutex<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::Mutex<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -49,7 +49,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_mutex_excludes_a_second_lock_while_held() {
             let value: i32 = kani::any();
-            let mutex = Mutex::new(value);
+            let mutex = std::sync::Mutex::new(value);
             {
                 let guard = mutex.lock().unwrap();
                 assert_eq!(*guard, value, "lock derefs to the wrapped value");
@@ -66,7 +66,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<MutexGuard<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::sync::MutexGuard<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -79,13 +79,13 @@ impl KaniWitness for RustStdStandard<MutexGuard<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<MutexGuard<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::MutexGuard<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<MutexGuard<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::MutexGuard<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<MutexGuard<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::sync::MutexGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -98,7 +98,7 @@ amenable_derive::harness! {
         fn verify_mutex_guard_writes_through() {
             let value: i32 = kani::any();
             let updated: i32 = kani::any();
-            let mutex = Mutex::new(value);
+            let mutex = std::sync::Mutex::new(value);
             {
                 let mut guard = mutex.lock().unwrap();
                 assert_eq!(*guard, value);
@@ -113,7 +113,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RwLock<i32>> {
+impl KaniWitness for RustStdStandard<std::sync::RwLock<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -126,13 +126,13 @@ impl KaniWitness for RustStdStandard<RwLock<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RwLock<i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::RwLock<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RwLock<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLock<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RwLock<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::RwLock<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -144,7 +144,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_rwlock_allows_concurrent_reads_but_not_a_write() {
             let value: i32 = kani::any();
-            let lock = RwLock::new(value);
+            let lock = std::sync::RwLock::new(value);
             {
                 let r1 = lock.read().unwrap();
                 let r2 = lock.read().unwrap();
@@ -163,7 +163,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RwLockReadGuard<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -176,13 +176,13 @@ impl KaniWitness for RustStdStandard<RwLockReadGuard<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RwLockReadGuard<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::RwLockReadGuard<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RwLockReadGuard<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLockReadGuard<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RwLockReadGuard<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -193,14 +193,14 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_rwlock_read_guard_derefs_to_the_value() {
             let value: i32 = kani::any();
-            let lock = RwLock::new(value);
+            let lock = std::sync::RwLock::new(value);
             let guard = lock.read().unwrap();
             assert_eq!(*guard, value);
         }
     }
 }
 
-impl KaniWitness for RustStdStandard<RwLockWriteGuard<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -213,13 +213,13 @@ impl KaniWitness for RustStdStandard<RwLockWriteGuard<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RwLockWriteGuard<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RwLockWriteGuard<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RwLockWriteGuard<'static, i32>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -232,7 +232,7 @@ amenable_derive::harness! {
         fn verify_rwlock_write_guard_writes_through() {
             let value: i32 = kani::any();
             let updated: i32 = kani::any();
-            let lock = RwLock::new(value);
+            let lock = std::sync::RwLock::new(value);
             {
                 let mut guard = lock.write().unwrap();
                 assert_eq!(*guard, value);
@@ -243,7 +243,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Once> {
+impl KaniWitness for RustStdStandard<std::sync::Once> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -256,13 +256,13 @@ impl KaniWitness for RustStdStandard<Once> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Once>);
+bridge_kani_witness!(RustStdStandard<std::sync::Once>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Once>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
         verifier: "kani",
-        describe: || <RustStdStandard<Once> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::Once> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -273,7 +273,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_once_runs_its_closure_exactly_once() {
             static CALLS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-            let once = Once::new();
+            let once = std::sync::Once::new();
             once.call_once(|| {
                 CALLS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
             });
@@ -319,7 +319,7 @@ amenable_derive::harness! {
         /// panicked) `Once`.
         #[kani::proof]
         fn verify_once_state_reports_not_poisoned_on_a_clean_run() {
-            let once = Once::new();
+            let once = std::sync::Once::new();
             once.call_once_force(|state| {
                 assert!(!state.is_poisoned(), "a clean Once reports not poisoned");
             });
@@ -494,7 +494,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Condvar> {
+impl KaniWitness for RustStdStandard<std::sync::Condvar> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -507,13 +507,13 @@ impl KaniWitness for RustStdStandard<Condvar> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Condvar>);
+bridge_kani_witness!(RustStdStandard<std::sync::Condvar>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Condvar>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Condvar>",
         verifier: "kani",
-        describe: || <RustStdStandard<Condvar> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::sync::Condvar> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -527,8 +527,8 @@ amenable_derive::harness! {
         fn verify_condvar_wait_timeout_reports_timing_out() {
             use std::time::Duration;
 
-            let mutex = Mutex::new(false);
-            let condvar = Condvar::new();
+            let mutex = std::sync::Mutex::new(false);
+            let condvar = std::sync::Condvar::new();
             let guard = mutex.lock().unwrap();
             let (_guard, timeout_result) = condvar
                 .wait_timeout(guard, Duration::from_millis(0))
@@ -575,7 +575,7 @@ amenable_derive::harness! {
         /// `.into_inner()` still recovers the guard.
         #[kani::proof]
         fn verify_poison_error_still_recovers_the_guards_value() {
-            let mutex = Mutex::new(0i32);
+            let mutex = std::sync::Mutex::new(0i32);
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let _guard = mutex.lock().unwrap();
                 panic!("poison it");
@@ -593,7 +593,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<TryLockError<MutexGuard<'static, i32>>> {
+impl KaniWitness for RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -606,13 +606,13 @@ impl KaniWitness for RustStdStandard<TryLockError<MutexGuard<'static, i32>>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<TryLockError<MutexGuard<'static, i32>>>);
+bridge_kani_witness!(RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryLockError<MutexGuard<'static, i32>>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>",
         verifier: "kani",
-        describe: || <RustStdStandard<TryLockError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -624,21 +624,21 @@ amenable_derive::harness! {
         /// simply already held.
         #[kani::proof]
         fn verify_try_lock_error_distinguishes_poisoned_from_would_block() {
-            let poisoned = Mutex::new(0i32);
+            let poisoned = std::sync::Mutex::new(0i32);
             let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let _guard = poisoned.lock().unwrap();
                 panic!("poison it");
             }));
             match poisoned.try_lock() {
-                Err(TryLockError::Poisoned(_)) => {}
+                Err(std::sync::TryLockError::Poisoned(_)) => {}
                 _ => panic!("expected Poisoned"),
             }
 
             let value: i32 = kani::any();
-            let held = Mutex::new(value);
+            let held = std::sync::Mutex::new(value);
             let _guard = held.lock().unwrap();
             match held.try_lock() {
-                Err(TryLockError::WouldBlock) => {}
+                Err(std::sync::TryLockError::WouldBlock) => {}
                 _ => panic!("expected WouldBlock"),
             }
         }
@@ -676,8 +676,8 @@ amenable_derive::harness! {
         fn verify_wait_timeout_result_reports_timed_out() {
             use std::time::Duration;
 
-            let mutex = Mutex::new(false);
-            let condvar = Condvar::new();
+            let mutex = std::sync::Mutex::new(false);
+            let condvar = std::sync::Condvar::new();
             let guard = mutex.lock().unwrap();
             let (_guard, timeout_result) = condvar
                 .wait_timeout(guard, Duration::from_millis(0))

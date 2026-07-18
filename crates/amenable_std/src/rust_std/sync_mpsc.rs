@@ -100,16 +100,23 @@ impl_rust_std_type!(
 
 // `i32` (and `'static` for the borrowing iterators) is the representative
 // element type/lifetime this module's proof batch covers.
+//
+// Sender/Receiver/IntoIter/Iter/TryIter/RecvTimeoutError/TryRecvError are
+// written fully-qualified: `std::sync::mpmc` and `std::sync::oneshot`
+// (both unstable, but already present in rustdoc's own inventory) define
+// their own types with the exact same bare names, so only the qualified
+// path disambiguates which channel family a given registration means for
+// tooling reading the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
-    Sender<i32>,
+    std::sync::mpsc::Sender<i32>,
     SyncSender<i32>,
-    Receiver<i32>,
-    IntoIter<i32>,
-    Iter<'static, i32>,
-    TryIter<'static, i32>,
+    std::sync::mpsc::Receiver<i32>,
+    std::sync::mpsc::IntoIter<i32>,
+    std::sync::mpsc::Iter<'static, i32>,
+    std::sync::mpsc::TryIter<'static, i32>,
     RecvError,
-    RecvTimeoutError,
+    std::sync::mpsc::RecvTimeoutError,
     SendError<i32>,
     TrySendError<i32>,
-    TryRecvError,
+    std::sync::mpsc::TryRecvError,
 );

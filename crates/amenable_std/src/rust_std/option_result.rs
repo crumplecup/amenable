@@ -73,18 +73,19 @@ impl_rust_std_type_lifetime1!(
 );
 
 // `i32` (and `'static` for the borrowing iterators) is the representative
-// element type/lifetime this module's proof batch covers. The
-// `Option`/`Result`-prefixed names here are this file's own import
-// aliases (see the `use` block above), not the real Rust type names —
-// `rust_std::option_result`'s Kani proofs import with the same aliases,
-// so the evidence strings still match exactly.
+// element type/lifetime this module's proof batch covers. The iterator
+// carriers are written fully-qualified: their bare names (`IntoIter`,
+// `Iter`, `IterMut`) recur across many other types with the exact same
+// spelling, so only the qualified path disambiguates which carrier a
+// given registration means for tooling reading the registry (e.g.
+// `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     Option<i32>,
     Result<i32, i32>,
-    OptionIntoIter<i32>,
-    OptionIter<'static, i32>,
-    OptionIterMut<'static, i32>,
-    ResultIntoIter<i32>,
-    ResultIter<'static, i32>,
-    ResultIterMut<'static, i32>,
+    core::option::IntoIter<i32>,
+    core::option::Iter<'static, i32>,
+    core::option::IterMut<'static, i32>,
+    core::result::IntoIter<i32>,
+    core::result::Iter<'static, i32>,
+    core::result::IterMut<'static, i32>,
 );
