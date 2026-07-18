@@ -15,6 +15,7 @@ use std::io::{
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime0,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -155,4 +156,26 @@ impl_rust_std_type!(
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.WriterPanicked.html",
     "The WriterPanicked carrier reports that a LineWriter's inner writer panicked, and returns the buffered data that couldn't be written."
+);
+
+// `&'static [u8]` (an in-memory Read+BufRead source) and `Vec<u8>` (an
+// in-memory Write sink) are the representative reader/writer types this
+// module's proof batch covers.
+register_rust_std_standard_evidence!(
+    BufReader<&'static [u8]>,
+    BufWriter<Vec<u8>>,
+    Bytes<&'static [u8]>,
+    IntoInnerError<BufWriter<Vec<u8>>>,
+    LineWriter<Vec<u8>>,
+    Lines<&'static [u8]>,
+    PipeReader,
+    PipeWriter,
+    Split<&'static [u8]>,
+    Stderr,
+    StderrLock<'static>,
+    Stdin,
+    StdinLock<'static>,
+    Stdout,
+    StdoutLock<'static>,
+    WriterPanicked,
 );

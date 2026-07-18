@@ -5,7 +5,9 @@ use std::path::{
     StripPrefixError,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_lifetime0!(
     Ancestors,
@@ -85,4 +87,21 @@ impl_rust_std_type!(
     "std::path",
     "https://doc.rust-lang.org/std/path/struct.StripPrefixError.html",
     "The StripPrefixError carrier reports that a Path did not start with the given prefix."
+);
+
+// `'static` is the representative lifetime this module's proof batch
+// covers. `Prefix`/`PrefixComponent` are only meaningfully exercised on
+// Windows targets, since Unix path parsing never produces a prefix
+// component.
+register_rust_std_standard_evidence!(
+    Ancestors<'static>,
+    Component<'static>,
+    Components<'static>,
+    Display<'static>,
+    Iter<'static>,
+    Path,
+    PathBuf,
+    Prefix<'static>,
+    PrefixComponent<'static>,
+    StripPrefixError,
 );

@@ -5,7 +5,7 @@ use std::fs::{
     TryLockError,
 };
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     DirBuilder,
@@ -85,4 +85,17 @@ impl_rust_std_type!(
     "std::fs",
     "https://doc.rust-lang.org/std/fs/enum.TryLockError.html",
     "The TryLockError carrier reports why a non-blocking file lock attempt failed."
+);
+
+register_rust_std_standard_evidence!(
+    DirBuilder,
+    DirEntry,
+    File,
+    FileTimes,
+    FileType,
+    Metadata,
+    OpenOptions,
+    Permissions,
+    ReadDir,
+    TryLockError,
 );

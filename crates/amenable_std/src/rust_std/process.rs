@@ -9,7 +9,9 @@ use std::process::{
     ExitStatus, Output, Stdio,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type!(
     Child,
@@ -97,4 +99,20 @@ impl_rust_std_type!(
     "std::process",
     "https://doc.rust-lang.org/std/process/struct.Stdio.html",
     "The Stdio carrier configures how a child process's stdin/stdout/stderr should be handled."
+);
+
+// `'static` is the representative lifetime this module's proof batch
+// covers.
+register_rust_std_standard_evidence!(
+    Child,
+    ChildStderr,
+    ChildStdin,
+    ChildStdout,
+    Command,
+    CommandArgs<'static>,
+    CommandEnvs<'static>,
+    ExitCode,
+    ExitStatus,
+    Output,
+    Stdio,
 );
