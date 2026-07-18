@@ -5,7 +5,9 @@
 
 use std::net::{Incoming, Shutdown, TcpListener, TcpStream, UdpSocket};
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_lifetime0!(
     Incoming,
@@ -45,4 +47,12 @@ impl_rust_std_type!(
     "std::net",
     "https://doc.rust-lang.org/std/net/struct.UdpSocket.html",
     "The UdpSocket carrier is a bound UDP socket for sending and receiving datagrams."
+);
+
+register_rust_std_standard_evidence!(
+    Incoming<'static>,
+    Shutdown,
+    TcpListener,
+    TcpStream,
+    UdpSocket,
 );

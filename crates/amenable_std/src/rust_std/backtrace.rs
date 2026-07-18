@@ -5,7 +5,7 @@
 
 use std::backtrace::{Backtrace, BacktraceStatus};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     Backtrace,
@@ -22,3 +22,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/std/backtrace/enum.BacktraceStatus.html",
     "The BacktraceStatus carrier reports whether a Backtrace was actually captured, and why not if not."
 );
+
+register_rust_std_standard_evidence!(Backtrace, BacktraceStatus);

@@ -6,6 +6,7 @@ use std::thread::{
 
 use crate::rust_std::macros::{
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime1,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type!(
@@ -78,4 +79,17 @@ impl_rust_std_type!(
     "std::thread",
     "https://doc.rust-lang.org/std/thread/struct.ThreadId.html",
     "The ThreadId carrier uniquely identifies a thread for the lifetime of the process."
+);
+
+// `i32` is the representative payload type for JoinHandle/LocalKey, and
+// `'static` the representative lifetime for Scope/ScopedJoinHandle.
+register_rust_std_standard_evidence!(
+    AccessError,
+    Builder,
+    JoinHandle<i32>,
+    LocalKey<std::cell::Cell<i32>>,
+    Scope<'static, 'static>,
+    ScopedJoinHandle<'static, i32>,
+    Thread,
+    ThreadId,
 );

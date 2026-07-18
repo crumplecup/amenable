@@ -2,7 +2,9 @@
 
 use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs};
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type!(
     Args,
@@ -58,4 +60,15 @@ impl_rust_std_type!(
     "std::env",
     "https://doc.rust-lang.org/std/env/struct.VarsOs.html",
     "The VarsOs carrier lazily yields the process's environment variables as (OsString, OsString) pairs."
+);
+
+// `'static` is the representative lifetime for `SplitPaths`.
+register_rust_std_standard_evidence!(
+    Args,
+    ArgsOs,
+    JoinPathsError,
+    SplitPaths<'static>,
+    VarError,
+    Vars,
+    VarsOs,
 );

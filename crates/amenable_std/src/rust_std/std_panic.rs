@@ -6,7 +6,7 @@
 
 use std::panic::PanicHookInfo;
 
-use crate::rust_std::macros::impl_rust_std_type_lifetime0;
+use crate::rust_std::macros::{impl_rust_std_type_lifetime0, register_rust_std_standard_evidence};
 
 impl_rust_std_type_lifetime0!(
     PanicHookInfo,
@@ -15,3 +15,5 @@ impl_rust_std_type_lifetime0!(
     "https://doc.rust-lang.org/std/panic/struct.PanicHookInfo.html",
     "The PanicHookInfo carrier describes an in-progress panic as seen by a panic hook: its message, location, and payload."
 );
+
+register_rust_std_standard_evidence!(PanicHookInfo<'static>);

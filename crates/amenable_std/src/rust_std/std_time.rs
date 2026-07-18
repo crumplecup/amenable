@@ -2,7 +2,7 @@
 
 use std::time::{Instant, SystemTime, SystemTimeError};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     Instant,
@@ -27,3 +27,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/std/time/struct.SystemTimeError.html",
     "The SystemTimeError carrier reports that a SystemTime subtraction went backward in time."
 );
+
+register_rust_std_standard_evidence!(Instant, SystemTime, SystemTimeError);

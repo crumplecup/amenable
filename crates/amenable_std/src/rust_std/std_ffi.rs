@@ -5,7 +5,7 @@
 
 use std::ffi::{OsStr, OsString};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     OsStr,
@@ -22,3 +22,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/std/ffi/struct.OsString.html",
     "The OsString carrier owns a platform-native string, capable of representing what the platform's real filenames/env vars allow."
 );
+
+register_rust_std_standard_evidence!(OsStr, OsString);
