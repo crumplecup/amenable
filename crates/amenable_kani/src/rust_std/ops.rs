@@ -1,6 +1,6 @@
 //! `KaniWitness` impls for `core::ops` (ranges, `Bound`, `ControlFlow`).
 
-use std::ops::{Bound, ControlFlow, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
+use std::ops::{Bound, ControlFlow, RangeTo};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -9,7 +9,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Range<i32>> {
+impl KaniWitness for RustStdStandard<std::ops::Range<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -22,13 +22,13 @@ impl KaniWitness for RustStdStandard<Range<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Range<i32>>);
+bridge_kani_witness!(RustStdStandard<std::ops::Range<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Range<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::Range<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Range<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::ops::Range<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -59,7 +59,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RangeFrom<i32>> {
+impl KaniWitness for RustStdStandard<std::ops::RangeFrom<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -72,13 +72,13 @@ impl KaniWitness for RustStdStandard<RangeFrom<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RangeFrom<i32>>);
+bridge_kani_witness!(RustStdStandard<std::ops::RangeFrom<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeFrom<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::RangeFrom<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RangeFrom<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::ops::RangeFrom<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -143,7 +143,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RangeToInclusive<i32>> {
+impl KaniWitness for RustStdStandard<std::ops::RangeToInclusive<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -156,13 +156,13 @@ impl KaniWitness for RustStdStandard<RangeToInclusive<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RangeToInclusive<i32>>);
+bridge_kani_witness!(RustStdStandard<std::ops::RangeToInclusive<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeToInclusive<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::RangeToInclusive<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RangeToInclusive<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::ops::RangeToInclusive<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -185,7 +185,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<RangeInclusive<i32>> {
+impl KaniWitness for RustStdStandard<std::ops::RangeInclusive<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -198,13 +198,13 @@ impl KaniWitness for RustStdStandard<RangeInclusive<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<RangeInclusive<i32>>);
+bridge_kani_witness!(RustStdStandard<std::ops::RangeInclusive<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeInclusive<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::RangeInclusive<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<RangeInclusive<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::ops::RangeInclusive<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 

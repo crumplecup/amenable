@@ -47,4 +47,14 @@ impl_rust_std_type!(
 // reference wrapper needed. c_void is intentionally excluded here — it is
 // only ever used behind a raw pointer and, unlike CStr, has no safe
 // constructor or accessor to write a checked proof against.
-register_rust_std_standard_evidence!(CStr, FromBytesUntilNulError, FromBytesWithNulError, c_void,);
+//
+// c_void is written fully-qualified: `std::os::raw::c_void` is a distinct
+// rustdoc item sharing this bare name — only the qualified path
+// disambiguates which one a given registration means for tooling reading
+// the registry (e.g. `elicit_doc`'s coverage report).
+register_rust_std_standard_evidence!(
+    CStr,
+    FromBytesUntilNulError,
+    FromBytesWithNulError,
+    core::ffi::c_void,
+);

@@ -5,9 +5,7 @@
 //! `Display`, nothing to build and check. It stays at the trusted
 //! disposition.
 
-use core::fmt::{
-    Alignment, Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Error, Formatter,
-};
+use core::fmt::{Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -16,7 +14,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 
-impl KaniWitness for RustStdStandard<Alignment> {
+impl KaniWitness for RustStdStandard<core::fmt::Alignment> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -29,13 +27,13 @@ impl KaniWitness for RustStdStandard<Alignment> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Alignment>);
+bridge_kani_witness!(RustStdStandard<core::fmt::Alignment>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Alignment>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::fmt::Alignment>",
         verifier: "kani",
-        describe: || <RustStdStandard<Alignment> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<core::fmt::Alignment> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -101,7 +99,7 @@ amenable_derive::harness! {
     }
 }
 
-impl_kani_witness_trusted!(Error);
+impl_kani_witness_trusted!(core::fmt::Error);
 
 impl KaniWitness for RustStdStandard<Formatter<'static>> {
     type SupportingEvidence = Self;

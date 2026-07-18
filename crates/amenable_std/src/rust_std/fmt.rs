@@ -94,10 +94,16 @@ impl_debug_builder!(
 // `'static` is the representative lifetime this module's proof batch
 // covers (the Debug*-builder family needs two, `'a, 'b`, per its own
 // `impl<'a, 'b: 'a>` shape above).
+//
+// Alignment/Error are written fully-qualified: `core::mem::Alignment`
+// (unstable, but already present in rustdoc's own inventory) and
+// `std::io::Error` share these bare names — only the qualified path
+// disambiguates which one a given registration means for tooling reading
+// the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
-    Alignment,
+    std::fmt::Alignment,
     Arguments<'static>,
-    Error,
+    std::fmt::Error,
     Formatter<'static>,
     DebugList<'static, 'static>,
     DebugMap<'static, 'static>,

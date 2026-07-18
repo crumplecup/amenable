@@ -13,9 +13,9 @@
 //! names `amenable_std::rust_std::iter`'s evidence registration uses.
 
 use std::iter::{
-    Chain, Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten, FromFn,
-    Fuse, Inspect, Map, MapWhile, Once, OnceWith, Peekable, Repeat, RepeatN, RepeatWith, Rev, Scan,
-    Skip, SkipWhile, StepBy, Successors, Take, TakeWhile, Zip,
+    Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map,
+    MapWhile, OnceWith, Peekable, RepeatN, RepeatWith, Rev, Scan, Skip, SkipWhile, StepBy,
+    Successors, TakeWhile, Zip,
 };
 use std::ops::Range;
 use std::slice::Iter;
@@ -257,7 +257,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Chain<Range<i32>, Range<i32>>> {
+impl KaniWitness for RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -270,13 +270,13 @@ impl KaniWitness for RustStdStandard<Chain<Range<i32>, Range<i32>>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Chain<Range<i32>, Range<i32>>>);
+bridge_kani_witness!(RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Chain<Range<i32>, Range<i32>>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Chain<Range<i32>, Range<i32>>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -850,7 +850,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Take<Range<i32>>> {
+impl KaniWitness for RustStdStandard<std::iter::Take<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -863,13 +863,13 @@ impl KaniWitness for RustStdStandard<Take<Range<i32>>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Take<Range<i32>>>);
+bridge_kani_witness!(RustStdStandard<std::iter::Take<Range<i32>>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Take<Range<i32>>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Take<Range<i32>>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Take<Range<i32>>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::iter::Take<Range<i32>>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -982,7 +982,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Once<i32>> {
+impl KaniWitness for RustStdStandard<std::iter::Once<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -995,13 +995,13 @@ impl KaniWitness for RustStdStandard<Once<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Once<i32>>);
+bridge_kani_witness!(RustStdStandard<std::iter::Once<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Once<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Once<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Once<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::iter::Once<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -1057,7 +1057,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Repeat<i32>> {
+impl KaniWitness for RustStdStandard<std::iter::Repeat<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -1070,13 +1070,13 @@ impl KaniWitness for RustStdStandard<Repeat<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Repeat<i32>>);
+bridge_kani_witness!(RustStdStandard<std::iter::Repeat<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Repeat<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Repeat<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Repeat<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::iter::Repeat<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -1182,7 +1182,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Empty<i32>> {
+impl KaniWitness for RustStdStandard<std::iter::Empty<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -1195,13 +1195,13 @@ impl KaniWitness for RustStdStandard<Empty<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Empty<i32>>);
+bridge_kani_witness!(RustStdStandard<std::iter::Empty<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Empty<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Empty<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Empty<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::iter::Empty<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -1210,7 +1210,7 @@ amenable_derive::harness! {
         /// `empty` never yields a value.
         #[kani::proof]
         fn verify_empty_yields_nothing() {
-            let mut e: Empty<i32> = std::iter::empty();
+            let mut e: std::iter::Empty<i32> = std::iter::empty();
             assert_eq!(e.next(), None, "empty never yields a value");
         }
     }
@@ -1262,7 +1262,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<FromFn<fn() -> Option<i32>>> {
+impl KaniWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -1275,13 +1275,13 @@ impl KaniWitness for RustStdStandard<FromFn<fn() -> Option<i32>>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<FromFn<fn() -> Option<i32>>>);
+bridge_kani_witness!(RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromFn<fn() -> Option<i32>>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>",
         verifier: "kani",
-        describe: || <RustStdStandard<FromFn<fn() -> Option<i32>>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> as KaniWitness>::proof()
             .to_string(),
     }
 }

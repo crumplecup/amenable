@@ -220,13 +220,19 @@ iter_adapter1!(
 // to a real item, confirmed empirically), and this macro only ever
 // stringifies its argument — never uses it in a real type position — so
 // there is nothing to import.
+//
+// Chain/Empty/FromFn/Once/Repeat/Take are written fully-qualified: each
+// bare name is shared by another module (e.g. `std::sync::Once`,
+// `core::iter::Take` vs. other truncating adapters) — only the qualified
+// path disambiguates which one a given registration means for tooling
+// reading the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     Map<Range<i32>, fn(i32) -> i32>,
     Filter<Range<i32>, fn(&i32) -> bool>,
     FilterMap<Range<i32>, fn(i32) -> Option<i32>>,
     FlatMap<Range<i32>, Range<i32>, fn(i32) -> Range<i32>>,
     Flatten<IntoIter<Range<i32>>>,
-    Chain<Range<i32>, Range<i32>>,
+    std::iter::Chain<Range<i32>, Range<i32>>,
     Zip<Range<i32>, Range<i32>>,
     Enumerate<Range<i32>>,
     Rev<Range<i32>>,
@@ -240,15 +246,15 @@ register_rust_std_standard_evidence!(
     Skip<Range<i32>>,
     SkipWhile<Range<i32>, fn(&i32) -> bool>,
     StepBy<Range<i32>>,
-    Take<Range<i32>>,
+    std::iter::Take<Range<i32>>,
     TakeWhile<Range<i32>, fn(&i32) -> bool>,
     MapWhile<Range<i32>, fn(i32) -> Option<i32>>,
-    Once<i32>,
+    std::iter::Once<i32>,
     OnceWith<fn() -> i32>,
-    Repeat<i32>,
+    std::iter::Repeat<i32>,
     RepeatWith<fn() -> i32>,
     RepeatN<i32>,
-    Empty<i32>,
+    std::iter::Empty<i32>,
     Successors<i32, fn(&i32) -> Option<i32>>,
-    FromFn<fn() -> Option<i32>>,
+    std::iter::FromFn<fn() -> Option<i32>>,
 );

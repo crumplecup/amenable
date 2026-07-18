@@ -1,6 +1,6 @@
 //! `KaniWitness` impls for `core::cmp`.
 
-use std::cmp::{Ordering, Reverse};
+use std::cmp::Reverse;
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -9,7 +9,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Ordering> {
+impl KaniWitness for RustStdStandard<std::cmp::Ordering> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -22,13 +22,13 @@ impl KaniWitness for RustStdStandard<Ordering> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Ordering>);
+bridge_kani_witness!(RustStdStandard<std::cmp::Ordering>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
         verifier: "kani",
-        describe: || <RustStdStandard<Ordering> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::cmp::Ordering> as KaniWitness>::proof().to_string(),
     }
 }
 

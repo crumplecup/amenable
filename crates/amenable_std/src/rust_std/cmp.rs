@@ -25,4 +25,9 @@ impl_rust_std_type_generic1!(
 // Evidence registration is per concrete type (see `register_rust_std_
 // standard_evidence!`'s own doc comment) — `Reverse<i32>` is the one
 // concrete instantiation this module's proof batch covers.
-register_rust_std_standard_evidence!(Ordering, Reverse<i32>);
+//
+// Ordering is written fully-qualified: `core::sync::atomic::Ordering`
+// shares its bare name — only the qualified path disambiguates which one a
+// given registration means for tooling reading the registry (e.g.
+// `elicit_doc`'s coverage report).
+register_rust_std_standard_evidence!(std::cmp::Ordering, Reverse<i32>);

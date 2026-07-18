@@ -4,7 +4,7 @@
 //! constructor or accessor — nothing a harness can build to check a
 //! property of. It stays at the trusted disposition.
 
-use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError, c_void};
+use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -154,4 +154,4 @@ amenable_derive::harness! {
     }
 }
 
-impl_kani_witness_trusted!(c_void);
+impl_kani_witness_trusted!(core::ffi::c_void);

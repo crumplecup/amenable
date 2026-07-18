@@ -78,12 +78,19 @@ impl_rust_std_type_generic2!(
 // Evidence registration is per concrete type (see `register_rust_std_
 // standard_evidence!`'s own doc comment) — `i32` is the one concrete
 // element type this module's proof batch covers.
+//
+// Range/RangeFrom/RangeInclusive/RangeToInclusive are written
+// fully-qualified: each bare name is shared by the newer, still-unstable
+// `core::range` family (already present in rustdoc's own inventory) —
+// only the qualified path disambiguates which one a given registration
+// means for tooling reading the registry (e.g. `elicit_doc`'s coverage
+// report).
 register_rust_std_standard_evidence!(
-    Range<i32>,
-    RangeFrom<i32>,
+    std::ops::Range<i32>,
+    std::ops::RangeFrom<i32>,
     RangeTo<i32>,
-    RangeToInclusive<i32>,
-    RangeInclusive<i32>,
+    std::ops::RangeToInclusive<i32>,
+    std::ops::RangeInclusive<i32>,
     RangeFull,
     Bound<i32>,
     ControlFlow<i32, i32>,
