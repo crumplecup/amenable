@@ -15,7 +15,9 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_lifetime0!(
     EncodeWide,
@@ -63,4 +65,13 @@ impl_rust_std_type!(
     "std::os::windows::io",
     "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedSocket.html",
     "The OwnedSocket carrier owns a raw Windows SOCKET, closing it on drop."
+);
+
+register_rust_std_standard_evidence!(
+    EncodeWide<'static>,
+    BorrowedHandle<'static>,
+    BorrowedSocket<'static>,
+    HandleOrInvalid,
+    OwnedHandle,
+    OwnedSocket,
 );

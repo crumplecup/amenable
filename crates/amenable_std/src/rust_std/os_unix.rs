@@ -18,7 +18,9 @@
 
 use std::os::unix::io::{BorrowedFd, OwnedFd};
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_lifetime0!(
     BorrowedFd,
@@ -35,3 +37,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/std/os/unix/io/struct.OwnedFd.html",
     "The OwnedFd carrier owns a raw Unix file descriptor, closing it on drop."
 );
+
+register_rust_std_standard_evidence!(BorrowedFd<'static>, OwnedFd);

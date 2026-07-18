@@ -38,6 +38,8 @@ mod net;
 mod num;
 mod ops;
 mod option_result;
+mod os_unix;
+mod os_windows;
 mod panic;
 mod path;
 mod pin;
