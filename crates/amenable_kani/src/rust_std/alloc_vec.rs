@@ -37,7 +37,12 @@ bridge_kani_witness!(RustStdStandard<Vec<i32>>);
 amenable_derive::harness! {
     kani, VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC, {
         /// `push` appends and is indexable, and `pop` removes and
-        /// returns the last element, leaving the Vec empty.
+        /// returns the last element, leaving the Vec empty. Also
+        /// checked with a drop-instrumented, non-`Copy` witness type:
+        /// `pop()` transfers ownership out *without* dropping the
+        /// value, and dropping the Vec drops every remaining element
+        /// exactly once — `i32` alone has no drop glue to distinguish
+        /// "moved out cleanly" from "dropped early" or "leaked".
         #[kani::proof]
         fn verify_vec_push_pop_round_trips() {
             let value: i32 = kani::any();
@@ -47,6 +52,26 @@ amenable_derive::harness! {
             assert_eq!(v[0], value, "the pushed value is indexable");
             assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
             assert!(v.is_empty(), "pop leaves the Vec empty");
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witnesses = Vec::new();
+            witnesses.push(DropWitness { drop_count: drop_count.clone() });
+            witnesses.push(DropWitness { drop_count: drop_count.clone() });
+            let popped = witnesses.pop().unwrap();
+            assert_eq!(drop_count.get(), 0, "pop does not drop the returned value");
+            drop(popped);
+            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            drop(witnesses);
+            assert_eq!(drop_count.get(), 2, "dropping the Vec drops the remaining element");
         }
     }
 }

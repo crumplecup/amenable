@@ -57,7 +57,12 @@ amenable_derive::harness! {
     kani, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC, {
         /// Unlike a hash map, `BTreeMap::iter` always yields entries in
         /// ascending key order, regardless of insertion order — checked
-        /// by inserting the larger key first.
+        /// by inserting the larger key first. Also checked with a
+        /// drop-instrumented, non-`Copy` value type: `remove()`
+        /// transfers the value out without dropping it, and dropping
+        /// the map drops every remaining value exactly once — `i32`
+        /// alone has no drop glue to distinguish "moved out cleanly"
+        /// from "dropped early" or "leaked".
         #[kani::proof]
         fn verify_btree_map_iterates_in_key_order() {
             let k1: i32 = kani::any();
@@ -75,6 +80,26 @@ amenable_derive::harness! {
                 vec![(&k1, &v1), (&k2, &v2)],
                 "iteration is in ascending key order despite insertion order"
             );
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_map = BTreeMap::new();
+            witness_map.insert(1, DropWitness { drop_count: drop_count.clone() });
+            witness_map.insert(2, DropWitness { drop_count: drop_count.clone() });
+            let removed = witness_map.remove(&1).unwrap();
+            assert_eq!(drop_count.get(), 0, "remove does not drop the returned value");
+            drop(removed);
+            assert_eq!(drop_count.get(), 1, "the removed value drops once its owner drops it");
+            drop(witness_map);
+            assert_eq!(drop_count.get(), 2, "dropping the map drops the remaining value");
         }
     }
 }
@@ -106,7 +131,12 @@ amenable_derive::harness! {
     kani, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, {
         /// Same ordering guarantee as `BTreeMap`, for a set: `iter`
         /// yields elements in ascending order regardless of insertion
-        /// order.
+        /// order. Also checked with a drop-instrumented, `Ord`-by-id
+        /// witness type standing in as the element itself (a set's
+        /// elements, unlike a map's values, must be `Ord`): `.take()`
+        /// transfers the real stored element out without dropping it —
+        /// only the probe key used to look it up gets dropped — and
+        /// dropping the set drops every remaining element exactly once.
         #[kani::proof]
         fn verify_btree_set_iterates_in_sorted_order() {
             let a: i32 = kani::any();
@@ -122,6 +152,47 @@ amenable_derive::harness! {
                 vec![&a, &b],
                 "iteration is in ascending order despite insertion order"
             );
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_set = BTreeSet::new();
+            witness_set.insert(OrderedDropWitness { id: 1, drop_count: drop_count.clone() });
+            witness_set.insert(OrderedDropWitness { id: 2, drop_count: drop_count.clone() });
+            let probe = OrderedDropWitness { id: 1, drop_count: drop_count.clone() };
+            let taken = witness_set.take(&probe);
+            assert_eq!(drop_count.get(), 0, "take does not drop the probe key or the stored element");
+            assert!(taken.is_some());
+            drop(probe);
+            assert_eq!(drop_count.get(), 1, "the probe key drops once its owner drops it");
+            drop(taken);
+            assert_eq!(drop_count.get(), 2, "the taken element drops once its owner drops it");
+            drop(witness_set);
+            assert_eq!(drop_count.get(), 3, "dropping the set drops the remaining element");
         }
     }
 }
@@ -155,7 +226,12 @@ amenable_derive::harness! {
         /// guarantees priority order for: it always returns the
         /// greatest remaining element first. (Plain iteration —
         /// `Drain`/`IntoIter`/`Iter` — does not share this guarantee;
-        /// see this module's own doc comment.)
+        /// see this module's own doc comment.) Also checked with a
+        /// drop-instrumented, `Ord`-by-id witness type standing in as
+        /// the element itself (a heap's elements must be `Ord`):
+        /// `.pop()` transfers ownership out without dropping the
+        /// value, and dropping the heap drops every remaining element
+        /// exactly once.
         #[kani::proof]
         fn verify_binary_heap_pop_yields_the_maximum_first() {
             let a: i32 = kani::any();
@@ -166,6 +242,43 @@ amenable_derive::harness! {
             heap.push(b);
             assert_eq!(heap.pop(), Some(a.max(b)), "pop returns the greatest element first");
             assert_eq!(heap.pop(), Some(a.min(b)), "the second pop returns the remaining element");
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_heap = BinaryHeap::new();
+            witness_heap.push(OrderedDropWitness { id: 1, drop_count: drop_count.clone() });
+            witness_heap.push(OrderedDropWitness { id: 2, drop_count: drop_count.clone() });
+            let popped = witness_heap.pop().unwrap();
+            assert_eq!(drop_count.get(), 0, "pop does not drop the returned value");
+            drop(popped);
+            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            drop(witness_heap);
+            assert_eq!(drop_count.get(), 2, "dropping the heap drops the remaining element");
         }
     }
 }
@@ -196,7 +309,11 @@ bridge_kani_witness!(RustStdStandard<LinkedList<i32>>);
 amenable_derive::harness! {
     kani, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
         /// `push_back` followed by `pop_front` behaves as a FIFO
-        /// queue: elements come out in the order they were pushed.
+        /// queue: elements come out in the order they were pushed. Also
+        /// checked with a drop-instrumented, non-`Copy` witness type:
+        /// `pop_front()` transfers ownership out without dropping the
+        /// value, and dropping the list drops every remaining element
+        /// exactly once.
         #[kani::proof]
         fn verify_linked_list_is_fifo_through_back_and_front() {
             let a: i32 = kani::any();
@@ -207,6 +324,26 @@ amenable_derive::harness! {
             list.push_back(b);
             assert_eq!(list.pop_front(), Some(a), "the first-pushed element comes out first");
             assert_eq!(list.pop_front(), Some(b));
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_list = LinkedList::new();
+            witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+            let popped = witness_list.pop_front().unwrap();
+            assert_eq!(drop_count.get(), 0, "pop_front does not drop the returned value");
+            drop(popped);
+            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            drop(witness_list);
+            assert_eq!(drop_count.get(), 2, "dropping the list drops the remaining element");
         }
     }
 }
@@ -239,7 +376,11 @@ amenable_derive::harness! {
         /// Unlike `LinkedList` (back-only push), `VecDeque` is
         /// genuinely double-ended: pushing one element to the back and
         /// another to the front, then popping from each end, returns
-        /// exactly the element pushed to that end.
+        /// exactly the element pushed to that end. Also checked with a
+        /// drop-instrumented, non-`Copy` witness type: `pop_front()`
+        /// transfers ownership out without dropping the value, and
+        /// dropping the deque drops every remaining element exactly
+        /// once.
         #[kani::proof]
         fn verify_vec_deque_pushes_and_pops_from_both_ends() {
             let a: i32 = kani::any();
@@ -250,6 +391,26 @@ amenable_derive::harness! {
             dq.push_front(b);
             assert_eq!(dq.pop_front(), Some(b), "pop_front returns the front-pushed element");
             assert_eq!(dq.pop_back(), Some(a), "pop_back returns the back-pushed element");
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_dq = VecDeque::new();
+            witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
+            let popped = witness_dq.pop_front().unwrap();
+            assert_eq!(drop_count.get(), 0, "pop_front does not drop the returned value");
+            drop(popped);
+            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            drop(witness_dq);
+            assert_eq!(drop_count.get(), 2, "dropping the deque drops the remaining element");
         }
     }
 }

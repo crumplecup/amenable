@@ -35,7 +35,12 @@ bridge_kani_witness!(RustStdStandard<Box<i32>>);
 amenable_derive::harness! {
     kani, VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC, {
         /// `Box::new` derefs to the value it wraps, and a write through
-        /// `DerefMut` is visible on the next read.
+        /// `DerefMut` is visible on the next read. Checked with `i32`
+        /// for the deref/write claim, and separately with a
+        /// drop-instrumented, non-`Copy` witness type to confirm the
+        /// wrapped value is dropped exactly once when the box is —
+        /// `i32` alone can't distinguish "dropped correctly" from
+        /// "dropped twice" or "leaked", since it has no drop glue.
         #[kani::proof]
         fn verify_box_derefs_and_writes_through() {
             let value: i32 = kani::any();
@@ -45,6 +50,21 @@ amenable_derive::harness! {
             let updated: i32 = kani::any();
             *boxed = updated;
             assert_eq!(*boxed, updated, "a write through deref_mut is visible");
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let witness = Box::new(DropWitness { drop_count: drop_count.clone() });
+            assert_eq!(drop_count.get(), 0, "the value isn't dropped while still boxed");
+            drop(witness);
+            assert_eq!(drop_count.get(), 1, "dropping the box drops the wrapped value exactly once");
         }
     }
 }
