@@ -214,6 +214,14 @@ impl_rust_std_type_generic1!(
 // element type/lifetime this module's proof batch covers.
 // `fn(&mut i32) -> bool` stands in for `LinkedListExtractIf`'s predicate
 // closure, which has no nameable type of its own.
+//
+// The Drain/IntoIter/Iter/IterMut/PeekMut/ExtractIf carriers are written
+// fully-qualified here, not via the locally-aliased `BinaryHeapDrain`-style
+// names imported above: those bare names (`Drain`, `IntoIter`, `Iter`, ...)
+// recur across many other containers with the exact same spelling, so only
+// the qualified path disambiguates which container's carrier a given
+// registration means for tooling reading the registry (e.g. `elicit_doc`'s
+// coverage report).
 register_rust_std_standard_evidence!(
     BTreeMap<i32, i32>,
     BTreeSet<i32>,
@@ -221,16 +229,16 @@ register_rust_std_standard_evidence!(
     LinkedList<i32>,
     VecDeque<i32>,
     TryReserveError,
-    BinaryHeapDrain<'static, i32>,
-    BinaryHeapIntoIter<i32>,
-    BinaryHeapIter<'static, i32>,
-    BinaryHeapPeekMut<'static, i32>,
-    LinkedListIter<'static, i32>,
-    LinkedListIterMut<'static, i32>,
-    LinkedListIntoIter<i32>,
-    LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>,
-    VecDequeDrain<'static, i32>,
-    VecDequeIter<'static, i32>,
-    VecDequeIterMut<'static, i32>,
-    VecDequeIntoIter<i32>,
+    std::collections::binary_heap::Drain<'static, i32>,
+    std::collections::binary_heap::IntoIter<i32>,
+    std::collections::binary_heap::Iter<'static, i32>,
+    std::collections::binary_heap::PeekMut<'static, i32>,
+    std::collections::linked_list::Iter<'static, i32>,
+    std::collections::linked_list::IterMut<'static, i32>,
+    std::collections::linked_list::IntoIter<i32>,
+    std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    std::collections::vec_deque::Drain<'static, i32>,
+    std::collections::vec_deque::Iter<'static, i32>,
+    std::collections::vec_deque::IterMut<'static, i32>,
+    std::collections::vec_deque::IntoIter<i32>,
 );

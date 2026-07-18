@@ -72,10 +72,16 @@ impl<I: Iterator> crate::RustStdType for std::vec::Splice<'_, I> {
 // the one concrete iterator type this batch exercises it with.
 // `fn(&mut i32) -> bool` stands in for ExtractIf's predicate closure,
 // which has no nameable type of its own.
+//
+// Drain/IntoIter/ExtractIf/Splice are written fully-qualified: their bare
+// names all recur across other containers with the exact same spelling,
+// so only the qualified path disambiguates which container's carrier a
+// given registration means for tooling reading the registry (e.g.
+// `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     Vec<i32>,
-    VecDrain<'static, i32>,
-    VecIntoIter<i32>,
-    VecExtractIf<'static, i32, fn(&mut i32) -> bool>,
-    Splice<'static, VecIntoIter<i32>>,
+    std::vec::Drain<'static, i32>,
+    std::vec::IntoIter<i32>,
+    std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    std::vec::Splice<'static, std::vec::IntoIter<i32>>,
 );

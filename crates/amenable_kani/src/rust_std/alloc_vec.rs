@@ -1,8 +1,6 @@
 //! `KaniWitness` impls for `alloc::vec`.
 
-use std::vec::{
-    Drain as VecDrain, ExtractIf as VecExtractIf, IntoIter as VecIntoIter, Splice, Vec,
-};
+use std::vec::Vec;
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -76,7 +74,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<VecDrain<'static, i32>> {
+impl KaniWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -89,13 +87,13 @@ impl KaniWitness for RustStdStandard<VecDrain<'static, i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<VecDrain<'static, i32>>);
+bridge_kani_witness!(RustStdStandard<std::vec::Drain<'static, i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecDrain<'static, i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::Drain<'static, i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<VecDrain<'static, i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::vec::Drain<'static, i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -115,7 +113,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<VecIntoIter<i32>> {
+impl KaniWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -128,13 +126,13 @@ impl KaniWitness for RustStdStandard<VecIntoIter<i32>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<VecIntoIter<i32>>);
+bridge_kani_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecIntoIter<i32>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::IntoIter<i32>>",
         verifier: "kani",
-        describe: || <RustStdStandard<VecIntoIter<i32>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::vec::IntoIter<i32>> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -155,7 +153,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<VecExtractIf<'static, i32, fn(&mut i32) -> bool>> {
+impl KaniWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -168,13 +166,13 @@ impl KaniWitness for RustStdStandard<VecExtractIf<'static, i32, fn(&mut i32) -> 
     }
 }
 
-bridge_kani_witness!(RustStdStandard<VecExtractIf<'static, i32, fn(&mut i32) -> bool>>);
+bridge_kani_witness!(RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
         verifier: "kani",
-        describe: || <RustStdStandard<VecExtractIf<'static, i32, fn(&mut i32) -> bool>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
     }
 }
@@ -197,7 +195,7 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<Splice<'static, VecIntoIter<i32>>> {
+impl KaniWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -210,13 +208,13 @@ impl KaniWitness for RustStdStandard<Splice<'static, VecIntoIter<i32>>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Splice<'static, VecIntoIter<i32>>>);
+bridge_kani_witness!(RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Splice<'static, VecIntoIter<i32>>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Splice<'static, VecIntoIter<i32>>> as KaniWitness>::proof()
+        describe: || <RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> as KaniWitness>::proof()
             .to_string(),
     }
 }

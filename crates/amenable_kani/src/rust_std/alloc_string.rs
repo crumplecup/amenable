@@ -1,6 +1,6 @@
 //! `KaniWitness` impls for `alloc::string`.
 
-use std::string::{Drain, FromUtf8Error, FromUtf16Error};
+use std::string::{FromUtf8Error, FromUtf16Error};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -9,7 +9,13 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
-impl KaniWitness for RustStdStandard<Drain<'static>> {
+// Written as the fully-qualified `std::string::Drain<'static>` throughout:
+// its bare name collides with `alloc::vec::Drain` and the
+// `alloc::collections::{binary_heap,vec_deque}::Drain` carriers, and this
+// qualification is what lets `amenable_std`'s matching evidence string
+// disambiguate them for tooling reading the registry (e.g. `elicit_doc`'s
+// coverage report).
+impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -22,13 +28,14 @@ impl KaniWitness for RustStdStandard<Drain<'static>> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<Drain<'static>>);
+bridge_kani_witness!(RustStdStandard<std::string::Drain<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Drain<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
         verifier: "kani",
-        describe: || <RustStdStandard<Drain<'static>> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::string::Drain<'static>> as KaniWitness>::proof()
+            .to_string(),
     }
 }
 
