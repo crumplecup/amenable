@@ -24,8 +24,8 @@ impl KaniWitness for RustStdStandard<EncodeWide<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_encode_wide_maps_ascii_to_matching_utf16_units",
-            claim: VERIFY_ENCODE_WIDE_MAPS_ASCII_TO_MATCHING_UTF16_UNITS_SRC,
+            harness: "verify_encode_wide_maps_ascii_to_matching_utf16_units".to_owned(),
+            claim: VERIFY_ENCODE_WIDE_MAPS_ASCII_TO_MATCHING_UTF16_UNITS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -61,8 +61,8 @@ impl KaniWitness for RustStdStandard<BorrowedHandle<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_borrowed_handle_reports_the_same_raw_value_as_the_owner",
-            claim: VERIFY_BORROWED_HANDLE_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC,
+            harness: "verify_borrowed_handle_reports_the_same_raw_value_as_the_owner".to_owned(),
+            claim: VERIFY_BORROWED_HANDLE_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -108,8 +108,8 @@ impl KaniWitness for RustStdStandard<BorrowedSocket<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_borrowed_socket_reports_the_same_raw_value_as_the_owner",
-            claim: VERIFY_BORROWED_SOCKET_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC,
+            harness: "verify_borrowed_socket_reports_the_same_raw_value_as_the_owner".to_owned(),
+            claim: VERIFY_BORROWED_SOCKET_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -147,8 +147,10 @@ impl KaniWitness for RustStdStandard<HandleOrInvalid> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel",
-            claim: VERIFY_HANDLE_OR_INVALID_DISTINGUISHES_A_REAL_HANDLE_FROM_THE_SENTINEL_SRC,
+            harness: "verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel"
+                .to_owned(),
+            claim: VERIFY_HANDLE_OR_INVALID_DISTINGUISHES_A_REAL_HANDLE_FROM_THE_SENTINEL_SRC
+                .to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -200,8 +202,8 @@ impl KaniWitness for RustStdStandard<OwnedHandle> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_owned_handle_preserves_the_raw_value_across_conversion",
-            claim: VERIFY_OWNED_HANDLE_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC,
+            harness: "verify_owned_handle_preserves_the_raw_value_across_conversion".to_owned(),
+            claim: VERIFY_OWNED_HANDLE_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -248,8 +250,8 @@ impl KaniWitness for RustStdStandard<OwnedSocket> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_owned_socket_preserves_the_raw_value_across_conversion",
-            claim: VERIFY_OWNED_SOCKET_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC,
+            harness: "verify_owned_socket_preserves_the_raw_value_across_conversion".to_owned(),
+            claim: VERIFY_OWNED_SOCKET_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

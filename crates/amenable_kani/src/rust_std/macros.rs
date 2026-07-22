@@ -74,9 +74,9 @@ pub(crate) use {bridge_kani_witness, impl_kani_witness_trusted};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckedProof {
     /// The Kani harness that checks this carrier's invariant.
-    pub harness: &'static str,
+    pub harness: String,
     /// The harness's own source — what it actually asserts, verbatim.
-    pub claim: &'static str,
+    pub claim: String,
     /// The chain-derived provenance this claim still rests on.
     pub provenance: RustStdProvenance,
 }

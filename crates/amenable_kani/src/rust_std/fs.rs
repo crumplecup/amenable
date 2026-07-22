@@ -22,8 +22,8 @@ impl KaniWitness for RustStdStandard<DirBuilder> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_dir_builder_creates_nested_directories_recursively",
-            claim: VERIFY_DIR_BUILDER_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC,
+            harness: "verify_dir_builder_creates_nested_directories_recursively".to_owned(),
+            claim: VERIFY_DIR_BUILDER_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -64,8 +64,8 @@ impl KaniWitness for RustStdStandard<DirEntry> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_dir_entry_reports_the_created_files_name_and_path",
-            claim: VERIFY_DIR_ENTRY_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC,
+            harness: "verify_dir_entry_reports_the_created_files_name_and_path".to_owned(),
+            claim: VERIFY_DIR_ENTRY_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -111,8 +111,8 @@ impl KaniWitness for RustStdStandard<File> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_file_write_then_read_round_trips_the_bytes",
-            claim: VERIFY_FILE_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC,
+            harness: "verify_file_write_then_read_round_trips_the_bytes".to_owned(),
+            claim: VERIFY_FILE_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -161,8 +161,8 @@ impl KaniWitness for RustStdStandard<FileTimes> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_file_times_sets_the_recorded_modification_time",
-            claim: VERIFY_FILE_TIMES_SETS_THE_RECORDED_MODIFICATION_TIME_SRC,
+            harness: "verify_file_times_sets_the_recorded_modification_time".to_owned(),
+            claim: VERIFY_FILE_TIMES_SETS_THE_RECORDED_MODIFICATION_TIME_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -218,8 +218,8 @@ impl KaniWitness for RustStdStandard<FileType> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_file_type_distinguishes_files_from_directories",
-            claim: VERIFY_FILE_TYPE_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC,
+            harness: "verify_file_type_distinguishes_files_from_directories".to_owned(),
+            claim: VERIFY_FILE_TYPE_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -267,8 +267,8 @@ impl KaniWitness for RustStdStandard<Metadata> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_metadata_reports_the_written_length",
-            claim: VERIFY_METADATA_REPORTS_THE_WRITTEN_LENGTH_SRC,
+            harness: "verify_metadata_reports_the_written_length".to_owned(),
+            claim: VERIFY_METADATA_REPORTS_THE_WRITTEN_LENGTH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -315,8 +315,8 @@ impl KaniWitness for RustStdStandard<OpenOptions> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_open_options_create_new_rejects_an_existing_file",
-            claim: VERIFY_OPEN_OPTIONS_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC,
+            harness: "verify_open_options_create_new_rejects_an_existing_file".to_owned(),
+            claim: VERIFY_OPEN_OPTIONS_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -374,8 +374,8 @@ impl KaniWitness for RustStdStandard<Permissions> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_permissions_readonly_round_trips_through_set_permissions",
-            claim: VERIFY_PERMISSIONS_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC,
+            harness: "verify_permissions_readonly_round_trips_through_set_permissions".to_owned(),
+            claim: VERIFY_PERMISSIONS_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -428,8 +428,8 @@ impl KaniWitness for RustStdStandard<ReadDir> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_read_dir_iterates_every_entry_in_the_directory",
-            claim: VERIFY_READ_DIR_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC,
+            harness: "verify_read_dir_iterates_every_entry_in_the_directory".to_owned(),
+            claim: VERIFY_READ_DIR_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -476,8 +476,8 @@ impl KaniWitness for RustStdStandard<std::fs::TryLockError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_try_lock_error_reports_a_lock_already_held",
-            claim: VERIFY_TRY_LOCK_ERROR_REPORTS_A_LOCK_ALREADY_HELD_SRC,
+            harness: "verify_try_lock_error_reports_a_lock_already_held".to_owned(),
+            claim: VERIFY_TRY_LOCK_ERROR_REPORTS_A_LOCK_ALREADY_HELD_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Box<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_box_derefs_and_writes_through",
-            claim: VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC,
+            harness: "verify_box_derefs_and_writes_through".to_owned(),
+            claim: VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -37,17 +37,18 @@ amenable_derive::harness! {
         /// `Box::new` derefs to the value it wraps, and a write through
         /// `DerefMut` is visible on the next read. Checked with `i32`
         /// for the deref/write claim, and separately with a
-        /// drop-instrumented, non-`Copy` witness type to confirm the
-        /// wrapped value is dropped exactly once when the box is —
-        /// `i32` alone can't distinguish "dropped correctly" from
-        /// "dropped twice" or "leaked", since it has no drop glue.
+        /// drop-instrumented, non-`Copy` witness type to confirm that a
+        /// replacement through `DerefMut` drops the displaced value
+        /// exactly once and that the replacement is dropped when the box
+        /// is destroyed. `i32` alone cannot distinguish correct destruction
+        /// from a double drop or leak because it has no drop glue.
         #[kani::proof]
         fn verify_box_derefs_and_writes_through() {
-            let value: i32 = kani::any();
-            let mut boxed = Box::new(value);
+            let mut boxed = <Box<i32> as crate::KaniCompose>::kani_any();
+            let value = *boxed;
             assert_eq!(*boxed, value, "deref exposes the wrapped value");
 
-            let updated: i32 = kani::any();
+            let updated = <i32 as crate::KaniCompose>::kani_any();
             *boxed = updated;
             assert_eq!(*boxed, updated, "a write through deref_mut is visible");
 
@@ -61,10 +62,28 @@ amenable_derive::harness! {
             }
 
             let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
-            let witness = Box::new(DropWitness { drop_count: drop_count.clone() });
-            assert_eq!(drop_count.get(), 0, "the value isn't dropped while still boxed");
+            let mut witness = Box::new(DropWitness {
+                drop_count: drop_count.clone(),
+            });
+            assert_eq!(
+                drop_count.get(),
+                0,
+                "the value is not dropped while it remains boxed"
+            );
+            *witness = DropWitness {
+                drop_count: drop_count.clone(),
+            };
+            assert_eq!(
+                drop_count.get(),
+                1,
+                "assigning through deref_mut drops the displaced value exactly once"
+            );
             drop(witness);
-            assert_eq!(drop_count.get(), 1, "dropping the box drops the wrapped value exactly once");
+            assert_eq!(
+                drop_count.get(),
+                2,
+                "dropping the box drops the replacement exactly once"
+            );
         }
     }
 }

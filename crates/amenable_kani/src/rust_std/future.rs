@@ -27,8 +27,8 @@ impl KaniWitness for RustStdStandard<Pending<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_pending_never_resolves",
-            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC,
+            harness: "verify_pending_never_resolves".to_owned(),
+            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -65,7 +65,12 @@ amenable_derive::harness! {
             assert_eq!(
                 fut.as_mut().poll(&mut cx),
                 Poll::Pending,
-                "pending always reports Poll::Pending"
+                "the first poll reports Poll::Pending"
+            );
+            assert_eq!(
+                fut.as_mut().poll(&mut cx),
+                Poll::Pending,
+                "a repeated poll still reports Poll::Pending"
             );
         }
     }
@@ -77,8 +82,8 @@ impl KaniWitness for RustStdStandard<Ready<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ready_resolves_immediately_with_its_value",
-            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
+            harness: "verify_ready_resolves_immediately_with_its_value".to_owned(),
+            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -129,8 +134,8 @@ impl KaniWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_poll_fn_dispatches_through_to_its_closure",
-            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+            harness: "verify_poll_fn_dispatches_through_to_its_closure".to_owned(),
+            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -154,6 +159,7 @@ amenable_derive::harness! {
         /// function.
         #[kani::proof]
         fn verify_poll_fn_dispatches_through_to_its_closure() {
+            use std::cell::Cell;
             use std::pin::pin;
             use std::sync::Arc;
             use std::task::{Wake, Waker};
@@ -163,18 +169,21 @@ amenable_derive::harness! {
                 fn wake(self: Arc<Self>) {}
             }
 
-            fn poll_ready(_cx: &mut Context<'_>) -> Poll<i32> {
-                Poll::Ready(kani::any())
-            }
-
+            let value: i32 = kani::any();
+            let called = Cell::new(false);
             let waker = Waker::from(Arc::new(NoopWake));
             let mut cx = Context::from_waker(&waker);
-            let fut = std::future::poll_fn(poll_ready as fn(&mut Context<'_>) -> Poll<i32>);
+            let fut = std::future::poll_fn(|_cx| {
+                called.set(true);
+                Poll::Ready(value)
+            });
             let mut fut = pin!(fut);
-            assert!(
-                matches!(fut.as_mut().poll(&mut cx), Poll::Ready(_)),
-                "poll_fn dispatches through to the wrapped function"
+            assert_eq!(
+                fut.as_mut().poll(&mut cx),
+                Poll::Ready(value),
+                "poll_fn preserves the wrapped closure result"
             );
+            assert!(called.get(), "poll_fn invokes the wrapped closure");
         }
     }
 }

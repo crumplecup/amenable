@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<PanicHookInfo<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_panic_hook_info_reports_the_panics_own_message",
-            claim: VERIFY_PANIC_HOOK_INFO_REPORTS_THE_PANICS_OWN_MESSAGE_SRC,
+            harness: "verify_panic_hook_info_reports_the_panics_own_message".to_owned(),
+            claim: VERIFY_PANIC_HOOK_INFO_REPORTS_THE_PANICS_OWN_MESSAGE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

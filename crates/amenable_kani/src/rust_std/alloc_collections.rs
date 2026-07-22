@@ -24,8 +24,8 @@ impl KaniWitness for RustStdStandard<BTreeMap<i32, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_btree_map_iterates_in_key_order",
-            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
+            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
+            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -68,6 +68,18 @@ amenable_derive::harness! {
                 vec![(&k1, &v1), (&k2, &v2)],
                 "iteration is in ascending key order despite insertion order"
             );
+            drop(entries);
+            assert_eq!(
+                map.remove(&k1),
+                Some(v1),
+                "iteration leaves the lower key and its value in the map"
+            );
+            assert_eq!(
+                map.remove(&k2),
+                Some(v2),
+                "iteration leaves the higher key and its value in the map"
+            );
+            assert!(map.is_empty(), "removing both entries after iteration empties the map");
 
             struct DropWitness {
                 drop_count: std::rc::Rc<std::cell::Cell<u32>>,
@@ -98,8 +110,8 @@ impl KaniWitness for RustStdStandard<BTreeSet<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_btree_set_iterates_in_sorted_order",
-            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC,
+            harness: "verify_btree_set_iterates_in_sorted_order".to_owned(),
+            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -140,6 +152,10 @@ amenable_derive::harness! {
                 vec![&a, &b],
                 "iteration is in ascending order despite insertion order"
             );
+            drop(items);
+            assert!(set.remove(&a), "iteration leaves the lower element in the set");
+            assert!(set.remove(&b), "iteration leaves the higher element in the set");
+            assert!(set.is_empty(), "removing both elements after iteration empties the set");
 
             struct OrderedDropWitness {
                 id: i32,
@@ -191,8 +207,8 @@ impl KaniWitness for RustStdStandard<BinaryHeap<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_pop_yields_the_maximum_first",
-            claim: VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
+            harness: "verify_binary_heap_pop_yields_the_maximum_first".to_owned(),
+            claim: VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -277,8 +293,8 @@ impl KaniWitness for RustStdStandard<LinkedList<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_is_fifo_through_back_and_front",
-            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+            harness: "verify_linked_list_is_fifo_through_back_and_front".to_owned(),
+            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -312,6 +328,8 @@ amenable_derive::harness! {
             list.push_back(b);
             assert_eq!(list.pop_front(), Some(a), "the first-pushed element comes out first");
             assert_eq!(list.pop_front(), Some(b));
+            assert_eq!(list.pop_front(), None, "popping an exhausted FIFO returns None");
+            assert!(list.is_empty(), "popping both queued elements empties the list");
 
             struct DropWitness {
                 drop_count: std::rc::Rc<std::cell::Cell<u32>>,
@@ -342,8 +360,8 @@ impl KaniWitness for RustStdStandard<VecDeque<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_pushes_and_pops_from_both_ends",
-            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
+            harness: "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
+            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -379,6 +397,9 @@ amenable_derive::harness! {
             dq.push_front(b);
             assert_eq!(dq.pop_front(), Some(b), "pop_front returns the front-pushed element");
             assert_eq!(dq.pop_back(), Some(a), "pop_back returns the back-pushed element");
+            assert_eq!(dq.pop_front(), None, "popping the exhausted front returns None");
+            assert_eq!(dq.pop_back(), None, "popping the exhausted back returns None");
+            assert!(dq.is_empty(), "popping both end-specific values empties the deque");
 
             struct DropWitness {
                 drop_count: std::rc::Rc<std::cell::Cell<u32>>,
@@ -409,8 +430,8 @@ impl KaniWitness for RustStdStandard<TryReserveError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_try_reserve_rejects_an_impossible_capacity",
-            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+            harness: "verify_try_reserve_rejects_an_impossible_capacity".to_owned(),
+            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -428,17 +449,19 @@ bridge_kani_witness!(RustStdStandard<TryReserveError>);
 
 amenable_derive::harness! {
     kani, VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, {
-        /// `.try_reserve` succeeds for a small, reasonable request and
-        /// fails — producing this error, instead of aborting like
-        /// `.reserve` would — for a request no allocator can satisfy.
+        /// `.try_reserve` fails — producing this error, instead of
+        /// aborting like `.reserve` would — for a request no allocator
+        /// can satisfy, without changing already stored values.
         #[kani::proof]
         fn verify_try_reserve_rejects_an_impossible_capacity() {
-            let mut v: Vec<i32> = Vec::new();
-            assert!(v.try_reserve(4).is_ok(), "a small reservation succeeds");
+            let first: i32 = kani::any();
+            let second: i32 = kani::any();
+            let mut v = vec![first, second];
             assert!(
                 v.try_reserve(usize::MAX).is_err(),
                 "an impossible reservation is rejected, not aborted"
             );
+            assert_eq!(v, vec![first, second], "a failed reservation preserves existing values");
         }
     }
 }
@@ -449,8 +472,8 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Drain<'stati
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_drain_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_drain_yields_every_pushed_element_once".to_owned(),
+            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -471,7 +494,10 @@ amenable_derive::harness! {
     kani, VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC, {
         /// `.drain()` yields every pushed element exactly once (checked
         /// by sorting both sides) and leaves the heap empty — but not
-        /// necessarily in priority order, unlike `.pop()`.
+        /// necessarily in priority order, unlike `.pop()`. It also
+        /// transfers a yielded non-`Copy` element to its caller and,
+        /// when dropped early, destroys every element that remains in
+        /// the unfinished drain.
         #[kani::proof]
         fn verify_binary_heap_drain_yields_every_pushed_element_once() {
             let a: i32 = kani::any();
@@ -486,6 +512,70 @@ amenable_derive::harness! {
             expected.sort_unstable();
             assert_eq!(drained, expected, "drain yields every pushed element exactly once");
             assert!(heap.is_empty(), "drain leaves the heap empty");
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_heap = BinaryHeap::new();
+            witness_heap.push(OrderedDropWitness {
+                id: 1,
+                drop_count: drop_count.clone(),
+            });
+            witness_heap.push(OrderedDropWitness {
+                id: 2,
+                drop_count: drop_count.clone(),
+            });
+            witness_heap.push(OrderedDropWitness {
+                id: 3,
+                drop_count: drop_count.clone(),
+            });
+            let mut drain = witness_heap.drain();
+            let first = drain.next().unwrap();
+            assert_eq!(
+                drop_count.get(),
+                0,
+                "drain transfers a yielded value without dropping it"
+            );
+            drop(first);
+            assert_eq!(
+                drop_count.get(),
+                1,
+                "the caller drops the yielded value exactly once"
+            );
+            drop(drain);
+            assert_eq!(
+                drop_count.get(),
+                3,
+                "dropping an unfinished drain drops every remaining element"
+            );
+            assert!(
+                witness_heap.is_empty(),
+                "dropping an unfinished drain leaves the heap empty"
+            );
         }
     }
 }
@@ -496,8 +586,8 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_into_iter_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_into_iter_yields_every_pushed_element_once".to_owned(),
+            claim: VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -520,7 +610,9 @@ amenable_derive::harness! {
         /// (checked by sorting both sides) — confirmed empirically to
         /// walk the heap's internal array order, not priority order
         /// (pushing `[3, 1, 2]` yields `[3, 1, 2]` back, not `[1, 2,
-        /// 3]`), so this deliberately does not assert an order.
+        /// 3]`), so this deliberately does not assert an order. An
+        /// early-dropped iterator is also checked to transfer its yielded
+        /// value and destroy its remaining non-`Copy` values exactly once.
         #[kani::proof]
         fn verify_binary_heap_into_iter_yields_every_pushed_element_once() {
             let a: i32 = kani::any();
@@ -534,6 +626,66 @@ amenable_derive::harness! {
             let mut expected = vec![a, b];
             expected.sort_unstable();
             assert_eq!(collected, expected, "into_iter yields every pushed element exactly once");
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_heap = BinaryHeap::new();
+            witness_heap.push(OrderedDropWitness {
+                id: 1,
+                drop_count: drop_count.clone(),
+            });
+            witness_heap.push(OrderedDropWitness {
+                id: 2,
+                drop_count: drop_count.clone(),
+            });
+            witness_heap.push(OrderedDropWitness {
+                id: 3,
+                drop_count: drop_count.clone(),
+            });
+            let mut iterator = witness_heap.into_iter();
+            let first = iterator.next().unwrap();
+            assert_eq!(
+                drop_count.get(),
+                0,
+                "into_iter transfers a yielded value without dropping it"
+            );
+            drop(first);
+            assert_eq!(
+                drop_count.get(),
+                1,
+                "the caller drops the yielded value exactly once"
+            );
+            drop(iterator);
+            assert_eq!(
+                drop_count.get(),
+                3,
+                "dropping an unfinished iterator drops every remaining value"
+            );
         }
     }
 }
@@ -544,8 +696,8 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Iter<'static
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_iter_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_iter_yields_every_pushed_element_once".to_owned(),
+            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -566,7 +718,8 @@ amenable_derive::harness! {
     kani, VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC, {
         /// Same non-priority-order caveat as `IntoIter`/`Drain`:
         /// `.iter()` yields a reference to every pushed element exactly
-        /// once, not necessarily in priority order.
+        /// once, not necessarily in priority order, and does not consume
+        /// or otherwise change the heap.
         #[kani::proof]
         fn verify_binary_heap_iter_yields_every_pushed_element_once() {
             let a: i32 = kani::any();
@@ -580,6 +733,9 @@ amenable_derive::harness! {
             let mut expected = vec![a, b];
             expected.sort_unstable();
             assert_eq!(collected, expected, "iter yields every pushed element exactly once");
+            assert_eq!(heap.len(), 2, "iteration leaves every heap element in place");
+            assert_eq!(heap.pop(), Some(a.max(b)), "iteration preserves the heap maximum");
+            assert_eq!(heap.pop(), Some(a.min(b)), "iteration preserves the remaining element");
         }
     }
 }
@@ -590,8 +746,8 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'sta
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_peek_mut_exposes_the_maximum",
-            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
+            harness: "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
+            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -610,9 +766,10 @@ bridge_kani_witness!(RustStdStandard<std::collections::binary_heap::PeekMut<'sta
 
 amenable_derive::harness! {
     kani, VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC, {
-        /// `.peek_mut()` derefs to the greatest element, and leaving it
-        /// unmodified (no re-heapify needed) leaves it as the top of
-        /// the heap afterward.
+        /// `.peek_mut()` derefs to the greatest element. Leaving it
+        /// unmodified keeps it at the top, while lowering it through
+        /// the guard re-establishes the heap invariant when the guard
+        /// is released.
         #[kani::proof]
         fn verify_binary_heap_peek_mut_exposes_the_maximum() {
             let a: i32 = kani::any();
@@ -627,6 +784,14 @@ amenable_derive::harness! {
                 assert_eq!(*peek, b, "peek_mut derefs to the greatest element");
             }
             assert_eq!(heap.peek(), Some(&b), "the maximum is still on top afterward");
+            {
+                let mut peek = heap.peek_mut().unwrap();
+                *peek = a;
+                assert_eq!(*peek, a, "peek_mut writes through to the guarded maximum");
+            }
+            assert_eq!(heap.peek(), Some(&a), "releasing a modified guard re-establishes the heap maximum");
+            assert_eq!(heap.pop(), Some(a), "the re-heapified first value is available");
+            assert_eq!(heap.pop(), Some(a), "the re-heapified remaining value is available");
         }
     }
 }
@@ -637,8 +802,8 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::Iter<'static
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_iter_yields_references_in_order",
-            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_linked_list_iter_yields_references_in_order".to_owned(),
+            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -671,6 +836,10 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(&a));
             assert_eq!(it.next(), Some(&b));
             assert_eq!(it.next(), None);
+            drop(it);
+            assert_eq!(list.pop_front(), Some(a), "iteration leaves the first value in place");
+            assert_eq!(list.pop_front(), Some(b), "iteration leaves the second value in place");
+            assert!(list.is_empty(), "removing values after iteration empties the list");
         }
     }
 }
@@ -681,8 +850,8 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IterMut<'sta
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_iter_mut_writes_through",
-            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
+            harness: "verify_linked_list_iter_mut_writes_through".to_owned(),
+            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -702,18 +871,25 @@ bridge_kani_witness!(RustStdStandard<std::collections::linked_list::IterMut<'sta
 amenable_derive::harness! {
     kani, VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC, {
         /// `.iter_mut()` yields mutable references, and a write
-        /// through one is visible when the list is read back.
+        /// through each is visible at its corresponding list position.
         #[kani::proof]
         fn verify_linked_list_iter_mut_writes_through() {
-            let value: i32 = kani::any();
-            let updated: i32 = kani::any();
+            let first: i32 = kani::any();
+            let second: i32 = kani::any();
+            let updated_first: i32 = kani::any();
+            let updated_second: i32 = kani::any();
 
             let mut list = LinkedList::new();
-            list.push_back(value);
-            for x in list.iter_mut() {
-                *x = updated;
+            list.push_back(first);
+            list.push_back(second);
+            {
+                let mut iterator = list.iter_mut();
+                *iterator.next().unwrap() = updated_first;
+                *iterator.next().unwrap() = updated_second;
+                assert_eq!(iterator.next(), None, "iter_mut visits every list element exactly once");
             }
-            assert_eq!(list.pop_front(), Some(updated), "the write through iter_mut is visible");
+            assert_eq!(list.pop_front(), Some(updated_first), "the first write is visible at the front");
+            assert_eq!(list.pop_front(), Some(updated_second), "the second write preserves list order");
         }
     }
 }
@@ -724,8 +900,8 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IntoIter<i32
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_linked_list_into_iter_yields_owned_values_in_order".to_owned(),
+            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -745,7 +921,9 @@ bridge_kani_witness!(RustStdStandard<std::collections::linked_list::IntoIter<i32
 amenable_derive::harness! {
     kani, VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `.into_iter()` consumes the list, yielding its owned
-        /// elements in front-to-back order.
+        /// elements in front-to-back order. A partially consumed
+        /// iterator transfers its yielded value to the caller and
+        /// destroys its remaining owned values when dropped.
         #[kani::proof]
         fn verify_linked_list_into_iter_yields_owned_values_in_order() {
             let a: i32 = kani::any();
@@ -758,6 +936,28 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(a));
             assert_eq!(it.next(), Some(b));
             assert_eq!(it.next(), None);
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_list = LinkedList::new();
+            witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+            let mut iterator = witness_list.into_iter();
+            let first = iterator.next().unwrap();
+            assert_eq!(drop_count.get(), 0, "into_iter transfers a yielded value without dropping it");
+            drop(first);
+            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            drop(iterator);
+            assert_eq!(drop_count.get(), 3, "dropping an unfinished iterator drops every remaining value");
         }
     }
 }
@@ -772,8 +972,8 @@ impl KaniWitness
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_extract_if_partitions_by_the_predicate",
-            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
+            harness: "verify_linked_list_extract_if_partitions_by_the_predicate".to_owned(),
+            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -811,6 +1011,17 @@ amenable_derive::harness! {
             assert_eq!(extracted, vec![2, 4], "extract_if removes exactly the matching elements");
             let remaining: Vec<i32> = list.into_iter().collect();
             assert_eq!(remaining, vec![1, 3], "extract_if leaves the non-matching elements, in order");
+
+            let mut early_list: LinkedList<i32> = LinkedList::from([1, 2, 3, 4]);
+            let mut extractor = early_list.extract_if(is_even as fn(&mut i32) -> bool);
+            assert_eq!(extractor.next(), Some(2), "extract_if yields the first matching element");
+            drop(extractor);
+            let early_remaining: Vec<i32> = early_list.into_iter().collect();
+            assert_eq!(
+                early_remaining,
+                vec![1, 3, 4],
+                "dropping extract_if retains every unvisited element in order"
+            );
         }
     }
 }
@@ -821,8 +1032,8 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Drain<'static,
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_drain_removes_and_yields_in_order",
-            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
+            harness: "verify_vec_deque_drain_removes_and_yields_in_order".to_owned(),
+            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -842,7 +1053,9 @@ bridge_kani_witness!(RustStdStandard<std::collections::vec_deque::Drain<'static,
 amenable_derive::harness! {
     kani, VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC, {
         /// `.drain(..)` yields every element in front-to-back order
-        /// and leaves the deque empty.
+        /// and leaves the deque empty. An unfinished whole-deque drain
+        /// transfers its yielded value and drops every remaining value
+        /// when released.
         #[kani::proof]
         fn verify_vec_deque_drain_removes_and_yields_in_order() {
             let a: i32 = kani::any();
@@ -854,6 +1067,29 @@ amenable_derive::harness! {
             let drained: Vec<i32> = dq.drain(..).collect();
             assert_eq!(drained, vec![a, b], "drain yields every element in order");
             assert!(dq.is_empty(), "drain leaves the deque empty");
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_deque = VecDeque::new();
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            let mut drain = witness_deque.drain(..);
+            let first = drain.next().unwrap();
+            assert_eq!(drop_count.get(), 0, "drain transfers a yielded value without dropping it");
+            drop(first);
+            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            drop(drain);
+            assert_eq!(drop_count.get(), 3, "dropping an unfinished drain drops every remaining value");
+            assert!(witness_deque.is_empty(), "dropping an unfinished drain leaves the deque empty");
         }
     }
 }
@@ -864,8 +1100,8 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Iter<'static, 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_iter_yields_references_in_order",
-            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_vec_deque_iter_yields_references_in_order".to_owned(),
+            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -898,6 +1134,10 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(&a));
             assert_eq!(it.next(), Some(&b));
             assert_eq!(it.next(), None);
+            drop(it);
+            assert_eq!(dq.pop_front(), Some(a), "iteration leaves the first value in place");
+            assert_eq!(dq.pop_front(), Some(b), "iteration leaves the second value in place");
+            assert!(dq.is_empty(), "removing values after iteration empties the deque");
         }
     }
 }
@@ -908,8 +1148,8 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stati
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_iter_mut_writes_through",
-            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
+            harness: "verify_vec_deque_iter_mut_writes_through".to_owned(),
+            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -929,18 +1169,25 @@ bridge_kani_witness!(RustStdStandard<std::collections::vec_deque::IterMut<'stati
 amenable_derive::harness! {
     kani, VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC, {
         /// `.iter_mut()` yields mutable references, and a write
-        /// through one is visible when the deque is read back.
+        /// through each is visible at its corresponding deque position.
         #[kani::proof]
         fn verify_vec_deque_iter_mut_writes_through() {
-            let value: i32 = kani::any();
-            let updated: i32 = kani::any();
+            let first: i32 = kani::any();
+            let second: i32 = kani::any();
+            let updated_first: i32 = kani::any();
+            let updated_second: i32 = kani::any();
 
             let mut dq = VecDeque::new();
-            dq.push_back(value);
-            for x in dq.iter_mut() {
-                *x = updated;
+            dq.push_back(first);
+            dq.push_back(second);
+            {
+                let mut iterator = dq.iter_mut();
+                *iterator.next().unwrap() = updated_first;
+                *iterator.next().unwrap() = updated_second;
+                assert_eq!(iterator.next(), None, "iter_mut visits every deque element exactly once");
             }
-            assert_eq!(dq.pop_front(), Some(updated), "the write through iter_mut is visible");
+            assert_eq!(dq.pop_front(), Some(updated_first), "the first write is visible at the front");
+            assert_eq!(dq.pop_front(), Some(updated_second), "the second write preserves deque order");
         }
     }
 }
@@ -951,8 +1198,8 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>>
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order".to_owned(),
+            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -972,7 +1219,8 @@ bridge_kani_witness!(RustStdStandard<std::collections::vec_deque::IntoIter<i32>>
 amenable_derive::harness! {
     kani, VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `.into_iter()` consumes the deque, yielding its owned
-        /// elements in front-to-back order.
+        /// elements in front-to-back order. An unfinished iterator
+        /// transfers yielded ownership and drops its remaining values.
         #[kani::proof]
         fn verify_vec_deque_into_iter_yields_owned_values_in_order() {
             let a: i32 = kani::any();
@@ -985,6 +1233,28 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(a));
             assert_eq!(it.next(), Some(b));
             assert_eq!(it.next(), None);
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_deque = VecDeque::new();
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
+            let mut iterator = witness_deque.into_iter();
+            let first = iterator.next().unwrap();
+            assert_eq!(drop_count.get(), 0, "into_iter transfers a yielded value without dropping it");
+            drop(first);
+            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            drop(iterator);
+            assert_eq!(drop_count.get(), 3, "dropping an unfinished iterator drops every remaining value");
         }
     }
 }

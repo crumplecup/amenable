@@ -1,13 +1,13 @@
 //! `KaniWitness` impls for `std::env`.
 
-use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs};
+use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, Vars, VarsOs};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 
 impl KaniWitness for RustStdStandard<Args> {
     type SupportingEvidence = Self;
@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Args> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_args_reports_at_least_the_program_path",
-            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            harness: "verify_args_reports_at_least_the_program_path".to_owned(),
+            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -50,8 +50,8 @@ impl KaniWitness for RustStdStandard<ArgsOs> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_args_os_reports_at_least_the_program_path",
-            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            harness: "verify_args_os_reports_at_least_the_program_path".to_owned(),
+            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -83,8 +83,8 @@ impl KaniWitness for RustStdStandard<JoinPathsError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_join_paths_error_reports_an_unjoinable_path",
-            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC,
+            harness: "verify_join_paths_error_reports_an_unjoinable_path".to_owned(),
+            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -121,8 +121,8 @@ impl KaniWitness for RustStdStandard<SplitPaths<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_paths_recovers_paths_joined_by_join_paths",
-            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
+            harness: "verify_split_paths_recovers_paths_joined_by_join_paths".to_owned(),
+            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -160,128 +160,12 @@ amenable_derive::harness! {
     }
 }
 
-impl KaniWitness for RustStdStandard<VarError> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CheckedProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_var_error_reports_an_unset_variable",
-            claim: VERIFY_VAR_ERROR_REPORTS_AN_UNSET_VARIABLE_SRC,
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
-    }
-}
-
-bridge_kani_witness!(RustStdStandard<VarError>);
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<VarError> as KaniWitness>::proof().to_string(),
-    }
-}
-
-amenable_derive::harness! {
-    kani, VERIFY_VAR_ERROR_REPORTS_AN_UNSET_VARIABLE_SRC, {
-        /// `.var()` on a variable that was never set fails with
-        /// `VarError::NotPresent`.
-        #[kani::proof]
-        fn verify_var_error_reports_an_unset_variable() {
-            assert_eq!(
-                std::env::var("AMENABLE_KANI_ENV_TEST_DEFINITELY_UNSET"),
-                Err(VarError::NotPresent)
-            );
-        }
-    }
-}
-
-impl KaniWitness for RustStdStandard<Vars> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CheckedProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vars_reports_a_variable_set_via_set_var",
-            claim: VERIFY_VARS_REPORTS_A_VARIABLE_SET_VIA_SET_VAR_SRC,
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
-    }
-}
-
-bridge_kani_witness!(RustStdStandard<Vars>);
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Vars>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Vars> as KaniWitness>::proof().to_string(),
-    }
-}
-
-amenable_derive::harness! {
-    kani, VERIFY_VARS_REPORTS_A_VARIABLE_SET_VIA_SET_VAR_SRC, {
-        /// A variable set via `set_var()` genuinely shows up in
-        /// `.vars()`, as a `(String, String)` pair.
-        #[kani::proof]
-        fn verify_vars_reports_a_variable_set_via_set_var() {
-            // SAFETY: single-threaded harness; no concurrent env access.
-            unsafe {
-                std::env::set_var("AMENABLE_KANI_ENV_TEST_VAR", "some-value");
-            }
-            let found = std::env::vars().find(|(key, _)| key == "AMENABLE_KANI_ENV_TEST_VAR");
-            assert_eq!(
-                found,
-                Some(("AMENABLE_KANI_ENV_TEST_VAR".to_string(), "some-value".to_string()))
-            );
-            // SAFETY: single-threaded harness; no concurrent env access.
-            unsafe {
-                std::env::remove_var("AMENABLE_KANI_ENV_TEST_VAR");
-            }
-        }
-    }
-}
-
-impl KaniWitness for RustStdStandard<VarsOs> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CheckedProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vars_os_reports_a_variable_set_via_set_var",
-            claim: VERIFY_VARS_OS_REPORTS_A_VARIABLE_SET_VIA_SET_VAR_SRC,
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
-    }
-}
-
-bridge_kani_witness!(RustStdStandard<VarsOs>);
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VarsOs>",
-        verifier: "kani",
-        describe: || <RustStdStandard<VarsOs> as KaniWitness>::proof().to_string(),
-    }
-}
-
-amenable_derive::harness! {
-    kani, VERIFY_VARS_OS_REPORTS_A_VARIABLE_SET_VIA_SET_VAR_SRC, {
-        /// Same guarantee as `Vars`, in the raw `OsString` form.
-        #[kani::proof]
-        fn verify_vars_os_reports_a_variable_set_via_set_var() {
-            // SAFETY: single-threaded harness; no concurrent env access.
-            unsafe {
-                std::env::set_var("AMENABLE_KANI_ENV_TEST_VAR_OS", "some-value");
-            }
-            let found = std::env::vars_os()
-                .find(|(key, _)| key == std::ffi::OsStr::new("AMENABLE_KANI_ENV_TEST_VAR_OS"));
-            assert!(found.is_some());
-            // SAFETY: single-threaded harness; no concurrent env access.
-            unsafe {
-                std::env::remove_var("AMENABLE_KANI_ENV_TEST_VAR_OS");
-            }
-        }
-    }
-}
+// `Vars` and `VarsOs` expose process-global state. Their previously
+// generated harnesses mutated that global state through `set_var`, which is
+// unsafe on current Rust and prohibited by this crate. There is no local,
+// type-level invariant to check without that mutation, so retain their Kani
+// witness as provenance-only rather than weakening the safety boundary.
+// `VarError` likewise depends on ambient process state: a harness cannot
+// establish that an arbitrary external variable is absent without that same
+// unsafe mutation. Keep it provenance-only as well.
+impl_kani_witness_trusted!(std::env::VarError, Vars, VarsOs);

@@ -21,8 +21,8 @@ impl KaniWitness for RustStdStandard<Incoming<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_incoming_yields_an_already_queued_connection",
-            claim: VERIFY_INCOMING_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC,
+            harness: "verify_incoming_yields_an_already_queued_connection".to_owned(),
+            claim: VERIFY_INCOMING_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -61,8 +61,8 @@ impl KaniWitness for RustStdStandard<Shutdown> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_shutdown_write_prevents_further_writes",
-            claim: VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC,
+            harness: "verify_shutdown_write_prevents_further_writes".to_owned(),
+            claim: VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -106,8 +106,8 @@ impl KaniWitness for RustStdStandard<TcpListener> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_tcp_listener_accepts_a_connecting_stream",
-            claim: VERIFY_TCP_LISTENER_ACCEPTS_A_CONNECTING_STREAM_SRC,
+            harness: "verify_tcp_listener_accepts_a_connecting_stream".to_owned(),
+            claim: VERIFY_TCP_LISTENER_ACCEPTS_A_CONNECTING_STREAM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -145,8 +145,8 @@ impl KaniWitness for RustStdStandard<TcpStream> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer",
-            claim: VERIFY_TCP_STREAM_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC,
+            harness: "verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer".to_owned(),
+            claim: VERIFY_TCP_STREAM_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -189,8 +189,8 @@ impl KaniWitness for RustStdStandard<UdpSocket> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_udp_socket_send_to_recv_from_round_trips_a_datagram",
-            claim: VERIFY_UDP_SOCKET_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC,
+            harness: "verify_udp_socket_send_to_recv_from_round_trips_a_datagram".to_owned(),
+            claim: VERIFY_UDP_SOCKET_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

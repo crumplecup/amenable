@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<OsStr> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str",
-            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str".to_owned(),
+            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -52,8 +52,8 @@ impl KaniWitness for RustStdStandard<OsString> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_os_string_push_appends_to_the_existing_content",
-            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC,
+            harness: "verify_os_string_push_appends_to_the_existing_content".to_owned(),
+            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

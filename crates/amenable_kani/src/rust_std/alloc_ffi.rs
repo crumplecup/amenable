@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<CString> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
-            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
+            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
+            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -43,6 +43,11 @@ amenable_derive::harness! {
             kani::assume(byte != 0);
             let cstring = CString::new(vec![byte]).unwrap();
             assert_eq!(cstring.as_bytes(), &[byte], "as_bytes excludes the terminator");
+            assert_eq!(
+                cstring.as_bytes_with_nul(),
+                &[byte, 0],
+                "as_bytes_with_nul retains exactly the appended terminator"
+            );
 
             let with_interior_nul = vec![byte, 0, byte];
             assert!(
@@ -59,8 +64,8 @@ impl KaniWitness for RustStdStandard<FromVecWithNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
-            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
+            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -93,6 +98,10 @@ amenable_derive::harness! {
                 CString::from_vec_with_nul(vec![byte, byte]).is_err(),
                 "no nul byte at all is rejected"
             );
+            assert!(
+                CString::from_vec_with_nul(vec![byte, 0, byte]).is_err(),
+                "a nul before the final byte is rejected"
+            );
         }
     }
 }
@@ -103,8 +112,8 @@ impl KaniWitness for RustStdStandard<IntoStringError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_into_string_error_recovers_the_original_cstring",
-            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
+            harness: "verify_into_string_error_recovers_the_original_cstring".to_owned(),
+            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -127,7 +136,7 @@ amenable_derive::harness! {
         /// recovers exactly the original `CString`.
         #[kani::proof]
         fn verify_into_string_error_recovers_the_original_cstring() {
-            let invalid = CString::new(vec![0xFFu8]).unwrap();
+            let invalid = CString::new(vec![0xFFu8, b'x']).unwrap();
             let original_bytes = invalid.as_bytes().to_vec();
             let err = invalid.into_string().unwrap_err();
             let recovered = err.into_cstring();
@@ -146,8 +155,8 @@ impl KaniWitness for RustStdStandard<NulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nul_error_reports_the_interior_nuls_position",
-            claim: VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
+            harness: "verify_nul_error_reports_the_interior_nuls_position".to_owned(),
+            claim: VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -173,6 +182,13 @@ amenable_derive::harness! {
             kani::assume(byte != 0);
             let err = CString::new(vec![byte, 0, byte]).unwrap_err();
             assert_eq!(err.nul_position(), 1, "nul_position reports the nul's index");
+
+            let first_of_two = CString::new(vec![byte, 0, 0, byte]).unwrap_err();
+            assert_eq!(
+                first_of_two.nul_position(),
+                1,
+                "nul_position reports the first interior nul"
+            );
         }
     }
 }

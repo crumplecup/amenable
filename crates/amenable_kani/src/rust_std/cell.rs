@@ -20,8 +20,8 @@ impl KaniWitness for RustStdStandard<Cell<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cell_get_set_replace_take_round_trip",
-            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC,
+            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -75,8 +75,8 @@ impl KaniWitness for RustStdStandard<RefCell<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ref_cell_dynamic_borrow_rules",
-            claim: VERIFY_REF_CELL_DYNAMIC_BORROW_RULES_SRC,
+            harness: "verify_ref_cell_dynamic_borrow_rules".to_owned(),
+            claim: VERIFY_REF_CELL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -119,7 +119,18 @@ amenable_derive::harness! {
             );
 
             let updated: i32 = kani::any();
-            *cell.borrow_mut() = updated;
+            {
+                let mut borrow = cell.borrow_mut();
+                assert!(
+                    cell.try_borrow().is_err(),
+                    "shared borrow rejected while a mutable borrow is live"
+                );
+                assert!(
+                    cell.try_borrow_mut().is_err(),
+                    "a second mutable borrow is rejected while the first is live"
+                );
+                *borrow = updated;
+            }
             assert_eq!(
                 *cell.borrow(),
                 updated,
@@ -135,8 +146,8 @@ impl KaniWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ref_derefs_to_the_borrowed_value",
-            claim: VERIFY_REF_DEREFS_TO_THE_BORROWED_VALUE_SRC,
+            harness: "verify_ref_derefs_to_the_borrowed_value".to_owned(),
+            claim: VERIFY_REF_DEREFS_TO_THE_BORROWED_VALUE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -174,8 +185,8 @@ impl KaniWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ref_mut_derefs_and_writes_through_to_the_cell",
-            claim: VERIFY_REF_MUT_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC,
+            harness: "verify_ref_mut_derefs_and_writes_through_to_the_cell".to_owned(),
+            claim: VERIFY_REF_MUT_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -222,8 +233,8 @@ impl KaniWitness for RustStdStandard<OnceCell<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_once_cell_initializes_exactly_once",
-            claim: VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC,
+            harness: "verify_once_cell_initializes_exactly_once".to_owned(),
+            claim: VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -271,8 +282,8 @@ impl KaniWitness for RustStdStandard<UnsafeCell<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_unsafe_cell_get_mut_and_into_inner_round_trip",
-            claim: VERIFY_UNSAFE_CELL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC,
+            harness: "verify_unsafe_cell_get_mut_and_into_inner_round_trip".to_owned(),
+            claim: VERIFY_UNSAFE_CELL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -318,8 +329,8 @@ impl KaniWitness for RustStdStandard<LazyCell<i32, fn() -> i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_lazy_cell_caches_its_initializer_result",
-            claim: VERIFY_LAZY_CELL_CACHES_ITS_INITIALIZER_RESULT_SRC,
+            harness: "verify_lazy_cell_caches_its_initializer_result".to_owned(),
+            claim: VERIFY_LAZY_CELL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

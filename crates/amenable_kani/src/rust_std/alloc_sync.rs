@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Arc<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_arc_strong_count_tracks_clones",
-            claim: VERIFY_ARC_STRONG_COUNT_TRACKS_CLONES_SRC,
+            harness: "verify_arc_strong_count_tracks_clones".to_owned(),
+            claim: VERIFY_ARC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -90,8 +90,8 @@ impl KaniWitness for RustStdStandard<std::sync::Weak<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero",
-            claim: VERIFY_ARC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC,
+            harness: "verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            claim: VERIFY_ARC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -121,9 +121,15 @@ amenable_derive::harness! {
             let arc = Arc::new(value);
             let weak = Arc::downgrade(&arc);
             assert_eq!(Arc::weak_count(&arc), 1, "downgrade increments weak_count");
-            assert!(
-                weak.upgrade().is_some(),
-                "upgrade succeeds while a strong reference is alive"
+            let upgraded = weak
+                .upgrade()
+                .expect("upgrade succeeds while a strong reference is alive");
+            assert_eq!(*upgraded, value, "an upgraded Weak exposes the original value");
+            drop(upgraded);
+            assert_eq!(
+                Arc::strong_count(&arc),
+                1,
+                "dropping the upgraded Arc restores the original strong count"
             );
 
             drop(arc);

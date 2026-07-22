@@ -29,8 +29,8 @@ impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_local_key_with_reads_the_initialized_value",
-            claim: VERIFY_LOCAL_KEY_WITH_READS_THE_INITIALIZED_VALUE_SRC,
+            harness: "verify_local_key_with_reads_the_initialized_value".to_owned(),
+            claim: VERIFY_LOCAL_KEY_WITH_READS_THE_INITIALIZED_VALUE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -74,8 +74,8 @@ impl KaniWitness for RustStdStandard<Thread> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_thread_current_is_stable_across_repeated_calls",
-            claim: VERIFY_THREAD_CURRENT_IS_STABLE_ACROSS_REPEATED_CALLS_SRC,
+            harness: "verify_thread_current_is_stable_across_repeated_calls".to_owned(),
+            claim: VERIFY_THREAD_CURRENT_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -111,8 +111,8 @@ impl KaniWitness for RustStdStandard<ThreadId> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_thread_id_is_stable_across_repeated_calls",
-            claim: VERIFY_THREAD_ID_IS_STABLE_ACROSS_REPEATED_CALLS_SRC,
+            harness: "verify_thread_id_is_stable_across_repeated_calls".to_owned(),
+            claim: VERIFY_THREAD_ID_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

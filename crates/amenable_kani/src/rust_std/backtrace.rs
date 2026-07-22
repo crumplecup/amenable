@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Backtrace> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_backtrace_force_capture_always_actually_captures",
-            claim: VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+            harness: "verify_backtrace_force_capture_always_actually_captures".to_owned(),
+            claim: VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -51,8 +51,8 @@ impl KaniWitness for RustStdStandard<BacktraceStatus> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_backtrace_status_reports_captured_after_force_capture",
-            claim: VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC,
+            harness: "verify_backtrace_status_reports_captured_after_force_capture".to_owned(),
+            claim: VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

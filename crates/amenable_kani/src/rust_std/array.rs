@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<TryFromSliceError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_try_from_slice_rejects_a_length_mismatch",
-            claim: VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC,
+            harness: "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
+            claim: VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -43,11 +43,18 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let matching: &[i32] = &[a, b];
             let arr: Result<[i32; 2], TryFromSliceError> = matching.try_into();
-            assert_eq!(arr, Ok([a, b]), "a matching-length slice round-trips into the array");
+            assert!(
+                matches!(arr, Ok([first, second]) if first == a && second == b),
+                "a matching-length slice round-trips into the array"
+            );
 
             let mismatched: &[i32] = &[a, b, a];
             let bad: Result<[i32; 2], TryFromSliceError> = mismatched.try_into();
             assert!(bad.is_err(), "a mismatched-length slice is rejected");
+
+            let too_short: &[i32] = &[a];
+            let short: Result<[i32; 2], TryFromSliceError> = too_short.try_into();
+            assert!(short.is_err(), "a shorter slice is rejected");
         }
     }
 }

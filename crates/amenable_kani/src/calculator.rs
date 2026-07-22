@@ -59,8 +59,8 @@ impl Witness<KaniVerifier> for Debit {
 
     fn proof() -> Self::ProofArtifact {
         CalculationProof {
-            harness: "verify_debit_access_preserves_value",
-            claim: VERIFY_DEBIT_ACCESS_PRESERVES_VALUE_SRC,
+            harness: "verify_debit_access_preserves_value".to_owned(),
+            claim: VERIFY_DEBIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
         }
     }
 }
@@ -125,8 +125,8 @@ impl Witness<KaniVerifier> for Credit {
 
     fn proof() -> Self::ProofArtifact {
         CalculationProof {
-            harness: "verify_credit_access_preserves_value",
-            claim: VERIFY_CREDIT_ACCESS_PRESERVES_VALUE_SRC,
+            harness: "verify_credit_access_preserves_value".to_owned(),
+            claim: VERIFY_CREDIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
         }
     }
 }
@@ -189,9 +189,9 @@ impl ProofToken for AddToken {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CalculationProof {
     /// The Kani harness that checks this calculation's invariant.
-    pub harness: &'static str,
+    pub harness: String,
     /// The harness's own source — what it actually asserts, verbatim.
-    pub claim: &'static str,
+    pub claim: String,
 }
 
 impl std::fmt::Display for CalculationProof {
@@ -217,8 +217,8 @@ where
 
     fn proof() -> Self::ProofArtifact {
         CalculationProof {
-            harness: "add_impl_computes_exact_sum",
-            claim: ADD_IMPL_COMPUTES_EXACT_SUM_SRC,
+            harness: "add_impl_computes_exact_sum".to_owned(),
+            claim: ADD_IMPL_COMPUTES_EXACT_SUM_SRC.to_owned(),
         }
     }
 }

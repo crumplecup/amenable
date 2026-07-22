@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Vec<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_push_pop_round_trips",
-            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC,
+            harness: "verify_vec_push_pop_round_trips".to_owned(),
+            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -43,13 +43,14 @@ amenable_derive::harness! {
         /// "moved out cleanly" from "dropped early" or "leaked".
         #[kani::proof]
         fn verify_vec_push_pop_round_trips() {
-            let value: i32 = kani::any();
-            let mut v = Vec::new();
+            let value = <i32 as crate::KaniCompose>::kani_any();
+            let mut v = <Vec<i32> as crate::KaniCompose>::kani_depth0();
             v.push(value);
             assert_eq!(v.len(), 1);
             assert_eq!(v[0], value, "the pushed value is indexable");
             assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
             assert!(v.is_empty(), "pop leaves the Vec empty");
+            assert_eq!(v.pop(), None, "popping an exhausted Vec returns None");
 
             struct DropWitness {
                 drop_count: std::rc::Rc<std::cell::Cell<u32>>,
@@ -80,8 +81,8 @@ impl KaniWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_drain_removes_and_yields_in_order",
-            claim: VERIFY_VEC_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
+            harness: "verify_vec_drain_removes_and_yields_in_order".to_owned(),
+            claim: VERIFY_VEC_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -103,12 +104,35 @@ amenable_derive::harness! {
         /// Vec empty afterward.
         #[kani::proof]
         fn verify_vec_drain_removes_and_yields_in_order() {
-            let a: i32 = kani::any();
-            let b: i32 = kani::any();
-            let mut v = vec![a, b];
+            let mut v = <Vec<i32> as crate::KaniCompose>::kani_depth2();
+            let expected = v.clone();
             let drained: Vec<i32> = v.drain(..).collect();
-            assert_eq!(drained, vec![a, b], "drain yields every element in order");
+            assert_eq!(drained, expected, "drain yields every element in order");
             assert!(v.is_empty(), "drain leaves the Vec empty");
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witnesses = vec![
+                DropWitness { drop_count: drop_count.clone() },
+                DropWitness { drop_count: drop_count.clone() },
+                DropWitness { drop_count: drop_count.clone() },
+            ];
+            let mut drain = witnesses.drain(..);
+            let first = drain.next().unwrap();
+            assert_eq!(drop_count.get(), 0, "drain transfers a yielded value without dropping it");
+            drop(first);
+            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            drop(drain);
+            assert_eq!(drop_count.get(), 3, "dropping an unfinished drain drops every remaining value");
+            assert!(witnesses.is_empty(), "dropping an unfinished drain leaves the Vec empty");
         }
     }
 }
@@ -119,8 +143,8 @@ impl KaniWitness for RustStdStandard<std::vec::IntoIter<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_VEC_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_vec_into_iter_yields_owned_values_in_order".to_owned(),
+            claim: VERIFY_VEC_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -142,13 +166,34 @@ amenable_derive::harness! {
         /// in order.
         #[kani::proof]
         fn verify_vec_into_iter_yields_owned_values_in_order() {
-            let a: i32 = kani::any();
-            let b: i32 = kani::any();
-            let v = vec![a, b];
-            let mut it = v.into_iter();
-            assert_eq!(it.next(), Some(a));
-            assert_eq!(it.next(), Some(b));
+            let expected = <Vec<i32> as crate::KaniCompose>::kani_depth2();
+            let mut it = expected.clone().into_iter();
+            assert_eq!(it.next(), Some(expected[0]));
+            assert_eq!(it.next(), Some(expected[1]));
             assert_eq!(it.next(), None);
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let mut witness_iter = vec![
+                DropWitness { drop_count: drop_count.clone() },
+                DropWitness { drop_count: drop_count.clone() },
+                DropWitness { drop_count: drop_count.clone() },
+            ]
+            .into_iter();
+            let first = witness_iter.next().unwrap();
+            assert_eq!(drop_count.get(), 0, "IntoIter transfers a yielded value without dropping it");
+            drop(first);
+            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            drop(witness_iter);
+            assert_eq!(drop_count.get(), 3, "dropping IntoIter drops every remaining value");
         }
     }
 }
@@ -159,8 +204,8 @@ impl KaniWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_extract_if_partitions_by_the_predicate",
-            claim: VERIFY_VEC_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
+            harness: "verify_vec_extract_if_partitions_by_the_predicate".to_owned(),
+            claim: VERIFY_VEC_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -191,6 +236,16 @@ amenable_derive::harness! {
             let extracted: Vec<i32> = v.extract_if(.., is_even as fn(&mut i32) -> bool).collect();
             assert_eq!(extracted, vec![2, 4], "extract_if removes exactly the matching elements");
             assert_eq!(v, vec![1, 3], "extract_if leaves the non-matching elements, in order");
+
+            let mut early_drop = vec![1, 2, 3, 4];
+            let mut extractor = early_drop.extract_if(.., is_even as fn(&mut i32) -> bool);
+            assert_eq!(extractor.next(), Some(2), "extract_if yields the first matching element");
+            drop(extractor);
+            assert_eq!(
+                early_drop,
+                vec![1, 3, 4],
+                "dropping ExtractIf preserves the unvisited elements in order"
+            );
         }
     }
 }
@@ -201,8 +256,8 @@ impl KaniWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIte
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_splice_replaces_a_range_and_yields_what_it_removed",
-            claim: VERIFY_SPLICE_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC,
+            harness: "verify_splice_replaces_a_range_and_yields_what_it_removed".to_owned(),
+            claim: VERIFY_SPLICE_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -233,6 +288,16 @@ amenable_derive::harness! {
             let removed: Vec<i32> = v.splice(1..2, vec![9, 8]).collect();
             assert_eq!(removed, vec![b], "splice yields exactly the elements it removed");
             assert_eq!(v, vec![a, 9, 8, c], "splice replaces the range with the given elements");
+
+            let mut early_drop = vec![a, b, c];
+            let mut splice = early_drop.splice(1..2, vec![9, 8]);
+            assert_eq!(splice.next(), Some(b), "splice first yields the removed element");
+            drop(splice);
+            assert_eq!(
+                early_drop,
+                vec![a, 9, 8, c],
+                "dropping an unfinished splice still completes replacement"
+            );
         }
     }
 }

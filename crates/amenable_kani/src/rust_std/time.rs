@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<Duration> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_duration_new_normalizes_nanos_and_carries_into_secs",
-            claim: VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+            harness: "verify_duration_new_normalizes_nanos_and_carries_into_secs".to_owned(),
+            claim: VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

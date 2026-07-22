@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<NonNull<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_non_null_rejects_the_null_pointer",
-            claim: VERIFY_NON_NULL_REJECTS_THE_NULL_POINTER_SRC,
+            harness: "verify_non_null_rejects_the_null_pointer".to_owned(),
+            claim: VERIFY_NON_NULL_REJECTS_THE_NULL_POINTER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

@@ -30,8 +30,8 @@ impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_buf_reader_reads_the_underlying_bytes",
-            claim: VERIFY_BUF_READER_READS_THE_UNDERLYING_BYTES_SRC,
+            harness: "verify_buf_reader_reads_the_underlying_bytes".to_owned(),
+            claim: VERIFY_BUF_READER_READS_THE_UNDERLYING_BYTES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -70,8 +70,8 @@ impl KaniWitness for RustStdStandard<BufWriter<Vec<u8>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_buf_writer_flushes_to_the_underlying_writer",
-            claim: VERIFY_BUF_WRITER_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC,
+            harness: "verify_buf_writer_flushes_to_the_underlying_writer".to_owned(),
+            claim: VERIFY_BUF_WRITER_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -96,6 +96,10 @@ amenable_derive::harness! {
 
             let mut writer = BufWriter::new(Vec::new());
             writer.write_all(b"hello").unwrap();
+            assert!(
+                writer.get_ref().is_empty(),
+                "a small write remains buffered before flush"
+            );
             writer.flush().unwrap();
             assert_eq!(writer.into_inner().unwrap(), b"hello");
         }
@@ -108,8 +112,8 @@ impl KaniWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_bytes_yields_one_byte_at_a_time",
-            claim: VERIFY_BYTES_YIELDS_ONE_BYTE_AT_A_TIME_SRC,
+            harness: "verify_bytes_yields_one_byte_at_a_time".to_owned(),
+            claim: VERIFY_BYTES_YIELDS_ONE_BYTE_AT_A_TIME_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -145,8 +149,8 @@ impl KaniWitness for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_into_inner_error_recovers_the_writer_and_the_flush_error",
-            claim: VERIFY_INTO_INNER_ERROR_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC,
+            harness: "verify_into_inner_error_recovers_the_writer_and_the_flush_error".to_owned(),
+            claim: VERIFY_INTO_INNER_ERROR_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -202,8 +206,8 @@ impl KaniWitness for RustStdStandard<LineWriter<Vec<u8>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_line_writer_flushes_on_a_newline_but_not_before_one",
-            claim: VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC,
+            harness: "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
+            claim: VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -251,8 +255,8 @@ impl KaniWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_lines_splits_on_newlines_and_drops_the_terminator",
-            claim: VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC,
+            harness: "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),
+            claim: VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -287,8 +291,8 @@ impl KaniWitness for RustStdStandard<PipeReader> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_pipe_reader_reads_what_the_paired_writer_wrote",
-            claim: VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC,
+            harness: "verify_pipe_reader_reads_what_the_paired_writer_wrote".to_owned(),
+            claim: VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -328,8 +332,8 @@ impl KaniWitness for RustStdStandard<PipeWriter> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_pipe_writer_writes_arrive_at_the_paired_reader",
-            claim: VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC,
+            harness: "verify_pipe_writer_writes_arrive_at_the_paired_reader".to_owned(),
+            claim: VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -370,8 +374,8 @@ impl KaniWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_segments_on_the_given_byte_and_drops_it",
-            claim: VERIFY_SPLIT_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC,
+            harness: "verify_split_segments_on_the_given_byte_and_drops_it".to_owned(),
+            claim: VERIFY_SPLIT_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -397,10 +401,14 @@ amenable_derive::harness! {
         fn verify_split_segments_on_the_given_byte_and_drops_it() {
             use std::io::BufRead;
 
-            let pieces: Vec<Vec<u8>> = BufRead::split(&b"a,b,c"[..], b',')
-                .map(|piece| piece.unwrap())
-                .collect();
-            assert_eq!(pieces, vec![b"a".to_vec(), b"b".to_vec(), b"c".to_vec()]);
+            let mut pieces = BufRead::split(&b"a,b,c"[..], b',');
+            assert_eq!(pieces.next().unwrap().unwrap(), b"a".to_vec());
+            assert_eq!(pieces.next().unwrap().unwrap(), b"b".to_vec());
+            assert_eq!(pieces.next().unwrap().unwrap(), b"c".to_vec());
+            assert!(
+                pieces.next().is_none(),
+                "the separator is dropped and no extra segment is produced",
+            );
         }
     }
 }
@@ -411,8 +419,8 @@ impl KaniWitness for RustStdStandard<WriterPanicked> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_writer_panicked_recovers_the_buffered_data",
-            claim: VERIFY_WRITER_PANICKED_RECOVERS_THE_BUFFERED_DATA_SRC,
+            harness: "verify_writer_panicked_recovers_the_buffered_data".to_owned(),
+            claim: VERIFY_WRITER_PANICKED_RECOVERS_THE_BUFFERED_DATA_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

@@ -19,8 +19,8 @@ impl KaniWitness for RustStdStandard<CStr> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
-            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -52,6 +52,11 @@ amenable_derive::harness! {
                 &[byte],
                 "to_bytes excludes the terminating nul"
             );
+            assert_eq!(
+                cstr.to_bytes_with_nul(),
+                &bytes,
+                "the retained representation includes the original terminator"
+            );
         }
     }
 }
@@ -62,8 +67,8 @@ impl KaniWitness for RustStdStandard<FromBytesUntilNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere",
-            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
+            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_owned(),
+            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -111,8 +116,8 @@ impl KaniWitness for RustStdStandard<FromBytesWithNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
-            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_owned(),
+            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

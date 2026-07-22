@@ -17,8 +17,8 @@ impl KaniWitness for RustStdStandard<char> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_char_unicode_scalar",
-            claim: VERIFY_CHAR_UNICODE_SCALAR_SRC,
+            harness: "verify_char_unicode_scalar".to_owned(),
+            claim: VERIFY_CHAR_UNICODE_SCALAR_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -60,8 +60,8 @@ impl KaniWitness for RustStdStandard<String> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_string_utf8_valid",
-            claim: VERIFY_STRING_UTF8_VALID_SRC,
+            harness: "verify_string_utf8_valid".to_owned(),
+            claim: VERIFY_STRING_UTF8_VALID_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

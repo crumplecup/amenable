@@ -23,8 +23,8 @@ impl KaniWitness for RustStdStandard<NonZero<i8>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i8",
-            claim: VERIFY_NONZERO_I8_SRC,
+            harness: "verify_nonzero_i8".to_owned(),
+            claim: VERIFY_NONZERO_I8_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -66,8 +66,8 @@ impl KaniWitness for RustStdStandard<NonZero<i16>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i16",
-            claim: VERIFY_NONZERO_I16_SRC,
+            harness: "verify_nonzero_i16".to_owned(),
+            claim: VERIFY_NONZERO_I16_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -109,8 +109,8 @@ impl KaniWitness for RustStdStandard<NonZero<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i32",
-            claim: VERIFY_NONZERO_I32_SRC,
+            harness: "verify_nonzero_i32".to_owned(),
+            claim: VERIFY_NONZERO_I32_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -152,8 +152,8 @@ impl KaniWitness for RustStdStandard<NonZero<i64>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i64",
-            claim: VERIFY_NONZERO_I64_SRC,
+            harness: "verify_nonzero_i64".to_owned(),
+            claim: VERIFY_NONZERO_I64_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -195,8 +195,8 @@ impl KaniWitness for RustStdStandard<NonZero<i128>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i128",
-            claim: VERIFY_NONZERO_I128_SRC,
+            harness: "verify_nonzero_i128".to_owned(),
+            claim: VERIFY_NONZERO_I128_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -238,8 +238,8 @@ impl KaniWitness for RustStdStandard<NonZero<isize>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_isize",
-            claim: VERIFY_NONZERO_ISIZE_SRC,
+            harness: "verify_nonzero_isize".to_owned(),
+            claim: VERIFY_NONZERO_ISIZE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -281,8 +281,8 @@ impl KaniWitness for RustStdStandard<NonZero<u8>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_u8",
-            claim: VERIFY_NONZERO_U8_SRC,
+            harness: "verify_nonzero_u8".to_owned(),
+            claim: VERIFY_NONZERO_U8_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -324,8 +324,8 @@ impl KaniWitness for RustStdStandard<NonZero<u16>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_u16",
-            claim: VERIFY_NONZERO_U16_SRC,
+            harness: "verify_nonzero_u16".to_owned(),
+            claim: VERIFY_NONZERO_U16_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -367,8 +367,8 @@ impl KaniWitness for RustStdStandard<NonZero<u32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_u32",
-            claim: VERIFY_NONZERO_U32_SRC,
+            harness: "verify_nonzero_u32".to_owned(),
+            claim: VERIFY_NONZERO_U32_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -410,8 +410,8 @@ impl KaniWitness for RustStdStandard<NonZero<u64>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_u64",
-            claim: VERIFY_NONZERO_U64_SRC,
+            harness: "verify_nonzero_u64".to_owned(),
+            claim: VERIFY_NONZERO_U64_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -453,8 +453,8 @@ impl KaniWitness for RustStdStandard<NonZero<u128>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_u128",
-            claim: VERIFY_NONZERO_U128_SRC,
+            harness: "verify_nonzero_u128".to_owned(),
+            claim: VERIFY_NONZERO_U128_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -496,8 +496,8 @@ impl KaniWitness for RustStdStandard<NonZero<usize>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_usize",
-            claim: VERIFY_NONZERO_USIZE_SRC,
+            harness: "verify_nonzero_usize".to_owned(),
+            claim: VERIFY_NONZERO_USIZE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

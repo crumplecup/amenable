@@ -23,8 +23,8 @@ impl KaniWitness for RustStdStandard<Context<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_context_from_waker_exposes_the_same_waker",
-            claim: VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC,
+            harness: "verify_context_from_waker_exposes_the_same_waker".to_owned(),
+            claim: VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -69,8 +69,8 @@ impl KaniWitness for RustStdStandard<Poll<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_poll_ready_and_pending_are_disjoint",
-            claim: VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC,
+            harness: "verify_poll_ready_and_pending_are_disjoint".to_owned(),
+            claim: VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -114,8 +114,8 @@ impl KaniWitness for RustStdStandard<Waker> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_waker_wake_by_ref_invokes_the_wake_impl",
-            claim: VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
+            harness: "verify_waker_wake_by_ref_invokes_the_wake_impl".to_owned(),
+            claim: VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

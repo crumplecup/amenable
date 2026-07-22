@@ -23,8 +23,8 @@ impl KaniWitness for RustStdStandard<Ancestors<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ancestors_yields_self_then_each_parent_up_to_root",
-            claim: VERIFY_ANCESTORS_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC,
+            harness: "verify_ancestors_yields_self_then_each_parent_up_to_root".to_owned(),
+            claim: VERIFY_ANCESTORS_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -68,8 +68,8 @@ impl KaniWitness for RustStdStandard<Component<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_component_distinguishes_root_from_normal_segments",
-            claim: VERIFY_COMPONENT_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC,
+            harness: "verify_component_distinguishes_root_from_normal_segments".to_owned(),
+            claim: VERIFY_COMPONENT_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -107,8 +107,8 @@ impl KaniWitness for RustStdStandard<Components<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_components_yields_root_then_named_segments_in_order",
-            claim: VERIFY_COMPONENTS_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC,
+            harness: "verify_components_yields_root_then_named_segments_in_order".to_owned(),
+            claim: VERIFY_COMPONENTS_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -149,8 +149,8 @@ impl KaniWitness for RustStdStandard<std::path::Display<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_display_renders_a_valid_utf8_path_verbatim",
-            claim: VERIFY_DISPLAY_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC,
+            harness: "verify_display_renders_a_valid_utf8_path_verbatim".to_owned(),
+            claim: VERIFY_DISPLAY_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -184,8 +184,8 @@ impl KaniWitness for RustStdStandard<std::path::Iter<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_iter_yields_the_named_segments",
-            claim: VERIFY_ITER_YIELDS_THE_NAMED_SEGMENTS_SRC,
+            harness: "verify_iter_yields_the_named_segments".to_owned(),
+            claim: VERIFY_ITER_YIELDS_THE_NAMED_SEGMENTS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -222,8 +222,8 @@ impl KaniWitness for RustStdStandard<Path> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_path_derives_extension_file_name_and_parent",
-            claim: VERIFY_PATH_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC,
+            harness: "verify_path_derives_extension_file_name_and_parent".to_owned(),
+            claim: VERIFY_PATH_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -260,8 +260,8 @@ impl KaniWitness for RustStdStandard<PathBuf> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_path_buf_push_pop_and_join_build_the_expected_path",
-            claim: VERIFY_PATH_BUF_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC,
+            harness: "verify_path_buf_push_pop_and_join_build_the_expected_path".to_owned(),
+            claim: VERIFY_PATH_BUF_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -303,8 +303,8 @@ impl KaniWitness for RustStdStandard<Prefix<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_prefix_disk_identifies_the_drive_letter",
-            claim: VERIFY_PREFIX_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC,
+            harness: "verify_prefix_disk_identifies_the_drive_letter".to_owned(),
+            claim: VERIFY_PREFIX_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -348,8 +348,8 @@ impl KaniWitness for RustStdStandard<PrefixComponent<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_prefix_component_pairs_raw_text_with_parsed_prefix",
-            claim: VERIFY_PREFIX_COMPONENT_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC,
+            harness: "verify_prefix_component_pairs_raw_text_with_parsed_prefix".to_owned(),
+            claim: VERIFY_PREFIX_COMPONENT_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -392,8 +392,8 @@ impl KaniWitness for RustStdStandard<StripPrefixError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_strip_prefix_error_reports_a_non_matching_prefix",
-            claim: VERIFY_STRIP_PREFIX_ERROR_REPORTS_A_NON_MATCHING_PREFIX_SRC,
+            harness: "verify_strip_prefix_error_reports_a_non_matching_prefix".to_owned(),
+            claim: VERIFY_STRIP_PREFIX_ERROR_REPORTS_A_NON_MATCHING_PREFIX_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

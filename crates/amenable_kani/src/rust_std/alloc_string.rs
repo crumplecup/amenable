@@ -21,8 +21,8 @@ impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_string_drain_removes_and_yields_the_content",
-            claim: VERIFY_STRING_DRAIN_REMOVES_AND_YIELDS_THE_CONTENT_SRC,
+            harness: "verify_string_drain_removes_and_yields_the_content".to_owned(),
+            claim: VERIFY_STRING_DRAIN_REMOVES_AND_YIELDS_THE_CONTENT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -42,15 +42,21 @@ bridge_kani_witness!(RustStdStandard<std::string::Drain<'static>>);
 amenable_derive::harness! {
     kani, VERIFY_STRING_DRAIN_REMOVES_AND_YIELDS_THE_CONTENT_SRC, {
         /// `.drain(..)` yields the String's content and leaves it
-        /// empty afterward, for any (symbolic) single-character string.
+        /// empty afterward, for any bounded single-character string.
         #[kani::proof]
         fn verify_string_drain_removes_and_yields_the_content() {
-            let byte: u8 = kani::any();
-            kani::assume(byte < 128);
-            let c = byte as char;
-            let mut s = c.to_string();
-            let drained: String = s.drain(..).collect();
-            assert_eq!(drained, c.to_string(), "drain yields the string's content");
+            let mut s = <String as crate::KaniCompose>::kani_depth1();
+            let expected = s.chars().next().expect("kani_depth1 builds one character");
+
+            let mut drained = s.drain(..);
+            assert_eq!(
+                drained.next(),
+                Some(expected),
+                "drain yields the source character"
+            );
+            assert_eq!(drained.next(), None, "single-character drain then exhausts");
+            drop(drained);
+
             assert!(s.is_empty(), "drain leaves the string empty");
         }
     }
@@ -62,8 +68,8 @@ impl KaniWitness for RustStdStandard<FromUtf16Error> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_utf16_rejects_a_lone_surrogate",
-            claim: VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC,
+            harness: "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
+            claim: VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -95,6 +101,12 @@ amenable_derive::harness! {
                 String::from_utf16(&lone_surrogate).is_err(),
                 "a lone surrogate half is rejected"
             );
+
+            let lone_low_surrogate: [u16; 1] = [0xDC00];
+            assert!(
+                String::from_utf16(&lone_low_surrogate).is_err(),
+                "a lone low surrogate half is rejected"
+            );
         }
     }
 }
@@ -105,8 +117,8 @@ impl KaniWitness for RustStdStandard<FromUtf8Error> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_utf8_error_recovers_the_original_bytes",
-            claim: VERIFY_FROM_UTF8_ERROR_RECOVERS_THE_ORIGINAL_BYTES_SRC,
+            harness: "verify_from_utf8_error_recovers_the_original_bytes".to_owned(),
+            claim: VERIFY_FROM_UTF8_ERROR_RECOVERS_THE_ORIGINAL_BYTES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

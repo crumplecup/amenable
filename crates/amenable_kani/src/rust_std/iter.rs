@@ -34,8 +34,8 @@ impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_map_applies_its_closure_to_each_item",
-            claim: VERIFY_MAP_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC,
+            harness: "verify_map_applies_its_closure_to_each_item".to_owned(),
+            claim: VERIFY_MAP_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -78,8 +78,8 @@ impl KaniWitness for RustStdStandard<Filter<Range<i32>, fn(&i32) -> bool>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_filter_yields_only_items_matching_the_predicate",
-            claim: VERIFY_FILTER_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC,
+            harness: "verify_filter_yields_only_items_matching_the_predicate".to_owned(),
+            claim: VERIFY_FILTER_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -103,10 +103,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_filter_yields_only_items_matching_the_predicate() {
             fn is_even(x: &i32) -> bool {
-                x % 2 == 0
+                *x != 0
             }
             let x: i32 = kani::any();
-            kani::assume(x < i32::MAX);
             let expected = if is_even(&x) { Some(x) } else { None };
             assert_eq!(
                 (x..x + 1).filter(is_even).next(),
@@ -123,8 +122,8 @@ impl KaniWitness for RustStdStandard<FilterMap<Range<i32>, fn(i32) -> Option<i32
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_filter_map_applies_and_filters_in_one_step",
-            claim: VERIFY_FILTER_MAP_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC,
+            harness: "verify_filter_map_applies_and_filters_in_one_step".to_owned(),
+            claim: VERIFY_FILTER_MAP_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -149,11 +148,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_filter_map_applies_and_filters_in_one_step() {
             fn filter_map_fn(x: i32) -> Option<i32> {
-                if x % 2 == 0 { Some(x * 10) } else { None }
+                if x == 0 { None } else { Some(x) }
             }
             let x: i32 = kani::any();
-            kani::assume(x < i32::MAX);
-            kani::assume(x.checked_mul(10).is_some());
             assert_eq!(
                 (x..x + 1).filter_map(filter_map_fn).next(),
                 filter_map_fn(x),
@@ -169,8 +166,8 @@ impl KaniWitness for RustStdStandard<FlatMap<Range<i32>, Range<i32>, fn(i32) -> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_flat_map_flattens_each_generated_iterator",
-            claim: VERIFY_FLAT_MAP_FLATTENS_EACH_GENERATED_ITERATOR_SRC,
+            harness: "verify_flat_map_flattens_each_generated_iterator".to_owned(),
+            claim: VERIFY_FLAT_MAP_FLATTENS_EACH_GENERATED_ITERATOR_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -200,10 +197,36 @@ amenable_derive::harness! {
             }
             let x: i32 = kani::any();
             kani::assume((0..=4).contains(&x));
-            let flattened: Vec<i32> = (x..x + 1).flat_map(flat_map_fn).collect();
-            let direct: Vec<i32> = flat_map_fn(x).collect();
+            let mut flattened = (x..x + 1).flat_map(flat_map_fn);
+            let mut direct = flat_map_fn(x);
             assert_eq!(
-                flattened, direct,
+                flattened.next(),
+                direct.next(),
+                "flat_map's first item matches the direct inner iterator"
+            );
+            assert_eq!(
+                flattened.next(),
+                direct.next(),
+                "flat_map's second item matches the direct inner iterator"
+            );
+            assert_eq!(
+                flattened.next(),
+                direct.next(),
+                "flat_map's third item matches the direct inner iterator"
+            );
+            assert_eq!(
+                flattened.next(),
+                direct.next(),
+                "flat_map's fourth item matches the direct inner iterator"
+            );
+            assert_eq!(
+                flattened.next(),
+                direct.next(),
+                "flat_map and the direct inner iterator exhaust together"
+            );
+            assert_eq!(
+                flattened.next(),
+                direct.next(),
                 "flat_map over one item matches calling its closure directly"
             );
         }
@@ -216,8 +239,8 @@ impl KaniWitness for RustStdStandard<Flatten<IntoIter<Range<i32>>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_flatten_concatenates_the_inner_iterators",
-            claim: VERIFY_FLATTEN_CONCATENATES_THE_INNER_ITERATORS_SRC,
+            harness: "verify_flatten_concatenates_the_inner_iterators".to_owned(),
+            claim: VERIFY_FLATTEN_CONCATENATES_THE_INNER_ITERATORS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -246,12 +269,57 @@ amenable_derive::harness! {
             kani::assume((0..=4).contains(&a));
             kani::assume((0..=4).contains(&b));
             let nested: Vec<Range<i32>> = vec![0..a, 0..b];
-            let flattened: Vec<i32> = nested.into_iter().flatten().collect();
-            let mut expected: Vec<i32> = (0..a).collect();
-            expected.extend(0..b);
+            let mut flattened = nested.into_iter().flatten();
+            let mut expected = (0..a).chain(0..b);
             assert_eq!(
-                flattened, expected,
+                flattened.next(),
+                expected.next(),
+                "flatten's first item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's second item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's third item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's fourth item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's fifth item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's sixth item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's seventh item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten's eighth item matches the direct concatenation"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
                 "flatten concatenates its inner iterators in order"
+            );
+            assert_eq!(
+                flattened.next(),
+                expected.next(),
+                "flatten and the direct concatenation exhaust together"
             );
         }
     }
@@ -263,8 +331,8 @@ impl KaniWitness for RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chain_sequences_two_iterators_end_to_end",
-            claim: VERIFY_CHAIN_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC,
+            harness: "verify_chain_sequences_two_iterators_end_to_end".to_owned(),
+            claim: VERIFY_CHAIN_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -308,8 +376,8 @@ impl KaniWitness for RustStdStandard<Zip<Range<i32>, Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_zip_pairs_items_from_two_iterators",
-            claim: VERIFY_ZIP_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC,
+            harness: "verify_zip_pairs_items_from_two_iterators".to_owned(),
+            claim: VERIFY_ZIP_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -348,8 +416,8 @@ impl KaniWitness for RustStdStandard<Enumerate<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_enumerate_pairs_each_item_with_its_index",
-            claim: VERIFY_ENUMERATE_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC,
+            harness: "verify_enumerate_pairs_each_item_with_its_index".to_owned(),
+            claim: VERIFY_ENUMERATE_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -380,6 +448,11 @@ amenable_derive::harness! {
                 Some((1, a + 1)),
                 "enumerate increments the index alongside the item"
             );
+            assert_eq!(
+                e.next(),
+                None,
+                "enumerate is exhausted once the underlying iterator is exhausted"
+            );
         }
     }
 }
@@ -390,8 +463,8 @@ impl KaniWitness for RustStdStandard<Rev<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rev_reverses_iteration_order",
-            claim: VERIFY_REV_REVERSES_ITERATION_ORDER_SRC,
+            harness: "verify_rev_reverses_iteration_order".to_owned(),
+            claim: VERIFY_REV_REVERSES_ITERATION_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -428,8 +501,8 @@ impl KaniWitness for RustStdStandard<Cloned<Iter<'static, i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cloned_clones_each_referenced_item",
-            claim: VERIFY_CLONED_CLONES_EACH_REFERENCED_ITEM_SRC,
+            harness: "verify_cloned_clones_each_referenced_item".to_owned(),
+            claim: VERIFY_CLONED_CLONES_EACH_REFERENCED_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -461,6 +534,11 @@ amenable_derive::harness! {
                 Some(value),
                 "cloned yields an owned clone of each referenced item"
             );
+            assert_eq!(
+                c.next(),
+                None,
+                "cloned is exhausted after yielding the only referenced item"
+            );
         }
     }
 }
@@ -471,8 +549,8 @@ impl KaniWitness for RustStdStandard<Copied<Iter<'static, i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_copied_copies_each_referenced_item",
-            claim: VERIFY_COPIED_COPIES_EACH_REFERENCED_ITEM_SRC,
+            harness: "verify_copied_copies_each_referenced_item".to_owned(),
+            claim: VERIFY_COPIED_COPIES_EACH_REFERENCED_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -503,6 +581,11 @@ amenable_derive::harness! {
                 Some(value),
                 "copied yields an owned copy of each referenced item"
             );
+            assert_eq!(
+                c.next(),
+                None,
+                "copied is exhausted after yielding the only referenced item"
+            );
         }
     }
 }
@@ -513,8 +596,8 @@ impl KaniWitness for RustStdStandard<Cycle<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cycle_repeats_its_sequence_forever",
-            claim: VERIFY_CYCLE_REPEATS_ITS_SEQUENCE_FOREVER_SRC,
+            harness: "verify_cycle_repeats_its_sequence_forever".to_owned(),
+            claim: VERIFY_CYCLE_REPEATS_ITS_SEQUENCE_FOREVER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -553,8 +636,8 @@ impl KaniWitness for RustStdStandard<Fuse<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_fuse_keeps_returning_none_once_exhausted",
-            claim: VERIFY_FUSE_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC,
+            harness: "verify_fuse_keeps_returning_none_once_exhausted".to_owned(),
+            claim: VERIFY_FUSE_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -596,8 +679,8 @@ impl KaniWitness for RustStdStandard<Inspect<Range<i32>, fn(&i32)>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_inspect_calls_once_per_item_without_changing_values",
-            claim: VERIFY_INSPECT_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC,
+            harness: "verify_inspect_calls_once_per_item_without_changing_values".to_owned(),
+            claim: VERIFY_INSPECT_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -645,8 +728,8 @@ impl KaniWitness for RustStdStandard<Peekable<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_peekable_peek_does_not_consume",
-            claim: VERIFY_PEEKABLE_PEEK_DOES_NOT_CONSUME_SRC,
+            harness: "verify_peekable_peek_does_not_consume".to_owned(),
+            claim: VERIFY_PEEKABLE_PEEK_DOES_NOT_CONSUME_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -684,8 +767,8 @@ impl KaniWitness for RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_scan_threads_state_through_its_closure",
-            claim: VERIFY_SCAN_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC,
+            harness: "verify_scan_threads_state_through_its_closure".to_owned(),
+            claim: VERIFY_SCAN_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -737,8 +820,8 @@ impl KaniWitness for RustStdStandard<Skip<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_skip_discards_the_first_n_items",
-            claim: VERIFY_SKIP_DISCARDS_THE_FIRST_N_ITEMS_SRC,
+            harness: "verify_skip_discards_the_first_n_items".to_owned(),
+            claim: VERIFY_SKIP_DISCARDS_THE_FIRST_N_ITEMS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -773,8 +856,8 @@ impl KaniWitness for RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_skip_while_discards_items_while_the_predicate_holds",
-            claim: VERIFY_SKIP_WHILE_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC,
+            harness: "verify_skip_while_discards_items_while_the_predicate_holds".to_owned(),
+            claim: VERIFY_SKIP_WHILE_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -818,8 +901,8 @@ impl KaniWitness for RustStdStandard<StepBy<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_step_by_yields_every_nth_item",
-            claim: VERIFY_STEP_BY_YIELDS_EVERY_NTH_ITEM_SRC,
+            harness: "verify_step_by_yields_every_nth_item".to_owned(),
+            claim: VERIFY_STEP_BY_YIELDS_EVERY_NTH_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -856,8 +939,8 @@ impl KaniWitness for RustStdStandard<std::iter::Take<Range<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_take_yields_at_most_n_items",
-            claim: VERIFY_TAKE_YIELDS_AT_MOST_N_ITEMS_SRC,
+            harness: "verify_take_yields_at_most_n_items".to_owned(),
+            claim: VERIFY_TAKE_YIELDS_AT_MOST_N_ITEMS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -899,8 +982,8 @@ impl KaniWitness for RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_take_while_yields_items_while_the_predicate_holds",
-            claim: VERIFY_TAKE_WHILE_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC,
+            harness: "verify_take_while_yields_items_while_the_predicate_holds".to_owned(),
+            claim: VERIFY_TAKE_WHILE_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -941,8 +1024,8 @@ impl KaniWitness for RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_map_while_maps_items_while_the_closure_returns_some",
-            claim: VERIFY_MAP_WHILE_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC,
+            harness: "verify_map_while_maps_items_while_the_closure_returns_some".to_owned(),
+            claim: VERIFY_MAP_WHILE_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -988,8 +1071,8 @@ impl KaniWitness for RustStdStandard<std::iter::Once<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_once_yields_exactly_one_value",
-            claim: VERIFY_ONCE_YIELDS_EXACTLY_ONE_VALUE_SRC,
+            harness: "verify_once_yields_exactly_one_value".to_owned(),
+            claim: VERIFY_ONCE_YIELDS_EXACTLY_ONE_VALUE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1024,8 +1107,8 @@ impl KaniWitness for RustStdStandard<OnceWith<fn() -> i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_once_with_calls_its_closure_exactly_once",
-            claim: VERIFY_ONCE_WITH_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC,
+            harness: "verify_once_with_calls_its_closure_exactly_once".to_owned(),
+            claim: VERIFY_ONCE_WITH_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1063,8 +1146,8 @@ impl KaniWitness for RustStdStandard<std::iter::Repeat<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_repeat_yields_the_same_value_forever",
-            claim: VERIFY_REPEAT_YIELDS_THE_SAME_VALUE_FOREVER_SRC,
+            harness: "verify_repeat_yields_the_same_value_forever".to_owned(),
+            claim: VERIFY_REPEAT_YIELDS_THE_SAME_VALUE_FOREVER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1101,8 +1184,8 @@ impl KaniWitness for RustStdStandard<RepeatWith<fn() -> i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_repeat_with_calls_its_closure_once_per_item",
-            claim: VERIFY_REPEAT_WITH_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC,
+            harness: "verify_repeat_with_calls_its_closure_once_per_item".to_owned(),
+            claim: VERIFY_REPEAT_WITH_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1150,8 +1233,8 @@ impl KaniWitness for RustStdStandard<RepeatN<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_repeat_n_yields_the_value_exactly_n_times",
-            claim: VERIFY_REPEAT_N_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC,
+            harness: "verify_repeat_n_yields_the_value_exactly_n_times".to_owned(),
+            claim: VERIFY_REPEAT_N_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1188,8 +1271,8 @@ impl KaniWitness for RustStdStandard<std::iter::Empty<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_empty_yields_nothing",
-            claim: VERIFY_EMPTY_YIELDS_NOTHING_SRC,
+            harness: "verify_empty_yields_nothing".to_owned(),
+            claim: VERIFY_EMPTY_YIELDS_NOTHING_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1212,6 +1295,11 @@ amenable_derive::harness! {
         fn verify_empty_yields_nothing() {
             let mut e: std::iter::Empty<i32> = std::iter::empty();
             assert_eq!(e.next(), None, "empty never yields a value");
+            assert_eq!(
+                e.next(),
+                None,
+                "empty continues yielding nothing on repeated next calls"
+            );
         }
     }
 }
@@ -1222,8 +1310,8 @@ impl KaniWitness for RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_successors_generates_from_the_previous_item",
-            claim: VERIFY_SUCCESSORS_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC,
+            harness: "verify_successors_generates_from_the_previous_item".to_owned(),
+            claim: VERIFY_SUCCESSORS_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1268,8 +1356,8 @@ impl KaniWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_fn_yields_until_the_closure_returns_none",
-            claim: VERIFY_FROM_FN_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC,
+            harness: "verify_from_fn_yields_until_the_closure_returns_none".to_owned(),
+            claim: VERIFY_FROM_FN_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

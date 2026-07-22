@@ -15,8 +15,8 @@ impl KaniWitness for RustStdStandard<std::cmp::Ordering> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ordering_reverse_involution",
-            claim: VERIFY_ORDERING_REVERSE_INVOLUTION_SRC,
+            harness: "verify_ordering_reverse_involution".to_owned(),
+            claim: VERIFY_ORDERING_REVERSE_INVOLUTION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -40,22 +40,26 @@ amenable_derive::harness! {
         /// all three variants concretely rather than sampling symbolically.
         #[kani::proof]
         fn verify_ordering_reverse_involution() {
-            for o in [Ordering::Less, Ordering::Equal, Ordering::Greater] {
+            for o in [
+                std::cmp::Ordering::Less,
+                std::cmp::Ordering::Equal,
+                std::cmp::Ordering::Greater,
+            ] {
                 assert_eq!(o.reverse().reverse(), o, "reverse is an involution");
             }
             assert_eq!(
-                Ordering::Less.reverse(),
-                Ordering::Greater,
+                std::cmp::Ordering::Less.reverse(),
+                std::cmp::Ordering::Greater,
                 "Less reverses to Greater"
             );
             assert_eq!(
-                Ordering::Greater.reverse(),
-                Ordering::Less,
+                std::cmp::Ordering::Greater.reverse(),
+                std::cmp::Ordering::Less,
                 "Greater reverses to Less"
             );
             assert_eq!(
-                Ordering::Equal.reverse(),
-                Ordering::Equal,
+                std::cmp::Ordering::Equal.reverse(),
+                std::cmp::Ordering::Equal,
                 "Equal reverses to itself"
             );
         }
@@ -68,8 +72,8 @@ impl KaniWitness for RustStdStandard<Reverse<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_reverse_inverts_comparison",
-            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
+            harness: "verify_reverse_inverts_comparison".to_owned(),
+            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

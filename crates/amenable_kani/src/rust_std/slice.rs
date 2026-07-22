@@ -28,8 +28,8 @@ impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_iter_yields_shared_references_in_order",
-            claim: VERIFY_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_iter_yields_shared_references_in_order".to_owned(),
+            claim: VERIFY_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -65,8 +65,8 @@ impl KaniWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_iter_mut_yields_mutable_references_that_write_through",
-            claim: VERIFY_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+            harness: "verify_iter_mut_yields_mutable_references_that_write_through".to_owned(),
+            claim: VERIFY_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -107,8 +107,10 @@ impl KaniWitness for RustStdStandard<Chunks<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk",
-            claim: VERIFY_CHUNKS_YIELDS_NON_OVERLAPPING_GROUPS_WITH_A_SHORT_LAST_CHUNK_SRC,
+            harness: "verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk"
+                .to_owned(),
+            claim: VERIFY_CHUNKS_YIELDS_NON_OVERLAPPING_GROUPS_WITH_A_SHORT_LAST_CHUNK_SRC
+                .to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -148,8 +150,8 @@ impl KaniWitness for RustStdStandard<ChunksExact<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunks_exact_discards_a_short_remainder",
-            claim: VERIFY_CHUNKS_EXACT_DISCARDS_A_SHORT_REMAINDER_SRC,
+            harness: "verify_chunks_exact_discards_a_short_remainder".to_owned(),
+            claim: VERIFY_CHUNKS_EXACT_DISCARDS_A_SHORT_REMAINDER_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -191,8 +193,8 @@ impl KaniWitness for RustStdStandard<ChunksMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunks_mut_writes_through_every_chunk",
-            claim: VERIFY_CHUNKS_MUT_WRITES_THROUGH_EVERY_CHUNK_SRC,
+            harness: "verify_chunks_mut_writes_through_every_chunk".to_owned(),
+            claim: VERIFY_CHUNKS_MUT_WRITES_THROUGH_EVERY_CHUNK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -236,8 +238,8 @@ impl KaniWitness for RustStdStandard<ChunksExactMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunks_exact_mut_leaves_the_remainder_untouched",
-            claim: VERIFY_CHUNKS_EXACT_MUT_LEAVES_THE_REMAINDER_UNTOUCHED_SRC,
+            harness: "verify_chunks_exact_mut_leaves_the_remainder_untouched".to_owned(),
+            claim: VERIFY_CHUNKS_EXACT_MUT_LEAVES_THE_REMAINDER_UNTOUCHED_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -284,8 +286,8 @@ impl KaniWitness for RustStdStandard<RChunks<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rchunks_groups_from_the_back",
-            claim: VERIFY_RCHUNKS_GROUPS_FROM_THE_BACK_SRC,
+            harness: "verify_rchunks_groups_from_the_back".to_owned(),
+            claim: VERIFY_RCHUNKS_GROUPS_FROM_THE_BACK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -326,8 +328,8 @@ impl KaniWitness for RustStdStandard<RChunksExact<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rchunks_exact_discards_a_short_remainder_at_the_front",
-            claim: VERIFY_RCHUNKS_EXACT_DISCARDS_A_SHORT_REMAINDER_AT_THE_FRONT_SRC,
+            harness: "verify_rchunks_exact_discards_a_short_remainder_at_the_front".to_owned(),
+            claim: VERIFY_RCHUNKS_EXACT_DISCARDS_A_SHORT_REMAINDER_AT_THE_FRONT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -369,8 +371,8 @@ impl KaniWitness for RustStdStandard<RChunksExactMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rchunks_exact_mut_leaves_the_front_remainder_untouched",
-            claim: VERIFY_RCHUNKS_EXACT_MUT_LEAVES_THE_FRONT_REMAINDER_UNTOUCHED_SRC,
+            harness: "verify_rchunks_exact_mut_leaves_the_front_remainder_untouched".to_owned(),
+            claim: VERIFY_RCHUNKS_EXACT_MUT_LEAVES_THE_FRONT_REMAINDER_UNTOUCHED_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -418,8 +420,8 @@ impl KaniWitness for RustStdStandard<RChunksMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rchunks_mut_writes_through_every_chunk",
-            claim: VERIFY_RCHUNKS_MUT_WRITES_THROUGH_EVERY_CHUNK_SRC,
+            harness: "verify_rchunks_mut_writes_through_every_chunk".to_owned(),
+            claim: VERIFY_RCHUNKS_MUT_WRITES_THROUGH_EVERY_CHUNK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -463,8 +465,8 @@ impl KaniWitness for RustStdStandard<Windows<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_windows_yields_overlapping_slices",
-            claim: VERIFY_WINDOWS_YIELDS_OVERLAPPING_SLICES_SRC,
+            harness: "verify_windows_yields_overlapping_slices".to_owned(),
+            claim: VERIFY_WINDOWS_YIELDS_OVERLAPPING_SLICES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -505,8 +507,8 @@ impl KaniWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> boo
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunk_by_groups_adjacent_elements_matching_the_predicate",
-            claim: VERIFY_CHUNK_BY_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC,
+            harness: "verify_chunk_by_groups_adjacent_elements_matching_the_predicate".to_owned(),
+            claim: VERIFY_CHUNK_BY_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -557,8 +559,10 @@ impl KaniWitness for RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate",
-            claim: VERIFY_CHUNK_BY_MUT_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC,
+            harness: "verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate"
+                .to_owned(),
+            claim: VERIFY_CHUNK_BY_MUT_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC
+                .to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -605,8 +609,8 @@ impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) ->
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_yields_subslices_between_matches",
-            claim: VERIFY_SPLIT_YIELDS_SUBSLICES_BETWEEN_MATCHES_SRC,
+            harness: "verify_split_yields_subslices_between_matches".to_owned(),
+            claim: VERIFY_SPLIT_YIELDS_SUBSLICES_BETWEEN_MATCHES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -650,8 +654,8 @@ impl KaniWitness for RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_mut_yields_writable_subslices_between_matches",
-            claim: VERIFY_SPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_BETWEEN_MATCHES_SRC,
+            harness: "verify_split_mut_yields_writable_subslices_between_matches".to_owned(),
+            claim: VERIFY_SPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_BETWEEN_MATCHES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -700,8 +704,8 @@ impl KaniWitness for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_inclusive_keeps_the_match_at_the_end_of_each_piece",
-            claim: VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC,
+            harness: "verify_split_inclusive_keeps_the_match_at_the_end_of_each_piece".to_owned(),
+            claim: VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -746,8 +750,10 @@ impl KaniWitness for RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) ->
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece",
-            claim: VERIFY_SPLIT_INCLUSIVE_MUT_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC,
+            harness: "verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece"
+                .to_owned(),
+            claim: VERIFY_SPLIT_INCLUSIVE_MUT_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC
+                .to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -793,8 +799,8 @@ impl KaniWitness for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_n_caps_the_number_of_pieces",
-            claim: VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC,
+            harness: "verify_split_n_caps_the_number_of_pieces".to_owned(),
+            claim: VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -845,8 +851,8 @@ impl KaniWitness for RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_n_mut_caps_the_number_of_pieces",
-            claim: VERIFY_SPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_SRC,
+            harness: "verify_split_n_mut_caps_the_number_of_pieces".to_owned(),
+            claim: VERIFY_SPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -895,8 +901,8 @@ impl KaniWitness for RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rsplit_yields_subslices_from_the_back",
-            claim: VERIFY_RSPLIT_YIELDS_SUBSLICES_FROM_THE_BACK_SRC,
+            harness: "verify_rsplit_yields_subslices_from_the_back".to_owned(),
+            claim: VERIFY_RSPLIT_YIELDS_SUBSLICES_FROM_THE_BACK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -940,8 +946,8 @@ impl KaniWitness for RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>> 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rsplit_mut_yields_writable_subslices_from_the_back",
-            claim: VERIFY_RSPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_FROM_THE_BACK_SRC,
+            harness: "verify_rsplit_mut_yields_writable_subslices_from_the_back".to_owned(),
+            claim: VERIFY_RSPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_FROM_THE_BACK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -990,8 +996,8 @@ impl KaniWitness for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) 
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rsplit_n_caps_the_number_of_pieces_from_the_back",
-            claim: VERIFY_RSPLIT_N_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC,
+            harness: "verify_rsplit_n_caps_the_number_of_pieces_from_the_back".to_owned(),
+            claim: VERIFY_RSPLIT_N_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1041,8 +1047,8 @@ impl KaniWitness for RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back",
-            claim: VERIFY_RSPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC,
+            harness: "verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back".to_owned(),
+            claim: VERIFY_RSPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1091,8 +1097,8 @@ impl KaniWitness for RustStdStandard<EscapeAscii<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_escape_ascii_leaves_printable_bytes_unescaped",
-            claim: VERIFY_ESCAPE_ASCII_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC,
+            harness: "verify_escape_ascii_leaves_printable_bytes_unescaped".to_owned(),
+            claim: VERIFY_ESCAPE_ASCII_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1135,8 +1141,8 @@ impl KaniWitness for RustStdStandard<GetDisjointMutError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds",
-            claim: VERIFY_GET_DISJOINT_MUT_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC,
+            harness: "verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds".to_owned(),
+            claim: VERIFY_GET_DISJOINT_MUT_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

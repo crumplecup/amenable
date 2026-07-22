@@ -20,8 +20,8 @@ impl KaniWitness for RustStdStandard<core::fmt::Alignment> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_alignment_reaches_the_formatter_from_the_format_spec",
-            claim: VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC,
+            harness: "verify_alignment_reaches_the_formatter_from_the_format_spec".to_owned(),
+            claim: VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -49,7 +49,7 @@ amenable_derive::harness! {
             struct Probe;
             impl std::fmt::Display for Probe {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    assert_eq!(f.align(), Some(Alignment::Left), "the spec's alignment reaches the Formatter");
+                    assert_eq!(f.align(), Some(core::fmt::Alignment::Left), "the spec's alignment reaches the Formatter");
                     write!(f, "x")
                 }
             }
@@ -64,8 +64,8 @@ impl KaniWitness for RustStdStandard<Arguments<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_arguments_renders_the_same_as_the_value_itself",
-            claim: VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC,
+            harness: "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
+            claim: VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -107,8 +107,8 @@ impl KaniWitness for RustStdStandard<Formatter<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_formatter_exposes_the_parsed_width_and_precision",
-            claim: VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC,
+            harness: "verify_formatter_exposes_the_parsed_width_and_precision".to_owned(),
+            claim: VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -151,8 +151,8 @@ impl KaniWitness for RustStdStandard<DebugStruct<'static, 'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_debug_struct_renders_named_fields",
-            claim: VERIFY_DEBUG_STRUCT_RENDERS_NAMED_FIELDS_SRC,
+            harness: "verify_debug_struct_renders_named_fields".to_owned(),
+            claim: VERIFY_DEBUG_STRUCT_RENDERS_NAMED_FIELDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -194,8 +194,8 @@ impl KaniWitness for RustStdStandard<DebugTuple<'static, 'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_debug_tuple_renders_positional_fields",
-            claim: VERIFY_DEBUG_TUPLE_RENDERS_POSITIONAL_FIELDS_SRC,
+            harness: "verify_debug_tuple_renders_positional_fields".to_owned(),
+            claim: VERIFY_DEBUG_TUPLE_RENDERS_POSITIONAL_FIELDS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -237,8 +237,8 @@ impl KaniWitness for RustStdStandard<DebugList<'static, 'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_debug_list_renders_entries_in_brackets",
-            claim: VERIFY_DEBUG_LIST_RENDERS_ENTRIES_IN_BRACKETS_SRC,
+            harness: "verify_debug_list_renders_entries_in_brackets".to_owned(),
+            claim: VERIFY_DEBUG_LIST_RENDERS_ENTRIES_IN_BRACKETS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -281,8 +281,8 @@ impl KaniWitness for RustStdStandard<DebugSet<'static, 'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_debug_set_renders_entries_in_braces",
-            claim: VERIFY_DEBUG_SET_RENDERS_ENTRIES_IN_BRACES_SRC,
+            harness: "verify_debug_set_renders_entries_in_braces".to_owned(),
+            claim: VERIFY_DEBUG_SET_RENDERS_ENTRIES_IN_BRACES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -326,8 +326,8 @@ impl KaniWitness for RustStdStandard<DebugMap<'static, 'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_debug_map_renders_key_value_pairs",
-            claim: VERIFY_DEBUG_MAP_RENDERS_KEY_VALUE_PAIRS_SRC,
+            harness: "verify_debug_map_renders_key_value_pairs".to_owned(),
+            claim: VERIFY_DEBUG_MAP_RENDERS_KEY_VALUE_PAIRS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }

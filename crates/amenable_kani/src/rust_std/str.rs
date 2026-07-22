@@ -27,8 +27,8 @@ impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_bytes_yields_the_utf8_encoding",
-            claim: VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC,
+            harness: "verify_bytes_yields_the_utf8_encoding".to_owned(),
+            claim: VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -65,8 +65,8 @@ impl KaniWitness for RustStdStandard<CharIndices<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_char_indices_pairs_each_char_with_its_byte_offset",
-            claim: VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC,
+            harness: "verify_char_indices_pairs_each_char_with_its_byte_offset".to_owned(),
+            claim: VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -103,8 +103,8 @@ impl KaniWitness for RustStdStandard<Chars<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_chars_yields_the_str_characters",
-            claim: VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC,
+            harness: "verify_chars_yields_the_str_characters".to_owned(),
+            claim: VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -142,8 +142,8 @@ impl KaniWitness for RustStdStandard<EncodeUtf16<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_encode_utf16_yields_utf16_code_units",
-            claim: VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC,
+            harness: "verify_encode_utf16_yields_utf16_code_units".to_owned(),
+            claim: VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -184,8 +184,8 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDebug<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_escape_debug_escapes_control_characters",
-            claim: VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC,
+            harness: "verify_escape_debug_escapes_control_characters".to_owned(),
+            claim: VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -220,8 +220,8 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDefault<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_escape_default_escapes_control_characters",
-            claim: VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC,
+            harness: "verify_escape_default_escapes_control_characters".to_owned(),
+            claim: VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -256,8 +256,8 @@ impl KaniWitness for RustStdStandard<std::str::EscapeUnicode<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_escape_unicode_renders_the_codepoint_escape",
-            claim: VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC,
+            harness: "verify_escape_unicode_renders_the_codepoint_escape".to_owned(),
+            claim: VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -292,8 +292,8 @@ impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_lines_splits_on_line_endings",
-            claim: VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC,
+            harness: "verify_lines_splits_on_line_endings".to_owned(),
+            claim: VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -330,8 +330,8 @@ impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace",
-            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC,
+            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
+            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -367,8 +367,8 @@ impl KaniWitness for RustStdStandard<SplitWhitespace<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_whitespace_collapses_runs_of_whitespace",
-            claim: VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC,
+            harness: "verify_split_whitespace_collapses_runs_of_whitespace".to_owned(),
+            claim: VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -404,8 +404,8 @@ impl KaniWitness for RustStdStandard<Utf8Chunks<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input",
-            claim: VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC,
+            harness: "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input".to_owned(),
+            claim: VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -443,8 +443,8 @@ impl KaniWitness for RustStdStandard<Utf8Chunk<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes",
-            claim: VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC,
+            harness: "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
+            claim: VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -482,8 +482,8 @@ impl KaniWitness for RustStdStandard<Utf8Error> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_utf8_error_reports_the_valid_prefix_length_and_error_span",
-            claim: VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC,
+            harness: "verify_utf8_error_reports_the_valid_prefix_length_and_error_span".to_owned(),
+            claim: VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -506,7 +506,9 @@ amenable_derive::harness! {
         /// bad byte (`error_len`).
         #[kani::proof]
         fn verify_utf8_error_reports_the_valid_prefix_length_and_error_span() {
-            let bytes = [b'a', b'b', 0xFFu8, b'c'];
+            let invalid: u8 = kani::any();
+            kani::assume(invalid >= 0xF5);
+            let bytes = [b'a', b'b', invalid, b'c'];
             let err = std::str::from_utf8(&bytes).unwrap_err();
             assert_eq!(err.valid_up_to(), 2, "two leading bytes were valid UTF-8");
             assert_eq!(err.error_len(), Some(1), "the single bad byte has error_len 1");
@@ -536,8 +538,8 @@ impl KaniWitness for RustStdStandard<LinesAnyStatic> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_lines_any_splits_on_any_line_ending",
-            claim: VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC,
+            harness: "verify_lines_any_splits_on_any_line_ending".to_owned(),
+            claim: VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC.to_owned(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
