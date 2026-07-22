@@ -3,8 +3,13 @@
 
 #![forbid(unsafe_code)]
 
+mod assessment;
+mod gallery;
+mod kani;
+
+use clap::{Args, Parser, Subcommand};
 use std::{
-    env, fs,
+    fs,
     path::{Path, PathBuf},
     process::ExitCode,
 };
@@ -13,22 +18,87 @@ fn artifacts_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts")
 }
 
-fn main() -> ExitCode {
-    let args: Vec<String> = env::args().skip(1).collect();
-
-    match args.first().map(String::as_str) {
-        Some("audit") => run_audit(&args[1..]),
-        Some("dump-registry") => run_dump_registry(&args[1..]),
-        Some(other) => {
-            eprintln!("Unrecognized command: {other}");
-            eprintln!("{USAGE}");
-            ExitCode::FAILURE
-        }
-        None => run_certify(),
-    }
+#[derive(Debug, Parser)]
+#[command(
+    about = "Emit provenance certificates, audit and assess proofs, and run registered verifiers"
+)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
 }
 
-const USAGE: &str = "Usage:\n  amenable                                        Write std-lib provenance certificates\n  amenable audit <name> --out <file> [--verifier <name>]...  Write the registered proof chain for <name>, optionally filtered to one or more verifiers (e.g. --verifier kani)\n  amenable dump-registry --out <file>             Write every registered EvidenceLink/ProofRecord as JSON, for external coverage tooling (e.g. elicit_doc)";
+#[derive(Debug, Subcommand)]
+enum Commands {
+    /// Write the registered proof chain for one evidence name.
+    Audit(AuditArgs),
+    /// Record and report structured assessments of registered proof harnesses.
+    Assess(assessment::AssessArgs),
+    /// Run and inspect non-production Kani proof-gallery experiments.
+    Gallery(gallery::GalleryArgs),
+    /// Write the full evidence and proof registry as JSON.
+    #[command(name = "dump-registry")]
+    DumpRegistry(DumpRegistryArgs),
+    /// Run registered proof harnesses through a verifier backend.
+    Verify(VerifyArgs),
+}
+
+#[derive(Debug, Args)]
+struct VerifyArgs {
+    #[command(subcommand)]
+    backend: VerifyBackend,
+}
+
+#[derive(Debug, Subcommand)]
+enum VerifyBackend {
+    /// Run self-registered Kani proof harnesses.
+    Kani(kani::VerifyKaniArgs),
+}
+
+fn main() -> ExitCode {
+    match Cli::try_parse() {
+        Ok(Cli {
+            command: Some(Commands::Audit(args)),
+        }) => run_audit(args),
+        Ok(Cli {
+            command: Some(Commands::Assess(args)),
+        }) => match assessment::run(args) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("Proof assessment failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli {
+            command: Some(Commands::Gallery(args)),
+        }) => match gallery::run(args) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("Proof gallery failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli {
+            command: Some(Commands::DumpRegistry(args)),
+        }) => run_dump_registry(args),
+        Ok(Cli {
+            command:
+                Some(Commands::Verify(VerifyArgs {
+                    backend: VerifyBackend::Kani(args),
+                })),
+        }) => match kani::verify(args) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("Kani verification failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli { command: None }) => run_certify(),
+        Err(error) => {
+            let _ = error.print();
+            ExitCode::FAILURE
+        }
+    }
+}
 
 fn run_certify() -> ExitCode {
     let directory = artifacts_directory().join("std-certificates");
@@ -58,20 +128,15 @@ fn run_certify() -> ExitCode {
     }
 }
 
-fn run_audit(args: &[String]) -> ExitCode {
-    let Some(parsed) = parse_audit_args(args) else {
-        eprintln!("{USAGE}");
-        return ExitCode::FAILURE;
-    };
-
-    let verifiers: Vec<&str> = parsed.verifiers.iter().map(String::as_str).collect();
+fn run_audit(args: AuditArgs) -> ExitCode {
+    let verifiers: Vec<&str> = args.verifiers.iter().map(String::as_str).collect();
     let filter = if verifiers.is_empty() {
         None
     } else {
         Some(verifiers.as_slice())
     };
 
-    let report = match amenable::proof_chain_for_verifiers(parsed.name, filter) {
+    let report = match amenable::proof_chain_for_verifiers(&args.name, filter) {
         Ok(report) => report,
         Err(error) => {
             eprintln!("{error}");
@@ -80,67 +145,48 @@ fn run_audit(args: &[String]) -> ExitCode {
             // not just stderr — it's a legitimate audit artifact in its
             // own right ("here's exactly what's missing"), not only a
             // diagnostic to be read once and discarded.
-            if let Err(write_error) = fs::write(&parsed.out, error.to_string()) {
+            if let Err(write_error) = fs::write(&args.out, error.to_string()) {
                 eprintln!(
                     "Additionally failed to write that error to {}: {write_error}",
-                    parsed.out.display()
+                    args.out.display()
                 );
             } else {
-                eprintln!(
-                    "Wrote the incompleteness report to {}",
-                    parsed.out.display()
-                );
+                eprintln!("Wrote the incompleteness report to {}", args.out.display());
             }
 
             return ExitCode::FAILURE;
         }
     };
 
-    match fs::write(&parsed.out, report.to_string()) {
+    match fs::write(&args.out, report.to_string()) {
         Ok(()) => {
             println!(
                 "Wrote proof chain for {:?} to {}",
-                parsed.name,
-                parsed.out.display()
+                args.name,
+                args.out.display()
             );
             ExitCode::SUCCESS
         }
         Err(error) => {
             eprintln!(
                 "Failed to write proof chain to {}: {error}",
-                parsed.out.display()
+                args.out.display()
             );
             ExitCode::FAILURE
         }
     }
 }
 
-struct AuditArgs<'a> {
-    name: &'a str,
+#[derive(Debug, Args)]
+struct AuditArgs {
+    /// Evidence name to audit.
+    name: String,
+    /// File to receive the proof-chain report.
+    #[arg(short, long)]
     out: PathBuf,
+    /// Restrict the report to one verifier; may be repeated.
+    #[arg(long)]
     verifiers: Vec<String>,
-}
-
-fn parse_audit_args(args: &[String]) -> Option<AuditArgs<'_>> {
-    let mut name = None;
-    let mut out = None;
-    let mut verifiers = Vec::new();
-    let mut iter = args.iter();
-
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--out" | "-o" => out = Some(PathBuf::from(iter.next()?)),
-            "--verifier" => verifiers.push(iter.next()?.clone()),
-            _ if name.is_none() => name = Some(arg.as_str()),
-            _ => return None,
-        }
-    }
-
-    Some(AuditArgs {
-        name: name?,
-        out: out?,
-        verifiers,
-    })
 }
 
 /// One [`amenable::EvidenceLink`], owned for JSON serialization.
@@ -166,14 +212,18 @@ struct ProofRecordDump {
 struct RegistryDump {
     evidence_links: Vec<EvidenceLinkDump>,
     proof_records: Vec<ProofRecordDump>,
+    kani_proofs: Vec<KaniProofDump>,
 }
 
-fn run_dump_registry(args: &[String]) -> ExitCode {
-    let Some(out) = parse_dump_registry_args(args) else {
-        eprintln!("{USAGE}");
-        return ExitCode::FAILURE;
-    };
+/// One [`amenable::KaniProof`], owned for JSON serialization.
+#[derive(serde::Serialize)]
+struct KaniProofDump {
+    id: String,
+    harness: String,
+    package: String,
+}
 
+fn run_dump_registry(args: DumpRegistryArgs) -> ExitCode {
     let dump = RegistryDump {
         evidence_links: inventory::iter::<amenable::EvidenceLink>()
             .map(|link| EvidenceLinkDump {
@@ -188,6 +238,14 @@ fn run_dump_registry(args: &[String]) -> ExitCode {
                 verifier: record.verifier.to_owned(),
             })
             .collect(),
+        kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()
+            .map(|registration| (registration.proof)())
+            .map(|record| KaniProofDump {
+                id: record.id,
+                harness: record.harness,
+                package: record.package,
+            })
+            .collect(),
     };
 
     let json = match serde_json::to_string_pretty(&dump) {
@@ -198,31 +256,47 @@ fn run_dump_registry(args: &[String]) -> ExitCode {
         }
     };
 
-    match fs::write(&out, json) {
+    match fs::write(&args.out, json) {
         Ok(()) => {
-            println!("Wrote registry dump to {}", out.display());
+            println!("Wrote registry dump to {}", args.out.display());
             ExitCode::SUCCESS
         }
         Err(error) => {
             eprintln!(
                 "Failed to write registry dump to {}: {error}",
-                out.display()
+                args.out.display()
             );
             ExitCode::FAILURE
         }
     }
 }
 
-fn parse_dump_registry_args(args: &[String]) -> Option<PathBuf> {
-    let mut out = None;
-    let mut iter = args.iter();
+#[derive(Debug, Args)]
+struct DumpRegistryArgs {
+    /// File to receive the JSON registry dump.
+    #[arg(short, long)]
+    out: PathBuf,
+}
 
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--out" | "-o" => out = Some(PathBuf::from(iter.next()?)),
-            _ => return None,
-        }
+#[cfg(test)]
+mod tests {
+    use clap::error::ErrorKind;
+
+    use super::Cli;
+    use clap::Parser;
+
+    #[test]
+    fn clap_rejects_a_single_proof_combined_with_a_retry_selector() {
+        let error = Cli::try_parse_from([
+            "amenable",
+            "verify",
+            "kani",
+            "--proof",
+            "amenable_kani::calculator::verify_debit_access_preserves_value",
+            "--failed",
+        ])
+        .expect_err("conflicting selectors must be rejected");
+
+        assert_eq!(error.kind(), ErrorKind::ArgumentConflict);
     }
-
-    out
 }
