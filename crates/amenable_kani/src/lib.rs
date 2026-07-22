@@ -18,11 +18,15 @@
 extern crate self as amenable_kani;
 
 mod calculator;
+mod gallery;
 mod registry;
 mod rust_std;
 mod witness;
 
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
-pub use registry::{KaniProof, KaniProofRegistration};
+pub use registry::{
+    KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
+    KaniProof, KaniProofRegistration,
+};
 pub use rust_std::CheckedProof;
 pub use witness::{KaniVerifier, KaniVerifierMetadata, KaniWitness};
