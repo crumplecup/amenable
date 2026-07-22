@@ -3,6 +3,7 @@
 mod calculation;
 mod evidence;
 mod harness;
+mod kani_compose;
 mod standard;
 
 use proc_macro::TokenStream;
@@ -16,6 +17,7 @@ use syn::{
 use calculation::{CalculationArgs, expand_calculation};
 use evidence::expand_evidence;
 use harness::expand_harness;
+use kani_compose::expand_kani_compose;
 use standard::expand_standard;
 
 /// Define a `#[cfg(...)]`-gated proof harness item and, alongside it, an
@@ -82,6 +84,16 @@ pub fn derive_standard(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     match expand_standard(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+#[proc_macro_derive(KaniCompose)]
+pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_kani_compose(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

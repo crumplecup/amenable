@@ -30,8 +30,9 @@ pub use amenable_creusot::{
 };
 pub use amenable_kani::{
     AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Credit, Debit,
-    KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
-    KaniProof, KaniProofRegistration, KaniVerifier, KaniVerifierMetadata, KaniWitness, Sum, add,
+    KaniCompose, KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation,
+    KaniGalleryRegistration, KaniProof, KaniProofRegistration, KaniVerifier, KaniVerifierMetadata,
+    KaniWitness, Sum, add,
 };
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,

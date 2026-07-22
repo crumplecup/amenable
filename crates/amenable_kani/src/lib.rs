@@ -18,12 +18,14 @@
 extern crate self as amenable_kani;
 
 mod calculator;
+mod compose;
 mod gallery;
 mod registry;
 mod rust_std;
 mod witness;
 
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
+pub use compose::KaniCompose;
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
     KaniProof, KaniProofRegistration,
