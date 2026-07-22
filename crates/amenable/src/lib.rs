@@ -29,10 +29,11 @@ pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
 };
 pub use amenable_kani::{
-    AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Credit, Debit,
-    KaniCompose, KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation,
-    KaniGalleryRegistration, KaniProof, KaniProofRegistration, KaniVerifier, KaniVerifierMetadata,
-    KaniWitness, Sum, add,
+    AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Color, Credit,
+    Debit, Green, GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition,
+    KaniGalleryExpectation, KaniGalleryRegistration, KaniProof, KaniProofRegistration,
+    KaniVerifier, KaniVerifierMetadata, KaniWitness, Red, RedToken, SequentialCycle, Stoplight,
+    Sum, Yellow, YellowToken, add,
 };
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,

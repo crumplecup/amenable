@@ -22,6 +22,7 @@ mod compose;
 mod gallery;
 mod registry;
 mod rust_std;
+mod stoplight;
 mod witness;
 
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
@@ -31,4 +32,7 @@ pub use registry::{
     KaniProof, KaniProofRegistration,
 };
 pub use rust_std::CheckedProof;
+pub use stoplight::{
+    Color, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow, YellowToken,
+};
 pub use witness::{KaniVerifier, KaniVerifierMetadata, KaniWitness};
