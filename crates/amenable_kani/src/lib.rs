@@ -15,10 +15,14 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+extern crate self as amenable_kani;
+
 mod calculator;
+mod registry;
 mod rust_std;
 mod witness;
 
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
+pub use registry::{KaniProof, KaniProofRegistration};
 pub use rust_std::CheckedProof;
 pub use witness::{KaniVerifier, KaniVerifierMetadata, KaniWitness};

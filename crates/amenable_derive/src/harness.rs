@@ -4,6 +4,11 @@
 //! show a proof exactly as its author wrote it, not a machine-reflowed
 //! approximation. Both come from the same braced group of tokens, so they
 //! can never drift apart.
+//!
+//! Kani invocations also emit an `inventory` record for the contained
+//! function. The record exists in ordinary Rust builds, while the harness
+//! itself remains gated behind `cfg(kani)`, allowing the CLI to discover the
+//! complete executable Kani catalog without source scanning.
 
 use proc_macro2::{Delimiter, Ident, TokenStream, TokenTree};
 use quote::quote;
@@ -11,7 +16,8 @@ use syn::Error;
 
 /// Expand `harness!(cfg_name, CONST_NAME, { item })` into the `#[cfg(...)]`
 /// gated `item` plus a `const CONST_NAME: &str = "...";` holding `item`'s
-/// verbatim source text.
+/// verbatim source text. A `kani` invocation additionally registers the
+/// contained function as an [`amenable_kani::KaniProof`].
 pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
     let mut tokens = input.into_iter().peekable();
 
@@ -34,12 +40,42 @@ pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
         .map(|text| trim_braces(&text).to_owned())
         .unwrap_or_else(|| group.stream().to_string());
     let item = group.stream();
+    let kani_record = if cfg_name == "kani" {
+        let harness = syn::parse2::<syn::ItemFn>(item.clone()).map_err(|_| {
+            Error::new_spanned(
+                &item,
+                "a `kani` harness! invocation must contain one function item",
+            )
+        })?;
+        let name = harness.sig.ident;
+
+        quote! {
+            ::inventory::submit! {
+                ::amenable_kani::KaniProofRegistration {
+                    proof: || ::amenable_kani::KaniProof {
+                        id: concat!(module_path!(), "::", stringify!(#name)).to_owned(),
+                        harness: module_path!()
+                            .split_once("::")
+                            .map_or_else(
+                                || stringify!(#name).to_owned(),
+                                |(_, module)| format!("{module}::{}", stringify!(#name)),
+                            ),
+                        package: "amenable_kani".to_owned(),
+                    },
+                }
+            }
+        }
+    } else {
+        TokenStream::new()
+    };
 
     Ok(quote! {
         #[cfg(#cfg_name)]
         #item
 
         const #const_name: &str = #source;
+
+        #kani_record
     })
 }
 
