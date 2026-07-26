@@ -8,6 +8,7 @@
 //! The current issue classes are:
 //!
 //! - unsupported foreign boundaries in reachable std implementations
+//! - Unix file-descriptor duplication paths that bottom out in `fcntl`
 //! - unsupported panic-capture boundaries
 //! - Kani environment-model mismatches against real-process invariants
 //! - OS-backed filesystem boundaries with real external state
@@ -40,6 +41,38 @@ amenable_derive::harness! {
                 std::backtrace::BacktraceStatus::Captured,
                 "forced capture should report a captured backtrace"
             );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "borrowed-fd cloning reaches an unsupported fcntl boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BORROWED_FD_CLONE_REACHES_UNSUPPORTED_FCNTL_BOUNDARY_SRC, {
+        /// This is the reduced form behind the refined Unix `OwnedFd`
+        /// replacement review: the ownership-transfer claim itself is small,
+        /// but seeding it from a live descriptor clone reaches `fcntl`
+        /// through `BorrowedFd::try_clone_to_owned` before the property can
+        /// be established.
+        #[kani::proof]
+        fn borrowed_fd_clone_reaches_unsupported_fcntl_boundary() {
+            use std::os::unix::io::{AsFd, AsRawFd};
+
+            let stdout = std::io::stdout();
+            let owned = stdout.as_fd().try_clone_to_owned().unwrap();
+
+            assert!(owned.as_raw_fd() >= 0, "cloned owned fd should stay live");
         }
     }
 }

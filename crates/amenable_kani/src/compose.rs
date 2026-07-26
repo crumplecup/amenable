@@ -58,18 +58,18 @@ pub trait KaniCompose: Sized {
 }
 
 #[cfg(kani)]
-trait KaniArbitrary: kani::Arbitrary {}
+pub(crate) trait KaniArbitrary: kani::Arbitrary {}
 
 #[cfg(kani)]
 impl<T> KaniArbitrary for T where T: kani::Arbitrary {}
 
 #[cfg(not(kani))]
-trait KaniArbitrary {}
+pub(crate) trait KaniArbitrary {}
 
 #[cfg(not(kani))]
 impl<T> KaniArbitrary for T {}
 
-fn symbolic_any<T>() -> T
+pub(crate) fn symbolic_any<T>() -> T
 where
     T: KaniArbitrary,
 {
@@ -84,7 +84,7 @@ where
     }
 }
 
-fn kani_assume(condition: bool) {
+pub(crate) fn kani_assume(condition: bool) {
     #[cfg(kani)]
     {
         kani::assume(condition);

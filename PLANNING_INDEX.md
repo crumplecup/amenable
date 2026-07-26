@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani FD Accommodation Model
+
+**Document:** [KANI_FD_MODEL_PLAN.md](KANI_FD_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only fd semantics are being added so
+Unix handle proofs can move from unsupported libc boundaries to explicit
+Amenable-owned accommodation laws.
+
+**Description:** Introduce a small verifier-facing Unix fd model in
+`amenable_kani`, migrate the `OwnedFd` proof to that model, preserve the
+direct `fcntl` path in the gallery, and give the repo a minimal `justfile`
+for canonical scoped validation.
+
 ### KaniCompose for Amenable
 
 **Document:** [KANI_COMPOSE_PLAN.md](KANI_COMPOSE_PLAN.md)
