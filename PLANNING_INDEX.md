@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani BTree Accommodation Model
+
+**Document:** [KANI_BTREE_MODEL_PLAN.md](KANI_BTREE_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only ordered-BTree semantics are being
+added so `BTreeMap` / `BTreeSet` proofs can move from std traversal blow-up to
+explicit Amenable-owned ordering and removal laws.
+
+**Description:** Introduce a small verifier-facing BTree model in
+`amenable_kani`, migrate the ordered `BTreeMap` / `BTreeSet` proofs to that
+model, preserve the direct symbolic std iteration timeout path in the gallery,
+and validate the model with scoped checks plus native Kani runs.
+
 ### Kani Fmt Accommodation Model
 
 **Document:** [KANI_FMT_MODEL_PLAN.md](KANI_FMT_MODEL_PLAN.md)

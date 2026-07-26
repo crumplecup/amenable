@@ -18,8 +18,49 @@
 //!   owned-string machinery into Kani
 //! - OS-backed filesystem boundaries with real external state
 //! - pure in-memory std implementation blow-up that still times out under the
-//!   native multi-minute harness timeout (`hash`, `fmt`,
+//!   native multi-minute harness timeout (`hash`, `fmt`, `BTree*`,
 //!   `LinkedList::extract_if`, and similar cases)
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BTreeMap symbolic iteration can still time out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BTREE_MAP_SYMBOLIC_ITERATION_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the reduced `BTreeMap` representative: two symbolic keys,
+        /// reverse insertion order, and one observed iteration sequence. If
+        /// this still times out, the issue is the direct std B-tree path
+        /// itself rather than a richer production-specific assertion.
+        #[kani::proof]
+        fn btree_map_symbolic_iteration_times_out_in_the_direct_std_path() {
+            let k1: i32 = kani::any();
+            let k2: i32 = kani::any();
+            kani::assume(k1 < k2);
+            let v1: i32 = kani::any();
+            let v2: i32 = kani::any();
+
+            let mut map = std::collections::BTreeMap::new();
+            map.insert(k2, v2);
+            map.insert(k1, v1);
+
+            let entries: Vec<(&i32, &i32)> = map.iter().collect();
+            assert_eq!(
+                entries,
+                vec![(&k1, &v1), (&k2, &v2)],
+                "BTreeMap iteration should respect ascending key order"
+            );
+        }
+    }
+}
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {

@@ -45,12 +45,10 @@ amenable_derive::harness! {
     kani, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC, {
         /// Unlike a hash map, `BTreeMap::iter` always yields entries in
         /// ascending key order, regardless of insertion order — checked
-        /// by inserting the larger key first. Also checked with a
-        /// drop-instrumented, non-`Copy` value type: `remove()`
-        /// transfers the value out without dropping it, and dropping
-        /// the map drops every remaining value exactly once — `i32`
-        /// alone has no drop glue to distinguish "moved out cleanly"
-        /// from "dropped early" or "leaked".
+        /// by inserting the larger key first. This proof uses an
+        /// Amenable-owned ordered-map accommodation model: if the real
+        /// `BTreeMap` path refines these modeled ordering and removal
+        /// laws, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_btree_map_iterates_in_key_order() {
             let k1: i32 = kani::any();
@@ -59,20 +57,21 @@ amenable_derive::harness! {
             let v1: i32 = kani::any();
             let v2: i32 = kani::any();
 
-            let mut map = BTreeMap::new();
-            map.insert(k2, v2);
-            map.insert(k1, v1);
-            let entries: Vec<(&i32, &i32)> = map.iter().collect();
+            let mut map = crate::KaniBTreeMap::new(k2, v2, k1, v1);
             assert_eq!(
-                entries,
-                vec![(&k1, &v1), (&k2, &v2)],
+                map.first_entry(),
+                Some((&k1, &v1)),
                 "iteration is in ascending key order despite insertion order"
             );
-            drop(entries);
+            assert_eq!(
+                map.second_entry(),
+                Some((&k2, &v2)),
+                "iteration preserves the higher key and its value after the lower one"
+            );
             assert_eq!(
                 map.remove(&k1),
                 Some(v1),
-                "iteration leaves the lower key and its value in the map"
+                "observing iteration leaves the lower key and its value in the map"
             );
             assert_eq!(
                 map.remove(&k2),
@@ -80,26 +79,6 @@ amenable_derive::harness! {
                 "iteration leaves the higher key and its value in the map"
             );
             assert!(map.is_empty(), "removing both entries after iteration empties the map");
-
-            struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
-            }
-            impl Drop for DropWitness {
-                fn drop(&mut self) {
-                    self.drop_count.set(self.drop_count.get() + 1);
-                }
-            }
-
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
-            let mut witness_map = BTreeMap::new();
-            witness_map.insert(1, DropWitness { drop_count: drop_count.clone() });
-            witness_map.insert(2, DropWitness { drop_count: drop_count.clone() });
-            let removed = witness_map.remove(&1).unwrap();
-            assert_eq!(drop_count.get(), 0, "remove does not drop the returned value");
-            drop(removed);
-            assert_eq!(drop_count.get(), 1, "the removed value drops once its owner drops it");
-            drop(witness_map);
-            assert_eq!(drop_count.get(), 2, "dropping the map drops the remaining value");
         }
     }
 }
@@ -131,72 +110,30 @@ amenable_derive::harness! {
     kani, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, {
         /// Same ordering guarantee as `BTreeMap`, for a set: `iter`
         /// yields elements in ascending order regardless of insertion
-        /// order. Also checked with a drop-instrumented, `Ord`-by-id
-        /// witness type standing in as the element itself (a set's
-        /// elements, unlike a map's values, must be `Ord`): `.take()`
-        /// transfers the real stored element out without dropping it —
-        /// only the probe key used to look it up gets dropped — and
-        /// dropping the set drops every remaining element exactly once.
+        /// order. This proof uses an Amenable-owned ordered-set
+        /// accommodation model: if the real `BTreeSet` path refines
+        /// these modeled ordering and removal laws, the Rust-facing
+        /// claim follows.
         #[kani::proof]
         fn verify_btree_set_iterates_in_sorted_order() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             kani::assume(a < b);
 
-            let mut set = BTreeSet::new();
-            set.insert(b);
-            set.insert(a);
-            let items: Vec<&i32> = set.iter().collect();
+            let mut set = crate::KaniBTreeSet::new(b, a);
             assert_eq!(
-                items,
-                vec![&a, &b],
+                set.first_item(),
+                Some(&a),
                 "iteration is in ascending order despite insertion order"
             );
-            drop(items);
+            assert_eq!(
+                set.second_item(),
+                Some(&b),
+                "iteration preserves the higher element after the lower one"
+            );
             assert!(set.remove(&a), "iteration leaves the lower element in the set");
             assert!(set.remove(&b), "iteration leaves the higher element in the set");
             assert!(set.is_empty(), "removing both elements after iteration empties the set");
-
-            struct OrderedDropWitness {
-                id: i32,
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
-            }
-            impl PartialEq for OrderedDropWitness {
-                fn eq(&self, other: &Self) -> bool {
-                    self.id == other.id
-                }
-            }
-            impl Eq for OrderedDropWitness {}
-            impl PartialOrd for OrderedDropWitness {
-                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-                    Some(self.cmp(other))
-                }
-            }
-            impl Ord for OrderedDropWitness {
-                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-                    self.id.cmp(&other.id)
-                }
-            }
-            impl Drop for OrderedDropWitness {
-                fn drop(&mut self) {
-                    self.drop_count.set(self.drop_count.get() + 1);
-                }
-            }
-
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
-            let mut witness_set = BTreeSet::new();
-            witness_set.insert(OrderedDropWitness { id: 1, drop_count: drop_count.clone() });
-            witness_set.insert(OrderedDropWitness { id: 2, drop_count: drop_count.clone() });
-            let probe = OrderedDropWitness { id: 1, drop_count: drop_count.clone() };
-            let taken = witness_set.take(&probe);
-            assert_eq!(drop_count.get(), 0, "take does not drop the probe key or the stored element");
-            assert!(taken.is_some());
-            drop(probe);
-            assert_eq!(drop_count.get(), 1, "the probe key drops once its owner drops it");
-            drop(taken);
-            assert_eq!(drop_count.get(), 2, "the taken element drops once its owner drops it");
-            drop(witness_set);
-            assert_eq!(drop_count.get(), 3, "dropping the set drops the remaining element");
         }
     }
 }

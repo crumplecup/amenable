@@ -57,6 +57,12 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
     }));
     assert!(cases.iter().any(|case| {
         case.id
+            == "amenable_kani::gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path"
+            && case.disposition == KaniGalleryDisposition::FalseTrail
+            && case.expected == KaniGalleryExpectation::Timeout
+    }));
+    assert!(cases.iter().any(|case| {
+        case.id
             == "amenable_kani::gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation"
             && case.disposition == KaniGalleryDisposition::FalseTrail
             && case.expected == KaniGalleryExpectation::Timeout

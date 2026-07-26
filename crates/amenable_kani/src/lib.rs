@@ -18,6 +18,7 @@
 extern crate self as amenable_kani;
 
 mod backtrace_model;
+mod btree_model;
 mod calculator;
 mod compose;
 mod env_model;
@@ -33,6 +34,7 @@ mod stoplight;
 mod witness;
 
 pub use backtrace_model::{KaniBacktrace, KaniBacktraceStatus};
+pub use btree_model::{KaniBTreeMap, KaniBTreeSet};
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
 pub use compose::KaniCompose;
 pub use env_model::KaniArgv;
