@@ -51,6 +51,15 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
         "amenable_kani::gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model [false_trail / failed]"
     ));
     assert!(stdout.contains(
+        "amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path [false_trail / timeout]"
+    ));
+    assert!(stdout.contains(
+        "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path [false_trail / timeout]"
+    ));
+    assert!(stdout.contains(
+        "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model [false_trail / timeout]"
+    ));
+    assert!(stdout.contains(
         "amenable_kani::gallery::replace_recommendations::default_hasher_determinism_times_out_in_the_direct_std_path [false_trail / timeout]"
     ));
     assert!(stdout.contains(

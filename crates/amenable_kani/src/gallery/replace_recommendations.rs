@@ -13,6 +13,9 @@
 //! - unsupported `#[track_caller]` / `Location::caller()` boundaries
 //! - unsupported panic-capture boundaries
 //! - Kani environment-model mismatches against real-process invariants
+//! - PATH-style helper expansion that still times out in direct std execution
+//! - first-pass concrete `String` / `Vec` PATH models that still leak too much
+//!   owned-string machinery into Kani
 //! - OS-backed filesystem boundaries with real external state
 //! - pure in-memory std implementation blow-up that still times out under the
 //!   native multi-minute harness timeout (`hash`, `fmt`,
@@ -238,6 +241,107 @@ amenable_derive::harness! {
                 std::env::args().count() >= 1,
                 "real processes should expose at least their own program path"
             );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct join_paths can still time out even for one fixed unjoinable path".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, JOIN_PATHS_UNJOINABLE_PATH_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the reduced `join_paths()` representative: one fixed
+        /// unjoinable path and one `is_err()` assertion. If this still times
+        /// out, the issue is the direct std helper path itself rather than a
+        /// richer proof-side setup.
+        #[kani::proof]
+        fn join_paths_unjoinable_path_times_out_in_the_direct_std_path() {
+            let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" };
+            assert!(std::env::join_paths([bad_path]).is_err());
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct split_paths round trips can still time out on a tiny fixed path list".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, SPLIT_PATHS_ROUND_TRIP_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the reduced `split_paths()` representative: a fixed
+        /// three-path round trip with no symbolic input. If this still times
+        /// out, the issue is the direct std helper path itself rather than a
+        /// richer production assertion.
+        #[kani::proof]
+        fn split_paths_round_trip_times_out_in_the_direct_std_path() {
+            let joined = std::env::join_paths(["one", "two", "three"]).unwrap();
+            let split: Vec<std::path::PathBuf> = std::env::split_paths(&joined).collect();
+            assert_eq!(
+                split,
+                vec![
+                    std::path::PathBuf::from("one"),
+                    std::path::PathBuf::from("two"),
+                    std::path::PathBuf::from("three"),
+                ]
+            );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
+            harness: "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "a first-pass concrete PATH string model can still time out under Kani".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, SPLIT_PATHS_ROUND_TRIP_TIMES_OUT_IN_THE_FIRST_CONCRETE_STRING_MODEL_SRC, {
+        /// This is the first accommodation false trail for `split_paths()`:
+        /// direct std helpers are gone, but the proof still asks Kani to
+        /// reason through owned `String`/`Vec` rendering and parsing. If this
+        /// times out, the next step is a semantic wrapper, not more proof-side
+        /// assertion trimming.
+        #[kani::proof]
+        fn split_paths_round_trip_times_out_in_the_first_concrete_string_model() {
+            let paths = ::amenable_kani::KaniEnvPathList::from_strings(vec![
+                "one".to_owned(),
+                "two".to_owned(),
+                "three".to_owned(),
+            ])
+            .expect("separator-free paths stay inside the modeled subset");
+            let joined = ::amenable_kani::KaniEnvPaths::join(&paths);
+            let split = ::amenable_kani::KaniEnvPaths::split(&joined);
+
+            assert_eq!(split.len(), 3);
+            assert_eq!(split.paths()[0].as_str(), "one");
+            assert_eq!(split.paths()[1].as_str(), "two");
+            assert_eq!(split.paths()[2].as_str(), "three");
         }
     }
 }

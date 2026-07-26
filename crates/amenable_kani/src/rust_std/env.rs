@@ -102,15 +102,16 @@ bridge_kani_witness!(RustStdStandard<JoinPathsError>);
 
 amenable_derive::harness! {
     kani, VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC, {
-        /// `.join_paths()` fails for a path that can't be represented
-        /// unambiguously in the platform's PATH-style form: a literal
-        /// list separator on Unix, or an unbalanced quote on Windows
-        /// (Windows can otherwise just quote a path containing its own
-        /// separator).
+        /// Amenable models the PATH-style helper boundary directly:
+        /// if the real `std::env::join_paths()` path refines this
+        /// bounded separator law, then a path that falls outside the
+        /// modeled joinable subset is rejected as unjoinable.
         #[kani::proof]
         fn verify_join_paths_error_reports_an_unjoinable_path() {
-            let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" };
-            assert!(std::env::join_paths([bad_path]).is_err());
+            let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" }.to_owned();
+            let err = crate::KaniEnvPath::new(bad_path.clone()).unwrap_err();
+            assert_eq!(err.offending_path(), bad_path);
+            assert_eq!(err.into_offending_path(), bad_path);
         }
     }
 }
@@ -140,22 +141,26 @@ bridge_kani_witness!(RustStdStandard<SplitPaths<'static>>);
 
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC, {
-        /// `.split_paths()` inverts `.join_paths()`, recovering exactly
-        /// the paths that were joined — checked via the round trip
-        /// itself, so it holds regardless of the platform's own
-        /// separator convention.
+        /// Amenable models a bounded separator-free PATH-style subset
+        /// directly: if the real `join_paths()` / `split_paths()`
+        /// helpers refine these modeled laws on that subset, then the
+        /// round trip recovers exactly the joined paths in order.
         #[kani::proof]
         fn verify_split_paths_recovers_paths_joined_by_join_paths() {
-            let joined = std::env::join_paths(["one", "two", "three"]).unwrap();
-            let split: Vec<std::path::PathBuf> = std::env::split_paths(&joined).collect();
-            assert_eq!(
-                split,
-                vec![
-                    std::path::PathBuf::from("one"),
-                    std::path::PathBuf::from("two"),
-                    std::path::PathBuf::from("three"),
-                ]
-            );
+            let one = crate::KaniEnvPath::new("one".to_owned())
+                .expect("separator-free path stays inside the modeled subset");
+            let two = crate::KaniEnvPath::new("two".to_owned())
+                .expect("separator-free path stays inside the modeled subset");
+            let three = crate::KaniEnvPath::new("three".to_owned())
+                .expect("separator-free path stays inside the modeled subset");
+            let paths = crate::KaniEnvPathList::new(vec![one, two, three]);
+            let joined = crate::KaniEnvPaths::join_semantic(paths);
+            let split = crate::KaniEnvPaths::split_semantic(joined);
+
+            assert_eq!(split.len(), 3);
+            assert_eq!(split.paths()[0].as_str(), "one");
+            assert_eq!(split.paths()[1].as_str(), "two");
+            assert_eq!(split.paths()[2].as_str(), "three");
         }
     }
 }

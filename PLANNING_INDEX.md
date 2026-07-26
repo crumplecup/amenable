@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Env Path Accommodation Model
+
+**Document:** [KANI_ENV_PATH_MODEL_PLAN.md](KANI_ENV_PATH_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only PATH-style helper semantics are
+being added so `join_paths` / `split_paths` proofs can move from std helper
+timeout to explicit Amenable-owned separator and error laws.
+
+**Description:** Introduce a small verifier-facing env-path model in
+`amenable_kani`, migrate the `JoinPathsError` / `SplitPaths<'static>` proofs
+to that model, preserve the direct std timeout path in the gallery, and
+validate the result with scoped checks plus native Kani runs.
+
 ### Kani LinkedList ExtractIf Accommodation Model
 
 **Document:** [KANI_LINKED_LIST_EXTRACT_MODEL_PLAN.md](KANI_LINKED_LIST_EXTRACT_MODEL_PLAN.md)
