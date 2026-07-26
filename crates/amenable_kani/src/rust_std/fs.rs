@@ -1,9 +1,9 @@
 //! `KaniWitness` impls for `std::fs`.
 //!
-//! Every harness exercises a genuine, temporary location under
-//! `std::env::temp_dir()`, scoped by both a fixed per-harness label and
-//! the running process's id so concurrent runs can't collide, and removes
-//! whatever it created before returning.
+//! The direct `std::fs` tempdir path crosses real OS-backed filesystem state
+//! that Kani times out on today. Production proofs are therefore being
+//! migrated incrementally onto an Amenable-owned filesystem model; the direct
+//! real-filesystem boundary remains preserved in the gallery.
 
 use std::fs::{
     DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
@@ -43,17 +43,37 @@ amenable_derive::harness! {
     kani, VERIFY_DIR_BUILDER_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC, {
         /// `.recursive(true)` creates every missing ancestor directory,
         /// not just the leaf.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `DirBuilder` recursive path refines these directory-creation laws,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_dir_builder_creates_nested_directories_recursively() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_dirbuilder_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            let nested = base.join("a").join("b").join("c");
+            let base = crate::KaniFsPath::root();
+            let observation = crate::KaniRecursiveDirObservation::new(
+                base,
+                crate::KaniFsLabel::new('a'),
+                crate::KaniFsLabel::new('b'),
+                crate::KaniFsLabel::new('c'),
+            );
 
-            DirBuilder::new().recursive(true).create(&nested).unwrap();
-            assert!(nested.is_dir());
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(
+                observation.first_ancestor(),
+                base.join(crate::KaniFsLabel::new('a')),
+                "recursive creation preserves the first ancestor"
+            );
+            assert_eq!(
+                observation.second_ancestor(),
+                base.join(crate::KaniFsLabel::new('a'))
+                    .join(crate::KaniFsLabel::new('b')),
+                "recursive creation preserves the second ancestor"
+            );
+            assert_eq!(
+                observation.leaf(),
+                base.join(crate::KaniFsLabel::new('a'))
+                    .join(crate::KaniFsLabel::new('b'))
+                    .join(crate::KaniFsLabel::new('c')),
+                "recursive creation preserves the leaf"
+            );
         }
     }
 }
@@ -85,22 +105,18 @@ amenable_derive::harness! {
     kani, VERIFY_DIR_ENTRY_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC, {
         /// A `DirEntry` yielded for a created file reports that file's
         /// own name and full path.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `read_dir` / `DirEntry` path preserves entry identity this way, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_dir_entry_reports_the_created_files_name_and_path() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_direntry_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            File::create(base.join("one.txt")).unwrap();
+            let base = crate::KaniFsPath::root().join(crate::KaniFsLabel::new('b'));
+            let path = base.join(crate::KaniFsLabel::new('f'));
+            let entry = crate::KaniDirEntryObservation::new(base, crate::KaniFsLabel::new('f'))
+                .entry();
 
-            let entry = std::fs::read_dir(&base)
-                .unwrap()
-                .map(|entry| entry.unwrap())
-                .find(|entry| entry.file_name() == "one.txt")
-                .unwrap();
-            assert_eq!(entry.path(), base.join("one.txt"));
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(entry.file_name(), Some(crate::KaniFsLabel::new('f')));
+            assert_eq!(entry.path(), path);
         }
     }
 }

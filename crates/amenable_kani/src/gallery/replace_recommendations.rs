@@ -512,6 +512,13 @@ amenable_derive::harness! {
         /// temp directory, one created file, one metadata observation, and
         /// cleanup. If this still times out, the issue is the real std::fs
         /// path itself rather than a larger production-specific assertion.
+        ///
+        /// In July 2026 we also confirmed that two filesystem accommodations
+        /// were still too heavy for Kani: first a heap-backed `Vec<String>`
+        /// path model, then a more generic mutable filesystem state machine
+        /// with fixed symbolic labels. Future filesystem proofs should target
+        /// the narrow observable law directly rather than simulating a general
+        /// filesystem.
         #[kani::proof]
         fn real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario() {
             let base =

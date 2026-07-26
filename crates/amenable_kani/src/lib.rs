@@ -25,6 +25,7 @@ mod env_model;
 mod env_path_model;
 mod fd_model;
 mod fmt_model;
+mod fs_model;
 mod gallery;
 mod linked_list_extract_model;
 mod pipe_model;
@@ -44,6 +45,10 @@ pub use env_path_model::{
 };
 pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile};
 pub use fmt_model::{KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRendered, KaniRenderedKind};
+pub use fs_model::{
+    KaniDirEntryObservation, KaniFileSystem, KaniFsDirEntry, KaniFsLabel, KaniFsNodeKind,
+    KaniFsPath, KaniRecursiveDirObservation,
+};
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
 pub use registry::{

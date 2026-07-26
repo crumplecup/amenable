@@ -4,6 +4,20 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Filesystem Accommodation Model
+
+**Document:** [KANI_FILESYSTEM_MODEL_PLAN.md](KANI_FILESYSTEM_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only filesystem semantics are being
+added so `std::fs` proofs can move from real tempdir timeouts to explicit
+Amenable-owned path, directory, and metadata laws.
+
+**Description:** Introduce a small verifier-facing filesystem model in
+`amenable_kani`, migrate the `std::fs` queue in registry order starting with
+recursive directory creation and directory entries, preserve the direct
+real-filesystem timeout path in the gallery, and validate the result with
+scoped checks plus native Kani runs.
+
 ### Kani UTF-8 Accommodation Model
 
 **Document:** [KANI_UTF8_MODEL_PLAN.md](KANI_UTF8_MODEL_PLAN.md)
