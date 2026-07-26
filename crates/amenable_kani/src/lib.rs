@@ -46,8 +46,11 @@ pub use env_path_model::{
 pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile};
 pub use fmt_model::{KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRendered, KaniRenderedKind};
 pub use fs_model::{
-    KaniDirEntryObservation, KaniFileSystem, KaniFsDirEntry, KaniFsLabel, KaniFsNodeKind,
-    KaniFsPath, KaniRecursiveDirObservation,
+    KaniAlreadyExists, KaniAlreadyLocked, KaniCreateNewObservation, KaniDirEntryObservation,
+    KaniFileContentObservation, KaniFileLenObservation, KaniFileSystem, KaniFileTimesObservation,
+    KaniFileTypeObservation, KaniFsDirEntry, KaniFsLabel, KaniFsNodeKind, KaniFsPath,
+    KaniLockObservation, KaniPermissionsObservation, KaniReadDirObservation,
+    KaniRecursiveDirObservation,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};

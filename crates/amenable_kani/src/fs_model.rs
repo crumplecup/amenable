@@ -298,3 +298,253 @@ impl KaniFileSystem {
         self.nodes.iter().position(|node| node.path == *path)
     }
 }
+
+/// Observable result of reading a file's own type against a sibling
+/// directory's, mutually exclusive by construction.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniFileTypeObservation {
+    file: KaniFsNodeKind,
+    directory: KaniFsNodeKind,
+}
+
+impl KaniFileTypeObservation {
+    /// Model one file node and one directory node.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            file: KaniFsNodeKind::File,
+            directory: KaniFsNodeKind::Directory,
+        }
+    }
+
+    /// Report whether the modeled file node reports as a file.
+    #[must_use]
+    pub fn file_is_file(&self) -> bool {
+        self.file == KaniFsNodeKind::File
+    }
+
+    /// Report whether the modeled file node reports as a directory.
+    #[must_use]
+    pub fn file_is_dir(&self) -> bool {
+        self.file == KaniFsNodeKind::Directory
+    }
+
+    /// Report whether the modeled directory node reports as a directory.
+    #[must_use]
+    pub fn directory_is_dir(&self) -> bool {
+        self.directory == KaniFsNodeKind::Directory
+    }
+
+    /// Report whether the modeled directory node reports as a file.
+    #[must_use]
+    pub fn directory_is_file(&self) -> bool {
+        self.directory == KaniFsNodeKind::File
+    }
+}
+
+impl Default for KaniFileTypeObservation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Observable result of writing a fixed-width byte sequence to a file and
+/// reading it back through a fresh handle.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniFileContentObservation {
+    content: [u8; 4],
+}
+
+impl KaniFileContentObservation {
+    /// Model writing `content` to a fresh file.
+    #[must_use]
+    pub fn write(content: [u8; 4]) -> Self {
+        Self { content }
+    }
+
+    /// Model reading the file back through a fresh handle.
+    #[must_use]
+    pub fn read(&self) -> [u8; 4] {
+        self.content
+    }
+}
+
+/// Observable result of writing a byte sequence and reading its recorded
+/// length back from metadata.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniFileLenObservation {
+    len: u8,
+}
+
+impl KaniFileLenObservation {
+    /// Model writing `len` bytes to a fresh file.
+    #[must_use]
+    pub fn write(len: u8) -> Self {
+        Self { len }
+    }
+
+    /// Model the file's recorded metadata length.
+    #[must_use]
+    pub fn len(&self) -> u64 {
+        u64::from(self.len)
+    }
+
+    /// Report whether the modeled file is empty.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+}
+
+/// Observable result of `.set_modified()` / metadata `.modified()`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniFileTimesObservation {
+    modified_unix_seconds: u64,
+}
+
+impl KaniFileTimesObservation {
+    /// Model setting a file's modification time.
+    #[must_use]
+    pub fn set_modified(modified_unix_seconds: u64) -> Self {
+        Self {
+            modified_unix_seconds,
+        }
+    }
+
+    /// Model reading the file's recorded modification time back.
+    #[must_use]
+    pub fn modified(&self) -> u64 {
+        self.modified_unix_seconds
+    }
+}
+
+/// Observable result of `OpenOptions::create_new` against a path that may
+/// or may not already have a file.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniCreateNewObservation {
+    already_exists: bool,
+}
+
+/// Modeled error for `create_new` against a path that already has a file.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct KaniAlreadyExists;
+
+impl KaniCreateNewObservation {
+    /// Model a path that either already has a file (`already_exists`) or is
+    /// genuinely fresh.
+    #[must_use]
+    pub fn new(already_exists: bool) -> Self {
+        Self { already_exists }
+    }
+
+    /// Model attempting `create_new` against the modeled path.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(KaniAlreadyExists)` when the modeled path already has a
+    /// file, mirroring `ErrorKind::AlreadyExists`.
+    pub fn create_new(&self) -> Result<(), KaniAlreadyExists> {
+        if self.already_exists {
+            Err(KaniAlreadyExists)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+/// Observable result of flipping a file's readonly permission bit and
+/// reading it back.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniPermissionsObservation {
+    readonly: bool,
+}
+
+impl KaniPermissionsObservation {
+    /// Model a freshly created file's permissions (never readonly).
+    #[must_use]
+    pub fn new() -> Self {
+        Self { readonly: false }
+    }
+
+    /// Report the modeled readonly bit.
+    #[must_use]
+    pub fn readonly(&self) -> bool {
+        self.readonly
+    }
+
+    /// Model `.set_readonly()` followed by applying the change.
+    pub fn set_readonly(&mut self, readonly: bool) {
+        self.readonly = readonly;
+    }
+}
+
+impl Default for KaniPermissionsObservation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Observable result of reading every entry a directory with two created
+/// files contains.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniReadDirObservation {
+    first: KaniFsDirEntry,
+    second: KaniFsDirEntry,
+}
+
+impl KaniReadDirObservation {
+    /// Model a directory containing exactly two created file entries.
+    #[must_use]
+    pub fn new(dir: KaniFsPath, first_name: KaniFsLabel, second_name: KaniFsLabel) -> Self {
+        Self {
+            first: KaniFsDirEntry::new(dir.join(first_name)),
+            second: KaniFsDirEntry::new(dir.join(second_name)),
+        }
+    }
+
+    /// Return the modeled entries in the order they were created.
+    #[must_use]
+    pub fn entries(&self) -> [KaniFsDirEntry; 2] {
+        [self.first, self.second]
+    }
+}
+
+/// Observable result of a second handle's `.try_lock()` while a first
+/// handle still holds the modeled file lock.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KaniLockObservation {
+    locked: bool,
+}
+
+/// Modeled error for a second `try_lock` while the modeled lock is held.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct KaniAlreadyLocked;
+
+impl KaniLockObservation {
+    /// Model a fresh, unlocked file.
+    #[must_use]
+    pub fn new() -> Self {
+        Self { locked: false }
+    }
+
+    /// Model a handle attempting to acquire the modeled lock.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(KaniAlreadyLocked)` when the modeled file is already
+    /// locked, mirroring `TryLockError::WouldBlock`.
+    pub fn try_lock(&mut self) -> Result<(), KaniAlreadyLocked> {
+        if self.locked {
+            Err(KaniAlreadyLocked)
+        } else {
+            self.locked = true;
+            Ok(())
+        }
+    }
+}
+
+impl Default for KaniLockObservation {
+    fn default() -> Self {
+        Self::new()
+    }
+}

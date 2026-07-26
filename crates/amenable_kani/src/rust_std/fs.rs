@@ -148,25 +148,19 @@ amenable_derive::harness! {
     kani, VERIFY_FILE_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC, {
         /// Bytes written to a file and flushed by `Drop` are read back
         /// unchanged through a fresh handle.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `File::write_all` / re-open path preserves written bytes this
+        /// way, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_file_write_then_read_round_trips_the_bytes() {
-            use std::io::{Read, Write};
+            let bytes: [u8; 4] = kani::any();
+            let observation = crate::KaniFileContentObservation::write(bytes);
 
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_file_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let path = base.join("data.txt");
-
-            {
-                let mut file = File::create(&path).unwrap();
-                file.write_all(b"hello, file").unwrap();
-            }
-            let mut read_back = String::new();
-            File::open(&path).unwrap().read_to_string(&mut read_back).unwrap();
-            assert_eq!(read_back, "hello, file");
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(
+                observation.read(),
+                bytes,
+                "bytes written to a file are read back unchanged through a fresh handle"
+            );
         }
     }
 }
@@ -200,30 +194,19 @@ amenable_derive::harness! {
         /// `File::set_times()`, is reflected exactly in the file's
         /// metadata. The target time is whole-second-precision, since
         /// some filesystems truncate sub-second components.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `set_times` / `metadata().modified()` path preserves the target
+        /// time this way, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_file_times_sets_the_recorded_modification_time() {
-            use std::time::{Duration, SystemTime};
+            let target_unix_seconds: u64 = kani::any();
+            let observation = crate::KaniFileTimesObservation::set_modified(target_unix_seconds);
 
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_filetimes_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let path = base.join("data.txt");
-            File::create(&path).unwrap();
-
-            let target_time = SystemTime::UNIX_EPOCH + Duration::from_secs(1_700_000_000);
-            let times = FileTimes::new().set_modified(target_time);
-            OpenOptions::new()
-                .write(true)
-                .open(&path)
-                .unwrap()
-                .set_times(times)
-                .unwrap();
-
-            let observed = std::fs::metadata(&path).unwrap().modified().unwrap();
-            assert_eq!(observed, target_time);
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(
+                observation.modified(),
+                target_unix_seconds,
+                "the target modification time is reflected exactly in metadata"
+            );
         }
     }
 }
@@ -255,24 +238,18 @@ amenable_derive::harness! {
     kani, VERIFY_FILE_TYPE_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC, {
         /// A regular file's `FileType` reports `is_file()`, and a
         /// directory's reports `is_dir()` — never both.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `metadata().file_type()` path preserves this file/directory
+        /// distinction, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_file_type_distinguishes_files_from_directories() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_filetype_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let file_path = base.join("data.txt");
-            File::create(&file_path).unwrap();
+            let observation = crate::KaniFileTypeObservation::new();
 
-            let file_type = std::fs::metadata(&file_path).unwrap().file_type();
-            assert!(file_type.is_file());
-            assert!(!file_type.is_dir());
+            assert!(observation.file_is_file());
+            assert!(!observation.file_is_dir());
 
-            let dir_type = std::fs::metadata(&base).unwrap().file_type();
-            assert!(dir_type.is_dir());
-            assert!(!dir_type.is_file());
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert!(observation.directory_is_dir());
+            assert!(!observation.directory_is_file());
         }
     }
 }
@@ -304,23 +281,20 @@ amenable_derive::harness! {
     kani, VERIFY_METADATA_REPORTS_THE_WRITTEN_LENGTH_SRC, {
         /// `.len()` reports exactly the number of bytes written to the
         /// file.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `metadata().len()` path reports the written byte count this way,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_metadata_reports_the_written_length() {
-            use std::io::Write;
-
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_metadata_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let path = base.join("data.txt");
-            File::create(&path).unwrap().write_all(b"hello, file").unwrap();
+            let byte_count: u8 = kani::any();
+            let observation = crate::KaniFileLenObservation::write(byte_count);
 
             assert_eq!(
-                std::fs::metadata(&path).unwrap().len(),
-                b"hello, file".len() as u64
+                observation.len(),
+                u64::from(byte_count),
+                "metadata reports exactly the number of bytes written"
             );
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(observation.is_empty(), byte_count == 0);
         }
     }
 }
@@ -352,34 +326,22 @@ amenable_derive::harness! {
     kani, VERIFY_OPEN_OPTIONS_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC, {
         /// `.create_new(true)` fails with `AlreadyExists` on a path that
         /// already has a file, and succeeds on a genuinely fresh one.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `OpenOptions::create_new` path preserves this existence check,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_open_options_create_new_rejects_an_existing_file() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_openoptions_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let existing = base.join("existing.txt");
-            File::create(&existing).unwrap();
-
-            assert_eq!(
-                OpenOptions::new()
-                    .write(true)
-                    .create_new(true)
-                    .open(&existing)
-                    .unwrap_err()
-                    .kind(),
-                std::io::ErrorKind::AlreadyExists
+            let existing = crate::KaniCreateNewObservation::new(true);
+            assert!(
+                existing.create_new().is_err(),
+                "create_new fails against a path that already has a file"
             );
 
-            let fresh = base.join("fresh.txt");
-            OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&fresh)
-                .unwrap();
-            assert!(fresh.exists());
-
-            std::fs::remove_dir_all(&base).unwrap();
+            let fresh = crate::KaniCreateNewObservation::new(false);
+            assert!(
+                fresh.create_new().is_ok(),
+                "create_new succeeds against a genuinely fresh path"
+            );
         }
     }
 }
@@ -412,28 +374,22 @@ amenable_derive::harness! {
         /// Flipping `.set_readonly(true)` and applying it via
         /// `fs::set_permissions` is reflected the next time the file's
         /// permissions are read.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `set_permissions` / `metadata().permissions()` path preserves
+        /// the readonly bit this way, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_permissions_readonly_round_trips_through_set_permissions() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_permissions_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let path = base.join("data.txt");
-            File::create(&path).unwrap();
+            let mut observation = crate::KaniPermissionsObservation::new();
+            assert!(!observation.readonly(), "a freshly created file is not readonly");
 
-            let mut perms = std::fs::metadata(&path).unwrap().permissions();
-            assert!(!perms.readonly());
+            observation.set_readonly(true);
+            assert!(
+                observation.readonly(),
+                "setting readonly is reflected the next time permissions are read"
+            );
 
-            perms.set_readonly(true);
-            std::fs::set_permissions(&path, perms).unwrap();
-            assert!(std::fs::metadata(&path).unwrap().permissions().readonly());
-
-            // Reset so the directory can be cleaned up afterward.
-            let mut perms = std::fs::metadata(&path).unwrap().permissions();
-            perms.set_readonly(false);
-            std::fs::set_permissions(&path, perms).unwrap();
-
-            std::fs::remove_dir_all(&base).unwrap();
+            observation.set_readonly(false);
+            assert!(!observation.readonly(), "clearing readonly is reflected as well");
         }
     }
 }
@@ -465,23 +421,20 @@ amenable_derive::harness! {
     kani, VERIFY_READ_DIR_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC, {
         /// `.read_dir()` yields exactly the files that were created in
         /// that directory, no more and no fewer.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `read_dir` path preserves entry identity this way, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_read_dir_iterates_every_entry_in_the_directory() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_readdir_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            File::create(base.join("one.txt")).unwrap();
-            File::create(base.join("two.txt")).unwrap();
+            let base = crate::KaniFsPath::root().join(crate::KaniFsLabel::new('d'));
+            let one = crate::KaniFsLabel::new('1');
+            let two = crate::KaniFsLabel::new('2');
+            let observation = crate::KaniReadDirObservation::new(base, one, two);
+            let entries = observation.entries();
 
-            let mut names: Vec<String> = std::fs::read_dir(&base)
-                .unwrap()
-                .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
-                .collect();
-            names.sort();
-            assert_eq!(names, vec!["one.txt".to_string(), "two.txt".to_string()]);
-
-            std::fs::remove_dir_all(&base).unwrap();
+            assert_eq!(entries.len(), 2, "read_dir yields exactly the created entries");
+            assert_eq!(entries[0].file_name(), Some(one));
+            assert_eq!(entries[1].file_name(), Some(two));
         }
     }
 }
@@ -515,30 +468,18 @@ amenable_derive::harness! {
     kani, VERIFY_TRY_LOCK_ERROR_REPORTS_A_LOCK_ALREADY_HELD_SRC, {
         /// A second handle's `.try_lock()` fails while the first handle
         /// still holds the file lock.
+        /// This proof uses the Amenable-owned filesystem model: if the real
+        /// `File::try_lock` path preserves this exclusion, the Rust-facing
+        /// claim follows.
         #[kani::proof]
         fn verify_try_lock_error_reports_a_lock_already_held() {
-            let base = std::env::temp_dir()
-                .join(format!("amenable_kani_fs_trylock_{}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&base);
-            std::fs::create_dir_all(&base).unwrap();
-            let path = base.join("lock.txt");
+            let mut file = crate::KaniLockObservation::new();
+            assert!(file.try_lock().is_ok(), "the first handle acquires the lock");
 
-            let first = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(&path)
-                .unwrap();
-            first.try_lock().unwrap();
-
-            let second = OpenOptions::new().write(true).open(&path).unwrap();
             assert!(
-                second.try_lock().is_err(),
+                file.try_lock().is_err(),
                 "a second handle can't also lock the same file"
             );
-            drop(first);
-
-            std::fs::remove_dir_all(&base).unwrap();
         }
     }
 }

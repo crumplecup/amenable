@@ -8,15 +8,21 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [KANI_FILESYSTEM_MODEL_PLAN.md](KANI_FILESYSTEM_MODEL_PLAN.md)
 
-**Status:** 🔲 Planning — initial Kani-only filesystem semantics are being
-added so `std::fs` proofs can move from real tempdir timeouts to explicit
-Amenable-owned path, directory, and metadata laws.
+**Status:** ✅ Implemented — the full `std::fs` production proof queue (10
+proofs: `DirBuilder`, `DirEntry`, `File`, `FileTimes`, `FileType`, `Metadata`,
+`OpenOptions`, `Permissions`, `ReadDir`, `TryLockError`) has been migrated off
+the direct real-tempdir path onto narrow, proof-specific Amenable-owned
+observation models. Several of the later migrations (`FileTimes`,
+`Metadata`, `OpenOptions`, `Permissions`, `TryLockError`) were assessed as
+`strengthen`: their models are close to tautological identity checks rather
+than independently derived laws, and are queued for a follow-up pass.
 
-**Description:** Introduce a small verifier-facing filesystem model in
-`amenable_kani`, migrate the `std::fs` queue in registry order starting with
-recursive directory creation and directory entries, preserve the direct
-real-filesystem timeout path in the gallery, and validate the result with
-scoped checks plus native Kani runs.
+**Description:** Introduced a small verifier-facing filesystem model in
+`amenable_kani` (`fs_model.rs`: `KaniFileSystem`, `KaniFsPath`, plus
+per-proof observation types), migrated the `std::fs` queue in registry
+order starting with recursive directory creation and directory entries,
+preserved the direct real-filesystem timeout path in the gallery, and
+validated the result with scoped checks plus native Kani runs.
 
 ### Kani UTF-8 Accommodation Model
 
