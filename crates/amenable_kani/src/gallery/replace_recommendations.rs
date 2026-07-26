@@ -10,6 +10,7 @@
 //! - unsupported foreign boundaries in reachable std implementations
 //! - Unix file-descriptor duplication paths that bottom out in `fcntl`
 //! - anonymous pipe creation paths that bottom out in `pipe2`
+//! - unsupported `#[track_caller]` / `Location::caller()` boundaries
 //! - unsupported panic-capture boundaries
 //! - Kani environment-model mismatches against real-process invariants
 //! - OS-backed filesystem boundaries with real external state
@@ -105,6 +106,39 @@ amenable_derive::harness! {
 
             assert!(reader.as_raw_fd() >= 0, "reader end should stay live");
             assert!(writer.as_raw_fd() >= 0, "writer end should stay live");
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Location::caller reaches an unsupported track_caller boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, LOCATION_CALLER_REACHES_UNSUPPORTED_TRACK_CALLER_BOUNDARY_SRC, {
+        /// This is the reduced form behind the `std::panic::Location`
+        /// replacement review: the semantic claim is reasonable, but the
+        /// direct call to `Location::caller()` already reaches a Kani
+        /// unsupported boundary before any richer line/file relation can be
+        /// established.
+        #[kani::proof]
+        fn location_caller_reaches_unsupported_track_caller_boundary() {
+            #[track_caller]
+            fn here() -> &'static std::panic::Location<'static> {
+                std::panic::Location::caller()
+            }
+
+            let location = here();
+            assert!(!location.file().is_empty(), "tracked caller should name a file");
         }
     }
 }
