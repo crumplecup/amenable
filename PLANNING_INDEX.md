@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Fmt Accommodation Model
+
+**Document:** [KANI_FMT_MODEL_PLAN.md](KANI_FMT_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only formatter semantics are being
+added so formatting-builder proofs can move from std rendering blow-up to
+explicit Amenable-owned punctuation and ordering laws.
+
+**Description:** Introduce a small verifier-facing formatter model in
+`amenable_kani`, migrate the replace-marked `Arguments` / `Debug*` proofs to
+that model, preserve the direct formatting timeout path in the gallery, and
+validate the model with scoped checks plus native Kani runs.
+
 ### Kani Backtrace Accommodation Model
 
 **Document:** [KANI_BACKTRACE_MODEL_PLAN.md](KANI_BACKTRACE_MODEL_PLAN.md)
