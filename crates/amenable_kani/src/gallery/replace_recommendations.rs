@@ -9,6 +9,7 @@
 //!
 //! - unsupported foreign boundaries in reachable std implementations
 //! - Unix file-descriptor duplication paths that bottom out in `fcntl`
+//! - anonymous pipe creation paths that bottom out in `pipe2`
 //! - unsupported panic-capture boundaries
 //! - Kani environment-model mismatches against real-process invariants
 //! - OS-backed filesystem boundaries with real external state
@@ -73,6 +74,37 @@ amenable_derive::harness! {
             let owned = stdout.as_fd().try_clone_to_owned().unwrap();
 
             assert!(owned.as_raw_fd() >= 0, "cloned owned fd should stay live");
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "anonymous pipe creation reaches an unsupported pipe2 boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, ANONYMOUS_PIPE_CREATION_REACHES_UNSUPPORTED_PIPE2_BOUNDARY_SRC, {
+        /// This is the reduced form behind the refined `PipeReader` /
+        /// `PipeWriter` replacement review: the delivery claim is reasonable,
+        /// but the direct `std::io::pipe()` setup already reaches `pipe2`
+        /// before any read/write property can be established.
+        #[kani::proof]
+        fn anonymous_pipe_creation_reaches_unsupported_pipe2_boundary() {
+            use std::os::fd::AsRawFd;
+
+            let (reader, writer) = std::io::pipe().unwrap();
+
+            assert!(reader.as_raw_fd() >= 0, "reader end should stay live");
+            assert!(writer.as_raw_fd() >= 0, "writer end should stay live");
         }
     }
 }

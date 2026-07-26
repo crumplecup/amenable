@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Pipe Accommodation Model
+
+**Document:** [KANI_PIPE_MODEL_PLAN.md](KANI_PIPE_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only pipe semantics are being added so
+anonymous-pipe proofs can move from unsupported `pipe2` boundaries to explicit
+Amenable-owned byte-channel laws.
+
+**Description:** Introduce a small verifier-facing anonymous-pipe model in
+`amenable_kani`, migrate the `PipeReader` / `PipeWriter` proofs to that model,
+preserve the direct `pipe2` path in the gallery, and validate the model with
+scoped checks plus native Kani runs.
+
 ### Kani FD Accommodation Model
 
 **Document:** [KANI_FD_MODEL_PLAN.md](KANI_FD_MODEL_PLAN.md)

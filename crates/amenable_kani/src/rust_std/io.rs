@@ -8,9 +8,10 @@
 //! invariant beyond what the type system already guarantees (exercising
 //! them for real would mean writing to, or blocking on, the actual
 //! process's standard streams during the proof), so those six stay
-//! "trusted." `PipeReader`/`PipeWriter` create a genuinely fresh OS pipe
-//! each time, so they get real behavioral harnesses like the in-memory
-//! types.
+//! "trusted." The direct `PipeReader`/`PipeWriter` setup path reaches
+//! unsupported `pipe2` under Kani, so the production proofs use an
+//! Amenable-owned anonymous-pipe model instead; the direct std path remains
+//! preserved in the gallery as a false trail.
 
 use std::io::{
     BufReader, BufWriter, IntoInnerError, LineWriter, PipeReader, PipeWriter, Stderr, StderrLock,
@@ -311,17 +312,23 @@ bridge_kani_witness!(RustStdStandard<PipeReader>);
 amenable_derive::harness! {
     kani, VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC, {
         /// Bytes written to a pipe's writer half arrive, unaltered, on
-        /// the paired reader half.
+        /// the paired reader half. This proof uses the Amenable-owned pipe
+        /// accommodation model: if the real std/libc path refines these
+        /// modeled laws, the Rust-facing delivery claim follows.
         #[kani::proof]
         fn verify_pipe_reader_reads_what_the_paired_writer_wrote() {
-            use std::io::{Read, Write};
+            let mut pipe = <crate::KaniPipe as crate::KaniCompose>::kani_depth0();
+            let reader = pipe.reader();
+            let writer = pipe.writer();
+            let payload = <[u8; 2] as crate::KaniCompose>::kani_any();
+            let expected = payload.to_vec();
 
-            let (mut reader, mut writer) = std::io::pipe().unwrap();
-            writer.write_all(b"piped").unwrap();
-            drop(writer);
-            let mut collected = Vec::new();
-            reader.read_to_end(&mut collected).unwrap();
-            assert_eq!(collected, b"piped");
+            pipe.write_all(writer.clone(), expected.clone());
+            pipe.close_writer(writer);
+
+            let collected = pipe.read_to_end(reader.clone());
+            assert_eq!(collected, expected);
+            assert_eq!(reader.resource_id(), pipe.resource_id());
         }
     }
 }
@@ -353,17 +360,24 @@ amenable_derive::harness! {
     kani, VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC, {
         /// The same delivery contract as `PipeReader`, checked from the
         /// writer's side: `.write_all()` succeeds and the bytes are
-        /// recoverable.
+        /// recoverable. This proof uses the Amenable-owned pipe
+        /// accommodation model: if the real std/libc path refines these
+        /// modeled laws, the Rust-facing delivery claim follows.
         #[kani::proof]
         fn verify_pipe_writer_writes_arrive_at_the_paired_reader() {
-            use std::io::{Read, Write};
+            let mut pipe = <crate::KaniPipe as crate::KaniCompose>::kani_depth0();
+            let reader = pipe.reader();
+            let writer = pipe.writer();
+            let payload = <[u8; 2] as crate::KaniCompose>::kani_any();
+            let expected = payload.to_vec();
+            let writer_resource = writer.resource_id();
 
-            let (mut reader, mut writer) = std::io::pipe().unwrap();
-            writer.write_all(b"piped").unwrap();
-            drop(writer);
-            let mut collected = Vec::new();
-            reader.read_to_end(&mut collected).unwrap();
-            assert_eq!(collected, b"piped");
+            pipe.write_all(writer.clone(), expected.clone());
+            pipe.close_writer(writer);
+
+            let collected = pipe.read_to_end(reader.clone());
+            assert_eq!(collected, expected);
+            assert_eq!(writer_resource, reader.resource_id());
         }
     }
 }
