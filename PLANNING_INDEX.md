@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani LinkedList ExtractIf Accommodation Model
+
+**Document:** [KANI_LINKED_LIST_EXTRACT_MODEL_PLAN.md](KANI_LINKED_LIST_EXTRACT_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only `extract_if` semantics are being
+added so `LinkedList::extract_if` proofs can move from std traversal timeout to
+explicit Amenable-owned partition and early-drop laws.
+
+**Description:** Introduce a small verifier-facing `LinkedList::extract_if`
+model in `amenable_kani`, migrate the production proof to that model, keep the
+direct std timeout path in the gallery, and validate the result with scoped
+checks plus native Kani runs.
+
 ### Kani Pipe Accommodation Model
 
 **Document:** [KANI_PIPE_MODEL_PLAN.md](KANI_PIPE_MODEL_PLAN.md)

@@ -15,7 +15,47 @@
 //! - Kani environment-model mismatches against real-process invariants
 //! - OS-backed filesystem boundaries with real external state
 //! - pure in-memory std implementation blow-up that still times out under the
-//!   native multi-minute harness timeout (`hash`, `fmt`, and similar cases)
+//!   native multi-minute harness timeout (`hash`, `fmt`,
+//!   `LinkedList::extract_if`, and similar cases)
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
+            harness: "gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct LinkedList::extract_if can still time out even without materialization".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, LINKED_LIST_EXTRACT_IF_TIMES_OUT_EVEN_WITH_INCREMENTAL_OBSERVATION_SRC, {
+        /// This is the reduced `LinkedList::extract_if` representative:
+        /// incremental `next()` observation plus one early-drop remainder
+        /// check, with no eager collection. If this still times out, the
+        /// issue is the direct std linked-list path rather than proof-side
+        /// materialization.
+        #[kani::proof]
+        fn linked_list_extract_if_times_out_even_with_incremental_observation() {
+            fn is_even(x: &mut i32) -> bool {
+                *x % 2 == 0
+            }
+
+            let mut list = std::collections::LinkedList::from([1, 2, 3, 4]);
+            let mut extractor = list.extract_if(is_even as fn(&mut i32) -> bool);
+            assert_eq!(extractor.next(), Some(2), "extract_if should yield the first matching element");
+            drop(extractor);
+
+            assert_eq!(list.pop_front(), Some(1), "the prefix element should remain in the list");
+            assert_eq!(list.pop_front(), Some(3), "the first unvisited non-match should remain");
+            assert_eq!(list.pop_front(), Some(4), "the unvisited matching suffix should remain");
+            assert_eq!(list.pop_front(), None, "only the visited match should be removed");
+        }
+    }
+}
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {

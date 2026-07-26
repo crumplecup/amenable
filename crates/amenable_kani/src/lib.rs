@@ -21,6 +21,7 @@ mod calculator;
 mod compose;
 mod fd_model;
 mod gallery;
+mod linked_list_extract_model;
 mod pipe_model;
 mod registry;
 mod rust_std;
@@ -30,6 +31,7 @@ mod witness;
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
 pub use compose::KaniCompose;
 pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile};
+pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,

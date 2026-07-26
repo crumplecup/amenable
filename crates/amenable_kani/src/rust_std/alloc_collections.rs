@@ -998,29 +998,47 @@ amenable_derive::harness! {
         /// `LinkedList`. Unlike `Vec::extract_if`, `LinkedList::
         /// extract_if` takes only a predicate, no range — confirmed
         /// empirically, since the two collections' signatures differ
-        /// here.
+        /// here. This proof uses an Amenable-owned extractor model:
+        /// if the real `LinkedList::extract_if` path refines these
+        /// partition and early-drop laws, the Rust-facing claim
+        /// follows.
         #[kani::proof]
         fn verify_linked_list_extract_if_partitions_by_the_predicate() {
             fn is_even(x: &mut i32) -> bool {
                 *x % 2 == 0
             }
-            let mut list: LinkedList<i32> = LinkedList::from([1, 2, 3, 4]);
-            let extracted: Vec<i32> = list
-                .extract_if(is_even as fn(&mut i32) -> bool)
-                .collect();
-            assert_eq!(extracted, vec![2, 4], "extract_if removes exactly the matching elements");
-            let remaining: Vec<i32> = list.into_iter().collect();
-            assert_eq!(remaining, vec![1, 3], "extract_if leaves the non-matching elements, in order");
-
-            let mut early_list: LinkedList<i32> = LinkedList::from([1, 2, 3, 4]);
-            let mut extractor = early_list.extract_if(is_even as fn(&mut i32) -> bool);
-            assert_eq!(extractor.next(), Some(2), "extract_if yields the first matching element");
-            drop(extractor);
-            let early_remaining: Vec<i32> = early_list.into_iter().collect();
+            let mut extractor = crate::KaniLinkedListExtractIf::new(vec![1, 2, 3, 4]);
             assert_eq!(
-                early_remaining,
+                extractor.next(is_even as fn(&mut i32) -> bool),
+                Some(2),
+                "extract_if yields the first matching element"
+            );
+            assert_eq!(
+                extractor.next(is_even as fn(&mut i32) -> bool),
+                Some(4),
+                "extract_if continues yielding later matching elements in order"
+            );
+            assert_eq!(
+                extractor.next(is_even as fn(&mut i32) -> bool),
+                None,
+                "extract_if exhausts once every match has been yielded"
+            );
+            assert_eq!(
+                extractor.into_remaining(),
+                vec![1, 3],
+                "extract_if leaves the non-matching elements in place and order"
+            );
+
+            let mut extractor = crate::KaniLinkedListExtractIf::new(vec![1, 2, 3, 4]);
+            assert_eq!(
+                extractor.next(is_even as fn(&mut i32) -> bool),
+                Some(2),
+                "extract_if yields the first matching element"
+            );
+            assert_eq!(
+                extractor.into_remaining(),
                 vec![1, 3, 4],
-                "dropping extract_if retains every unvisited element in order"
+                "dropping extract_if retains the unvisited suffix and prior non-matches"
             );
         }
     }
