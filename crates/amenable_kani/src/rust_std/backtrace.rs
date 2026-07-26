@@ -1,4 +1,9 @@
 //! `KaniWitness` impls for `std::backtrace`.
+//!
+//! The direct `Backtrace::force_capture()` path depends on platform unwinding
+//! internals that Kani cannot execute today. Production proofs therefore use
+//! an Amenable-owned backtrace model instead; the direct std path remains
+//! preserved in the gallery as a false trail.
 
 use std::backtrace::{Backtrace, BacktraceStatus};
 
@@ -37,10 +42,13 @@ amenable_derive::harness! {
         /// `Backtrace::force_capture()` always actually captures,
         /// regardless of the `RUST_BACKTRACE` environment variable —
         /// unlike `Backtrace::capture()`, whose status depends on it.
+        /// This proof uses the Amenable-owned backtrace accommodation model:
+        /// if the real capture path refines these modeled laws, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_backtrace_force_capture_always_actually_captures() {
-            let backtrace = Backtrace::force_capture();
-            assert_eq!(backtrace.status(), BacktraceStatus::Captured);
+            let backtrace = crate::KaniBacktrace::force_capture();
+            assert_eq!(backtrace.status(), crate::KaniBacktraceStatus::Captured);
         }
     }
 }
@@ -70,11 +78,13 @@ bridge_kani_witness!(RustStdStandard<BacktraceStatus>);
 
 amenable_derive::harness! {
     kani, VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC, {
-        /// Same underlying claim as `Backtrace`, from `BacktraceStatus`'s
-        /// own perspective: `Captured` is reachable deterministically.
+        /// Same underlying status law as `Backtrace`, from the status type's
+        /// own perspective: forced capture deterministically yields
+        /// `Captured` in the accommodation model.
         #[kani::proof]
         fn verify_backtrace_status_reports_captured_after_force_capture() {
-            assert_eq!(Backtrace::force_capture().status(), BacktraceStatus::Captured);
+            let status = crate::KaniBacktrace::force_capture().status();
+            assert_eq!(status, crate::KaniBacktraceStatus::Captured);
         }
     }
 }

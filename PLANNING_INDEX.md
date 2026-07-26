@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Backtrace Accommodation Model
+
+**Document:** [KANI_BACKTRACE_MODEL_PLAN.md](KANI_BACKTRACE_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only backtrace semantics are being
+added so forced-capture proofs can move from Kani's unsupported unwinding
+boundary to explicit Amenable-owned status laws.
+
+**Description:** Introduce a small verifier-facing backtrace model in
+`amenable_kani`, migrate the `Backtrace` / `BacktraceStatus` proofs to that
+model, preserve the direct unwinding path in the gallery, and validate the
+model with scoped checks plus native Kani runs.
+
 ### Kani Argv Accommodation Model
 
 **Document:** [KANI_ARGV_MODEL_PLAN.md](KANI_ARGV_MODEL_PLAN.md)
