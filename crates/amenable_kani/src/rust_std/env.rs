@@ -1,4 +1,10 @@
 //! `KaniWitness` impls for `std::env`.
+//!
+//! The direct `Args` / `ArgsOs` path depends on Kani's synthetic process
+//! state, which can admit an empty argv even though a real process exposes its
+//! own program slot. Production proofs therefore use an Amenable-owned argv
+//! model instead; the direct std path remains preserved in the gallery as a
+//! false trail.
 
 use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, Vars, VarsOs};
 
@@ -35,11 +41,15 @@ bridge_kani_witness!(RustStdStandard<Args>);
 amenable_derive::harness! {
     kani, VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, {
         /// The process's own argv always has at least one element — the
-        /// program's own path — so `.args()` never yields an empty
-        /// sequence.
+        /// program's own slot — so `.args()` never yields an empty sequence.
+        /// This proof uses the Amenable-owned argv accommodation model: if the
+        /// real process argv refines these modeled laws, the Rust-facing claim
+        /// follows.
         #[kani::proof]
         fn verify_args_reports_at_least_the_program_path() {
-            assert!(std::env::args().count() >= 1);
+            let argv = <crate::KaniArgv as crate::KaniCompose>::kani_any();
+            assert!(argv.args_count() >= 1);
+            assert_eq!(argv.args_count(), 1 + usize::from(argv.extra_count()));
         }
     }
 }
@@ -72,7 +82,9 @@ amenable_derive::harness! {
         /// Same guarantee as `Args`, in the raw `OsString` form.
         #[kani::proof]
         fn verify_args_os_reports_at_least_the_program_path() {
-            assert!(std::env::args_os().count() >= 1);
+            let argv = <crate::KaniArgv as crate::KaniCompose>::kani_any();
+            assert!(argv.args_os_count() >= 1);
+            assert_eq!(argv.args_os_count(), 1 + usize::from(argv.extra_count()));
         }
     }
 }

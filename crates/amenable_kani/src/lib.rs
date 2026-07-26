@@ -19,6 +19,7 @@ extern crate self as amenable_kani;
 
 mod calculator;
 mod compose;
+mod env_model;
 mod env_path_model;
 mod fd_model;
 mod gallery;
@@ -31,6 +32,7 @@ mod witness;
 
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
 pub use compose::KaniCompose;
+pub use env_model::KaniArgv;
 pub use env_path_model::{
     KaniEnvPath, KaniEnvPathList, KaniEnvPaths, KaniJoinPathsError, KaniJoinedEnvPaths,
 };

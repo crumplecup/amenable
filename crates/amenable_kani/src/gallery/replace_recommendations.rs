@@ -248,6 +248,34 @@ amenable_derive::harness! {
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
         case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            harness: "gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "raw process-argument invariants can fail under Kani's synthetic model".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, ENV_ARGS_OS_PROCESS_INVARIANT_FAILS_UNDER_THE_SYNTHETIC_KANI_MODEL_SRC, {
+        /// Real processes include their own program slot in `args_os()`, but
+        /// Kani's synthetic process model can violate that invariant. This is
+        /// a model mismatch, not a counterexample to the Rust API contract.
+        #[kani::proof]
+        fn env_args_os_process_invariant_fails_under_the_synthetic_kani_model() {
+            assert!(
+                std::env::args_os().count() >= 1,
+                "real processes should expose at least their own program slot"
+            );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
             id: "amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
             harness: "gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
             package: "amenable_kani".to_owned(),

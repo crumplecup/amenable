@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani Argv Accommodation Model
+
+**Document:** [KANI_ARGV_MODEL_PLAN.md](KANI_ARGV_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only argv semantics are being added so
+process-argument proofs can move from Kani's synthetic-process mismatch to
+explicit Amenable-owned non-empty-argv laws.
+
+**Description:** Introduce a small verifier-facing argv model in
+`amenable_kani`, migrate the `Args` / `ArgsOs` proofs to that model, preserve
+the direct synthetic-process mismatch in the gallery, and validate the model
+with scoped checks plus native Kani runs.
+
 ### Kani Env Path Accommodation Model
 
 **Document:** [KANI_ENV_PATH_MODEL_PLAN.md](KANI_ENV_PATH_MODEL_PLAN.md)
