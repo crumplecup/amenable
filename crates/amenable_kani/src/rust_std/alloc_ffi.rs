@@ -137,12 +137,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_into_string_error_recovers_the_original_cstring() {
             let invalid = CString::new(vec![0xFFu8, b'x']).unwrap();
-            let original_bytes = invalid.as_bytes().to_vec();
             let err = invalid.into_string().unwrap_err();
             let recovered = err.into_cstring();
             assert_eq!(
                 recovered.as_bytes(),
-                &original_bytes[..],
+                &[0xFFu8, b'x'],
                 "into_cstring recovers the original CString"
             );
         }

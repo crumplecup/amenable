@@ -700,23 +700,25 @@ bridge_kani_witness!(RustStdStandard<Inspect<Range<i32>, fn(&i32)>>);
 amenable_derive::harness! {
     kani, VERIFY_INSPECT_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC, {
         /// `Inspect` leaves values unchanged and calls its closure
-        /// exactly once per item, observed through a shared counter
-        /// (the closure itself, a bare `fn`, can't capture state).
+        /// exactly once per item.
         #[kani::proof]
         fn verify_inspect_calls_once_per_item_without_changing_values() {
-            static CALLS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-            fn record(_x: &i32) {
-                CALLS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-            }
-
             let value: i32 = kani::any();
             kani::assume(value < i32::MAX);
-            let v: Vec<i32> = (value..value + 1).inspect(record).collect();
-            assert_eq!(v, vec![value], "inspect does not change the values");
+            let calls = std::cell::Cell::new(0usize);
+            let mut inspected = (value..value + 1).inspect(|_| calls.set(calls.get() + 1));
+
+            assert_eq!(inspected.next(), Some(value), "inspect does not change the yielded value");
             assert_eq!(
-                CALLS.load(std::sync::atomic::Ordering::SeqCst),
+                calls.get(),
                 1,
                 "inspect calls its closure exactly once per item"
+            );
+            assert_eq!(inspected.next(), None, "the one-item inspected iterator then exhausts");
+            assert_eq!(
+                calls.get(),
+                1,
+                "inspect does not re-invoke its closure after exhaustion"
             );
         }
     }

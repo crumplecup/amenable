@@ -1,8 +1,9 @@
 //! Gallery cases for iterator observation strategy under Kani.
 //!
-//! The production `flatten` review exposed a process problem: it was too easy
-//! to swap observation styles inside the proof queue without preserving why.
-//! These cases isolate the question directly.
+//! The production `rust_std::iter::verify_flatten_concatenates_the_inner_iterators`
+//! review exposed a process problem: it was too easy to swap observation styles
+//! inside the proof queue without preserving why. These cases isolate the
+//! question directly.
 //!
 //! Both cases use the same bounded semantic claim:
 //!
@@ -82,7 +83,8 @@ amenable_derive::harness! {
     kani, FLATTEN_INCREMENTAL_NEXT_PASSES_SRC, {
         /// This keeps the exact same semantic claim while avoiding eager
         /// materialization: compare one observed item at a time and then
-        /// confirm joint exhaustion.
+        /// confirm joint exhaustion. This is the same proof shape the
+        /// production flatten witness now uses.
         #[kani::proof]
         fn flatten_incremental_next_passes() {
             let a: i32 = kani::any();

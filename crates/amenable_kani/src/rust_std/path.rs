@@ -91,12 +91,13 @@ amenable_derive::harness! {
         /// segment is `Component::Normal` wrapping that segment's text.
         #[kani::proof]
         fn verify_component_distinguishes_root_from_normal_segments() {
-            let components: Vec<Component> = Path::new("/a").components().collect();
-            assert_eq!(components[0], Component::RootDir);
+            let mut components = Path::new("/a").components();
+            assert_eq!(components.next(), Some(Component::RootDir));
             assert_eq!(
-                components[1],
-                Component::Normal(std::ffi::OsStr::new("a"))
+                components.next(),
+                Some(Component::Normal(std::ffi::OsStr::new("a")))
             );
+            assert_eq!(components.next(), None);
         }
     }
 }
