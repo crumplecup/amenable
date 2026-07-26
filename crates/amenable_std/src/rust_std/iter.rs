@@ -221,16 +221,25 @@ iter_adapter1!(
 // stringifies its argument — never uses it in a real type position — so
 // there is nothing to import.
 //
-// Chain/Empty/FromFn/Once/Repeat/Take are written fully-qualified: each
-// bare name is shared by another module (e.g. `std::sync::Once`,
-// `core::iter::Take` vs. other truncating adapters) — only the qualified
-// path disambiguates which one a given registration means for tooling
-// reading the registry (e.g. `elicit_doc`'s coverage report).
+// `Filter` and `FilterMap` are the two exceptions to the `Range<i32>` source
+// convention: their `next()` is implemented in std via `Iterator::find`,
+// which routes through `Range<i32>::try_fold`. That generic try_fold loop's
+// termination bound depends on a runtime comparison between two symbolic
+// `i32` endpoints, so Kani's (sound) unwinder cannot conclude the loop is
+// bounded no matter how tightly a `kani::assume` narrows the range — it
+// still unwinds past several hundred iterations and times out. A
+// `std::array::IntoIter<i32, 1>` source has the same `try_fold`-routed
+// `find`, but its loop bound is a compile-time array length, so the
+// unwinder concludes immediately. `FlatMap`'s outer source has the same
+// hazard, so it uses the same array source while keeping its inner
+// `Range<i32>` (the actual subject of the claim) unchanged. See
+// `crates/amenable_kani/src/gallery/replace_recommendations.rs` for the
+// direct `Range<i32>`-sourced false trail this replaces.
 register_rust_std_standard_evidence!(
     Map<Range<i32>, fn(i32) -> i32>,
-    Filter<Range<i32>, fn(&i32) -> bool>,
-    FilterMap<Range<i32>, fn(i32) -> Option<i32>>,
-    FlatMap<Range<i32>, Range<i32>, fn(i32) -> Range<i32>>,
+    Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>,
+    FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
+    FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>,
     Flatten<IntoIter<Range<i32>>>,
     std::iter::Chain<Range<i32>, Range<i32>>,
     Zip<Range<i32>, Range<i32>>,

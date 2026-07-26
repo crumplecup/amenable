@@ -17,5 +17,6 @@
 
 mod iter_materialization;
 mod replace_recommendations;
+mod slice_split_position;
 mod string_drain;
 mod vacuity;

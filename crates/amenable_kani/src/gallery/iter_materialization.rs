@@ -21,12 +21,99 @@
 //! The follow-up control keeps the incremental observation but removes the
 //! symbolic lengths so we can isolate whether the blow-up is in the symbolic
 //! iterator shape rather than the observation style alone.
+//!
+//! A second, distinct failure mode lives below: `Filter` (and `FilterMap`,
+//! `FlatMap`'s outer source) time out even for a single-item observation
+//! with no collection at all, because their `next()` routes through
+//! `Iterator::find`/`try_fold`, and `Range<i32>::try_fold`'s loop bound is a
+//! runtime comparison Kani's unwinder cannot bound. Swapping only the
+//! source's *type* -- from `Range<i32>` to `std::array::IntoIter<i32, 1>`,
+//! same symbolic element, same predicate -- resolves it, since the array's
+//! `try_fold` loop bound is a compile-time constant.
 
 #[cfg(kani)]
 use std::{ops::Range, vec::IntoIter};
 
 #[cfg(kani)]
 use core::iter::Flatten;
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
+            harness: "gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Filter over a single-item symbolic Range<i32> still times out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, FIND_ROUTED_FILTER_OVER_SYMBOLIC_RANGE_TIMES_OUT_SRC, {
+        /// `Filter::next` is implemented in std via `Iterator::find`, which
+        /// routes through the source's `try_fold`. `Range<i32>::try_fold`'s
+        /// loop bound is a runtime comparison between two symbolic `i32`
+        /// endpoints, so Kani's unwinder cannot conclude the loop is bounded
+        /// even though the range is logically a single item -- confirmed
+        /// this still times out past 500 unwind iterations. This is a
+        /// distinct failure mode from the eager-materialization case above:
+        /// this harness never collects anything, it calls `.next()` once.
+        #[kani::proof]
+        fn find_routed_filter_over_symbolic_range_times_out() {
+            fn is_even(x: &i32) -> bool {
+                *x != 0
+            }
+            let x: i32 = kani::any();
+            let expected = if is_even(&x) { Some(x) } else { None };
+            assert_eq!(
+                (x..x + 1).filter(is_even).next(),
+                expected,
+                "filter yields the item only when the predicate holds"
+            );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
+            harness: "gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Filter over a one-element array source resolves the same find/try_fold timeout".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, FIND_ROUTED_FILTER_OVER_ARRAY_SOURCE_PASSES_SRC, {
+        /// Same claim, same predicate, same symbolic element value as the
+        /// timeout control above -- the only change is the source type.
+        /// `std::array::IntoIter<i32, 1>` has the same `find`-routed
+        /// `next()` as `Range<i32>`, but its `try_fold` loop bound is a
+        /// compile-time array length rather than a runtime comparison, so
+        /// Kani resolves it immediately. This is the fix applied to the
+        /// production `Filter`/`FilterMap`/`FlatMap` proofs in
+        /// `rust_std::iter`.
+        #[kani::proof]
+        fn find_routed_filter_over_array_source_passes() {
+            fn is_even(x: &i32) -> bool {
+                *x != 0
+            }
+            let x: i32 = kani::any();
+            let expected = if is_even(&x) { Some(x) } else { None };
+            assert_eq!(
+                [x].into_iter().filter(is_even).next(),
+                expected,
+                "filter yields the item only when the predicate holds"
+            );
+        }
+    }
+}
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
