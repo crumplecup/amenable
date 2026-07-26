@@ -9,7 +9,7 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
         .collect();
 
     assert!(
-        cases.len() >= 14,
+        cases.len() >= 18,
         "the proof gallery should include scaffold, iterator, string-drain, and replace-issue cases"
     );
     assert!(cases.iter().any(|case| {
@@ -54,6 +54,12 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
         case.id == "amenable_kani::gallery::string_drain::single_char_incremental_next_passes"
             && case.disposition == KaniGalleryDisposition::Hypothesis
             && case.expected == KaniGalleryExpectation::Passed
+    }));
+    assert!(cases.iter().any(|case| {
+        case.id
+            == "amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector"
+            && case.disposition == KaniGalleryDisposition::FalseTrail
+            && case.expected == KaniGalleryExpectation::Timeout
     }));
     assert!(cases.iter().any(|case| {
         case.id

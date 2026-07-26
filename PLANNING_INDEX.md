@@ -4,6 +4,19 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Kani UTF-8 Accommodation Model
+
+**Document:** [KANI_UTF8_MODEL_PLAN.md](KANI_UTF8_MODEL_PLAN.md)
+
+**Status:** 🔲 Planning — initial Kani-only bounded UTF-8 semantics are being
+added so owned UTF-8 recovery proofs can move from std conversion timeout to
+explicit Amenable-owned byte-preservation laws.
+
+**Description:** Lift the bounded UTF-8 modeling pattern from `elicitation`
+into `amenable_kani`, migrate the `FromUtf8Error` proof to that model,
+preserve the direct `String::from_utf8` timeout in the gallery, and validate
+the resulting byte-recovery laws with scoped checks plus native Kani runs.
+
 ### Kani BTree Accommodation Model
 
 **Document:** [KANI_BTREE_MODEL_PLAN.md](KANI_BTREE_MODEL_PLAN.md)

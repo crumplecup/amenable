@@ -39,6 +39,9 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
         "amenable_kani::gallery::string_drain::single_char_incremental_next_passes [hypothesis / passed]"
     ));
     assert!(stdout.contains(
+        "amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector [false_trail / timeout]"
+    ));
+    assert!(stdout.contains(
         "amenable_kani::gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path [false_trail / timeout]"
     ));
     assert!(stdout.contains(

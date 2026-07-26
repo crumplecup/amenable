@@ -19,7 +19,45 @@
 //! - OS-backed filesystem boundaries with real external state
 //! - pure in-memory std implementation blow-up that still times out under the
 //!   native multi-minute harness timeout (`hash`, `fmt`, `BTree*`,
-//!   `LinkedList::extract_if`, and similar cases)
+//!   `LinkedList::extract_if`, `String::from_utf8`, and similar cases)
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
+            harness: "gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct String::from_utf8 error recovery can still time out for a tiny fixed invalid vector".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, FROM_UTF8_ERROR_TIMES_OUT_EVEN_FOR_A_FIXED_TWO_BYTE_INVALID_VECTOR_SRC, {
+        /// This is the reduced `FromUtf8Error` representative: no symbolic
+        /// prefix, no cloning, and only a fixed two-byte invalid vector. If
+        /// this still times out, the issue is the direct owned
+        /// `String::from_utf8` / `FromUtf8Error` path rather than a richer
+        /// proof-side setup.
+        #[kani::proof]
+        fn from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector() {
+            let err = String::from_utf8(vec![b'x', 0xFFu8]).unwrap_err();
+
+            assert_eq!(
+                err.as_bytes(),
+                &[b'x', 0xFFu8],
+                "as_bytes should recover the original invalid vector"
+            );
+            assert_eq!(
+                err.into_bytes(),
+                vec![b'x', 0xFFu8],
+                "into_bytes should recover the original invalid vector"
+            );
+        }
+    }
+}
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {

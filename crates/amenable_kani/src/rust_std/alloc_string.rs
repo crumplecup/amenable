@@ -136,16 +136,56 @@ bridge_kani_witness!(RustStdStandard<FromUtf8Error>);
 
 amenable_derive::harness! {
     kani, VERIFY_FROM_UTF8_ERROR_RECOVERS_THE_ORIGINAL_BYTES_SRC, {
-        /// `String::from_utf8`'s error doesn't discard the invalid
-        /// bytes: `.as_bytes()`/`.into_bytes()` both recover exactly
-        /// the original vector that failed to convert.
+        /// Amenable models the owned invalid-UTF-8 recovery boundary
+        /// directly: if the real `String::from_utf8` /
+        /// `std::string::FromUtf8Error` path conforms to this
+        /// Kani-owned byte-preservation law, then `.as_bytes()` and
+        /// `.into_bytes()` both recover exactly the original owned
+        /// bytes that failed conversion.
         #[kani::proof]
         fn verify_from_utf8_error_recovers_the_original_bytes() {
-            let byte: u8 = kani::any();
-            let bytes = vec![byte, 0xFFu8];
-            let err = String::from_utf8(bytes.clone()).unwrap_err();
-            assert_eq!(err.as_bytes(), &bytes[..], "as_bytes recovers the original bytes");
-            assert_eq!(err.into_bytes(), bytes, "into_bytes recovers the original bytes");
+            let depth0 = <crate::KaniFromUtf8Error as crate::KaniCompose>::kani_depth0()
+                .into_bytes();
+            let depth1 = <crate::KaniFromUtf8Error as crate::KaniCompose>::kani_depth1()
+                .into_bytes();
+            let depth2 = <crate::KaniFromUtf8Error as crate::KaniCompose>::kani_depth2()
+                .into_bytes();
+
+            let err0 = crate::KaniUtf8::classify_owned(depth0.clone()).unwrap_err();
+            assert_eq!(
+                err0.as_bytes(),
+                &depth0[..],
+                "depth0 as_bytes recovers the original bytes"
+            );
+            assert_eq!(
+                err0.into_bytes(),
+                depth0,
+                "depth0 into_bytes recovers the original bytes"
+            );
+
+            let err1 = crate::KaniUtf8::classify_owned(depth1.clone()).unwrap_err();
+            assert_eq!(
+                err1.as_bytes(),
+                &depth1[..],
+                "depth1 as_bytes recovers the original bytes"
+            );
+            assert_eq!(
+                err1.into_bytes(),
+                depth1,
+                "depth1 into_bytes recovers the original bytes"
+            );
+
+            let err2 = crate::KaniUtf8::classify_owned(depth2.clone()).unwrap_err();
+            assert_eq!(
+                err2.as_bytes(),
+                &depth2[..],
+                "depth2 as_bytes recovers the original bytes"
+            );
+            assert_eq!(
+                err2.into_bytes(),
+                depth2,
+                "depth2 into_bytes recovers the original bytes"
+            );
         }
     }
 }
