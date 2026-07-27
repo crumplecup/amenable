@@ -22,6 +22,8 @@
 //!   `LinkedList::extract_if`, `String::from_utf8`, and similar cases)
 //! - OS entropy-source boundaries reached by process-randomized seeding
 //!   (`RandomState::new()`)
+//! - thread-local-storage boundaries reached by `std::thread::current()`
+//!   (`pthread_key_create`)
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -602,6 +604,35 @@ amenable_derive::harness! {
             let mut hasher = state.build_hasher();
             "some value".hash(&mut hasher);
             let _ = hasher.finish();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "std::thread::current() reaches an unsupported pthread_key_create boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, THREAD_CURRENT_REACHES_AN_UNSUPPORTED_THREAD_LOCAL_STORAGE_BOUNDARY_SRC, {
+        /// This is the reduced form behind both `thread::current()`- and
+        /// `ThreadId`-stability reviews: the two-calls-agree claim itself
+        /// is straightforward, but `std::thread::current()` reaches a
+        /// `pthread_key_create` call (thread-local-storage key creation)
+        /// Kani reports unsupported before the claim can be established --
+        /// an OS-backed threading boundary, the same class as the other
+        /// foreign-boundary cases above, not a proof-side deficiency.
+        #[kani::proof]
+        fn thread_current_reaches_an_unsupported_thread_local_storage_boundary() {
+            let _ = std::thread::current();
         }
     }
 }

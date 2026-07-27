@@ -24,6 +24,7 @@ amenable_kani::gallery::replace_recommendations::random_state_construction_reach
 amenable_kani::gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario,1785090272,timeout
 amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path,1785090460,timeout
 amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model,1785090652,timeout
+amenable_kani::gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary,1785120172,failed
 amenable_kani::gallery::slice_split_position::bare_iter_position_over_fixed_array_passes,1785105564,passed
 amenable_kani::gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out,1785105630,timeout
 amenable_kani::gallery::string_drain::single_char_collect_times_out,1785090840,timeout
@@ -296,6 +297,6 @@ amenable_kani::rust_std::task::verify_context_from_waker_exposes_the_same_waker,
 amenable_kani::rust_std::task::verify_poll_ready_and_pending_are_disjoint,1785101926,passed
 amenable_kani::rust_std::task::verify_waker_wake_by_ref_invokes_the_wake_impl,1785101931,passed
 amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_value,1785101936,passed
-amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1785101947,failed
-amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1785101959,failed
+amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1785120149,failed
+amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1785120163,failed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1785101964,passed
