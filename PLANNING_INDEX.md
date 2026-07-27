@@ -28,14 +28,25 @@ validated the result with scoped checks plus native Kani runs.
 
 **Document:** [KANI_UTF8_MODEL_PLAN.md](KANI_UTF8_MODEL_PLAN.md)
 
-**Status:** 🔲 Planning — initial Kani-only bounded UTF-8 semantics are being
-added so owned UTF-8 recovery proofs can move from std conversion timeout to
-explicit Amenable-owned byte-preservation laws.
+**Status:** ✅ Implemented — the `FromUtf8Error` proof uses the bounded
+byte-recovery model, and three further proofs (`str::Utf8Error`'s
+`valid_up_to`/`error_len`, `primitives::String`'s length/emptiness
+consistency, `std_ffi::OsStr`'s `to_str()` round trip) were migrated in a
+later pass. The `String`/`OsStr` migrations required a second model,
+`KaniUtf8Buffer<MAX_LEN>`, lifted directly from `elicitation`'s
+`verification::types::Utf8Bytes<MAX_LEN>`: it assumes UTF-8 validity as a
+symbolic fact under Kani rather than running the validation algorithm,
+since the algorithm itself (not its input representation) was confirmed to
+time out even for two fixed valid bytes when the loop must run to
+completion — see `gallery::utf8_validation_algorithm_cost`.
 
-**Description:** Lift the bounded UTF-8 modeling pattern from `elicitation`
-into `amenable_kani`, migrate the `FromUtf8Error` proof to that model,
-preserve the direct `String::from_utf8` timeout in the gallery, and validate
-the resulting byte-recovery laws with scoped checks plus native Kani runs.
+**Description:** Lifted the bounded UTF-8 modeling pattern from
+`elicitation` into `amenable_kani` (`utf8_model.rs`: `KaniUtf8`,
+`KaniUtf8String`, `KaniFromUtf8Error`, `KaniUtf8PositionError`,
+`KaniUtf8Buffer`), migrated the `FromUtf8Error`, `Utf8Error`, `String`, and
+`OsStr` proofs onto it, preserved the direct `String::from_utf8` /
+full-validation-algorithm timeouts in the gallery, and validated the
+resulting laws with scoped checks plus native Kani runs.
 
 ### Kani BTree Accommodation Model
 

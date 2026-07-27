@@ -62,5 +62,8 @@ pub use rust_std::CheckedProof;
 pub use stoplight::{
     Color, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow, YellowToken,
 };
-pub use utf8_model::{KaniFromUtf8Error, KaniUtf8, KaniUtf8String};
+pub use utf8_model::{
+    KaniFromUtf8Error, KaniUtf8, KaniUtf8Buffer, KaniUtf8BufferError, KaniUtf8PositionError,
+    KaniUtf8String,
+};
 pub use witness::{KaniVerifier, KaniVerifierMetadata, KaniWitness};

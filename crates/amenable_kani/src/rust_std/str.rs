@@ -504,12 +504,21 @@ amenable_derive::harness! {
         /// `str::from_utf8`'s error reports exactly how much of the
         /// input was valid (`valid_up_to`) and the width of the single
         /// bad byte (`error_len`).
+        /// This proof uses the Amenable-owned UTF-8 accommodation model
+        /// (`utf8_model.rs`'s `KaniUtf8::error_position`, which exposes the
+        /// same `valid_up_to`/`error_len` position information as
+        /// `std::str::Utf8Error`): the direct `std::str::from_utf8` path
+        /// times out even for fixed concrete literals (see
+        /// `gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector`).
+        /// `0xF5..=0xFF` are never valid UTF-8 lead bytes anywhere, so any
+        /// byte in that range is a lone one-byte error regardless of its
+        /// neighbors.
         #[kani::proof]
         fn verify_utf8_error_reports_the_valid_prefix_length_and_error_span() {
             let invalid: u8 = kani::any();
             kani::assume(invalid >= 0xF5);
             let bytes = [b'a', b'b', invalid, b'c'];
-            let err = std::str::from_utf8(&bytes).unwrap_err();
+            let err = crate::KaniUtf8::error_position(&bytes).unwrap_err();
             assert_eq!(err.valid_up_to(), 2, "two leading bytes were valid UTF-8");
             assert_eq!(err.error_len(), Some(1), "the single bad byte has error_len 1");
         }

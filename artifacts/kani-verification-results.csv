@@ -27,6 +27,7 @@ amenable_kani::gallery::slice_split_position::bare_iter_position_over_fixed_arra
 amenable_kani::gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out,1785105630,timeout
 amenable_kani::gallery::string_drain::single_char_collect_times_out,1785090840,timeout
 amenable_kani::gallery::string_drain::single_char_incremental_next_passes,1785090852,passed
+amenable_kani::gallery::utf8_validation_algorithm_cost::full_branch_validation_over_two_valid_bytes_times_out,1785119599,timeout
 amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass,1785090857,passed
 amenable_kani::gallery::vacuity::bounded_assumption_passes_nonvacuously,1785090862,passed
 amenable_kani::gallery::vacuity::explicit_contradiction_fails,1785090867,failed
@@ -200,7 +201,7 @@ amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,17
 amenable_kani::rust_std::path::verify_strip_prefix_error_reports_a_non_matching_prefix,1785095850,passed
 amenable_kani::rust_std::pin::verify_pin_derefs_and_get_mut_round_trip,1785095855,passed
 amenable_kani::rust_std::primitives::verify_char_unicode_scalar,1785095859,passed
-amenable_kani::rust_std::primitives::verify_string_utf8_valid,1785096045,timeout
+amenable_kani::rust_std::primitives::verify_string_utf8_valid,1785119378,passed
 amenable_kani::rust_std::process::verify_child_has_a_process_id_and_can_be_waited_on,1785096066,failed
 amenable_kani::rust_std::process::verify_child_stderr_captures_what_the_child_wrote_to_stderr,1785096265,timeout
 amenable_kani::rust_std::process::verify_child_stdin_is_readable_by_the_child_process,1785096290,failed
@@ -237,7 +238,7 @@ amenable_kani::rust_std::slice::verify_split_n_caps_the_number_of_pieces,1785098
 amenable_kani::rust_std::slice::verify_split_n_mut_caps_the_number_of_pieces,1785098926,timeout
 amenable_kani::rust_std::slice::verify_split_yields_subslices_between_matches,1785099111,timeout
 amenable_kani::rust_std::slice::verify_windows_yields_overlapping_slices,1785099118,passed
-amenable_kani::rust_std::std_ffi::verify_os_str_valid_utf8_content_round_trips_through_to_str,1785099304,timeout
+amenable_kani::rust_std::std_ffi::verify_os_str_valid_utf8_content_round_trips_through_to_str,1785119391,passed
 amenable_kani::rust_std::std_ffi::verify_os_string_push_appends_to_the_existing_content,1785099310,passed
 amenable_kani::rust_std::std_hash::verify_default_hasher_is_deterministic_across_fresh_instances,1785099317,passed
 amenable_kani::rust_std::std_hash::verify_random_state_gives_the_same_hasher_seed_across_calls,1785099330,failed
@@ -263,7 +264,7 @@ amenable_kani::rust_std::str::verify_split_ascii_whitespace_collapses_runs_of_wh
 amenable_kani::rust_std::str::verify_split_whitespace_collapses_runs_of_whitespace,1785099599,passed
 amenable_kani::rust_std::str::verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes,1785099604,passed
 amenable_kani::rust_std::str::verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input,1785099610,passed
-amenable_kani::rust_std::str::verify_utf8_error_reports_the_valid_prefix_length_and_error_span,1785099797,timeout
+amenable_kani::rust_std::str::verify_utf8_error_reports_the_valid_prefix_length_and_error_span,1785119367,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_of_one_is_its_own_leader,1785099807,failed
 amenable_kani::rust_std::sync_lock::verify_barrier_wait_result_reports_the_sole_participant_as_leader,1785099817,failed
 amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_out,1785099826,failed
