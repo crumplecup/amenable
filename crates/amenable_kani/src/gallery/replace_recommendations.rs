@@ -24,6 +24,10 @@
 //!   (`RandomState::new()`)
 //! - thread-local-storage boundaries reached by `std::thread::current()`
 //!   (`pthread_key_create`)
+//! - real futex/clock syscall boundaries reached by `Barrier`/`Condvar`
+//!   (`futex_wait`, `clock_gettime`)
+//! - Kani's no-concurrency-support environment not enforcing real mutual
+//!   exclusion for `Mutex::try_lock`
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -633,6 +637,107 @@ amenable_derive::harness! {
         #[kani::proof]
         fn thread_current_reaches_an_unsupported_thread_local_storage_boundary() {
             let _ = std::thread::current();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Barrier::wait() reaches an unsupported futex syscall boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BARRIER_WAIT_REACHES_AN_UNSUPPORTED_FUTEX_BOUNDARY_SRC, {
+        /// This is the reduced form behind both `Barrier` reviews: the
+        /// sole-participant-is-leader claim is straightforward, but even a
+        /// `Barrier::new(1)` still routes `.wait()` through the same
+        /// generic futex-based wait/notify machinery as a multi-party
+        /// barrier, which reaches a raw `syscall` (`futex_wait`) Kani
+        /// reports unsupported before the claim can be checked -- an
+        /// OS-backed threading boundary, not a proof-side deficiency.
+        #[kani::proof]
+        fn barrier_wait_reaches_an_unsupported_futex_boundary() {
+            let barrier = std::sync::Barrier::new(1);
+            let _ = barrier.wait();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Condvar::wait_timeout reaches an unsupported clock_gettime boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, CONDVAR_WAIT_TIMEOUT_REACHES_AN_UNSUPPORTED_CLOCK_BOUNDARY_SRC, {
+        /// This is the reduced form behind both `Condvar`/`WaitTimeoutResult`
+        /// reviews: the never-notified-wait-times-out claim is
+        /// straightforward, but computing the timeout deadline reaches
+        /// `clock_gettime` (via `Timespec::now`) Kani reports unsupported,
+        /// even for a zero-duration timeout -- an OS-backed clock boundary,
+        /// not a proof-side deficiency.
+        #[kani::proof]
+        fn condvar_wait_timeout_reaches_an_unsupported_clock_boundary() {
+            use std::time::Duration;
+
+            let mutex = std::sync::Mutex::new(());
+            let condvar = std::sync::Condvar::new();
+            let guard = mutex.lock().unwrap();
+            let _ = condvar.wait_timeout(guard, Duration::from_millis(0));
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
+            harness: "gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Mutex::try_lock succeeds while a guard is held, under Kani's no-concurrency-support environment model".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, TRY_LOCK_SUCCEEDS_UNDER_KANIS_NO_CONCURRENCY_ENVIRONMENT_MODEL_SRC, {
+        /// Unlike the other cases in this module, this is not an
+        /// unsupported-construct failure -- it is a genuine assertion
+        /// failure, and a genuine Kani-environment mismatch against a real
+        /// invariant, the same class already documented for
+        /// `env_args_process_invariant_fails_under_the_synthetic_kani_model`.
+        /// Kani reports "Kani currently does not support concurrency" for
+        /// every harness that reaches synchronization primitives; under
+        /// that model, `Mutex::try_lock` was observed to succeed even
+        /// while a `MutexGuard` from the same `.lock()` call is still
+        /// alive and unreleased -- which never happens in real single- or
+        /// multi-threaded Rust execution (`Mutex` is not reentrant).
+        #[kani::proof]
+        fn try_lock_succeeds_under_kanis_no_concurrency_environment_model() {
+            let mutex = std::sync::Mutex::new(0i32);
+            let _guard = mutex.lock().unwrap();
+            assert!(
+                mutex.try_lock().is_err(),
+                "a real Mutex never grants a second lock while a guard is held"
+            );
         }
     }
 }
