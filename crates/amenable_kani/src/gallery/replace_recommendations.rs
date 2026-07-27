@@ -31,6 +31,8 @@
 //! - `std::process::Command`/`Child` construction and spawning reaching
 //!   several distinct unsupported foreign constructs (`strlen` via
 //!   `CString`, `gnu_get_libc_version`, C string literals in `Stdio`)
+//! - any `std::net` socket construction (`TcpListener`/`TcpStream`/
+//!   `UdpSocket`) reaching an unsupported `socket` syscall
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -829,6 +831,36 @@ amenable_derive::harness! {
             let _ = std::process::Command::new("true")
                 .stdout(std::process::Stdio::null())
                 .spawn();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "TcpListener::bind reaches an unsupported socket() syscall boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, SOCKET_CONSTRUCTION_REACHES_AN_UNSUPPORTED_SOCKET_SYSCALL_BOUNDARY_SRC, {
+        /// This is the reduced form behind every `std::net` review
+        /// (`TcpListener`, `TcpStream`, `UdpSocket`, `Incoming`,
+        /// shutdown): whatever the specific claim, constructing any socket
+        /// at all reaches the `socket()` syscall Kani reports unsupported,
+        /// before any connect/accept/send/recv-specific claim can be
+        /// checked. An OS-backed networking boundary, not a proof-side
+        /// deficiency -- confirmed identical across all five production
+        /// proofs in this review pass.
+        #[kani::proof]
+        fn socket_construction_reaches_an_unsupported_socket_syscall_boundary() {
+            let _ = std::net::TcpListener::bind("127.0.0.1:0");
         }
     }
 }
