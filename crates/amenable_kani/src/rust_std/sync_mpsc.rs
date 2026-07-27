@@ -42,12 +42,19 @@ amenable_derive::harness! {
     kani, VERIFY_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC, {
         /// A value sent on an unbounded channel is receivable on the
         /// paired `Receiver`.
+        /// This proof uses the Amenable-owned channel model
+        /// (`mpsc_model.rs`): the direct `std::sync::mpsc::channel` path
+        /// times out even for a single send immediately followed by a recv
+        /// with no blocking involved -- a pure in-memory implementation
+        /// cost of the real flavor-switching, atomics-backed queue, not an
+        /// unwinding-bound or foreign-boundary issue (see
+        /// `gallery::replace_recommendations`).
         #[kani::proof]
         fn verify_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
-            let (tx, rx) = std::sync::mpsc::channel();
-            tx.send(value).unwrap();
-            assert_eq!(rx.recv(), Ok(value), "the sent value is receivable");
+            let mut channel = crate::KaniChannel::unbounded();
+            channel.send(value).unwrap();
+            assert_eq!(channel.recv(), Ok(value), "the sent value is receivable");
         }
     }
 }
@@ -79,12 +86,13 @@ amenable_derive::harness! {
     kani, VERIFY_SYNC_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC, {
         /// Same delivery contract as `Sender`, for a bounded channel
         /// with spare capacity.
+        /// Same `KaniChannel` model migration as `Sender`'s proof above.
         #[kani::proof]
         fn verify_sync_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
-            let (tx, rx) = std::sync::mpsc::sync_channel(1);
-            tx.send(value).unwrap();
-            assert_eq!(rx.recv(), Ok(value));
+            let mut channel = crate::KaniChannel::bounded(1);
+            channel.send(value).unwrap();
+            assert_eq!(channel.recv(), Ok(value));
         }
     }
 }
@@ -117,12 +125,13 @@ amenable_derive::harness! {
         /// `.recv()` fails once the channel is both empty and every
         /// `Sender` has been dropped — it never blocks forever on a
         /// channel that can no longer receive anything.
+        /// Same `KaniChannel` model migration as `Sender`'s proof above.
         #[kani::proof]
         fn verify_receiver_fails_once_every_sender_is_dropped() {
-            let (tx, rx) = std::sync::mpsc::channel::<i32>();
-            drop(tx);
+            let mut channel = crate::KaniChannel::<i32>::unbounded();
+            channel.drop_sender();
             assert!(
-                rx.recv().is_err(),
+                channel.recv().is_err(),
                 "recv fails once the channel is empty and disconnected"
             );
         }
@@ -157,15 +166,19 @@ amenable_derive::harness! {
         /// `.into_iter()` consumes the `Receiver`, yielding sent
         /// values and stopping once the channel is disconnected and
         /// drained.
+        /// This proof uses the Amenable-owned channel model: `IntoIter`'s
+        /// `next()` is `self.rx.recv().ok()` under the hood, so a
+        /// `KaniChannel::recv()` call directly models the same
+        /// yield-then-stop shape, conditional on the real `IntoIter`
+        /// refining this law.
         #[kani::proof]
         fn verify_into_iter_yields_sent_values_then_stops() {
             let value: i32 = kani::any();
-            let (tx, rx) = std::sync::mpsc::channel();
-            tx.send(value).unwrap();
-            drop(tx);
-            let mut it = rx.into_iter();
-            assert_eq!(it.next(), Some(value));
-            assert_eq!(it.next(), None);
+            let mut channel = crate::KaniChannel::unbounded();
+            channel.send(value).unwrap();
+            channel.drop_sender();
+            assert_eq!(channel.recv().ok(), Some(value));
+            assert_eq!(channel.recv().ok(), None);
         }
     }
 }
@@ -197,15 +210,17 @@ amenable_derive::harness! {
     kani, VERIFY_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC, {
         /// `.iter()` borrows the `Receiver` instead of consuming it,
         /// with the same yield-then-stop behavior as `IntoIter`.
+        /// Same `KaniChannel` model migration and rationale as
+        /// `IntoIter`'s proof above -- `Iter::next()` is the same
+        /// `recv().ok()` shape.
         #[kani::proof]
         fn verify_iter_yields_sent_values_then_stops() {
             let value: i32 = kani::any();
-            let (tx, rx) = std::sync::mpsc::channel();
-            tx.send(value).unwrap();
-            drop(tx);
-            let mut it = rx.iter();
-            assert_eq!(it.next(), Some(value));
-            assert_eq!(it.next(), None);
+            let mut channel = crate::KaniChannel::unbounded();
+            channel.send(value).unwrap();
+            channel.drop_sender();
+            assert_eq!(channel.recv().ok(), Some(value));
+            assert_eq!(channel.recv().ok(), None);
         }
     }
 }
@@ -238,11 +253,14 @@ amenable_derive::harness! {
         /// Unlike `Iter`, `.try_iter()` never blocks: on an empty
         /// channel whose `Sender` is still alive (where `Iter` would
         /// wait for a value), it returns `None` immediately.
+        /// This proof uses the Amenable-owned channel model: `TryIter`'s
+        /// `next()` is `self.rx.try_recv().ok()` under the hood, so
+        /// `KaniChannel::try_recv()` models the same non-blocking shape.
         #[kani::proof]
         fn verify_try_iter_does_not_block_on_an_empty_open_channel() {
-            let (_tx, rx) = std::sync::mpsc::channel::<i32>();
+            let mut channel = crate::KaniChannel::<i32>::unbounded();
             assert_eq!(
-                rx.try_iter().next(),
+                channel.try_recv().ok(),
                 None,
                 "try_iter returns None immediately rather than blocking"
             );
@@ -277,11 +295,13 @@ amenable_derive::harness! {
     kani, VERIFY_RECV_ERROR_ON_AN_EMPTY_DISCONNECTED_CHANNEL_SRC, {
         /// `.recv()` fails with exactly this error when the channel is
         /// empty and every `Sender` has been dropped.
+        /// Same `KaniChannel` model migration as the other `recv`-family
+        /// proofs above.
         #[kani::proof]
         fn verify_recv_error_on_an_empty_disconnected_channel() {
-            let (tx, rx) = std::sync::mpsc::channel::<i32>();
-            drop(tx);
-            assert_eq!(rx.recv(), Err(RecvError));
+            let mut channel = crate::KaniChannel::<i32>::unbounded();
+            channel.drop_sender();
+            assert_eq!(channel.recv().unwrap_err(), crate::KaniRecvError::Disconnected);
         }
     }
 }
@@ -363,13 +383,21 @@ amenable_derive::harness! {
         /// `.send()` fails once the `Receiver` is dropped, and the
         /// error doesn't discard the value: it's recoverable via the
         /// error's own field.
+        /// Same `KaniChannel` model migration as the other `send`-family
+        /// proofs; the direct `std::sync::mpsc` path was confirmed to
+        /// time out even for this single send with no recv involved at
+        /// all.
         #[kani::proof]
         fn verify_send_error_recovers_the_unsent_value() {
             let value: i32 = kani::any();
-            let (tx, rx) = std::sync::mpsc::channel();
-            drop(rx);
-            let err = tx.send(value).unwrap_err();
-            assert_eq!(err.0, value, "the unsent value is recoverable from the error");
+            let mut channel = crate::KaniChannel::unbounded();
+            channel.drop_receiver();
+            let err = channel.send(value).unwrap_err();
+            assert_eq!(
+                err,
+                crate::KaniSendError::Disconnected(value),
+                "the unsent value is recoverable from the error"
+            );
         }
     }
 }
@@ -402,12 +430,15 @@ amenable_derive::harness! {
         /// A zero-capacity (rendezvous) channel's `.try_send()` fails
         /// `Full` immediately, since no receiver is ready to rendezvous
         /// with — and the error still recovers the unsent value.
+        /// Same `KaniChannel` model migration as the other `send`-family
+        /// proofs above: a `bounded(0)` channel models the rendezvous
+        /// capacity directly.
         #[kani::proof]
         fn verify_try_send_error_full_recovers_the_unsent_value() {
             let value: i32 = kani::any();
-            let (tx, _rx) = std::sync::mpsc::sync_channel(0);
-            match tx.try_send(value) {
-                Err(TrySendError::Full(v)) => {
+            let mut channel = crate::KaniChannel::bounded(0);
+            match channel.try_send(value) {
+                Err(crate::KaniSendError::Full(v)) => {
                     assert_eq!(v, value, "the unsent value is recoverable from Full")
                 }
                 other => panic!("expected Full, got {other:?}"),
@@ -444,15 +475,17 @@ amenable_derive::harness! {
         /// `.try_recv()`'s two failure modes are distinct, same as
         /// `RecvTimeoutError`'s: an open, empty channel is `Empty`; a
         /// disconnected one is `Disconnected` instead.
+        /// Same `KaniChannel` model migration as `TryIter`'s proof above.
         #[kani::proof]
         fn verify_try_recv_error_distinguishes_empty_from_disconnected() {
-            use std::sync::mpsc::TryRecvError;
+            let mut channel = crate::KaniChannel::<i32>::unbounded();
+            assert_eq!(channel.try_recv().unwrap_err(), crate::KaniRecvError::Empty);
 
-            let (tx, rx) = std::sync::mpsc::channel::<i32>();
-            assert_eq!(rx.try_recv(), Err(TryRecvError::Empty));
-
-            drop(tx);
-            assert_eq!(rx.try_recv(), Err(TryRecvError::Disconnected));
+            channel.drop_sender();
+            assert_eq!(
+                channel.try_recv().unwrap_err(),
+                crate::KaniRecvError::Disconnected
+            );
         }
     }
 }

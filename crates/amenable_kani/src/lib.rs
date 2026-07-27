@@ -28,6 +28,7 @@ mod fmt_model;
 mod fs_model;
 mod gallery;
 mod linked_list_extract_model;
+mod mpsc_model;
 mod pipe_model;
 mod registry;
 mod rust_std;
@@ -53,6 +54,7 @@ pub use fs_model::{
     KaniRecursiveDirObservation,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
+pub use mpsc_model::{KaniChannel, KaniRecvError, KaniSendError};
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
