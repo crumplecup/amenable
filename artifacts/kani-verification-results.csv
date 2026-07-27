@@ -88,7 +88,6 @@ amenable_kani::rust_std::env::verify_args_os_reports_at_least_the_program_path,1
 amenable_kani::rust_std::env::verify_args_reports_at_least_the_program_path,1785091285,passed
 amenable_kani::rust_std::env::verify_join_paths_error_reports_an_unjoinable_path,1785091297,passed
 amenable_kani::rust_std::env::verify_split_paths_recovers_paths_joined_by_join_paths,1785091312,passed
-amenable_kani::rust_std::env::verify_var_error_reports_an_unset_variable,1784748333,timeout
 amenable_kani::rust_std::ffi::verify_cstr_excludes_the_terminating_nul_from_to_bytes,1785091319,passed
 amenable_kani::rust_std::ffi::verify_from_bytes_until_nul_requires_a_nul_byte_somewhere,1785091326,passed
 amenable_kani::rust_std::ffi::verify_from_bytes_with_nul_requires_the_nul_only_at_the_end,1785091333,passed
@@ -254,7 +253,7 @@ amenable_kani::rust_std::std_net::verify_tcp_listener_accepts_a_connecting_strea
 amenable_kani::rust_std::std_net::verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer,1785123744,failed
 amenable_kani::rust_std::std_net::verify_udp_socket_send_to_recv_from_round_trips_a_datagram,1785123761,failed
 amenable_kani::rust_std::std_panic::verify_panic_hook_info_reports_the_panics_own_message,1785124010,failed
-amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing,1785099495,failed
+amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing,1785124859,failed
 amenable_kani::rust_std::std_time::verify_system_time_duration_since_computes_the_elapsed_span,1785099502,passed
 amenable_kani::rust_std::std_time::verify_system_time_error_recovers_how_far_backward_it_went,1785099507,passed
 amenable_kani::rust_std::str::verify_bytes_yields_the_utf8_encoding,1785099515,passed
