@@ -28,6 +28,9 @@
 //!   (`futex_wait`, `clock_gettime`)
 //! - Kani's no-concurrency-support environment not enforcing real mutual
 //!   exclusion for `Mutex::try_lock`
+//! - `std::process::Command`/`Child` construction and spawning reaching
+//!   several distinct unsupported foreign constructs (`strlen` via
+//!   `CString`, `gnu_get_libc_version`, C string literals in `Stdio`)
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -738,6 +741,94 @@ amenable_derive::harness! {
                 mutex.try_lock().is_err(),
                 "a real Mutex never grants a second lock while a guard is held"
             );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Command::new(...).arg(...) reaches an unsupported CString strlen boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, COMMAND_CONSTRUCTION_REACHES_AN_UNSUPPORTED_CSTRING_BOUNDARY_SRC, {
+        /// This is the reduced form behind the `Command`-args review: pure
+        /// builder introspection with no spawning at all still reaches
+        /// `strlen` (via `CString::from_raw`), since `Command`'s Unix
+        /// representation converts the program path and arguments to
+        /// `CString` unconditionally at construction time. An OS-backed
+        /// boundary reached before any spawn-specific claim is even in
+        /// play, not a proof-side deficiency.
+        #[kani::proof]
+        fn command_construction_reaches_an_unsupported_cstring_boundary() {
+            let mut command = std::process::Command::new("prog");
+            command.arg("a");
+            let _: Vec<&std::ffi::OsStr> = command.get_args().collect();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Command::spawn() reaches an unsupported gnu_get_libc_version boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, COMMAND_SPAWN_REACHES_AN_UNSUPPORTED_GLIBC_VERSION_BOUNDARY_SRC, {
+        /// This is the reduced form behind both the `Child`-process-id and
+        /// `ExitStatus` reviews: spawning any process at all, regardless of
+        /// what it does, reaches `gnu_get_libc_version` (glibc version
+        /// detection used to pick a `posix_spawn` vs. `fork`/`exec`
+        /// strategy) before any spawn-specific claim can be checked. An
+        /// OS/libc-backed boundary, not a proof-side deficiency.
+        #[kani::proof]
+        fn command_spawn_reaches_an_unsupported_glibc_version_boundary() {
+            let _ = std::process::Command::new("true").spawn();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Stdio::to_child_stdio reaches an unsupported C string literal construct".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, STDIO_CONVERSION_REACHES_AN_UNSUPPORTED_C_STRING_LITERAL_BOUNDARY_SRC, {
+        /// This is the reduced form behind the `Output`/`Stdio` reviews:
+        /// configuring a piped/null standard stream and spawning reaches a
+        /// C string literal construct in `Stdio::to_child_stdio` Kani
+        /// reports unsupported, before any output-capture or
+        /// handle-discarding claim can be checked.
+        #[kani::proof]
+        fn stdio_conversion_reaches_an_unsupported_c_string_literal_boundary() {
+            let _ = std::process::Command::new("true")
+                .stdout(std::process::Stdio::null())
+                .spawn();
         }
     }
 }
