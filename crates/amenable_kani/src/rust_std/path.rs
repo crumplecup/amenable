@@ -129,17 +129,24 @@ amenable_derive::harness! {
     kani, VERIFY_COMPONENTS_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC, {
         /// `.components()` yields a root component followed by each named
         /// segment, in path order.
+        /// Observed incrementally via `.next()` rather than `.collect()`
+        /// into a `Vec`: confirmed the eager-collection form times out even
+        /// for this fully concrete literal path, matching the
+        /// materialization-cost pattern already documented in
+        /// `gallery::iter_materialization`.
         #[kani::proof]
         fn verify_components_yields_root_then_named_segments_in_order() {
-            let components: Vec<Component> = Path::new("/a/b").components().collect();
+            let mut components = Path::new("/a/b").components();
+            assert_eq!(components.next(), Some(Component::RootDir));
             assert_eq!(
-                components,
-                vec![
-                    Component::RootDir,
-                    Component::Normal(std::ffi::OsStr::new("a")),
-                    Component::Normal(std::ffi::OsStr::new("b")),
-                ]
+                components.next(),
+                Some(Component::Normal(std::ffi::OsStr::new("a")))
             );
+            assert_eq!(
+                components.next(),
+                Some(Component::Normal(std::ffi::OsStr::new("b")))
+            );
+            assert_eq!(components.next(), None);
         }
     }
 }
