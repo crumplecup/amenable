@@ -20,6 +20,8 @@
 //! - pure in-memory std implementation blow-up that still times out under the
 //!   native multi-minute harness timeout (`hash`, `fmt`, `BTree*`,
 //!   `LinkedList::extract_if`, `String::from_utf8`, and similar cases)
+//! - OS entropy-source boundaries reached by process-randomized seeding
+//!   (`RandomState::new()`)
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -564,6 +566,42 @@ amenable_derive::harness! {
                 value.to_string(),
                 "Arguments should render the same as the value's own Display"
             );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "RandomState::new() reaches an unsupported OS entropy-source boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, RANDOM_STATE_CONSTRUCTION_REACHES_AN_UNSUPPORTED_ENTROPY_SOURCE_BOUNDARY_SRC, {
+        /// This is the reduced form behind the `RandomState` review: the
+        /// per-instance determinism claim itself is reasonable (two
+        /// hashers built from the *same* instance should agree), but
+        /// `RandomState::new()` reaches foreign functions Kani reports as
+        /// unsupported (`strlen`, `OwnedFd::drop`'s `close`) before the
+        /// claim can be established -- consistent with reading a process
+        /// entropy source (e.g. `/dev/urandom` or `getrandom`) to pick its
+        /// random per-instance seed, the same class of OS-backed boundary
+        /// as the pipe/fd cases above, not a proof-side deficiency.
+        #[kani::proof]
+        fn random_state_construction_reaches_an_unsupported_entropy_source_boundary() {
+            use std::hash::{BuildHasher, Hash, Hasher};
+
+            let state = std::hash::RandomState::new();
+            let mut hasher = state.build_hasher();
+            "some value".hash(&mut hasher);
+            let _ = hasher.finish();
         }
     }
 }

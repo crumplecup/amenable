@@ -20,6 +20,7 @@ amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_
 amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path,1785089887,timeout
 amenable_kani::gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation,1785090072,timeout
 amenable_kani::gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary,1785090078,failed
+amenable_kani::gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary,1785119994,failed
 amenable_kani::gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario,1785090272,timeout
 amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path,1785090460,timeout
 amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model,1785090652,timeout
@@ -107,8 +108,8 @@ amenable_kani::rust_std::fs::verify_try_lock_error_reports_a_lock_already_held,1
 amenable_kani::rust_std::future::verify_pending_never_resolves,1785092964,passed
 amenable_kani::rust_std::future::verify_poll_fn_dispatches_through_to_its_closure,1785092970,passed
 amenable_kani::rust_std::future::verify_ready_resolves_immediately_with_its_value,1785092976,passed
-amenable_kani::rust_std::hash::verify_build_hasher_default_produces_consistent_hashers,1785093161,timeout
-amenable_kani::rust_std::hash::verify_sip_hasher_produces_consistent_hashes,1785093347,timeout
+amenable_kani::rust_std::hash::verify_build_hasher_default_produces_consistent_hashers,1785119960,passed
+amenable_kani::rust_std::hash::verify_sip_hasher_produces_consistent_hashes,1785119969,passed
 amenable_kani::rust_std::io::verify_buf_reader_reads_the_underlying_bytes,1785093536,timeout
 amenable_kani::rust_std::io::verify_buf_writer_flushes_to_the_underlying_writer,1785093551,passed
 amenable_kani::rust_std::io::verify_bytes_yields_one_byte_at_a_time,1785093561,passed
@@ -241,7 +242,7 @@ amenable_kani::rust_std::slice::verify_windows_yields_overlapping_slices,1785099
 amenable_kani::rust_std::std_ffi::verify_os_str_valid_utf8_content_round_trips_through_to_str,1785119391,passed
 amenable_kani::rust_std::std_ffi::verify_os_string_push_appends_to_the_existing_content,1785099310,passed
 amenable_kani::rust_std::std_hash::verify_default_hasher_is_deterministic_across_fresh_instances,1785099317,passed
-amenable_kani::rust_std::std_hash::verify_random_state_gives_the_same_hasher_seed_across_calls,1785099330,failed
+amenable_kani::rust_std::std_hash::verify_random_state_gives_the_same_hasher_seed_across_calls,1785119986,failed
 amenable_kani::rust_std::std_net::verify_incoming_yields_an_already_queued_connection,1785099346,failed
 amenable_kani::rust_std::std_net::verify_shutdown_write_prevents_further_writes,1785099362,failed
 amenable_kani::rust_std::std_net::verify_tcp_listener_accepts_a_connecting_stream,1785099378,failed
