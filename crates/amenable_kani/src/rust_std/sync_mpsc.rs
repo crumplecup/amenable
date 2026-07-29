@@ -555,6 +555,24 @@ bridge_kani_witness!(RustStdStandard<SendError<i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SendError<i32>>`'s
+/// value-recovery claim has been established from a `KaniChannel<i32>`
+/// that has itself demonstrated the unsent value recoverable from the
+/// error.
+pub struct RustStdSendErrorToken(());
+
+impl ProofToken for RustStdSendErrorToken {
+    type Proposition = RustStdStandard<SendError<i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<SendError<i32>> {
+    type Token = RustStdSendErrorToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdSendErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SEND_ERROR_RECOVERS_THE_UNSENT_VALUE_SRC, {
         /// `.send()` fails once the `Receiver` is dropped, and the
@@ -563,7 +581,11 @@ amenable_derive::harness! {
         /// Same `KaniChannel` model migration as the other `send`-family
         /// proofs; the direct `std::sync::mpsc` path was confirmed to
         /// time out even for this single send with no recv involved at
-        /// all.
+        /// all. The claim is established through
+        /// `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<SendError<i32>>` from the channel instance that
+        /// actually demonstrated the recovery, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_send_error_recovers_the_unsent_value() {
             let value: i32 = kani::any();
@@ -575,6 +597,8 @@ amenable_derive::harness! {
                 crate::KaniSendError::Disconnected(value),
                 "the unsent value is recoverable from the error"
             );
+
+            let _token = RustStdStandard::<SendError<i32>>::establish(&channel);
         }
     }
 }
