@@ -2,11 +2,17 @@
 //!
 //! The `rust_std::slice` split family (`Split`, `SplitMut`, `SplitN`,
 //! `SplitNMut`, `RSplit`, `RSplitMut`, `RSplitN`, `RSplitNMut`,
-//! `SplitInclusive`, `SplitInclusiveMut`, and `ChunkBy`) time out even
-//! though every harness in that module already uses a small, fixed-length
-//! array source (never a symbolic-length `Vec` or `Range`) -- so this is a
-//! distinct failure mode from `iter_materialization`'s `Range<i32>::try_fold`
-//! issue, not a repeat of it.
+//! `SplitInclusive`, and `SplitInclusiveMut`) times out even though every
+//! harness in that module already uses a small, fixed-length array source
+//! (never a symbolic-length `Vec` or `Range`) -- so this is a distinct
+//! failure mode from `iter_materialization`'s `Range<i32>::try_fold` issue,
+//! not a repeat of it.
+//!
+//! The production `ChunkBy` proof on a fixed two-element array also times out
+//! under Kani, so it now uses the same style of bounded accommodation. The
+//! reduced cases below isolate the `Split`-family `Iter::position` route
+//! directly; they are the closest existing gallery analogue for that broader
+//! fixed-slice timeout class.
 //!
 //! Isolated here: calling `[T]::iter().position(predicate)` directly on the
 //! same fixed 3-element array with the same predicate passes in well under a

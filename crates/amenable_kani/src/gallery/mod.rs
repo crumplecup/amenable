@@ -18,6 +18,7 @@
 mod filesystem_observation_granularity;
 mod iter_materialization;
 mod replace_recommendations;
+mod slice_escape_ascii;
 mod slice_split_position;
 mod string_drain;
 mod utf8_validation_algorithm_cost;

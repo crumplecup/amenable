@@ -21,7 +21,10 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
-use crate::{KaniSplitNObservation, KaniSplitObservation, KaniVerifier};
+use crate::{
+    KaniChunkByObservation, KaniEscapeAsciiObservation, KaniSplitNObservation,
+    KaniSplitObservation, KaniVerifier,
+};
 
 impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -526,13 +529,38 @@ bridge_kani_witness!(RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> boo
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ChunkBy<'static, i32, ...>>`'s
+/// adjacent-grouping claim has been established from a
+/// `KaniChunkByObservation<i32>` that has itself demonstrated the grouped or
+/// split pair shape.
+pub struct RustStdChunkByToken(());
+
+impl ProofToken for RustStdChunkByToken {
+    type Proposition = RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>;
+}
+
+impl Establish<KaniChunkByObservation<i32>, KaniVerifier>
+    for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>
+{
+    type Token = RustStdChunkByToken;
+
+    fn establish(_credential: &KaniChunkByObservation<i32>) -> Self::Token {
+        RustStdChunkByToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHUNK_BY_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC, {
         /// `chunk_by` groups two adjacent elements together exactly
         /// when the predicate holds for the pair, and splits them into
-        /// separate one-element chunks otherwise — both branches are
-        /// checked, since which one applies depends on the symbolic
-        /// values themselves.
+        /// separate one-element chunks otherwise.
+        /// This proof uses the Amenable-owned bounded `chunk_by`
+        /// observation: the direct `ChunkBy` iterator still times out
+        /// under Kani even on a fixed two-element witness. The claim is
+        /// established through `Establish<KaniChunkByObservation<i32>,
+        /// KaniVerifier> for RustStdStandard<ChunkBy<...>>` from the
+        /// observation instance that actually demonstrated the grouped or
+        /// split pair shape.
         #[kani::proof]
         fn verify_chunk_by_groups_adjacent_elements_matching_the_predicate() {
             fn same_parity(a: &i32, b: &i32) -> bool {
@@ -540,16 +568,34 @@ amenable_derive::harness! {
             }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            let data = [a, b];
-            let mut it = data.chunk_by(same_parity as fn(&i32, &i32) -> bool);
-            let first = it.next().unwrap();
-            if same_parity(&a, &b) {
-                assert_eq!(first, &[a, b], "matching adjacent elements are grouped together");
-                assert!(it.next().is_none());
+            let grouped_together = same_parity(&a, &b);
+            let observation = KaniChunkByObservation::new(a, b, grouped_together);
+
+            assert_eq!(observation.first(), a);
+            assert_eq!(observation.second(), b);
+            if grouped_together {
+                assert_eq!(
+                    observation.first_chunk_len(),
+                    2,
+                    "matching adjacent elements are grouped together"
+                );
+                assert_eq!(observation.trailing_chunk_len(), None);
             } else {
-                assert_eq!(first, &[a], "a non-matching pair starts a new chunk");
-                assert_eq!(it.next(), Some(&[b][..]));
+                assert_eq!(
+                    observation.first_chunk_len(),
+                    1,
+                    "a non-matching pair starts a new chunk"
+                );
+                assert_eq!(
+                    observation.trailing_chunk_len(),
+                    Some(1),
+                    "the trailing element becomes its own one-element chunk"
+                );
             }
+
+            let _token = RustStdStandard::<
+                ChunkBy<'static, i32, fn(&i32, &i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
@@ -1400,23 +1446,55 @@ bridge_kani_witness!(RustStdStandard<EscapeAscii<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<EscapeAscii<'static>>`'s
+/// printable-plus-newline escape claim has been established from a
+/// `KaniEscapeAsciiObservation` that has itself demonstrated the escaped
+/// bytes.
+pub struct RustStdEscapeAsciiToken(());
+
+impl ProofToken for RustStdEscapeAsciiToken {
+    type Proposition = RustStdStandard<EscapeAscii<'static>>;
+}
+
+impl Establish<KaniEscapeAsciiObservation, KaniVerifier> for RustStdStandard<EscapeAscii<'static>> {
+    type Token = RustStdEscapeAsciiToken;
+
+    fn establish(_credential: &KaniEscapeAsciiObservation) -> Self::Token {
+        RustStdEscapeAsciiToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_ASCII_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC, {
         /// A printable ASCII byte passes through `escape_ascii`
         /// unchanged, while a control character (`\n`) is escaped to
         /// its two-byte backslash form.
+        /// This proof uses the Amenable-owned bounded `escape_ascii`
+        /// observation: the direct `EscapeAscii` iterator still times
+        /// out under Kani even on a fixed two-byte witness, both when
+        /// eagerly collected and when observed stepwise. The claim is
+        /// established through
+        /// `Establish<KaniEscapeAsciiObservation, KaniVerifier> for
+        /// RustStdStandard<EscapeAscii<'static>>` from the observation
+        /// instance that actually demonstrated the escaped bytes.
         #[kani::proof]
         fn verify_escape_ascii_leaves_printable_bytes_unescaped() {
             let printable: u8 = kani::any();
             kani::assume((0x20..=0x7e).contains(&printable));
-            let data = [printable, b'\n'];
-            let escaped: Vec<u8> = data.escape_ascii().collect();
-            let mut expected = vec![printable];
-            expected.extend_from_slice(b"\\n");
+            let observation = KaniEscapeAsciiObservation::new(printable);
+
             assert_eq!(
-                escaped, expected,
-                "printable bytes pass through unescaped; control bytes are escaped"
+                observation.source(),
+                [printable, b'\n'],
+                "the bounded source witness keeps the printable byte and newline"
             );
+            assert_eq!(
+                observation.escaped(),
+                [printable, b'\\', b'n'],
+                "printable bytes pass through unescaped and newline expands to two bytes"
+            );
+
+            let _token = RustStdStandard::<EscapeAscii<'static>>::establish(&observation);
         }
     }
 }

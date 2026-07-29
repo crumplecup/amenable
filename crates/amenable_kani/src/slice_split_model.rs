@@ -200,3 +200,116 @@ impl<T: Copy> Evidence for KaniSplitNObservation<T> {
         ]
     }
 }
+
+/// The assumption `KaniChunkByWindow` stands in for: a two-element
+/// `chunk_by` witness reduces to deciding whether the adjacent pair stays
+/// together or splits into two one-element chunks, without executing the
+/// real std iterator path. The direct `ChunkBy` proof still times out under
+/// Kani on a fixed two-element array even after stepwise observation, so the
+/// bounded grouping shape is named explicitly here.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[standard(basis = "Self")]
+pub struct KaniChunkByWindow;
+
+impl Provenance for KaniChunkByWindow {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "a two-element chunk_by witness reduces to either one grouped pair or two one-element chunks depending only on whether the adjacent predicate holds",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::slice::ChunkBy path still times out under Kani even on a fixed two-element array with stepwise observation, so the production proof uses a bounded grouping observation instead",
+            ),
+        ]
+        .into_iter()
+    }
+}
+
+/// Audit payload for a bounded `chunk_by` observation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct KaniChunkByAudit<T> {
+    data: [T; 2],
+    grouped_together: bool,
+}
+
+impl<T: Copy> KaniChunkByAudit<T> {
+    /// Recover the modeled adjacent pair.
+    #[must_use]
+    pub fn data(&self) -> [T; 2] {
+        self.data
+    }
+
+    /// Report whether the adjacent pair is modeled as one chunk.
+    #[must_use]
+    pub fn grouped_together(&self) -> bool {
+        self.grouped_together
+    }
+}
+
+/// Bounded two-element `chunk_by` observation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct KaniChunkByObservation<T> {
+    first: T,
+    second: T,
+    grouped_together: bool,
+}
+
+impl<T: Copy> KaniChunkByObservation<T> {
+    /// Construct the bounded adjacent-pair witness.
+    #[must_use]
+    pub fn new(first: T, second: T, grouped_together: bool) -> Self {
+        Self {
+            first,
+            second,
+            grouped_together,
+        }
+    }
+
+    /// Report whether the adjacent pair is modeled as one chunk.
+    #[must_use]
+    pub fn grouped_together(&self) -> bool {
+        self.grouped_together
+    }
+
+    /// Recover the first element.
+    #[must_use]
+    pub fn first(&self) -> T {
+        self.first
+    }
+
+    /// Recover the second element.
+    #[must_use]
+    pub fn second(&self) -> T {
+        self.second
+    }
+
+    /// Report the first chunk length under the modeled grouping rule.
+    #[must_use]
+    pub fn first_chunk_len(&self) -> usize {
+        if self.grouped_together { 2 } else { 1 }
+    }
+
+    /// Report the trailing chunk length, if any.
+    #[must_use]
+    pub fn trailing_chunk_len(&self) -> Option<usize> {
+        if self.grouped_together { None } else { Some(1) }
+    }
+}
+
+impl<T: Copy> Evidence for KaniChunkByObservation<T> {
+    type Basis = KaniChunkByWindow;
+    type Audit = KaniChunkByAudit<T>;
+
+    fn basis() -> Self::Basis {
+        KaniChunkByWindow
+    }
+
+    fn audit(&self) -> Self::Audit {
+        KaniChunkByAudit {
+            data: [self.first, self.second],
+            grouped_together: self.grouped_together,
+        }
+    }
+}

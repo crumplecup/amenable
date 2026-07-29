@@ -37,6 +37,7 @@ mod pipe_model;
 mod registry;
 mod runtime_model;
 mod rust_std;
+mod slice_escape_ascii_model;
 mod slice_split_model;
 mod stoplight;
 mod sync_lock_model;
@@ -76,7 +77,8 @@ pub use registry::{
 };
 pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::CheckedProof;
-pub use slice_split_model::{KaniSplitNObservation, KaniSplitObservation};
+pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
+pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{
     Color, Established, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow,
     YellowToken, next,
