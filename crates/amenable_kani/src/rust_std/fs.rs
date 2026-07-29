@@ -18,7 +18,7 @@ use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
     KaniFileLenObservation, KaniFileTimesObservation, KaniFileTypeObservation,
-    KaniPermissionsObservation, KaniRecursiveDirObservation, KaniVerifier,
+    KaniPermissionsObservation, KaniReadDirObservation, KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -618,13 +618,34 @@ bridge_kani_witness!(RustStdStandard<ReadDir>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ReadDir>`'s entry-completeness
+/// claim has been established from a `KaniReadDirObservation` that has
+/// itself demonstrated exactly the created entries.
+pub struct RustStdReadDirToken(());
+
+impl ProofToken for RustStdReadDirToken {
+    type Proposition = RustStdStandard<ReadDir>;
+}
+
+impl Establish<KaniReadDirObservation, KaniVerifier> for RustStdStandard<ReadDir> {
+    type Token = RustStdReadDirToken;
+
+    fn establish(_credential: &KaniReadDirObservation) -> Self::Token {
+        RustStdReadDirToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_READ_DIR_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC, {
         /// `.read_dir()` yields exactly the files that were created in
         /// that directory, no more and no fewer.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `read_dir` path preserves entry identity this way, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniReadDirObservation, KaniVerifier> for
+        /// RustStdStandard<ReadDir>` from the observation instance that
+        /// actually demonstrated the entry completeness, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_read_dir_iterates_every_entry_in_the_directory() {
             let base = crate::KaniFsPath::root().join(crate::KaniFsLabel::new('d'));
@@ -636,6 +657,8 @@ amenable_derive::harness! {
             assert_eq!(entries.len(), 2, "read_dir yields exactly the created entries");
             assert_eq!(entries[0].file_name(), Some(one));
             assert_eq!(entries[1].file_name(), Some(two));
+
+            let _token = RustStdStandard::<ReadDir>::establish(&observation);
         }
     }
 }

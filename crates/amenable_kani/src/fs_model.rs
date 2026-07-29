@@ -763,10 +763,40 @@ impl Default for KaniPermissionsObservation {
 
 /// Observable result of reading every entry a directory with two created
 /// files contains.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that `.read_dir()`
+/// yields exactly the files that were created in that directory, no more
+/// and no fewer, and nothing else about the real OS-backed directory
+/// listing -- is named explicitly as a `Standard` rather than left as
+/// prose: the direct `std::fs` path crosses OS-backed state Kani cannot
+/// symbolically execute well (see this module's own doc comment), so this
+/// bounded observation is what the `ReadDir` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(
+    basis = "Self",
+    basis_ctor = "Self::new(KaniFsPath::root(), KaniFsLabel::new('1'), KaniFsLabel::new('2'))"
+)]
 pub struct KaniReadDirObservation {
     first: KaniFsDirEntry,
     second: KaniFsDirEntry,
+}
+
+impl Provenance for KaniReadDirObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                ".read_dir() yields exactly the files that were created in that directory, no more and no fewer, standing in for the real OS-backed directory listing",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("first", format!("{:?}", self.first.path())),
+            MetadataEntry::new("second", format!("{:?}", self.second.path())),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniReadDirObservation {
