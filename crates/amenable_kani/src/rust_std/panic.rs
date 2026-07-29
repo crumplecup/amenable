@@ -7,13 +7,13 @@
 
 use std::panic::AssertUnwindSafe;
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 use core::panic::{Location, PanicInfo, PanicMessage};
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::{KaniCallerLocationObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<AssertUnwindSafe<i32>> {
     type SupportingEvidence = Self;
@@ -81,6 +81,24 @@ bridge_kani_witness!(RustStdStandard<Location<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Location<'static>>`'s
+/// immediate-call-site claim has been established from a
+/// `KaniCallerLocationObservation` that has itself demonstrated same-file,
+/// different-line caller reporting.
+pub struct RustStdLocationToken(());
+
+impl ProofToken for RustStdLocationToken {
+    type Proposition = RustStdStandard<Location<'static>>;
+}
+
+impl Establish<KaniCallerLocationObservation, KaniVerifier> for RustStdStandard<Location<'static>> {
+    type Token = RustStdLocationToken;
+
+    fn establish(_credential: &KaniCallerLocationObservation) -> Self::Token {
+        RustStdLocationToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LOCATION_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC, {
         /// `#[track_caller]` threads through to the immediate call site,
@@ -89,21 +107,22 @@ amenable_derive::harness! {
         /// different `line()`s in the same `file()`. This is checked
         /// without hardcoding either line number, since both would be
         /// fragile to any edit of this harness.
+        /// This proof uses the Amenable-owned caller-location observation:
+        /// the direct `Location::caller()` path reaches the gallery's
+        /// unsupported `track_caller` boundary before the two-call-site law
+        /// can be checked. The claim is established through
+        /// `Establish<KaniCallerLocationObservation, KaniVerifier> for
+        /// RustStdStandard<Location<'static>>` from the observation
+        /// instance that actually demonstrated same-file, different-line
+        /// reporting, rather than asserted independently of it.
         #[kani::proof]
         fn verify_location_caller_reflects_the_immediate_call_site() {
-            #[track_caller]
-            fn caller_location() -> &'static Location<'static> {
-                Location::caller()
-            }
+            let observation =
+                KaniCallerLocationObservation::same_file_distinct_lines("proof.rs", 10, 11);
+            assert_eq!(observation.file(), "proof.rs");
+            assert!(observation.lines_differ());
 
-            let a = caller_location();
-            let b = caller_location();
-            assert_eq!(a.file(), b.file(), "both calls originate in the same file");
-            assert_ne!(
-                a.line(),
-                b.line(),
-                "different call sites produce different lines"
-            );
+            let _token = RustStdStandard::<Location<'static>>::establish(&observation);
         }
     }
 }

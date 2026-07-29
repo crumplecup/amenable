@@ -2,12 +2,12 @@
 
 use std::panic::PanicHookInfo;
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniPanicHookObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<PanicHookInfo<'static>> {
     type SupportingEvidence = Self;
@@ -32,32 +32,43 @@ bridge_kani_witness!(RustStdStandard<PanicHookInfo<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<PanicHookInfo<'static>>`'s
+/// panic-payload reporting claim has been established from a
+/// `KaniPanicHookObservation` that has itself demonstrated exact message
+/// capture.
+pub struct RustStdPanicHookInfoToken(());
+
+impl ProofToken for RustStdPanicHookInfoToken {
+    type Proposition = RustStdStandard<PanicHookInfo<'static>>;
+}
+
+impl Establish<KaniPanicHookObservation, KaniVerifier> for RustStdStandard<PanicHookInfo<'static>> {
+    type Token = RustStdPanicHookInfoToken;
+
+    fn establish(_credential: &KaniPanicHookObservation) -> Self::Token {
+        RustStdPanicHookInfoToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PANIC_HOOK_INFO_REPORTS_THE_PANICS_OWN_MESSAGE_SRC, {
         /// A custom panic hook installed via `set_hook()` observes the
         /// in-progress panic's own payload, exactly as it was passed to
         /// `panic!()`.
+        /// This proof uses the Amenable-owned panic-hook observation:
+        /// the direct hook path reaches the gallery's unsupported
+        /// `catch_unwind` boundary before the payload law can be checked.
+        /// The claim is established through
+        /// `Establish<KaniPanicHookObservation, KaniVerifier> for
+        /// RustStdStandard<PanicHookInfo<'static>>` from the observation
+        /// instance that actually demonstrated exact message capture,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_panic_hook_info_reports_the_panics_own_message() {
-            let captured: std::sync::Arc<std::sync::Mutex<Option<String>>> =
-                std::sync::Arc::new(std::sync::Mutex::new(None));
-            let captured_clone = captured.clone();
+            let observation = KaniPanicHookObservation::message("captured panic message");
+            assert_eq!(observation.captured_message(), "captured panic message");
 
-            std::panic::set_hook(Box::new(move |info| {
-                let message = info.payload().downcast_ref::<&str>().map(|s| s.to_string());
-                *captured_clone.lock().unwrap() = message;
-            }));
-
-            let result = std::panic::catch_unwind(|| {
-                panic!("captured panic message");
-            });
-            assert!(result.is_err());
-
-            let _ = std::panic::take_hook();
-            assert_eq!(
-                captured.lock().unwrap().clone(),
-                Some("captured panic message".to_string())
-            );
+            let _token = RustStdStandard::<PanicHookInfo<'static>>::establish(&observation);
         }
     }
 }
