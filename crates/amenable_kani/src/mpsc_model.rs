@@ -21,6 +21,9 @@
 //! - if the real channel conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+use amenable_core::{MetadataEntry, Provenance};
+use amenable_derive::Standard;
+
 const KANI_MPSC_MAX_QUEUE: usize = 2;
 
 /// Modeled error recovering an unsent value: `send`/`try_send` failing.
@@ -48,12 +51,47 @@ pub enum KaniRecvError {
 /// `sync_channel(n)` (`Some(0)` is a zero-capacity rendezvous channel, whose
 /// `try_send` always reports `Full` since nothing here models a receiver
 /// actively rendezvousing).
-#[derive(Debug, Clone, PartialEq, Eq)]
+///
+/// The assumption this model stands in for -- that `std::sync::mpsc`'s
+/// flavor-switching, atomics-backed queue is fully captured by this small
+/// FIFO/open-flag/capacity state machine, and nothing else about the real
+/// channel's implementation -- is named explicitly as a `Standard` rather
+/// than left as prose: even the simplest single send-then-recv on the real
+/// channel times out under Kani (see this module's own doc comment), so
+/// this bounded model is what every `std::sync::mpsc` proof in this crate
+/// actually rests on.
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[standard(basis = "Self", basis_ctor = "Self::unbounded()", bound = "T: Clone")]
 pub struct KaniChannel<T> {
     queue: Vec<T>,
     sender_open: bool,
     receiver_open: bool,
     capacity: Option<usize>,
+}
+
+impl<T> Provenance for KaniChannel<T> {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        let capacity = match self.capacity {
+            None => "unbounded".to_owned(),
+            Some(capacity) => capacity.to_string(),
+        };
+
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "std::sync::mpsc's flavor-switching, atomics-backed queue is fully captured by this small FIFO/open-flag/capacity state machine",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "even the simplest single send-then-recv on the real channel times out under Kani -- see gallery::replace_recommendations",
+            ),
+            MetadataEntry::new("sender_open", self.sender_open.to_string()),
+            MetadataEntry::new("receiver_open", self.receiver_open.to_string()),
+            MetadataEntry::new("capacity", capacity),
+            MetadataEntry::new("queue_len", self.queue.len().to_string()),
+        ]
+        .into_iter()
+    }
 }
 
 impl<T> KaniChannel<T> {
