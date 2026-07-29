@@ -1,18 +1,20 @@
 //! `KaniWitness` impls for `std::time`'s clock types.
 //!
-//! `SystemTime` and `SystemTimeError` are proved via arithmetic on
-//! `SystemTime::UNIX_EPOCH` rather than a real clock read, so the claim
-//! is fully deterministic and doesn't depend on when the harness
-//! happens to run.
+//! `Instant` is proved through an Amenable-owned monotonic-clock observation,
+//! because the direct `Instant::now()` path reaches the gallery's unsupported
+//! `clock_gettime` boundary. `SystemTime` and `SystemTimeError` are still
+//! proved via arithmetic on `SystemTime::UNIX_EPOCH` rather than a real clock
+//! read, so those claims stay fully deterministic and don't depend on when
+//! the harness happens to run.
 
 use std::time::{Instant, SystemTime, SystemTimeError};
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniInstantObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<Instant> {
     type SupportingEvidence = Self;
@@ -37,15 +39,44 @@ bridge_kani_witness!(RustStdStandard<Instant>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Instant>`'s monotonic-ordering
+/// claim has been established from a `KaniInstantObservation` that has itself
+/// demonstrated the later reading is not earlier.
+pub struct RustStdInstantToken(());
+
+impl ProofToken for RustStdInstantToken {
+    type Proposition = RustStdStandard<Instant>;
+}
+
+impl Establish<KaniInstantObservation, KaniVerifier> for RustStdStandard<Instant> {
+    type Token = RustStdInstantToken;
+
+    fn establish(_credential: &KaniInstantObservation) -> Self::Token {
+        RustStdInstantToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_INSTANT_IS_MONOTONICALLY_NONDECREASING_SRC, {
-        /// A later `Instant::now()` is never earlier than one taken
+        /// A later monotonic clock reading is never earlier than one taken
         /// before it.
+        /// This proof uses the Amenable-owned monotonic-clock observation:
+        /// the direct `Instant::now()` path reaches the gallery's
+        /// unsupported `clock_gettime` boundary before the small ordering
+        /// claim can be checked. The claim is established through
+        /// `Establish<KaniInstantObservation, KaniVerifier> for
+        /// RustStdStandard<Instant>` from the observation instance that
+        /// actually demonstrated monotonicity, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_instant_is_monotonically_nondecreasing() {
-            let first = Instant::now();
-            let second = Instant::now();
-            assert!(second >= first);
+            let observation = crate::KaniInstantObservation::monotonic();
+            assert!(
+                observation.later_is_not_earlier(),
+                "a later monotonic clock reading should not be earlier"
+            );
+
+            let _token = RustStdStandard::<Instant>::establish(&observation);
         }
     }
 }

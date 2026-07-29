@@ -257,7 +257,7 @@ amenable_kani::rust_std::std_net::verify_tcp_listener_accepts_a_connecting_strea
 amenable_kani::rust_std::std_net::verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer,1785123744,failed
 amenable_kani::rust_std::std_net::verify_udp_socket_send_to_recv_from_round_trips_a_datagram,1785123761,failed
 amenable_kani::rust_std::std_panic::verify_panic_hook_info_reports_the_panics_own_message,1785124010,failed
-amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing,1785124859,failed
+amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing,1785353857,passed
 amenable_kani::rust_std::std_time::verify_system_time_duration_since_computes_the_elapsed_span,1785099502,passed
 amenable_kani::rust_std::std_time::verify_system_time_error_recovers_how_far_backward_it_went,1785099507,passed
 amenable_kani::rust_std::str::verify_bytes_yields_the_utf8_encoding,1785099515,passed
@@ -293,7 +293,7 @@ amenable_kani::rust_std::sync_mpsc::verify_into_iter_yields_sent_values_then_sto
 amenable_kani::rust_std::sync_mpsc::verify_iter_yields_sent_values_then_stops,1785349064,passed
 amenable_kani::rust_std::sync_mpsc::verify_receiver_fails_once_every_sender_is_dropped,1785348882,passed
 amenable_kani::rust_std::sync_mpsc::verify_recv_error_on_an_empty_disconnected_channel,1785349236,passed
-amenable_kani::rust_std::sync_mpsc::verify_recv_timeout_error_distinguishes_timeout_from_disconnected,1785121565,failed
+amenable_kani::rust_std::sync_mpsc::verify_recv_timeout_error_distinguishes_timeout_from_disconnected,1785353862,passed
 amenable_kani::rust_std::sync_mpsc::verify_send_error_recovers_the_unsent_value,1785349316,passed
 amenable_kani::rust_std::sync_mpsc::verify_sender_delivers_to_the_paired_receiver,1785348699,passed
 amenable_kani::rust_std::sync_mpsc::verify_sync_sender_delivers_to_the_paired_receiver,1785348785,passed
@@ -304,7 +304,7 @@ amenable_kani::rust_std::task::verify_context_from_waker_exposes_the_same_waker,
 amenable_kani::rust_std::task::verify_poll_ready_and_pending_are_disjoint,1785101926,passed
 amenable_kani::rust_std::task::verify_waker_wake_by_ref_invokes_the_wake_impl,1785101931,passed
 amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_value,1785101936,passed
-amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1785120149,failed
-amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1785120163,failed
+amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1785353847,passed
+amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1785353850,passed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1785101964,passed
 amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1785346239,passed

@@ -506,28 +506,58 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::RecvTimeoutError>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RecvTimeoutError>`'s
+/// timeout-vs-disconnected classification claim has been established from a
+/// `KaniChannel<i32>` that has itself demonstrated the corresponding
+/// zero-duration timed-receive outcomes.
+pub struct RustStdRecvTimeoutErrorToken(());
+
+impl ProofToken for RustStdRecvTimeoutErrorToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::RecvTimeoutError>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::RecvTimeoutError>
+{
+    type Token = RustStdRecvTimeoutErrorToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdRecvTimeoutErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RECV_TIMEOUT_ERROR_DISTINGUISHES_TIMEOUT_FROM_DISCONNECTED_SRC, {
         /// `.recv_timeout()`'s two failure modes are distinct: a
         /// channel that's open but empty times out; a disconnected
         /// channel fails immediately as `Disconnected` instead.
+        /// This proof uses the Amenable-owned channel model's
+        /// zero-duration timed-receive observation: the direct
+        /// `std::sync::mpsc::Receiver::recv_timeout` path reaches the same
+        /// gallery-documented `clock_gettime` boundary as timed waits on
+        /// `Condvar`. The claim is established through
+        /// `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<RecvTimeoutError>` from the channel instance that
+        /// actually demonstrated the timeout/disconnected distinction,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_recv_timeout_error_distinguishes_timeout_from_disconnected() {
-            use std::sync::mpsc::RecvTimeoutError;
-
-            let (tx, rx) = std::sync::mpsc::channel::<i32>();
+            let mut channel = crate::KaniChannel::<i32>::unbounded();
             assert_eq!(
-                rx.recv_timeout(std::time::Duration::from_millis(0)),
-                Err(RecvTimeoutError::Timeout),
+                channel.recv_timeout_zero(),
+                Err(crate::KaniRecvTimeoutError::Timeout),
                 "an open, empty channel times out"
             );
 
-            drop(tx);
+            channel.drop_sender();
             assert_eq!(
-                rx.recv_timeout(std::time::Duration::from_millis(0)),
-                Err(RecvTimeoutError::Disconnected),
+                channel.recv_timeout_zero(),
+                Err(crate::KaniRecvTimeoutError::Disconnected),
                 "a disconnected channel fails immediately instead"
             );
+
+            let _token =
+                RustStdStandard::<std::sync::mpsc::RecvTimeoutError>::establish(&channel);
         }
     }
 }

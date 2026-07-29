@@ -1,27 +1,26 @@
 //! `KaniWitness` impls for `std::thread`.
 //!
-//! Kani does not model concurrency (confirmed against its own
-//! documented limitations) — it verifies a single sequential
-//! instruction stream, not multiple concurrently scheduled ones. Every
-//! type here whose only observable behavior requires actually spawning
-//! a thread (`Builder`, `JoinHandle`, `Scope`, `ScopedJoinHandle`) or
-//! exploiting single-thread TLS teardown ordering (`AccessError`) has
-//! no claim Kani could check, so those stay "trusted." `LocalKey`,
-//! `Thread`, and `ThreadId` all have real, single-threaded-observable
-//! behavior — accessing a `thread_local!` value, or querying the
-//! *current* (already-running) thread's own handle — so those get real
-//! harnesses.
+//! Kani does not model concurrency (confirmed against its own documented
+//! limitations) — it verifies a single sequential instruction stream, not
+//! multiple concurrently scheduled ones. Every type here whose only
+//! observable behavior requires actually spawning a thread (`Builder`,
+//! `JoinHandle`, `Scope`, `ScopedJoinHandle`) or exploiting single-thread TLS
+//! teardown ordering (`AccessError`) has no claim Kani could check, so those
+//! stay "trusted." `LocalKey` still has a direct single-thread harness; the
+//! `Thread` and `ThreadId` laws are proved through an Amenable-owned
+//! observation instead, because the direct `std::thread::current()` path
+//! reaches the gallery's unsupported `pthread_key_create` boundary first.
 
 use std::thread::{
     AccessError, Builder, JoinHandle, LocalKey, Scope, ScopedJoinHandle, Thread, ThreadId,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::{KaniCurrentThreadObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {
     type SupportingEvidence = Self;
@@ -91,16 +90,44 @@ bridge_kani_witness!(RustStdStandard<Thread>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Thread>`'s repeated-current-query
+/// claim has been established from a `KaniCurrentThreadObservation` that has
+/// itself demonstrated current-thread handle stability.
+pub struct RustStdThreadToken(());
+
+impl ProofToken for RustStdThreadToken {
+    type Proposition = RustStdStandard<Thread>;
+}
+
+impl Establish<KaniCurrentThreadObservation, KaniVerifier> for RustStdStandard<Thread> {
+    type Token = RustStdThreadToken;
+
+    fn establish(_credential: &KaniCurrentThreadObservation) -> Self::Token {
+        RustStdThreadToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_THREAD_CURRENT_IS_STABLE_ACROSS_REPEATED_CALLS_SRC, {
-        /// `std::thread::current()` doesn't spawn anything — it just
-        /// hands back a handle to the thread already running the
-        /// harness, so two calls report the same name.
+        /// Repeated queries for the already-running current thread identify
+        /// the same thread handle.
+        /// This proof uses the Amenable-owned current-thread observation:
+        /// the direct `std::thread::current()` path reaches the gallery's
+        /// unsupported `pthread_key_create` TLS boundary before the small
+        /// stability claim can be checked. The claim is established through
+        /// `Establish<KaniCurrentThreadObservation, KaniVerifier> for
+        /// RustStdStandard<Thread>` from the observation instance that
+        /// actually demonstrated handle stability, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_thread_current_is_stable_across_repeated_calls() {
-            let first = std::thread::current();
-            let second = std::thread::current();
-            assert_eq!(first.name(), second.name());
+            let observation = crate::KaniCurrentThreadObservation::current();
+            assert!(
+                observation.handle_is_stable(),
+                "the current thread handle should stay stable across repeated queries"
+            );
+
+            let _token = RustStdStandard::<Thread>::establish(&observation);
         }
     }
 }
@@ -128,15 +155,44 @@ bridge_kani_witness!(RustStdStandard<ThreadId>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ThreadId>`'s repeated-current-id
+/// claim has been established from a `KaniCurrentThreadObservation` that has
+/// itself demonstrated current-thread id stability.
+pub struct RustStdThreadIdToken(());
+
+impl ProofToken for RustStdThreadIdToken {
+    type Proposition = RustStdStandard<ThreadId>;
+}
+
+impl Establish<KaniCurrentThreadObservation, KaniVerifier> for RustStdStandard<ThreadId> {
+    type Token = RustStdThreadIdToken;
+
+    fn establish(_credential: &KaniCurrentThreadObservation) -> Self::Token {
+        RustStdThreadIdToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_THREAD_ID_IS_STABLE_ACROSS_REPEATED_CALLS_SRC, {
-        /// The current thread's id, queried twice without spawning
-        /// anything in between, compares equal both ways.
+        /// Repeated queries for the already-running current thread id stay
+        /// stable.
+        /// This proof uses the same Amenable-owned current-thread
+        /// observation as `Thread`: the direct `std::thread::current().id()`
+        /// path reaches the gallery's unsupported `pthread_key_create` TLS
+        /// boundary before the claim can be checked. The claim is
+        /// established through `Establish<KaniCurrentThreadObservation,
+        /// KaniVerifier> for RustStdStandard<ThreadId>` from the observation
+        /// instance that actually demonstrated id stability, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_thread_id_is_stable_across_repeated_calls() {
-            let first = std::thread::current().id();
-            let second = std::thread::current().id();
-            assert_eq!(first, second);
+            let observation = crate::KaniCurrentThreadObservation::current();
+            assert!(
+                observation.id_is_stable(),
+                "the current thread id should stay stable across repeated queries"
+            );
+
+            let _token = RustStdStandard::<ThreadId>::establish(&observation);
         }
     }
 }

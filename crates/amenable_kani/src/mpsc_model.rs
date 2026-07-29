@@ -9,10 +9,12 @@
 //! followed by `recv` on a freshly created unbounded channel, with no actual
 //! blocking) times out under Kani's native harness timeout -- this is a pure
 //! in-memory implementation cost, not a foreign-boundary or unwinding-bound
-//! issue like several other proof families in this crate. `recv_timeout` (and
-//! anything else that computes a deadline) additionally reaches the same
-//! `clock_gettime` foreign boundary already documented for `Condvar`, and
-//! remains on the direct path rather than being modeled here.
+//! issue like several other proof families in this crate. Arbitrary
+//! `recv_timeout` deadlines additionally reach the same `clock_gettime`
+//! foreign boundary already documented for `Condvar`; this model therefore
+//! only captures the smallest timed-receive law we currently need:
+//! `recv_timeout(Duration::ZERO)` distinguishes an open-but-empty channel
+//! (`Timeout`) from a disconnected one (`Disconnected`).
 //!
 //! The direct `std::sync::mpsc` path remains preserved in the proof gallery as
 //! a timeout false trail. Production proofs that use this model are therefore
@@ -40,6 +42,15 @@ pub enum KaniSendError<T> {
 pub enum KaniRecvError {
     /// The channel is open but has no buffered value yet.
     Empty,
+    /// The channel is empty and the paired sender has been dropped.
+    Disconnected,
+}
+
+/// Modeled error for a zero-duration timed receive.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KaniRecvTimeoutError {
+    /// The channel is open but has no buffered value yet.
+    Timeout,
     /// The channel is empty and the paired sender has been dropped.
     Disconnected,
 }
@@ -199,6 +210,26 @@ impl<T> KaniChannel<T> {
             Err(KaniRecvError::Empty)
         } else {
             Err(KaniRecvError::Disconnected)
+        }
+    }
+
+    /// Model `recv_timeout(Duration::ZERO)`: because the timeout has already
+    /// expired, the only observable distinction is whether the empty channel
+    /// is still open (`Timeout`) or disconnected.
+    ///
+    /// # Errors
+    ///
+    /// Returns `KaniRecvTimeoutError::Timeout` if the queue is empty and the
+    /// sender is still open, or `KaniRecvTimeoutError::Disconnected` if the
+    /// queue is empty and the sender has been dropped.
+    pub fn recv_timeout_zero(&mut self) -> Result<T, KaniRecvTimeoutError> {
+        if let Some(value) = self.pop_front() {
+            return Ok(value);
+        }
+        if self.sender_open {
+            Err(KaniRecvTimeoutError::Timeout)
+        } else {
+            Err(KaniRecvTimeoutError::Disconnected)
         }
     }
 

@@ -32,6 +32,7 @@ mod linked_list_extract_model;
 mod mpsc_model;
 mod pipe_model;
 mod registry;
+mod runtime_model;
 mod rust_std;
 mod slice_split_model;
 mod stoplight;
@@ -61,12 +62,13 @@ pub use io_model::{
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
-pub use mpsc_model::{KaniChannel, KaniRecvError, KaniSendError};
+pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
     KaniProof, KaniProofRegistration,
 };
+pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::CheckedProof;
 pub use slice_split_model::{KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{
