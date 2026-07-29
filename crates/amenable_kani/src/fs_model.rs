@@ -235,9 +235,38 @@ impl KaniRecursiveDirObservation {
 }
 
 /// Observable result of reading one created entry from a directory.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that a directory entry
+/// yielded for a created file reports that file's own name and full path
+/// exactly, and nothing else about the real OS-backed directory listing --
+/// is named explicitly as a `Standard` rather than left as prose: the
+/// direct `std::fs` path crosses OS-backed state Kani cannot symbolically
+/// execute well (see this module's own doc comment), so this bounded
+/// observation is what the `DirEntry` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(
+    basis = "Self",
+    basis_ctor = "Self::new(KaniFsPath::root(), KaniFsLabel::new('f'))"
+)]
 pub struct KaniDirEntryObservation {
     entry: KaniFsDirEntry,
+}
+
+impl Provenance for KaniDirEntryObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "a directory entry yielded for a created file reports that file's own name and full path exactly, standing in for the real OS-backed directory listing",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("entry_path", format!("{:?}", self.entry.path())),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniDirEntryObservation {

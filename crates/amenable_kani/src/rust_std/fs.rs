@@ -15,7 +15,9 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
-use crate::{KaniCreateNewObservation, KaniRecursiveDirObservation, KaniVerifier};
+use crate::{
+    KaniCreateNewObservation, KaniDirEntryObservation, KaniRecursiveDirObservation, KaniVerifier,
+};
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
     type SupportingEvidence = Self;
@@ -126,22 +128,46 @@ bridge_kani_witness!(RustStdStandard<DirEntry>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<DirEntry>`'s name/path
+/// reporting claim has been established from a `KaniDirEntryObservation`
+/// that has itself demonstrated entry identity is preserved exactly.
+pub struct RustStdDirEntryToken(());
+
+impl ProofToken for RustStdDirEntryToken {
+    type Proposition = RustStdStandard<DirEntry>;
+}
+
+impl Establish<KaniDirEntryObservation, KaniVerifier> for RustStdStandard<DirEntry> {
+    type Token = RustStdDirEntryToken;
+
+    fn establish(_credential: &KaniDirEntryObservation) -> Self::Token {
+        RustStdDirEntryToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_DIR_ENTRY_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC, {
         /// A `DirEntry` yielded for a created file reports that file's
         /// own name and full path.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `read_dir` / `DirEntry` path preserves entry identity this way, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniDirEntryObservation, KaniVerifier> for
+        /// RustStdStandard<DirEntry>` from the observation instance that
+        /// actually demonstrated that identity, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_dir_entry_reports_the_created_files_name_and_path() {
             let base = crate::KaniFsPath::root().join(crate::KaniFsLabel::new('b'));
             let path = base.join(crate::KaniFsLabel::new('f'));
-            let entry = crate::KaniDirEntryObservation::new(base, crate::KaniFsLabel::new('f'))
-                .entry();
+            let observation =
+                crate::KaniDirEntryObservation::new(base, crate::KaniFsLabel::new('f'));
+            let entry = observation.entry();
 
             assert_eq!(entry.file_name(), Some(crate::KaniFsLabel::new('f')));
             assert_eq!(entry.path(), path);
+
+            let _token = RustStdStandard::<DirEntry>::establish(&observation);
         }
     }
 }
