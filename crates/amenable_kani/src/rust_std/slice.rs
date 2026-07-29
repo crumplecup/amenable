@@ -15,12 +15,13 @@ use std::slice::{
     SplitInclusiveMut, SplitMut, SplitNMut, Windows,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniSplitObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -627,13 +628,36 @@ bridge_kani_witness!(RustStdStandard<std::slice::Split<'static, i32, fn(&i32) ->
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Split<'static, i32, ...>>`'s
+/// subslices-between-matches claim has been established from a
+/// `KaniSplitObservation<i32>` that has itself demonstrated the split.
+pub struct RustStdSplitToken(());
+
+impl ProofToken for RustStdSplitToken {
+    type Proposition = RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+    for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdSplitToken;
+
+    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+        RustStdSplitToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_YIELDS_SUBSLICES_BETWEEN_MATCHES_SRC, {
         /// `split` on a predicate yields the subslices between matches,
         /// consuming the matched element itself.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `split` path refines this one-delimiter observation, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<Split<...>>` from the observation instance that
+        /// actually demonstrated the split, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_split_yields_subslices_between_matches() {
             let a: i32 = kani::any();
@@ -644,6 +668,10 @@ amenable_derive::harness! {
 
             assert_eq!(pieces.0, [a]);
             assert_eq!(pieces.1, [b]);
+
+            let _token = RustStdStandard::<
+                std::slice::Split<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
