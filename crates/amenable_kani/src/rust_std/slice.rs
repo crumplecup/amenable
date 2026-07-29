@@ -858,13 +858,37 @@ bridge_kani_witness!(RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) ->
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SplitInclusiveMut<'static,
+/// i32, ...>>`'s inclusive-boundary claim has been established from a
+/// `KaniSplitObservation<i32>` that has itself demonstrated the piece
+/// lengths.
+pub struct RustStdSplitInclusiveMutToken(());
+
+impl ProofToken for RustStdSplitInclusiveMutToken {
+    type Proposition = RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+    for RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdSplitInclusiveMutToken;
+
+    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+        RustStdSplitInclusiveMutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_INCLUSIVE_MUT_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC, {
         /// Same inclusive-boundary rule as `SplitInclusive`, checked
         /// via the resulting piece's length on the mutable variant.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `split_inclusive_mut` path refines this one-delimiter
-        /// observation, the Rust-facing claim follows.
+        /// observation, the Rust-facing claim follows. The claim is
+        /// established through `Establish<KaniSplitObservation<i32>,
+        /// KaniVerifier> for RustStdStandard<SplitInclusiveMut<...>>` from
+        /// the observation instance that actually demonstrated the piece
+        /// lengths, rather than asserted independently of it.
         #[kani::proof]
         fn verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece() {
             let a: i32 = kani::any();
@@ -875,6 +899,10 @@ amenable_derive::harness! {
 
             assert_eq!(pieces.0.len(), 2, "the first piece includes the matched element");
             assert_eq!(pieces.1.len(), 1);
+
+            let _token = RustStdStandard::<
+                SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
