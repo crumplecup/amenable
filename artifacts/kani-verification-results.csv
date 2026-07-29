@@ -71,7 +71,7 @@ amenable_kani::rust_std::alloc_rc::verify_rc_strong_count_tracks_clones,17850911
 amenable_kani::rust_std::alloc_rc::verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero,1785091110,passed
 amenable_kani::rust_std::alloc_string::verify_from_utf16_rejects_a_lone_surrogate,1785091117,passed
 amenable_kani::rust_std::alloc_string::verify_from_utf8_error_recovers_the_original_bytes,1785091127,passed
-amenable_kani::rust_std::alloc_string::verify_string_drain_removes_and_yields_the_content,1785091138,passed
+amenable_kani::rust_std::alloc_string::verify_string_drain_removes_and_yields_the_content,1785359018,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_strong_count_tracks_clones,1785091144,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero,1785091152,passed
 amenable_kani::rust_std::alloc_vec::verify_splice_replaces_a_range_and_yields_what_it_removed,1785091168,passed

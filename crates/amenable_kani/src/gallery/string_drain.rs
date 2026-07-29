@@ -71,3 +71,69 @@ amenable_derive::harness! {
         }
     }
 }
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
+            harness: "gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "symbolic utf8 drain observation still times out after replacing the std iterator".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, SYMBOLIC_UTF8_OBSERVATION_TIMES_OUT_SRC, {
+        /// Replacing the native `String::drain(..)` iterator with an
+        /// Amenable-owned observation is not sufficient on its own: asking
+        /// Kani to quantify that observation over symbolic UTF-8 strings still
+        /// expands into enough symbolic string machinery to time out. The
+        /// production proof therefore works from the smaller
+        /// `KaniUtf8Buffer<2>` witness instead.
+        #[kani::proof]
+        fn symbolic_utf8_observation_times_out() {
+            fn assert_full_drain(source: crate::KaniUtf8String) {
+                let expected = source.clone();
+                let bytes = source.into_bytes();
+                let len = bytes.len();
+                let mut bounded = [0u8; 2];
+                if len >= 1 {
+                    bounded[0] = bytes[0];
+                }
+                if len >= 2 {
+                    bounded[1] = bytes[1];
+                }
+
+                let buffer = crate::KaniUtf8Buffer::<2>::new(bounded, len)
+                    .expect("symbolic utf8 compose always yields a bounded valid buffer");
+                let observation = crate::KaniStringDrainObservation::new(buffer);
+                let yielded = observation.yielded_bytes();
+
+                assert_eq!(
+                    yielded.len(),
+                    len,
+                    "drain yields a slice with the source byte length"
+                );
+                if len >= 1 {
+                    assert_eq!(yielded[0], expected.as_bytes()[0], "drain preserves the first byte");
+                }
+                if len >= 2 {
+                    assert_eq!(yielded[1], expected.as_bytes()[1], "drain preserves the second byte");
+                }
+                assert_eq!(
+                    observation.source_len_after_drain(),
+                    0,
+                    "drain leaves the source length at zero"
+                );
+                assert!(observation.source_is_empty(), "drain leaves the source empty");
+            }
+
+            assert_full_drain(<crate::KaniUtf8String as crate::KaniCompose>::kani_depth0());
+            assert_full_drain(<crate::KaniUtf8String as crate::KaniCompose>::kani_depth1());
+            assert_full_drain(<crate::KaniUtf8String as crate::KaniCompose>::kani_depth2());
+        }
+    }
+}
