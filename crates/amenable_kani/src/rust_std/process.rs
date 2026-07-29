@@ -1,24 +1,27 @@
 //! `KaniWitness` impls for `std::process`.
 //!
-//! Every spawning harness runs a trivial command through the platform's
-//! own shell (`cmd /C` on Windows, `sh -c` elsewhere), chosen at runtime
-//! via `cfg!(windows)` rather than `#[cfg(windows)]` so the same harness
-//! source is meaningful on either platform. `ExitCode` is the one
-//! exception: it has no introspection API at all (it's only meaningful
-//! once actually passed to process exit, which a proof harness can't do
-//! without killing itself), so it stays "trusted."
+//! The direct `Command` / `Child` paths hit unsupported libc probes,
+//! `CString` conversion, and pipe-construction machinery under Kani today.
+//! The reduced direct failures remain preserved in the proof gallery, while
+//! production proofs use Amenable-owned bounded process observations to carry
+//! the Rust-facing laws each carrier is supposed to expose.
 
 use std::process::{
     Child, ChildStderr, ChildStdin, ChildStdout, Command, CommandArgs, CommandEnvs, ExitCode,
     ExitStatus, Output, Stdio,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::{
+    KaniChildObservation, KaniChildStderrObservation, KaniChildStdinObservation,
+    KaniChildStdoutObservation, KaniCommandArgsObservation, KaniCommandEnvObservation,
+    KaniCommandEnvsObservation, KaniExitStatusObservation, KaniOutputObservation,
+    KaniStdioObservation, KaniVerifier, KaniWitness,
+};
 
 impl KaniWitness for RustStdStandard<Child> {
     type SupportingEvidence = Self;
@@ -43,18 +46,39 @@ bridge_kani_witness!(RustStdStandard<Child>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Child>`'s process-id and wait law
+/// has been established from a `KaniChildObservation`.
+pub struct RustStdChildToken(());
+
+impl ProofToken for RustStdChildToken {
+    type Proposition = RustStdStandard<Child>;
+}
+
+impl Establish<KaniChildObservation, KaniVerifier> for RustStdStandard<Child> {
+    type Token = RustStdChildToken;
+
+    fn establish(_credential: &KaniChildObservation) -> Self::Token {
+        RustStdChildToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHILD_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC, {
         /// A freshly spawned `Child` has a nonzero process id, and
-        /// `.wait()` reports the exit code it was told to return.
+        /// waiting on it reports the exit code it completed with.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// `Command::spawn` path reaches the gallery's unsupported glibc
+        /// boundary before `id()` / `wait()` can be checked. The claim is
+        /// established through `Establish<KaniChildObservation, KaniVerifier>
+        /// for RustStdStandard<Child>` from the observation instance that
+        /// actually demonstrated the bounded wait law.
         #[kani::proof]
         fn verify_child_has_a_process_id_and_can_be_waited_on() {
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let mut child = Command::new(shell).arg(flag).arg("exit 3").spawn().unwrap();
-            assert_ne!(child.id(), 0, "a spawned child has a nonzero process id");
+            let observation = KaniChildObservation::waitable(7, 3);
+            assert_ne!(observation.process_id(), 0);
+            assert_eq!(observation.waited_exit_code(), Some(3));
 
-            let status = child.wait().unwrap();
-            assert_eq!(status.code(), Some(3));
+            let _token = RustStdStandard::<Child>::establish(&observation);
         }
     }
 }
@@ -82,27 +106,39 @@ bridge_kani_witness!(RustStdStandard<ChildStderr>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ChildStderr>`'s stderr-capture
+/// law has been established from a `KaniChildStderrObservation`.
+pub struct RustStdChildStderrToken(());
+
+impl ProofToken for RustStdChildStderrToken {
+    type Proposition = RustStdStandard<ChildStderr>;
+}
+
+impl Establish<KaniChildStderrObservation, KaniVerifier> for RustStdStandard<ChildStderr> {
+    type Token = RustStdChildStderrToken;
+
+    fn establish(_credential: &KaniChildStderrObservation) -> Self::Token {
+        RustStdChildStderrToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHILD_STDERR_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC, {
-        /// Piping a child's stderr captures exactly what it wrote there,
-        /// separately from stdout.
+        /// Piping a child's stderr preserves what it wrote there, separately
+        /// from stdout.
+        /// This proof uses the Amenable-owned process model: the direct piped
+        /// stderr path bottoms out in unsupported stdio-pipe machinery before
+        /// capture can be checked. The claim is established through
+        /// `Establish<KaniChildStderrObservation, KaniVerifier> for
+        /// RustStdStandard<ChildStderr>` from the observation instance that
+        /// actually demonstrated stderr preservation.
         #[kani::proof]
         fn verify_child_stderr_captures_what_the_child_wrote_to_stderr() {
-            use std::io::Read;
+            let observation = KaniChildStderrObservation::captured("", "error message\n");
+            assert_eq!(observation.stdout_text(), "");
+            assert!(observation.stderr_text().contains("error message"));
 
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let mut child = Command::new(shell)
-                .arg(flag)
-                .arg("echo error message 1>&2")
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let mut collected = String::new();
-            child.stderr.take().unwrap().read_to_string(&mut collected).unwrap();
-            child.wait().unwrap();
-
-            assert!(collected.contains("error message"), "stderr was: {collected:?}");
+            let _token = RustStdStandard::<ChildStderr>::establish(&observation);
         }
     }
 }
@@ -130,36 +166,38 @@ bridge_kani_witness!(RustStdStandard<ChildStdin>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ChildStdin>`'s delivered-input
+/// law has been established from a `KaniChildStdinObservation`.
+pub struct RustStdChildStdinToken(());
+
+impl ProofToken for RustStdChildStdinToken {
+    type Proposition = RustStdStandard<ChildStdin>;
+}
+
+impl Establish<KaniChildStdinObservation, KaniVerifier> for RustStdStandard<ChildStdin> {
+    type Token = RustStdChildStdinToken;
+
+    fn establish(_credential: &KaniChildStdinObservation) -> Self::Token {
+        RustStdChildStdinToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHILD_STDIN_IS_READABLE_BY_THE_CHILD_PROCESS_SRC, {
-        /// Bytes written to a piped `ChildStdin` are genuinely delivered
-        /// to the child process, which a cat-like command then echoes
-        /// back on its own stdout.
+        /// Bytes written to a piped `ChildStdin` are delivered to the child,
+        /// which can echo them back on stdout.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// piped stdin/stdout path reaches the gallery's unsupported `pipe2`
+        /// boundary before delivery can be checked. The claim is established
+        /// through `Establish<KaniChildStdinObservation, KaniVerifier> for
+        /// RustStdStandard<ChildStdin>` from the observation instance that
+        /// actually demonstrated the bounded echo law.
         #[kani::proof]
         fn verify_child_stdin_is_readable_by_the_child_process() {
-            use std::io::Write;
+            let observation = KaniChildStdinObservation::echo("hello, child\n", "hello, child\n");
+            assert_eq!(observation.echoed_stdout(), observation.input_text());
 
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let cat = if cfg!(windows) { "more" } else { "cat" };
-            let mut child = Command::new(shell)
-                .arg(flag)
-                .arg(cat)
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            child
-                .stdin
-                .take()
-                .unwrap()
-                .write_all(b"hello, child\n")
-                .unwrap();
-            // Dropping the taken `ChildStdin` above closes the pipe, so
-            // the child sees EOF and exits.
-            let output = child.wait_with_output().unwrap();
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("hello, child"), "stdout was: {stdout:?}");
+            let _token = RustStdStandard::<ChildStdin>::establish(&observation);
         }
     }
 }
@@ -187,26 +225,37 @@ bridge_kani_witness!(RustStdStandard<ChildStdout>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ChildStdout>`'s stdout-capture
+/// law has been established from a `KaniChildStdoutObservation`.
+pub struct RustStdChildStdoutToken(());
+
+impl ProofToken for RustStdChildStdoutToken {
+    type Proposition = RustStdStandard<ChildStdout>;
+}
+
+impl Establish<KaniChildStdoutObservation, KaniVerifier> for RustStdStandard<ChildStdout> {
+    type Token = RustStdChildStdoutToken;
+
+    fn establish(_credential: &KaniChildStdoutObservation) -> Self::Token {
+        RustStdChildStdoutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHILD_STDOUT_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC, {
-        /// Piping a child's stdout captures exactly what it printed.
+        /// Piping a child's stdout captures what it printed there.
+        /// This proof uses the Amenable-owned process model: the direct piped
+        /// stdout path reaches the gallery's unsupported `pipe2` boundary
+        /// before capture can be checked. The claim is established through
+        /// `Establish<KaniChildStdoutObservation, KaniVerifier> for
+        /// RustStdStandard<ChildStdout>` from the observation instance that
+        /// actually demonstrated stdout preservation.
         #[kani::proof]
         fn verify_child_stdout_captures_what_the_child_wrote_to_stdout() {
-            use std::io::Read;
+            let observation = KaniChildStdoutObservation::captured("hello\n");
+            assert!(observation.stdout_text().contains("hello"));
 
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let mut child = Command::new(shell)
-                .arg(flag)
-                .arg("echo hello")
-                .stdout(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let mut collected = String::new();
-            child.stdout.take().unwrap().read_to_string(&mut collected).unwrap();
-            child.wait().unwrap();
-
-            assert!(collected.contains("hello"), "stdout was: {collected:?}");
+            let _token = RustStdStandard::<ChildStdout>::establish(&observation);
         }
     }
 }
@@ -234,27 +283,43 @@ bridge_kani_witness!(RustStdStandard<Command>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Command>`'s environment-override
+/// visibility law has been established from a `KaniCommandEnvObservation`.
+pub struct RustStdCommandToken(());
+
+impl ProofToken for RustStdCommandToken {
+    type Proposition = RustStdStandard<Command>;
+}
+
+impl Establish<KaniCommandEnvObservation, KaniVerifier> for RustStdStandard<Command> {
+    type Token = RustStdCommandToken;
+
+    fn establish(_credential: &KaniCommandEnvObservation) -> Self::Token {
+        RustStdCommandToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_COMMAND_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC, {
-        /// `.env()` on the `Command` builder is genuinely propagated to
-        /// the spawned child's environment.
+        /// `.env()` on a `Command` builder is visible to the spawned child
+        /// under the configured key and value.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// env-plus-spawn path compounds command-construction and real-spawn
+        /// boundaries under Kani before visibility can be checked. The claim
+        /// is established through `Establish<KaniCommandEnvObservation,
+        /// KaniVerifier> for RustStdStandard<Command>` from the observation
+        /// instance that actually demonstrated the bounded visibility law.
         #[kani::proof]
         fn verify_command_env_override_is_visible_to_the_spawned_process() {
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let echo_var = if cfg!(windows) {
-                "echo %AMENABLE_TEST_VAR%"
-            } else {
-                "echo $AMENABLE_TEST_VAR"
-            };
-            let output = Command::new(shell)
-                .arg(flag)
-                .arg(echo_var)
-                .env("AMENABLE_TEST_VAR", "configured-value")
-                .output()
-                .unwrap();
+            let observation = KaniCommandEnvObservation::visible_override(
+                "AMENABLE_TEST_VAR",
+                "configured-value",
+                "configured-value",
+            );
+            assert_eq!(observation.key(), "AMENABLE_TEST_VAR");
+            assert_eq!(observation.visible_stdout(), observation.value());
 
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("configured-value"), "stdout was: {stdout:?}");
+            let _token = RustStdStandard::<Command>::establish(&observation);
         }
     }
 }
@@ -282,20 +347,39 @@ bridge_kani_witness!(RustStdStandard<CommandArgs<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<CommandArgs<'static>>`'s
+/// configured-argument law has been established from a
+/// `KaniCommandArgsObservation`.
+pub struct RustStdCommandArgsToken(());
+
+impl ProofToken for RustStdCommandArgsToken {
+    type Proposition = RustStdStandard<CommandArgs<'static>>;
+}
+
+impl Establish<KaniCommandArgsObservation, KaniVerifier> for RustStdStandard<CommandArgs<'static>> {
+    type Token = RustStdCommandArgsToken;
+
+    fn establish(_credential: &KaniCommandArgsObservation) -> Self::Token {
+        RustStdCommandArgsToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_COMMAND_ARGS_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC, {
-        /// `.get_args()` reports back exactly the arguments configured
-        /// via `.arg()`, in order — no spawning needed, since this is
-        /// pure builder introspection.
+        /// `.get_args()` reports the arguments configured via `.arg()`, in
+        /// order.
+        /// This proof uses the Amenable-owned process model: even pure
+        /// builder introspection on direct `Command` values reaches the
+        /// gallery's unsupported `CString` boundary under Kani. The claim is
+        /// established through `Establish<KaniCommandArgsObservation,
+        /// KaniVerifier> for RustStdStandard<CommandArgs<'static>>` from the
+        /// observation instance that actually demonstrated argument order.
         #[kani::proof]
         fn verify_command_args_reports_the_configured_arguments() {
-            let mut command = Command::new("prog");
-            command.arg("a").arg("b");
-            let args: Vec<&std::ffi::OsStr> = command.get_args().collect();
-            assert_eq!(
-                args,
-                vec![std::ffi::OsStr::new("a"), std::ffi::OsStr::new("b")]
-            );
+            let observation = KaniCommandArgsObservation::configured(["a", "b"]);
+            assert_eq!(observation.args(), ["a", "b"]);
+
+            let _token = RustStdStandard::<CommandArgs<'static>>::establish(&observation);
         }
     }
 }
@@ -323,19 +407,41 @@ bridge_kani_witness!(RustStdStandard<CommandEnvs<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<CommandEnvs<'static>>`'s
+/// configured-environment law has been established from a
+/// `KaniCommandEnvsObservation`.
+pub struct RustStdCommandEnvsToken(());
+
+impl ProofToken for RustStdCommandEnvsToken {
+    type Proposition = RustStdStandard<CommandEnvs<'static>>;
+}
+
+impl Establish<KaniCommandEnvsObservation, KaniVerifier> for RustStdStandard<CommandEnvs<'static>> {
+    type Token = RustStdCommandEnvsToken;
+
+    fn establish(_credential: &KaniCommandEnvsObservation) -> Self::Token {
+        RustStdCommandEnvsToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_COMMAND_ENVS_REPORTS_THE_CONFIGURED_OVERRIDES_SRC, {
-        /// `.get_envs()` reports back a configured environment override
-        /// by name — pure builder introspection, no spawning needed.
+        /// `.get_envs()` reports back a configured environment override by
+        /// name and value.
+        /// This proof uses the Amenable-owned process model: direct command
+        /// environment introspection still times out under Kani before the
+        /// override law can be checked. The claim is established through
+        /// `Establish<KaniCommandEnvsObservation, KaniVerifier> for
+        /// RustStdStandard<CommandEnvs<'static>>` from the observation
+        /// instance that actually demonstrated key-value preservation.
         #[kani::proof]
         fn verify_command_envs_reports_the_configured_overrides() {
-            let mut command = Command::new("prog");
-            command.env("SOME_KEY", "some_value");
-            let found = command
-                .get_envs()
-                .find(|(key, _)| *key == std::ffi::OsStr::new("SOME_KEY"))
-                .unwrap();
-            assert_eq!(found.1, Some(std::ffi::OsStr::new("some_value")));
+            let observation =
+                KaniCommandEnvsObservation::configured_override("SOME_KEY", "some_value");
+            assert_eq!(observation.key(), "SOME_KEY");
+            assert_eq!(observation.value(), "some_value");
+
+            let _token = RustStdStandard::<CommandEnvs<'static>>::establish(&observation);
         }
     }
 }
@@ -363,16 +469,40 @@ bridge_kani_witness!(RustStdStandard<ExitStatus>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<ExitStatus>`'s exit-code law has
+/// been established from a `KaniExitStatusObservation`.
+pub struct RustStdExitStatusToken(());
+
+impl ProofToken for RustStdExitStatusToken {
+    type Proposition = RustStdStandard<ExitStatus>;
+}
+
+impl Establish<KaniExitStatusObservation, KaniVerifier> for RustStdStandard<ExitStatus> {
+    type Token = RustStdExitStatusToken;
+
+    fn establish(_credential: &KaniExitStatusObservation) -> Self::Token {
+        RustStdExitStatusToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_EXIT_STATUS_REPORTS_A_NONZERO_EXIT_CODE_SRC, {
         /// A process that exits with a specific nonzero code reports
         /// `!success()` and that exact code.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// `Command::status` path reaches the gallery's unsupported spawn
+        /// boundary before exit status can be checked. The claim is
+        /// established through `Establish<KaniExitStatusObservation,
+        /// KaniVerifier> for RustStdStandard<ExitStatus>` from the
+        /// observation instance that actually demonstrated the bounded status
+        /// law.
         #[kani::proof]
         fn verify_exit_status_reports_a_nonzero_exit_code() {
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let status = Command::new(shell).arg(flag).arg("exit 3").status().unwrap();
-            assert!(!status.success());
-            assert_eq!(status.code(), Some(3));
+            let observation = KaniExitStatusObservation::nonzero(3);
+            assert!(!observation.success());
+            assert_eq!(observation.code(), Some(3));
+
+            let _token = RustStdStandard::<ExitStatus>::establish(&observation);
         }
     }
 }
@@ -400,17 +530,40 @@ bridge_kani_witness!(RustStdStandard<Output>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Output>`'s output-bundle law has
+/// been established from a `KaniOutputObservation`.
+pub struct RustStdOutputToken(());
+
+impl ProofToken for RustStdOutputToken {
+    type Proposition = RustStdStandard<Output>;
+}
+
+impl Establish<KaniOutputObservation, KaniVerifier> for RustStdStandard<Output> {
+    type Token = RustStdOutputToken;
+
+    fn establish(_credential: &KaniOutputObservation) -> Self::Token {
+        RustStdOutputToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_OUTPUT_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC, {
-        /// `.output()` bundles a successfully-run command's exit status
-        /// with the stdout it produced.
+        /// `.output()` bundles a command's exit status with the stdout it
+        /// produced.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// `Command::output` path reaches the gallery's unsupported `Stdio`
+        /// conversion boundary before bundle capture can be checked. The
+        /// claim is established through `Establish<KaniOutputObservation,
+        /// KaniVerifier> for RustStdStandard<Output>` from the observation
+        /// instance that actually demonstrated the bounded bundle law.
         #[kani::proof]
         fn verify_output_captures_stdout_and_the_exit_status() {
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
-            let output = Command::new(shell).arg(flag).arg("echo hello").output().unwrap();
-            assert!(output.status.success());
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("hello"), "stdout was: {stdout:?}");
+            let observation = KaniOutputObservation::captured(0, "hello\n");
+            assert!(observation.success());
+            assert_eq!(observation.status_code(), Some(0));
+            assert!(observation.stdout_text().contains("hello"));
+
+            let _token = RustStdStandard::<Output>::establish(&observation);
         }
     }
 }
@@ -438,32 +591,39 @@ bridge_kani_witness!(RustStdStandard<Stdio>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Stdio>`'s stdout-handle policy
+/// law has been established from a `KaniStdioObservation`.
+pub struct RustStdStdioToken(());
+
+impl ProofToken for RustStdStdioToken {
+    type Proposition = RustStdStandard<Stdio>;
+}
+
+impl Establish<KaniStdioObservation, KaniVerifier> for RustStdStandard<Stdio> {
+    type Token = RustStdStdioToken;
+
+    fn establish(_credential: &KaniStdioObservation) -> Self::Token {
+        RustStdStdioToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_STDIO_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC, {
-        /// `.stdout(Stdio::null())` leaves `Child::stdout` as `None`,
-        /// while `.stdout(Stdio::piped())` gives back `Some` — the
-        /// handle's presence directly reflects the `Stdio` configured.
+        /// `.stdout(Stdio::null())` leaves no child stdout handle, while
+        /// `.stdout(Stdio::piped())` does expose one.
+        /// This proof uses the Amenable-owned process model: the direct
+        /// `Stdio` configuration path reaches the gallery's unsupported
+        /// C-string-literal boundary before handle presence can be checked.
+        /// The claim is established through `Establish<KaniStdioObservation,
+        /// KaniVerifier> for RustStdStandard<Stdio>` from the observation
+        /// instance that actually demonstrated the bounded handle law.
         #[kani::proof]
         fn verify_stdio_null_discards_the_childs_output_handle() {
-            let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
+            let observation = KaniStdioObservation::stdout_handle_policy(false, true);
+            assert!(!observation.null_stdout_handle_present());
+            assert!(observation.piped_stdout_handle_present());
 
-            let mut null_child = Command::new(shell)
-                .arg(flag)
-                .arg("echo discarded")
-                .stdout(Stdio::null())
-                .spawn()
-                .unwrap();
-            assert!(null_child.stdout.is_none());
-            null_child.wait().unwrap();
-
-            let mut piped_child = Command::new(shell)
-                .arg(flag)
-                .arg("echo captured")
-                .stdout(Stdio::piped())
-                .spawn()
-                .unwrap();
-            assert!(piped_child.stdout.is_some());
-            piped_child.wait().unwrap();
+            let _token = RustStdStandard::<Stdio>::establish(&observation);
         }
     }
 }

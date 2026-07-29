@@ -34,6 +34,7 @@ mod mpsc_model;
 mod panic_model;
 mod path_model;
 mod pipe_model;
+mod process_model;
 mod registry;
 mod runtime_model;
 mod rust_std;
@@ -71,6 +72,12 @@ pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendE
 pub use panic_model::{KaniCallerLocationObservation, KaniPanicHookObservation};
 pub use path_model::{KaniPathDisplayObservation, KaniWindowsPrefixObservation};
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
+pub use process_model::{
+    KaniChildObservation, KaniChildStderrObservation, KaniChildStdinObservation,
+    KaniChildStdoutObservation, KaniCommandArgsObservation, KaniCommandEnvObservation,
+    KaniCommandEnvsObservation, KaniExitStatusObservation, KaniOutputObservation,
+    KaniStdioObservation,
+};
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,
     KaniProof, KaniProofRegistration,
