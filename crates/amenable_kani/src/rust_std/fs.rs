@@ -15,7 +15,7 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
-use crate::{KaniCreateNewObservation, KaniVerifier};
+use crate::{KaniCreateNewObservation, KaniRecursiveDirObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
     type SupportingEvidence = Self;
@@ -40,13 +40,35 @@ bridge_kani_witness!(RustStdStandard<DirBuilder>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<DirBuilder>`'s recursive
+/// directory-creation claim has been established from a
+/// `KaniRecursiveDirObservation` that has itself demonstrated the
+/// ancestor-preserving join law.
+pub struct RustStdDirBuilderRecursiveToken(());
+
+impl ProofToken for RustStdDirBuilderRecursiveToken {
+    type Proposition = RustStdStandard<DirBuilder>;
+}
+
+impl Establish<KaniRecursiveDirObservation, KaniVerifier> for RustStdStandard<DirBuilder> {
+    type Token = RustStdDirBuilderRecursiveToken;
+
+    fn establish(_credential: &KaniRecursiveDirObservation) -> Self::Token {
+        RustStdDirBuilderRecursiveToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_DIR_BUILDER_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC, {
         /// `.recursive(true)` creates every missing ancestor directory,
         /// not just the leaf.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `DirBuilder` recursive path refines these directory-creation laws,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniRecursiveDirObservation, KaniVerifier> for
+        /// RustStdStandard<DirBuilder>` from the observation instance that
+        /// actually demonstrated the ancestor-preserving join law, rather
+        /// than asserted independently of it.
         #[kani::proof]
         fn verify_dir_builder_creates_nested_directories_recursively() {
             let base = crate::KaniFsPath::root();
@@ -75,6 +97,8 @@ amenable_derive::harness! {
                     .join(crate::KaniFsLabel::new('c')),
                 "recursive creation preserves the leaf"
             );
+
+            let _token = RustStdStandard::<DirBuilder>::establish(&observation);
         }
     }
 }

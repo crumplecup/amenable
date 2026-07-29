@@ -156,11 +156,43 @@ impl KaniFsDirEntry {
 }
 
 /// Observable result of a recursive directory-creation law.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that recursive
+/// directory creation (`create_dir_all`/`DirBuilder::recursive(true)`)
+/// reaches exactly the ancestors implied by joining path segments in
+/// order, and nothing else about the real OS-backed directory tree -- is
+/// named explicitly as a `Standard` rather than left as prose: the direct
+/// `std::fs` path crosses OS-backed state Kani cannot symbolically execute
+/// well (see this module's own doc comment), so this bounded observation is
+/// what the `DirBuilder` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(
+    basis = "Self",
+    basis_ctor = "Self::new(KaniFsPath::root(), KaniFsLabel::new('a'), KaniFsLabel::new('b'), KaniFsLabel::new('c'))"
+)]
 pub struct KaniRecursiveDirObservation {
     first_ancestor: KaniFsPath,
     second_ancestor: KaniFsPath,
     leaf: KaniFsPath,
+}
+
+impl Provenance for KaniRecursiveDirObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "recursive directory creation reaches exactly the ancestors implied by repeated path-segment joins, standing in for the real OS-backed directory tree",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("first_ancestor", format!("{:?}", self.first_ancestor)),
+            MetadataEntry::new("second_ancestor", format!("{:?}", self.second_ancestor)),
+            MetadataEntry::new("leaf", format!("{:?}", self.leaf)),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniRecursiveDirObservation {
