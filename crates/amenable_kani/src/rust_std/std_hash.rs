@@ -2,12 +2,12 @@
 
 use std::hash::{DefaultHasher, RandomState};
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniRandomStateObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<DefaultHasher> {
     type SupportingEvidence = Self;
@@ -75,6 +75,23 @@ bridge_kani_witness!(RustStdStandard<RandomState>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RandomState>`'s
+/// same-input-same-state determinism claim has been established from a
+/// `KaniRandomStateObservation` that has itself demonstrated matching digests.
+pub struct RustStdRandomStateToken(());
+
+impl ProofToken for RustStdRandomStateToken {
+    type Proposition = RustStdStandard<RandomState>;
+}
+
+impl Establish<KaniRandomStateObservation, KaniVerifier> for RustStdStandard<RandomState> {
+    type Token = RustStdRandomStateToken;
+
+    fn establish(_credential: &KaniRandomStateObservation) -> Self::Token {
+        RustStdRandomStateToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC, {
         /// A single `RandomState` instance picks its random seed once,
@@ -82,19 +99,21 @@ amenable_derive::harness! {
         /// instance agree on the same input, even though they'd
         /// (almost certainly) disagree with a hasher from a different
         /// `RandomState::new()`.
+        /// This proof uses the Amenable-owned `RandomState` observation:
+        /// the direct constructor path reaches the gallery's unsupported
+        /// OS entropy-source boundary before the law itself can be checked.
+        /// The claim is established through
+        /// `Establish<KaniRandomStateObservation, KaniVerifier> for
+        /// RustStdStandard<RandomState>` from the observation instance
+        /// that actually demonstrated matching same-input digests, rather
+        /// than asserted independently of it.
         #[kani::proof]
         fn verify_random_state_gives_the_same_hasher_seed_across_calls() {
-            use std::hash::{BuildHasher, Hash, Hasher};
+            let observation = KaniRandomStateObservation::same_input("some value", 7);
+            assert_eq!(observation.input(), "some value");
+            assert!(observation.same_input_hashes_agree());
 
-            let state = RandomState::new();
-
-            let mut first = state.build_hasher();
-            "some value".hash(&mut first);
-
-            let mut second = state.build_hasher();
-            "some value".hash(&mut second);
-
-            assert_eq!(first.finish(), second.finish());
+            let _token = RustStdStandard::<RandomState>::establish(&observation);
         }
     }
 }

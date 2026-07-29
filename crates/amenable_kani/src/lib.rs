@@ -27,6 +27,7 @@ mod fd_model;
 mod fmt_model;
 mod fs_model;
 mod gallery;
+mod hash_model;
 mod io_model;
 mod linked_list_extract_model;
 mod mpsc_model;
@@ -58,6 +59,7 @@ pub use fs_model::{
     KaniLockObservation, KaniPermissionsObservation, KaniReadDirObservation,
     KaniRecursiveDirObservation,
 };
+pub use hash_model::KaniRandomStateObservation;
 pub use io_model::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,

@@ -599,12 +599,13 @@ amenable_derive::harness! {
         /// This is the reduced form behind the `RandomState` review: the
         /// per-instance determinism claim itself is reasonable (two
         /// hashers built from the *same* instance should agree), but
-        /// `RandomState::new()` reaches foreign functions Kani reports as
-        /// unsupported (`strlen`, `OwnedFd::drop`'s `close`) before the
-        /// claim can be established -- consistent with reading a process
-        /// entropy source (e.g. `/dev/urandom` or `getrandom`) to pick its
-        /// random per-instance seed, the same class of OS-backed boundary
-        /// as the pipe/fd cases above, not a proof-side deficiency.
+        /// `RandomState::new()` reaches Kani's unsupported OS
+        /// entropy-source boundary before the claim can be established;
+        /// the current reduction bottoms out in `getrandom` via a raw
+        /// `syscall`, consistent with reading process entropy to pick the
+        /// random per-instance seed. That is the same class of OS-backed
+        /// boundary as the pipe/fd cases above, not a proof-side
+        /// deficiency.
         #[kani::proof]
         fn random_state_construction_reaches_an_unsupported_entropy_source_boundary() {
             use std::hash::{BuildHasher, Hash, Hasher};
