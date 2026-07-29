@@ -1323,13 +1323,37 @@ bridge_kani_witness!(RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RSplitNMut<'static, i32,
+/// ...>>`'s cap-from-the-back claim has been established from a
+/// `KaniSplitNObservation<i32>` that has itself demonstrated the piece
+/// lengths.
+pub struct RustStdRSplitNMutToken(());
+
+impl ProofToken for RustStdRSplitNMutToken {
+    type Proposition = RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+    for RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdRSplitNMutToken;
+
+    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+        RustStdRSplitNMutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RSPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC, {
         /// Same cap-from-the-back rule as `RSplitN`, checked via piece
         /// lengths on the mutable variant.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `rsplitn_mut` path refines this two-delimiter observation,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established
+        /// through `Establish<KaniSplitNObservation<i32>, KaniVerifier>
+        /// for RustStdStandard<RSplitNMut<...>>` from the observation
+        /// instance that actually demonstrated the cap, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back() {
             let a: i32 = kani::any();
@@ -1345,6 +1369,10 @@ amenable_derive::harness! {
                 [a, 0, b],
                 "the cap leaves the first delimiter unsplit in the last piece"
             );
+
+            let _token = RustStdStandard::<
+                RSplitNMut<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
