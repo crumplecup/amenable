@@ -16,7 +16,8 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
-    KaniCreateNewObservation, KaniDirEntryObservation, KaniRecursiveDirObservation, KaniVerifier,
+    KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
+    KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -195,13 +196,34 @@ bridge_kani_witness!(RustStdStandard<File>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<File>`'s write/read round-trip
+/// claim has been established from a `KaniFileContentObservation` that has
+/// itself demonstrated the byte-preserving round trip.
+pub struct RustStdFileContentToken(());
+
+impl ProofToken for RustStdFileContentToken {
+    type Proposition = RustStdStandard<File>;
+}
+
+impl Establish<KaniFileContentObservation, KaniVerifier> for RustStdStandard<File> {
+    type Token = RustStdFileContentToken;
+
+    fn establish(_credential: &KaniFileContentObservation) -> Self::Token {
+        RustStdFileContentToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_FILE_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC, {
         /// Bytes written to a file and flushed by `Drop` are read back
         /// unchanged through a fresh handle.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `File::write_all` / re-open path preserves written bytes this
-        /// way, the Rust-facing claim follows.
+        /// way, the Rust-facing claim follows. The claim is established
+        /// through `Establish<KaniFileContentObservation, KaniVerifier> for
+        /// RustStdStandard<File>` from the observation instance that
+        /// actually demonstrated the round trip, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_file_write_then_read_round_trips_the_bytes() {
             let bytes: [u8; 4] = kani::any();
@@ -212,6 +234,8 @@ amenable_derive::harness! {
                 bytes,
                 "bytes written to a file are read back unchanged through a fresh handle"
             );
+
+            let _token = RustStdStandard::<File>::establish(&observation);
         }
     }
 }

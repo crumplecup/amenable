@@ -436,9 +436,35 @@ impl Default for KaniFileTypeObservation {
 
 /// Observable result of writing a fixed-width byte sequence to a file and
 /// reading it back through a fresh handle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that bytes written to
+/// a file and flushed by `Drop` are read back unchanged through a fresh
+/// handle, and nothing else about the real OS-backed write/read path -- is
+/// named explicitly as a `Standard` rather than left as prose: the direct
+/// `std::fs` path crosses OS-backed state Kani cannot symbolically execute
+/// well (see this module's own doc comment), so this bounded observation is
+/// what the `File` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(basis = "Self", basis_ctor = "Self::write([0u8; 4])")]
 pub struct KaniFileContentObservation {
     content: [u8; 4],
+}
+
+impl Provenance for KaniFileContentObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "bytes written to a file and flushed by Drop are read back unchanged through a fresh handle, standing in for the real OS-backed write/read path",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("content", format!("{:?}", self.content)),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniFileContentObservation {
