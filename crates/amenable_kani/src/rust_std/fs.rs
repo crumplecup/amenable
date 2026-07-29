@@ -9,12 +9,13 @@ use std::fs::{
     DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniCreateNewObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
     type SupportingEvidence = Self;
@@ -322,13 +323,34 @@ bridge_kani_witness!(RustStdStandard<OpenOptions>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<OpenOptions>`'s `create_new`
+/// existence-check claim has been established from a `KaniCreateNewObservation`
+/// that has itself demonstrated the successful-creation transition.
+pub struct RustStdOpenOptionsCreateNewToken(());
+
+impl ProofToken for RustStdOpenOptionsCreateNewToken {
+    type Proposition = RustStdStandard<OpenOptions>;
+}
+
+impl Establish<KaniCreateNewObservation, KaniVerifier> for RustStdStandard<OpenOptions> {
+    type Token = RustStdOpenOptionsCreateNewToken;
+
+    fn establish(_credential: &KaniCreateNewObservation) -> Self::Token {
+        RustStdOpenOptionsCreateNewToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_OPEN_OPTIONS_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC, {
         /// `.create_new(true)` fails with `AlreadyExists` on a path that
         /// already has a file, and succeeds on a genuinely fresh one.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `OpenOptions::create_new` path preserves this existence check,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniCreateNewObservation, KaniVerifier> for
+        /// RustStdStandard<OpenOptions>` from the observation instance that
+        /// actually demonstrated a successful creation, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_open_options_create_new_rejects_an_existing_file() {
             let mut existing = crate::KaniCreateNewObservation::existing_file();
@@ -352,6 +374,8 @@ amenable_derive::harness! {
                 fresh.is_file(),
                 "a successful create_new leaves a file at the created path"
             );
+
+            let _token = RustStdStandard::<OpenOptions>::establish(&fresh);
         }
     }
 }

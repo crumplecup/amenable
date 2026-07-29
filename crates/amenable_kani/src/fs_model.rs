@@ -5,6 +5,9 @@
 //! laws the production proofs actually claim, starting with recursive
 //! directory creation and directory entry reporting.
 
+use amenable_core::{MetadataEntry, Provenance};
+use amenable_derive::Standard;
+
 const KANI_FS_MAX_DEPTH: usize = 4;
 
 /// Symbolic path-segment label for filesystem proofs.
@@ -442,9 +445,42 @@ impl KaniFileTimesObservation {
 
 /// Observable result of `OpenOptions::create_new` against a path that may
 /// already name a modeled filesystem node.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that `create_new`'s
+/// outcome is fully determined by a ternary prior existence state (missing,
+/// an existing file, or an existing directory), and nothing else about the
+/// real OS-backed path -- is named explicitly as a `Standard` rather than
+/// left as prose: the general filesystem state machine times out under
+/// Kani even for `create_new` alone (see
+/// `gallery::filesystem_observation_granularity`), so this narrower
+/// observation is what production proofs actually rest on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniCreateNewObservation {
     kind: Option<KaniFsNodeKind>,
+}
+
+impl Provenance for KaniCreateNewObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        let prior_kind = match self.kind {
+            None => "missing",
+            Some(KaniFsNodeKind::File) => "existing_file",
+            Some(KaniFsNodeKind::Directory) => "existing_directory",
+        };
+
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "create_new's outcome is determined entirely by a ternary prior existence state, standing in for the real OS-backed existence check",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the general filesystem state machine times out under Kani even for create_new alone -- see gallery::filesystem_observation_granularity",
+            ),
+            MetadataEntry::new("prior_kind", prior_kind),
+        ]
+        .into_iter()
+    }
 }
 
 /// Modeled error for `create_new` against a path that already has a file.
