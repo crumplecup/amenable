@@ -43,26 +43,27 @@ pub trait Establish<C, V: Verifier>: Evidence + Witness<V> + Sized {
 }
 
 /// Lawful proof-bearing exchange from one sidecar state to another.
-pub trait Exchange<Input, Output> {
-    /// Proposition required before the exchange may proceed.
-    type Precondition: Evidence;
-
-    /// Proposition established by a successful exchange.
-    type Postcondition: Evidence;
-
-    /// Concrete proof token required for the precondition.
-    type PreconditionToken: ProofToken<Proposition = Self::Precondition>;
-
-    /// Concrete proof token minted for the postcondition.
-    type PostconditionToken: ProofToken<Proposition = Self::Postcondition>;
-
+///
+/// `Input` and `Output` are each required to be a [`Sidecar`]: a value that
+/// couples an action's payload to its own proof token. That coupling is the
+/// shape amenable to formal verification — an exchange only ever consumes
+/// an input whose precondition is already proven (carried by the input's
+/// own `SidecarToken`, via [`Sidecar::sidecar`]) and only ever produces an
+/// output already bundled with the proof of its postcondition (the
+/// output's own `SidecarToken`). There is no precondition or postcondition
+/// token threaded through `exchange`'s signature separately: both are
+/// exactly `Input::Proposition`/`Input::SidecarToken` and
+/// `Output::Proposition`/`Output::SidecarToken`, so declaring them again
+/// here would just be restating what `Sidecar` already guarantees.
+pub trait Exchange<Input, Output>
+where
+    Input: Sidecar,
+    Output: Sidecar,
+{
     /// Error surface for failed exchanges.
     type Error;
 
-    /// Perform the exchange, consuming the input sidecar and minting a new one.
-    fn exchange(
-        &self,
-        input: Input,
-        proof: Self::PreconditionToken,
-    ) -> Result<(Output, Self::PostconditionToken), Self::Error>;
+    /// Perform the exchange, consuming a proven input sidecar and
+    /// producing a proven output sidecar.
+    fn exchange(&self, input: Input) -> Result<Output, Self::Error>;
 }

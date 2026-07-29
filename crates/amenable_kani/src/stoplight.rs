@@ -8,17 +8,35 @@
 //! workspace — built to discover the bounds and methods an operation
 //! actually needs, not to match a design sketched in advance.
 //!
-//! One thing that discovery surfaced directly: minting a token for a
-//! *state* is not the same problem as proving a *transition*. A
-//! transition has real shape — a model checker can decide whether Yellow
-//! ever reaches Green directly — so `Exchange` earns real `Witness`-backed
-//! proof machinery. A root state carrying no data (`Green`) has nothing
-//! of that shape to falsify; its trust rests entirely on `Provenance`
-//! (asserted, documented, cited), and gating its token behind a Kani
-//! harness would have been proving something that isn't there to prove.
+//! `Exchange` requires both its `Input` and `Output` to implement
+//! [`Sidecar`], and every concrete `Sidecar` value here is an
+//! [`Established`] carrier: a primary payload bundled with the *specific*
+//! proof token that was actually minted for it. `Established::new` is
+//! private, so the only ways to get one are `Established::root()` (the
+//! power-on `Green` case: no computational barrier to cross, nothing to
+//! prove — see `GreenToken::new`'s doc) or `Stoplight::exchange`, which
+//! calls `Establish::establish` on the real credential it was handed and
+//! stores the resulting token rather than re-minting an independent one
+//! later. That's the whole point of holding onto the token instead of
+//! synthesizing a fresh one on every `Sidecar::sidecar()` call: a token
+//! disconnected from a real `establish()` call proves nothing about *this*
+//! transition, only that the token type is constructible in the abstract.
+//!
+//! The `establish()` calls themselves are gated by `Witness`: `Establish<C,
+//! V>: Evidence + Witness<V>` means `impl Establish<Green, KaniVerifier>
+//! for Yellow` cannot exist unless `Yellow: Witness<KaniVerifier>` also
+//! does, so each transition earns a real (if small) Kani harness proving
+//! the `SequentialCycle` invariant it claims — `Green` only ever
+//! transitions to `Yellow`, never skipping to `Red` or looping back to
+//! itself, and so on around the cycle.
 
-use amenable_core::{Exchange, MetadataEntry, ProofToken, Provenance, StateMachine};
+use amenable_core::{
+    Establish, Evidence, Exchange, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
+    Witness,
+};
 use amenable_derive::Standard;
+
+use crate::{CalculationProof, KaniVerifier};
 
 /// The light is green — a root state claim, asserted rather than derived
 /// from a prior transition (see `AMENABLE_PLAN.md`, "States Are Roots,
@@ -40,7 +58,8 @@ impl Provenance for Green {
 
 /// The light is yellow — see [`Green`] for why this is a root claim, not
 /// a derived one, even though in practice a [`Stoplight`] only ever
-/// reaches `Yellow` via a proven `Exchange<Green, Yellow>` transition.
+/// reaches `Yellow` via a proven `Exchange<Established<Green, GreenToken>,
+/// Established<Yellow, YellowToken>>` transition.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
 #[standard(basis = "Self")]
 pub struct Yellow;
@@ -49,7 +68,7 @@ impl Provenance for Yellow {
     fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
         vec![MetadataEntry::new(
             "asserted",
-            "traffic light state, reachable only via Exchange<Green, Yellow>",
+            "traffic light state, reachable only via a proven Green -> Yellow exchange",
         )]
         .into_iter()
     }
@@ -64,7 +83,7 @@ impl Provenance for Red {
     fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
         vec![MetadataEntry::new(
             "asserted",
-            "traffic light state, reachable only via Exchange<Yellow, Red>",
+            "traffic light state, reachable only via a proven Yellow -> Red exchange",
         )]
         .into_iter()
     }
@@ -96,11 +115,24 @@ pub enum Color {
     Red,
 }
 
+/// The single lawful successor for each color in the cycle — what each
+/// transition's Kani harness below actually checks, and the one place the
+/// `SequentialCycle` order lives as executable code rather than only as a
+/// name. `pub` for the same reason `#[calculation]`-generated `*_impl`
+/// functions are: every call site lives inside a `#[cfg(kani)]`-gated
+/// harness body (see `amenable_derive::harness!`'s doc), invisible to an
+/// ordinary build, so a private `next` would be flagged as dead code.
+pub fn next(color: Color) -> Color {
+    match color {
+        Color::Green => Color::Yellow,
+        Color::Yellow => Color::Red,
+        Color::Red => Color::Green,
+    }
+}
+
 /// Governs sequential-cycle traffic light transitions: `Green -> Yellow
-/// -> Red -> Green`, never skipping or reversing a step. Not yet used by
-/// any `StateMachine` method directly — naming it here is what the
-/// `Exchange` impls below collectively prove, one legal transition at a
-/// time.
+/// -> Red -> Green`, never skipping or reversing a step. Proven one edge
+/// at a time by the `Witness` impls backing each `Establish` impl below.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct SequentialCycle;
 
@@ -109,16 +141,51 @@ impl StateMachine for Stoplight {
     type Invariant = SequentialCycle;
 }
 
+/// A primary payload bundled with the specific proof token that was
+/// actually minted for it — the concrete `Sidecar` shape used throughout
+/// this module. `new` is private: the only lawful ways to produce one are
+/// [`Established::root`] (the `Green` power-on case) or `Stoplight`'s
+/// `Exchange` impls, both of which mint the token via a real
+/// `Establish`/`Witness`-gated call rather than handing back an
+/// independently re-minted token disconnected from what happened.
+pub struct Established<T, Token> {
+    primary: T,
+    token: Token,
+}
+
+impl<T, Token> Established<T, Token> {
+    fn new(primary: T, token: Token) -> Self {
+        Self { primary, token }
+    }
+}
+
+impl<T, Token> Sidecar for Established<T, Token>
+where
+    T: Evidence,
+    Token: ProofToken<Proposition = T> + Clone,
+{
+    type Primary = T;
+    type Proposition = T;
+    type SidecarToken = Token;
+
+    fn primary(&self) -> &Self::Primary {
+        &self.primary
+    }
+
+    fn sidecar(&self) -> Self::SidecarToken {
+        self.token.clone()
+    }
+}
+
 /// Lawful token minted once a [`Stoplight`] is confirmed `Green`.
+#[derive(Debug, Clone, Copy)]
 pub struct GreenToken(());
 
 impl GreenToken {
     /// Mint a token asserting the light is `Green` — no computational
     /// barrier to cross. `Green` carries no data, so there is nothing
     /// about it a model checker could falsify beyond what its own
-    /// `Provenance` impl already documents. `Exchange`'s `Witness`-backed
-    /// proof machinery is for transitions, which have real shape a model
-    /// checker has purchase on; a root state is "trusted with
+    /// `Provenance` impl already documents. A root state is "trusted with
     /// provenance," not "trusted because a model checker verified it" —
     /// see `AMENABLE_PLAN.md`, "States Are Roots, Transitions Are
     /// Relations."
@@ -131,64 +198,199 @@ impl ProofToken for GreenToken {
     type Proposition = Green;
 }
 
-/// Lawful token minted once `Exchange<Green, Yellow>` completes.
+impl Established<Green, GreenToken> {
+    /// The root case: the power-on default, asserted rather than reached
+    /// via any transition. See [`GreenToken::new`] for why no `Establish`/
+    /// `Witness` gate applies here.
+    #[must_use]
+    pub fn root() -> Self {
+        Self::new(Green, GreenToken::new(Green))
+    }
+}
+
+/// Lawful token minted once `Yellow` is established from a proven `Green`.
+#[derive(Debug, Clone, Copy)]
 pub struct YellowToken(());
 
 impl ProofToken for YellowToken {
     type Proposition = Yellow;
 }
 
-impl Exchange<Green, Yellow> for Stoplight {
-    type Precondition = Green;
-    type Postcondition = Yellow;
-    type PreconditionToken = GreenToken;
-    type PostconditionToken = YellowToken;
+/// Backs `Establish<Green, KaniVerifier> for Yellow`: without this impl,
+/// that `Establish` impl does not compile, so `Stoplight`'s `Green ->
+/// Yellow` exchange cannot exist until the transition it claims is proven.
+impl Witness<KaniVerifier> for Yellow {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_green_transitions_only_to_yellow".to_owned(),
+            claim: VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC.to_owned(),
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: concat!(module_path!(), "::", stringify!(Yellow)),
+        verifier: "kani",
+        describe: || <Yellow as Witness<KaniVerifier>>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC, {
+        /// `Green`'s only lawful successor in the `SequentialCycle` is
+        /// `Yellow`: it never skips ahead to `Red` and never loops back
+        /// to `Green`.
+        #[kani::proof]
+        fn verify_green_transitions_only_to_yellow() {
+            let successor = next(Color::Green);
+            assert_eq!(successor, Color::Yellow, "Green transitions to Yellow");
+            assert_ne!(successor, Color::Red, "Green must not skip directly to Red");
+            assert_ne!(successor, Color::Green, "Green must not stay Green");
+        }
+    }
+}
+
+impl Establish<Green, KaniVerifier> for Yellow {
+    type Token = YellowToken;
+
+    fn establish(_credential: &Green) -> Self::Token {
+        YellowToken(())
+    }
+}
+
+impl Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>> for Stoplight {
     type Error = std::convert::Infallible;
 
     fn exchange(
         &self,
-        _input: Green,
-        _proof: GreenToken,
-    ) -> Result<(Yellow, YellowToken), Self::Error> {
-        Ok((Yellow, YellowToken(())))
+        input: Established<Green, GreenToken>,
+    ) -> Result<Established<Yellow, YellowToken>, Self::Error> {
+        let token = Yellow::establish(input.primary());
+        Ok(Established::new(Yellow, token))
     }
 }
 
-/// Lawful token minted once `Exchange<Yellow, Red>` completes.
+/// Lawful token minted once `Red` is established from a proven `Yellow`.
+#[derive(Debug, Clone, Copy)]
 pub struct RedToken(());
 
 impl ProofToken for RedToken {
     type Proposition = Red;
 }
 
-impl Exchange<Yellow, Red> for Stoplight {
-    type Precondition = Yellow;
-    type Postcondition = Red;
-    type PreconditionToken = YellowToken;
-    type PostconditionToken = RedToken;
+/// Backs `Establish<Yellow, KaniVerifier> for Red` — see `Yellow`'s
+/// `Witness` impl above for the rationale.
+impl Witness<KaniVerifier> for Red {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_yellow_transitions_only_to_red".to_owned(),
+            claim: VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC.to_owned(),
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: concat!(module_path!(), "::", stringify!(Red)),
+        verifier: "kani",
+        describe: || <Red as Witness<KaniVerifier>>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC, {
+        /// `Yellow`'s only lawful successor is `Red`: it never reverses
+        /// back to `Green` and never stays `Yellow`.
+        #[kani::proof]
+        fn verify_yellow_transitions_only_to_red() {
+            let successor = next(Color::Yellow);
+            assert_eq!(successor, Color::Red, "Yellow transitions to Red");
+            assert_ne!(successor, Color::Green, "Yellow must not reverse back to Green");
+            assert_ne!(successor, Color::Yellow, "Yellow must not stay Yellow");
+        }
+    }
+}
+
+impl Establish<Yellow, KaniVerifier> for Red {
+    type Token = RedToken;
+
+    fn establish(_credential: &Yellow) -> Self::Token {
+        RedToken(())
+    }
+}
+
+impl Exchange<Established<Yellow, YellowToken>, Established<Red, RedToken>> for Stoplight {
     type Error = std::convert::Infallible;
 
     fn exchange(
         &self,
-        _input: Yellow,
-        _proof: YellowToken,
-    ) -> Result<(Red, RedToken), Self::Error> {
-        Ok((Red, RedToken(())))
+        input: Established<Yellow, YellowToken>,
+    ) -> Result<Established<Red, RedToken>, Self::Error> {
+        let token = Red::establish(input.primary());
+        Ok(Established::new(Red, token))
     }
 }
 
-// Reaching Green again by cycling through uses the same GreenToken a
-// fresh power-on would — there is no meaningful difference between "Green
-// because this is the start" and "Green because the cycle came back
-// around" for a type that carries no data to distinguish them by.
-impl Exchange<Red, Green> for Stoplight {
-    type Precondition = Red;
-    type Postcondition = Green;
-    type PreconditionToken = RedToken;
-    type PostconditionToken = GreenToken;
+/// Backs `Establish<Red, KaniVerifier> for Green` — the cycle-back edge.
+/// Distinct from [`Green`]'s root case: this is the proof that a `Red`
+/// light lawfully cycles back to `Green`, not the power-on assertion.
+impl Witness<KaniVerifier> for Green {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_red_transitions_only_to_green".to_owned(),
+            claim: VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC.to_owned(),
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: concat!(module_path!(), "::", stringify!(Green), "::cycle_back"),
+        verifier: "kani",
+        describe: || <Green as Witness<KaniVerifier>>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC, {
+        /// `Red`'s only lawful successor is `Green`: the cycle closes,
+        /// never advancing straight to `Yellow` and never staying `Red`.
+        #[kani::proof]
+        fn verify_red_transitions_only_to_green() {
+            let successor = next(Color::Red);
+            assert_eq!(successor, Color::Green, "Red cycles back to Green");
+            assert_ne!(successor, Color::Yellow, "Red must not advance directly to Yellow");
+            assert_ne!(successor, Color::Red, "Red must not stay Red");
+        }
+    }
+}
+
+impl Establish<Red, KaniVerifier> for Green {
+    type Token = GreenToken;
+
+    fn establish(_credential: &Red) -> Self::Token {
+        GreenToken(())
+    }
+}
+
+impl Exchange<Established<Red, RedToken>, Established<Green, GreenToken>> for Stoplight {
     type Error = std::convert::Infallible;
 
-    fn exchange(&self, _input: Red, _proof: RedToken) -> Result<(Green, GreenToken), Self::Error> {
-        Ok((Green, GreenToken(())))
+    fn exchange(
+        &self,
+        input: Established<Red, RedToken>,
+    ) -> Result<Established<Green, GreenToken>, Self::Error> {
+        let token = Green::establish(input.primary());
+        Ok(Established::new(Green, token))
     }
 }

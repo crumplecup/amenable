@@ -1,19 +1,23 @@
 //! Exercises the first real `StateMachine`/`Exchange` implementation in
-//! the workspace end to end: minting a root state's token has no
-//! computational barrier, but performing a transition still goes through
-//! `Exchange::exchange` for real.
+//! the workspace end to end, through the `Sidecar`-coupled `Established`
+//! shape: every `exchange` call consumes an already-proven input and
+//! returns an already-proven output, carrying the specific token
+//! `Establish` minted for that transition rather than a token
+//! independently re-minted afterward.
 
-use amenable_core::Exchange;
-use amenable_kani::{Green, GreenToken, Red, Stoplight, Yellow};
+use amenable_core::{Exchange, Sidecar};
+use amenable_kani::{
+    Established, Green, GreenToken, Red, RedToken, Stoplight, Yellow, YellowToken,
+};
 
 #[test]
 fn green_to_yellow_exchange_succeeds() -> Result<(), std::convert::Infallible> {
     let stoplight = Stoplight;
-    let token = GreenToken::new(Green);
 
-    let (state, _proof) = stoplight.exchange(Green, token)?;
+    let yellow: Established<Yellow, YellowToken> =
+        stoplight.exchange(Established::<Green, GreenToken>::root())?;
 
-    assert_eq!(state, Yellow);
+    assert_eq!(yellow.primary(), &Yellow);
     Ok(())
 }
 
@@ -21,14 +25,15 @@ fn green_to_yellow_exchange_succeeds() -> Result<(), std::convert::Infallible> {
 fn full_cycle_returns_to_green() -> Result<(), std::convert::Infallible> {
     let stoplight = Stoplight;
 
-    let (yellow, yellow_token) = stoplight.exchange(Green, GreenToken::new(Green))?;
-    assert_eq!(yellow, Yellow);
+    let yellow: Established<Yellow, YellowToken> =
+        stoplight.exchange(Established::<Green, GreenToken>::root())?;
+    assert_eq!(yellow.primary(), &Yellow);
 
-    let (red, red_token) = stoplight.exchange(Yellow, yellow_token)?;
-    assert_eq!(red, Red);
+    let red: Established<Red, RedToken> = stoplight.exchange(yellow)?;
+    assert_eq!(red.primary(), &Red);
 
-    let (green, _green_token) = stoplight.exchange(Red, red_token)?;
-    assert_eq!(green, Green);
+    let green: Established<Green, GreenToken> = stoplight.exchange(red)?;
+    assert_eq!(green.primary(), &Green);
 
     Ok(())
 }
@@ -36,6 +41,13 @@ fn full_cycle_returns_to_green() -> Result<(), std::convert::Infallible> {
 // Illegal transitions have no Exchange impl to call at all -- there is no
 // runtime check to exercise, only a fact about which impls exist to
 // confirm by their absence. A test attempting
-// `stoplight.exchange(Yellow, some_token_that_would_have_to_be_a_GreenToken)`
-// for Exchange<Yellow, Green> would not compile, which is the actual
+// `stoplight.exchange(some_established_yellow)` where an
+// `Exchange<Established<Yellow, YellowToken>, Established<Green,
+// GreenToken>>` impl doesn't exist would not compile, which is the actual
 // claim: illegal transitions are uncompilable, not merely unlikely.
+
+// `Established::new` is private, so a test attempting to hand-construct
+// `Established { primary: Yellow, token: YellowToken }` from outside the
+// `stoplight` module -- minting a token disconnected from any real
+// `Establish` call -- would also not compile. The only way to obtain a
+// non-root `Established` value is a lawful `Stoplight::exchange` call.
