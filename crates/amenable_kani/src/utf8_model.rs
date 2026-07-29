@@ -12,10 +12,76 @@
 //! - if the real owned UTF-8 conversion path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, Witness};
+use amenable_derive::Standard;
+
 use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
+use crate::{CalculationProof, KaniVerifier};
 
 const MAX_KANI_UTF8_BYTES: usize = 4;
+
+/// The root assumption `KaniUtf8Buffer` rests on: under Kani, a byte
+/// sequence's UTF-8 validity is asserted symbolically rather than computed
+/// by running the real validation algorithm. Naming this as an explicit
+/// `Standard` turns the "if the real path conforms" sentence in this
+/// module's own doc comment into an auditable `Provenance` record instead
+/// of prose -- `KaniUtf8Buffer`, and everything built on it, rests on this
+/// assumption, not on a machine-checked fact about the real algorithm.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[standard(basis = "Self")]
+pub struct KaniAssumedUtf8Validity {
+    valid: bool,
+}
+
+impl KaniAssumedUtf8Validity {
+    /// Decide validity for the given bytes: assumed symbolically
+    /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
+    /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
+    /// before this assumption had a name.
+    #[must_use]
+    pub fn decide(bytes: &[u8]) -> Self {
+        #[cfg(kani)]
+        let valid: bool = kani::any();
+        #[cfg(not(kani))]
+        let valid = is_valid_utf8(bytes);
+
+        Self { valid }
+    }
+
+    /// A canonical "assumed valid" instance, used where the type -- not a
+    /// specific decided value -- is what matters: `Evidence::basis`'s
+    /// static claim, or a downstream `Establish` call whose credential is
+    /// a compile-time formality (see `Establish`'s own doc: establishing a
+    /// token never invokes a verifier) rather than runtime-inspected data.
+    #[must_use]
+    pub fn asserted_valid() -> Self {
+        Self { valid: true }
+    }
+
+    /// Report the assumed/computed validity.
+    #[must_use]
+    pub fn holds(&self) -> bool {
+        self.valid
+    }
+}
+
+impl Provenance for KaniAssumedUtf8Validity {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "UTF-8 validity, standing in for the real std::str::from_utf8 algorithm",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the real validation algorithm times out under Kani even for two fully-valid bytes -- see gallery::utf8_validation_algorithm_cost",
+            ),
+            MetadataEntry::new("valid", self.valid.to_string()),
+        ]
+        .into_iter()
+    }
+}
 
 /// Modeled owned valid UTF-8 bytes.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -335,12 +401,7 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
             return Err(KaniUtf8BufferError::TooLong);
         }
 
-        #[cfg(kani)]
-        let content_is_valid_utf8: bool = kani::any();
-        #[cfg(not(kani))]
-        let content_is_valid_utf8 = is_valid_utf8(&bytes[..len]);
-
-        if content_is_valid_utf8 {
+        if KaniAssumedUtf8Validity::decide(&bytes[..len]).holds() {
             Ok(Self { bytes, len })
         } else {
             Err(KaniUtf8BufferError::InvalidUtf8)
@@ -363,6 +424,94 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes[..self.len]
+    }
+}
+
+impl<const MAX_LEN: usize> Evidence for KaniUtf8Buffer<MAX_LEN> {
+    type Basis = KaniAssumedUtf8Validity;
+    type Audit = [u8; MAX_LEN];
+
+    fn basis() -> Self::Basis {
+        KaniAssumedUtf8Validity::asserted_valid()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        self.bytes
+    }
+}
+
+/// Backs `Establish<KaniAssumedUtf8Validity, KaniVerifier> for
+/// KaniUtf8Buffer<2>`: without this impl, that `Establish` impl does not
+/// compile, so no downstream proof can establish a claim from a
+/// `KaniUtf8Buffer<2>` until the model's own bookkeeping is proven. `2` is
+/// the representative instantiation this crate's std-facing proofs
+/// (`String`, `OsStr`) actually use; `Evidence` above is implemented
+/// generically over every `MAX_LEN` since it states a structural fact, but
+/// Kani harnesses are concrete, so the one dedicated proof below is for
+/// this one representative size.
+impl Witness<KaniVerifier> for KaniUtf8Buffer<2> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_kani_utf8_buffer_bookkeeping_is_consistent".to_owned(),
+            claim: VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC.to_owned(),
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: concat!(module_path!(), "::", stringify!(KaniUtf8Buffer)),
+        verifier: "kani",
+        describe: || <KaniUtf8Buffer<2> as Witness<KaniVerifier>>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC, {
+        /// `KaniUtf8Buffer`'s own invariant, proven once here rather than
+        /// re-derived independently by every downstream std-facing proof:
+        /// given an accepted construction (the assumed-validity credential
+        /// holds), length tracks the stored bytes, emptiness tracks a zero
+        /// length, and the recovered bytes match exactly what was passed
+        /// in.
+        #[kani::proof]
+        fn verify_kani_utf8_buffer_bookkeeping_is_consistent() {
+            let bytes: [u8; 2] = kani::any();
+            let len: usize = kani::any();
+            kani::assume(len <= 2);
+
+            if let Ok(buffer) = KaniUtf8Buffer::<2>::new(bytes, len) {
+                assert_eq!(buffer.len(), len, "length tracks the stored bytes");
+                assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
+                let recovered = buffer.as_bytes();
+                assert_eq!(recovered.len(), len);
+                if len >= 1 {
+                    assert_eq!(recovered[0], bytes[0]);
+                }
+                if len >= 2 {
+                    assert_eq!(recovered[1], bytes[1]);
+                }
+            }
+        }
+    }
+}
+
+/// Lawful token minted once `KaniUtf8Buffer<2>`'s bookkeeping has been
+/// established from the assumed-validity credential.
+pub struct KaniUtf8BufferToken(());
+
+impl ProofToken for KaniUtf8BufferToken {
+    type Proposition = KaniUtf8Buffer<2>;
+}
+
+impl Establish<KaniAssumedUtf8Validity, KaniVerifier> for KaniUtf8Buffer<2> {
+    type Token = KaniUtf8BufferToken;
+
+    fn establish(_credential: &KaniAssumedUtf8Validity) -> Self::Token {
+        KaniUtf8BufferToken(())
     }
 }
 

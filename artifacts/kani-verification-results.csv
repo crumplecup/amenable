@@ -306,3 +306,4 @@ amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_val
 amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1785120149,failed
 amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1785120163,failed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1785101964,passed
+amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1785346239,passed

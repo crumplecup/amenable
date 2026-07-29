@@ -68,7 +68,7 @@ pub use stoplight::{
     YellowToken, next,
 };
 pub use utf8_model::{
-    KaniFromUtf8Error, KaniUtf8, KaniUtf8Buffer, KaniUtf8BufferError, KaniUtf8PositionError,
-    KaniUtf8String,
+    KaniAssumedUtf8Validity, KaniFromUtf8Error, KaniUtf8, KaniUtf8Buffer, KaniUtf8BufferError,
+    KaniUtf8BufferToken, KaniUtf8PositionError, KaniUtf8String,
 };
 pub use witness::{KaniVerifier, KaniVerifierMetadata, KaniWitness};
