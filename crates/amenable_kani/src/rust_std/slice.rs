@@ -1011,13 +1011,37 @@ bridge_kani_witness!(RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>)
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SplitNMut<'static, i32,
+/// ...>>`'s cap-at-two claim has been established from a
+/// `KaniSplitNObservation<i32>` that has itself demonstrated the piece
+/// lengths.
+pub struct RustStdSplitNMutToken(());
+
+impl ProofToken for RustStdSplitNMutToken {
+    type Proposition = RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+    for RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdSplitNMutToken;
+
+    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+        RustStdSplitNMutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_SRC, {
         /// Same cap-at-n rule as `SplitN`, checked via piece lengths on
         /// the mutable variant.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `splitn_mut` path refines this two-delimiter observation,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitNObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<SplitNMut<...>>` from the observation instance
+        /// that actually demonstrated the cap, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_split_n_mut_caps_the_number_of_pieces() {
             let a: i32 = kani::any();
@@ -1033,6 +1057,10 @@ amenable_derive::harness! {
                 [b, 0, c],
                 "the cap leaves the second delimiter unsplit in the last piece"
             );
+
+            let _token = RustStdStandard::<
+                SplitNMut<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
