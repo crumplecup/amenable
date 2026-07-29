@@ -695,12 +695,33 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryRecvError>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<TryRecvError>`'s
+/// empty-vs-disconnected distinction claim has been established from a
+/// `KaniChannel<i32>` that has itself demonstrated both failure modes.
+pub struct RustStdTryRecvErrorToken(());
+
+impl ProofToken for RustStdTryRecvErrorToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::TryRecvError>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::TryRecvError> {
+    type Token = RustStdTryRecvErrorToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdTryRecvErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TRY_RECV_ERROR_DISTINGUISHES_EMPTY_FROM_DISCONNECTED_SRC, {
         /// `.try_recv()`'s two failure modes are distinct, same as
         /// `RecvTimeoutError`'s: an open, empty channel is `Empty`; a
         /// disconnected one is `Disconnected` instead.
         /// Same `KaniChannel` model migration as `TryIter`'s proof above.
+        /// The claim is established through `Establish<KaniChannel<i32>,
+        /// KaniVerifier> for RustStdStandard<TryRecvError>` from the
+        /// channel instance that actually demonstrated both failure modes,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_try_recv_error_distinguishes_empty_from_disconnected() {
             let mut channel = crate::KaniChannel::<i32>::unbounded();
@@ -711,6 +732,8 @@ amenable_derive::harness! {
                 channel.try_recv().unwrap_err(),
                 crate::KaniRecvError::Disconnected
             );
+
+            let _token = RustStdStandard::<std::sync::mpsc::TryRecvError>::establish(&channel);
         }
     }
 }
