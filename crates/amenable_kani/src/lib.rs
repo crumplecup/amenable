@@ -30,6 +30,7 @@ mod gallery;
 mod io_model;
 mod linked_list_extract_model;
 mod mpsc_model;
+mod path_model;
 mod pipe_model;
 mod registry;
 mod runtime_model;
@@ -63,6 +64,7 @@ pub use io_model::{
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
+pub use path_model::{KaniPathDisplayObservation, KaniWindowsPrefixObservation};
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
 pub use registry::{
     KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation, KaniGalleryRegistration,

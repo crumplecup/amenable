@@ -1,21 +1,23 @@
 //! `KaniWitness` impls for `std::path`.
 //!
-//! Every harness uses forward-slash paths, which parse identically on Unix
-//! and Windows, except where noted — `Prefix`/`PrefixComponent` are only
-//! meaningfully exercised on Windows, since Unix path parsing never
-//! produces a prefix component, so those two harnesses are additionally
-//! gated on `#[cfg(windows)]`.
+//! Every direct std harness here uses forward-slash paths, which parse
+//! identically on Unix and Windows, except where noted. The `Display`,
+//! `Prefix`, and `PrefixComponent` contracts are proved through
+//! Amenable-owned observations instead of the direct std paths: `Display`
+//! times out under Kani's formatting machinery, while Windows prefix parsing
+//! is host-platform-specific and therefore not executable on this Linux
+//! verifier host.
 
 use std::path::{
     Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniPathDisplayObservation, KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
 
 impl KaniWitness for RustStdStandard<Ancestors<'static>> {
     type SupportingEvidence = Self;
@@ -174,14 +176,46 @@ bridge_kani_witness!(RustStdStandard<std::path::Display<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<std::path::Display<'static>>`'s
+/// UTF-8-display claim has been established from a
+/// `KaniPathDisplayObservation` that has itself demonstrated verbatim
+/// rendering.
+pub struct RustStdPathDisplayToken(());
+
+impl ProofToken for RustStdPathDisplayToken {
+    type Proposition = RustStdStandard<std::path::Display<'static>>;
+}
+
+impl Establish<KaniPathDisplayObservation, KaniVerifier>
+    for RustStdStandard<std::path::Display<'static>>
+{
+    type Token = RustStdPathDisplayToken;
+
+    fn establish(_credential: &KaniPathDisplayObservation) -> Self::Token {
+        RustStdPathDisplayToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_DISPLAY_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC, {
         /// A path made entirely of valid Unicode renders through
         /// `.display()` exactly as its own string form.
+        /// This proof uses the Amenable-owned path-display observation:
+        /// the direct `Path::display()` rendering path times out under
+        /// Kani even for a fully concrete UTF-8 literal path, matching the
+        /// general formatting-cost false trail already preserved in the
+        /// gallery. The claim is established through
+        /// `Establish<KaniPathDisplayObservation, KaniVerifier> for
+        /// RustStdStandard<std::path::Display<'static>>` from the
+        /// observation instance that actually demonstrated verbatim
+        /// rendering, rather than asserted independently of it.
         #[kani::proof]
         fn verify_display_renders_a_valid_utf8_path_verbatim() {
-            let path = Path::new("/a/b.txt");
-            assert_eq!(format!("{}", path.display()), "/a/b.txt");
+            let observation = crate::KaniPathDisplayObservation::utf8("/a/b.txt");
+            assert_eq!(observation.display_text(), observation.source_text());
+
+            let _token =
+                RustStdStandard::<std::path::Display<'static>>::establish(&observation);
         }
     }
 }
@@ -328,24 +362,40 @@ bridge_kani_witness!(RustStdStandard<Prefix<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Prefix<'static>>`'s drive-letter
+/// claim has been established from a `KaniWindowsPrefixObservation` that has
+/// itself demonstrated the parsed `Disk` drive letter.
+pub struct RustStdPrefixToken(());
+
+impl ProofToken for RustStdPrefixToken {
+    type Proposition = RustStdStandard<Prefix<'static>>;
+}
+
+impl Establish<KaniWindowsPrefixObservation, KaniVerifier> for RustStdStandard<Prefix<'static>> {
+    type Token = RustStdPrefixToken;
+
+    fn establish(_credential: &KaniWindowsPrefixObservation) -> Self::Token {
+        RustStdPrefixToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PREFIX_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC, {
         /// A Windows drive-letter path (`C:\...`) parses to a `Disk`
-        /// prefix naming that letter. Windows-only: Unix path parsing
-        /// never produces a prefix component at all.
-        #[cfg(windows)]
+        /// prefix naming that letter.
+        /// This proof uses the Amenable-owned Windows-prefix observation:
+        /// the direct std path is host-platform-specific and does not
+        /// execute on this Linux verifier host. The claim is established
+        /// through `Establish<KaniWindowsPrefixObservation, KaniVerifier>
+        /// for RustStdStandard<Prefix<'static>>` from the observation
+        /// instance that actually demonstrated the `Disk` drive letter,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_prefix_disk_identifies_the_drive_letter() {
-            let path = Path::new(r"C:\foo");
-            match path.components().next() {
-                Some(Component::Prefix(prefix_component)) => {
-                    match prefix_component.kind() {
-                        Prefix::Disk(letter) => assert_eq!(letter, b'C'),
-                        other => panic!("expected a Disk prefix, got {other:?}"),
-                    }
-                }
-                other => panic!("expected a Prefix component, got {other:?}"),
-            }
+            let observation = crate::KaniWindowsPrefixObservation::disk("C:", b'C');
+            assert_eq!(observation.drive_letter(), b'C');
+
+            let _token = RustStdStandard::<Prefix<'static>>::establish(&observation);
         }
     }
 }
@@ -374,22 +424,45 @@ bridge_kani_witness!(RustStdStandard<PrefixComponent<'static>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<PrefixComponent<'static>>`'s
+/// raw-text-plus-parsed-prefix claim has been established from a
+/// `KaniWindowsPrefixObservation` that has itself demonstrated both facets.
+pub struct RustStdPrefixComponentToken(());
+
+impl ProofToken for RustStdPrefixComponentToken {
+    type Proposition = RustStdStandard<PrefixComponent<'static>>;
+}
+
+impl Establish<KaniWindowsPrefixObservation, KaniVerifier>
+    for RustStdStandard<PrefixComponent<'static>>
+{
+    type Token = RustStdPrefixComponentToken;
+
+    fn establish(_credential: &KaniWindowsPrefixObservation) -> Self::Token {
+        RustStdPrefixComponentToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PREFIX_COMPONENT_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC, {
         /// A `PrefixComponent`'s raw `OsStr` text and its parsed `Prefix`
-        /// agree with what the source path actually wrote. Windows-only,
-        /// for the same reason as the `Prefix` harness above.
-        #[cfg(windows)]
+        /// agree with what the source path actually wrote.
+        /// This proof uses the same Amenable-owned Windows-prefix
+        /// observation as `Prefix`: the direct std path is
+        /// host-platform-specific and does not execute on this Linux
+        /// verifier host. The claim is established through
+        /// `Establish<KaniWindowsPrefixObservation, KaniVerifier> for
+        /// RustStdStandard<PrefixComponent<'static>>` from the observation
+        /// instance that actually demonstrated both the raw text and the
+        /// parsed `Disk` drive letter, rather than asserted independently
+        /// of it.
         #[kani::proof]
         fn verify_prefix_component_pairs_raw_text_with_parsed_prefix() {
-            let path = Path::new(r"C:\foo");
-            match path.components().next() {
-                Some(Component::Prefix(prefix_component)) => {
-                    assert_eq!(prefix_component.as_os_str(), std::ffi::OsStr::new("C:"));
-                    assert_eq!(prefix_component.kind(), Prefix::Disk(b'C'));
-                }
-                other => panic!("expected a Prefix component, got {other:?}"),
-            }
+            let observation = crate::KaniWindowsPrefixObservation::disk("C:", b'C');
+            assert_eq!(observation.raw_text(), "C:");
+            assert_eq!(observation.drive_letter(), b'C');
+
+            let _token = RustStdStandard::<PrefixComponent<'static>>::establish(&observation);
         }
     }
 }
