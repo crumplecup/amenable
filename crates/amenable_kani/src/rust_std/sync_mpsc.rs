@@ -444,17 +444,41 @@ bridge_kani_witness!(RustStdStandard<RecvError>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RecvError>`'s
+/// empty-and-disconnected claim has been established from a
+/// `KaniChannel<i32>` that has itself demonstrated `.recv()` failing with
+/// exactly this error.
+pub struct RustStdRecvErrorToken(());
+
+impl ProofToken for RustStdRecvErrorToken {
+    type Proposition = RustStdStandard<RecvError>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<RecvError> {
+    type Token = RustStdRecvErrorToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdRecvErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RECV_ERROR_ON_AN_EMPTY_DISCONNECTED_CHANNEL_SRC, {
         /// `.recv()` fails with exactly this error when the channel is
         /// empty and every `Sender` has been dropped.
         /// Same `KaniChannel` model migration as the other `recv`-family
-        /// proofs above.
+        /// proofs above. The claim is established through
+        /// `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<RecvError>` from the channel instance that
+        /// actually demonstrated the error, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_recv_error_on_an_empty_disconnected_channel() {
             let mut channel = crate::KaniChannel::<i32>::unbounded();
             channel.drop_sender();
             assert_eq!(channel.recv().unwrap_err(), crate::KaniRecvError::Disconnected);
+
+            let _token = RustStdStandard::<RecvError>::establish(&channel);
         }
     }
 }
