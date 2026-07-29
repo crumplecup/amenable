@@ -289,7 +289,7 @@ amenable_kani::rust_std::sync_lock::verify_rwlock_write_guard_writes_through,178
 amenable_kani::rust_std::sync_lock::verify_try_lock_error_distinguishes_poisoned_from_would_block,1785120497,failed
 amenable_kani::rust_std::sync_lock::verify_wait_timeout_result_reports_timed_out,1785120508,failed
 amenable_kani::rust_std::sync_mpsc::verify_into_iter_yields_sent_values_then_stops,1785348981,passed
-amenable_kani::rust_std::sync_mpsc::verify_iter_yields_sent_values_then_stops,1785121533,passed
+amenable_kani::rust_std::sync_mpsc::verify_iter_yields_sent_values_then_stops,1785349064,passed
 amenable_kani::rust_std::sync_mpsc::verify_receiver_fails_once_every_sender_is_dropped,1785348882,passed
 amenable_kani::rust_std::sync_mpsc::verify_recv_error_on_an_empty_disconnected_channel,1785121538,passed
 amenable_kani::rust_std::sync_mpsc::verify_recv_timeout_error_distinguishes_timeout_from_disconnected,1785121565,failed

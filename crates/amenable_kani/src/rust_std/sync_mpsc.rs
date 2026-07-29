@@ -304,13 +304,37 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Iter<'static, i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Iter<'static, i32>>`'s
+/// yield-then-stop claim has been established from a `KaniChannel<i32>`
+/// that has itself demonstrated the sent value yielded then the channel
+/// stopping.
+pub struct RustStdIterToken(());
+
+impl ProofToken for RustStdIterToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::Iter<'static, i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::Iter<'static, i32>>
+{
+    type Token = RustStdIterToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdIterToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC, {
         /// `.iter()` borrows the `Receiver` instead of consuming it,
         /// with the same yield-then-stop behavior as `IntoIter`.
         /// Same `KaniChannel` model migration and rationale as
         /// `IntoIter`'s proof above -- `Iter::next()` is the same
-        /// `recv().ok()` shape.
+        /// `recv().ok()` shape. The claim is established through
+        /// `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<Iter<'static, i32>>` from the channel instance
+        /// that actually demonstrated the yield-then-stop shape, rather
+        /// than asserted independently of it.
         #[kani::proof]
         fn verify_iter_yields_sent_values_then_stops() {
             let value: i32 = kani::any();
@@ -319,6 +343,9 @@ amenable_derive::harness! {
             channel.drop_sender();
             assert_eq!(channel.recv().ok(), Some(value));
             assert_eq!(channel.recv().ok(), None);
+
+            let _token =
+                RustStdStandard::<std::sync::mpsc::Iter<'static, i32>>::establish(&channel);
         }
     }
 }
