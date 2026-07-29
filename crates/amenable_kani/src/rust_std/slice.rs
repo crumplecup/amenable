@@ -1162,13 +1162,37 @@ bridge_kani_witness!(RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>)
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RSplitMut<'static, i32,
+/// ...>>`'s write-through claim has been established from a
+/// `KaniSplitObservation<i32>` that has itself demonstrated the reverse
+/// order and the write-through.
+pub struct RustStdRSplitMutToken(());
+
+impl ProofToken for RustStdRSplitMutToken {
+    type Proposition = RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+    for RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdRSplitMutToken;
+
+    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+        RustStdRSplitMutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RSPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_FROM_THE_BACK_SRC, {
         /// Same reverse-order rule as `RSplit`, writable and writing
         /// through to the underlying slice.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `rsplit_mut` path refines this one-delimiter observation,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established
+        /// through `Establish<KaniSplitObservation<i32>, KaniVerifier>
+        /// for RustStdStandard<RSplitMut<...>>` from the observation
+        /// instance that actually demonstrated the write-through, rather
+        /// than asserted independently of it.
         #[kani::proof]
         fn verify_rsplit_mut_yields_writable_subslices_from_the_back() {
             let a: i32 = kani::any();
@@ -1187,6 +1211,10 @@ amenable_derive::harness! {
                 observation.data(),
                 [a, 0, updated],
                 "a write through the first (rearmost) subslice is visible"
+            );
+
+            let _token = RustStdStandard::<RSplitMut<'static, i32, fn(&i32) -> bool>>::establish(
+                &observation,
             );
         }
     }
