@@ -17,7 +17,7 @@ use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
-    KaniFileLenObservation, KaniFileTimesObservation, KaniFileTypeObservation,
+    KaniFileLenObservation, KaniFileTimesObservation, KaniFileTypeObservation, KaniLockObservation,
     KaniPermissionsObservation, KaniReadDirObservation, KaniRecursiveDirObservation, KaniVerifier,
 };
 
@@ -688,13 +688,35 @@ bridge_kani_witness!(RustStdStandard<std::fs::TryLockError>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<std::fs::TryLockError>`'s
+/// mutual-exclusion claim has been established from a
+/// `KaniLockObservation` that has itself demonstrated a second handle
+/// failing to acquire an already-held lock.
+pub struct RustStdTryLockErrorToken(());
+
+impl ProofToken for RustStdTryLockErrorToken {
+    type Proposition = RustStdStandard<std::fs::TryLockError>;
+}
+
+impl Establish<KaniLockObservation, KaniVerifier> for RustStdStandard<std::fs::TryLockError> {
+    type Token = RustStdTryLockErrorToken;
+
+    fn establish(_credential: &KaniLockObservation) -> Self::Token {
+        RustStdTryLockErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TRY_LOCK_ERROR_REPORTS_A_LOCK_ALREADY_HELD_SRC, {
         /// A second handle's `.try_lock()` fails while the first handle
         /// still holds the file lock.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `File::try_lock` path preserves this exclusion, the Rust-facing
-        /// claim follows.
+        /// claim follows. The claim is established through
+        /// `Establish<KaniLockObservation, KaniVerifier> for
+        /// RustStdStandard<std::fs::TryLockError>` from the observation
+        /// instance that actually demonstrated the exclusion, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_try_lock_error_reports_a_lock_already_held() {
             let mut file = crate::KaniLockObservation::new();
@@ -704,6 +726,9 @@ amenable_derive::harness! {
                 file.try_lock().is_err(),
                 "a second handle can't also lock the same file"
             );
+
+            let _token =
+                RustStdStandard::<std::fs::TryLockError>::establish(&file);
         }
     }
 }

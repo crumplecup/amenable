@@ -818,9 +818,35 @@ impl KaniReadDirObservation {
 
 /// Observable result of a second handle's `.try_lock()` while a first
 /// handle still holds the modeled file lock.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that a second handle's
+/// `.try_lock()` fails while a first handle still holds the file lock, and
+/// nothing else about the real OS-backed advisory lock -- is named
+/// explicitly as a `Standard` rather than left as prose: the direct
+/// `std::fs` path crosses OS-backed state Kani cannot symbolically execute
+/// well (see this module's own doc comment), so this bounded observation is
+/// what the `TryLockError` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniLockObservation {
     locked: bool,
+}
+
+impl Provenance for KaniLockObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "a second handle's .try_lock() fails while a first handle still holds the file lock, standing in for the real OS-backed advisory lock",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("locked", self.locked.to_string()),
+        ]
+        .into_iter()
+    }
 }
 
 /// Modeled error for a second `try_lock` while the modeled lock is held.
