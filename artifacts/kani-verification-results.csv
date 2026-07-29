@@ -296,7 +296,7 @@ amenable_kani::rust_std::sync_mpsc::verify_recv_timeout_error_distinguishes_time
 amenable_kani::rust_std::sync_mpsc::verify_send_error_recovers_the_unsent_value,1785121540,passed
 amenable_kani::rust_std::sync_mpsc::verify_sender_delivers_to_the_paired_receiver,1785348699,passed
 amenable_kani::rust_std::sync_mpsc::verify_sync_sender_delivers_to_the_paired_receiver,1785348785,passed
-amenable_kani::rust_std::sync_mpsc::verify_try_iter_does_not_block_on_an_empty_open_channel,1785121536,passed
+amenable_kani::rust_std::sync_mpsc::verify_try_iter_does_not_block_on_an_empty_open_channel,1785349147,passed
 amenable_kani::rust_std::sync_mpsc::verify_try_recv_error_distinguishes_empty_from_disconnected,1785121544,passed
 amenable_kani::rust_std::sync_mpsc::verify_try_send_error_full_recovers_the_unsent_value,1785121541,passed
 amenable_kani::rust_std::task::verify_context_from_waker_exposes_the_same_waker,1785101921,passed

@@ -373,6 +373,26 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<TryIter<'static, i32>>`'s
+/// non-blocking claim has been established from a `KaniChannel<i32>` that
+/// has itself demonstrated returning `None` immediately rather than
+/// blocking.
+pub struct RustStdTryIterToken(());
+
+impl ProofToken for RustStdTryIterToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>
+{
+    type Token = RustStdTryIterToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdTryIterToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TRY_ITER_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC, {
         /// Unlike `Iter`, `.try_iter()` never blocks: on an empty
@@ -381,6 +401,11 @@ amenable_derive::harness! {
         /// This proof uses the Amenable-owned channel model: `TryIter`'s
         /// `next()` is `self.rx.try_recv().ok()` under the hood, so
         /// `KaniChannel::try_recv()` models the same non-blocking shape.
+        /// The claim is established through `Establish<KaniChannel<i32>,
+        /// KaniVerifier> for RustStdStandard<TryIter<'static, i32>>` from
+        /// the channel instance that actually demonstrated the
+        /// non-blocking behavior, rather than asserted independently of
+        /// it.
         #[kani::proof]
         fn verify_try_iter_does_not_block_on_an_empty_open_channel() {
             let mut channel = crate::KaniChannel::<i32>::unbounded();
@@ -389,6 +414,9 @@ amenable_derive::harness! {
                 None,
                 "try_iter returns None immediately rather than blocking"
             );
+
+            let _token =
+                RustStdStandard::<std::sync::mpsc::TryIter<'static, i32>>::establish(&channel);
         }
     }
 }
