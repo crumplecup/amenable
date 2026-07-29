@@ -700,13 +700,37 @@ bridge_kani_witness!(RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SplitMut<'static, i32, ...>>`'s
+/// write-through claim has been established from a
+/// `KaniSplitObservation<i32>` that has itself demonstrated the writable
+/// split and the write-through.
+pub struct RustStdSplitMutToken(());
+
+impl ProofToken for RustStdSplitMutToken {
+    type Proposition = RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+    for RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdSplitMutToken;
+
+    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+        RustStdSplitMutToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_BETWEEN_MATCHES_SRC, {
         /// `split_mut` yields the same subslices as `Split`, writable
         /// and writing through to the underlying slice.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `split_mut` path refines this one-delimiter observation, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<SplitMut<...>>` from the observation instance
+        /// that actually demonstrated the write-through, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_split_mut_yields_writable_subslices_between_matches() {
             let a: i32 = kani::any();
@@ -725,6 +749,10 @@ amenable_derive::harness! {
                 observation.data(),
                 [updated, 0, b],
                 "a write through the first subslice is visible"
+            );
+
+            let _token = RustStdStandard::<SplitMut<'static, i32, fn(&i32) -> bool>>::establish(
+                &observation,
             );
         }
     }
