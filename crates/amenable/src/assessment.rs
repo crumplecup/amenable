@@ -17,6 +17,7 @@ use time::{
 };
 
 const CURRENT_ASSESSMENT_VERSION: &str = "0.1.0";
+const LEGACY_ASSESSMENT_VERSION: &str = "legacy-1";
 const LEGACY_SCHEMA_VERSION: u8 = 1;
 
 /// Commands for recording and examining proof assessments.
@@ -70,6 +71,9 @@ struct RecordAssessmentArgs {
     /// Recommended next action for this proof.
     #[arg(long, value_enum)]
     recommendation: Recommendation,
+    /// Explicit triage lane for acting on this assessment.
+    #[arg(long, value_enum)]
+    resolution_path: ResolutionPath,
     /// Long-form reasoning supporting the scores and recommendation.
     #[arg(
         long,
@@ -102,9 +106,15 @@ struct AssessmentSummaryArgs {
     /// Restrict the summary to one exact, fully-qualified registered proof ID.
     #[arg(long)]
     proof: Option<String>,
+    /// Dimension to aggregate when counting matching assessments.
+    #[arg(long, value_enum, default_value_t = SummaryDimension::Recommendation)]
+    by: SummaryDimension,
     /// Only count assessments recorded on or after this UTC date (`YYYY-MM-DD`).
     #[arg(long, value_parser = parse_utc_date)]
     since: Option<Date>,
+    /// Emit the summary as pretty JSON instead of a text table.
+    #[arg(long)]
+    json: bool,
     /// Read this JSON Lines assessment artifact.
     #[arg(short, long, default_value_os_t = default_assessment_path())]
     assessments: PathBuf,
@@ -119,9 +129,15 @@ struct AssessmentListArgs {
     /// Restrict the list to one recommendation status.
     #[arg(long, value_enum)]
     recommendation: Option<Recommendation>,
+    /// Restrict the list to one explicit triage lane.
+    #[arg(long, value_enum)]
+    resolution_path: Option<ResolutionPath>,
     /// Only list assessments recorded on or after this UTC date (`YYYY-MM-DD`).
     #[arg(long, value_parser = parse_utc_date)]
     since: Option<Date>,
+    /// Emit matching assessments as pretty JSON instead of tab-separated text.
+    #[arg(long)]
+    json: bool,
     /// Read this JSON Lines assessment artifact.
     #[arg(short, long, default_value_os_t = default_assessment_path())]
     assessments: PathBuf,
@@ -135,6 +151,9 @@ struct AssessmentQueueArgs {
     /// Older assessments do not satisfy the queue when running a fresh sweep.
     #[arg(long, value_parser = parse_utc_date)]
     since: Option<Date>,
+    /// Emit the queue as pretty JSON instead of plain text.
+    #[arg(long)]
+    json: bool,
     /// Read this JSON Lines assessment artifact.
     #[arg(short, long, default_value_os_t = default_assessment_path())]
     assessments: PathBuf,
@@ -161,6 +180,62 @@ impl Recommendation {
             Self::Strengthen => "strengthen",
             Self::Replace => "replace",
             Self::Retire => "retire",
+        }
+    }
+}
+
+/// The operational path for acting on an assessment.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, ValueEnum)]
+#[serde(rename_all = "snake_case")]
+enum ResolutionPath {
+    /// Keep the proof as-is and continue relying on it.
+    #[value(name = "keep_current_proof")]
+    KeepCurrentProof,
+    /// Extend the current proof without changing its fundamental approach.
+    #[value(name = "strengthen_current_proof")]
+    StrengthenCurrentProof,
+    /// Replace the proof with a narrower proof-specific model.
+    #[value(name = "replace_with_proof_specific_model")]
+    ReplaceWithProofSpecificModel,
+    /// Replace the proof with an accommodation model backed by the standards.
+    #[value(name = "replace_with_accommodation_model")]
+    ReplaceWithAccommodationModel,
+    /// Capture the verifier/process limitation in the gallery while rerouting.
+    #[value(name = "document_verifier_limitation")]
+    DocumentVerifierLimitation,
+    /// Stop relying on the current claim.
+    #[value(name = "retire_claim")]
+    RetireClaim,
+}
+
+impl ResolutionPath {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::KeepCurrentProof => "keep_current_proof",
+            Self::StrengthenCurrentProof => "strengthen_current_proof",
+            Self::ReplaceWithProofSpecificModel => "replace_with_proof_specific_model",
+            Self::ReplaceWithAccommodationModel => "replace_with_accommodation_model",
+            Self::DocumentVerifierLimitation => "document_verifier_limitation",
+            Self::RetireClaim => "retire_claim",
+        }
+    }
+}
+
+/// The dimension used when grouping assessment counts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, ValueEnum)]
+#[serde(rename_all = "snake_case")]
+enum SummaryDimension {
+    #[value(name = "recommendation")]
+    Recommendation,
+    #[value(name = "resolution_path")]
+    ResolutionPath,
+}
+
+impl SummaryDimension {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Recommendation => "recommendation",
+            Self::ResolutionPath => "resolution_path",
         }
     }
 }
@@ -212,19 +287,21 @@ impl Rubric {
 #[derive(Debug)]
 struct ProofAssessment {
     version: String,
+    assessment_id: Option<String>,
     proof_id: String,
     reviewer: String,
     timestamp: u64,
     rubric: Rubric,
     recommendation: Recommendation,
+    resolution_path: Option<ResolutionPath>,
     comment: String,
 }
 
 impl ProofAssessment {
     fn validate(&self) -> Result<(), String> {
-        if self.version != CURRENT_ASSESSMENT_VERSION {
+        if self.version != CURRENT_ASSESSMENT_VERSION && self.version != LEGACY_ASSESSMENT_VERSION {
             return Err(format!(
-                "unsupported assessment version {}; expected {CURRENT_ASSESSMENT_VERSION}",
+                "unsupported assessment version {}; expected one of {LEGACY_ASSESSMENT_VERSION} or {CURRENT_ASSESSMENT_VERSION}",
                 self.version
             ));
         }
@@ -233,6 +310,20 @@ impl ProofAssessment {
         }
         if self.comment.trim().is_empty() {
             return Err("assessment comment must not be empty".to_owned());
+        }
+        if self.version == CURRENT_ASSESSMENT_VERSION {
+            let assessment_id = self
+                .assessment_id
+                .as_ref()
+                .ok_or_else(|| "assessment ID is required for version 0.1.0".to_owned())?;
+            if assessment_id.trim().is_empty() {
+                return Err("assessment ID must not be empty".to_owned());
+            }
+
+            let resolution_path = self
+                .resolution_path
+                .ok_or_else(|| "resolution path is required for version 0.1.0".to_owned())?;
+            validate_resolution_path(self.recommendation, resolution_path)?;
         }
 
         self.rubric.validate()
@@ -245,6 +336,8 @@ struct StoredProofAssessment {
     version: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     schema_version: Option<u8>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    assessment_id: Option<String>,
     proof_id: String,
     reviewer: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -253,6 +346,8 @@ struct StoredProofAssessment {
     timestamp_unix_seconds: Option<u64>,
     rubric: Rubric,
     recommendation: Recommendation,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    resolution_path: Option<ResolutionPath>,
     comment: String,
 }
 
@@ -261,7 +356,7 @@ impl StoredProofAssessment {
         let proof_id = self.proof_id;
         let version = match (self.version, self.schema_version) {
             (Some(version), None) => version,
-            (None, Some(LEGACY_SCHEMA_VERSION)) => CURRENT_ASSESSMENT_VERSION.to_owned(),
+            (None, Some(LEGACY_SCHEMA_VERSION)) => LEGACY_ASSESSMENT_VERSION.to_owned(),
             (None, Some(schema_version)) => {
                 return Err(format!(
                     "unsupported legacy assessment schema version {schema_version}; expected {LEGACY_SCHEMA_VERSION}"
@@ -296,11 +391,13 @@ impl StoredProofAssessment {
 
         Ok(ProofAssessment {
             version,
+            assessment_id: self.assessment_id,
             proof_id,
             reviewer: self.reviewer,
             timestamp,
             rubric: self.rubric,
             recommendation: self.recommendation,
+            resolution_path: self.resolution_path,
             comment: self.comment,
         })
     }
@@ -311,15 +408,46 @@ impl From<&ProofAssessment> for StoredProofAssessment {
         Self {
             version: Some(assessment.version.clone()),
             schema_version: None,
+            assessment_id: assessment.assessment_id.clone(),
             proof_id: assessment.proof_id.clone(),
             reviewer: assessment.reviewer.clone(),
             timestamp: Some(assessment.timestamp),
             timestamp_unix_seconds: None,
             rubric: assessment.rubric,
             recommendation: assessment.recommendation,
+            resolution_path: assessment.resolution_path,
             comment: assessment.comment.clone(),
         }
     }
+}
+
+#[derive(Debug, Serialize)]
+struct SummaryOutput {
+    by: String,
+    proof: Option<String>,
+    since: Option<String>,
+    counts: BTreeMap<String, usize>,
+}
+
+#[derive(Debug, Serialize)]
+struct ListedAssessment {
+    assessment_id: Option<String>,
+    version: String,
+    proof_id: String,
+    reviewer: String,
+    timestamp: u64,
+    recorded_at: String,
+    rubric: Rubric,
+    recommendation: Recommendation,
+    resolution_path: Option<ResolutionPath>,
+    comment: String,
+}
+
+#[derive(Debug, Serialize)]
+struct QueueOutput {
+    since: Option<String>,
+    count: usize,
+    proof_ids: Vec<String>,
 }
 
 /// Execute an assessment command.
@@ -362,6 +490,7 @@ fn record(args: RecordAssessmentArgs) -> Result<(), String> {
     let comment = read_comment(args.comment, args.comment_file)?;
     let assessment = ProofAssessment {
         version: CURRENT_ASSESSMENT_VERSION.to_owned(),
+        assessment_id: Some(assessment_id()?),
         proof_id: args.proof,
         reviewer: args.reviewer,
         timestamp: timestamp()?,
@@ -374,6 +503,7 @@ fn record(args: RecordAssessmentArgs) -> Result<(), String> {
             clarity: args.clarity,
         },
         recommendation: args.recommendation,
+        resolution_path: Some(args.resolution_path),
         comment,
     };
     assessment.validate()?;
@@ -398,24 +528,59 @@ fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
         load(&args.assessments)?,
         args.proof.as_deref(),
         None,
+        None,
         since_timestamp,
     );
 
-    let mut counts: BTreeMap<Recommendation, usize> = Recommendation::value_variants()
-        .iter()
-        .copied()
-        .map(|recommendation| (recommendation, 0))
-        .collect();
-    for assessment in assessments {
-        *counts.entry(assessment.recommendation).or_default() += 1;
+    let counts = match args.by {
+        SummaryDimension::Recommendation => {
+            let mut counts: BTreeMap<String, usize> = Recommendation::value_variants()
+                .iter()
+                .copied()
+                .map(|recommendation| (recommendation.as_str().to_owned(), 0))
+                .collect();
+            for assessment in assessments {
+                *counts
+                    .entry(assessment.recommendation.as_str().to_owned())
+                    .or_default() += 1;
+            }
+            counts
+        }
+        SummaryDimension::ResolutionPath => {
+            let mut counts: BTreeMap<String, usize> = ResolutionPath::value_variants()
+                .iter()
+                .copied()
+                .map(|resolution_path| (resolution_path.as_str().to_owned(), 0))
+                .collect();
+            counts.insert("legacy_unspecified".to_owned(), 0);
+            for assessment in assessments {
+                let key = assessment
+                    .resolution_path
+                    .map(ResolutionPath::as_str)
+                    .unwrap_or("legacy_unspecified")
+                    .to_owned();
+                *counts.entry(key).or_default() += 1;
+            }
+            counts
+        }
+    };
+
+    if args.json {
+        let output = SummaryOutput {
+            by: args.by.as_str().to_owned(),
+            proof: args.proof,
+            since: args.since.map(|date| date.to_string()),
+            counts,
+        };
+        return print_json(&output);
     }
 
-    let recommendation_width = Recommendation::value_variants()
-        .iter()
-        .map(|recommendation| recommendation.as_str().len())
+    let label_width = counts
+        .keys()
+        .map(String::len)
         .max()
-        .unwrap_or("recommendation".len())
-        .max("recommendation".len());
+        .unwrap_or(args.by.as_str().len())
+        .max(args.by.as_str().len());
     let count_width = counts
         .values()
         .map(|count| count.to_string().len())
@@ -424,20 +589,13 @@ fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
         .max("count".len());
 
     println!(
-        "{:<recommendation_width$} {:>count_width$}",
-        "recommendation", "count"
+        "{:<label_width$} {:>count_width$}",
+        args.by.as_str(),
+        "count"
     );
-    println!(
-        "{} {}",
-        "-".repeat(recommendation_width),
-        "-".repeat(count_width)
-    );
-    for recommendation in Recommendation::value_variants() {
-        println!(
-            "{:<recommendation_width$} {:>count_width$}",
-            recommendation.as_str(),
-            counts[recommendation]
-        );
+    println!("{} {}", "-".repeat(label_width), "-".repeat(count_width));
+    for label in counts.keys() {
+        println!("{:<label_width$} {:>count_width$}", label, counts[label]);
     }
 
     Ok(())
@@ -469,6 +627,7 @@ fn list(args: AssessmentListArgs) -> Result<(), String> {
         load(&args.assessments)?,
         args.proof.as_deref(),
         args.recommendation,
+        args.resolution_path,
         since_timestamp,
     );
 
@@ -477,11 +636,40 @@ fn list(args: AssessmentListArgs) -> Result<(), String> {
         return Ok(());
     }
 
+    if args.json {
+        let listed = assessments
+            .into_iter()
+            .map(|assessment| {
+                Ok(ListedAssessment {
+                    assessment_id: assessment.assessment_id,
+                    version: assessment.version,
+                    proof_id: assessment.proof_id,
+                    reviewer: assessment.reviewer,
+                    timestamp: assessment.timestamp,
+                    recorded_at: format_timestamp(assessment.timestamp)?,
+                    rubric: assessment.rubric,
+                    recommendation: assessment.recommendation,
+                    resolution_path: assessment.resolution_path,
+                    comment: assessment.comment,
+                })
+            })
+            .collect::<Result<Vec<_>, String>>()?;
+        return print_json(&listed);
+    }
+
     for assessment in assessments {
         let recorded_at = format_timestamp(assessment.timestamp)?;
         println!(
-            "{recorded_at}\t{}\t{}\t{}",
+            "{}\t{recorded_at}\t{}\t{}\t{}\t{}",
+            assessment
+                .assessment_id
+                .as_deref()
+                .unwrap_or("legacy-unidentified"),
             assessment.recommendation.as_str(),
+            assessment
+                .resolution_path
+                .map(ResolutionPath::as_str)
+                .unwrap_or("legacy_unspecified"),
             assessment.proof_id,
             assessment.reviewer
         );
@@ -536,6 +724,15 @@ fn queue(args: AssessmentQueueArgs) -> Result<(), String> {
         .filter(|proof| !assessed.contains(proof.id.as_str()))
         .collect();
 
+    if args.json {
+        let output = QueueOutput {
+            since: args.since.map(|date| date.to_string()),
+            count: unassessed.len(),
+            proof_ids: unassessed.iter().map(|proof| proof.id.clone()).collect(),
+        };
+        return print_json(&output);
+    }
+
     if unassessed.is_empty() {
         println!("Every registered Kani proof has at least one assessment.");
         return Ok(());
@@ -552,6 +749,7 @@ fn filtered_assessments(
     assessments: Vec<ProofAssessment>,
     proof: Option<&str>,
     recommendation: Option<Recommendation>,
+    resolution_path: Option<ResolutionPath>,
     since_timestamp: Option<u64>,
 ) -> Vec<ProofAssessment> {
     assessments
@@ -559,6 +757,9 @@ fn filtered_assessments(
         .filter(|assessment| proof.is_none_or(|proof_id| assessment.proof_id == proof_id))
         .filter(|assessment| {
             recommendation.is_none_or(|wanted| assessment.recommendation == wanted)
+        })
+        .filter(|assessment| {
+            resolution_path.is_none_or(|wanted| assessment.resolution_path == Some(wanted))
         })
         .filter(|assessment| {
             since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
@@ -596,6 +797,22 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
         .collect::<Vec<_>>()
         .join(" ");
     println!("  recommendations: {recommendations}");
+
+    let mut resolution_paths: BTreeMap<String, usize> = BTreeMap::new();
+    for entry in entries {
+        let key = entry
+            .resolution_path
+            .map(ResolutionPath::as_str)
+            .unwrap_or("legacy_unspecified")
+            .to_owned();
+        *resolution_paths.entry(key).or_default() += 1;
+    }
+    let resolution_paths = resolution_paths
+        .into_iter()
+        .map(|(resolution_path, count)| format!("{resolution_path}:{count}"))
+        .collect::<Vec<_>>()
+        .join(" ");
+    println!("  resolution paths: {resolution_paths}");
 }
 
 fn registered_proofs() -> Vec<KaniProof> {
@@ -621,6 +838,13 @@ fn timestamp() -> Result<u64, String> {
         .map(|duration| duration.as_secs())
 }
 
+fn assessment_id() -> Result<String, String> {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| format!("system clock is before the Unix epoch: {error}"))
+        .map(|duration| format!("assessment-{}", duration.as_nanos()))
+}
+
 fn start_of_utc_date_timestamp(date: Date) -> Result<u64, String> {
     let timestamp = date.midnight().assume_utc().unix_timestamp();
     u64::try_from(timestamp).map_err(|_| {
@@ -636,6 +860,38 @@ fn format_timestamp(timestamp: u64) -> Result<String, String> {
     recorded_at
         .format(&Rfc3339)
         .map_err(|error| format!("could not format assessment timestamp {timestamp}: {error}"))
+}
+
+fn validate_resolution_path(
+    recommendation: Recommendation,
+    resolution_path: ResolutionPath,
+) -> Result<(), String> {
+    let valid = match recommendation {
+        Recommendation::Accept => resolution_path == ResolutionPath::KeepCurrentProof,
+        Recommendation::Strengthen => resolution_path == ResolutionPath::StrengthenCurrentProof,
+        Recommendation::Replace => matches!(
+            resolution_path,
+            ResolutionPath::ReplaceWithProofSpecificModel
+                | ResolutionPath::ReplaceWithAccommodationModel
+                | ResolutionPath::DocumentVerifierLimitation
+        ),
+        Recommendation::Retire => resolution_path == ResolutionPath::RetireClaim,
+    };
+
+    valid.then_some(()).ok_or_else(|| {
+        format!(
+            "resolution path {} is incompatible with recommendation {}",
+            resolution_path.as_str(),
+            recommendation.as_str()
+        )
+    })
+}
+
+fn print_json<T: Serialize>(value: &T) -> Result<(), String> {
+    let json = serde_json::to_string_pretty(value)
+        .map_err(|error| format!("could not serialize assessment output as JSON: {error}"))?;
+    println!("{json}");
+    Ok(())
 }
 
 fn load(path: &Path) -> Result<Vec<ProofAssessment>, String> {
