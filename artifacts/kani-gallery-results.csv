@@ -1,3 +1,4 @@
 case_id,timestamp,disposition,expected_status,observed_status,matched_expectation
 amenable_kani::gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path,1785351840,false_trail,timeout,timeout,true
 amenable_kani::gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary,1785351854,false_trail,failed,failed,true
+amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary,1785353100,false_trail,failed,failed,true

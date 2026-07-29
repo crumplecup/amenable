@@ -712,6 +712,39 @@ amenable_derive::harness! {
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
         case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "Mutex poisoning reaches an unsupported catch_unwind boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, MUTEX_POISONING_REACHES_THE_UNSUPPORTED_CATCH_UNWIND_BOUNDARY_SRC, {
+        /// This is the reduced form behind the `PoisonError` review and
+        /// the poisoned branch of the `TryLockError` review: the data-
+        /// recovery claim is straightforward, but the direct poisoning
+        /// setup must cross `std::panic::catch_unwind`, which Kani
+        /// currently reports unsupported before the lock can be observed
+        /// as poisoned. That is a verifier boundary for the direct std
+        /// path, not a reason to drop the law.
+        #[kani::proof]
+        fn mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary() {
+            let mutex = std::sync::Mutex::new(0i32);
+            let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let _guard = mutex.lock().unwrap();
+                panic!("poison it");
+            }));
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
             id: "amenable_kani::gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
             harness: "gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
             package: "amenable_kani".to_owned(),

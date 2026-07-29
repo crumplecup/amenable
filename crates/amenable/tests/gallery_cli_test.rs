@@ -72,6 +72,9 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
         "amenable_kani::gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario [false_trail / timeout]"
     ));
     assert!(stdout.contains(
+        "amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary [false_trail / failed]"
+    ));
+    assert!(stdout.contains(
         "amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path [false_trail / timeout]"
     ));
 }

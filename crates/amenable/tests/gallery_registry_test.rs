@@ -140,6 +140,12 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
     }));
     assert!(cases.iter().any(|case| {
         case.id
+            == "amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary"
+            && case.disposition == KaniGalleryDisposition::FalseTrail
+            && case.expected == KaniGalleryExpectation::Failed
+    }));
+    assert!(cases.iter().any(|case| {
+        case.id
             == "amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path"
             && case.disposition == KaniGalleryDisposition::FalseTrail
             && case.expected == KaniGalleryExpectation::Timeout
