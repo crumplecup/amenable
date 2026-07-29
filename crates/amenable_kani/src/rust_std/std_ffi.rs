@@ -2,12 +2,13 @@
 
 use std::ffi::{OsStr, OsString};
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<OsStr> {
     type SupportingEvidence = Self;
@@ -32,6 +33,24 @@ bridge_kani_witness!(RustStdStandard<OsStr>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<OsStr>`'s UTF-8 round-trip
+/// claim has been established from an already-proven `KaniUtf8Buffer<2>` --
+/// mirrors `primitives::RustStdStringUtf8Token`, one credential shared by
+/// both std-facing carriers built on the same buffer model.
+pub struct RustStdOsStrUtf8Token(());
+
+impl ProofToken for RustStdOsStrUtf8Token {
+    type Proposition = RustStdStandard<OsStr>;
+}
+
+impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<OsStr> {
+    type Token = RustStdOsStrUtf8Token;
+
+    fn establish(_credential: &KaniUtf8Buffer<2>) -> Self::Token {
+        RustStdOsStrUtf8Token(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC, {
         /// An `OsStr` built entirely of valid Unicode round-trips
@@ -50,7 +69,11 @@ amenable_derive::harness! {
         /// the same bytes -- `to_str()` returning `Some` never changes what
         /// bytes are exposed, so a byte-equality check stands in for the
         /// round trip without materializing a real `&str` through
-        /// `from_utf8` again.
+        /// `from_utf8` again. The claim is established through
+        /// `Establish<KaniUtf8Buffer<2>, KaniVerifier> for
+        /// RustStdStandard<OsStr>` rather than asserted independently, so
+        /// it rests on the buffer's own proven bookkeeping instead of
+        /// re-deriving it inline.
         #[kani::proof]
         fn verify_os_str_valid_utf8_content_round_trips_through_to_str() {
             use crate::{KaniUtf8Buffer, KaniUtf8BufferError};
@@ -61,6 +84,8 @@ amenable_derive::harness! {
 
             match KaniUtf8Buffer::<2>::new(bytes, len) {
                 Ok(buffer) => {
+                    let _token = RustStdStandard::<OsStr>::establish(&buffer);
+
                     // Compared index-by-index rather than via slice
                     // equality: `&[u8] == &[u8]` over a symbolic length
                     // routes through CBMC's memcmp intrinsic with a

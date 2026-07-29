@@ -1,11 +1,12 @@
 //! `KaniWitness` impls for Rust's scalar primitives and `String`.
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl_kani_witness_trusted!(
     bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
@@ -77,6 +78,26 @@ bridge_kani_witness!(RustStdStandard<String>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<String>`'s UTF-8 bookkeeping
+/// claim has been established from an already-proven `KaniUtf8Buffer<2>` --
+/// the buffer's own bookkeeping is proven once, generically, by
+/// `utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent`; this
+/// impl is what lets `String`'s proof rest on that instead of re-deriving
+/// the same length/emptiness/byte-recovery facts independently.
+pub struct RustStdStringUtf8Token(());
+
+impl ProofToken for RustStdStringUtf8Token {
+    type Proposition = RustStdStandard<String>;
+}
+
+impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<String> {
+    type Token = RustStdStringUtf8Token;
+
+    fn establish(_credential: &KaniUtf8Buffer<2>) -> Self::Token {
+        RustStdStringUtf8Token(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_STRING_UTF8_VALID_SRC, {
         /// `String`'s length and emptiness are consistent with its byte
@@ -94,23 +115,29 @@ amenable_derive::harness! {
         /// invalid one); what this proof establishes is that the
         /// bookkeeping `String` shares with any owned buffer -- length
         /// tracks the stored bytes, and emptiness tracks a zero length --
-        /// holds conditional on that invariant.
+        /// holds conditional on that invariant. The claim is established
+        /// through `Establish<KaniUtf8Buffer<2>, KaniVerifier> for
+        /// RustStdStandard<String>` rather than asserted independently, so
+        /// it rests on the buffer's own proven bookkeeping instead of
+        /// re-deriving it inline.
         #[kani::proof]
         fn verify_string_utf8_valid() {
             use crate::{KaniUtf8Buffer, KaniUtf8BufferError};
 
-            let byte: u8 = kani::any();
+            let bytes: [u8; 2] = kani::any();
             let len: usize = kani::any();
-            kani::assume(len <= 1);
+            kani::assume(len <= 2);
 
-            match KaniUtf8Buffer::<1>::new([byte], len) {
+            match KaniUtf8Buffer::<2>::new(bytes, len) {
                 Ok(buffer) => {
+                    let _token = RustStdStandard::<String>::establish(&buffer);
+
                     assert_eq!(buffer.len(), len, "length tracks the stored bytes");
                     assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
                     assert_eq!(buffer.as_bytes().len(), len);
                 }
                 Err(KaniUtf8BufferError::InvalidUtf8) => {
-                    // A single byte can be assumed invalid under Kani's
+                    // Bytes can be assumed invalid under Kani's
                     // symbolic-validity model; the bookkeeping claim above
                     // only applies to the accepted construction path.
                 }
