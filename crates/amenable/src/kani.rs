@@ -9,7 +9,8 @@ use std::{
 };
 
 use amenable::{KaniProof, KaniProofRegistration};
-use clap::Args;
+use clap::{Args, ValueEnum};
+use serde::Serialize;
 
 const LEDGER_HEADER: &str = "proof_id,timestamp,status";
 
@@ -36,8 +37,12 @@ pub(super) struct VerifyKaniArgs {
     harness_timeout: String,
 }
 
-fn default_results_path() -> std::path::PathBuf {
+pub(super) fn default_results_path() -> std::path::PathBuf {
     super::artifacts_directory().join("kani-verification-results.csv")
+}
+
+pub(super) fn load_results(path: &Path) -> Result<Vec<VerificationResult>, String> {
+    Ok(Ledger::load(path)?.into_results())
 }
 
 /// List or run the selected Kani harnesses.
@@ -209,15 +214,16 @@ fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
         .map(ToOwned::to_owned)
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ProofStatus {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, ValueEnum)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum ProofStatus {
     Passed,
     Failed,
     Timeout,
 }
 
 impl ProofStatus {
-    fn as_str(self) -> &'static str {
+    pub(super) fn as_str(self) -> &'static str {
         match self {
             Self::Passed => "passed",
             Self::Failed => "failed",
@@ -250,12 +256,19 @@ impl ProofRun {
 }
 
 struct LedgerRow {
-    timestamp: String,
+    timestamp: u64,
     status: ProofStatus,
 }
 
 struct Ledger {
     rows: BTreeMap<String, LedgerRow>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(super) struct VerificationResult {
+    pub(super) proof_id: String,
+    pub(super) timestamp: u64,
+    pub(super) status: ProofStatus,
 }
 
 impl Ledger {
@@ -286,11 +299,11 @@ impl Ledger {
             }
             let mut fields = line.split(',');
             let proof_id = fields.next().unwrap_or_default();
-            let timestamp = fields.next().unwrap_or_default();
+            let timestamp = fields.next().unwrap_or_default().parse::<u64>().ok();
             let status = fields.next().and_then(ProofStatus::parse);
             if fields.next().is_some()
                 || proof_id.is_empty()
-                || timestamp.is_empty()
+                || timestamp.is_none()
                 || status.is_none()
             {
                 return Err(format!(
@@ -302,7 +315,7 @@ impl Ledger {
             rows.insert(
                 proof_id.to_owned(),
                 LedgerRow {
-                    timestamp: timestamp.to_owned(),
+                    timestamp: timestamp.expect("validated above"),
                     status: status.expect("validated above"),
                 },
             );
@@ -315,8 +328,7 @@ impl Ledger {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|error| format!("system clock is before the Unix epoch: {error}"))?
-            .as_secs()
-            .to_string();
+            .as_secs();
         self.rows
             .insert(proof_id.to_owned(), LedgerRow { timestamp, status });
         Ok(())
@@ -336,7 +348,7 @@ impl Ledger {
         for (proof_id, row) in &self.rows {
             contents.push_str(proof_id);
             contents.push(',');
-            contents.push_str(&row.timestamp);
+            contents.push_str(&row.timestamp.to_string());
             contents.push(',');
             contents.push_str(row.status.as_str());
             contents.push('\n');
@@ -355,6 +367,17 @@ impl Ledger {
                 path.display()
             )
         })
+    }
+
+    fn into_results(self) -> Vec<VerificationResult> {
+        self.rows
+            .into_iter()
+            .map(|(proof_id, row)| VerificationResult {
+                proof_id,
+                timestamp: row.timestamp,
+                status: row.status,
+            })
+            .collect()
     }
 }
 

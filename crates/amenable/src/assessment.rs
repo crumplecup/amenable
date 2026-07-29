@@ -1,5 +1,6 @@
 //! Structured, append-only assessments of executable proof harnesses.
 
+use crate::kani::{self, ProofStatus};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs::{self, OpenOptions},
@@ -31,6 +32,8 @@ pub(super) struct AssessArgs {
 enum AssessCommand {
     /// Append one reviewer assessment for a registered Kani proof.
     Proof(RecordAssessmentArgs),
+    /// List latest Kani verification results that are not currently passing.
+    Failures(VerificationFailuresArgs),
     /// Summarize assessment counts by recommendation.
     Summary(AssessmentSummaryArgs),
     /// List recorded assessments, optionally filtered by recommendation.
@@ -157,6 +160,25 @@ struct AssessmentQueueArgs {
     /// Read this JSON Lines assessment artifact.
     #[arg(short, long, default_value_os_t = default_assessment_path())]
     assessments: PathBuf,
+}
+
+/// Arguments that list non-passing Kani verification results.
+#[derive(Debug, Args)]
+struct VerificationFailuresArgs {
+    /// Restrict the list to one exact, fully-qualified registered proof ID.
+    #[arg(long)]
+    proof: Option<String>,
+    /// Restrict the list to one latest verification status.
+    ///
+    /// By default, this lists every proof whose latest result is not `passed`.
+    #[arg(long, value_enum)]
+    status: Option<ProofStatus>,
+    /// Emit matching verification results as pretty JSON instead of tab-separated text.
+    #[arg(long)]
+    json: bool,
+    /// Read this Kani verification CSV ledger.
+    #[arg(short, long, default_value_os_t = kani::default_results_path())]
+    results: PathBuf,
 }
 
 /// A reviewer's recommended next action.
@@ -450,10 +472,19 @@ struct QueueOutput {
     proof_ids: Vec<String>,
 }
 
+#[derive(Debug, Serialize)]
+struct ListedVerificationFailure {
+    proof_id: String,
+    timestamp: u64,
+    recorded_at: String,
+    status: ProofStatus,
+}
+
 /// Execute an assessment command.
 pub(super) fn run(args: AssessArgs) -> Result<(), String> {
     match args.command {
         AssessCommand::Proof(args) => record(args),
+        AssessCommand::Failures(args) => failures(args),
         AssessCommand::Summary(args) => summary(args),
         AssessCommand::List(args) => list(args),
         AssessCommand::Report(args) => report(args),
@@ -596,6 +627,73 @@ fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
     println!("{} {}", "-".repeat(label_width), "-".repeat(count_width));
     for label in counts.keys() {
         println!("{:<label_width$} {:>count_width$}", label, counts[label]);
+    }
+
+    Ok(())
+}
+
+fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
+    if let Some(proof) = &args.proof {
+        ensure_registered(proof)?;
+    }
+
+    let registered: BTreeSet<_> = registered_proofs()
+        .into_iter()
+        .map(|proof| proof.id)
+        .collect();
+    let mut failures = Vec::new();
+
+    for result in kani::load_results(&args.results)? {
+        if !registered.contains(&result.proof_id) {
+            eprintln!(
+                "Verification result is no longer registered and will be skipped: {}",
+                result.proof_id
+            );
+            continue;
+        }
+
+        if args
+            .proof
+            .as_ref()
+            .is_some_and(|proof| result.proof_id != *proof)
+        {
+            continue;
+        }
+
+        if !matches_failure_filter(result.status, args.status) {
+            continue;
+        }
+
+        failures.push(result);
+    }
+
+    if failures.is_empty() {
+        println!("No Kani verification results matched the selection.");
+        return Ok(());
+    }
+
+    if args.json {
+        let listed = failures
+            .into_iter()
+            .map(|result| {
+                Ok(ListedVerificationFailure {
+                    proof_id: result.proof_id,
+                    timestamp: result.timestamp,
+                    recorded_at: format_timestamp(result.timestamp)?,
+                    status: result.status,
+                })
+            })
+            .collect::<Result<Vec<_>, String>>()?;
+        return print_json(&listed);
+    }
+
+    for result in failures {
+        let recorded_at = format_timestamp(result.timestamp)?;
+        println!(
+            "{}\t{recorded_at}\t{}",
+            result.status.as_str(),
+            result.proof_id
+        );
     }
 
     Ok(())
@@ -765,6 +863,13 @@ fn filtered_assessments(
             since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
         })
         .collect()
+}
+
+fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> bool {
+    match filter {
+        Some(wanted) => status == wanted,
+        None => status != ProofStatus::Passed,
+    }
 }
 
 fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {

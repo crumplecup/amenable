@@ -10,6 +10,7 @@ use serde_json::Value;
 const PROOF_ID: &str = "amenable_kani::calculator::add_impl_computes_exact_sum";
 const SECOND_PROOF_ID: &str =
     "amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through";
+const THIRD_PROOF_ID: &str = "amenable_kani::calculator::verify_credit_access_preserves_value";
 
 fn temporary_path(name: &str) -> PathBuf {
     let nonce = SystemTime::now()
@@ -71,6 +72,10 @@ fn record(
 
 fn write_assessment_artifact(path: &Path, contents: &str) {
     fs::write(path, contents).expect("assessment artifact should be written");
+}
+
+fn write_kani_results_artifact(path: &Path, contents: &str) {
+    fs::write(path, contents).expect("Kani results artifact should be written");
 }
 
 struct AssessmentRecord<'a> {
@@ -466,6 +471,82 @@ fn list_json_emits_full_structured_assessments() {
     assert_eq!(entry["recorded_at"], "2026-07-29T00:00:00Z");
 
     fs::remove_file(path).expect("assessment artifact should be removed");
+}
+
+#[test]
+fn failures_list_nonpassing_latest_kani_results() {
+    let path = temporary_path("assessment-failures");
+    write_kani_results_artifact(
+        &path,
+        &format!(
+            "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,passed\n{THIRD_PROOF_ID},1785290400,timeout\n"
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "failures",
+            "--results",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment failures CLI should start");
+
+    assert!(
+        output.status.success(),
+        "failures failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
+    assert!(stdout.contains("failed"));
+    assert!(stdout.contains(PROOF_ID));
+    assert!(stdout.contains("timeout"));
+    assert!(stdout.contains(THIRD_PROOF_ID));
+    assert!(!stdout.contains(SECOND_PROOF_ID));
+    assert!(!stdout.contains("\tpassed\t"));
+
+    fs::remove_file(path).expect("Kani results artifact should be removed");
+}
+
+#[test]
+fn failures_can_filter_by_status_and_emit_json() {
+    let path = temporary_path("assessment-failures-json");
+    write_kani_results_artifact(
+        &path,
+        &format!(
+            "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,passed\n{THIRD_PROOF_ID},1785290400,timeout\n"
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "failures",
+            "--status",
+            "timeout",
+            "--json",
+            "--results",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment failures CLI should start");
+
+    assert!(
+        output.status.success(),
+        "failures failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
+    let json: Value = serde_json::from_str(&stdout).expect("failures output should be JSON");
+    let entries = json.as_array().expect("failures JSON should be an array");
+    assert_eq!(entries.len(), 1);
+    assert_eq!(entries[0]["proof_id"], THIRD_PROOF_ID);
+    assert_eq!(entries[0]["status"], "timeout");
+    assert_eq!(entries[0]["timestamp"], 1785290400);
+    assert_eq!(entries[0]["recorded_at"], "2026-07-29T02:00:00Z");
+
+    fs::remove_file(path).expect("Kani results artifact should be removed");
 }
 
 #[test]
