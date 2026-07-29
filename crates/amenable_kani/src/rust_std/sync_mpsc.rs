@@ -8,12 +8,13 @@
 
 use std::sync::mpsc::{RecvError, SendError, SyncSender, TrySendError};
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{KaniChannel, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::sync::mpsc::Sender<i32>> {
     type SupportingEvidence = Self;
@@ -38,6 +39,23 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Sender<i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Sender<i32>>`'s delivery claim
+/// has been established from a `KaniChannel<i32>` that has itself
+/// demonstrated the sent value is receivable.
+pub struct RustStdSenderToken(());
+
+impl ProofToken for RustStdSenderToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::Sender<i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::Sender<i32>> {
+    type Token = RustStdSenderToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdSenderToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC, {
         /// A value sent on an unbounded channel is receivable on the
@@ -48,13 +66,20 @@ amenable_derive::harness! {
         /// with no blocking involved -- a pure in-memory implementation
         /// cost of the real flavor-switching, atomics-backed queue, not an
         /// unwinding-bound or foreign-boundary issue (see
-        /// `gallery::replace_recommendations`).
+        /// `gallery::replace_recommendations`). The claim is established
+        /// through `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<Sender<i32>>` from the channel instance that
+        /// actually demonstrated the delivery, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
             let mut channel = crate::KaniChannel::unbounded();
             channel.send(value).unwrap();
             assert_eq!(channel.recv(), Ok(value), "the sent value is receivable");
+
+            let _token =
+                RustStdStandard::<std::sync::mpsc::Sender<i32>>::establish(&channel);
         }
     }
 }
