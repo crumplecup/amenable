@@ -295,7 +295,7 @@ amenable_kani::rust_std::sync_mpsc::verify_recv_error_on_an_empty_disconnected_c
 amenable_kani::rust_std::sync_mpsc::verify_recv_timeout_error_distinguishes_timeout_from_disconnected,1785121565,failed
 amenable_kani::rust_std::sync_mpsc::verify_send_error_recovers_the_unsent_value,1785121540,passed
 amenable_kani::rust_std::sync_mpsc::verify_sender_delivers_to_the_paired_receiver,1785348699,passed
-amenable_kani::rust_std::sync_mpsc::verify_sync_sender_delivers_to_the_paired_receiver,1785121522,passed
+amenable_kani::rust_std::sync_mpsc::verify_sync_sender_delivers_to_the_paired_receiver,1785348785,passed
 amenable_kani::rust_std::sync_mpsc::verify_try_iter_does_not_block_on_an_empty_open_channel,1785121536,passed
 amenable_kani::rust_std::sync_mpsc::verify_try_recv_error_distinguishes_empty_from_disconnected,1785121544,passed
 amenable_kani::rust_std::sync_mpsc::verify_try_send_error_full_recovers_the_unsent_value,1785121541,passed

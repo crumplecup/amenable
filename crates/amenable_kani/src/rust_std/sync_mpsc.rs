@@ -107,17 +107,40 @@ bridge_kani_witness!(RustStdStandard<SyncSender<i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SyncSender<i32>>`'s delivery
+/// claim has been established from a `KaniChannel<i32>` that has itself
+/// demonstrated the sent value is receivable.
+pub struct RustStdSyncSenderToken(());
+
+impl ProofToken for RustStdSyncSenderToken {
+    type Proposition = RustStdStandard<SyncSender<i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<SyncSender<i32>> {
+    type Token = RustStdSyncSenderToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdSyncSenderToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SYNC_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC, {
         /// Same delivery contract as `Sender`, for a bounded channel
         /// with spare capacity.
         /// Same `KaniChannel` model migration as `Sender`'s proof above.
+        /// The claim is established through `Establish<KaniChannel<i32>,
+        /// KaniVerifier> for RustStdStandard<SyncSender<i32>>` from the
+        /// channel instance that actually demonstrated the delivery,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_sync_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
             let mut channel = crate::KaniChannel::bounded(1);
             channel.send(value).unwrap();
             assert_eq!(channel.recv(), Ok(value));
+
+            let _token = RustStdStandard::<SyncSender<i32>>::establish(&channel);
         }
     }
 }
