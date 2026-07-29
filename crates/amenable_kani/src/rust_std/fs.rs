@@ -18,7 +18,7 @@ use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
     KaniFileLenObservation, KaniFileTimesObservation, KaniFileTypeObservation,
-    KaniRecursiveDirObservation, KaniVerifier,
+    KaniPermissionsObservation, KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -547,6 +547,23 @@ bridge_kani_witness!(RustStdStandard<Permissions>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Permissions>`'s readonly
+/// round-trip claim has been established from a `KaniPermissionsObservation`
+/// that has itself demonstrated the round trip in both directions.
+pub struct RustStdPermissionsToken(());
+
+impl ProofToken for RustStdPermissionsToken {
+    type Proposition = RustStdStandard<Permissions>;
+}
+
+impl Establish<KaniPermissionsObservation, KaniVerifier> for RustStdStandard<Permissions> {
+    type Token = RustStdPermissionsToken;
+
+    fn establish(_credential: &KaniPermissionsObservation) -> Self::Token {
+        RustStdPermissionsToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PERMISSIONS_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC, {
         /// Flipping `.set_readonly(true)` and applying it via
@@ -554,7 +571,11 @@ amenable_derive::harness! {
         /// permissions are read.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `set_permissions` / `metadata().permissions()` path preserves
-        /// the readonly bit this way, the Rust-facing claim follows.
+        /// the readonly bit this way, the Rust-facing claim follows. The
+        /// claim is established through `Establish<KaniPermissionsObservation,
+        /// KaniVerifier> for RustStdStandard<Permissions>` from the
+        /// observation instance that actually demonstrated the round trip
+        /// in both directions, rather than asserted independently of it.
         #[kani::proof]
         fn verify_permissions_readonly_round_trips_through_set_permissions() {
             let mut observation = crate::KaniPermissionsObservation::new();
@@ -568,6 +589,8 @@ amenable_derive::harness! {
 
             observation.set_readonly(false);
             assert!(!observation.readonly(), "clearing readonly is reflected as well");
+
+            let _token = RustStdStandard::<Permissions>::establish(&observation);
         }
     }
 }

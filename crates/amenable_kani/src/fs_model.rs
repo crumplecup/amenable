@@ -704,9 +704,36 @@ impl KaniCreateNewObservation {
 
 /// Observable result of flipping a file's readonly permission bit and
 /// reading it back.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that flipping
+/// `.set_readonly()` and applying it via `fs::set_permissions` is
+/// reflected the next time the file's permissions are read, and nothing
+/// else about the real OS-backed permission bit -- is named explicitly as
+/// a `Standard` rather than left as prose: the direct `std::fs` path
+/// crosses OS-backed state Kani cannot symbolically execute well (see this
+/// module's own doc comment), so this bounded observation is what the
+/// `Permissions` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniPermissionsObservation {
     readonly: bool,
+}
+
+impl Provenance for KaniPermissionsObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "flipping .set_readonly() and applying it via fs::set_permissions is reflected the next time the file's permissions are read, standing in for the real OS-backed permission bit",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("readonly", self.readonly.to_string()),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniPermissionsObservation {
