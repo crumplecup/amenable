@@ -21,7 +21,7 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
-use crate::{KaniSplitObservation, KaniVerifier};
+use crate::{KaniSplitNObservation, KaniSplitObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -931,6 +931,26 @@ bridge_kani_witness!(RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -
     }
 }
 
+/// Lawful token minted once `RustStdStandard<SplitN<'static, i32, ...>>`'s
+/// cap-at-two claim has been established from a
+/// `KaniSplitNObservation<i32>` that has itself demonstrated the second
+/// delimiter staying unsplit in the last piece.
+pub struct RustStdSplitNToken(());
+
+impl ProofToken for RustStdSplitNToken {
+    type Proposition = RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+    for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdSplitNToken;
+
+    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+        RustStdSplitNToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC, {
         /// `splitn(2, ..)` stops after producing 2 pieces even when a
@@ -939,7 +959,11 @@ amenable_derive::harness! {
         /// that distinguishes `SplitN` from plain `Split`.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `splitn` path refines this two-delimiter observation, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitNObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<SplitN<...>>` from the observation instance
+        /// that actually demonstrated the cap, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_split_n_caps_the_number_of_pieces() {
             let a: i32 = kani::any();
@@ -955,6 +979,10 @@ amenable_derive::harness! {
                 [b, 0, c],
                 "the cap leaves the second delimiter unsplit in the last piece"
             );
+
+            let _token = RustStdStandard::<
+                std::slice::SplitN<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
