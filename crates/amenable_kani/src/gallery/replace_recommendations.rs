@@ -864,3 +864,238 @@ amenable_derive::harness! {
         }
     }
 }
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BufReader::read_to_string still times out in the pure std path".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BUF_READER_READ_TO_STRING_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the reduced direct `BufReader` path retained after the
+        /// production proof moved to a bounded buffered-read observation:
+        /// in-memory input only, exact byte-for-byte string recovery, and no
+        /// OS boundary at all. If this still times out, the issue is std's
+        /// buffered-reader implementation expansion rather than proof-side
+        /// scaffolding.
+        #[kani::proof]
+        fn buf_reader_read_to_string_times_out_in_the_direct_std_path() {
+            use std::io::Read;
+
+            let mut reader = std::io::BufReader::new(&b"hello"[..]);
+            let mut collected = String::new();
+            reader.read_to_string(&mut collected).unwrap();
+            assert_eq!(collected, "hello");
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BufWriter::into_inner error recovery still times out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, INTO_INNER_ERROR_RECOVERY_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the direct `IntoInnerError` path retained after the
+        /// production proof moved to a bounded recovery observation: the
+        /// writer always fails, and the harness observes both the surfaced
+        /// error and writer recovery. If this still times out, the issue is
+        /// std's buffered-writer recovery path rather than proof-side setup.
+        #[kani::proof]
+        fn into_inner_error_recovery_times_out_in_the_direct_std_path() {
+            use std::io::Write;
+
+            struct FailingWriter;
+            impl Write for FailingWriter {
+                fn write(&mut self, _buf: &[u8]) -> std::io::Result<usize> {
+                    Err(std::io::Error::other("always fails"))
+                }
+                fn flush(&mut self) -> std::io::Result<()> {
+                    Err(std::io::Error::other("always fails"))
+                }
+            }
+
+            let mut failing = std::io::BufWriter::new(FailingWriter);
+            failing.write_all(b"buffered, not yet flushed").unwrap();
+            match failing.into_inner() {
+                Err(err) => {
+                    assert_eq!(err.error().to_string(), "always fails");
+                    let _recovered_writer: std::io::BufWriter<FailingWriter> = err.into_inner();
+                }
+                Ok(_) => panic!("expected into_inner to fail when flushing fails"),
+            }
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct LineWriter newline flushing still times out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, LINE_WRITER_NEWLINE_FLUSH_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the direct `LineWriter` path retained after the production
+        /// proof moved to a bounded line-buffer observation: the harness
+        /// distinguishes automatic newline flush from a trailing partial line
+        /// that remains buffered. If this still times out, the issue is std's
+        /// line-buffering internals rather than proof-side materialization.
+        #[kani::proof]
+        fn line_writer_newline_flush_times_out_in_the_direct_std_path() {
+            use std::io::Write;
+
+            let mut writer = std::io::LineWriter::new(Vec::new());
+            writer.write_all(b"abc\n").unwrap();
+            assert_eq!(writer.get_ref().as_slice(), b"abc\n");
+
+            writer.write_all(b"def").unwrap();
+            assert_eq!(
+                writer.get_ref().as_slice(),
+                b"abc\n",
+                "the partial line stays buffered until a newline or flush"
+            );
+
+            writer.flush().unwrap();
+            assert_eq!(writer.get_ref().as_slice(), b"abc\ndef");
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BufRead::lines still times out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BUFREAD_LINES_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the direct `BufRead::lines` path retained after the
+        /// production proof moved to a bounded line-splitting observation:
+        /// fixed in-memory input only, with exact expected line bodies. If
+        /// this still times out, the issue is std's line iteration / string
+        /// machinery rather than any richer proof-side setup.
+        #[kani::proof]
+        fn bufread_lines_times_out_in_the_direct_std_path() {
+            use std::io::BufRead;
+
+            let lines: Vec<String> = (b"a\nb\nc"[..]).lines().map(|l| l.unwrap()).collect();
+            assert_eq!(lines, vec!["a", "b", "c"]);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BufRead::split still times out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BUFREAD_SPLIT_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// This is the direct `BufRead::split` path retained after the
+        /// production proof moved to a bounded delimiter-splitting
+        /// observation: incremental `next()` checks only, with no eager
+        /// collection. If this still times out, the issue is std's own split
+        /// state machine rather than proof-side materialization.
+        #[kani::proof]
+        fn bufread_split_times_out_in_the_direct_std_path() {
+            use std::io::BufRead;
+
+            let mut pieces = BufRead::split(&b"a,b,c"[..], b',');
+            assert_eq!(pieces.next().unwrap().unwrap(), b"a".to_vec());
+            assert_eq!(pieces.next().unwrap().unwrap(), b"b".to_vec());
+            assert_eq!(pieces.next().unwrap().unwrap(), b"c".to_vec());
+            assert!(
+                pieces.next().is_none(),
+                "the separator is dropped and no extra segment is produced",
+            );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            harness: "gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct BufWriter panic recovery reaches the unsupported catch_unwind boundary".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BUF_WRITER_PANIC_RECOVERY_REACHES_THE_UNSUPPORTED_CATCH_UNWIND_BOUNDARY_SRC, {
+        /// This is the direct `WriterPanicked` path retained after the
+        /// production proof moved to a bounded panic-recovery observation:
+        /// the claim is a straightforward buffered-data recovery law, but the
+        /// direct proof reaches `catch_unwind` before that law can be checked
+        /// under Kani.
+        #[kani::proof]
+        fn buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary() {
+            use std::io::Write;
+
+            struct PanickingWriter;
+            impl Write for PanickingWriter {
+                fn write(&mut self, _buf: &[u8]) -> std::io::Result<usize> {
+                    panic!("writer panicked");
+                }
+                fn flush(&mut self) -> std::io::Result<()> {
+                    Ok(())
+                }
+            }
+
+            let mut writer = std::io::BufWriter::new(PanickingWriter);
+            writer.write_all(b"data").unwrap();
+            let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                writer.flush().unwrap();
+            }));
+            assert!(caught.is_err(), "the inner writer's panic propagates out");
+            match writer.into_parts().1 {
+                Err(writer_panicked) => assert_eq!(writer_panicked.into_inner(), b"data"),
+                Ok(_) => panic!("expected WriterPanicked after a caught panic"),
+            }
+        }
+    }
+}
