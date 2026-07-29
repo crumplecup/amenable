@@ -12,7 +12,8 @@ use amenable::{KaniProof, KaniProofRegistration};
 use clap::{Args, Subcommand, ValueEnum};
 use serde::{Deserialize, Serialize};
 
-const SCHEMA_VERSION: u8 = 1;
+const CURRENT_ASSESSMENT_VERSION: &str = "0.1.0";
+const LEGACY_SCHEMA_VERSION: u8 = 1;
 
 /// Commands for recording and examining proof assessments.
 #[derive(Debug, Args)]
@@ -164,12 +165,12 @@ impl Rubric {
 }
 
 /// One immutable assessment event stored in the JSON Lines artifact.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]
 struct ProofAssessment {
-    schema_version: u8,
+    version: String,
     proof_id: String,
     reviewer: String,
-    timestamp_unix_seconds: u64,
+    timestamp: u64,
     rubric: Rubric,
     recommendation: Recommendation,
     comment: String,
@@ -177,10 +178,10 @@ struct ProofAssessment {
 
 impl ProofAssessment {
     fn validate(&self) -> Result<(), String> {
-        if self.schema_version != SCHEMA_VERSION {
+        if self.version != CURRENT_ASSESSMENT_VERSION {
             return Err(format!(
-                "unsupported assessment schema version {}; expected {SCHEMA_VERSION}",
-                self.schema_version
+                "unsupported assessment version {}; expected {CURRENT_ASSESSMENT_VERSION}",
+                self.version
             ));
         }
         if self.proof_id.trim().is_empty() || self.reviewer.trim().is_empty() {
@@ -191,6 +192,89 @@ impl ProofAssessment {
         }
 
         self.rubric.validate()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct StoredProofAssessment {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    schema_version: Option<u8>,
+    proof_id: String,
+    reviewer: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    timestamp: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    timestamp_unix_seconds: Option<u64>,
+    rubric: Rubric,
+    recommendation: Recommendation,
+    comment: String,
+}
+
+impl StoredProofAssessment {
+    fn into_assessment(self) -> Result<ProofAssessment, String> {
+        let proof_id = self.proof_id;
+        let version = match (self.version, self.schema_version) {
+            (Some(version), None) => version,
+            (None, Some(LEGACY_SCHEMA_VERSION)) => CURRENT_ASSESSMENT_VERSION.to_owned(),
+            (None, Some(schema_version)) => {
+                return Err(format!(
+                    "unsupported legacy assessment schema version {schema_version}; expected {LEGACY_SCHEMA_VERSION}"
+                ));
+            }
+            (Some(_), Some(_)) => {
+                return Err(format!(
+                    "assessment record for {proof_id} must not contain both version and schema_version"
+                ));
+            }
+            (None, None) => {
+                return Err(format!(
+                    "assessment record for {proof_id} is missing version metadata"
+                ));
+            }
+        };
+
+        let timestamp = match (self.timestamp, self.timestamp_unix_seconds) {
+            (Some(timestamp), None) => timestamp,
+            (None, Some(timestamp)) => timestamp,
+            (Some(_), Some(_)) => {
+                return Err(format!(
+                    "assessment record for {proof_id} must not contain both timestamp and timestamp_unix_seconds"
+                ));
+            }
+            (None, None) => {
+                return Err(format!(
+                    "assessment record for {proof_id} is missing timestamp metadata"
+                ));
+            }
+        };
+
+        Ok(ProofAssessment {
+            version,
+            proof_id,
+            reviewer: self.reviewer,
+            timestamp,
+            rubric: self.rubric,
+            recommendation: self.recommendation,
+            comment: self.comment,
+        })
+    }
+}
+
+impl From<&ProofAssessment> for StoredProofAssessment {
+    fn from(assessment: &ProofAssessment) -> Self {
+        Self {
+            version: Some(assessment.version.clone()),
+            schema_version: None,
+            proof_id: assessment.proof_id.clone(),
+            reviewer: assessment.reviewer.clone(),
+            timestamp: Some(assessment.timestamp),
+            timestamp_unix_seconds: None,
+            rubric: assessment.rubric,
+            recommendation: assessment.recommendation,
+            comment: assessment.comment.clone(),
+        }
     }
 }
 
@@ -224,10 +308,10 @@ fn record(args: RecordAssessmentArgs) -> Result<(), String> {
     ensure_registered(&args.proof)?;
     let comment = read_comment(args.comment, args.comment_file)?;
     let assessment = ProofAssessment {
-        schema_version: SCHEMA_VERSION,
+        version: CURRENT_ASSESSMENT_VERSION.to_owned(),
         proof_id: args.proof,
         reviewer: args.reviewer,
-        timestamp_unix_seconds: timestamp()?,
+        timestamp: timestamp()?,
         rubric: Rubric {
             claim_alignment: args.claim_alignment,
             assumption_adequacy: args.assumption_adequacy,
@@ -392,9 +476,17 @@ fn load(path: &Path) -> Result<Vec<ProofAssessment>, String> {
         .enumerate()
         .filter(|(_, line)| !line.trim().is_empty())
         .map(|(index, line)| {
-            let assessment: ProofAssessment = serde_json::from_str(line).map_err(|error| {
+            let assessment: StoredProofAssessment =
+                serde_json::from_str(line).map_err(|error| {
+                    format!(
+                        "invalid assessment JSON on line {} in {}: {error}",
+                        index + 1,
+                        path.display()
+                    )
+                })?;
+            let assessment = assessment.into_assessment().map_err(|error| {
                 format!(
-                    "invalid assessment JSON on line {} in {}: {error}",
+                    "invalid assessment on line {} in {}: {error}",
                     index + 1,
                     path.display()
                 )
@@ -421,7 +513,7 @@ fn append(path: &Path, assessment: &ProofAssessment) -> Result<(), String> {
         })?;
     }
 
-    let record = serde_json::to_string(assessment)
+    let record = serde_json::to_string(&StoredProofAssessment::from(assessment))
         .map_err(|error| format!("could not serialize proof assessment: {error}"))?;
     let mut file = OpenOptions::new()
         .create(true)

@@ -2,9 +2,11 @@
 
 ## Implementation Status
 
-Implemented in `amenable assess`. The command records `schema_version: 1`
-JSON Lines assessments, reports score means and distributions, and lists the
-registered Kani proofs awaiting a first assessment. The initial assessment of
+Implemented in `amenable assess`. The command records versioned JSON Lines
+assessments with `version: "0.1.0"` and a CLI-produced Unix-seconds
+`timestamp`, reports score means and distributions, and lists the registered
+Kani proofs awaiting a first assessment. Legacy `schema_version: 1` records
+remain readable for append-only back-compatibility. The initial assessment of
 `amenable_kani::calculator::add_impl_computes_exact_sum` is recorded with a
 `strengthen` recommendation.
 
@@ -63,10 +65,12 @@ later assessment must not erase an earlier judgment. JSON Lines, rather than
 CSV, safely represents arbitrary multiline comment text without weakening the
 schema.
 
-Each JSON object contains a schema version, proof ID, reviewer, Unix timestamp,
-six rubric scores, recommendation, and comment. Initially, proof IDs must be
-present in the compiled Kani inventory; users of the crate receive the same
-workflow when their code registers a Kani harness.
+Each JSON object contains an assessment version, proof ID, reviewer, Unix
+timestamp, six rubric scores, recommendation, and comment. The CLI owns that
+metadata so reviewers should record assessments through `amenable assess
+proof`, not by hand-editing the artifact. Initially, proof IDs must be present
+in the compiled Kani inventory; users of the crate receive the same workflow
+when their code registers a Kani harness.
 
 ## CLI
 

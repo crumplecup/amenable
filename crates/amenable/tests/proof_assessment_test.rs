@@ -109,9 +109,19 @@ fn assessment_appends_multiline_comment_as_one_json_record() {
 
     let record: serde_json::Value =
         serde_json::from_str(contents.trim()).expect("assessment record should be JSON");
+    assert_eq!(record["version"], "0.1.0");
     assert_eq!(record["proof_id"], PROOF_ID);
+    assert!(record["timestamp"].as_u64().is_some());
     assert_eq!(record["recommendation"], "strengthen");
     assert_eq!(record["comment"], comment);
+    assert!(
+        record.get("schema_version").is_none(),
+        "new records should not emit the legacy schema_version field"
+    );
+    assert!(
+        record.get("timestamp_unix_seconds").is_none(),
+        "new records should not emit the legacy timestamp_unix_seconds field"
+    );
 
     fs::remove_file(path).expect("assessment artifact should be removed");
     fs::remove_file(comment_path).expect("comment file should be removed");
@@ -231,4 +241,36 @@ fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
     assert!(!stdout.contains(PROOF_ID));
 
     fs::remove_file(path).expect("assessment artifact should be removed");
+}
+
+#[test]
+fn report_accepts_legacy_assessment_records_for_back_compatibility() {
+    let path = temporary_path("assessment-legacy-report");
+    let legacy_record = format!(
+        "{{\"schema_version\":1,\"proof_id\":\"{PROOF_ID}\",\"reviewer\":\"legacy-reviewer\",\"timestamp_unix_seconds\":1785357757,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":4,\"adversarial_coverage\":2,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Legacy record.\"}}\n"
+    );
+    fs::write(&path, legacy_record).expect("legacy assessment artifact should be written");
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "report",
+            "--proof",
+            PROOF_ID,
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("legacy assessment report CLI should start");
+
+    assert!(
+        output.status.success(),
+        "legacy report failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("legacy report should be UTF-8");
+    assert!(stdout.contains("1 assessment(s)"));
+    assert!(stdout.contains("recommendations: accept:1"));
+
+    fs::remove_file(path).expect("legacy assessment artifact should be removed");
 }
