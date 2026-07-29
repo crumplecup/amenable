@@ -1244,6 +1244,26 @@ bridge_kani_witness!(RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) 
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RSplitN<'static, i32,
+/// ...>>`'s cap-from-the-back claim has been established from a
+/// `KaniSplitNObservation<i32>` that has itself demonstrated the first
+/// delimiter staying unsplit in the last piece.
+pub struct RustStdRSplitNToken(());
+
+impl ProofToken for RustStdRSplitNToken {
+    type Proposition = RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+    for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdRSplitNToken;
+
+    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+        RustStdRSplitNToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RSPLIT_N_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC, {
         /// `rsplitn(2, ..)` caps at 2 pieces from the back: the
@@ -1251,7 +1271,11 @@ amenable_derive::harness! {
         /// the last (frontmost) piece.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `rsplitn` path refines this two-delimiter observation, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitNObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<RSplitN<...>>` from the observation instance
+        /// that actually demonstrated the cap, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_rsplit_n_caps_the_number_of_pieces_from_the_back() {
             let a: i32 = kani::any();
@@ -1267,6 +1291,10 @@ amenable_derive::harness! {
                 [a, 0, b],
                 "the cap leaves the first delimiter unsplit in the last piece"
             );
+
+            let _token = RustStdStandard::<
+                std::slice::RSplitN<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
