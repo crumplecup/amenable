@@ -1089,13 +1089,37 @@ bridge_kani_witness!(RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -
     }
 }
 
+/// Lawful token minted once `RustStdStandard<RSplit<'static, i32, ...>>`'s
+/// reverse-order claim has been established from a
+/// `KaniSplitObservation<i32>` that has itself demonstrated the last piece
+/// yielded first.
+pub struct RustStdRSplitToken(());
+
+impl ProofToken for RustStdRSplitToken {
+    type Proposition = RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>;
+}
+
+impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+    for RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>
+{
+    type Token = RustStdRSplitToken;
+
+    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+        RustStdRSplitToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RSPLIT_YIELDS_SUBSLICES_FROM_THE_BACK_SRC, {
         /// `rsplit` yields the same pieces as `Split`, but in reverse
         /// order — the last piece first.
         /// This proof uses the Amenable-owned bounded split model: if the
         /// real `rsplit` path refines this one-delimiter observation, the
-        /// Rust-facing claim follows.
+        /// Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniSplitObservation<i32>, KaniVerifier> for
+        /// RustStdStandard<RSplit<...>>` from the observation instance
+        /// that actually demonstrated the reverse order, rather than
+        /// asserted independently of it.
         #[kani::proof]
         fn verify_rsplit_yields_subslices_from_the_back() {
             let a: i32 = kani::any();
@@ -1106,6 +1130,10 @@ amenable_derive::harness! {
 
             assert_eq!(pieces.0, [b], "rsplit yields the last piece first");
             assert_eq!(pieces.1, [a]);
+
+            let _token = RustStdStandard::<
+                std::slice::RSplit<'static, i32, fn(&i32) -> bool>,
+            >::establish(&observation);
         }
     }
 }
