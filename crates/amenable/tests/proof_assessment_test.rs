@@ -580,7 +580,7 @@ fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() {
                 timestamp: 1785196799,
                 score: 2,
                 recommendation: "replace",
-                resolution_path: "document_verifier_limitation",
+                resolution_path: "replace_with_accommodation_model",
                 comment: "Older sweep assessment should not satisfy the queue.",
             })
         ),
@@ -704,8 +704,8 @@ fn incompatible_resolution_path_is_rejected_before_recording() {
 }
 
 #[test]
-fn accept_can_record_a_documented_verifier_limitation() {
-    let path = temporary_path("assessment-accepts-documented-verifier-limitation");
+fn replace_can_record_an_accommodation_reroute() {
+    let path = temporary_path("assessment-replace-accommodation-reroute");
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -727,11 +727,11 @@ fn accept_can_record_a_documented_verifier_limitation() {
             "--clarity",
             "4",
             "--recommendation",
-            "accept",
+            "replace",
             "--resolution-path",
-            "document_verifier_limitation",
+            "replace_with_accommodation_model",
             "--comment",
-            "This preserved false trail is accepted boundary evidence.",
+            "This failing direct path needs an accommodation-backed replacement.",
             "--assessments",
             path.to_str().expect("temporary path should be UTF-8"),
         ])
@@ -745,8 +745,50 @@ fn accept_can_record_a_documented_verifier_limitation() {
     );
 
     let contents = fs::read_to_string(path).expect("recorded assessment should exist");
-    assert!(contents.contains("\"recommendation\":\"accept\""));
-    assert!(contents.contains("\"resolution_path\":\"document_verifier_limitation\""));
+    assert!(contents.contains("\"recommendation\":\"replace\""));
+    assert!(contents.contains("\"resolution_path\":\"replace_with_accommodation_model\""));
+}
+
+#[test]
+fn document_verifier_limitation_is_not_a_valid_resolution_path() {
+    let path = temporary_path("assessment-invalid-documented-limitation");
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "proof",
+            "--proof",
+            PROOF_ID,
+            "--reviewer",
+            "reviewer",
+            "--claim-alignment",
+            "4",
+            "--assumption-adequacy",
+            "4",
+            "--model-fidelity",
+            "4",
+            "--assertion-strength",
+            "3",
+            "--adversarial-coverage",
+            "3",
+            "--clarity",
+            "4",
+            "--recommendation",
+            "replace",
+            "--resolution-path",
+            "document_verifier_limitation",
+            "--comment",
+            "This should not be recorded.",
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment CLI should start");
+
+    assert!(!output.status.success());
+    assert!(
+        !path.exists(),
+        "invalid assessment must not create a record"
+    );
 }
 
 #[test]

@@ -232,9 +232,6 @@ enum ResolutionPath {
     /// Replace the proof with an accommodation model backed by the standards.
     #[value(name = "replace_with_accommodation_model")]
     ReplaceWithAccommodationModel,
-    /// Capture the verifier/process limitation in the gallery while rerouting.
-    #[value(name = "document_verifier_limitation")]
-    DocumentVerifierLimitation,
     /// Stop relying on the current claim.
     #[value(name = "retire_claim")]
     RetireClaim,
@@ -247,7 +244,6 @@ impl ResolutionPath {
             Self::StrengthenCurrentProof => "strengthen_current_proof",
             Self::ReplaceWithProofSpecificModel => "replace_with_proof_specific_model",
             Self::ReplaceWithAccommodationModel => "replace_with_accommodation_model",
-            Self::DocumentVerifierLimitation => "document_verifier_limitation",
             Self::RetireClaim => "retire_claim",
         }
     }
@@ -999,16 +995,12 @@ fn validate_resolution_path(
     resolution_path: ResolutionPath,
 ) -> Result<(), String> {
     let valid = match recommendation {
-        Recommendation::Accept => matches!(
-            resolution_path,
-            ResolutionPath::KeepCurrentProof | ResolutionPath::DocumentVerifierLimitation
-        ),
+        Recommendation::Accept => resolution_path == ResolutionPath::KeepCurrentProof,
         Recommendation::Strengthen => resolution_path == ResolutionPath::StrengthenCurrentProof,
         Recommendation::Replace => matches!(
             resolution_path,
             ResolutionPath::ReplaceWithProofSpecificModel
                 | ResolutionPath::ReplaceWithAccommodationModel
-                | ResolutionPath::DocumentVerifierLimitation
         ),
         Recommendation::Retire => resolution_path == ResolutionPath::RetireClaim,
     };
