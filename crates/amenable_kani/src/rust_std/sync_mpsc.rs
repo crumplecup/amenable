@@ -626,6 +626,24 @@ bridge_kani_witness!(RustStdStandard<TrySendError<i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<TrySendError<i32>>`'s
+/// full-capacity recovery claim has been established from a
+/// `KaniChannel<i32>` that has itself demonstrated the unsent value
+/// recoverable from `Full`.
+pub struct RustStdTrySendErrorToken(());
+
+impl ProofToken for RustStdTrySendErrorToken {
+    type Proposition = RustStdStandard<TrySendError<i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<TrySendError<i32>> {
+    type Token = RustStdTrySendErrorToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdTrySendErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TRY_SEND_ERROR_FULL_RECOVERS_THE_UNSENT_VALUE_SRC, {
         /// A zero-capacity (rendezvous) channel's `.try_send()` fails
@@ -633,7 +651,11 @@ amenable_derive::harness! {
         /// with — and the error still recovers the unsent value.
         /// Same `KaniChannel` model migration as the other `send`-family
         /// proofs above: a `bounded(0)` channel models the rendezvous
-        /// capacity directly.
+        /// capacity directly. The claim is established through
+        /// `Establish<KaniChannel<i32>, KaniVerifier> for
+        /// RustStdStandard<TrySendError<i32>>` from the channel instance
+        /// that actually demonstrated the recovery, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_try_send_error_full_recovers_the_unsent_value() {
             let value: i32 = kani::any();
@@ -644,6 +666,8 @@ amenable_derive::harness! {
                 }
                 other => panic!("expected Full, got {other:?}"),
             }
+
+            let _token = RustStdStandard::<TrySendError<i32>>::establish(&channel);
         }
     }
 }
