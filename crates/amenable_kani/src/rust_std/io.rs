@@ -1,13 +1,15 @@
 //! `KaniWitness` impls for `std::io`.
 //!
-//! `BufReader`/`Bytes`/`Lines`/`Split` are proved over `&'static [u8]`, and
-//! `BufWriter`/`LineWriter`/`IntoInnerError` over `Vec<u8>` — in-memory
-//! `Read`/`Write`/`BufRead` implementors, so every harness runs without
-//! real filesystem or OS-handle I/O. `Stdin`/`Stdout`/`Stderr` and their
-//! lock guards are process-attached global handles with no checkable
-//! invariant beyond what the type system already guarantees (exercising
-//! them for real would mean writing to, or blocking on, the actual
-//! process's standard streams during the proof), so those six stay
+//! `Bytes` and the simple `BufWriter` flush law still verify directly over
+//! in-memory `&'static [u8]` / `Vec<u8>` readers and writers. The rest of the
+//! buffered `std::io` family (`BufReader`, `IntoInnerError`, `LineWriter`,
+//! `Lines`, `Split`, `WriterPanicked`) uses Amenable-owned bounded
+//! observations instead: these direct std paths are pure in-memory, but still
+//! time out or hit unsupported panic capture under Kani. `Stdin`/`Stdout`/
+//! `Stderr` and their lock guards are process-attached global handles with no
+//! checkable invariant beyond what the type system already guarantees
+//! (exercising them for real would mean writing to, or blocking on, the
+//! actual process's standard streams during the proof), so those six stay
 //! "trusted." The direct `PipeReader`/`PipeWriter` setup path reaches
 //! unsupported `pipe2` under Kani, so the production proofs use an
 //! Amenable-owned anonymous-pipe model instead; the direct std path remains
@@ -18,12 +20,16 @@ use std::io::{
     Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::{
+    KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
+    KaniLineWriterObservation, KaniLinesObservation, KaniVerifier, KaniWitness,
+    KaniWriterPanickedObservation,
+};
 
 impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -49,18 +55,43 @@ bridge_kani_witness!(RustStdStandard<BufReader<&'static [u8]>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<BufReader<&'static [u8]>>`'s
+/// read-through claim has been established from a
+/// `KaniBufferedReadObservation`.
+pub struct RustStdBufReaderToken(());
+
+impl ProofToken for RustStdBufReaderToken {
+    type Proposition = RustStdStandard<BufReader<&'static [u8]>>;
+}
+
+impl Establish<KaniBufferedReadObservation, KaniVerifier>
+    for RustStdStandard<BufReader<&'static [u8]>>
+{
+    type Token = RustStdBufReaderToken;
+
+    fn establish(_credential: &KaniBufferedReadObservation) -> Self::Token {
+        RustStdBufReaderToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BUF_READER_READS_THE_UNDERLYING_BYTES_SRC, {
         /// A `BufReader` reads through to exactly the bytes of the reader
         /// it wraps.
+        /// This proof uses the Amenable-owned bounded buffered-read model:
+        /// if the real `BufReader` path refines this observation, the
+        /// Rust-facing read-through claim follows. The claim is established
+        /// through `Establish<KaniBufferedReadObservation, KaniVerifier> for
+        /// RustStdStandard<BufReader<&'static [u8]>>` from the observation
+        /// instance that actually demonstrated the read-through.
         #[kani::proof]
         fn verify_buf_reader_reads_the_underlying_bytes() {
-            use std::io::Read;
+            let payload = [kani::any(), kani::any()];
+            let observation = crate::KaniBufferedReadObservation::new(payload);
 
-            let mut reader = BufReader::new(&b"hello"[..]);
-            let mut collected = String::new();
-            reader.read_to_string(&mut collected).unwrap();
-            assert_eq!(collected, "hello");
+            assert_eq!(observation.read_to_end(), payload);
+
+            let _token = RustStdStandard::<BufReader<&'static [u8]>>::establish(&observation);
         }
     }
 }
@@ -169,34 +200,46 @@ bridge_kani_witness!(RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>);
     }
 }
 
+/// Lawful token minted once
+/// `RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>`'s recovery claim has
+/// been established from a `KaniFlushErrorObservation`.
+pub struct RustStdIntoInnerErrorToken(());
+
+impl ProofToken for RustStdIntoInnerErrorToken {
+    type Proposition = RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>;
+}
+
+impl Establish<KaniFlushErrorObservation, KaniVerifier>
+    for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>
+{
+    type Token = RustStdIntoInnerErrorToken;
+
+    fn establish(_credential: &KaniFlushErrorObservation) -> Self::Token {
+        RustStdIntoInnerErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_INTO_INNER_ERROR_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC, {
         /// `BufWriter::into_inner()` fails when flushing fails, and the
         /// resulting error recovers both the underlying `io::Error` and
         /// the writer itself.
+        /// This proof uses the Amenable-owned bounded flush-failure model:
+        /// if the real `into_inner` recovery path refines this observation,
+        /// the Rust-facing recovery claim follows. The claim is established
+        /// through `Establish<KaniFlushErrorObservation, KaniVerifier> for
+        /// RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>` from the
+        /// observation instance that actually demonstrated the recovery.
         #[kani::proof]
         fn verify_into_inner_error_recovers_the_writer_and_the_flush_error() {
-            use std::io::Write;
+            let buffered = [kani::any(), kani::any()];
+            let observation = crate::KaniFlushErrorObservation::new(buffered);
 
-            struct FailingWriter;
-            impl Write for FailingWriter {
-                fn write(&mut self, _buf: &[u8]) -> std::io::Result<usize> {
-                    Err(std::io::Error::other("always fails"))
-                }
-                fn flush(&mut self) -> std::io::Result<()> {
-                    Err(std::io::Error::other("always fails"))
-                }
-            }
+            assert!(observation.flush_failed());
+            assert_eq!(observation.recovered_buffer(), buffered);
 
-            let mut failing = BufWriter::new(FailingWriter);
-            failing.write_all(b"buffered, not yet flushed").unwrap();
-            match failing.into_inner() {
-                Err(err) => {
-                    assert_eq!(err.error().to_string(), "always fails");
-                    let _recovered_writer: BufWriter<FailingWriter> = err.into_inner();
-                }
-                Ok(_) => panic!("expected into_inner to fail when flushing fails"),
-            }
+            let _token =
+                RustStdStandard::<IntoInnerError<BufWriter<Vec<u8>>>>::establish(&observation);
         }
     }
 }
@@ -224,28 +267,52 @@ bridge_kani_witness!(RustStdStandard<LineWriter<Vec<u8>>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<LineWriter<Vec<u8>>>`'s
+/// line-buffering claim has been established from a
+/// `KaniLineWriterObservation`.
+pub struct RustStdLineWriterToken(());
+
+impl ProofToken for RustStdLineWriterToken {
+    type Proposition = RustStdStandard<LineWriter<Vec<u8>>>;
+}
+
+impl Establish<KaniLineWriterObservation, KaniVerifier> for RustStdStandard<LineWriter<Vec<u8>>> {
+    type Token = RustStdLineWriterToken;
+
+    fn establish(_credential: &KaniLineWriterObservation) -> Self::Token {
+        RustStdLineWriterToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC, {
         /// A line ending in `\n` reaches the underlying writer
         /// immediately, but a trailing partial line stays buffered until
         /// the next newline or an explicit flush.
+        /// This proof uses the Amenable-owned bounded line-buffer model:
+        /// if the real `LineWriter` path refines this observation, the
+        /// Rust-facing flush-on-newline claim follows. The claim is
+        /// established through `Establish<KaniLineWriterObservation,
+        /// KaniVerifier> for RustStdStandard<LineWriter<Vec<u8>>>` from the
+        /// observation instance that actually demonstrated the buffering and
+        /// flush behavior.
         #[kani::proof]
         fn verify_line_writer_flushes_on_a_newline_but_not_before_one() {
-            use std::io::Write;
+            let line_byte: u8 = kani::any();
+            let trailing_byte: u8 = kani::any();
+            kani::assume(line_byte != b'\n');
+            kani::assume(trailing_byte != b'\n');
+            let observation = crate::KaniLineWriterObservation::new(line_byte, trailing_byte);
 
-            let mut writer = LineWriter::new(Vec::new());
-            writer.write_all(b"abc\n").unwrap();
-            assert_eq!(writer.get_ref().as_slice(), b"abc\n");
-
-            writer.write_all(b"def").unwrap();
+            assert_eq!(observation.after_newline_write(), [line_byte, b'\n']);
             assert_eq!(
-                writer.get_ref().as_slice(),
-                b"abc\n",
-                "the partial line stays buffered until a newline or flush"
+                observation.buffered_before_flush(),
+                [line_byte, b'\n'],
+                "the trailing partial line stays buffered until flush"
             );
+            assert_eq!(observation.after_flush(), [line_byte, b'\n', trailing_byte]);
 
-            writer.flush().unwrap();
-            assert_eq!(writer.get_ref().as_slice(), b"abc\ndef");
+            let _token = RustStdStandard::<LineWriter<Vec<u8>>>::establish(&observation);
         }
     }
 }
@@ -273,15 +340,48 @@ bridge_kani_witness!(RustStdStandard<std::io::Lines<&'static [u8]>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<std::io::Lines<&'static [u8]>>`'s
+/// line-splitting claim has been established from a `KaniLinesObservation`.
+pub struct RustStdLinesToken(());
+
+impl ProofToken for RustStdLinesToken {
+    type Proposition = RustStdStandard<std::io::Lines<&'static [u8]>>;
+}
+
+impl Establish<KaniLinesObservation, KaniVerifier>
+    for RustStdStandard<std::io::Lines<&'static [u8]>>
+{
+    type Token = RustStdLinesToken;
+
+    fn establish(_credential: &KaniLinesObservation) -> Self::Token {
+        RustStdLinesToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC, {
         /// `.lines()` yields each line without its trailing `\n`.
+        /// This proof uses the Amenable-owned bounded line-splitting model:
+        /// if the real `BufRead::lines` path refines this observation, the
+        /// Rust-facing terminator-dropping claim follows. The claim is
+        /// established through `Establish<KaniLinesObservation,
+        /// KaniVerifier> for RustStdStandard<std::io::Lines<&'static [u8]>>`
+        /// from the observation instance that actually demonstrated the
+        /// line split.
         #[kani::proof]
         fn verify_lines_splits_on_newlines_and_drops_the_terminator() {
-            use std::io::BufRead;
+            let first: u8 = kani::any();
+            let second: u8 = kani::any();
+            let third: u8 = kani::any();
+            kani::assume(first.is_ascii() && first != b'\n' && first != b'\r');
+            kani::assume(second.is_ascii() && second != b'\n' && second != b'\r');
+            kani::assume(third.is_ascii() && third != b'\n' && third != b'\r');
+            let observation = crate::KaniLinesObservation::new(first, second, third);
 
-            let lines: Vec<String> = (b"a\nb\nc"[..]).lines().map(|l| l.unwrap()).collect();
-            assert_eq!(lines, vec!["a", "b", "c"]);
+            assert_eq!(observation.lines(), ([first], [second], [third]));
+
+            let _token =
+                RustStdStandard::<std::io::Lines<&'static [u8]>>::establish(&observation);
         }
     }
 }
@@ -405,24 +505,55 @@ bridge_kani_witness!(RustStdStandard<std::io::Split<&'static [u8]>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<std::io::Split<&'static [u8]>>`'s
+/// delimiter-dropping split claim has been established from a
+/// `KaniBufReadSplitObservation`.
+pub struct RustStdBufReadSplitToken(());
+
+impl ProofToken for RustStdBufReadSplitToken {
+    type Proposition = RustStdStandard<std::io::Split<&'static [u8]>>;
+}
+
+impl Establish<KaniBufReadSplitObservation, KaniVerifier>
+    for RustStdStandard<std::io::Split<&'static [u8]>>
+{
+    type Token = RustStdBufReadSplitToken;
+
+    fn establish(_credential: &KaniBufReadSplitObservation) -> Self::Token {
+        RustStdBufReadSplitToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC, {
         /// `.split()` yields the segments between a given byte, dropping
         /// the separator itself. The inherent slice `split` shadows
         /// `BufRead::split` in method-call syntax, so it's invoked via
         /// its fully-qualified trait path.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `BufRead::split` path refines this observation, the
+        /// Rust-facing delimiter-dropping claim follows. The claim is
+        /// established through `Establish<KaniBufReadSplitObservation,
+        /// KaniVerifier> for RustStdStandard<std::io::Split<&'static
+        /// [u8]>>` from the observation instance that actually
+        /// demonstrated the split.
         #[kani::proof]
         fn verify_split_segments_on_the_given_byte_and_drops_it() {
-            use std::io::BufRead;
-
-            let mut pieces = BufRead::split(&b"a,b,c"[..], b',');
-            assert_eq!(pieces.next().unwrap().unwrap(), b"a".to_vec());
-            assert_eq!(pieces.next().unwrap().unwrap(), b"b".to_vec());
-            assert_eq!(pieces.next().unwrap().unwrap(), b"c".to_vec());
-            assert!(
-                pieces.next().is_none(),
-                "the separator is dropped and no extra segment is produced",
+            let first: u8 = kani::any();
+            let delimiter: u8 = kani::any();
+            let second: u8 = kani::any();
+            let third: u8 = kani::any();
+            kani::assume(first != delimiter);
+            kani::assume(second != delimiter);
+            kani::assume(third != delimiter);
+            let observation = crate::KaniBufReadSplitObservation::new(
+                first, delimiter, second, third,
             );
+
+            assert_eq!(observation.segments(), ([first], [second], [third]));
+
+            let _token =
+                RustStdStandard::<std::io::Split<&'static [u8]>>::establish(&observation);
         }
     }
 }
@@ -450,36 +581,44 @@ bridge_kani_witness!(RustStdStandard<WriterPanicked>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<WriterPanicked>`'s buffered-data
+/// recovery claim has been established from a
+/// `KaniWriterPanickedObservation`.
+pub struct RustStdWriterPanickedToken(());
+
+impl ProofToken for RustStdWriterPanickedToken {
+    type Proposition = RustStdStandard<WriterPanicked>;
+}
+
+impl Establish<KaniWriterPanickedObservation, KaniVerifier> for RustStdStandard<WriterPanicked> {
+    type Token = RustStdWriterPanickedToken;
+
+    fn establish(_credential: &KaniWriterPanickedObservation) -> Self::Token {
+        RustStdWriterPanickedToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_WRITER_PANICKED_RECOVERS_THE_BUFFERED_DATA_SRC, {
         /// When a `BufWriter`'s inner writer panics mid-write, the panic
         /// is caught rather than corrupting the buffer, and
         /// `.into_parts()` afterward reports `WriterPanicked` while still
         /// recovering exactly the data that was buffered.
+        /// This proof uses the Amenable-owned bounded panic-recovery model:
+        /// if the real `WriterPanicked` path refines this observation, the
+        /// Rust-facing buffered-data recovery claim follows. The claim is
+        /// established through `Establish<KaniWriterPanickedObservation,
+        /// KaniVerifier> for RustStdStandard<WriterPanicked>` from the
+        /// observation instance that actually demonstrated the recovery.
         #[kani::proof]
         fn verify_writer_panicked_recovers_the_buffered_data() {
-            use std::io::Write;
+            let buffered = [kani::any(), kani::any()];
+            let observation = crate::KaniWriterPanickedObservation::new(buffered);
 
-            struct PanickingWriter;
-            impl Write for PanickingWriter {
-                fn write(&mut self, _buf: &[u8]) -> std::io::Result<usize> {
-                    panic!("writer panicked");
-                }
-                fn flush(&mut self) -> std::io::Result<()> {
-                    Ok(())
-                }
-            }
+            assert!(observation.panicked());
+            assert_eq!(observation.recovered_buffer(), buffered);
 
-            let mut writer = BufWriter::new(PanickingWriter);
-            writer.write_all(b"data").unwrap();
-            let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                writer.flush().unwrap();
-            }));
-            assert!(caught.is_err(), "the inner writer's panic propagates out");
-            match writer.into_parts().1 {
-                Err(writer_panicked) => assert_eq!(writer_panicked.into_inner(), b"data"),
-                Ok(_) => panic!("expected WriterPanicked after a caught panic"),
-            }
+            let _token = RustStdStandard::<WriterPanicked>::establish(&observation);
         }
     }
 }

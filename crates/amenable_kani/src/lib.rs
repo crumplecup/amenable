@@ -27,6 +27,7 @@ mod fd_model;
 mod fmt_model;
 mod fs_model;
 mod gallery;
+mod io_model;
 mod linked_list_extract_model;
 mod mpsc_model;
 mod pipe_model;
@@ -53,6 +54,10 @@ pub use fs_model::{
     KaniFileTypeObservation, KaniFsDirEntry, KaniFsLabel, KaniFsNodeKind, KaniFsPath,
     KaniLockObservation, KaniPermissionsObservation, KaniReadDirObservation,
     KaniRecursiveDirObservation,
+};
+pub use io_model::{
+    KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
+    KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniSendError};

@@ -155,7 +155,7 @@ impl_rust_std_type!(
     "std",
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.WriterPanicked.html",
-    "The WriterPanicked carrier reports that a LineWriter's inner writer panicked, and returns the buffered data that couldn't be written."
+    "The WriterPanicked carrier reports that a BufWriter's inner writer panicked, and returns the buffered data that couldn't be written."
 );
 
 // `&'static [u8]` (an in-memory Read+BufRead source) and `Vec<u8>` (an
