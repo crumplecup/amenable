@@ -173,12 +173,22 @@ struct VerificationFailuresArgs {
     /// By default, this lists every proof whose latest result is not `passed`.
     #[arg(long, value_enum)]
     status: Option<ProofStatus>,
+    /// Only list failing proofs that do not yet have an assessment.
+    #[arg(long)]
+    needs_assessment: bool,
+    /// Only count assessments recorded on or after this UTC date when evaluating
+    /// `--needs-assessment`.
+    #[arg(long, value_parser = parse_utc_date)]
+    since: Option<Date>,
     /// Emit matching verification results as pretty JSON instead of tab-separated text.
     #[arg(long)]
     json: bool,
     /// Read this Kani verification CSV ledger.
     #[arg(short, long, default_value_os_t = kani::default_results_path())]
     results: PathBuf,
+    /// Read this JSON Lines assessment artifact when evaluating `--needs-assessment`.
+    #[arg(short = 'a', long, default_value_os_t = default_assessment_path())]
+    assessments: PathBuf,
 }
 
 /// A reviewer's recommended next action.
@@ -637,6 +647,13 @@ fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
         ensure_registered(proof)?;
     }
 
+    let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
+    let assessed = if args.needs_assessment {
+        assessed_proof_ids(&args.assessments, since_timestamp)?
+    } else {
+        BTreeSet::new()
+    };
+
     let registered: BTreeSet<_> = registered_proofs()
         .into_iter()
         .map(|proof| proof.id)
@@ -661,6 +678,10 @@ fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
         }
 
         if !matches_failure_filter(result.status, args.status) {
+            continue;
+        }
+
+        if args.needs_assessment && assessed.contains(result.proof_id.as_str()) {
             continue;
         }
 
@@ -809,14 +830,7 @@ fn report(args: AssessmentReportArgs) -> Result<(), String> {
 
 fn queue(args: AssessmentQueueArgs) -> Result<(), String> {
     let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
-    let assessments = load(&args.assessments)?;
-    let assessed: BTreeSet<_> = assessments
-        .iter()
-        .filter(|assessment| {
-            since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
-        })
-        .map(|assessment| assessment.proof_id.as_str())
-        .collect();
+    let assessed = assessed_proof_ids(&args.assessments, since_timestamp)?;
     let unassessed: Vec<_> = registered_proofs()
         .into_iter()
         .filter(|proof| !assessed.contains(proof.id.as_str()))
@@ -863,6 +877,19 @@ fn filtered_assessments(
             since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
         })
         .collect()
+}
+
+fn assessed_proof_ids(
+    path: &Path,
+    since_timestamp: Option<u64>,
+) -> Result<BTreeSet<String>, String> {
+    Ok(load(path)?
+        .into_iter()
+        .filter(|assessment| {
+            since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
+        })
+        .map(|assessment| assessment.proof_id)
+        .collect())
 }
 
 fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> bool {

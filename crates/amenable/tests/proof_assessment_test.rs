@@ -550,6 +550,76 @@ fn failures_can_filter_by_status_and_emit_json() {
 }
 
 #[test]
+fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() {
+    let results_path = temporary_path("assessment-failures-needs-assessment-results");
+    let assessments_path = temporary_path("assessment-failures-needs-assessment-assessments");
+    write_kani_results_artifact(
+        &results_path,
+        &format!(
+            "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,failed\n{THIRD_PROOF_ID},1785290400,timeout\n"
+        ),
+    );
+    write_assessment_artifact(
+        &assessments_path,
+        &format!(
+            "{}{}",
+            assessment_record(AssessmentRecord {
+                assessment_id: "assessment-current",
+                proof_id: PROOF_ID,
+                reviewer: "reviewer-current",
+                timestamp: 1785283200,
+                score: 3,
+                recommendation: "strengthen",
+                resolution_path: "strengthen_current_proof",
+                comment: "Current sweep assessment.",
+            }),
+            assessment_record(AssessmentRecord {
+                assessment_id: "assessment-old",
+                proof_id: THIRD_PROOF_ID,
+                reviewer: "reviewer-old",
+                timestamp: 1785196799,
+                score: 2,
+                recommendation: "replace",
+                resolution_path: "document_verifier_limitation",
+                comment: "Older sweep assessment should not satisfy the queue.",
+            })
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "failures",
+            "--needs-assessment",
+            "--since",
+            "2026-07-29",
+            "--results",
+            results_path
+                .to_str()
+                .expect("temporary results path should be UTF-8"),
+            "--assessments",
+            assessments_path
+                .to_str()
+                .expect("temporary assessments path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment failures CLI should start");
+
+    assert!(
+        output.status.success(),
+        "failures failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
+    assert!(!stdout.contains(PROOF_ID));
+    assert!(stdout.contains(SECOND_PROOF_ID));
+    assert!(stdout.contains(THIRD_PROOF_ID));
+
+    fs::remove_file(results_path).expect("Kani results artifact should be removed");
+    fs::remove_file(assessments_path).expect("assessment artifact should be removed");
+}
+
+#[test]
 fn score_outside_the_rubric_range_is_rejected_before_recording() {
     let path = temporary_path("assessment-invalid-score");
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
