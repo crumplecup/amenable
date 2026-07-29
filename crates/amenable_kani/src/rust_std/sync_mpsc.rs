@@ -168,12 +168,34 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Receiver<i32>>`'s
+/// disconnect-on-drop claim has been established from a `KaniChannel<i32>`
+/// that has itself demonstrated `.recv()` failing once every sender is
+/// dropped.
+pub struct RustStdReceiverToken(());
+
+impl ProofToken for RustStdReceiverToken {
+    type Proposition = RustStdStandard<std::sync::mpsc::Receiver<i32>>;
+}
+
+impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
+    type Token = RustStdReceiverToken;
+
+    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+        RustStdReceiverToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_RECEIVER_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC, {
         /// `.recv()` fails once the channel is both empty and every
         /// `Sender` has been dropped — it never blocks forever on a
         /// channel that can no longer receive anything.
         /// Same `KaniChannel` model migration as `Sender`'s proof above.
+        /// The claim is established through `Establish<KaniChannel<i32>,
+        /// KaniVerifier> for RustStdStandard<Receiver<i32>>` from the
+        /// channel instance that actually demonstrated the disconnect,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_receiver_fails_once_every_sender_is_dropped() {
             let mut channel = crate::KaniChannel::<i32>::unbounded();
@@ -182,6 +204,9 @@ amenable_derive::harness! {
                 channel.recv().is_err(),
                 "recv fails once the channel is empty and disconnected"
             );
+
+            let _token =
+                RustStdStandard::<std::sync::mpsc::Receiver<i32>>::establish(&channel);
         }
     }
 }
