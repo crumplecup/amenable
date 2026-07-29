@@ -11,6 +11,10 @@ use std::{
 use amenable::{KaniProof, KaniProofRegistration};
 use clap::{Args, Subcommand, ValueEnum};
 use serde::{Deserialize, Serialize};
+use time::{
+    Date, OffsetDateTime,
+    format_description::{self, well_known::Rfc3339},
+};
 
 const CURRENT_ASSESSMENT_VERSION: &str = "0.1.0";
 const LEGACY_SCHEMA_VERSION: u8 = 1;
@@ -26,6 +30,10 @@ pub(super) struct AssessArgs {
 enum AssessCommand {
     /// Append one reviewer assessment for a registered Kani proof.
     Proof(RecordAssessmentArgs),
+    /// Summarize assessment counts by recommendation.
+    Summary(AssessmentSummaryArgs),
+    /// List recorded assessments, optionally filtered by recommendation.
+    List(AssessmentListArgs),
     /// Summarize recorded assessments, optionally for one proof.
     Report(AssessmentReportArgs),
     /// List registered proofs that have no assessment yet.
@@ -88,9 +96,45 @@ struct AssessmentReportArgs {
     assessments: PathBuf,
 }
 
+/// Arguments that render recommendation counts.
+#[derive(Debug, Args)]
+struct AssessmentSummaryArgs {
+    /// Restrict the summary to one exact, fully-qualified registered proof ID.
+    #[arg(long)]
+    proof: Option<String>,
+    /// Only count assessments recorded on or after this UTC date (`YYYY-MM-DD`).
+    #[arg(long, value_parser = parse_utc_date)]
+    since: Option<Date>,
+    /// Read this JSON Lines assessment artifact.
+    #[arg(short, long, default_value_os_t = default_assessment_path())]
+    assessments: PathBuf,
+}
+
+/// Arguments that list recorded assessments.
+#[derive(Debug, Args)]
+struct AssessmentListArgs {
+    /// Restrict the list to one exact, fully-qualified registered proof ID.
+    #[arg(long)]
+    proof: Option<String>,
+    /// Restrict the list to one recommendation status.
+    #[arg(long, value_enum)]
+    recommendation: Option<Recommendation>,
+    /// Only list assessments recorded on or after this UTC date (`YYYY-MM-DD`).
+    #[arg(long, value_parser = parse_utc_date)]
+    since: Option<Date>,
+    /// Read this JSON Lines assessment artifact.
+    #[arg(short, long, default_value_os_t = default_assessment_path())]
+    assessments: PathBuf,
+}
+
 /// Arguments that render the unassessed-proof queue.
 #[derive(Debug, Args)]
 struct AssessmentQueueArgs {
+    /// Only count assessments recorded on or after this UTC date (`YYYY-MM-DD`).
+    ///
+    /// Older assessments do not satisfy the queue when running a fresh sweep.
+    #[arg(long, value_parser = parse_utc_date)]
+    since: Option<Date>,
     /// Read this JSON Lines assessment artifact.
     #[arg(short, long, default_value_os_t = default_assessment_path())]
     assessments: PathBuf,
@@ -282,6 +326,8 @@ impl From<&ProofAssessment> for StoredProofAssessment {
 pub(super) fn run(args: AssessArgs) -> Result<(), String> {
     match args.command {
         AssessCommand::Proof(args) => record(args),
+        AssessCommand::Summary(args) => summary(args),
+        AssessCommand::List(args) => list(args),
         AssessCommand::Report(args) => report(args),
         AssessCommand::Queue(args) => queue(args),
     }
@@ -302,6 +348,13 @@ fn parse_score(value: &str) -> Result<u8, String> {
     }
 
     Ok(score)
+}
+
+fn parse_utc_date(value: &str) -> Result<Date, String> {
+    let format = format_description::parse_borrowed::<2>("[year]-[month]-[day]")
+        .map_err(|error| format!("internal date-format error: {error}"))?;
+    Date::parse(value, &format)
+        .map_err(|error| format!("invalid date {value:?}; expected YYYY-MM-DD: {error}"))
 }
 
 fn record(args: RecordAssessmentArgs) -> Result<(), String> {
@@ -335,6 +388,61 @@ fn record(args: RecordAssessmentArgs) -> Result<(), String> {
     Ok(())
 }
 
+fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
+    if let Some(proof) = &args.proof {
+        ensure_registered(proof)?;
+    }
+
+    let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
+    let assessments = filtered_assessments(
+        load(&args.assessments)?,
+        args.proof.as_deref(),
+        None,
+        since_timestamp,
+    );
+
+    let mut counts: BTreeMap<Recommendation, usize> = Recommendation::value_variants()
+        .iter()
+        .copied()
+        .map(|recommendation| (recommendation, 0))
+        .collect();
+    for assessment in assessments {
+        *counts.entry(assessment.recommendation).or_default() += 1;
+    }
+
+    let recommendation_width = Recommendation::value_variants()
+        .iter()
+        .map(|recommendation| recommendation.as_str().len())
+        .max()
+        .unwrap_or("recommendation".len())
+        .max("recommendation".len());
+    let count_width = counts
+        .values()
+        .map(|count| count.to_string().len())
+        .max()
+        .unwrap_or(1)
+        .max("count".len());
+
+    println!(
+        "{:<recommendation_width$} {:>count_width$}",
+        "recommendation", "count"
+    );
+    println!(
+        "{} {}",
+        "-".repeat(recommendation_width),
+        "-".repeat(count_width)
+    );
+    for recommendation in Recommendation::value_variants() {
+        println!(
+            "{:<recommendation_width$} {:>count_width$}",
+            recommendation.as_str(),
+            counts[recommendation]
+        );
+    }
+
+    Ok(())
+}
+
 fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> Result<String, String> {
     match (comment, comment_file) {
         (Some(comment), None) => Ok(comment),
@@ -349,6 +457,37 @@ fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> Resul
         }
         (None, None) => Err("provide --comment or --comment-file".to_owned()),
     }
+}
+
+fn list(args: AssessmentListArgs) -> Result<(), String> {
+    if let Some(proof) = &args.proof {
+        ensure_registered(proof)?;
+    }
+
+    let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
+    let assessments = filtered_assessments(
+        load(&args.assessments)?,
+        args.proof.as_deref(),
+        args.recommendation,
+        since_timestamp,
+    );
+
+    if assessments.is_empty() {
+        println!("No proof assessments matched the selection.");
+        return Ok(());
+    }
+
+    for assessment in assessments {
+        let recorded_at = format_timestamp(assessment.timestamp)?;
+        println!(
+            "{recorded_at}\t{}\t{}\t{}",
+            assessment.recommendation.as_str(),
+            assessment.proof_id,
+            assessment.reviewer
+        );
+    }
+
+    Ok(())
 }
 
 fn report(args: AssessmentReportArgs) -> Result<(), String> {
@@ -383,9 +522,13 @@ fn report(args: AssessmentReportArgs) -> Result<(), String> {
 }
 
 fn queue(args: AssessmentQueueArgs) -> Result<(), String> {
+    let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
     let assessments = load(&args.assessments)?;
     let assessed: BTreeSet<_> = assessments
         .iter()
+        .filter(|assessment| {
+            since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
+        })
         .map(|assessment| assessment.proof_id.as_str())
         .collect();
     let unassessed: Vec<_> = registered_proofs()
@@ -403,6 +546,24 @@ fn queue(args: AssessmentQueueArgs) -> Result<(), String> {
         println!("{}", proof.id);
     }
     Ok(())
+}
+
+fn filtered_assessments(
+    assessments: Vec<ProofAssessment>,
+    proof: Option<&str>,
+    recommendation: Option<Recommendation>,
+    since_timestamp: Option<u64>,
+) -> Vec<ProofAssessment> {
+    assessments
+        .into_iter()
+        .filter(|assessment| proof.is_none_or(|proof_id| assessment.proof_id == proof_id))
+        .filter(|assessment| {
+            recommendation.is_none_or(|wanted| assessment.recommendation == wanted)
+        })
+        .filter(|assessment| {
+            since_timestamp.is_none_or(|threshold| assessment.timestamp >= threshold)
+        })
+        .collect()
 }
 
 fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
@@ -458,6 +619,23 @@ fn timestamp() -> Result<u64, String> {
         .duration_since(UNIX_EPOCH)
         .map_err(|error| format!("system clock is before the Unix epoch: {error}"))
         .map(|duration| duration.as_secs())
+}
+
+fn start_of_utc_date_timestamp(date: Date) -> Result<u64, String> {
+    let timestamp = date.midnight().assume_utc().unix_timestamp();
+    u64::try_from(timestamp).map_err(|_| {
+        format!("date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01")
+    })
+}
+
+fn format_timestamp(timestamp: u64) -> Result<String, String> {
+    let seconds = i64::try_from(timestamp)
+        .map_err(|_| format!("assessment timestamp {timestamp} is too large to format"))?;
+    let recorded_at = OffsetDateTime::from_unix_timestamp(seconds)
+        .map_err(|error| format!("invalid assessment timestamp {timestamp}: {error}"))?;
+    recorded_at
+        .format(&Rfc3339)
+        .map_err(|error| format!("could not format assessment timestamp {timestamp}: {error}"))
 }
 
 fn load(path: &Path) -> Result<Vec<ProofAssessment>, String> {

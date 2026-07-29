@@ -6,6 +6,8 @@ use std::{
 };
 
 const PROOF_ID: &str = "amenable_kani::calculator::add_impl_computes_exact_sum";
+const SECOND_PROOF_ID: &str =
+    "amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through";
 
 fn temporary_path(name: &str) -> PathBuf {
     let nonce = SystemTime::now()
@@ -54,6 +56,10 @@ fn record(path: &Path, reviewer: &str, score: &str, recommendation: &str, commen
         "assessment failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
+}
+
+fn write_assessment_artifact(path: &Path, contents: &str) {
+    fs::write(path, contents).expect("assessment artifact should be written");
 }
 
 #[test]
@@ -171,6 +177,99 @@ fn report_aggregates_independent_assessments_by_axis_and_recommendation() {
 }
 
 #[test]
+fn summary_counts_assessments_by_recommendation() {
+    let path = temporary_path("assessment-summary");
+    write_assessment_artifact(
+        &path,
+        &format!(
+            concat!(
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{proof}\",\"reviewer\":\"one\",\"timestamp\":1785283200,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":4,\"model_fidelity\":4,\"assertion_strength\":4,\"adversarial_coverage\":4,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Accepted.\"}}\n",
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{proof}\",\"reviewer\":\"two\",\"timestamp\":1785286800,\"rubric\":{{\"claim_alignment\":3,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":3,\"adversarial_coverage\":3,\"clarity\":3}},\"recommendation\":\"replace\",\"comment\":\"Replace it.\"}}\n",
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{second}\",\"reviewer\":\"three\",\"timestamp\":1785290400,\"rubric\":{{\"claim_alignment\":2,\"assumption_adequacy\":2,\"model_fidelity\":2,\"assertion_strength\":2,\"adversarial_coverage\":2,\"clarity\":2}},\"recommendation\":\"replace\",\"comment\":\"Also replace it.\"}}\n"
+            ),
+            proof = PROOF_ID,
+            second = SECOND_PROOF_ID,
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "summary",
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment summary CLI should start");
+
+    assert!(
+        output.status.success(),
+        "summary failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("summary should be UTF-8");
+    assert!(stdout.contains("recommendation"));
+    assert!(stdout.contains("accept"));
+    assert!(stdout.contains("replace"));
+    assert!(stdout.contains("strengthen"));
+    assert!(stdout.contains("retire"));
+    let accept_row = stdout
+        .lines()
+        .find(|line| line.trim_start().starts_with("accept"))
+        .expect("summary should include an accept row");
+    let replace_row = stdout
+        .lines()
+        .find(|line| line.trim_start().starts_with("replace"))
+        .expect("summary should include a replace row");
+    assert!(accept_row.split_whitespace().eq(["accept", "1"]));
+    assert!(replace_row.split_whitespace().eq(["replace", "2"]));
+
+    fs::remove_file(path).expect("assessment artifact should be removed");
+}
+
+#[test]
+fn list_filters_assessments_by_recommendation() {
+    let path = temporary_path("assessment-list");
+    write_assessment_artifact(
+        &path,
+        &format!(
+            concat!(
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{proof}\",\"reviewer\":\"one\",\"timestamp\":1785283200,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":4,\"model_fidelity\":4,\"assertion_strength\":4,\"adversarial_coverage\":4,\"clarity\":4}},\"recommendation\":\"replace\",\"comment\":\"Replace it.\"}}\n",
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{second}\",\"reviewer\":\"two\",\"timestamp\":1785286800,\"rubric\":{{\"claim_alignment\":3,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":3,\"adversarial_coverage\":3,\"clarity\":3}},\"recommendation\":\"accept\",\"comment\":\"Accepted.\"}}\n"
+            ),
+            proof = PROOF_ID,
+            second = SECOND_PROOF_ID,
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "list",
+            "--recommendation",
+            "replace",
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment list CLI should start");
+
+    assert!(
+        output.status.success(),
+        "list failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("list should be UTF-8");
+    assert!(stdout.contains("replace"));
+    assert!(stdout.contains(PROOF_ID));
+    assert!(stdout.contains("one"));
+    assert!(!stdout.contains(SECOND_PROOF_ID));
+    assert!(!stdout.contains("\taccept\t"));
+
+    fs::remove_file(path).expect("assessment artifact should be removed");
+}
+
+#[test]
 fn score_outside_the_rubric_range_is_rejected_before_recording() {
     let path = temporary_path("assessment-invalid-score");
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
@@ -239,6 +338,45 @@ fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
     let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
     assert!(stdout.contains("Unassessed Kani proofs:"));
     assert!(!stdout.contains(PROOF_ID));
+
+    fs::remove_file(path).expect("assessment artifact should be removed");
+}
+
+#[test]
+fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() {
+    let path = temporary_path("assessment-queue-since");
+    write_assessment_artifact(
+        &path,
+        &format!(
+            concat!(
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{proof}\",\"reviewer\":\"old-reviewer\",\"timestamp\":1784592000,\"rubric\":{{\"claim_alignment\":3,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":3,\"adversarial_coverage\":3,\"clarity\":3}},\"recommendation\":\"accept\",\"comment\":\"Older assessment.\"}}\n",
+                "{{\"version\":\"0.1.0\",\"proof_id\":\"{second}\",\"reviewer\":\"fresh-reviewer\",\"timestamp\":1785283200,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":4,\"model_fidelity\":4,\"assertion_strength\":4,\"adversarial_coverage\":4,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Fresh assessment.\"}}\n"
+            ),
+            proof = PROOF_ID,
+            second = SECOND_PROOF_ID,
+        ),
+    );
+
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "queue",
+            "--since",
+            "2026-07-28",
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment queue CLI should start");
+
+    assert!(
+        output.status.success(),
+        "queue failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
+    assert!(stdout.contains(PROOF_ID));
+    assert!(!stdout.contains(SECOND_PROOF_ID));
 
     fs::remove_file(path).expect("assessment artifact should be removed");
 }
