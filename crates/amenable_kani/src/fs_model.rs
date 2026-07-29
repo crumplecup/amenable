@@ -509,9 +509,39 @@ impl KaniFileLenObservation {
 }
 
 /// Observable result of `.set_modified()` / metadata `.modified()`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that a target
+/// modification time set via `.set_modified()`, applied through
+/// `File::set_times()`, is reflected exactly in the file's metadata, and
+/// nothing else about the real OS-backed filesystem clock -- is named
+/// explicitly as a `Standard` rather than left as prose: the direct
+/// `std::fs` path crosses OS-backed state Kani cannot symbolically execute
+/// well (see this module's own doc comment), so this bounded observation is
+/// what the `FileTimes` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniFileTimesObservation {
     modified_unix_seconds: u64,
+}
+
+impl Provenance for KaniFileTimesObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "a target modification time set via .set_modified() is reflected exactly in the file's metadata, standing in for the real OS-backed filesystem clock",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new(
+                "modified_unix_seconds",
+                self.modified_unix_seconds.to_string(),
+            ),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniFileTimesObservation {

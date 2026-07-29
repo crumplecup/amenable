@@ -17,7 +17,7 @@ use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
-    KaniRecursiveDirObservation, KaniVerifier,
+    KaniFileTimesObservation, KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -263,6 +263,23 @@ bridge_kani_witness!(RustStdStandard<FileTimes>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<FileTimes>`'s modification-time
+/// claim has been established from a `KaniFileTimesObservation` that has
+/// itself demonstrated the exact time reflection.
+pub struct RustStdFileTimesToken(());
+
+impl ProofToken for RustStdFileTimesToken {
+    type Proposition = RustStdStandard<FileTimes>;
+}
+
+impl Establish<KaniFileTimesObservation, KaniVerifier> for RustStdStandard<FileTimes> {
+    type Token = RustStdFileTimesToken;
+
+    fn establish(_credential: &KaniFileTimesObservation) -> Self::Token {
+        RustStdFileTimesToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_FILE_TIMES_SETS_THE_RECORDED_MODIFICATION_TIME_SRC, {
         /// `.set_modified()` on a `FileTimes`, applied via
@@ -271,7 +288,11 @@ amenable_derive::harness! {
         /// some filesystems truncate sub-second components.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `set_times` / `metadata().modified()` path preserves the target
-        /// time this way, the Rust-facing claim follows.
+        /// time this way, the Rust-facing claim follows. The claim is
+        /// established through `Establish<KaniFileTimesObservation,
+        /// KaniVerifier> for RustStdStandard<FileTimes>` from the
+        /// observation instance that actually demonstrated the reflection,
+        /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_file_times_sets_the_recorded_modification_time() {
             let target_unix_seconds: u64 = kani::any();
@@ -282,6 +303,8 @@ amenable_derive::harness! {
                 target_unix_seconds,
                 "the target modification time is reflected exactly in metadata"
             );
+
+            let _token = RustStdStandard::<FileTimes>::establish(&observation);
         }
     }
 }
