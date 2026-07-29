@@ -553,6 +553,52 @@ fn incompatible_resolution_path_is_rejected_before_recording() {
 }
 
 #[test]
+fn accept_can_record_a_documented_verifier_limitation() {
+    let path = temporary_path("assessment-accepts-documented-verifier-limitation");
+    let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
+        .args([
+            "assess",
+            "proof",
+            "--proof",
+            PROOF_ID,
+            "--reviewer",
+            "reviewer",
+            "--claim-alignment",
+            "4",
+            "--assumption-adequacy",
+            "4",
+            "--model-fidelity",
+            "4",
+            "--assertion-strength",
+            "3",
+            "--adversarial-coverage",
+            "3",
+            "--clarity",
+            "4",
+            "--recommendation",
+            "accept",
+            "--resolution-path",
+            "document_verifier_limitation",
+            "--comment",
+            "This preserved false trail is accepted boundary evidence.",
+            "--assessments",
+            path.to_str().expect("temporary path should be UTF-8"),
+        ])
+        .output()
+        .expect("assessment CLI should start");
+
+    assert!(
+        output.status.success(),
+        "recording should succeed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let contents = fs::read_to_string(path).expect("recorded assessment should exist");
+    assert!(contents.contains("\"recommendation\":\"accept\""));
+    assert!(contents.contains("\"resolution_path\":\"document_verifier_limitation\""));
+}
+
+#[test]
 fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
     let path = temporary_path("assessment-queue");
     record(

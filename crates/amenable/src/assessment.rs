@@ -867,7 +867,10 @@ fn validate_resolution_path(
     resolution_path: ResolutionPath,
 ) -> Result<(), String> {
     let valid = match recommendation {
-        Recommendation::Accept => resolution_path == ResolutionPath::KeepCurrentProof,
+        Recommendation::Accept => matches!(
+            resolution_path,
+            ResolutionPath::KeepCurrentProof | ResolutionPath::DocumentVerifierLimitation
+        ),
         Recommendation::Strengthen => resolution_path == ResolutionPath::StrengthenCurrentProof,
         Recommendation::Replace => matches!(
             resolution_path,
