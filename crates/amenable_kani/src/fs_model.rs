@@ -266,11 +266,33 @@ impl KaniFileSystem {
         }
     }
 
+    /// Create a fresh file only when no node already exists at the path.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(KaniAlreadyExists)` when the modeled path already names an
+    /// existing node, mirroring `OpenOptions::create_new(true)`.
+    pub fn create_new_file(&mut self, path: &KaniFsPath) -> Result<(), KaniAlreadyExists> {
+        if self.node_index(path).is_some() {
+            Err(KaniAlreadyExists)
+        } else {
+            self.create_file(path);
+            Ok(())
+        }
+    }
+
     /// Return whether the path currently names a directory.
     #[must_use]
     pub fn is_dir(&self, path: &KaniFsPath) -> bool {
         self.node(path)
             .is_some_and(|node| node.kind == KaniFsNodeKind::Directory)
+    }
+
+    /// Return whether the path currently names a file.
+    #[must_use]
+    pub fn is_file(&self, path: &KaniFsPath) -> bool {
+        self.node(path)
+            .is_some_and(|node| node.kind == KaniFsNodeKind::File)
     }
 
     /// Return the immediate entries of a modeled directory.
@@ -419,10 +441,10 @@ impl KaniFileTimesObservation {
 }
 
 /// Observable result of `OpenOptions::create_new` against a path that may
-/// or may not already have a file.
+/// already name a modeled filesystem node.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KaniCreateNewObservation {
-    already_exists: bool,
+    kind: Option<KaniFsNodeKind>,
 }
 
 /// Modeled error for `create_new` against a path that already has a file.
@@ -430,25 +452,47 @@ pub struct KaniCreateNewObservation {
 pub struct KaniAlreadyExists;
 
 impl KaniCreateNewObservation {
-    /// Model a path that either already has a file (`already_exists`) or is
-    /// genuinely fresh.
+    /// Model a genuinely fresh path.
     #[must_use]
-    pub fn new(already_exists: bool) -> Self {
-        Self { already_exists }
+    pub fn missing() -> Self {
+        Self { kind: None }
+    }
+
+    /// Model a path that already names a file.
+    #[must_use]
+    pub fn existing_file() -> Self {
+        Self {
+            kind: Some(KaniFsNodeKind::File),
+        }
+    }
+
+    /// Model a path that already names a directory.
+    #[must_use]
+    pub fn existing_directory() -> Self {
+        Self {
+            kind: Some(KaniFsNodeKind::Directory),
+        }
     }
 
     /// Model attempting `create_new` against the modeled path.
     ///
     /// # Errors
     ///
-    /// Returns `Err(KaniAlreadyExists)` when the modeled path already has a
-    /// file, mirroring `ErrorKind::AlreadyExists`.
-    pub fn create_new(&self) -> Result<(), KaniAlreadyExists> {
-        if self.already_exists {
+    /// Returns `Err(KaniAlreadyExists)` when the modeled path already names an
+    /// existing node, mirroring `ErrorKind::AlreadyExists`.
+    pub fn create_new(&mut self) -> Result<(), KaniAlreadyExists> {
+        if self.kind.is_some() {
             Err(KaniAlreadyExists)
         } else {
+            self.kind = Some(KaniFsNodeKind::File);
             Ok(())
         }
+    }
+
+    /// Report whether the modeled path now names a file.
+    #[must_use]
+    pub fn is_file(&self) -> bool {
+        self.kind == Some(KaniFsNodeKind::File)
     }
 }
 

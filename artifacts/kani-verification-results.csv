@@ -2,6 +2,8 @@ proof_id,timestamp,status
 amenable_kani::calculator::add_impl_computes_exact_sum,1785088495,passed
 amenable_kani::calculator::verify_credit_access_preserves_value,1785088501,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1785088507,passed
+amenable_kani::gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new,1785343619,timeout
+amenable_kani::gallery::filesystem_observation_granularity::single_path_create_new_observation_passes,1785343420,passed
 amenable_kani::gallery::iter_materialization::find_routed_filter_over_array_source_passes,1785104893,passed
 amenable_kani::gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out,1785104958,timeout
 amenable_kani::gallery::iter_materialization::flatten_collect_times_out,1785088695,timeout
@@ -105,7 +107,7 @@ amenable_kani::rust_std::fs::verify_file_times_sets_the_recorded_modification_ti
 amenable_kani::rust_std::fs::verify_file_type_distinguishes_files_from_directories,1785109217,passed
 amenable_kani::rust_std::fs::verify_file_write_then_read_round_trips_the_bytes,1785109206,passed
 amenable_kani::rust_std::fs::verify_metadata_reports_the_written_length,1785109223,passed
-amenable_kani::rust_std::fs::verify_open_options_create_new_rejects_an_existing_file,1785109313,passed
+amenable_kani::rust_std::fs::verify_open_options_create_new_rejects_an_existing_file,1785343427,passed
 amenable_kani::rust_std::fs::verify_permissions_readonly_round_trips_through_set_permissions,1785109237,passed
 amenable_kani::rust_std::fs::verify_read_dir_iterates_every_entry_in_the_directory,1785109242,passed
 amenable_kani::rust_std::fs::verify_try_lock_error_reports_a_lock_already_held,1785109318,passed

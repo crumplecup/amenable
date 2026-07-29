@@ -15,6 +15,7 @@
 //! `failed` can still be a successful experiment if that failure is exactly
 //! the behavior we needed to confirm.
 
+mod filesystem_observation_granularity;
 mod iter_materialization;
 mod replace_recommendations;
 mod slice_split_position;

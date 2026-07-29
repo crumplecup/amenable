@@ -74,8 +74,14 @@ fn file_times_round_trips_the_set_modification_time() {
 
 #[test]
 fn create_new_rejects_an_existing_path_and_accepts_a_fresh_one() {
-    assert!(KaniCreateNewObservation::new(true).create_new().is_err());
-    assert!(KaniCreateNewObservation::new(false).create_new().is_ok());
+    let mut existing_file = KaniCreateNewObservation::existing_file();
+    let mut existing_directory = KaniCreateNewObservation::existing_directory();
+    let mut fresh = KaniCreateNewObservation::missing();
+
+    assert!(existing_file.create_new().is_err());
+    assert!(existing_directory.create_new().is_err());
+    assert!(fresh.create_new().is_ok());
+    assert!(fresh.is_file());
 }
 
 #[test]

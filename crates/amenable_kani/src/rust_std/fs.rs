@@ -331,16 +331,26 @@ amenable_derive::harness! {
         /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_open_options_create_new_rejects_an_existing_file() {
-            let existing = crate::KaniCreateNewObservation::new(true);
+            let mut existing = crate::KaniCreateNewObservation::existing_file();
+            let mut existing_directory = crate::KaniCreateNewObservation::existing_directory();
+            let mut fresh = crate::KaniCreateNewObservation::missing();
+
             assert!(
                 existing.create_new().is_err(),
                 "create_new fails against a path that already has a file"
             );
+            assert!(
+                existing_directory.create_new().is_err(),
+                "create_new also fails when the path already names a directory"
+            );
 
-            let fresh = crate::KaniCreateNewObservation::new(false);
             assert!(
                 fresh.create_new().is_ok(),
                 "create_new succeeds against a genuinely fresh path"
+            );
+            assert!(
+                fresh.is_file(),
+                "a successful create_new leaves a file at the created path"
             );
         }
     }
