@@ -32,6 +32,7 @@ mod mpsc_model;
 mod pipe_model;
 mod registry;
 mod rust_std;
+mod slice_split_model;
 mod stoplight;
 mod utf8_model;
 mod witness;
@@ -61,6 +62,7 @@ pub use registry::{
     KaniProof, KaniProofRegistration,
 };
 pub use rust_std::CheckedProof;
+pub use slice_split_model::{KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{
     Color, Established, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow,
     YellowToken, next,

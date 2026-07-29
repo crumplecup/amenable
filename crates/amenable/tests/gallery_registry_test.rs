@@ -9,8 +9,8 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
         .collect();
 
     assert!(
-        cases.len() >= 20,
-        "the proof gallery should include scaffold, iterator, filesystem, string-drain, and replace-issue cases"
+        cases.len() >= 21,
+        "the proof gallery should include scaffold, iterator, filesystem, slice-split, string-drain, and replace-issue cases"
     );
     assert!(cases.iter().any(|case| {
         case.id == "amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass"
@@ -54,6 +54,11 @@ fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
     assert!(cases.iter().any(|case| {
         case.id
             == "amenable_kani::gallery::filesystem_observation_granularity::single_path_create_new_observation_passes"
+            && case.disposition == KaniGalleryDisposition::BestPractice
+            && case.expected == KaniGalleryExpectation::Passed
+    }));
+    assert!(cases.iter().any(|case| {
+        case.id == "amenable_kani::gallery::slice_split_position::bounded_split_observation_passes"
             && case.disposition == KaniGalleryDisposition::BestPractice
             && case.expected == KaniGalleryExpectation::Passed
     }));

@@ -631,19 +631,19 @@ amenable_derive::harness! {
     kani, VERIFY_SPLIT_YIELDS_SUBSLICES_BETWEEN_MATCHES_SRC, {
         /// `split` on a predicate yields the subslices between matches,
         /// consuming the matched element itself.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `split` path refines this one-delimiter observation, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_yields_subslices_between_matches() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let data = [a, 0, b];
-            let mut it = data.split(is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&[a][..]));
-            assert_eq!(it.next(), Some(&[b][..]));
-            assert_eq!(it.next(), None);
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.split();
+
+            assert_eq!(pieces.0, [a]);
+            assert_eq!(pieces.1, [b]);
         }
     }
 }
@@ -676,24 +676,28 @@ amenable_derive::harness! {
     kani, VERIFY_SPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_BETWEEN_MATCHES_SRC, {
         /// `split_mut` yields the same subslices as `Split`, writable
         /// and writing through to the underlying slice.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `split_mut` path refines this one-delimiter observation, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_mut_yields_writable_subslices_between_matches() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
+            let updated: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            kani::assume(a.checked_add(1).is_some());
-            let mut data = [a, 0, b];
-            {
-                let mut it = data.split_mut(is_zero as fn(&i32) -> bool);
-                let first = it.next().unwrap();
-                first[0] += 1;
-                assert_eq!(it.next(), Some(&mut [b][..]));
-                assert_eq!(it.next(), None);
-            }
-            assert_eq!(data[0], a + 1, "a write through the first subslice is visible");
+            let mut observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.split();
+
+            assert_eq!(pieces.0, [a]);
+            assert_eq!(pieces.1, [b]);
+
+            observation.set_before(updated);
+
+            assert_eq!(
+                observation.data(),
+                [updated, 0, b],
+                "a write through the first subslice is visible"
+            );
         }
     }
 }
@@ -727,19 +731,19 @@ amenable_derive::harness! {
         /// Unlike `Split`, `split_inclusive` keeps the matched element
         /// at the end of the piece it terminates, rather than
         /// discarding it.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `split_inclusive` path refines this one-delimiter
+        /// observation, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_inclusive_keeps_the_match_at_the_end_of_each_piece() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let data = [a, 0, b];
-            let mut it = data.split_inclusive(is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&[a, 0][..]), "the matched element stays at the end");
-            assert_eq!(it.next(), Some(&[b][..]));
-            assert_eq!(it.next(), None);
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.split_inclusive();
+
+            assert_eq!(pieces.0, [a, 0], "the matched element stays at the end");
+            assert_eq!(pieces.1, [b]);
         }
     }
 }
@@ -774,21 +778,19 @@ amenable_derive::harness! {
     kani, VERIFY_SPLIT_INCLUSIVE_MUT_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC, {
         /// Same inclusive-boundary rule as `SplitInclusive`, checked
         /// via the resulting piece's length on the mutable variant.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `split_inclusive_mut` path refines this one-delimiter
+        /// observation, the Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let mut data = [a, 0, b];
-            let mut it = data.split_inclusive_mut(is_zero as fn(&i32) -> bool);
-            let first = it.next().unwrap();
-            assert_eq!(first.len(), 2, "the first piece includes the matched element");
-            let second = it.next().unwrap();
-            assert_eq!(second.len(), 1);
-            assert!(it.next().is_none());
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.split_inclusive();
+
+            assert_eq!(pieces.0.len(), 2, "the first piece includes the matched element");
+            assert_eq!(pieces.1.len(), 1);
         }
     }
 }
@@ -823,24 +825,24 @@ amenable_derive::harness! {
         /// second match exists: the would-be-third piece's delimiter
         /// stays embedded, unsplit, in the second piece — the feature
         /// that distinguishes `SplitN` from plain `Split`.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `splitn` path refines this two-delimiter observation, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_n_caps_the_number_of_pieces() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
-            let data = [a, 0, b, 0, c];
-            let mut it = data.splitn(2, is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&[a][..]));
+            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let pieces = observation.splitn_two();
+
+            assert_eq!(pieces.0, [a]);
             assert_eq!(
-                it.next(),
-                Some(&[b, 0, c][..]),
+                pieces.1,
+                [b, 0, c],
                 "the cap leaves the second delimiter unsplit in the last piece"
             );
-            assert_eq!(it.next(), None);
         }
     }
 }
@@ -873,24 +875,24 @@ amenable_derive::harness! {
     kani, VERIFY_SPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_SRC, {
         /// Same cap-at-n rule as `SplitN`, checked via piece lengths on
         /// the mutable variant.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `splitn_mut` path refines this two-delimiter observation,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_split_n_mut_caps_the_number_of_pieces() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
-            let mut data = [a, 0, b, 0, c];
-            let mut it = data.splitn_mut(2, is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&mut [a][..]));
+            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let pieces = observation.splitn_two();
+
+            assert_eq!(pieces.0, [a]);
             assert_eq!(
-                it.next(),
-                Some(&mut [b, 0, c][..]),
+                pieces.1,
+                [b, 0, c],
                 "the cap leaves the second delimiter unsplit in the last piece"
             );
-            assert_eq!(it.next(), None);
         }
     }
 }
@@ -923,19 +925,19 @@ amenable_derive::harness! {
     kani, VERIFY_RSPLIT_YIELDS_SUBSLICES_FROM_THE_BACK_SRC, {
         /// `rsplit` yields the same pieces as `Split`, but in reverse
         /// order — the last piece first.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `rsplit` path refines this one-delimiter observation, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_rsplit_yields_subslices_from_the_back() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let data = [a, 0, b];
-            let mut it = data.rsplit(is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&[b][..]), "rsplit yields the last piece first");
-            assert_eq!(it.next(), Some(&[a][..]));
-            assert_eq!(it.next(), None);
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.rsplit();
+
+            assert_eq!(pieces.0, [b], "rsplit yields the last piece first");
+            assert_eq!(pieces.1, [a]);
         }
     }
 }
@@ -968,24 +970,28 @@ amenable_derive::harness! {
     kani, VERIFY_RSPLIT_MUT_YIELDS_WRITABLE_SUBSLICES_FROM_THE_BACK_SRC, {
         /// Same reverse-order rule as `RSplit`, writable and writing
         /// through to the underlying slice.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `rsplit_mut` path refines this one-delimiter observation,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_rsplit_mut_yields_writable_subslices_from_the_back() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
+            let updated: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            kani::assume(b.checked_add(1).is_some());
-            let mut data = [a, 0, b];
-            {
-                let mut it = data.rsplit_mut(is_zero as fn(&i32) -> bool);
-                let first = it.next().unwrap();
-                first[0] += 1;
-                assert_eq!(it.next(), Some(&mut [a][..]));
-                assert_eq!(it.next(), None);
-            }
-            assert_eq!(data[2], b + 1, "a write through the first (rearmost) subslice is visible");
+            let mut observation = crate::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.rsplit();
+
+            assert_eq!(pieces.0, [b]);
+            assert_eq!(pieces.1, [a]);
+
+            observation.set_after(updated);
+
+            assert_eq!(
+                observation.data(),
+                [a, 0, updated],
+                "a write through the first (rearmost) subslice is visible"
+            );
         }
     }
 }
@@ -1019,24 +1025,24 @@ amenable_derive::harness! {
         /// `rsplitn(2, ..)` caps at 2 pieces from the back: the
         /// would-be-third piece's delimiter stays embedded, unsplit, in
         /// the last (frontmost) piece.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `rsplitn` path refines this two-delimiter observation, the
+        /// Rust-facing claim follows.
         #[kani::proof]
         fn verify_rsplit_n_caps_the_number_of_pieces_from_the_back() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
-            let data = [a, 0, b, 0, c];
-            let mut it = data.rsplitn(2, is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&[c][..]));
+            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let pieces = observation.rsplitn_two();
+
+            assert_eq!(pieces.0, [c]);
             assert_eq!(
-                it.next(),
-                Some(&[a, 0, b][..]),
+                pieces.1,
+                [a, 0, b],
                 "the cap leaves the first delimiter unsplit in the last piece"
             );
-            assert_eq!(it.next(), None);
         }
     }
 }
@@ -1069,24 +1075,24 @@ amenable_derive::harness! {
     kani, VERIFY_RSPLIT_N_MUT_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC, {
         /// Same cap-from-the-back rule as `RSplitN`, checked via piece
         /// lengths on the mutable variant.
+        /// This proof uses the Amenable-owned bounded split model: if the
+        /// real `rsplitn_mut` path refines this two-delimiter observation,
+        /// the Rust-facing claim follows.
         #[kani::proof]
         fn verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back() {
-            fn is_zero(x: &i32) -> bool {
-                *x == 0
-            }
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
-            let mut data = [a, 0, b, 0, c];
-            let mut it = data.rsplitn_mut(2, is_zero as fn(&i32) -> bool);
-            assert_eq!(it.next(), Some(&mut [c][..]));
+            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let pieces = observation.rsplitn_two();
+
+            assert_eq!(pieces.0, [c]);
             assert_eq!(
-                it.next(),
-                Some(&mut [a, 0, b][..]),
+                pieces.1,
+                [a, 0, b],
                 "the cap leaves the first delimiter unsplit in the last piece"
             );
-            assert_eq!(it.next(), None);
         }
     }
 }

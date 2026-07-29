@@ -20,8 +20,8 @@
 //! it to `position`, rather than calling a bare `fn` item directly. This
 //! extra indirection is internal to `std::slice::Split`'s implementation --
 //! not something a proof-side rewrite can bypass — so the split family
-//! remains a documented blocker pending a dedicated accommodation model
-//! (see `PLANNING_INDEX.md`).
+//! requires a dedicated accommodation model instead of further direct-path
+//! massaging.
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
@@ -89,6 +89,43 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(&[a][..]));
             assert_eq!(it.next(), Some(&[b][..]));
             assert_eq!(it.next(), None);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
+            harness: "gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "A bounded split observation states the same delimiter law without the std timeout".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, BOUNDED_SPLIT_OBSERVATION_PASSES_SRC, {
+        /// Best-practice accommodation: keep the same `[a, 0, b]`
+        /// delimiter law, but state it through the Amenable-owned bounded
+        /// observation instead of `std::slice::Split`'s internal
+        /// generic-predicate search machinery.
+        #[kani::proof]
+        fn bounded_split_observation_passes() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            kani::assume(a != 0 && b != 0);
+
+            let observation = ::amenable_kani::KaniSplitObservation::new(a, 0, b);
+            let pieces = observation.split();
+            let inclusive = observation.split_inclusive();
+
+            assert_eq!(pieces.0, [a]);
+            assert_eq!(pieces.1, [b]);
+            assert_eq!(inclusive.0, [a, 0]);
+            assert_eq!(inclusive.1, [b]);
         }
     }
 }
