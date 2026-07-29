@@ -35,6 +35,7 @@ mod registry;
 mod rust_std;
 mod slice_split_model;
 mod stoplight;
+mod sync_lock_model;
 mod utf8_model;
 mod witness;
 
@@ -71,6 +72,10 @@ pub use slice_split_model::{KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{
     Color, Established, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow,
     YellowToken, next,
+};
+pub use sync_lock_model::{
+    KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
+    KaniWaitTimeoutObservation,
 };
 pub use utf8_model::{
     KaniAssumedUtf8Validity, KaniFromUtf8Error, KaniUtf8, KaniUtf8Buffer, KaniUtf8BufferError,

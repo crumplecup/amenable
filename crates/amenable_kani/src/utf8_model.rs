@@ -40,11 +40,11 @@ impl KaniAssumedUtf8Validity {
     /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
     /// before this assumption had a name.
     #[must_use]
-    pub fn decide(bytes: &[u8]) -> Self {
+    pub fn decide(_bytes: &[u8]) -> Self {
         #[cfg(kani)]
         let valid: bool = kani::any();
         #[cfg(not(kani))]
-        let valid = is_valid_utf8(bytes);
+        let valid = is_valid_utf8(_bytes);
 
         Self { valid }
     }

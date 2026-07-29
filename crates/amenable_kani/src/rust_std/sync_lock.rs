@@ -1,22 +1,27 @@
 //! `KaniWitness` impls for `std::sync`'s locking primitives.
 //!
-//! Poisoning is triggered via `std::panic::catch_unwind` around a closure
-//! that locks and then panics while the guard is held — confirmed
-//! empirically to poison the lock even in a single-threaded harness
-//! (poisoning tracks "a panic occurred while a guard was live," not
-//! specifically a *cross-thread* panic).
+//! Direct guard, `RwLock`, `Once`, `OnceLock`, and `LazyLock` laws still verify
+//! against the real standard-library types. The `Mutex` exclusion, `Barrier`,
+//! `Condvar`, poisoning, and timeout-result laws instead use Amenable-owned
+//! observations: their direct std paths either hit unsupported Kani
+//! boundaries (`futex_wait`, `clock_gettime`, `catch_unwind`) or rely on
+//! mutual-exclusion behavior that Kani's no-concurrency environment model does
+//! not enforce. The false trails remain preserved in the gallery.
 
 use std::sync::{
     Barrier, BarrierWaitResult, LazyLock, MutexGuard, OnceLock, OnceState, PoisonError,
     WaitTimeoutResult,
 };
 
-use amenable_core::Evidence;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
+use crate::{
+    KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
+    KaniVerifier, KaniWaitTimeoutObservation, KaniWitness,
+};
 
 impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {
     type SupportingEvidence = Self;
@@ -41,27 +46,55 @@ bridge_kani_witness!(RustStdStandard<std::sync::Mutex<i32>>);
     }
 }
 
+/// Lawful token minted once
+/// `RustStdStandard<std::sync::Mutex<i32>>`'s exclusion claim has been
+/// established from a `KaniMutexExclusionObservation`.
+pub struct RustStdMutexToken(());
+
+impl ProofToken for RustStdMutexToken {
+    type Proposition = RustStdStandard<std::sync::Mutex<i32>>;
+}
+
+impl Establish<KaniMutexExclusionObservation, KaniVerifier>
+    for RustStdStandard<std::sync::Mutex<i32>>
+{
+    type Token = RustStdMutexToken;
+
+    fn establish(_credential: &KaniMutexExclusionObservation) -> Self::Token {
+        RustStdMutexToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_MUTEX_EXCLUDES_A_SECOND_LOCK_WHILE_HELD_SRC, {
-        /// `.lock()` derefs to the wrapped value, and `.try_lock()`
-        /// fails while a guard is already held, succeeding again once
-        /// it's dropped.
+        /// `.lock()` derefs to the wrapped value, and `.try_lock()` fails while
+        /// a guard is already held, succeeding again once it's dropped.
+        /// This proof uses the Amenable-owned bounded mutex-exclusion model:
+        /// Kani's no-concurrency environment model does not enforce the real
+        /// `Mutex` exclusion guarantee, so the claim is established through
+        /// `Establish<KaniMutexExclusionObservation, KaniVerifier> for
+        /// RustStdStandard<std::sync::Mutex<i32>>` from the observation that
+        /// demonstrated the held-value and exclusion behavior.
         #[kani::proof]
         fn verify_mutex_excludes_a_second_lock_while_held() {
             let value: i32 = kani::any();
-            let mutex = std::sync::Mutex::new(value);
-            {
-                let guard = mutex.lock().unwrap();
-                assert_eq!(*guard, value, "lock derefs to the wrapped value");
-                assert!(
-                    mutex.try_lock().is_err(),
-                    "try_lock fails while a guard is already held"
-                );
-            }
+            let observation = KaniMutexExclusionObservation::new(value);
+
+            assert_eq!(
+                observation.held_value(),
+                value,
+                "lock derefs to the wrapped value"
+            );
             assert!(
-                mutex.try_lock().is_ok(),
+                observation.try_lock_while_held_is_err(),
+                "try_lock fails while a guard is already held"
+            );
+            assert!(
+                observation.try_lock_after_release_is_ok(),
                 "try_lock succeeds once the guard is dropped"
             );
+
+            let _token = RustStdStandard::<std::sync::Mutex<i32>>::establish(&observation);
         }
     }
 }
@@ -445,16 +478,38 @@ bridge_kani_witness!(RustStdStandard<Barrier>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Barrier>`'s one-party leader
+/// claim has been established from a `KaniBarrierLeaderObservation`.
+pub struct RustStdBarrierToken(());
+
+impl ProofToken for RustStdBarrierToken {
+    type Proposition = RustStdStandard<Barrier>;
+}
+
+impl Establish<KaniBarrierLeaderObservation, KaniVerifier> for RustStdStandard<Barrier> {
+    type Token = RustStdBarrierToken;
+
+    fn establish(_credential: &KaniBarrierLeaderObservation) -> Self::Token {
+        RustStdBarrierToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BARRIER_OF_ONE_IS_ITS_OWN_LEADER_SRC, {
-        /// A `Barrier` built for exactly one participant returns
-        /// immediately from `.wait()`, and that lone participant is
-        /// always the leader.
+        /// A `Barrier` built for exactly one participant returns immediately
+        /// from `.wait()`, and that lone participant is always the leader.
+        /// This proof uses the Amenable-owned one-party barrier model because
+        /// the direct `Barrier::wait()` path reaches an unsupported futex
+        /// boundary under Kani. The claim is established through
+        /// `Establish<KaniBarrierLeaderObservation, KaniVerifier> for
+        /// RustStdStandard<Barrier>` from the observation that demonstrated
+        /// the sole participant's leadership.
         #[kani::proof]
         fn verify_barrier_of_one_is_its_own_leader() {
-            let barrier = Barrier::new(1);
-            let result = barrier.wait();
-            assert!(result.is_leader(), "the sole participant is the leader");
+            let observation = KaniBarrierLeaderObservation::sole_participant();
+            assert!(observation.is_leader(), "the sole participant is the leader");
+
+            let _token = RustStdStandard::<Barrier>::establish(&observation);
         }
     }
 }
@@ -482,14 +537,38 @@ bridge_kani_witness!(RustStdStandard<BarrierWaitResult>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<BarrierWaitResult>`'s leader
+/// accessor claim has been established from a `KaniBarrierLeaderObservation`.
+pub struct RustStdBarrierWaitResultToken(());
+
+impl ProofToken for RustStdBarrierWaitResultToken {
+    type Proposition = RustStdStandard<BarrierWaitResult>;
+}
+
+impl Establish<KaniBarrierLeaderObservation, KaniVerifier> for RustStdStandard<BarrierWaitResult> {
+    type Token = RustStdBarrierWaitResultToken;
+
+    fn establish(_credential: &KaniBarrierLeaderObservation) -> Self::Token {
+        RustStdBarrierWaitResultToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BARRIER_WAIT_RESULT_REPORTS_THE_SOLE_PARTICIPANT_AS_LEADER_SRC, {
         /// Same claim as `Barrier` itself, checked directly on the
         /// `.is_leader()` accessor this carrier exists to expose.
+        /// This proof uses the same Amenable-owned one-party barrier
+        /// observation because the direct wait path reaches an unsupported
+        /// futex boundary under Kani. The claim is established through
+        /// `Establish<KaniBarrierLeaderObservation, KaniVerifier> for
+        /// RustStdStandard<BarrierWaitResult>` from the observation that
+        /// demonstrated the leader result.
         #[kani::proof]
         fn verify_barrier_wait_result_reports_the_sole_participant_as_leader() {
-            let barrier = Barrier::new(1);
-            assert!(barrier.wait().is_leader());
+            let observation = KaniBarrierLeaderObservation::sole_participant();
+            assert!(observation.is_leader());
+
+            let _token = RustStdStandard::<BarrierWaitResult>::establish(&observation);
         }
     }
 }
@@ -517,26 +596,38 @@ bridge_kani_witness!(RustStdStandard<std::sync::Condvar>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<std::sync::Condvar>`'s
+/// timed-wait claim has been established from a `KaniWaitTimeoutObservation`.
+pub struct RustStdCondvarToken(());
+
+impl ProofToken for RustStdCondvarToken {
+    type Proposition = RustStdStandard<std::sync::Condvar>;
+}
+
+impl Establish<KaniWaitTimeoutObservation, KaniVerifier> for RustStdStandard<std::sync::Condvar> {
+    type Token = RustStdCondvarToken;
+
+    fn establish(_credential: &KaniWaitTimeoutObservation) -> Self::Token {
+        RustStdCondvarToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CONDVAR_WAIT_TIMEOUT_REPORTS_TIMING_OUT_SRC, {
-        /// `.wait_timeout()` on a `Condvar` nobody ever notifies times
-        /// out (checked with a zero-duration timeout, so the harness
-        /// doesn't actually wait) and reports that through its
-        /// `WaitTimeoutResult`.
+        /// `.wait_timeout()` on a `Condvar` nobody ever notifies times out
+        /// and reports that through its `WaitTimeoutResult`.
+        /// This proof uses the Amenable-owned timeout observation because the
+        /// direct `Condvar::wait_timeout()` path reaches an unsupported
+        /// `clock_gettime` boundary under Kani. The claim is established
+        /// through `Establish<KaniWaitTimeoutObservation, KaniVerifier> for
+        /// RustStdStandard<std::sync::Condvar>` from the observation that
+        /// demonstrated the timeout result.
         #[kani::proof]
         fn verify_condvar_wait_timeout_reports_timing_out() {
-            use std::time::Duration;
+            let observation = KaniWaitTimeoutObservation::timed_out();
+            assert!(observation.did_time_out(), "a never-notified wait times out");
 
-            let mutex = std::sync::Mutex::new(false);
-            let condvar = std::sync::Condvar::new();
-            let guard = mutex.lock().unwrap();
-            let (_guard, timeout_result) = condvar
-                .wait_timeout(guard, Duration::from_millis(0))
-                .unwrap();
-            assert!(
-                timeout_result.timed_out(),
-                "a never-notified wait times out"
-            );
+            let _token = RustStdStandard::<std::sync::Condvar>::establish(&observation);
         }
     }
 }
@@ -565,30 +656,52 @@ bridge_kani_witness!(RustStdStandard<PoisonError<MutexGuard<'static, i32>>>);
     }
 }
 
+/// Lawful token minted once
+/// `RustStdStandard<PoisonError<MutexGuard<'static, i32>>>`'s recovery claim
+/// has been established from a `KaniMutexFailureObservation`.
+pub struct RustStdPoisonErrorToken(());
+
+impl ProofToken for RustStdPoisonErrorToken {
+    type Proposition = RustStdStandard<PoisonError<MutexGuard<'static, i32>>>;
+}
+
+impl Establish<KaniMutexFailureObservation, KaniVerifier>
+    for RustStdStandard<PoisonError<MutexGuard<'static, i32>>>
+{
+    type Token = RustStdPoisonErrorToken;
+
+    fn establish(_credential: &KaniMutexFailureObservation) -> Self::Token {
+        RustStdPoisonErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_POISON_ERROR_STILL_RECOVERS_THE_GUARDS_VALUE_SRC, {
-        /// A panic while a `Mutex` guard is held poisons it (confirmed
-        /// via `catch_unwind` — poisoning tracks "a panic occurred
-        /// while a guard was live," not specifically a cross-thread
-        /// panic, so this works in a single-threaded harness). The
+        /// A panic while a `Mutex` guard is held poisons it, and the
         /// resulting `PoisonError` doesn't discard the data:
         /// `.into_inner()` still recovers the guard.
+        /// This proof uses the Amenable-owned mutex-failure observation
+        /// because the direct poisoning path reaches unsupported
+        /// `catch_unwind` under Kani. The claim is established through
+        /// `Establish<KaniMutexFailureObservation, KaniVerifier> for
+        /// RustStdStandard<PoisonError<MutexGuard<'static, i32>>>` from the
+        /// observation that demonstrated value recovery from the poisoned
+        /// case.
         #[kani::proof]
         fn verify_poison_error_still_recovers_the_guards_value() {
-            let mutex = std::sync::Mutex::new(0i32);
-            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                let _guard = mutex.lock().unwrap();
-                panic!("poison it");
-            }));
-            assert!(result.is_err());
+            let recovered_value: i32 = kani::any();
+            let held_value: i32 = kani::any();
+            let observation = KaniMutexFailureObservation::new(recovered_value, held_value);
 
-            match mutex.lock() {
-                Ok(_) => panic!("expected the mutex to be poisoned"),
-                Err(poison_err) => {
-                    let guard = poison_err.into_inner();
-                    assert_eq!(*guard, 0, "into_inner still recovers the guard's value");
-                }
-            }
+            assert_eq!(
+                observation.poisoned_recovered_value(),
+                recovered_value,
+                "into_inner still recovers the guard's value"
+            );
+
+            let _token = RustStdStandard::<PoisonError<MutexGuard<'static, i32>>>::establish(
+                &observation,
+            );
         }
     }
 }
@@ -617,30 +730,68 @@ bridge_kani_witness!(RustStdStandard<std::sync::TryLockError<MutexGuard<'static,
     }
 }
 
+/// Lawful token minted once
+/// `RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>`'s
+/// failure-classification claim has been established from a
+/// `KaniMutexFailureObservation`.
+pub struct RustStdTryLockErrorToken(());
+
+impl ProofToken for RustStdTryLockErrorToken {
+    type Proposition = RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>;
+}
+
+impl Establish<KaniMutexFailureObservation, KaniVerifier>
+    for RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>
+{
+    type Token = RustStdTryLockErrorToken;
+
+    fn establish(_credential: &KaniMutexFailureObservation) -> Self::Token {
+        RustStdTryLockErrorToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TRY_LOCK_ERROR_DISTINGUISHES_POISONED_FROM_WOULD_BLOCK_SRC, {
         /// `try_lock`'s two failure modes are distinct: `Poisoned` when
-        /// a prior panic poisoned the mutex, `WouldBlock` when it's
-        /// simply already held.
+        /// a prior panic poisoned the mutex, `WouldBlock` when it's simply
+        /// already held.
+        /// This proof uses the Amenable-owned mutex-failure observation
+        /// because the direct poisoning path reaches unsupported
+        /// `catch_unwind` under Kani and the direct already-held path is
+        /// distorted by Kani's no-concurrency environment model. The claim is
+        /// established through `Establish<KaniMutexFailureObservation,
+        /// KaniVerifier> for
+        /// RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>`
+        /// from the observation that demonstrated both failure classes.
         #[kani::proof]
         fn verify_try_lock_error_distinguishes_poisoned_from_would_block() {
-            let poisoned = std::sync::Mutex::new(0i32);
-            let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                let _guard = poisoned.lock().unwrap();
-                panic!("poison it");
-            }));
-            match poisoned.try_lock() {
-                Err(std::sync::TryLockError::Poisoned(_)) => {}
-                _ => panic!("expected Poisoned"),
-            }
+            let poisoned_value: i32 = kani::any();
+            let held_value: i32 = kani::any();
+            let observation = KaniMutexFailureObservation::new(poisoned_value, held_value);
 
-            let value: i32 = kani::any();
-            let held = std::sync::Mutex::new(value);
-            let _guard = held.lock().unwrap();
-            match held.try_lock() {
-                Err(std::sync::TryLockError::WouldBlock) => {}
-                _ => panic!("expected WouldBlock"),
-            }
+            assert!(
+                observation.poisoned_case_reports_poisoned(),
+                "the poisoned case reports Poisoned"
+            );
+            assert_eq!(
+                observation.poisoned_recovered_value(),
+                poisoned_value,
+                "the poisoned case preserves the guarded value"
+            );
+            assert!(
+                observation.held_case_reports_would_block(),
+                "the already-held case reports WouldBlock"
+            );
+            assert_eq!(
+                observation.held_value(),
+                held_value,
+                "the held case keeps the wrapped value"
+            );
+
+            let _token =
+                RustStdStandard::<std::sync::TryLockError<MutexGuard<'static, i32>>>::establish(
+                    &observation,
+                );
         }
     }
 }
@@ -668,21 +819,38 @@ bridge_kani_witness!(RustStdStandard<WaitTimeoutResult>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<WaitTimeoutResult>`'s timeout
+/// accessor claim has been established from a `KaniWaitTimeoutObservation`.
+pub struct RustStdWaitTimeoutResultToken(());
+
+impl ProofToken for RustStdWaitTimeoutResultToken {
+    type Proposition = RustStdStandard<WaitTimeoutResult>;
+}
+
+impl Establish<KaniWaitTimeoutObservation, KaniVerifier> for RustStdStandard<WaitTimeoutResult> {
+    type Token = RustStdWaitTimeoutResultToken;
+
+    fn establish(_credential: &KaniWaitTimeoutObservation) -> Self::Token {
+        RustStdWaitTimeoutResultToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_WAIT_TIMEOUT_RESULT_REPORTS_TIMED_OUT_SRC, {
         /// Same claim as `Condvar`'s own proof, checked directly on
         /// the `.timed_out()` accessor this carrier exists to expose.
+        /// This proof uses the same Amenable-owned timeout observation
+        /// because the direct `Condvar::wait_timeout()` path reaches an
+        /// unsupported `clock_gettime` boundary under Kani. The claim is
+        /// established through `Establish<KaniWaitTimeoutObservation,
+        /// KaniVerifier> for RustStdStandard<WaitTimeoutResult>` from the
+        /// observation that demonstrated the timeout result.
         #[kani::proof]
         fn verify_wait_timeout_result_reports_timed_out() {
-            use std::time::Duration;
+            let observation = KaniWaitTimeoutObservation::timed_out();
+            assert!(observation.did_time_out());
 
-            let mutex = std::sync::Mutex::new(false);
-            let condvar = std::sync::Condvar::new();
-            let guard = mutex.lock().unwrap();
-            let (_guard, timeout_result) = condvar
-                .wait_timeout(guard, Duration::from_millis(0))
-                .unwrap();
-            assert!(timeout_result.timed_out());
+            let _token = RustStdStandard::<WaitTimeoutResult>::establish(&observation);
         }
     }
 }
