@@ -510,9 +510,35 @@ impl KaniFileContentObservation {
 
 /// Observable result of writing a byte sequence and reading its recorded
 /// length back from metadata.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that `.len()` reports
+/// exactly the number of bytes written to the file, and nothing else about
+/// the real OS-backed metadata query -- is named explicitly as a `Standard`
+/// rather than left as prose: the direct `std::fs` path crosses OS-backed
+/// state Kani cannot symbolically execute well (see this module's own doc
+/// comment), so this bounded observation is what the `Metadata` proof
+/// actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniFileLenObservation {
     len: u8,
+}
+
+impl Provenance for KaniFileLenObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                ".len() reports exactly the number of bytes written to the file, standing in for the real OS-backed metadata query",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("len", self.len.to_string()),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniFileLenObservation {

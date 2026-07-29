@@ -17,7 +17,8 @@ use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
-    KaniFileTimesObservation, KaniFileTypeObservation, KaniRecursiveDirObservation, KaniVerifier,
+    KaniFileLenObservation, KaniFileTimesObservation, KaniFileTypeObservation,
+    KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -398,13 +399,34 @@ bridge_kani_witness!(RustStdStandard<Metadata>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<Metadata>`'s written-length
+/// claim has been established from a `KaniFileLenObservation` that has
+/// itself demonstrated the exact byte count.
+pub struct RustStdMetadataLenToken(());
+
+impl ProofToken for RustStdMetadataLenToken {
+    type Proposition = RustStdStandard<Metadata>;
+}
+
+impl Establish<KaniFileLenObservation, KaniVerifier> for RustStdStandard<Metadata> {
+    type Token = RustStdMetadataLenToken;
+
+    fn establish(_credential: &KaniFileLenObservation) -> Self::Token {
+        RustStdMetadataLenToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_METADATA_REPORTS_THE_WRITTEN_LENGTH_SRC, {
         /// `.len()` reports exactly the number of bytes written to the
         /// file.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `metadata().len()` path reports the written byte count this way,
-        /// the Rust-facing claim follows.
+        /// the Rust-facing claim follows. The claim is established through
+        /// `Establish<KaniFileLenObservation, KaniVerifier> for
+        /// RustStdStandard<Metadata>` from the observation instance that
+        /// actually demonstrated the exact count, rather than asserted
+        /// independently of it.
         #[kani::proof]
         fn verify_metadata_reports_the_written_length() {
             let byte_count: u8 = kani::any();
@@ -416,6 +438,8 @@ amenable_derive::harness! {
                 "metadata reports exactly the number of bytes written"
             );
             assert_eq!(observation.is_empty(), byte_count == 0);
+
+            let _token = RustStdStandard::<Metadata>::establish(&observation);
         }
     }
 }
