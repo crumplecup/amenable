@@ -17,7 +17,7 @@ use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
     KaniCreateNewObservation, KaniDirEntryObservation, KaniFileContentObservation,
-    KaniFileTimesObservation, KaniRecursiveDirObservation, KaniVerifier,
+    KaniFileTimesObservation, KaniFileTypeObservation, KaniRecursiveDirObservation, KaniVerifier,
 };
 
 impl KaniWitness for RustStdStandard<DirBuilder> {
@@ -332,13 +332,34 @@ bridge_kani_witness!(RustStdStandard<FileType>);
     }
 }
 
+/// Lawful token minted once `RustStdStandard<FileType>`'s file/directory
+/// distinction claim has been established from a `KaniFileTypeObservation`
+/// that has itself demonstrated the mutual exclusion.
+pub struct RustStdFileTypeToken(());
+
+impl ProofToken for RustStdFileTypeToken {
+    type Proposition = RustStdStandard<FileType>;
+}
+
+impl Establish<KaniFileTypeObservation, KaniVerifier> for RustStdStandard<FileType> {
+    type Token = RustStdFileTypeToken;
+
+    fn establish(_credential: &KaniFileTypeObservation) -> Self::Token {
+        RustStdFileTypeToken(())
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_FILE_TYPE_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC, {
         /// A regular file's `FileType` reports `is_file()`, and a
         /// directory's reports `is_dir()` — never both.
         /// This proof uses the Amenable-owned filesystem model: if the real
         /// `metadata().file_type()` path preserves this file/directory
-        /// distinction, the Rust-facing claim follows.
+        /// distinction, the Rust-facing claim follows. The claim is
+        /// established through `Establish<KaniFileTypeObservation,
+        /// KaniVerifier> for RustStdStandard<FileType>` from the
+        /// observation instance that actually demonstrated the mutual
+        /// exclusion, rather than asserted independently of it.
         #[kani::proof]
         fn verify_file_type_distinguishes_files_from_directories() {
             let observation = crate::KaniFileTypeObservation::new();
@@ -348,6 +369,8 @@ amenable_derive::harness! {
 
             assert!(observation.directory_is_dir());
             assert!(!observation.directory_is_file());
+
+            let _token = RustStdStandard::<FileType>::establish(&observation);
         }
     }
 }

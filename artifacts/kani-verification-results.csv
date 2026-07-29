@@ -105,7 +105,7 @@ amenable_kani::rust_std::fmt::verify_formatter_exposes_the_parsed_width_and_prec
 amenable_kani::rust_std::fs::verify_dir_builder_creates_nested_directories_recursively,1785347511,passed
 amenable_kani::rust_std::fs::verify_dir_entry_reports_the_created_files_name_and_path,1785347676,passed
 amenable_kani::rust_std::fs::verify_file_times_sets_the_recorded_modification_time,1785347869,passed
-amenable_kani::rust_std::fs::verify_file_type_distinguishes_files_from_directories,1785109217,passed
+amenable_kani::rust_std::fs::verify_file_type_distinguishes_files_from_directories,1785347963,passed
 amenable_kani::rust_std::fs::verify_file_write_then_read_round_trips_the_bytes,1785347771,passed
 amenable_kani::rust_std::fs::verify_metadata_reports_the_written_length,1785109223,passed
 amenable_kani::rust_std::fs::verify_open_options_create_new_rejects_an_existing_file,1785347234,passed

@@ -387,10 +387,37 @@ impl KaniFileSystem {
 
 /// Observable result of reading a file's own type against a sibling
 /// directory's, mutually exclusive by construction.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The assumption this observation stands in for -- that a regular file's
+/// `FileType` reports `is_file()` and a directory's reports `is_dir()`,
+/// never both, and nothing else about the real OS-backed type distinction
+/// -- is named explicitly as a `Standard` rather than left as prose: the
+/// direct `std::fs` path crosses OS-backed state Kani cannot symbolically
+/// execute well (see this module's own doc comment), so this bounded
+/// observation is what the `FileType` proof actually rests on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[standard(basis = "Self")]
 pub struct KaniFileTypeObservation {
     file: KaniFsNodeKind,
     directory: KaniFsNodeKind,
+}
+
+impl Provenance for KaniFileTypeObservation {
+    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+        vec![
+            MetadataEntry::new(
+                "assumed",
+                "a regular file's FileType reports is_file() and a directory's reports is_dir(), never both, standing in for the real OS-backed type distinction",
+            ),
+            MetadataEntry::new(
+                "rationale",
+                "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
+            ),
+            MetadataEntry::new("file", format!("{:?}", self.file)),
+            MetadataEntry::new("directory", format!("{:?}", self.directory)),
+        ]
+        .into_iter()
+    }
 }
 
 impl KaniFileTypeObservation {
