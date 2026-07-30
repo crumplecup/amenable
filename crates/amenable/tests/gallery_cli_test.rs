@@ -93,7 +93,19 @@ fn gallery_run_rejects_unknown_case_before_spawning_kani() {
 
     assert!(!output.status.success(), "unknown gallery case must fail");
     let stderr = String::from_utf8(output.stderr).expect("gallery stderr should be UTF-8");
-    assert!(stderr.contains(
-        "Proof gallery failed: unknown Kani proof-gallery case ID: amenable_kani::gallery::missing"
-    ));
+    // Asserted as separate substrings rather than one long string: miette
+    // wraps its rendered diagnostic across lines, so a single combined
+    // assertion would be brittle against wrap width.
+    assert!(
+        stderr.contains("amenable::Invariant"),
+        "stderr should carry the Invariant diagnostic code: {stderr}"
+    );
+    assert!(
+        stderr.contains("unknown Kani proof-gallery case ID"),
+        "stderr: {stderr}"
+    );
+    assert!(
+        stderr.contains("amenable_kani::gallery::missing"),
+        "stderr: {stderr}"
+    );
 }
