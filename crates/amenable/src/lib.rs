@@ -18,6 +18,14 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod error;
+pub mod paths;
+
+pub use error::{
+    AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
+    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
+};
+
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
     Establish, Evidence, EvidenceLink, Exchange, MetadataEntry, OwnedProvenanceReport,
