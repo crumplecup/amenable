@@ -9,7 +9,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use amenable::{KaniProof, KaniProofRegistration};
+use crate::{AmenableError, AmenableResult, KaniProof, KaniProofRegistration};
 use clap::{Args, Subcommand, ValueEnum};
 use serde::{Deserialize, Serialize};
 use time::{
@@ -23,7 +23,7 @@ const LEGACY_SCHEMA_VERSION: u8 = 1;
 
 /// Commands for recording and examining proof assessments.
 #[derive(Debug, Args)]
-pub(super) struct AssessArgs {
+pub struct AssessArgs {
     #[command(subcommand)]
     command: AssessCommand,
 }
@@ -280,7 +280,7 @@ struct Rubric {
 }
 
 impl Rubric {
-    fn validate(self) -> Result<(), String> {
+    fn validate(self) -> AmenableResult<()> {
         for (name, score) in [
             ("claim_alignment", self.claim_alignment),
             ("assumption_adequacy", self.assumption_adequacy),
@@ -290,9 +290,9 @@ impl Rubric {
             ("clarity", self.clarity),
         ] {
             if score > 4 {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "invalid {name} score {score}; expected an integer from 0 to 4"
-                ));
+                )));
             }
         }
 
@@ -313,7 +313,7 @@ impl Rubric {
 
 /// One immutable assessment event stored in the JSON Lines artifact.
 #[derive(Debug)]
-struct ProofAssessment {
+pub struct ProofAssessment {
     version: String,
     assessment_id: Option<String>,
     proof_id: String,
@@ -326,31 +326,34 @@ struct ProofAssessment {
 }
 
 impl ProofAssessment {
-    fn validate(&self) -> Result<(), String> {
+    fn validate(&self) -> AmenableResult<()> {
         if self.version != CURRENT_ASSESSMENT_VERSION && self.version != LEGACY_ASSESSMENT_VERSION {
-            return Err(format!(
+            return Err(AmenableError::invariant(format!(
                 "unsupported assessment version {}; expected one of {LEGACY_ASSESSMENT_VERSION} or {CURRENT_ASSESSMENT_VERSION}",
                 self.version
-            ));
+            )));
         }
         if self.proof_id.trim().is_empty() || self.reviewer.trim().is_empty() {
-            return Err("assessment proof ID and reviewer must not be empty".to_owned());
+            return Err(AmenableError::invariant(
+                "assessment proof ID and reviewer must not be empty",
+            ));
         }
         if self.comment.trim().is_empty() {
-            return Err("assessment comment must not be empty".to_owned());
+            return Err(AmenableError::invariant(
+                "assessment comment must not be empty",
+            ));
         }
         if self.version == CURRENT_ASSESSMENT_VERSION {
-            let assessment_id = self
-                .assessment_id
-                .as_ref()
-                .ok_or_else(|| "assessment ID is required for version 0.1.0".to_owned())?;
+            let assessment_id = self.assessment_id.as_ref().ok_or_else(|| {
+                AmenableError::invariant("assessment ID is required for version 0.1.0")
+            })?;
             if assessment_id.trim().is_empty() {
-                return Err("assessment ID must not be empty".to_owned());
+                return Err(AmenableError::invariant("assessment ID must not be empty"));
             }
 
-            let resolution_path = self
-                .resolution_path
-                .ok_or_else(|| "resolution path is required for version 0.1.0".to_owned())?;
+            let resolution_path = self.resolution_path.ok_or_else(|| {
+                AmenableError::invariant("resolution path is required for version 0.1.0")
+            })?;
             validate_resolution_path(self.recommendation, resolution_path)?;
         }
 
@@ -380,25 +383,25 @@ struct StoredProofAssessment {
 }
 
 impl StoredProofAssessment {
-    fn into_assessment(self) -> Result<ProofAssessment, String> {
+    fn into_assessment(self) -> AmenableResult<ProofAssessment> {
         let proof_id = self.proof_id;
         let version = match (self.version, self.schema_version) {
             (Some(version), None) => version,
             (None, Some(LEGACY_SCHEMA_VERSION)) => LEGACY_ASSESSMENT_VERSION.to_owned(),
             (None, Some(schema_version)) => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "unsupported legacy assessment schema version {schema_version}; expected {LEGACY_SCHEMA_VERSION}"
-                ));
+                )));
             }
             (Some(_), Some(_)) => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "assessment record for {proof_id} must not contain both version and schema_version"
-                ));
+                )));
             }
             (None, None) => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "assessment record for {proof_id} is missing version metadata"
-                ));
+                )));
             }
         };
 
@@ -406,14 +409,14 @@ impl StoredProofAssessment {
             (Some(timestamp), None) => timestamp,
             (None, Some(timestamp)) => timestamp,
             (Some(_), Some(_)) => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "assessment record for {proof_id} must not contain both timestamp and timestamp_unix_seconds"
-                ));
+                )));
             }
             (None, None) => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "assessment record for {proof_id} is missing timestamp metadata"
-                ));
+                )));
             }
         };
 
@@ -487,7 +490,7 @@ struct ListedVerificationFailure {
 }
 
 /// Execute an assessment command.
-pub(super) fn run(args: AssessArgs) -> Result<(), String> {
+pub fn run(args: AssessArgs) -> AmenableResult<()> {
     match args.command {
         AssessCommand::Proof(args) => record(args),
         AssessCommand::Failures(args) => failures(args),
@@ -499,30 +502,30 @@ pub(super) fn run(args: AssessArgs) -> Result<(), String> {
 }
 
 fn default_assessment_path() -> PathBuf {
-    super::artifacts_directory().join("proof-assessments.jsonl")
+    crate::paths::artifacts_directory().join("proof-assessments.jsonl")
 }
 
-fn parse_score(value: &str) -> Result<u8, String> {
-    let score: u8 = value
-        .parse()
-        .map_err(|_| format!("invalid score {value:?}; expected an integer from 0 to 4"))?;
+fn parse_score(value: &str) -> AmenableResult<u8> {
+    let score: u8 = value.parse().map_err(|_| {
+        AmenableError::invariant(format!(
+            "invalid score {value:?}; expected an integer from 0 to 4"
+        ))
+    })?;
     if score > 4 {
-        return Err(format!(
+        return Err(AmenableError::invariant(format!(
             "invalid score {score}; expected an integer from 0 to 4"
-        ));
+        )));
     }
 
     Ok(score)
 }
 
-fn parse_utc_date(value: &str) -> Result<Date, String> {
-    let format = format_description::parse_borrowed::<2>("[year]-[month]-[day]")
-        .map_err(|error| format!("internal date-format error: {error}"))?;
-    Date::parse(value, &format)
-        .map_err(|error| format!("invalid date {value:?}; expected YYYY-MM-DD: {error}"))
+fn parse_utc_date(value: &str) -> AmenableResult<Date> {
+    let format = format_description::parse_borrowed::<2>("[year]-[month]-[day]")?;
+    Date::parse(value, &format).map_err(|error| AmenableError::invalid_utc_date(value, error))
 }
 
-fn record(args: RecordAssessmentArgs) -> Result<(), String> {
+fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
     ensure_registered(&args.proof)?;
     let comment = read_comment(args.comment, args.comment_file)?;
     let assessment = ProofAssessment {
@@ -555,7 +558,7 @@ fn record(args: RecordAssessmentArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
+fn summary(args: AssessmentSummaryArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
     }
@@ -638,7 +641,7 @@ fn summary(args: AssessmentSummaryArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
+fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
     }
@@ -700,7 +703,7 @@ fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
                     status: result.status,
                 })
             })
-            .collect::<Result<Vec<_>, String>>()?;
+            .collect::<AmenableResult<Vec<_>>>()?;
         return print_json(&listed);
     }
 
@@ -716,23 +719,22 @@ fn failures(args: VerificationFailuresArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> Result<String, String> {
+fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> AmenableResult<String> {
     match (comment, comment_file) {
         (Some(comment), None) => Ok(comment),
-        (None, Some(path)) => fs::read_to_string(&path).map_err(|error| {
-            format!(
-                "could not read assessment comment {}: {error}",
-                path.display()
-            )
-        }),
-        (Some(_), Some(_)) => {
-            Err("provide either --comment or --comment-file, not both".to_owned())
+        (None, Some(path)) => {
+            fs::read_to_string(&path).map_err(|error| AmenableError::io(path, error))
         }
-        (None, None) => Err("provide --comment or --comment-file".to_owned()),
+        (Some(_), Some(_)) => Err(AmenableError::invariant(
+            "provide either --comment or --comment-file, not both",
+        )),
+        (None, None) => Err(AmenableError::invariant(
+            "provide --comment or --comment-file",
+        )),
     }
 }
 
-fn list(args: AssessmentListArgs) -> Result<(), String> {
+fn list(args: AssessmentListArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
     }
@@ -768,7 +770,7 @@ fn list(args: AssessmentListArgs) -> Result<(), String> {
                     comment: assessment.comment,
                 })
             })
-            .collect::<Result<Vec<_>, String>>()?;
+            .collect::<AmenableResult<Vec<_>>>()?;
         return print_json(&listed);
     }
 
@@ -793,7 +795,7 @@ fn list(args: AssessmentListArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn report(args: AssessmentReportArgs) -> Result<(), String> {
+fn report(args: AssessmentReportArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
     }
@@ -824,7 +826,7 @@ fn report(args: AssessmentReportArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn queue(args: AssessmentQueueArgs) -> Result<(), String> {
+fn queue(args: AssessmentQueueArgs) -> AmenableResult<()> {
     let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
     let assessed = assessed_proof_ids(&args.assessments, since_timestamp)?;
     let unassessed: Vec<_> = registered_proofs()
@@ -878,7 +880,7 @@ fn filtered_assessments(
 fn assessed_proof_ids(
     path: &Path,
     since_timestamp: Option<u64>,
-) -> Result<BTreeSet<String>, String> {
+) -> AmenableResult<BTreeSet<String>> {
     Ok(load(path)?
         .into_iter()
         .filter(|assessment| {
@@ -951,49 +953,48 @@ fn registered_proofs() -> Vec<KaniProof> {
     proofs
 }
 
-fn ensure_registered(proof_id: &str) -> Result<(), String> {
+fn ensure_registered(proof_id: &str) -> AmenableResult<()> {
     registered_proofs()
         .into_iter()
         .any(|proof| proof.id == proof_id)
         .then_some(())
-        .ok_or_else(|| format!("unknown registered Kani proof ID: {proof_id}"))
+        .ok_or_else(|| {
+            AmenableError::invariant(format!("unknown registered Kani proof ID: {proof_id}"))
+        })
 }
 
-fn timestamp() -> Result<u64, String> {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|error| format!("system clock is before the Unix epoch: {error}"))
-        .map(|duration| duration.as_secs())
+fn timestamp() -> AmenableResult<u64> {
+    Ok(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs())
 }
 
-fn assessment_id() -> Result<String, String> {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|error| format!("system clock is before the Unix epoch: {error}"))
-        .map(|duration| format!("assessment-{}", duration.as_nanos()))
+fn assessment_id() -> AmenableResult<String> {
+    let duration = SystemTime::now().duration_since(UNIX_EPOCH)?;
+    Ok(format!("assessment-{}", duration.as_nanos()))
 }
 
-fn start_of_utc_date_timestamp(date: Date) -> Result<u64, String> {
+fn start_of_utc_date_timestamp(date: Date) -> AmenableResult<u64> {
     let timestamp = date.midnight().assume_utc().unix_timestamp();
     u64::try_from(timestamp).map_err(|_| {
-        format!("date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01")
+        AmenableError::invariant(format!(
+            "date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01"
+        ))
     })
 }
 
-fn format_timestamp(timestamp: u64) -> Result<String, String> {
-    let seconds = i64::try_from(timestamp)
-        .map_err(|_| format!("assessment timestamp {timestamp} is too large to format"))?;
-    let recorded_at = OffsetDateTime::from_unix_timestamp(seconds)
-        .map_err(|error| format!("invalid assessment timestamp {timestamp}: {error}"))?;
-    recorded_at
-        .format(&Rfc3339)
-        .map_err(|error| format!("could not format assessment timestamp {timestamp}: {error}"))
+fn format_timestamp(timestamp: u64) -> AmenableResult<String> {
+    let seconds = i64::try_from(timestamp).map_err(|_| {
+        AmenableError::invariant(format!(
+            "assessment timestamp {timestamp} is too large to format"
+        ))
+    })?;
+    let recorded_at = OffsetDateTime::from_unix_timestamp(seconds)?;
+    Ok(recorded_at.format(&Rfc3339)?)
 }
 
 fn validate_resolution_path(
     recommendation: Recommendation,
     resolution_path: ResolutionPath,
-) -> Result<(), String> {
+) -> AmenableResult<()> {
     let valid = match recommendation {
         Recommendation::Accept => resolution_path == ResolutionPath::KeepCurrentProof,
         Recommendation::Strengthen => resolution_path == ResolutionPath::StrengthenCurrentProof,
@@ -1006,92 +1007,71 @@ fn validate_resolution_path(
     };
 
     valid.then_some(()).ok_or_else(|| {
-        format!(
+        AmenableError::invariant(format!(
             "resolution path {} is incompatible with recommendation {}",
             resolution_path.as_str(),
             recommendation.as_str()
-        )
+        ))
     })
 }
 
-fn print_json<T: Serialize>(value: &T) -> Result<(), String> {
-    let json = serde_json::to_string_pretty(value)
-        .map_err(|error| format!("could not serialize assessment output as JSON: {error}"))?;
+fn print_json<T: Serialize>(value: &T) -> AmenableResult<()> {
+    let json = serde_json::to_string_pretty(value)?;
     println!("{json}");
     Ok(())
 }
 
-fn load(path: &Path) -> Result<Vec<ProofAssessment>, String> {
+/// Load every recorded assessment from a JSON Lines artifact, or an empty
+/// list if it doesn't exist yet.
+///
+/// # Errors
+///
+/// Returns an [`amenable::AmenableError`] if the artifact can't be read,
+/// or if any line is invalid JSON or fails assessment validation.
+pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {
     if !path.exists() {
         return Ok(Vec::new());
     }
 
-    let contents = fs::read_to_string(path).map_err(|error| {
-        format!(
-            "could not read assessment artifact {}: {error}",
-            path.display()
-        )
-    })?;
+    let contents = fs::read_to_string(path).map_err(|error| AmenableError::io(path, error))?;
     contents
         .lines()
         .enumerate()
         .filter(|(_, line)| !line.trim().is_empty())
         .map(|(index, line)| {
-            let assessment: StoredProofAssessment =
-                serde_json::from_str(line).map_err(|error| {
-                    format!(
-                        "invalid assessment JSON on line {} in {}: {error}",
-                        index + 1,
-                        path.display()
-                    )
-                })?;
+            let assessment: StoredProofAssessment = serde_json::from_str(line)
+                .map_err(|error| AmenableError::json_line(path, index + 1, error))?;
             let assessment = assessment.into_assessment().map_err(|error| {
-                format!(
+                AmenableError::invariant(format!(
                     "invalid assessment on line {} in {}: {error}",
                     index + 1,
                     path.display()
-                )
+                ))
             })?;
             assessment.validate().map_err(|error| {
-                format!(
+                AmenableError::invariant(format!(
                     "invalid assessment on line {} in {}: {error}",
                     index + 1,
                     path.display()
-                )
+                ))
             })?;
             Ok(assessment)
         })
         .collect()
 }
 
-fn append(path: &Path, assessment: &ProofAssessment) -> Result<(), String> {
+fn append(path: &Path, assessment: &ProofAssessment) -> AmenableResult<()> {
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|error| {
-            format!(
-                "could not create assessment directory {}: {error}",
-                parent.display()
-            )
-        })?;
+        fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
     }
 
-    let record = serde_json::to_string(&StoredProofAssessment::from(assessment))
-        .map_err(|error| format!("could not serialize proof assessment: {error}"))?;
+    let record = serde_json::to_string(&StoredProofAssessment::from(assessment))?;
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
         .open(path)
-        .map_err(|error| {
-            format!(
-                "could not open assessment artifact {}: {error}",
-                path.display()
-            )
-        })?;
+        .map_err(|error| AmenableError::io(path, error))?;
     file.write_all(record.as_bytes())
         .and_then(|()| file.write_all(b"\n"))
-        .map_err(|error| {
-            format!(
-                "could not append assessment artifact {}: {error}",
-                path.display()
-            )
-        })
+        .map_err(|error| AmenableError::io(path, error))
 }

@@ -8,7 +8,9 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use amenable::{KaniGalleryCase, KaniGalleryExpectation, KaniGalleryRegistration};
+use crate::{
+    AmenableError, AmenableResult, KaniGalleryCase, KaniGalleryExpectation, KaniGalleryRegistration,
+};
 use clap::{Args, Subcommand};
 
 const LEDGER_HEADER: &str =
@@ -16,7 +18,7 @@ const LEDGER_HEADER: &str =
 
 /// Commands for inspecting and running non-production Kani gallery cases.
 #[derive(Debug, Args)]
-pub(super) struct GalleryArgs {
+pub struct GalleryArgs {
     #[command(subcommand)]
     command: GalleryCommand,
 }
@@ -44,21 +46,23 @@ struct RunGalleryArgs {
 }
 
 fn default_results_path() -> PathBuf {
-    super::artifacts_directory().join("kani-gallery-results.csv")
+    crate::paths::artifacts_directory().join("kani-gallery-results.csv")
 }
 
 /// Execute a proof-gallery command.
-pub(super) fn run(args: GalleryArgs) -> Result<(), String> {
+pub fn run(args: GalleryArgs) -> AmenableResult<()> {
     match args.command {
         GalleryCommand::List => list_cases(),
         GalleryCommand::Run(args) => run_cases(args),
     }
 }
 
-fn list_cases() -> Result<(), String> {
+fn list_cases() -> AmenableResult<()> {
     let cases = registered_cases();
     if cases.is_empty() {
-        return Err("no Kani proof-gallery cases are registered".to_owned());
+        return Err(AmenableError::invariant(
+            "no Kani proof-gallery cases are registered",
+        ));
     }
 
     for case in cases {
@@ -74,7 +78,7 @@ fn list_cases() -> Result<(), String> {
     Ok(())
 }
 
-fn run_cases(args: RunGalleryArgs) -> Result<(), String> {
+fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     let cases = registered_cases();
     let selected = select_cases(&cases, args.case.as_deref())?;
     if selected.is_empty() {
@@ -113,9 +117,9 @@ fn run_cases(args: RunGalleryArgs) -> Result<(), String> {
     if mismatches == 0 {
         Ok(())
     } else {
-        Err(format!(
+        Err(AmenableError::invariant(format!(
             "{mismatches} proof-gallery case(s) did not match their expected outcome"
-        ))
+        )))
     }
 }
 
@@ -130,13 +134,15 @@ fn registered_cases() -> Vec<KaniGalleryCase> {
 fn select_cases<'a>(
     cases: &'a [KaniGalleryCase],
     id: Option<&str>,
-) -> Result<Vec<&'a KaniGalleryCase>, String> {
+) -> AmenableResult<Vec<&'a KaniGalleryCase>> {
     match id {
         Some(id) => cases
             .iter()
             .find(|case| case.id == id)
             .map(|case| vec![case])
-            .ok_or_else(|| format!("unknown Kani proof-gallery case ID: {id}")),
+            .ok_or_else(|| {
+                AmenableError::invariant(format!("unknown Kani proof-gallery case ID: {id}"))
+            }),
         None => Ok(cases.iter().collect()),
     }
 }
@@ -233,24 +239,22 @@ struct Ledger {
 }
 
 impl Ledger {
-    fn load(path: &Path) -> Result<Self, String> {
+    fn load(path: &Path) -> AmenableResult<Self> {
         if !path.exists() {
             return Ok(Self {
                 rows: BTreeMap::new(),
             });
         }
 
-        let contents = fs::read_to_string(path).map_err(|error| {
-            format!("could not read gallery ledger {}: {error}", path.display())
-        })?;
+        let contents = fs::read_to_string(path).map_err(|error| AmenableError::io(path, error))?;
         let mut lines = contents.lines();
         match lines.next() {
             Some(LEDGER_HEADER) => {}
             _ => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "invalid Kani proof-gallery ledger header in {}",
                     path.display()
-                ));
+                )));
             }
         }
 
@@ -274,11 +278,11 @@ impl Ledger {
                 || observed.is_none()
                 || matched.is_none()
             {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "invalid Kani proof-gallery ledger row {} in {}",
                     line_number + 2,
                     path.display()
-                ));
+                )));
             }
 
             rows.insert(
@@ -300,10 +304,9 @@ impl Ledger {
         &mut self,
         case: &KaniGalleryCase,
         observed: KaniGalleryExpectation,
-    ) -> Result<(), String> {
+    ) -> AmenableResult<()> {
         let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(|error| format!("system clock is before the Unix epoch: {error}"))?
+            .duration_since(UNIX_EPOCH)?
             .as_secs()
             .to_string();
         self.rows.insert(
@@ -319,14 +322,9 @@ impl Ledger {
         Ok(())
     }
 
-    fn persist(&self, path: &Path) -> Result<(), String> {
+    fn persist(&self, path: &Path) -> AmenableResult<()> {
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).map_err(|error| {
-                format!(
-                    "could not create gallery ledger directory {}: {error}",
-                    parent.display()
-                )
-            })?;
+            fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
         }
 
         let mut contents = format!("{LEDGER_HEADER}\n");
@@ -346,18 +344,8 @@ impl Ledger {
         }
 
         let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
-        fs::write(&temporary, contents).map_err(|error| {
-            format!(
-                "could not write temporary Kani proof-gallery ledger {}: {error}",
-                temporary.display()
-            )
-        })?;
-        fs::rename(&temporary, path).map_err(|error| {
-            format!(
-                "could not replace Kani proof-gallery ledger {}: {error}",
-                path.display()
-            )
-        })
+        fs::write(&temporary, contents).map_err(|error| AmenableError::io(&temporary, error))?;
+        fs::rename(&temporary, path).map_err(|error| AmenableError::io(path, error))
     }
 }
 

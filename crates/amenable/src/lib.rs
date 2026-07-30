@@ -21,6 +21,10 @@
 mod error;
 pub mod paths;
 
+pub mod assessment;
+pub mod gallery;
+pub mod kani;
+
 pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,

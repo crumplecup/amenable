@@ -3,20 +3,11 @@
 
 #![forbid(unsafe_code)]
 
-mod assessment;
-mod gallery;
-mod kani;
+mod boundary;
 
+use amenable::{AmenableResult, assessment, gallery, kani};
 use clap::{Args, Parser, Subcommand};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::ExitCode,
-};
-
-fn artifacts_directory() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts")
-}
+use std::{fs, path::PathBuf, process::ExitCode};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -56,43 +47,13 @@ enum VerifyBackend {
 
 fn main() -> ExitCode {
     match Cli::try_parse() {
-        Ok(Cli {
-            command: Some(Commands::Audit(args)),
-        }) => run_audit(args),
-        Ok(Cli {
-            command: Some(Commands::Assess(args)),
-        }) => match assessment::run(args) {
+        Ok(cli) => match boundary::run(cli) {
             Ok(()) => ExitCode::SUCCESS,
-            Err(error) => {
-                eprintln!("Proof assessment failed: {error}");
+            Err(report) => {
+                boundary::exit_on_error(&report);
                 ExitCode::FAILURE
             }
         },
-        Ok(Cli {
-            command: Some(Commands::Gallery(args)),
-        }) => match gallery::run(args) {
-            Ok(()) => ExitCode::SUCCESS,
-            Err(error) => {
-                eprintln!("Proof gallery failed: {error}");
-                ExitCode::FAILURE
-            }
-        },
-        Ok(Cli {
-            command: Some(Commands::DumpRegistry(args)),
-        }) => run_dump_registry(args),
-        Ok(Cli {
-            command:
-                Some(Commands::Verify(VerifyArgs {
-                    backend: VerifyBackend::Kani(args),
-                })),
-        }) => match kani::verify(args) {
-            Ok(()) => ExitCode::SUCCESS,
-            Err(error) => {
-                eprintln!("Kani verification failed: {error}");
-                ExitCode::FAILURE
-            }
-        },
-        Ok(Cli { command: None }) => run_certify(),
         Err(error) => {
             let _ = error.print();
             ExitCode::FAILURE
@@ -100,35 +61,41 @@ fn main() -> ExitCode {
     }
 }
 
-fn run_certify() -> ExitCode {
-    let directory = artifacts_directory().join("std-certificates");
-
-    match amenable::write_rust_std_certificate_artifacts(&directory) {
-        Ok(paths) => {
-            println!(
-                "Wrote {} provenance certificate artifact(s) to {}:",
-                paths.len(),
-                directory.display()
-            );
-
-            for path in &paths {
-                println!("  {}", path.display());
-            }
-
-            ExitCode::SUCCESS
-        }
-        Err(error) => {
-            eprintln!(
-                "Failed to write provenance certificate artifacts to {}: {error}",
-                directory.display()
-            );
-
-            ExitCode::FAILURE
-        }
+/// Dispatch a parsed [`Cli`] to its subcommand, returning a single unified
+/// result type so `boundary::run` has one place to convert failures into a
+/// presented [`miette::Report`].
+fn dispatch(cli: Cli) -> AmenableResult<()> {
+    match cli.command {
+        Some(Commands::Audit(args)) => run_audit(args),
+        Some(Commands::Assess(args)) => assessment::run(args),
+        Some(Commands::Gallery(args)) => gallery::run(args),
+        Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
+        Some(Commands::Verify(VerifyArgs {
+            backend: VerifyBackend::Kani(args),
+        })) => kani::verify(args),
+        None => run_certify(),
     }
 }
 
-fn run_audit(args: AuditArgs) -> ExitCode {
+fn run_certify() -> AmenableResult<()> {
+    let directory = amenable::paths::artifacts_directory().join("std-certificates");
+    let paths = amenable::write_rust_std_certificate_artifacts(&directory)
+        .map_err(|error| amenable::AmenableError::io(&directory, error))?;
+
+    println!(
+        "Wrote {} provenance certificate artifact(s) to {}:",
+        paths.len(),
+        directory.display()
+    );
+
+    for path in &paths {
+        println!("  {}", path.display());
+    }
+
+    Ok(())
+}
+
+fn run_audit(args: AuditArgs) -> AmenableResult<()> {
     let verifiers: Vec<&str> = args.verifiers.iter().map(String::as_str).collect();
     let filter = if verifiers.is_empty() {
         None
@@ -139,42 +106,30 @@ fn run_audit(args: AuditArgs) -> ExitCode {
     let report = match amenable::proof_chain_for_verifiers(&args.name, filter) {
         Ok(report) => report,
         Err(error) => {
-            eprintln!("{error}");
-
             // Write the incompleteness report to the requested path too,
             // not just stderr — it's a legitimate audit artifact in its
             // own right ("here's exactly what's missing"), not only a
             // diagnostic to be read once and discarded.
-            if let Err(write_error) = fs::write(&args.out, error.to_string()) {
-                eprintln!(
+            match fs::write(&args.out, error.to_string()) {
+                Ok(()) => eprintln!("Wrote the incompleteness report to {}", args.out.display()),
+                Err(write_error) => eprintln!(
                     "Additionally failed to write that error to {}: {write_error}",
                     args.out.display()
-                );
-            } else {
-                eprintln!("Wrote the incompleteness report to {}", args.out.display());
+                ),
             }
 
-            return ExitCode::FAILURE;
+            return Err(amenable::AmenableError::invariant(error.to_string()));
         }
     };
 
-    match fs::write(&args.out, report.to_string()) {
-        Ok(()) => {
-            println!(
-                "Wrote proof chain for {:?} to {}",
-                args.name,
-                args.out.display()
-            );
-            ExitCode::SUCCESS
-        }
-        Err(error) => {
-            eprintln!(
-                "Failed to write proof chain to {}: {error}",
-                args.out.display()
-            );
-            ExitCode::FAILURE
-        }
-    }
+    fs::write(&args.out, report.to_string())
+        .map_err(|error| amenable::AmenableError::io(&args.out, error))?;
+    println!(
+        "Wrote proof chain for {:?} to {}",
+        args.name,
+        args.out.display()
+    );
+    Ok(())
 }
 
 #[derive(Debug, Args)]
@@ -223,7 +178,7 @@ struct KaniProofDump {
     package: String,
 }
 
-fn run_dump_registry(args: DumpRegistryArgs) -> ExitCode {
+fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
     let dump = RegistryDump {
         evidence_links: inventory::iter::<amenable::EvidenceLink>()
             .map(|link| EvidenceLinkDump {
@@ -248,27 +203,10 @@ fn run_dump_registry(args: DumpRegistryArgs) -> ExitCode {
             .collect(),
     };
 
-    let json = match serde_json::to_string_pretty(&dump) {
-        Ok(json) => json,
-        Err(error) => {
-            eprintln!("Failed to serialize registry dump: {error}");
-            return ExitCode::FAILURE;
-        }
-    };
-
-    match fs::write(&args.out, json) {
-        Ok(()) => {
-            println!("Wrote registry dump to {}", args.out.display());
-            ExitCode::SUCCESS
-        }
-        Err(error) => {
-            eprintln!(
-                "Failed to write registry dump to {}: {error}",
-                args.out.display()
-            );
-            ExitCode::FAILURE
-        }
-    }
+    let json = serde_json::to_string_pretty(&dump)?;
+    fs::write(&args.out, json).map_err(|error| amenable::AmenableError::io(&args.out, error))?;
+    println!("Wrote registry dump to {}", args.out.display());
+    Ok(())
 }
 
 #[derive(Debug, Args)]

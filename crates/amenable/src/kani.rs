@@ -8,7 +8,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use amenable::{KaniProof, KaniProofRegistration};
+use crate::{AmenableError, AmenableResult, KaniProof, KaniProofRegistration};
 use clap::{Args, ValueEnum};
 use serde::Serialize;
 
@@ -16,7 +16,7 @@ const LEDGER_HEADER: &str = "proof_id,timestamp,status";
 
 /// Selection and execution options for `amenable verify kani`.
 #[derive(Debug, Args)]
-pub(super) struct VerifyKaniArgs {
+pub struct VerifyKaniArgs {
     /// Run one exact, fully-qualified registered proof ID.
     #[arg(long, conflicts_with_all = ["retry_failed", "retry_timeout", "list"])]
     proof: Option<String>,
@@ -38,15 +38,15 @@ pub(super) struct VerifyKaniArgs {
 }
 
 pub(super) fn default_results_path() -> std::path::PathBuf {
-    super::artifacts_directory().join("kani-verification-results.csv")
+    crate::paths::artifacts_directory().join("kani-verification-results.csv")
 }
 
-pub(super) fn load_results(path: &Path) -> Result<Vec<VerificationResult>, String> {
+pub(super) fn load_results(path: &Path) -> AmenableResult<Vec<VerificationResult>> {
     Ok(Ledger::load(path)?.into_results())
 }
 
 /// List or run the selected Kani harnesses.
-pub(super) fn verify(args: VerifyKaniArgs) -> Result<(), String> {
+pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     let records = registered_proofs();
     if args.list {
         for record in records {
@@ -93,7 +93,9 @@ pub(super) fn verify(args: VerifyKaniArgs) -> Result<(), String> {
     if unsuccessful == 0 {
         Ok(())
     } else {
-        Err(format!("{unsuccessful} Kani proof(s) did not pass"))
+        Err(AmenableError::invariant(format!(
+            "{unsuccessful} Kani proof(s) did not pass"
+        )))
     }
 }
 
@@ -109,13 +111,13 @@ fn select_records<'a>(
     records: &'a [KaniProof],
     ledger: &Ledger,
     args: &VerifyKaniArgs,
-) -> Result<Vec<&'a KaniProof>, String> {
+) -> AmenableResult<Vec<&'a KaniProof>> {
     if let Some(proof) = &args.proof {
         return records
             .iter()
             .find(|record| record.id == *proof)
             .map(|record| vec![record])
-            .ok_or_else(|| format!("unknown Kani proof ID: {proof}"));
+            .ok_or_else(|| AmenableError::invariant(format!("unknown Kani proof ID: {proof}")));
     }
 
     if !args.retry_failed && !args.retry_timeout {
@@ -272,23 +274,22 @@ pub(super) struct VerificationResult {
 }
 
 impl Ledger {
-    fn load(path: &Path) -> Result<Self, String> {
+    fn load(path: &Path) -> AmenableResult<Self> {
         if !path.exists() {
             return Ok(Self {
                 rows: BTreeMap::new(),
             });
         }
 
-        let contents = fs::read_to_string(path)
-            .map_err(|error| format!("could not read result ledger {}: {error}", path.display()))?;
+        let contents = fs::read_to_string(path).map_err(|error| AmenableError::io(path, error))?;
         let mut lines = contents.lines();
         match lines.next() {
             Some(LEDGER_HEADER) => {}
             _ => {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "invalid Kani result ledger header in {}",
                     path.display()
-                ));
+                )));
             }
         }
 
@@ -306,11 +307,11 @@ impl Ledger {
                 || timestamp.is_none()
                 || status.is_none()
             {
-                return Err(format!(
+                return Err(AmenableError::invariant(format!(
                     "invalid Kani result ledger row {} in {}",
                     line_number + 2,
                     path.display()
-                ));
+                )));
             }
             rows.insert(
                 proof_id.to_owned(),
@@ -324,24 +325,16 @@ impl Ledger {
         Ok(Self { rows })
     }
 
-    fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> Result<(), String> {
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(|error| format!("system clock is before the Unix epoch: {error}"))?
-            .as_secs();
+    fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> AmenableResult<()> {
+        let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         self.rows
             .insert(proof_id.to_owned(), LedgerRow { timestamp, status });
         Ok(())
     }
 
-    fn persist(&self, path: &Path) -> Result<(), String> {
+    fn persist(&self, path: &Path) -> AmenableResult<()> {
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).map_err(|error| {
-                format!(
-                    "could not create result ledger directory {}: {error}",
-                    parent.display()
-                )
-            })?;
+            fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
         }
 
         let mut contents = format!("{LEDGER_HEADER}\n");
@@ -355,18 +348,8 @@ impl Ledger {
         }
 
         let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
-        fs::write(&temporary, contents).map_err(|error| {
-            format!(
-                "could not write temporary Kani result ledger {}: {error}",
-                temporary.display()
-            )
-        })?;
-        fs::rename(&temporary, path).map_err(|error| {
-            format!(
-                "could not replace Kani result ledger {}: {error}",
-                path.display()
-            )
-        })
+        fs::write(&temporary, contents).map_err(|error| AmenableError::io(&temporary, error))?;
+        fs::rename(&temporary, path).map_err(|error| AmenableError::io(path, error))
     }
 
     fn into_results(self) -> Vec<VerificationResult> {
