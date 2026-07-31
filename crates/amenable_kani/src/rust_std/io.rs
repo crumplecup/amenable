@@ -55,6 +55,27 @@ bridge_kani_witness!(RustStdStandard<BufReader<&'static [u8]>>);
     }
 }
 
+/// Witness that a `KaniBufferedReadObservation` instance actually
+/// demonstrated its read-through, minted only by
+/// [`KaniBufferedReadObservation::demonstrate_read_through`].
+pub struct KaniBufferedReadWitnessToken(());
+
+impl ProofToken for KaniBufferedReadWitnessToken {
+    type Proposition = KaniBufferedReadObservation;
+}
+
+impl KaniBufferedReadObservation {
+    /// Assert `.read_to_end()` reads through to exactly the wrapped
+    /// bytes. Consumes `self`: the only way to obtain the token is to
+    /// have run this check against a real observation instance, not to
+    /// assert it independently.
+    #[must_use]
+    pub fn demonstrate_read_through(self, payload: [u8; 2]) -> KaniBufferedReadWitnessToken {
+        assert_eq!(self.read_to_end(), payload);
+        KaniBufferedReadWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<BufReader<&'static [u8]>>`'s
 /// read-through claim has been established from a
 /// `KaniBufferedReadObservation`.
@@ -64,12 +85,12 @@ impl ProofToken for RustStdBufReaderToken {
     type Proposition = RustStdStandard<BufReader<&'static [u8]>>;
 }
 
-impl Establish<KaniBufferedReadObservation, KaniVerifier>
+impl Establish<KaniBufferedReadWitnessToken, KaniVerifier>
     for RustStdStandard<BufReader<&'static [u8]>>
 {
     type Token = RustStdBufReaderToken;
 
-    fn establish(_credential: &KaniBufferedReadObservation) -> Self::Token {
+    fn establish(_credential: KaniBufferedReadWitnessToken) -> Self::Token {
         RustStdBufReaderToken(())
     }
 }
@@ -88,10 +109,9 @@ amenable_derive::harness! {
         fn verify_buf_reader_reads_the_underlying_bytes() {
             let payload = [kani::any(), kani::any()];
             let observation = crate::KaniBufferedReadObservation::new(payload);
+            let demonstration = observation.demonstrate_read_through(payload);
 
-            assert_eq!(observation.read_to_end(), payload);
-
-            let _token = RustStdStandard::<BufReader<&'static [u8]>>::establish(&observation);
+            let _token = RustStdStandard::<BufReader<&'static [u8]>>::establish(demonstration);
         }
     }
 }
@@ -200,6 +220,27 @@ bridge_kani_witness!(RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>);
     }
 }
 
+/// Witness that a `KaniFlushErrorObservation` instance actually
+/// demonstrated recovering both the flush failure and the buffered data,
+/// minted only by [`KaniFlushErrorObservation::demonstrate_recovery`].
+pub struct KaniFlushErrorWitnessToken(());
+
+impl ProofToken for KaniFlushErrorWitnessToken {
+    type Proposition = KaniFlushErrorObservation;
+}
+
+impl KaniFlushErrorObservation {
+    /// Assert the flush failed and the buffered bytes are recoverable
+    /// unchanged. Consumes `self` for the same reason
+    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[must_use]
+    pub fn demonstrate_recovery(self, buffered: [u8; 2]) -> KaniFlushErrorWitnessToken {
+        assert!(self.flush_failed());
+        assert_eq!(self.recovered_buffer(), buffered);
+        KaniFlushErrorWitnessToken(())
+    }
+}
+
 /// Lawful token minted once
 /// `RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>`'s recovery claim has
 /// been established from a `KaniFlushErrorObservation`.
@@ -209,12 +250,12 @@ impl ProofToken for RustStdIntoInnerErrorToken {
     type Proposition = RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>;
 }
 
-impl Establish<KaniFlushErrorObservation, KaniVerifier>
+impl Establish<KaniFlushErrorWitnessToken, KaniVerifier>
     for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>
 {
     type Token = RustStdIntoInnerErrorToken;
 
-    fn establish(_credential: &KaniFlushErrorObservation) -> Self::Token {
+    fn establish(_credential: KaniFlushErrorWitnessToken) -> Self::Token {
         RustStdIntoInnerErrorToken(())
     }
 }
@@ -234,12 +275,10 @@ amenable_derive::harness! {
         fn verify_into_inner_error_recovers_the_writer_and_the_flush_error() {
             let buffered = [kani::any(), kani::any()];
             let observation = crate::KaniFlushErrorObservation::new(buffered);
-
-            assert!(observation.flush_failed());
-            assert_eq!(observation.recovered_buffer(), buffered);
+            let demonstration = observation.demonstrate_recovery(buffered);
 
             let _token =
-                RustStdStandard::<IntoInnerError<BufWriter<Vec<u8>>>>::establish(&observation);
+                RustStdStandard::<IntoInnerError<BufWriter<Vec<u8>>>>::establish(demonstration);
         }
     }
 }
@@ -267,6 +306,37 @@ bridge_kani_witness!(RustStdStandard<LineWriter<Vec<u8>>>);
     }
 }
 
+/// Witness that a `KaniLineWriterObservation` instance actually
+/// demonstrated the buffering and flush-on-newline behavior, minted only
+/// by [`KaniLineWriterObservation::demonstrate_flush_behavior`].
+pub struct KaniLineWriterWitnessToken(());
+
+impl ProofToken for KaniLineWriterWitnessToken {
+    type Proposition = KaniLineWriterObservation;
+}
+
+impl KaniLineWriterObservation {
+    /// Assert a newline-terminated write reaches the underlying writer
+    /// immediately, a trailing partial line stays buffered until flush,
+    /// and flush then delivers it. Consumes `self` for the same reason
+    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[must_use]
+    pub fn demonstrate_flush_behavior(
+        self,
+        line_byte: u8,
+        trailing_byte: u8,
+    ) -> KaniLineWriterWitnessToken {
+        assert_eq!(self.after_newline_write(), [line_byte, b'\n']);
+        assert_eq!(
+            self.buffered_before_flush(),
+            [line_byte, b'\n'],
+            "the trailing partial line stays buffered until flush"
+        );
+        assert_eq!(self.after_flush(), [line_byte, b'\n', trailing_byte]);
+        KaniLineWriterWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<LineWriter<Vec<u8>>>`'s
 /// line-buffering claim has been established from a
 /// `KaniLineWriterObservation`.
@@ -276,10 +346,10 @@ impl ProofToken for RustStdLineWriterToken {
     type Proposition = RustStdStandard<LineWriter<Vec<u8>>>;
 }
 
-impl Establish<KaniLineWriterObservation, KaniVerifier> for RustStdStandard<LineWriter<Vec<u8>>> {
+impl Establish<KaniLineWriterWitnessToken, KaniVerifier> for RustStdStandard<LineWriter<Vec<u8>>> {
     type Token = RustStdLineWriterToken;
 
-    fn establish(_credential: &KaniLineWriterObservation) -> Self::Token {
+    fn establish(_credential: KaniLineWriterWitnessToken) -> Self::Token {
         RustStdLineWriterToken(())
     }
 }
@@ -303,16 +373,9 @@ amenable_derive::harness! {
             kani::assume(line_byte != b'\n');
             kani::assume(trailing_byte != b'\n');
             let observation = crate::KaniLineWriterObservation::new(line_byte, trailing_byte);
+            let demonstration = observation.demonstrate_flush_behavior(line_byte, trailing_byte);
 
-            assert_eq!(observation.after_newline_write(), [line_byte, b'\n']);
-            assert_eq!(
-                observation.buffered_before_flush(),
-                [line_byte, b'\n'],
-                "the trailing partial line stays buffered until flush"
-            );
-            assert_eq!(observation.after_flush(), [line_byte, b'\n', trailing_byte]);
-
-            let _token = RustStdStandard::<LineWriter<Vec<u8>>>::establish(&observation);
+            let _token = RustStdStandard::<LineWriter<Vec<u8>>>::establish(demonstration);
         }
     }
 }
@@ -340,6 +403,26 @@ bridge_kani_witness!(RustStdStandard<std::io::Lines<&'static [u8]>>);
     }
 }
 
+/// Witness that a `KaniLinesObservation` instance actually demonstrated
+/// its terminator-dropping line split, minted only by
+/// [`KaniLinesObservation::demonstrate_line_split`].
+pub struct KaniLinesWitnessToken(());
+
+impl ProofToken for KaniLinesWitnessToken {
+    type Proposition = KaniLinesObservation;
+}
+
+impl KaniLinesObservation {
+    /// Assert `.lines()` yields the three lines with their terminators
+    /// dropped. Consumes `self` for the same reason
+    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[must_use]
+    pub fn demonstrate_line_split(self, first: u8, second: u8, third: u8) -> KaniLinesWitnessToken {
+        assert_eq!(self.lines(), ([first], [second], [third]));
+        KaniLinesWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::io::Lines<&'static [u8]>>`'s
 /// line-splitting claim has been established from a `KaniLinesObservation`.
 pub struct RustStdLinesToken(());
@@ -348,12 +431,12 @@ impl ProofToken for RustStdLinesToken {
     type Proposition = RustStdStandard<std::io::Lines<&'static [u8]>>;
 }
 
-impl Establish<KaniLinesObservation, KaniVerifier>
+impl Establish<KaniLinesWitnessToken, KaniVerifier>
     for RustStdStandard<std::io::Lines<&'static [u8]>>
 {
     type Token = RustStdLinesToken;
 
-    fn establish(_credential: &KaniLinesObservation) -> Self::Token {
+    fn establish(_credential: KaniLinesWitnessToken) -> Self::Token {
         RustStdLinesToken(())
     }
 }
@@ -377,11 +460,10 @@ amenable_derive::harness! {
             kani::assume(second.is_ascii() && second != b'\n' && second != b'\r');
             kani::assume(third.is_ascii() && third != b'\n' && third != b'\r');
             let observation = crate::KaniLinesObservation::new(first, second, third);
-
-            assert_eq!(observation.lines(), ([first], [second], [third]));
+            let demonstration = observation.demonstrate_line_split(first, second, third);
 
             let _token =
-                RustStdStandard::<std::io::Lines<&'static [u8]>>::establish(&observation);
+                RustStdStandard::<std::io::Lines<&'static [u8]>>::establish(demonstration);
         }
     }
 }
@@ -505,6 +587,31 @@ bridge_kani_witness!(RustStdStandard<std::io::Split<&'static [u8]>>);
     }
 }
 
+/// Witness that a `KaniBufReadSplitObservation` instance actually
+/// demonstrated its delimiter-dropping split, minted only by
+/// [`KaniBufReadSplitObservation::demonstrate_segments`].
+pub struct KaniBufReadSplitWitnessToken(());
+
+impl ProofToken for KaniBufReadSplitWitnessToken {
+    type Proposition = KaniBufReadSplitObservation;
+}
+
+impl KaniBufReadSplitObservation {
+    /// Assert `.segments()` yields the three segments with the delimiter
+    /// dropped. Consumes `self` for the same reason
+    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[must_use]
+    pub fn demonstrate_segments(
+        self,
+        first: u8,
+        second: u8,
+        third: u8,
+    ) -> KaniBufReadSplitWitnessToken {
+        assert_eq!(self.segments(), ([first], [second], [third]));
+        KaniBufReadSplitWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::io::Split<&'static [u8]>>`'s
 /// delimiter-dropping split claim has been established from a
 /// `KaniBufReadSplitObservation`.
@@ -514,12 +621,12 @@ impl ProofToken for RustStdBufReadSplitToken {
     type Proposition = RustStdStandard<std::io::Split<&'static [u8]>>;
 }
 
-impl Establish<KaniBufReadSplitObservation, KaniVerifier>
+impl Establish<KaniBufReadSplitWitnessToken, KaniVerifier>
     for RustStdStandard<std::io::Split<&'static [u8]>>
 {
     type Token = RustStdBufReadSplitToken;
 
-    fn establish(_credential: &KaniBufReadSplitObservation) -> Self::Token {
+    fn establish(_credential: KaniBufReadSplitWitnessToken) -> Self::Token {
         RustStdBufReadSplitToken(())
     }
 }
@@ -549,11 +656,10 @@ amenable_derive::harness! {
             let observation = crate::KaniBufReadSplitObservation::new(
                 first, delimiter, second, third,
             );
-
-            assert_eq!(observation.segments(), ([first], [second], [third]));
+            let demonstration = observation.demonstrate_segments(first, second, third);
 
             let _token =
-                RustStdStandard::<std::io::Split<&'static [u8]>>::establish(&observation);
+                RustStdStandard::<std::io::Split<&'static [u8]>>::establish(demonstration);
         }
     }
 }
@@ -581,6 +687,27 @@ bridge_kani_witness!(RustStdStandard<WriterPanicked>);
     }
 }
 
+/// Witness that a `KaniWriterPanickedObservation` instance actually
+/// demonstrated recovering the buffered data after a panic, minted only by
+/// [`KaniWriterPanickedObservation::demonstrate_recovery`].
+pub struct KaniWriterPanickedWitnessToken(());
+
+impl ProofToken for KaniWriterPanickedWitnessToken {
+    type Proposition = KaniWriterPanickedObservation;
+}
+
+impl KaniWriterPanickedObservation {
+    /// Assert the panic was captured and the buffered bytes are
+    /// recoverable unchanged. Consumes `self` for the same reason
+    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[must_use]
+    pub fn demonstrate_recovery(self, buffered: [u8; 2]) -> KaniWriterPanickedWitnessToken {
+        assert!(self.panicked());
+        assert_eq!(self.recovered_buffer(), buffered);
+        KaniWriterPanickedWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<WriterPanicked>`'s buffered-data
 /// recovery claim has been established from a
 /// `KaniWriterPanickedObservation`.
@@ -590,10 +717,10 @@ impl ProofToken for RustStdWriterPanickedToken {
     type Proposition = RustStdStandard<WriterPanicked>;
 }
 
-impl Establish<KaniWriterPanickedObservation, KaniVerifier> for RustStdStandard<WriterPanicked> {
+impl Establish<KaniWriterPanickedWitnessToken, KaniVerifier> for RustStdStandard<WriterPanicked> {
     type Token = RustStdWriterPanickedToken;
 
-    fn establish(_credential: &KaniWriterPanickedObservation) -> Self::Token {
+    fn establish(_credential: KaniWriterPanickedWitnessToken) -> Self::Token {
         RustStdWriterPanickedToken(())
     }
 }
@@ -614,11 +741,9 @@ amenable_derive::harness! {
         fn verify_writer_panicked_recovers_the_buffered_data() {
             let buffered = [kani::any(), kani::any()];
             let observation = crate::KaniWriterPanickedObservation::new(buffered);
+            let demonstration = observation.demonstrate_recovery(buffered);
 
-            assert!(observation.panicked());
-            assert_eq!(observation.recovered_buffer(), buffered);
-
-            let _token = RustStdStandard::<WriterPanicked>::establish(&observation);
+            let _token = RustStdStandard::<WriterPanicked>::establish(demonstration);
         }
     }
 }

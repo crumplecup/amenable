@@ -39,6 +39,60 @@ bridge_kani_witness!(RustStdStandard<std::string::Drain<'static>>);
     }
 }
 
+/// Witness that a `KaniStringDrainObservation` instance actually
+/// demonstrated the whole-string drain law, minted only by
+/// [`crate::KaniStringDrainObservation::demonstrate_whole_string_drain`].
+pub struct KaniStringDrainWitnessToken(());
+
+impl ProofToken for KaniStringDrainWitnessToken {
+    type Proposition = crate::KaniStringDrainObservation;
+}
+
+impl crate::KaniStringDrainObservation {
+    /// Assert the drain yields exactly `bytes[..len]` and leaves the
+    /// source empty afterward. Consumes `self`: the only way to obtain
+    /// the token is to have run this check against a real observation
+    /// instance, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_whole_string_drain(
+        self,
+        bytes: [u8; 2],
+        len: usize,
+    ) -> KaniStringDrainWitnessToken {
+        let yielded = self.yielded_bytes();
+
+        assert_eq!(
+            self.yielded_len(),
+            len,
+            "drain yields exactly the source byte length"
+        );
+        assert_eq!(
+            yielded.len(),
+            len,
+            "drain recovers a byte slice with the source length"
+        );
+        if len >= 1 {
+            assert_eq!(
+                yielded[0], bytes[0],
+                "drain preserves the first source byte"
+            );
+        }
+        if len >= 2 {
+            assert_eq!(
+                yielded[1], bytes[1],
+                "drain preserves the second source byte"
+            );
+        }
+        assert_eq!(
+            self.source_len_after_drain(),
+            0,
+            "drain leaves the source length at zero"
+        );
+        assert!(self.source_is_empty(), "drain leaves the source empty");
+        KaniStringDrainWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::string::Drain<'static>>`'s
 /// whole-string drain law has been established from a
 /// `KaniStringDrainObservation`.
@@ -48,12 +102,12 @@ impl ProofToken for RustStdStringDrainToken {
     type Proposition = RustStdStandard<std::string::Drain<'static>>;
 }
 
-impl Establish<crate::KaniStringDrainObservation, KaniVerifier>
+impl Establish<KaniStringDrainWitnessToken, KaniVerifier>
     for RustStdStandard<std::string::Drain<'static>>
 {
     type Token = RustStdStringDrainToken;
 
-    fn establish(_credential: &crate::KaniStringDrainObservation) -> Self::Token {
+    fn establish(_credential: KaniStringDrainWitnessToken) -> Self::Token {
         RustStdStringDrainToken(())
     }
 }
@@ -84,35 +138,9 @@ amenable_derive::harness! {
 
             if let Ok(buffer) = crate::KaniUtf8Buffer::<2>::new(bytes, len) {
                 let observation = crate::KaniStringDrainObservation::new(buffer);
-                let yielded = observation.yielded_bytes();
+                let demonstration = observation.demonstrate_whole_string_drain(bytes, len);
 
-                assert_eq!(
-                    observation.yielded_len(),
-                    len,
-                    "drain yields exactly the source byte length"
-                );
-                assert_eq!(
-                    yielded.len(),
-                    len,
-                    "drain recovers a byte slice with the source length"
-                );
-                if len >= 1 {
-                    assert_eq!(yielded[0], bytes[0], "drain preserves the first source byte");
-                }
-                if len >= 2 {
-                    assert_eq!(yielded[1], bytes[1], "drain preserves the second source byte");
-                }
-                assert_eq!(
-                    observation.source_len_after_drain(),
-                    0,
-                    "drain leaves the source length at zero"
-                );
-                assert!(
-                    observation.source_is_empty(),
-                    "drain leaves the source empty"
-                );
-
-                let _token = RustStdStandard::<std::string::Drain<'static>>::establish(&observation);
+                let _token = RustStdStandard::<std::string::Drain<'static>>::establish(demonstration);
             }
         }
     }
