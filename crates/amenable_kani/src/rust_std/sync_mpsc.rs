@@ -39,6 +39,30 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Sender<i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually delivered a sent
+/// value unchanged, minted only by [`KaniChannel::demonstrate_delivery`] —
+/// the sole lawful credential for [`Establish`] impls that claim delivery
+/// fidelity for a `std::sync::mpsc` sender.
+pub struct KaniChannelDeliveryToken(());
+
+impl ProofToken for KaniChannelDeliveryToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Send `value`, then receive it back, asserting the channel preserved
+    /// it unchanged. Consumes `self`: the only way to obtain the token is
+    /// to actually run the send/recv pair being claimed, not to assert it
+    /// independently of a real channel instance.
+    #[track_caller]
+    #[must_use]
+    pub fn demonstrate_delivery(mut self, value: i32) -> KaniChannelDeliveryToken {
+        self.send(value).unwrap();
+        assert_eq!(self.recv(), Ok(value), "the sent value is receivable");
+        KaniChannelDeliveryToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Sender<i32>>`'s delivery claim
 /// has been established from a `KaniChannel<i32>` that has itself
 /// demonstrated the sent value is receivable.
@@ -48,10 +72,12 @@ impl ProofToken for RustStdSenderToken {
     type Proposition = RustStdStandard<std::sync::mpsc::Sender<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::Sender<i32>> {
+impl Establish<KaniChannelDeliveryToken, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::Sender<i32>>
+{
     type Token = RustStdSenderToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelDeliveryToken) -> Self::Token {
         RustStdSenderToken(())
     }
 }
@@ -74,12 +100,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::unbounded();
-            channel.send(value).unwrap();
-            assert_eq!(channel.recv(), Ok(value), "the sent value is receivable");
+            let channel = crate::KaniChannel::unbounded();
+            let demonstration = channel.demonstrate_delivery(value);
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::Sender<i32>>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::Sender<i32>>::establish(demonstration);
         }
     }
 }
@@ -116,10 +141,10 @@ impl ProofToken for RustStdSyncSenderToken {
     type Proposition = RustStdStandard<SyncSender<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<SyncSender<i32>> {
+impl Establish<KaniChannelDeliveryToken, KaniVerifier> for RustStdStandard<SyncSender<i32>> {
     type Token = RustStdSyncSenderToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelDeliveryToken) -> Self::Token {
         RustStdSyncSenderToken(())
     }
 }
@@ -136,11 +161,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_sync_sender_delivers_to_the_paired_receiver() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::bounded(1);
-            channel.send(value).unwrap();
-            assert_eq!(channel.recv(), Ok(value));
+            let channel = crate::KaniChannel::bounded(1);
+            let demonstration = channel.demonstrate_delivery(value);
 
-            let _token = RustStdStandard::<SyncSender<i32>>::establish(&channel);
+            let _token = RustStdStandard::<SyncSender<i32>>::establish(demonstration);
         }
     }
 }
@@ -168,6 +192,30 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually failed `.recv()`
+/// once every sender was dropped, minted only by
+/// [`KaniChannel::demonstrate_disconnected_recv_fails`].
+pub struct KaniChannelDisconnectedRecvToken(());
+
+impl ProofToken for KaniChannelDisconnectedRecvToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Drop the sender, then assert `.recv()` fails on the now-empty,
+    /// disconnected channel. Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_disconnected_recv_fails(mut self) -> KaniChannelDisconnectedRecvToken {
+        self.drop_sender();
+        assert!(
+            self.recv().is_err(),
+            "recv fails once the channel is empty and disconnected"
+        );
+        KaniChannelDisconnectedRecvToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Receiver<i32>>`'s
 /// disconnect-on-drop claim has been established from a `KaniChannel<i32>`
 /// that has itself demonstrated `.recv()` failing once every sender is
@@ -178,10 +226,12 @@ impl ProofToken for RustStdReceiverToken {
     type Proposition = RustStdStandard<std::sync::mpsc::Receiver<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
+impl Establish<KaniChannelDisconnectedRecvToken, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::Receiver<i32>>
+{
     type Token = RustStdReceiverToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelDisconnectedRecvToken) -> Self::Token {
         RustStdReceiverToken(())
     }
 }
@@ -198,15 +248,11 @@ amenable_derive::harness! {
         /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_receiver_fails_once_every_sender_is_dropped() {
-            let mut channel = crate::KaniChannel::<i32>::unbounded();
-            channel.drop_sender();
-            assert!(
-                channel.recv().is_err(),
-                "recv fails once the channel is empty and disconnected"
-            );
+            let channel = crate::KaniChannel::<i32>::unbounded();
+            let demonstration = channel.demonstrate_disconnected_recv_fails();
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::Receiver<i32>>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::Receiver<i32>>::establish(demonstration);
         }
     }
 }
@@ -234,6 +280,30 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::IntoIter<i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually yielded a sent
+/// value and then stopped once disconnected and drained, minted only by
+/// [`KaniChannel::demonstrate_yield_then_stop`].
+pub struct KaniChannelYieldThenStopToken(());
+
+impl ProofToken for KaniChannelYieldThenStopToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Send `value`, drop the sender, then assert `.recv()` yields the
+    /// value once and `None`-equivalent thereafter. Consumes `self` for
+    /// the same reason [`KaniChannel::demonstrate_delivery`] does.
+    #[track_caller]
+    #[must_use]
+    pub fn demonstrate_yield_then_stop(mut self, value: i32) -> KaniChannelYieldThenStopToken {
+        self.send(value).unwrap();
+        self.drop_sender();
+        assert_eq!(self.recv().ok(), Some(value));
+        assert_eq!(self.recv().ok(), None);
+        KaniChannelYieldThenStopToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<IntoIter<i32>>`'s
 /// yield-then-stop claim has been established from a `KaniChannel<i32>`
 /// that has itself demonstrated the sent value yielded then the channel
@@ -244,10 +314,12 @@ impl ProofToken for RustStdIntoIterToken {
     type Proposition = RustStdStandard<std::sync::mpsc::IntoIter<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::IntoIter<i32>> {
+impl Establish<KaniChannelYieldThenStopToken, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::IntoIter<i32>>
+{
     type Token = RustStdIntoIterToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelYieldThenStopToken) -> Self::Token {
         RustStdIntoIterToken(())
     }
 }
@@ -269,14 +341,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_into_iter_yields_sent_values_then_stops() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::unbounded();
-            channel.send(value).unwrap();
-            channel.drop_sender();
-            assert_eq!(channel.recv().ok(), Some(value));
-            assert_eq!(channel.recv().ok(), None);
+            let channel = crate::KaniChannel::unbounded();
+            let demonstration = channel.demonstrate_yield_then_stop(value);
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::IntoIter<i32>>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::IntoIter<i32>>::establish(demonstration);
         }
     }
 }
@@ -314,12 +383,12 @@ impl ProofToken for RustStdIterToken {
     type Proposition = RustStdStandard<std::sync::mpsc::Iter<'static, i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier>
+impl Establish<KaniChannelYieldThenStopToken, KaniVerifier>
     for RustStdStandard<std::sync::mpsc::Iter<'static, i32>>
 {
     type Token = RustStdIterToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelYieldThenStopToken) -> Self::Token {
         RustStdIterToken(())
     }
 }
@@ -338,14 +407,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_iter_yields_sent_values_then_stops() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::unbounded();
-            channel.send(value).unwrap();
-            channel.drop_sender();
-            assert_eq!(channel.recv().ok(), Some(value));
-            assert_eq!(channel.recv().ok(), None);
+            let channel = crate::KaniChannel::unbounded();
+            let demonstration = channel.demonstrate_yield_then_stop(value);
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::Iter<'static, i32>>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::Iter<'static, i32>>::establish(demonstration);
         }
     }
 }
@@ -373,6 +439,30 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually returned `None`
+/// immediately from `.try_recv()` on an empty, still-open channel, minted
+/// only by [`KaniChannel::demonstrate_non_blocking_empty`].
+pub struct KaniChannelNonBlockingEmptyToken(());
+
+impl ProofToken for KaniChannelNonBlockingEmptyToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Assert `.try_recv()` returns `None`-equivalent immediately on an
+    /// empty, open channel rather than blocking. Consumes `self` for the
+    /// same reason [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_non_blocking_empty(mut self) -> KaniChannelNonBlockingEmptyToken {
+        assert_eq!(
+            self.try_recv().ok(),
+            None,
+            "try_iter returns None immediately rather than blocking"
+        );
+        KaniChannelNonBlockingEmptyToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<TryIter<'static, i32>>`'s
 /// non-blocking claim has been established from a `KaniChannel<i32>` that
 /// has itself demonstrated returning `None` immediately rather than
@@ -383,12 +473,12 @@ impl ProofToken for RustStdTryIterToken {
     type Proposition = RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier>
+impl Establish<KaniChannelNonBlockingEmptyToken, KaniVerifier>
     for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>
 {
     type Token = RustStdTryIterToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelNonBlockingEmptyToken) -> Self::Token {
         RustStdTryIterToken(())
     }
 }
@@ -408,15 +498,11 @@ amenable_derive::harness! {
         /// it.
         #[kani::proof]
         fn verify_try_iter_does_not_block_on_an_empty_open_channel() {
-            let mut channel = crate::KaniChannel::<i32>::unbounded();
-            assert_eq!(
-                channel.try_recv().ok(),
-                None,
-                "try_iter returns None immediately rather than blocking"
-            );
+            let channel = crate::KaniChannel::<i32>::unbounded();
+            let demonstration = channel.demonstrate_non_blocking_empty();
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::TryIter<'static, i32>>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::TryIter<'static, i32>>::establish(demonstration);
         }
     }
 }
@@ -444,6 +530,27 @@ bridge_kani_witness!(RustStdStandard<RecvError>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually failed `.recv()`
+/// with exactly `Disconnected`, minted only by
+/// [`KaniChannel::demonstrate_recv_disconnected`].
+pub struct KaniChannelRecvDisconnectedToken(());
+
+impl ProofToken for KaniChannelRecvDisconnectedToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Drop the sender, then assert `.recv()` fails with exactly
+    /// `Disconnected`. Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_recv_disconnected(mut self) -> KaniChannelRecvDisconnectedToken {
+        self.drop_sender();
+        assert_eq!(self.recv().unwrap_err(), crate::KaniRecvError::Disconnected);
+        KaniChannelRecvDisconnectedToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RecvError>`'s
 /// empty-and-disconnected claim has been established from a
 /// `KaniChannel<i32>` that has itself demonstrated `.recv()` failing with
@@ -454,10 +561,10 @@ impl ProofToken for RustStdRecvErrorToken {
     type Proposition = RustStdStandard<RecvError>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<RecvError> {
+impl Establish<KaniChannelRecvDisconnectedToken, KaniVerifier> for RustStdStandard<RecvError> {
     type Token = RustStdRecvErrorToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelRecvDisconnectedToken) -> Self::Token {
         RustStdRecvErrorToken(())
     }
 }
@@ -474,11 +581,10 @@ amenable_derive::harness! {
         /// independently of it.
         #[kani::proof]
         fn verify_recv_error_on_an_empty_disconnected_channel() {
-            let mut channel = crate::KaniChannel::<i32>::unbounded();
-            channel.drop_sender();
-            assert_eq!(channel.recv().unwrap_err(), crate::KaniRecvError::Disconnected);
+            let channel = crate::KaniChannel::<i32>::unbounded();
+            let demonstration = channel.demonstrate_recv_disconnected();
 
-            let _token = RustStdStandard::<RecvError>::establish(&channel);
+            let _token = RustStdStandard::<RecvError>::establish(demonstration);
         }
     }
 }
@@ -506,6 +612,41 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::RecvTimeoutError>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually distinguished a
+/// zero-duration timeout from a disconnect, minted only by
+/// [`KaniChannel::demonstrate_recv_timeout_distinguishes_disconnect`].
+pub struct KaniChannelRecvTimeoutToken(());
+
+impl ProofToken for KaniChannelRecvTimeoutToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Assert a zero-duration timed receive times out while the channel is
+    /// open and empty, then, after dropping the sender, assert it instead
+    /// fails `Disconnected`. Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_recv_timeout_distinguishes_disconnect(
+        mut self,
+    ) -> KaniChannelRecvTimeoutToken {
+        assert_eq!(
+            self.recv_timeout_zero(),
+            Err(crate::KaniRecvTimeoutError::Timeout),
+            "an open, empty channel times out"
+        );
+
+        self.drop_sender();
+        assert_eq!(
+            self.recv_timeout_zero(),
+            Err(crate::KaniRecvTimeoutError::Disconnected),
+            "a disconnected channel fails immediately instead"
+        );
+
+        KaniChannelRecvTimeoutToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RecvTimeoutError>`'s
 /// timeout-vs-disconnected classification claim has been established from a
 /// `KaniChannel<i32>` that has itself demonstrated the corresponding
@@ -516,12 +657,12 @@ impl ProofToken for RustStdRecvTimeoutErrorToken {
     type Proposition = RustStdStandard<std::sync::mpsc::RecvTimeoutError>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier>
+impl Establish<KaniChannelRecvTimeoutToken, KaniVerifier>
     for RustStdStandard<std::sync::mpsc::RecvTimeoutError>
 {
     type Token = RustStdRecvTimeoutErrorToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelRecvTimeoutToken) -> Self::Token {
         RustStdRecvTimeoutErrorToken(())
     }
 }
@@ -542,22 +683,11 @@ amenable_derive::harness! {
         /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_recv_timeout_error_distinguishes_timeout_from_disconnected() {
-            let mut channel = crate::KaniChannel::<i32>::unbounded();
-            assert_eq!(
-                channel.recv_timeout_zero(),
-                Err(crate::KaniRecvTimeoutError::Timeout),
-                "an open, empty channel times out"
-            );
-
-            channel.drop_sender();
-            assert_eq!(
-                channel.recv_timeout_zero(),
-                Err(crate::KaniRecvTimeoutError::Disconnected),
-                "a disconnected channel fails immediately instead"
-            );
+            let channel = crate::KaniChannel::<i32>::unbounded();
+            let demonstration = channel.demonstrate_recv_timeout_distinguishes_disconnect();
 
             let _token =
-                RustStdStandard::<std::sync::mpsc::RecvTimeoutError>::establish(&channel);
+                RustStdStandard::<std::sync::mpsc::RecvTimeoutError>::establish(demonstration);
         }
     }
 }
@@ -585,6 +715,36 @@ bridge_kani_witness!(RustStdStandard<SendError<i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually recovered an unsent
+/// value from a `.send()` failure, minted only by
+/// [`KaniChannel::demonstrate_send_error_recovers_value`].
+pub struct KaniChannelSendErrorToken(());
+
+impl ProofToken for KaniChannelSendErrorToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Drop the receiver, then send `value` and assert the resulting
+    /// error recovers it unchanged. Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[track_caller]
+    #[must_use]
+    pub fn demonstrate_send_error_recovers_value(
+        mut self,
+        value: i32,
+    ) -> KaniChannelSendErrorToken {
+        self.drop_receiver();
+        let err = self.send(value).unwrap_err();
+        assert_eq!(
+            err,
+            crate::KaniSendError::Disconnected(value),
+            "the unsent value is recoverable from the error"
+        );
+        KaniChannelSendErrorToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<SendError<i32>>`'s
 /// value-recovery claim has been established from a `KaniChannel<i32>`
 /// that has itself demonstrated the unsent value recoverable from the
@@ -595,10 +755,10 @@ impl ProofToken for RustStdSendErrorToken {
     type Proposition = RustStdStandard<SendError<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<SendError<i32>> {
+impl Establish<KaniChannelSendErrorToken, KaniVerifier> for RustStdStandard<SendError<i32>> {
     type Token = RustStdSendErrorToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelSendErrorToken) -> Self::Token {
         RustStdSendErrorToken(())
     }
 }
@@ -619,16 +779,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_send_error_recovers_the_unsent_value() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::unbounded();
-            channel.drop_receiver();
-            let err = channel.send(value).unwrap_err();
-            assert_eq!(
-                err,
-                crate::KaniSendError::Disconnected(value),
-                "the unsent value is recoverable from the error"
-            );
+            let channel = crate::KaniChannel::unbounded();
+            let demonstration = channel.demonstrate_send_error_recovers_value(value);
 
-            let _token = RustStdStandard::<SendError<i32>>::establish(&channel);
+            let _token = RustStdStandard::<SendError<i32>>::establish(demonstration);
         }
     }
 }
@@ -656,6 +810,35 @@ bridge_kani_witness!(RustStdStandard<TrySendError<i32>>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually recovered an unsent
+/// value from a `.try_send()` `Full` failure, minted only by
+/// [`KaniChannel::demonstrate_try_send_full_recovers_value`].
+pub struct KaniChannelTrySendFullToken(());
+
+impl ProofToken for KaniChannelTrySendFullToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Try to send `value` on a full (zero-capacity rendezvous) channel,
+    /// and assert the resulting `Full` error recovers it unchanged.
+    /// Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_try_send_full_recovers_value(
+        mut self,
+        value: i32,
+    ) -> KaniChannelTrySendFullToken {
+        match self.try_send(value) {
+            Err(crate::KaniSendError::Full(v)) => {
+                assert_eq!(v, value, "the unsent value is recoverable from Full");
+            }
+            other => panic!("expected Full, got {other:?}"),
+        }
+        KaniChannelTrySendFullToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<TrySendError<i32>>`'s
 /// full-capacity recovery claim has been established from a
 /// `KaniChannel<i32>` that has itself demonstrated the unsent value
@@ -666,10 +849,10 @@ impl ProofToken for RustStdTrySendErrorToken {
     type Proposition = RustStdStandard<TrySendError<i32>>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<TrySendError<i32>> {
+impl Establish<KaniChannelTrySendFullToken, KaniVerifier> for RustStdStandard<TrySendError<i32>> {
     type Token = RustStdTrySendErrorToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelTrySendFullToken) -> Self::Token {
         RustStdTrySendErrorToken(())
     }
 }
@@ -689,15 +872,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_try_send_error_full_recovers_the_unsent_value() {
             let value: i32 = kani::any();
-            let mut channel = crate::KaniChannel::bounded(0);
-            match channel.try_send(value) {
-                Err(crate::KaniSendError::Full(v)) => {
-                    assert_eq!(v, value, "the unsent value is recoverable from Full")
-                }
-                other => panic!("expected Full, got {other:?}"),
-            }
+            let channel = crate::KaniChannel::bounded(0);
+            let demonstration = channel.demonstrate_try_send_full_recovers_value(value);
 
-            let _token = RustStdStandard::<TrySendError<i32>>::establish(&channel);
+            let _token = RustStdStandard::<TrySendError<i32>>::establish(demonstration);
         }
     }
 }
@@ -725,6 +903,34 @@ bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryRecvError>);
     }
 }
 
+/// Witness that a `KaniChannel<i32>` instance actually distinguished
+/// `.try_recv()`'s `Empty` and `Disconnected` failure modes, minted only
+/// by [`KaniChannel::demonstrate_try_recv_distinguishes_disconnect`].
+pub struct KaniChannelTryRecvToken(());
+
+impl ProofToken for KaniChannelTryRecvToken {
+    type Proposition = KaniChannel<i32>;
+}
+
+impl KaniChannel<i32> {
+    /// Assert `.try_recv()` fails `Empty` on an open, empty channel, then,
+    /// after dropping the sender, assert it instead fails `Disconnected`.
+    /// Consumes `self` for the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_try_recv_distinguishes_disconnect(mut self) -> KaniChannelTryRecvToken {
+        assert_eq!(self.try_recv().unwrap_err(), crate::KaniRecvError::Empty);
+
+        self.drop_sender();
+        assert_eq!(
+            self.try_recv().unwrap_err(),
+            crate::KaniRecvError::Disconnected
+        );
+
+        KaniChannelTryRecvToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<TryRecvError>`'s
 /// empty-vs-disconnected distinction claim has been established from a
 /// `KaniChannel<i32>` that has itself demonstrated both failure modes.
@@ -734,10 +940,12 @@ impl ProofToken for RustStdTryRecvErrorToken {
     type Proposition = RustStdStandard<std::sync::mpsc::TryRecvError>;
 }
 
-impl Establish<KaniChannel<i32>, KaniVerifier> for RustStdStandard<std::sync::mpsc::TryRecvError> {
+impl Establish<KaniChannelTryRecvToken, KaniVerifier>
+    for RustStdStandard<std::sync::mpsc::TryRecvError>
+{
     type Token = RustStdTryRecvErrorToken;
 
-    fn establish(_credential: &KaniChannel<i32>) -> Self::Token {
+    fn establish(_credential: KaniChannelTryRecvToken) -> Self::Token {
         RustStdTryRecvErrorToken(())
     }
 }
@@ -754,16 +962,11 @@ amenable_derive::harness! {
         /// rather than asserted independently of it.
         #[kani::proof]
         fn verify_try_recv_error_distinguishes_empty_from_disconnected() {
-            let mut channel = crate::KaniChannel::<i32>::unbounded();
-            assert_eq!(channel.try_recv().unwrap_err(), crate::KaniRecvError::Empty);
+            let channel = crate::KaniChannel::<i32>::unbounded();
+            let demonstration = channel.demonstrate_try_recv_distinguishes_disconnect();
 
-            channel.drop_sender();
-            assert_eq!(
-                channel.try_recv().unwrap_err(),
-                crate::KaniRecvError::Disconnected
-            );
-
-            let _token = RustStdStandard::<std::sync::mpsc::TryRecvError>::establish(&channel);
+            let _token =
+                RustStdStandard::<std::sync::mpsc::TryRecvError>::establish(demonstration);
         }
     }
 }
