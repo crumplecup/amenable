@@ -39,6 +39,30 @@ bridge_kani_witness!(RustStdStandard<Instant>);
     }
 }
 
+/// Witness that a `KaniInstantObservation` instance actually demonstrated
+/// its later reading is not earlier, minted only by
+/// [`KaniInstantObservation::demonstrate_monotonicity`].
+pub struct KaniInstantWitnessToken(());
+
+impl ProofToken for KaniInstantWitnessToken {
+    type Proposition = KaniInstantObservation;
+}
+
+impl KaniInstantObservation {
+    /// Assert the later monotonic clock reading is not earlier. Consumes
+    /// `self`: the only way to obtain the token is to have run this check
+    /// against a real observation instance, not to assert it
+    /// independently.
+    #[must_use]
+    pub fn demonstrate_monotonicity(self) -> KaniInstantWitnessToken {
+        assert!(
+            self.later_is_not_earlier(),
+            "a later monotonic clock reading should not be earlier"
+        );
+        KaniInstantWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Instant>`'s monotonic-ordering
 /// claim has been established from a `KaniInstantObservation` that has itself
 /// demonstrated the later reading is not earlier.
@@ -48,10 +72,10 @@ impl ProofToken for RustStdInstantToken {
     type Proposition = RustStdStandard<Instant>;
 }
 
-impl Establish<KaniInstantObservation, KaniVerifier> for RustStdStandard<Instant> {
+impl Establish<KaniInstantWitnessToken, KaniVerifier> for RustStdStandard<Instant> {
     type Token = RustStdInstantToken;
 
-    fn establish(_credential: &KaniInstantObservation) -> Self::Token {
+    fn establish(_credential: KaniInstantWitnessToken) -> Self::Token {
         RustStdInstantToken(())
     }
 }
@@ -71,12 +95,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_instant_is_monotonically_nondecreasing() {
             let observation = crate::KaniInstantObservation::monotonic();
-            assert!(
-                observation.later_is_not_earlier(),
-                "a later monotonic clock reading should not be earlier"
-            );
+            let demonstration = observation.demonstrate_monotonicity();
 
-            let _token = RustStdStandard::<Instant>::establish(&observation);
+            let _token = RustStdStandard::<Instant>::establish(demonstration);
         }
     }
 }

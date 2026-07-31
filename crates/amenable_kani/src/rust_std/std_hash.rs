@@ -75,6 +75,31 @@ bridge_kani_witness!(RustStdStandard<RandomState>);
     }
 }
 
+/// Witness that a `KaniRandomStateObservation` instance actually
+/// demonstrated matching same-input digests, minted only by
+/// [`KaniRandomStateObservation::demonstrate_same_input_agreement`].
+pub struct KaniRandomStateWitnessToken(());
+
+impl ProofToken for KaniRandomStateWitnessToken {
+    type Proposition = KaniRandomStateObservation;
+}
+
+impl KaniRandomStateObservation {
+    /// Assert the observed input matches and that two hashers built from
+    /// the same `RandomState` instance agree on it. Consumes `self`: the
+    /// only way to obtain the token is to have run this check against a
+    /// real observation instance, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_same_input_agreement(
+        self,
+        expected_input: &'static str,
+    ) -> KaniRandomStateWitnessToken {
+        assert_eq!(self.input(), expected_input);
+        assert!(self.same_input_hashes_agree());
+        KaniRandomStateWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RandomState>`'s
 /// same-input-same-state determinism claim has been established from a
 /// `KaniRandomStateObservation` that has itself demonstrated matching digests.
@@ -84,10 +109,10 @@ impl ProofToken for RustStdRandomStateToken {
     type Proposition = RustStdStandard<RandomState>;
 }
 
-impl Establish<KaniRandomStateObservation, KaniVerifier> for RustStdStandard<RandomState> {
+impl Establish<KaniRandomStateWitnessToken, KaniVerifier> for RustStdStandard<RandomState> {
     type Token = RustStdRandomStateToken;
 
-    fn establish(_credential: &KaniRandomStateObservation) -> Self::Token {
+    fn establish(_credential: KaniRandomStateWitnessToken) -> Self::Token {
         RustStdRandomStateToken(())
     }
 }
@@ -110,10 +135,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_random_state_gives_the_same_hasher_seed_across_calls() {
             let observation = KaniRandomStateObservation::same_input("some value", 7);
-            assert_eq!(observation.input(), "some value");
-            assert!(observation.same_input_hashes_agree());
+            let demonstration = observation.demonstrate_same_input_agreement("some value");
 
-            let _token = RustStdStandard::<RandomState>::establish(&observation);
+            let _token = RustStdStandard::<RandomState>::establish(demonstration);
         }
     }
 }
