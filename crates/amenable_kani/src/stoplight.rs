@@ -22,13 +22,17 @@
 //! disconnected from a real `establish()` call proves nothing about *this*
 //! transition, only that the token type is constructible in the abstract.
 //!
-//! The `establish()` calls themselves are gated by `Witness`: `Establish<C,
-//! V>: Evidence + Witness<V>` means `impl Establish<Green, KaniVerifier>
-//! for Yellow` cannot exist unless `Yellow: Witness<KaniVerifier>` also
-//! does, so each transition earns a real (if small) Kani harness proving
-//! the `SequentialCycle` invariant it claims — `Green` only ever
-//! transitions to `Yellow`, never skipping to `Red` or looping back to
-//! itself, and so on around the cycle.
+//! The `establish()` calls themselves are gated two ways: by `Witness`
+//! (`Establish<C, V>: Evidence + Witness<V>` means `impl
+//! Establish<GreenToken, KaniVerifier> for Yellow` cannot exist unless
+//! `Yellow: Witness<KaniVerifier>` also does, so each transition earns a
+//! real (if small) Kani harness proving the `SequentialCycle` invariant it
+//! claims — `Green` only ever transitions to `Yellow`, never skipping to
+//! `Red` or looping back to itself, and so on around the cycle), and by
+//! `Establish`'s own `C: ProofToken` bound (the credential is the prior
+//! state's real token — `GreenToken`, not the bare `Green` marker — so
+//! `Stoplight::exchange` must call `input.sidecar()` to obtain a lawful
+//! credential; `input.primary()` doesn't type-check).
 
 use amenable_core::{
     Establish, Evidence, Exchange, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
@@ -254,10 +258,10 @@ amenable_derive::harness! {
     }
 }
 
-impl Establish<Green, KaniVerifier> for Yellow {
+impl Establish<GreenToken, KaniVerifier> for Yellow {
     type Token = YellowToken;
 
-    fn establish(_credential: &Green) -> Self::Token {
+    fn establish(_credential: GreenToken) -> Self::Token {
         YellowToken(())
     }
 }
@@ -269,7 +273,7 @@ impl Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>> 
         &self,
         input: Established<Green, GreenToken>,
     ) -> Result<Established<Yellow, YellowToken>, Self::Error> {
-        let token = Yellow::establish(input.primary());
+        let token = Yellow::establish(input.sidecar());
         Ok(Established::new(Yellow, token))
     }
 }
@@ -318,10 +322,10 @@ amenable_derive::harness! {
     }
 }
 
-impl Establish<Yellow, KaniVerifier> for Red {
+impl Establish<YellowToken, KaniVerifier> for Red {
     type Token = RedToken;
 
-    fn establish(_credential: &Yellow) -> Self::Token {
+    fn establish(_credential: YellowToken) -> Self::Token {
         RedToken(())
     }
 }
@@ -333,7 +337,7 @@ impl Exchange<Established<Yellow, YellowToken>, Established<Red, RedToken>> for 
         &self,
         input: Established<Yellow, YellowToken>,
     ) -> Result<Established<Red, RedToken>, Self::Error> {
-        let token = Red::establish(input.primary());
+        let token = Red::establish(input.sidecar());
         Ok(Established::new(Red, token))
     }
 }
@@ -375,10 +379,10 @@ amenable_derive::harness! {
     }
 }
 
-impl Establish<Red, KaniVerifier> for Green {
+impl Establish<RedToken, KaniVerifier> for Green {
     type Token = GreenToken;
 
-    fn establish(_credential: &Red) -> Self::Token {
+    fn establish(_credential: RedToken) -> Self::Token {
         GreenToken(())
     }
 }
@@ -390,7 +394,7 @@ impl Exchange<Established<Red, RedToken>, Established<Green, GreenToken>> for St
         &self,
         input: Established<Red, RedToken>,
     ) -> Result<Established<Green, GreenToken>, Self::Error> {
-        let token = Green::establish(input.primary());
+        let token = Green::establish(input.sidecar());
         Ok(Established::new(Green, token))
     }
 }
