@@ -46,6 +46,28 @@ bridge_kani_witness!(RustStdStandard<Child>);
     }
 }
 
+/// Witness that a `KaniChildObservation` instance actually demonstrated its
+/// process-id and wait law, minted only by
+/// [`KaniChildObservation::demonstrate_waitable`].
+pub struct KaniChildWitnessToken(());
+
+impl ProofToken for KaniChildWitnessToken {
+    type Proposition = KaniChildObservation;
+}
+
+impl KaniChildObservation {
+    /// Assert a nonzero process id and that waiting reports the expected
+    /// exit code. Consumes `self`: the only way to obtain the token is
+    /// to have run this check against a real observation instance, not
+    /// to assert it independently.
+    #[must_use]
+    pub fn demonstrate_waitable(self, exit_code: i32) -> KaniChildWitnessToken {
+        assert_ne!(self.process_id(), 0);
+        assert_eq!(self.waited_exit_code(), Some(exit_code));
+        KaniChildWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Child>`'s process-id and wait law
 /// has been established from a `KaniChildObservation`.
 pub struct RustStdChildToken(());
@@ -54,10 +76,10 @@ impl ProofToken for RustStdChildToken {
     type Proposition = RustStdStandard<Child>;
 }
 
-impl Establish<KaniChildObservation, KaniVerifier> for RustStdStandard<Child> {
+impl Establish<KaniChildWitnessToken, KaniVerifier> for RustStdStandard<Child> {
     type Token = RustStdChildToken;
 
-    fn establish(_credential: &KaniChildObservation) -> Self::Token {
+    fn establish(_credential: KaniChildWitnessToken) -> Self::Token {
         RustStdChildToken(())
     }
 }
@@ -75,10 +97,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_child_has_a_process_id_and_can_be_waited_on() {
             let observation = KaniChildObservation::waitable(7, 3);
-            assert_ne!(observation.process_id(), 0);
-            assert_eq!(observation.waited_exit_code(), Some(3));
+            let demonstration = observation.demonstrate_waitable(3);
 
-            let _token = RustStdStandard::<Child>::establish(&observation);
+            let _token = RustStdStandard::<Child>::establish(demonstration);
         }
     }
 }
@@ -106,6 +127,27 @@ bridge_kani_witness!(RustStdStandard<ChildStderr>);
     }
 }
 
+/// Witness that a `KaniChildStderrObservation` instance actually
+/// demonstrated stderr preservation, separate from stdout, minted only by
+/// [`KaniChildStderrObservation::demonstrate_capture`].
+pub struct KaniChildStderrWitnessToken(());
+
+impl ProofToken for KaniChildStderrWitnessToken {
+    type Proposition = KaniChildStderrObservation;
+}
+
+impl KaniChildStderrObservation {
+    /// Assert stdout stayed empty while stderr captured the expected
+    /// text. Consumes `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_capture(self) -> KaniChildStderrWitnessToken {
+        assert_eq!(self.stdout_text(), "");
+        assert!(self.stderr_text().contains("error message"));
+        KaniChildStderrWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ChildStderr>`'s stderr-capture
 /// law has been established from a `KaniChildStderrObservation`.
 pub struct RustStdChildStderrToken(());
@@ -114,10 +156,10 @@ impl ProofToken for RustStdChildStderrToken {
     type Proposition = RustStdStandard<ChildStderr>;
 }
 
-impl Establish<KaniChildStderrObservation, KaniVerifier> for RustStdStandard<ChildStderr> {
+impl Establish<KaniChildStderrWitnessToken, KaniVerifier> for RustStdStandard<ChildStderr> {
     type Token = RustStdChildStderrToken;
 
-    fn establish(_credential: &KaniChildStderrObservation) -> Self::Token {
+    fn establish(_credential: KaniChildStderrWitnessToken) -> Self::Token {
         RustStdChildStderrToken(())
     }
 }
@@ -135,10 +177,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_child_stderr_captures_what_the_child_wrote_to_stderr() {
             let observation = KaniChildStderrObservation::captured("", "error message\n");
-            assert_eq!(observation.stdout_text(), "");
-            assert!(observation.stderr_text().contains("error message"));
+            let demonstration = observation.demonstrate_capture();
 
-            let _token = RustStdStandard::<ChildStderr>::establish(&observation);
+            let _token = RustStdStandard::<ChildStderr>::establish(demonstration);
         }
     }
 }
@@ -166,6 +207,26 @@ bridge_kani_witness!(RustStdStandard<ChildStdin>);
     }
 }
 
+/// Witness that a `KaniChildStdinObservation` instance actually
+/// demonstrated the delivered-input echo law, minted only by
+/// [`KaniChildStdinObservation::demonstrate_echo`].
+pub struct KaniChildStdinWitnessToken(());
+
+impl ProofToken for KaniChildStdinWitnessToken {
+    type Proposition = KaniChildStdinObservation;
+}
+
+impl KaniChildStdinObservation {
+    /// Assert the echoed stdout matches the delivered input exactly.
+    /// Consumes `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_echo(self) -> KaniChildStdinWitnessToken {
+        assert_eq!(self.echoed_stdout(), self.input_text());
+        KaniChildStdinWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ChildStdin>`'s delivered-input
 /// law has been established from a `KaniChildStdinObservation`.
 pub struct RustStdChildStdinToken(());
@@ -174,10 +235,10 @@ impl ProofToken for RustStdChildStdinToken {
     type Proposition = RustStdStandard<ChildStdin>;
 }
 
-impl Establish<KaniChildStdinObservation, KaniVerifier> for RustStdStandard<ChildStdin> {
+impl Establish<KaniChildStdinWitnessToken, KaniVerifier> for RustStdStandard<ChildStdin> {
     type Token = RustStdChildStdinToken;
 
-    fn establish(_credential: &KaniChildStdinObservation) -> Self::Token {
+    fn establish(_credential: KaniChildStdinWitnessToken) -> Self::Token {
         RustStdChildStdinToken(())
     }
 }
@@ -195,9 +256,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_child_stdin_is_readable_by_the_child_process() {
             let observation = KaniChildStdinObservation::echo("hello, child\n", "hello, child\n");
-            assert_eq!(observation.echoed_stdout(), observation.input_text());
+            let demonstration = observation.demonstrate_echo();
 
-            let _token = RustStdStandard::<ChildStdin>::establish(&observation);
+            let _token = RustStdStandard::<ChildStdin>::establish(demonstration);
         }
     }
 }
@@ -225,6 +286,25 @@ bridge_kani_witness!(RustStdStandard<ChildStdout>);
     }
 }
 
+/// Witness that a `KaniChildStdoutObservation` instance actually
+/// demonstrated stdout preservation, minted only by
+/// [`KaniChildStdoutObservation::demonstrate_capture`].
+pub struct KaniChildStdoutWitnessToken(());
+
+impl ProofToken for KaniChildStdoutWitnessToken {
+    type Proposition = KaniChildStdoutObservation;
+}
+
+impl KaniChildStdoutObservation {
+    /// Assert stdout captured the expected text. Consumes `self` for the
+    /// same reason [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_capture(self) -> KaniChildStdoutWitnessToken {
+        assert!(self.stdout_text().contains("hello"));
+        KaniChildStdoutWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ChildStdout>`'s stdout-capture
 /// law has been established from a `KaniChildStdoutObservation`.
 pub struct RustStdChildStdoutToken(());
@@ -233,10 +313,10 @@ impl ProofToken for RustStdChildStdoutToken {
     type Proposition = RustStdStandard<ChildStdout>;
 }
 
-impl Establish<KaniChildStdoutObservation, KaniVerifier> for RustStdStandard<ChildStdout> {
+impl Establish<KaniChildStdoutWitnessToken, KaniVerifier> for RustStdStandard<ChildStdout> {
     type Token = RustStdChildStdoutToken;
 
-    fn establish(_credential: &KaniChildStdoutObservation) -> Self::Token {
+    fn establish(_credential: KaniChildStdoutWitnessToken) -> Self::Token {
         RustStdChildStdoutToken(())
     }
 }
@@ -253,9 +333,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_child_stdout_captures_what_the_child_wrote_to_stdout() {
             let observation = KaniChildStdoutObservation::captured("hello\n");
-            assert!(observation.stdout_text().contains("hello"));
+            let demonstration = observation.demonstrate_capture();
 
-            let _token = RustStdStandard::<ChildStdout>::establish(&observation);
+            let _token = RustStdStandard::<ChildStdout>::establish(demonstration);
         }
     }
 }
@@ -283,6 +363,27 @@ bridge_kani_witness!(RustStdStandard<Command>);
     }
 }
 
+/// Witness that a `KaniCommandEnvObservation` instance actually
+/// demonstrated the environment-override visibility law, minted only by
+/// [`KaniCommandEnvObservation::demonstrate_visibility`].
+pub struct KaniCommandEnvWitnessToken(());
+
+impl ProofToken for KaniCommandEnvWitnessToken {
+    type Proposition = KaniCommandEnvObservation;
+}
+
+impl KaniCommandEnvObservation {
+    /// Assert the configured key and the visible stdout match. Consumes
+    /// `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_visibility(self, expected_key: &'static str) -> KaniCommandEnvWitnessToken {
+        assert_eq!(self.key(), expected_key);
+        assert_eq!(self.visible_stdout(), self.value());
+        KaniCommandEnvWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Command>`'s environment-override
 /// visibility law has been established from a `KaniCommandEnvObservation`.
 pub struct RustStdCommandToken(());
@@ -291,10 +392,10 @@ impl ProofToken for RustStdCommandToken {
     type Proposition = RustStdStandard<Command>;
 }
 
-impl Establish<KaniCommandEnvObservation, KaniVerifier> for RustStdStandard<Command> {
+impl Establish<KaniCommandEnvWitnessToken, KaniVerifier> for RustStdStandard<Command> {
     type Token = RustStdCommandToken;
 
-    fn establish(_credential: &KaniCommandEnvObservation) -> Self::Token {
+    fn establish(_credential: KaniCommandEnvWitnessToken) -> Self::Token {
         RustStdCommandToken(())
     }
 }
@@ -316,10 +417,9 @@ amenable_derive::harness! {
                 "configured-value",
                 "configured-value",
             );
-            assert_eq!(observation.key(), "AMENABLE_TEST_VAR");
-            assert_eq!(observation.visible_stdout(), observation.value());
+            let demonstration = observation.demonstrate_visibility("AMENABLE_TEST_VAR");
 
-            let _token = RustStdStandard::<Command>::establish(&observation);
+            let _token = RustStdStandard::<Command>::establish(demonstration);
         }
     }
 }
@@ -347,6 +447,29 @@ bridge_kani_witness!(RustStdStandard<CommandArgs<'static>>);
     }
 }
 
+/// Witness that a `KaniCommandArgsObservation` instance actually
+/// demonstrated the configured-argument order law, minted only by
+/// [`KaniCommandArgsObservation::demonstrate_configured_arguments`].
+pub struct KaniCommandArgsWitnessToken(());
+
+impl ProofToken for KaniCommandArgsWitnessToken {
+    type Proposition = KaniCommandArgsObservation;
+}
+
+impl KaniCommandArgsObservation {
+    /// Assert `.args()` reports the expected arguments in order. Consumes
+    /// `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_configured_arguments(
+        self,
+        expected: [&'static str; 2],
+    ) -> KaniCommandArgsWitnessToken {
+        assert_eq!(self.args(), expected);
+        KaniCommandArgsWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<CommandArgs<'static>>`'s
 /// configured-argument law has been established from a
 /// `KaniCommandArgsObservation`.
@@ -356,10 +479,12 @@ impl ProofToken for RustStdCommandArgsToken {
     type Proposition = RustStdStandard<CommandArgs<'static>>;
 }
 
-impl Establish<KaniCommandArgsObservation, KaniVerifier> for RustStdStandard<CommandArgs<'static>> {
+impl Establish<KaniCommandArgsWitnessToken, KaniVerifier>
+    for RustStdStandard<CommandArgs<'static>>
+{
     type Token = RustStdCommandArgsToken;
 
-    fn establish(_credential: &KaniCommandArgsObservation) -> Self::Token {
+    fn establish(_credential: KaniCommandArgsWitnessToken) -> Self::Token {
         RustStdCommandArgsToken(())
     }
 }
@@ -377,9 +502,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_command_args_reports_the_configured_arguments() {
             let observation = KaniCommandArgsObservation::configured(["a", "b"]);
-            assert_eq!(observation.args(), ["a", "b"]);
+            let demonstration = observation.demonstrate_configured_arguments(["a", "b"]);
 
-            let _token = RustStdStandard::<CommandArgs<'static>>::establish(&observation);
+            let _token = RustStdStandard::<CommandArgs<'static>>::establish(demonstration);
         }
     }
 }
@@ -407,6 +532,32 @@ bridge_kani_witness!(RustStdStandard<CommandEnvs<'static>>);
     }
 }
 
+/// Witness that a `KaniCommandEnvsObservation` instance actually
+/// demonstrated the configured-environment key/value preservation law,
+/// minted only by
+/// [`KaniCommandEnvsObservation::demonstrate_configured_override`].
+pub struct KaniCommandEnvsWitnessToken(());
+
+impl ProofToken for KaniCommandEnvsWitnessToken {
+    type Proposition = KaniCommandEnvsObservation;
+}
+
+impl KaniCommandEnvsObservation {
+    /// Assert `.get_envs()` reports back the configured key and value.
+    /// Consumes `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_configured_override(
+        self,
+        expected_key: &'static str,
+        expected_value: &'static str,
+    ) -> KaniCommandEnvsWitnessToken {
+        assert_eq!(self.key(), expected_key);
+        assert_eq!(self.value(), expected_value);
+        KaniCommandEnvsWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<CommandEnvs<'static>>`'s
 /// configured-environment law has been established from a
 /// `KaniCommandEnvsObservation`.
@@ -416,10 +567,12 @@ impl ProofToken for RustStdCommandEnvsToken {
     type Proposition = RustStdStandard<CommandEnvs<'static>>;
 }
 
-impl Establish<KaniCommandEnvsObservation, KaniVerifier> for RustStdStandard<CommandEnvs<'static>> {
+impl Establish<KaniCommandEnvsWitnessToken, KaniVerifier>
+    for RustStdStandard<CommandEnvs<'static>>
+{
     type Token = RustStdCommandEnvsToken;
 
-    fn establish(_credential: &KaniCommandEnvsObservation) -> Self::Token {
+    fn establish(_credential: KaniCommandEnvsWitnessToken) -> Self::Token {
         RustStdCommandEnvsToken(())
     }
 }
@@ -438,10 +591,9 @@ amenable_derive::harness! {
         fn verify_command_envs_reports_the_configured_overrides() {
             let observation =
                 KaniCommandEnvsObservation::configured_override("SOME_KEY", "some_value");
-            assert_eq!(observation.key(), "SOME_KEY");
-            assert_eq!(observation.value(), "some_value");
+            let demonstration = observation.demonstrate_configured_override("SOME_KEY", "some_value");
 
-            let _token = RustStdStandard::<CommandEnvs<'static>>::establish(&observation);
+            let _token = RustStdStandard::<CommandEnvs<'static>>::establish(demonstration);
         }
     }
 }
@@ -469,6 +621,27 @@ bridge_kani_witness!(RustStdStandard<ExitStatus>);
     }
 }
 
+/// Witness that a `KaniExitStatusObservation` instance actually
+/// demonstrated the nonzero exit-code law, minted only by
+/// [`KaniExitStatusObservation::demonstrate_nonzero_exit`].
+pub struct KaniExitStatusWitnessToken(());
+
+impl ProofToken for KaniExitStatusWitnessToken {
+    type Proposition = KaniExitStatusObservation;
+}
+
+impl KaniExitStatusObservation {
+    /// Assert `!success()` and the expected exit code. Consumes `self`
+    /// for the same reason [`KaniChildObservation::demonstrate_waitable`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_nonzero_exit(self, exit_code: i32) -> KaniExitStatusWitnessToken {
+        assert!(!self.success());
+        assert_eq!(self.code(), Some(exit_code));
+        KaniExitStatusWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ExitStatus>`'s exit-code law has
 /// been established from a `KaniExitStatusObservation`.
 pub struct RustStdExitStatusToken(());
@@ -477,10 +650,10 @@ impl ProofToken for RustStdExitStatusToken {
     type Proposition = RustStdStandard<ExitStatus>;
 }
 
-impl Establish<KaniExitStatusObservation, KaniVerifier> for RustStdStandard<ExitStatus> {
+impl Establish<KaniExitStatusWitnessToken, KaniVerifier> for RustStdStandard<ExitStatus> {
     type Token = RustStdExitStatusToken;
 
-    fn establish(_credential: &KaniExitStatusObservation) -> Self::Token {
+    fn establish(_credential: KaniExitStatusWitnessToken) -> Self::Token {
         RustStdExitStatusToken(())
     }
 }
@@ -499,10 +672,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_exit_status_reports_a_nonzero_exit_code() {
             let observation = KaniExitStatusObservation::nonzero(3);
-            assert!(!observation.success());
-            assert_eq!(observation.code(), Some(3));
+            let demonstration = observation.demonstrate_nonzero_exit(3);
 
-            let _token = RustStdStandard::<ExitStatus>::establish(&observation);
+            let _token = RustStdStandard::<ExitStatus>::establish(demonstration);
         }
     }
 }
@@ -530,6 +702,28 @@ bridge_kani_witness!(RustStdStandard<Output>);
     }
 }
 
+/// Witness that a `KaniOutputObservation` instance actually demonstrated
+/// bundling the exit status with captured stdout, minted only by
+/// [`KaniOutputObservation::demonstrate_bundle`].
+pub struct KaniOutputWitnessToken(());
+
+impl ProofToken for KaniOutputWitnessToken {
+    type Proposition = KaniOutputObservation;
+}
+
+impl KaniOutputObservation {
+    /// Assert success, the expected status code, and captured stdout.
+    /// Consumes `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_bundle(self, exit_code: i32) -> KaniOutputWitnessToken {
+        assert!(self.success());
+        assert_eq!(self.status_code(), Some(exit_code));
+        assert!(self.stdout_text().contains("hello"));
+        KaniOutputWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Output>`'s output-bundle law has
 /// been established from a `KaniOutputObservation`.
 pub struct RustStdOutputToken(());
@@ -538,10 +732,10 @@ impl ProofToken for RustStdOutputToken {
     type Proposition = RustStdStandard<Output>;
 }
 
-impl Establish<KaniOutputObservation, KaniVerifier> for RustStdStandard<Output> {
+impl Establish<KaniOutputWitnessToken, KaniVerifier> for RustStdStandard<Output> {
     type Token = RustStdOutputToken;
 
-    fn establish(_credential: &KaniOutputObservation) -> Self::Token {
+    fn establish(_credential: KaniOutputWitnessToken) -> Self::Token {
         RustStdOutputToken(())
     }
 }
@@ -559,11 +753,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_output_captures_stdout_and_the_exit_status() {
             let observation = KaniOutputObservation::captured(0, "hello\n");
-            assert!(observation.success());
-            assert_eq!(observation.status_code(), Some(0));
-            assert!(observation.stdout_text().contains("hello"));
+            let demonstration = observation.demonstrate_bundle(0);
 
-            let _token = RustStdStandard::<Output>::establish(&observation);
+            let _token = RustStdStandard::<Output>::establish(demonstration);
         }
     }
 }
@@ -591,6 +783,27 @@ bridge_kani_witness!(RustStdStandard<Stdio>);
     }
 }
 
+/// Witness that a `KaniStdioObservation` instance actually demonstrated
+/// the stdout-handle policy, minted only by
+/// [`KaniStdioObservation::demonstrate_handle_policy`].
+pub struct KaniStdioWitnessToken(());
+
+impl ProofToken for KaniStdioWitnessToken {
+    type Proposition = KaniStdioObservation;
+}
+
+impl KaniStdioObservation {
+    /// Assert `Stdio::null()` leaves no handle while `Stdio::piped()`
+    /// exposes one. Consumes `self` for the same reason
+    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[must_use]
+    pub fn demonstrate_handle_policy(self) -> KaniStdioWitnessToken {
+        assert!(!self.null_stdout_handle_present());
+        assert!(self.piped_stdout_handle_present());
+        KaniStdioWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Stdio>`'s stdout-handle policy
 /// law has been established from a `KaniStdioObservation`.
 pub struct RustStdStdioToken(());
@@ -599,10 +812,10 @@ impl ProofToken for RustStdStdioToken {
     type Proposition = RustStdStandard<Stdio>;
 }
 
-impl Establish<KaniStdioObservation, KaniVerifier> for RustStdStandard<Stdio> {
+impl Establish<KaniStdioWitnessToken, KaniVerifier> for RustStdStandard<Stdio> {
     type Token = RustStdStdioToken;
 
-    fn establish(_credential: &KaniStdioObservation) -> Self::Token {
+    fn establish(_credential: KaniStdioWitnessToken) -> Self::Token {
         RustStdStdioToken(())
     }
 }
@@ -620,10 +833,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_stdio_null_discards_the_childs_output_handle() {
             let observation = KaniStdioObservation::stdout_handle_policy(false, true);
-            assert!(!observation.null_stdout_handle_present());
-            assert!(observation.piped_stdout_handle_present());
+            let demonstration = observation.demonstrate_handle_policy();
 
-            let _token = RustStdStandard::<Stdio>::establish(&observation);
+            let _token = RustStdStandard::<Stdio>::establish(demonstration);
         }
     }
 }
