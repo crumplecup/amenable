@@ -90,6 +90,30 @@ bridge_kani_witness!(RustStdStandard<Thread>);
     }
 }
 
+/// Witness that a `KaniCurrentThreadObservation` instance actually
+/// demonstrated current-thread handle stability, minted only by
+/// [`KaniCurrentThreadObservation::demonstrate_handle_stability`].
+pub struct KaniCurrentThreadHandleWitnessToken(());
+
+impl ProofToken for KaniCurrentThreadHandleWitnessToken {
+    type Proposition = KaniCurrentThreadObservation;
+}
+
+impl KaniCurrentThreadObservation {
+    /// Assert the current thread handle stays stable across repeated
+    /// queries. Consumes `self`: the only way to obtain the token is to
+    /// have run this check against a real observation instance, not to
+    /// assert it independently.
+    #[must_use]
+    pub fn demonstrate_handle_stability(self) -> KaniCurrentThreadHandleWitnessToken {
+        assert!(
+            self.handle_is_stable(),
+            "the current thread handle should stay stable across repeated queries"
+        );
+        KaniCurrentThreadHandleWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Thread>`'s repeated-current-query
 /// claim has been established from a `KaniCurrentThreadObservation` that has
 /// itself demonstrated current-thread handle stability.
@@ -99,10 +123,10 @@ impl ProofToken for RustStdThreadToken {
     type Proposition = RustStdStandard<Thread>;
 }
 
-impl Establish<KaniCurrentThreadObservation, KaniVerifier> for RustStdStandard<Thread> {
+impl Establish<KaniCurrentThreadHandleWitnessToken, KaniVerifier> for RustStdStandard<Thread> {
     type Token = RustStdThreadToken;
 
-    fn establish(_credential: &KaniCurrentThreadObservation) -> Self::Token {
+    fn establish(_credential: KaniCurrentThreadHandleWitnessToken) -> Self::Token {
         RustStdThreadToken(())
     }
 }
@@ -122,12 +146,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_thread_current_is_stable_across_repeated_calls() {
             let observation = crate::KaniCurrentThreadObservation::current();
-            assert!(
-                observation.handle_is_stable(),
-                "the current thread handle should stay stable across repeated queries"
-            );
+            let demonstration = observation.demonstrate_handle_stability();
 
-            let _token = RustStdStandard::<Thread>::establish(&observation);
+            let _token = RustStdStandard::<Thread>::establish(demonstration);
         }
     }
 }
@@ -155,6 +176,30 @@ bridge_kani_witness!(RustStdStandard<ThreadId>);
     }
 }
 
+/// Witness that a `KaniCurrentThreadObservation` instance actually
+/// demonstrated current-thread id stability, minted only by
+/// [`KaniCurrentThreadObservation::demonstrate_id_stability`].
+pub struct KaniCurrentThreadIdWitnessToken(());
+
+impl ProofToken for KaniCurrentThreadIdWitnessToken {
+    type Proposition = KaniCurrentThreadObservation;
+}
+
+impl KaniCurrentThreadObservation {
+    /// Assert the current thread id stays stable across repeated
+    /// queries. Consumes `self` for the same reason
+    /// [`KaniCurrentThreadObservation::demonstrate_handle_stability`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_id_stability(self) -> KaniCurrentThreadIdWitnessToken {
+        assert!(
+            self.id_is_stable(),
+            "the current thread id should stay stable across repeated queries"
+        );
+        KaniCurrentThreadIdWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ThreadId>`'s repeated-current-id
 /// claim has been established from a `KaniCurrentThreadObservation` that has
 /// itself demonstrated current-thread id stability.
@@ -164,10 +209,10 @@ impl ProofToken for RustStdThreadIdToken {
     type Proposition = RustStdStandard<ThreadId>;
 }
 
-impl Establish<KaniCurrentThreadObservation, KaniVerifier> for RustStdStandard<ThreadId> {
+impl Establish<KaniCurrentThreadIdWitnessToken, KaniVerifier> for RustStdStandard<ThreadId> {
     type Token = RustStdThreadIdToken;
 
-    fn establish(_credential: &KaniCurrentThreadObservation) -> Self::Token {
+    fn establish(_credential: KaniCurrentThreadIdWitnessToken) -> Self::Token {
         RustStdThreadIdToken(())
     }
 }
@@ -187,12 +232,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_thread_id_is_stable_across_repeated_calls() {
             let observation = crate::KaniCurrentThreadObservation::current();
-            assert!(
-                observation.id_is_stable(),
-                "the current thread id should stay stable across repeated queries"
-            );
+            let demonstration = observation.demonstrate_id_stability();
 
-            let _token = RustStdStandard::<ThreadId>::establish(&observation);
+            let _token = RustStdStandard::<ThreadId>::establish(demonstration);
         }
     }
 }
