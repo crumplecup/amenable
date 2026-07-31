@@ -167,7 +167,13 @@ pub fn expand_calculation(args: &CalculationArgs, input: &ItemFn) -> syn::Result
         #(#attrs)*
         #vis fn #fn_name<__Verifier: ::amenable_core::Verifier>(#inputs) -> #evidence_name
         where
-            #evidence_name: ::amenable_core::Establish<#output_ty, __Verifier, Token = #token>,
+            // The evidence type is its own lawful credential (reflexive
+            // `ProofToken`), not the bare output value: the output's own
+            // constructor is typically public, so holding one never
+            // demonstrates the calculation actually ran. Holding
+            // `#evidence_name` does, because outside this module it's only
+            // reachable by calling this very function.
+            #evidence_name: ::amenable_core::Establish<#evidence_name, __Verifier, Token = #token>,
             // Every argument must carry its own witness for the same
             // verifier before this calculation can be proved: access to
             // a calculation's basis is a proof obligation, not something

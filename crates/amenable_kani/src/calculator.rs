@@ -223,10 +223,21 @@ where
     }
 }
 
-impl Establish<Sum, KaniVerifier> for AddEvidence {
+// `AddEvidence` itself, not the bare `Sum` it wraps, is the lawful
+// credential: `Sum::new` is a public constructor (any `i64` value passes),
+// so a `Sum` alone never demonstrated that `add_impl` actually ran. An
+// `AddEvidence` value, by contrast, is only reachable from outside this
+// module through `add::<V>()`, which already requires `Debit: Witness<V>`
+// and `Credit: Witness<V>` — holding one *is* the proof that the
+// calculation was legitimately performed.
+impl ProofToken for AddEvidence {
+    type Proposition = AddEvidence;
+}
+
+impl Establish<AddEvidence, KaniVerifier> for AddEvidence {
     type Token = AddToken;
 
-    fn establish(_credential: &Sum) -> Self::Token {
+    fn establish(_credential: AddEvidence) -> Self::Token {
         AddToken(())
     }
 }

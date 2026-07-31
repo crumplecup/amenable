@@ -11,7 +11,7 @@ fn add_calculation_forms_an_evidence_chain() {
         (Debit::new(0), Credit::new(0))
     );
 
-    let _token: AddToken = AddEvidence::establish(&evidence.audit());
+    let _token: AddToken = AddEvidence::establish(evidence);
 }
 
 #[test]
