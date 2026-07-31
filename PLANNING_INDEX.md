@@ -4,6 +4,37 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Fixing `Establish` to Actually Gate Obligations
+
+**Document:** [PROVABLE_FROM_PLAN.md](PROVABLE_FROM_PLAN.md)
+
+**Status:** ✅ Implemented — `Establish<C, V>` requires `C: ProofToken` and
+takes the credential by value, retrofitted across all ~65 sites in
+`amenable_kani`. Workspace compiles, clippy is clean, and
+`cargo test --workspace` passes with zero failures.
+
+**Description:** `Establish::establish(credential: &C)` did not enforce
+that `C`'s value ever demonstrated anything — any value of the credential
+type minted a token, which `elicit_doc`'s antipattern scanner correctly
+flagged (`unused_underscore_arg`), and which was also live as a real bug
+in `Stoplight`'s `exchange` bodies (`input.primary()` used where the real
+`.sidecar()` token was available). `Establish` is this codebase's
+deliberate rename of `elicitation`'s `ProvableFrom<C>` — the fix lands
+inside `Establish` itself, no sibling trait, reusing the already-existing
+`ProofToken` trait as the credential bound rather than inventing a
+bespoke marker-struct mechanism like `elicitation`'s `Established<P>`.
+`AddEvidence`/`calculator.rs` got a reflexive `AddEvidence: ProofToken`
+impl (not `Sum`, whose constructor is public and unguarded); `Stoplight`
+got its three `Establish` impls retargeted to the real `*Token` types
+plus the `.primary()`→`.sidecar()` fix; every accommodation-model site
+across `sync_mpsc.rs`, `slice.rs`, `fs.rs`, `io.rs`/`alloc_string.rs`,
+`process.rs`, `sync_lock.rs`, `thread.rs`, `path.rs`/`panic.rs`/
+`std_panic.rs`, `std_hash.rs`/`std_time.rs`, and the chained UTF-8 buffer
+family got a purpose-built `demonstrate_*` witness token (or a reflexive
+impl where already gated by construction). See
+[PROVABLE_FROM_PLAN.md](PROVABLE_FROM_PLAN.md)'s Resolution section for
+the full site list.
+
 ### Kani Filesystem Accommodation Model
 
 **Document:** [KANI_FILESYSTEM_MODEL_PLAN.md](KANI_FILESYSTEM_MODEL_PLAN.md)
