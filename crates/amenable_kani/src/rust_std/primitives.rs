@@ -93,7 +93,7 @@ impl ProofToken for RustStdStringUtf8Token {
 impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<String> {
     type Token = RustStdStringUtf8Token;
 
-    fn establish(_credential: &KaniUtf8Buffer<2>) -> Self::Token {
+    fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         RustStdStringUtf8Token(())
     }
 }
@@ -130,7 +130,7 @@ amenable_derive::harness! {
 
             match KaniUtf8Buffer::<2>::new(bytes, len) {
                 Ok(buffer) => {
-                    let _token = RustStdStandard::<String>::establish(&buffer);
+                    let _token = RustStdStandard::<String>::establish(buffer);
 
                     assert_eq!(buffer.len(), len, "length tracks the stored bytes");
                     assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");

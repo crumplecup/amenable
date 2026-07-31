@@ -46,7 +46,7 @@ impl ProofToken for RustStdOsStrUtf8Token {
 impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<OsStr> {
     type Token = RustStdOsStrUtf8Token;
 
-    fn establish(_credential: &KaniUtf8Buffer<2>) -> Self::Token {
+    fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         RustStdOsStrUtf8Token(())
     }
 }
@@ -84,7 +84,7 @@ amenable_derive::harness! {
 
             match KaniUtf8Buffer::<2>::new(bytes, len) {
                 Ok(buffer) => {
-                    let _token = RustStdStandard::<OsStr>::establish(&buffer);
+                    let _token = RustStdStandard::<OsStr>::establish(buffer);
 
                     // Compared index-by-index rather than via slice
                     // equality: `&[u8] == &[u8]` over a symbolic length

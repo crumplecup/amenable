@@ -500,17 +500,29 @@ amenable_derive::harness! {
 }
 
 /// Lawful token minted once `KaniUtf8Buffer<2>`'s bookkeeping has been
-/// established from the assumed-validity credential.
+/// established.
 pub struct KaniUtf8BufferToken(());
 
 impl ProofToken for KaniUtf8BufferToken {
     type Proposition = KaniUtf8Buffer<2>;
 }
 
-impl Establish<KaniAssumedUtf8Validity, KaniVerifier> for KaniUtf8Buffer<2> {
+// `KaniUtf8Buffer<2>` itself, not the bare `KaniAssumedUtf8Validity` axiom,
+// is the lawful credential: `KaniUtf8Buffer::new` already runs the
+// assumed-validity check internally and only returns `Ok` once it holds
+// (its fields are private, so there's no other way to obtain one), while a
+// freestanding `KaniAssumedUtf8Validity::asserted_valid()` call is
+// disconnected from any particular buffer instance. This is the same
+// "evidence by construction" shape as `AddEvidence`/`Sum` in
+// `calculator.rs`.
+impl ProofToken for KaniUtf8Buffer<2> {
+    type Proposition = KaniUtf8Buffer<2>;
+}
+
+impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for KaniUtf8Buffer<2> {
     type Token = KaniUtf8BufferToken;
 
-    fn establish(_credential: &KaniAssumedUtf8Validity) -> Self::Token {
+    fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         KaniUtf8BufferToken(())
     }
 }
