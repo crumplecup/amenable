@@ -176,6 +176,27 @@ bridge_kani_witness!(RustStdStandard<std::path::Display<'static>>);
     }
 }
 
+/// Witness that a `KaniPathDisplayObservation` instance actually
+/// demonstrated verbatim rendering, minted only by
+/// [`KaniPathDisplayObservation::demonstrate_verbatim_rendering`].
+pub struct KaniPathDisplayWitnessToken(());
+
+impl ProofToken for KaniPathDisplayWitnessToken {
+    type Proposition = KaniPathDisplayObservation;
+}
+
+impl KaniPathDisplayObservation {
+    /// Assert the rendered display text matches the source text exactly.
+    /// Consumes `self`: the only way to obtain the token is to have run
+    /// this check against a real observation instance, not to assert it
+    /// independently.
+    #[must_use]
+    pub fn demonstrate_verbatim_rendering(self) -> KaniPathDisplayWitnessToken {
+        assert_eq!(self.display_text(), self.source_text());
+        KaniPathDisplayWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::path::Display<'static>>`'s
 /// UTF-8-display claim has been established from a
 /// `KaniPathDisplayObservation` that has itself demonstrated verbatim
@@ -186,12 +207,12 @@ impl ProofToken for RustStdPathDisplayToken {
     type Proposition = RustStdStandard<std::path::Display<'static>>;
 }
 
-impl Establish<KaniPathDisplayObservation, KaniVerifier>
+impl Establish<KaniPathDisplayWitnessToken, KaniVerifier>
     for RustStdStandard<std::path::Display<'static>>
 {
     type Token = RustStdPathDisplayToken;
 
-    fn establish(_credential: &KaniPathDisplayObservation) -> Self::Token {
+    fn establish(_credential: KaniPathDisplayWitnessToken) -> Self::Token {
         RustStdPathDisplayToken(())
     }
 }
@@ -212,10 +233,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_display_renders_a_valid_utf8_path_verbatim() {
             let observation = crate::KaniPathDisplayObservation::utf8("/a/b.txt");
-            assert_eq!(observation.display_text(), observation.source_text());
+            let demonstration = observation.demonstrate_verbatim_rendering();
 
             let _token =
-                RustStdStandard::<std::path::Display<'static>>::establish(&observation);
+                RustStdStandard::<std::path::Display<'static>>::establish(demonstration);
         }
     }
 }
@@ -362,6 +383,30 @@ bridge_kani_witness!(RustStdStandard<Prefix<'static>>);
     }
 }
 
+/// Witness that a `KaniWindowsPrefixObservation` instance actually
+/// demonstrated the parsed `Disk` drive letter, minted only by
+/// [`KaniWindowsPrefixObservation::demonstrate_drive_letter`].
+pub struct KaniWindowsPrefixDriveLetterWitnessToken(());
+
+impl ProofToken for KaniWindowsPrefixDriveLetterWitnessToken {
+    type Proposition = KaniWindowsPrefixObservation;
+}
+
+impl KaniWindowsPrefixObservation {
+    /// Assert the parsed drive letter matches the expected byte. Consumes
+    /// `self`: the only way to obtain the token is to have run this check
+    /// against a real observation instance, not to assert it
+    /// independently.
+    #[must_use]
+    pub fn demonstrate_drive_letter(
+        self,
+        expected: u8,
+    ) -> KaniWindowsPrefixDriveLetterWitnessToken {
+        assert_eq!(self.drive_letter(), expected);
+        KaniWindowsPrefixDriveLetterWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Prefix<'static>>`'s drive-letter
 /// claim has been established from a `KaniWindowsPrefixObservation` that has
 /// itself demonstrated the parsed `Disk` drive letter.
@@ -371,10 +416,12 @@ impl ProofToken for RustStdPrefixToken {
     type Proposition = RustStdStandard<Prefix<'static>>;
 }
 
-impl Establish<KaniWindowsPrefixObservation, KaniVerifier> for RustStdStandard<Prefix<'static>> {
+impl Establish<KaniWindowsPrefixDriveLetterWitnessToken, KaniVerifier>
+    for RustStdStandard<Prefix<'static>>
+{
     type Token = RustStdPrefixToken;
 
-    fn establish(_credential: &KaniWindowsPrefixObservation) -> Self::Token {
+    fn establish(_credential: KaniWindowsPrefixDriveLetterWitnessToken) -> Self::Token {
         RustStdPrefixToken(())
     }
 }
@@ -393,9 +440,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_prefix_disk_identifies_the_drive_letter() {
             let observation = crate::KaniWindowsPrefixObservation::disk("C:", b'C');
-            assert_eq!(observation.drive_letter(), b'C');
+            let demonstration = observation.demonstrate_drive_letter(b'C');
 
-            let _token = RustStdStandard::<Prefix<'static>>::establish(&observation);
+            let _token = RustStdStandard::<Prefix<'static>>::establish(demonstration);
         }
     }
 }
@@ -424,6 +471,32 @@ bridge_kani_witness!(RustStdStandard<PrefixComponent<'static>>);
     }
 }
 
+/// Witness that a `KaniWindowsPrefixObservation` instance actually
+/// demonstrated both its raw text and parsed drive letter, minted only by
+/// [`KaniWindowsPrefixObservation::demonstrate_raw_text_and_drive_letter`].
+pub struct KaniWindowsPrefixComponentWitnessToken(());
+
+impl ProofToken for KaniWindowsPrefixComponentWitnessToken {
+    type Proposition = KaniWindowsPrefixObservation;
+}
+
+impl KaniWindowsPrefixObservation {
+    /// Assert both the raw text and the parsed drive letter match what
+    /// the source path actually wrote. Consumes `self` for the same
+    /// reason [`KaniWindowsPrefixObservation::demonstrate_drive_letter`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_raw_text_and_drive_letter(
+        self,
+        expected_text: &'static str,
+        expected_letter: u8,
+    ) -> KaniWindowsPrefixComponentWitnessToken {
+        assert_eq!(self.raw_text(), expected_text);
+        assert_eq!(self.drive_letter(), expected_letter);
+        KaniWindowsPrefixComponentWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<PrefixComponent<'static>>`'s
 /// raw-text-plus-parsed-prefix claim has been established from a
 /// `KaniWindowsPrefixObservation` that has itself demonstrated both facets.
@@ -433,12 +506,12 @@ impl ProofToken for RustStdPrefixComponentToken {
     type Proposition = RustStdStandard<PrefixComponent<'static>>;
 }
 
-impl Establish<KaniWindowsPrefixObservation, KaniVerifier>
+impl Establish<KaniWindowsPrefixComponentWitnessToken, KaniVerifier>
     for RustStdStandard<PrefixComponent<'static>>
 {
     type Token = RustStdPrefixComponentToken;
 
-    fn establish(_credential: &KaniWindowsPrefixObservation) -> Self::Token {
+    fn establish(_credential: KaniWindowsPrefixComponentWitnessToken) -> Self::Token {
         RustStdPrefixComponentToken(())
     }
 }
@@ -459,10 +532,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_prefix_component_pairs_raw_text_with_parsed_prefix() {
             let observation = crate::KaniWindowsPrefixObservation::disk("C:", b'C');
-            assert_eq!(observation.raw_text(), "C:");
-            assert_eq!(observation.drive_letter(), b'C');
+            let demonstration = observation.demonstrate_raw_text_and_drive_letter("C:", b'C');
 
-            let _token = RustStdStandard::<PrefixComponent<'static>>::establish(&observation);
+            let _token = RustStdStandard::<PrefixComponent<'static>>::establish(demonstration);
         }
     }
 }

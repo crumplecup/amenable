@@ -81,6 +81,31 @@ bridge_kani_witness!(RustStdStandard<Location<'static>>);
     }
 }
 
+/// Witness that a `KaniCallerLocationObservation` instance actually
+/// demonstrated same-file, different-line caller reporting, minted only by
+/// [`KaniCallerLocationObservation::demonstrate_immediate_call_site`].
+pub struct KaniCallerLocationWitnessToken(());
+
+impl ProofToken for KaniCallerLocationWitnessToken {
+    type Proposition = KaniCallerLocationObservation;
+}
+
+impl KaniCallerLocationObservation {
+    /// Assert the observation reports the expected file and that its two
+    /// call-site lines differ. Consumes `self`: the only way to obtain
+    /// the token is to have run this check against a real observation
+    /// instance, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_immediate_call_site(
+        self,
+        expected_file: &'static str,
+    ) -> KaniCallerLocationWitnessToken {
+        assert_eq!(self.file(), expected_file);
+        assert!(self.lines_differ());
+        KaniCallerLocationWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Location<'static>>`'s
 /// immediate-call-site claim has been established from a
 /// `KaniCallerLocationObservation` that has itself demonstrated same-file,
@@ -91,10 +116,12 @@ impl ProofToken for RustStdLocationToken {
     type Proposition = RustStdStandard<Location<'static>>;
 }
 
-impl Establish<KaniCallerLocationObservation, KaniVerifier> for RustStdStandard<Location<'static>> {
+impl Establish<KaniCallerLocationWitnessToken, KaniVerifier>
+    for RustStdStandard<Location<'static>>
+{
     type Token = RustStdLocationToken;
 
-    fn establish(_credential: &KaniCallerLocationObservation) -> Self::Token {
+    fn establish(_credential: KaniCallerLocationWitnessToken) -> Self::Token {
         RustStdLocationToken(())
     }
 }
@@ -119,10 +146,9 @@ amenable_derive::harness! {
         fn verify_location_caller_reflects_the_immediate_call_site() {
             let observation =
                 KaniCallerLocationObservation::same_file_distinct_lines("proof.rs", 10, 11);
-            assert_eq!(observation.file(), "proof.rs");
-            assert!(observation.lines_differ());
+            let demonstration = observation.demonstrate_immediate_call_site("proof.rs");
 
-            let _token = RustStdStandard::<Location<'static>>::establish(&observation);
+            let _token = RustStdStandard::<Location<'static>>::establish(demonstration);
         }
     }
 }

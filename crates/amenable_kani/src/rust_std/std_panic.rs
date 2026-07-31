@@ -32,6 +32,27 @@ bridge_kani_witness!(RustStdStandard<PanicHookInfo<'static>>);
     }
 }
 
+/// Witness that a `KaniPanicHookObservation` instance actually demonstrated
+/// exact panic-message capture, minted only by
+/// [`KaniPanicHookObservation::demonstrate_message_capture`].
+pub struct KaniPanicHookWitnessToken(());
+
+impl ProofToken for KaniPanicHookWitnessToken {
+    type Proposition = KaniPanicHookObservation;
+}
+
+impl KaniPanicHookObservation {
+    /// Assert the captured message matches the expected panic payload
+    /// exactly. Consumes `self`: the only way to obtain the token is to
+    /// have run this check against a real observation instance, not to
+    /// assert it independently.
+    #[must_use]
+    pub fn demonstrate_message_capture(self, expected: &'static str) -> KaniPanicHookWitnessToken {
+        assert_eq!(self.captured_message(), expected);
+        KaniPanicHookWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<PanicHookInfo<'static>>`'s
 /// panic-payload reporting claim has been established from a
 /// `KaniPanicHookObservation` that has itself demonstrated exact message
@@ -42,10 +63,12 @@ impl ProofToken for RustStdPanicHookInfoToken {
     type Proposition = RustStdStandard<PanicHookInfo<'static>>;
 }
 
-impl Establish<KaniPanicHookObservation, KaniVerifier> for RustStdStandard<PanicHookInfo<'static>> {
+impl Establish<KaniPanicHookWitnessToken, KaniVerifier>
+    for RustStdStandard<PanicHookInfo<'static>>
+{
     type Token = RustStdPanicHookInfoToken;
 
-    fn establish(_credential: &KaniPanicHookObservation) -> Self::Token {
+    fn establish(_credential: KaniPanicHookWitnessToken) -> Self::Token {
         RustStdPanicHookInfoToken(())
     }
 }
@@ -66,9 +89,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_panic_hook_info_reports_the_panics_own_message() {
             let observation = KaniPanicHookObservation::message("captured panic message");
-            assert_eq!(observation.captured_message(), "captured panic message");
+            let demonstration = observation.demonstrate_message_capture("captured panic message");
 
-            let _token = RustStdStandard::<PanicHookInfo<'static>>::establish(&observation);
+            let _token = RustStdStandard::<PanicHookInfo<'static>>::establish(demonstration);
         }
     }
 }
