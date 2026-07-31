@@ -44,6 +44,47 @@ bridge_kani_witness!(RustStdStandard<DirBuilder>);
     }
 }
 
+/// Witness that a `KaniRecursiveDirObservation` instance actually
+/// demonstrated the ancestor-preserving join law, minted only by
+/// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`].
+pub struct KaniRecursiveDirWitnessToken(());
+
+impl ProofToken for KaniRecursiveDirWitnessToken {
+    type Proposition = KaniRecursiveDirObservation;
+}
+
+impl KaniRecursiveDirObservation {
+    /// Assert the observation's ancestors and leaf match repeated joins
+    /// from `base`. Consumes `self`: the only way to obtain the token is
+    /// to have run this check against a real observation instance, not to
+    /// assert it independently.
+    #[must_use]
+    pub fn demonstrate_ancestor_preservation(
+        self,
+        base: crate::KaniFsPath,
+        first: crate::KaniFsLabel,
+        second: crate::KaniFsLabel,
+        leaf: crate::KaniFsLabel,
+    ) -> KaniRecursiveDirWitnessToken {
+        assert_eq!(
+            self.first_ancestor(),
+            base.join(first),
+            "recursive creation preserves the first ancestor"
+        );
+        assert_eq!(
+            self.second_ancestor(),
+            base.join(first).join(second),
+            "recursive creation preserves the second ancestor"
+        );
+        assert_eq!(
+            self.leaf(),
+            base.join(first).join(second).join(leaf),
+            "recursive creation preserves the leaf"
+        );
+        KaniRecursiveDirWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<DirBuilder>`'s recursive
 /// directory-creation claim has been established from a
 /// `KaniRecursiveDirObservation` that has itself demonstrated the
@@ -54,10 +95,10 @@ impl ProofToken for RustStdDirBuilderRecursiveToken {
     type Proposition = RustStdStandard<DirBuilder>;
 }
 
-impl Establish<KaniRecursiveDirObservation, KaniVerifier> for RustStdStandard<DirBuilder> {
+impl Establish<KaniRecursiveDirWitnessToken, KaniVerifier> for RustStdStandard<DirBuilder> {
     type Token = RustStdDirBuilderRecursiveToken;
 
-    fn establish(_credential: &KaniRecursiveDirObservation) -> Self::Token {
+    fn establish(_credential: KaniRecursiveDirWitnessToken) -> Self::Token {
         RustStdDirBuilderRecursiveToken(())
     }
 }
@@ -76,33 +117,13 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_dir_builder_creates_nested_directories_recursively() {
             let base = crate::KaniFsPath::root();
-            let observation = crate::KaniRecursiveDirObservation::new(
-                base,
-                crate::KaniFsLabel::new('a'),
-                crate::KaniFsLabel::new('b'),
-                crate::KaniFsLabel::new('c'),
-            );
+            let a = crate::KaniFsLabel::new('a');
+            let b = crate::KaniFsLabel::new('b');
+            let c = crate::KaniFsLabel::new('c');
+            let observation = crate::KaniRecursiveDirObservation::new(base, a, b, c);
+            let demonstration = observation.demonstrate_ancestor_preservation(base, a, b, c);
 
-            assert_eq!(
-                observation.first_ancestor(),
-                base.join(crate::KaniFsLabel::new('a')),
-                "recursive creation preserves the first ancestor"
-            );
-            assert_eq!(
-                observation.second_ancestor(),
-                base.join(crate::KaniFsLabel::new('a'))
-                    .join(crate::KaniFsLabel::new('b')),
-                "recursive creation preserves the second ancestor"
-            );
-            assert_eq!(
-                observation.leaf(),
-                base.join(crate::KaniFsLabel::new('a'))
-                    .join(crate::KaniFsLabel::new('b'))
-                    .join(crate::KaniFsLabel::new('c')),
-                "recursive creation preserves the leaf"
-            );
-
-            let _token = RustStdStandard::<DirBuilder>::establish(&observation);
+            let _token = RustStdStandard::<DirBuilder>::establish(demonstration);
         }
     }
 }
@@ -130,6 +151,33 @@ bridge_kani_witness!(RustStdStandard<DirEntry>);
     }
 }
 
+/// Witness that a `KaniDirEntryObservation` instance actually demonstrated
+/// entry identity is preserved exactly, minted only by
+/// [`KaniDirEntryObservation::demonstrate_identity`].
+pub struct KaniDirEntryWitnessToken(());
+
+impl ProofToken for KaniDirEntryWitnessToken {
+    type Proposition = KaniDirEntryObservation;
+}
+
+impl KaniDirEntryObservation {
+    /// Assert the entry reports the expected name and path. Consumes
+    /// `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_identity(
+        self,
+        expected_name: crate::KaniFsLabel,
+        expected_path: crate::KaniFsPath,
+    ) -> KaniDirEntryWitnessToken {
+        let entry = self.entry();
+        assert_eq!(entry.file_name(), Some(expected_name));
+        assert_eq!(entry.path(), expected_path);
+        KaniDirEntryWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<DirEntry>`'s name/path
 /// reporting claim has been established from a `KaniDirEntryObservation`
 /// that has itself demonstrated entry identity is preserved exactly.
@@ -139,10 +187,10 @@ impl ProofToken for RustStdDirEntryToken {
     type Proposition = RustStdStandard<DirEntry>;
 }
 
-impl Establish<KaniDirEntryObservation, KaniVerifier> for RustStdStandard<DirEntry> {
+impl Establish<KaniDirEntryWitnessToken, KaniVerifier> for RustStdStandard<DirEntry> {
     type Token = RustStdDirEntryToken;
 
-    fn establish(_credential: &KaniDirEntryObservation) -> Self::Token {
+    fn establish(_credential: KaniDirEntryWitnessToken) -> Self::Token {
         RustStdDirEntryToken(())
     }
 }
@@ -161,15 +209,12 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_dir_entry_reports_the_created_files_name_and_path() {
             let base = crate::KaniFsPath::root().join(crate::KaniFsLabel::new('b'));
-            let path = base.join(crate::KaniFsLabel::new('f'));
-            let observation =
-                crate::KaniDirEntryObservation::new(base, crate::KaniFsLabel::new('f'));
-            let entry = observation.entry();
+            let name = crate::KaniFsLabel::new('f');
+            let path = base.join(name);
+            let observation = crate::KaniDirEntryObservation::new(base, name);
+            let demonstration = observation.demonstrate_identity(name, path);
 
-            assert_eq!(entry.file_name(), Some(crate::KaniFsLabel::new('f')));
-            assert_eq!(entry.path(), path);
-
-            let _token = RustStdStandard::<DirEntry>::establish(&observation);
+            let _token = RustStdStandard::<DirEntry>::establish(demonstration);
         }
     }
 }
@@ -197,6 +242,31 @@ bridge_kani_witness!(RustStdStandard<File>);
     }
 }
 
+/// Witness that a `KaniFileContentObservation` instance actually
+/// demonstrated its byte-preserving round trip, minted only by
+/// [`KaniFileContentObservation::demonstrate_round_trip`].
+pub struct KaniFileContentWitnessToken(());
+
+impl ProofToken for KaniFileContentWitnessToken {
+    type Proposition = KaniFileContentObservation;
+}
+
+impl KaniFileContentObservation {
+    /// Assert the bytes read back match what was written. Consumes
+    /// `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_round_trip(self, bytes: [u8; 4]) -> KaniFileContentWitnessToken {
+        assert_eq!(
+            self.read(),
+            bytes,
+            "bytes written to a file are read back unchanged through a fresh handle"
+        );
+        KaniFileContentWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<File>`'s write/read round-trip
 /// claim has been established from a `KaniFileContentObservation` that has
 /// itself demonstrated the byte-preserving round trip.
@@ -206,10 +276,10 @@ impl ProofToken for RustStdFileContentToken {
     type Proposition = RustStdStandard<File>;
 }
 
-impl Establish<KaniFileContentObservation, KaniVerifier> for RustStdStandard<File> {
+impl Establish<KaniFileContentWitnessToken, KaniVerifier> for RustStdStandard<File> {
     type Token = RustStdFileContentToken;
 
-    fn establish(_credential: &KaniFileContentObservation) -> Self::Token {
+    fn establish(_credential: KaniFileContentWitnessToken) -> Self::Token {
         RustStdFileContentToken(())
     }
 }
@@ -229,14 +299,9 @@ amenable_derive::harness! {
         fn verify_file_write_then_read_round_trips_the_bytes() {
             let bytes: [u8; 4] = kani::any();
             let observation = crate::KaniFileContentObservation::write(bytes);
+            let demonstration = observation.demonstrate_round_trip(bytes);
 
-            assert_eq!(
-                observation.read(),
-                bytes,
-                "bytes written to a file are read back unchanged through a fresh handle"
-            );
-
-            let _token = RustStdStandard::<File>::establish(&observation);
+            let _token = RustStdStandard::<File>::establish(demonstration);
         }
     }
 }
@@ -264,6 +329,34 @@ bridge_kani_witness!(RustStdStandard<FileTimes>);
     }
 }
 
+/// Witness that a `KaniFileTimesObservation` instance actually
+/// demonstrated the exact time reflection, minted only by
+/// [`KaniFileTimesObservation::demonstrate_modification_time`].
+pub struct KaniFileTimesWitnessToken(());
+
+impl ProofToken for KaniFileTimesWitnessToken {
+    type Proposition = KaniFileTimesObservation;
+}
+
+impl KaniFileTimesObservation {
+    /// Assert the recorded modification time matches the target exactly.
+    /// Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_modification_time(
+        self,
+        target_unix_seconds: u64,
+    ) -> KaniFileTimesWitnessToken {
+        assert_eq!(
+            self.modified(),
+            target_unix_seconds,
+            "the target modification time is reflected exactly in metadata"
+        );
+        KaniFileTimesWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<FileTimes>`'s modification-time
 /// claim has been established from a `KaniFileTimesObservation` that has
 /// itself demonstrated the exact time reflection.
@@ -273,10 +366,10 @@ impl ProofToken for RustStdFileTimesToken {
     type Proposition = RustStdStandard<FileTimes>;
 }
 
-impl Establish<KaniFileTimesObservation, KaniVerifier> for RustStdStandard<FileTimes> {
+impl Establish<KaniFileTimesWitnessToken, KaniVerifier> for RustStdStandard<FileTimes> {
     type Token = RustStdFileTimesToken;
 
-    fn establish(_credential: &KaniFileTimesObservation) -> Self::Token {
+    fn establish(_credential: KaniFileTimesWitnessToken) -> Self::Token {
         RustStdFileTimesToken(())
     }
 }
@@ -298,14 +391,9 @@ amenable_derive::harness! {
         fn verify_file_times_sets_the_recorded_modification_time() {
             let target_unix_seconds: u64 = kani::any();
             let observation = crate::KaniFileTimesObservation::set_modified(target_unix_seconds);
+            let demonstration = observation.demonstrate_modification_time(target_unix_seconds);
 
-            assert_eq!(
-                observation.modified(),
-                target_unix_seconds,
-                "the target modification time is reflected exactly in metadata"
-            );
-
-            let _token = RustStdStandard::<FileTimes>::establish(&observation);
+            let _token = RustStdStandard::<FileTimes>::establish(demonstration);
         }
     }
 }
@@ -333,6 +421,31 @@ bridge_kani_witness!(RustStdStandard<FileType>);
     }
 }
 
+/// Witness that a `KaniFileTypeObservation` instance actually demonstrated
+/// the file/directory mutual exclusion, minted only by
+/// [`KaniFileTypeObservation::demonstrate_distinction`].
+pub struct KaniFileTypeWitnessToken(());
+
+impl ProofToken for KaniFileTypeWitnessToken {
+    type Proposition = KaniFileTypeObservation;
+}
+
+impl KaniFileTypeObservation {
+    /// Assert a file reports `is_file()` but not `is_dir()`, and a
+    /// directory the reverse. Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_distinction(self) -> KaniFileTypeWitnessToken {
+        assert!(self.file_is_file());
+        assert!(!self.file_is_dir());
+
+        assert!(self.directory_is_dir());
+        assert!(!self.directory_is_file());
+        KaniFileTypeWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<FileType>`'s file/directory
 /// distinction claim has been established from a `KaniFileTypeObservation`
 /// that has itself demonstrated the mutual exclusion.
@@ -342,10 +455,10 @@ impl ProofToken for RustStdFileTypeToken {
     type Proposition = RustStdStandard<FileType>;
 }
 
-impl Establish<KaniFileTypeObservation, KaniVerifier> for RustStdStandard<FileType> {
+impl Establish<KaniFileTypeWitnessToken, KaniVerifier> for RustStdStandard<FileType> {
     type Token = RustStdFileTypeToken;
 
-    fn establish(_credential: &KaniFileTypeObservation) -> Self::Token {
+    fn establish(_credential: KaniFileTypeWitnessToken) -> Self::Token {
         RustStdFileTypeToken(())
     }
 }
@@ -364,14 +477,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_file_type_distinguishes_files_from_directories() {
             let observation = crate::KaniFileTypeObservation::new();
+            let demonstration = observation.demonstrate_distinction();
 
-            assert!(observation.file_is_file());
-            assert!(!observation.file_is_dir());
-
-            assert!(observation.directory_is_dir());
-            assert!(!observation.directory_is_file());
-
-            let _token = RustStdStandard::<FileType>::establish(&observation);
+            let _token = RustStdStandard::<FileType>::establish(demonstration);
         }
     }
 }
@@ -399,6 +507,32 @@ bridge_kani_witness!(RustStdStandard<Metadata>);
     }
 }
 
+/// Witness that a `KaniFileLenObservation` instance actually demonstrated
+/// the exact written byte count, minted only by
+/// [`KaniFileLenObservation::demonstrate_length`].
+pub struct KaniFileLenWitnessToken(());
+
+impl ProofToken for KaniFileLenWitnessToken {
+    type Proposition = KaniFileLenObservation;
+}
+
+impl KaniFileLenObservation {
+    /// Assert `.len()`/`.is_empty()` report exactly the written byte
+    /// count. Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_length(self, byte_count: u8) -> KaniFileLenWitnessToken {
+        assert_eq!(
+            self.len(),
+            u64::from(byte_count),
+            "metadata reports exactly the number of bytes written"
+        );
+        assert_eq!(self.is_empty(), byte_count == 0);
+        KaniFileLenWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Metadata>`'s written-length
 /// claim has been established from a `KaniFileLenObservation` that has
 /// itself demonstrated the exact byte count.
@@ -408,10 +542,10 @@ impl ProofToken for RustStdMetadataLenToken {
     type Proposition = RustStdStandard<Metadata>;
 }
 
-impl Establish<KaniFileLenObservation, KaniVerifier> for RustStdStandard<Metadata> {
+impl Establish<KaniFileLenWitnessToken, KaniVerifier> for RustStdStandard<Metadata> {
     type Token = RustStdMetadataLenToken;
 
-    fn establish(_credential: &KaniFileLenObservation) -> Self::Token {
+    fn establish(_credential: KaniFileLenWitnessToken) -> Self::Token {
         RustStdMetadataLenToken(())
     }
 }
@@ -431,15 +565,9 @@ amenable_derive::harness! {
         fn verify_metadata_reports_the_written_length() {
             let byte_count: u8 = kani::any();
             let observation = crate::KaniFileLenObservation::write(byte_count);
+            let demonstration = observation.demonstrate_length(byte_count);
 
-            assert_eq!(
-                observation.len(),
-                u64::from(byte_count),
-                "metadata reports exactly the number of bytes written"
-            );
-            assert_eq!(observation.is_empty(), byte_count == 0);
-
-            let _token = RustStdStandard::<Metadata>::establish(&observation);
+            let _token = RustStdStandard::<Metadata>::establish(demonstration);
         }
     }
 }
@@ -467,6 +595,49 @@ bridge_kani_witness!(RustStdStandard<OpenOptions>);
     }
 }
 
+/// Witness that a `KaniCreateNewObservation` instance actually demonstrated
+/// a successful creation against a fresh path, having also confirmed the
+/// same operation rejects an already-occupied one, minted only by
+/// [`KaniCreateNewObservation::demonstrate_creation_succeeds`].
+pub struct KaniCreateNewWitnessToken(());
+
+impl ProofToken for KaniCreateNewWitnessToken {
+    type Proposition = KaniCreateNewObservation;
+}
+
+impl KaniCreateNewObservation {
+    /// Assert `.create_new()` fails against `existing` and
+    /// `existing_directory`, then assert it succeeds against `self` (a
+    /// fresh path) and leaves a file there. Consumes all three: the only
+    /// way to obtain the token is to have run this check against real
+    /// observation instances, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_creation_succeeds(
+        mut self,
+        mut existing: KaniCreateNewObservation,
+        mut existing_directory: KaniCreateNewObservation,
+    ) -> KaniCreateNewWitnessToken {
+        assert!(
+            existing.create_new().is_err(),
+            "create_new fails against a path that already has a file"
+        );
+        assert!(
+            existing_directory.create_new().is_err(),
+            "create_new also fails when the path already names a directory"
+        );
+
+        assert!(
+            self.create_new().is_ok(),
+            "create_new succeeds against a genuinely fresh path"
+        );
+        assert!(
+            self.is_file(),
+            "a successful create_new leaves a file at the created path"
+        );
+        KaniCreateNewWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<OpenOptions>`'s `create_new`
 /// existence-check claim has been established from a `KaniCreateNewObservation`
 /// that has itself demonstrated the successful-creation transition.
@@ -476,10 +647,10 @@ impl ProofToken for RustStdOpenOptionsCreateNewToken {
     type Proposition = RustStdStandard<OpenOptions>;
 }
 
-impl Establish<KaniCreateNewObservation, KaniVerifier> for RustStdStandard<OpenOptions> {
+impl Establish<KaniCreateNewWitnessToken, KaniVerifier> for RustStdStandard<OpenOptions> {
     type Token = RustStdOpenOptionsCreateNewToken;
 
-    fn establish(_credential: &KaniCreateNewObservation) -> Self::Token {
+    fn establish(_credential: KaniCreateNewWitnessToken) -> Self::Token {
         RustStdOpenOptionsCreateNewToken(())
     }
 }
@@ -497,29 +668,12 @@ amenable_derive::harness! {
         /// asserted independently of it.
         #[kani::proof]
         fn verify_open_options_create_new_rejects_an_existing_file() {
-            let mut existing = crate::KaniCreateNewObservation::existing_file();
-            let mut existing_directory = crate::KaniCreateNewObservation::existing_directory();
-            let mut fresh = crate::KaniCreateNewObservation::missing();
+            let existing = crate::KaniCreateNewObservation::existing_file();
+            let existing_directory = crate::KaniCreateNewObservation::existing_directory();
+            let fresh = crate::KaniCreateNewObservation::missing();
+            let demonstration = fresh.demonstrate_creation_succeeds(existing, existing_directory);
 
-            assert!(
-                existing.create_new().is_err(),
-                "create_new fails against a path that already has a file"
-            );
-            assert!(
-                existing_directory.create_new().is_err(),
-                "create_new also fails when the path already names a directory"
-            );
-
-            assert!(
-                fresh.create_new().is_ok(),
-                "create_new succeeds against a genuinely fresh path"
-            );
-            assert!(
-                fresh.is_file(),
-                "a successful create_new leaves a file at the created path"
-            );
-
-            let _token = RustStdStandard::<OpenOptions>::establish(&fresh);
+            let _token = RustStdStandard::<OpenOptions>::establish(demonstration);
         }
     }
 }
@@ -547,6 +701,37 @@ bridge_kani_witness!(RustStdStandard<Permissions>);
     }
 }
 
+/// Witness that a `KaniPermissionsObservation` instance actually
+/// demonstrated the readonly round trip in both directions, minted only by
+/// [`KaniPermissionsObservation::demonstrate_readonly_round_trip`].
+pub struct KaniPermissionsWitnessToken(());
+
+impl ProofToken for KaniPermissionsWitnessToken {
+    type Proposition = KaniPermissionsObservation;
+}
+
+impl KaniPermissionsObservation {
+    /// Assert a fresh file isn't readonly, then assert setting and
+    /// clearing readonly are each reflected the next time permissions are
+    /// read. Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_readonly_round_trip(mut self) -> KaniPermissionsWitnessToken {
+        assert!(!self.readonly(), "a freshly created file is not readonly");
+
+        self.set_readonly(true);
+        assert!(
+            self.readonly(),
+            "setting readonly is reflected the next time permissions are read"
+        );
+
+        self.set_readonly(false);
+        assert!(!self.readonly(), "clearing readonly is reflected as well");
+        KaniPermissionsWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Permissions>`'s readonly
 /// round-trip claim has been established from a `KaniPermissionsObservation`
 /// that has itself demonstrated the round trip in both directions.
@@ -556,10 +741,10 @@ impl ProofToken for RustStdPermissionsToken {
     type Proposition = RustStdStandard<Permissions>;
 }
 
-impl Establish<KaniPermissionsObservation, KaniVerifier> for RustStdStandard<Permissions> {
+impl Establish<KaniPermissionsWitnessToken, KaniVerifier> for RustStdStandard<Permissions> {
     type Token = RustStdPermissionsToken;
 
-    fn establish(_credential: &KaniPermissionsObservation) -> Self::Token {
+    fn establish(_credential: KaniPermissionsWitnessToken) -> Self::Token {
         RustStdPermissionsToken(())
     }
 }
@@ -578,19 +763,10 @@ amenable_derive::harness! {
         /// in both directions, rather than asserted independently of it.
         #[kani::proof]
         fn verify_permissions_readonly_round_trips_through_set_permissions() {
-            let mut observation = crate::KaniPermissionsObservation::new();
-            assert!(!observation.readonly(), "a freshly created file is not readonly");
+            let observation = crate::KaniPermissionsObservation::new();
+            let demonstration = observation.demonstrate_readonly_round_trip();
 
-            observation.set_readonly(true);
-            assert!(
-                observation.readonly(),
-                "setting readonly is reflected the next time permissions are read"
-            );
-
-            observation.set_readonly(false);
-            assert!(!observation.readonly(), "clearing readonly is reflected as well");
-
-            let _token = RustStdStandard::<Permissions>::establish(&observation);
+            let _token = RustStdStandard::<Permissions>::establish(demonstration);
         }
     }
 }
@@ -618,6 +794,38 @@ bridge_kani_witness!(RustStdStandard<ReadDir>);
     }
 }
 
+/// Witness that a `KaniReadDirObservation` instance actually demonstrated
+/// exactly the created entries, minted only by
+/// [`KaniReadDirObservation::demonstrate_completeness`].
+pub struct KaniReadDirWitnessToken(());
+
+impl ProofToken for KaniReadDirWitnessToken {
+    type Proposition = KaniReadDirObservation;
+}
+
+impl KaniReadDirObservation {
+    /// Assert `.entries()` yields exactly the two created entries, in
+    /// order. Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_completeness(
+        self,
+        first_name: crate::KaniFsLabel,
+        second_name: crate::KaniFsLabel,
+    ) -> KaniReadDirWitnessToken {
+        let entries = self.entries();
+        assert_eq!(
+            entries.len(),
+            2,
+            "read_dir yields exactly the created entries"
+        );
+        assert_eq!(entries[0].file_name(), Some(first_name));
+        assert_eq!(entries[1].file_name(), Some(second_name));
+        KaniReadDirWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ReadDir>`'s entry-completeness
 /// claim has been established from a `KaniReadDirObservation` that has
 /// itself demonstrated exactly the created entries.
@@ -627,10 +835,10 @@ impl ProofToken for RustStdReadDirToken {
     type Proposition = RustStdStandard<ReadDir>;
 }
 
-impl Establish<KaniReadDirObservation, KaniVerifier> for RustStdStandard<ReadDir> {
+impl Establish<KaniReadDirWitnessToken, KaniVerifier> for RustStdStandard<ReadDir> {
     type Token = RustStdReadDirToken;
 
-    fn establish(_credential: &KaniReadDirObservation) -> Self::Token {
+    fn establish(_credential: KaniReadDirWitnessToken) -> Self::Token {
         RustStdReadDirToken(())
     }
 }
@@ -652,13 +860,9 @@ amenable_derive::harness! {
             let one = crate::KaniFsLabel::new('1');
             let two = crate::KaniFsLabel::new('2');
             let observation = crate::KaniReadDirObservation::new(base, one, two);
-            let entries = observation.entries();
+            let demonstration = observation.demonstrate_completeness(one, two);
 
-            assert_eq!(entries.len(), 2, "read_dir yields exactly the created entries");
-            assert_eq!(entries[0].file_name(), Some(one));
-            assert_eq!(entries[1].file_name(), Some(two));
-
-            let _token = RustStdStandard::<ReadDir>::establish(&observation);
+            let _token = RustStdStandard::<ReadDir>::establish(demonstration);
         }
     }
 }
@@ -688,6 +892,35 @@ bridge_kani_witness!(RustStdStandard<std::fs::TryLockError>);
     }
 }
 
+/// Witness that a `KaniLockObservation` instance actually demonstrated a
+/// second handle failing to acquire an already-held lock, minted only by
+/// [`KaniLockObservation::demonstrate_exclusion`].
+pub struct KaniLockWitnessToken(());
+
+impl ProofToken for KaniLockWitnessToken {
+    type Proposition = KaniLockObservation;
+}
+
+impl KaniLockObservation {
+    /// Assert the first `.try_lock()` succeeds and a second fails while
+    /// the lock is still held. Consumes `self` for the same reason
+    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_exclusion(mut self) -> KaniLockWitnessToken {
+        assert!(
+            self.try_lock().is_ok(),
+            "the first handle acquires the lock"
+        );
+
+        assert!(
+            self.try_lock().is_err(),
+            "a second handle can't also lock the same file"
+        );
+        KaniLockWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::fs::TryLockError>`'s
 /// mutual-exclusion claim has been established from a
 /// `KaniLockObservation` that has itself demonstrated a second handle
@@ -698,10 +931,10 @@ impl ProofToken for RustStdTryLockErrorToken {
     type Proposition = RustStdStandard<std::fs::TryLockError>;
 }
 
-impl Establish<KaniLockObservation, KaniVerifier> for RustStdStandard<std::fs::TryLockError> {
+impl Establish<KaniLockWitnessToken, KaniVerifier> for RustStdStandard<std::fs::TryLockError> {
     type Token = RustStdTryLockErrorToken;
 
-    fn establish(_credential: &KaniLockObservation) -> Self::Token {
+    fn establish(_credential: KaniLockWitnessToken) -> Self::Token {
         RustStdTryLockErrorToken(())
     }
 }
@@ -719,16 +952,10 @@ amenable_derive::harness! {
         /// asserted independently of it.
         #[kani::proof]
         fn verify_try_lock_error_reports_a_lock_already_held() {
-            let mut file = crate::KaniLockObservation::new();
-            assert!(file.try_lock().is_ok(), "the first handle acquires the lock");
+            let file = crate::KaniLockObservation::new();
+            let demonstration = file.demonstrate_exclusion();
 
-            assert!(
-                file.try_lock().is_err(),
-                "a second handle can't also lock the same file"
-            );
-
-            let _token =
-                RustStdStandard::<std::fs::TryLockError>::establish(&file);
+            let _token = RustStdStandard::<std::fs::TryLockError>::establish(demonstration);
         }
     }
 }
