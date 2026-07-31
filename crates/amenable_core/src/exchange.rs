@@ -33,13 +33,24 @@ pub trait Sidecar {
 /// different mode than doing), but it does mean an `Establish` impl cannot
 /// exist unless a matching `Witness<V>` impl — naming which proof backs
 /// it — exists alongside it.
-pub trait Establish<C, V: Verifier>: Evidence + Witness<V> + Sized {
+///
+/// Bounding `C` on [`ProofToken`] is the actual obligation gate: the only
+/// way to hold a value of a `ProofToken` type is to have obtained one from
+/// an earlier lawful `establish()` call (every `ProofToken` implementor's
+/// fields are private), so a caller can never mint a token from a bare
+/// domain value that never demonstrated anything. Taking `credential` by
+/// value (rather than by reference) means minting also consumes the prior
+/// token, so it cannot be replayed against a second `establish` call.
+pub trait Establish<C, V: Verifier>: Evidence + Witness<V> + Sized
+where
+    C: ProofToken,
+{
     /// Concrete proof token minted for this evidence.
     type Token: ProofToken<Proposition = Self>;
 
     /// Mint a proof token from a lawful credential.
     #[track_caller]
-    fn establish(credential: &C) -> Self::Token;
+    fn establish(credential: C) -> Self::Token;
 }
 
 /// Lawful proof-bearing exchange from one sidecar state to another.
