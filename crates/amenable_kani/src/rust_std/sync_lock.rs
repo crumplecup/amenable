@@ -46,6 +46,35 @@ bridge_kani_witness!(RustStdStandard<std::sync::Mutex<i32>>);
     }
 }
 
+/// Witness that a `KaniMutexExclusionObservation` instance actually
+/// demonstrated the held-value and exclusion behavior, minted only by
+/// [`KaniMutexExclusionObservation::demonstrate_exclusion`].
+pub struct KaniMutexExclusionWitnessToken(());
+
+impl ProofToken for KaniMutexExclusionWitnessToken {
+    type Proposition = KaniMutexExclusionObservation;
+}
+
+impl KaniMutexExclusionObservation {
+    /// Assert the held value derefs correctly and a second `try_lock`
+    /// fails while held but succeeds after release. Consumes `self`: the
+    /// only way to obtain the token is to have run this check against a
+    /// real observation instance, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_exclusion(self, value: i32) -> KaniMutexExclusionWitnessToken {
+        assert_eq!(self.held_value(), value, "lock derefs to the wrapped value");
+        assert!(
+            self.try_lock_while_held_is_err(),
+            "try_lock fails while a guard is already held"
+        );
+        assert!(
+            self.try_lock_after_release_is_ok(),
+            "try_lock succeeds once the guard is dropped"
+        );
+        KaniMutexExclusionWitnessToken(())
+    }
+}
+
 /// Lawful token minted once
 /// `RustStdStandard<std::sync::Mutex<i32>>`'s exclusion claim has been
 /// established from a `KaniMutexExclusionObservation`.
@@ -55,12 +84,12 @@ impl ProofToken for RustStdMutexToken {
     type Proposition = RustStdStandard<std::sync::Mutex<i32>>;
 }
 
-impl Establish<KaniMutexExclusionObservation, KaniVerifier>
+impl Establish<KaniMutexExclusionWitnessToken, KaniVerifier>
     for RustStdStandard<std::sync::Mutex<i32>>
 {
     type Token = RustStdMutexToken;
 
-    fn establish(_credential: &KaniMutexExclusionObservation) -> Self::Token {
+    fn establish(_credential: KaniMutexExclusionWitnessToken) -> Self::Token {
         RustStdMutexToken(())
     }
 }
@@ -79,22 +108,9 @@ amenable_derive::harness! {
         fn verify_mutex_excludes_a_second_lock_while_held() {
             let value: i32 = kani::any();
             let observation = KaniMutexExclusionObservation::new(value);
+            let demonstration = observation.demonstrate_exclusion(value);
 
-            assert_eq!(
-                observation.held_value(),
-                value,
-                "lock derefs to the wrapped value"
-            );
-            assert!(
-                observation.try_lock_while_held_is_err(),
-                "try_lock fails while a guard is already held"
-            );
-            assert!(
-                observation.try_lock_after_release_is_ok(),
-                "try_lock succeeds once the guard is dropped"
-            );
-
-            let _token = RustStdStandard::<std::sync::Mutex<i32>>::establish(&observation);
+            let _token = RustStdStandard::<std::sync::Mutex<i32>>::establish(demonstration);
         }
     }
 }
@@ -478,6 +494,29 @@ bridge_kani_witness!(RustStdStandard<Barrier>);
     }
 }
 
+/// Witness that a `KaniBarrierLeaderObservation` instance actually
+/// demonstrated the sole participant's leadership, minted only by
+/// [`KaniBarrierLeaderObservation::demonstrate_leadership`] — shared by
+/// every `Establish` impl claiming this exact one-party leader shape
+/// (`Barrier` and `BarrierWaitResult` both reduce to the identical
+/// `is_leader()` check).
+pub struct KaniBarrierLeaderWitnessToken(());
+
+impl ProofToken for KaniBarrierLeaderWitnessToken {
+    type Proposition = KaniBarrierLeaderObservation;
+}
+
+impl KaniBarrierLeaderObservation {
+    /// Assert the sole participant is the leader. Consumes `self` for
+    /// the same reason
+    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[must_use]
+    pub fn demonstrate_leadership(self) -> KaniBarrierLeaderWitnessToken {
+        assert!(self.is_leader(), "the sole participant is the leader");
+        KaniBarrierLeaderWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Barrier>`'s one-party leader
 /// claim has been established from a `KaniBarrierLeaderObservation`.
 pub struct RustStdBarrierToken(());
@@ -486,10 +525,10 @@ impl ProofToken for RustStdBarrierToken {
     type Proposition = RustStdStandard<Barrier>;
 }
 
-impl Establish<KaniBarrierLeaderObservation, KaniVerifier> for RustStdStandard<Barrier> {
+impl Establish<KaniBarrierLeaderWitnessToken, KaniVerifier> for RustStdStandard<Barrier> {
     type Token = RustStdBarrierToken;
 
-    fn establish(_credential: &KaniBarrierLeaderObservation) -> Self::Token {
+    fn establish(_credential: KaniBarrierLeaderWitnessToken) -> Self::Token {
         RustStdBarrierToken(())
     }
 }
@@ -507,9 +546,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_barrier_of_one_is_its_own_leader() {
             let observation = KaniBarrierLeaderObservation::sole_participant();
-            assert!(observation.is_leader(), "the sole participant is the leader");
+            let demonstration = observation.demonstrate_leadership();
 
-            let _token = RustStdStandard::<Barrier>::establish(&observation);
+            let _token = RustStdStandard::<Barrier>::establish(demonstration);
         }
     }
 }
@@ -545,10 +584,10 @@ impl ProofToken for RustStdBarrierWaitResultToken {
     type Proposition = RustStdStandard<BarrierWaitResult>;
 }
 
-impl Establish<KaniBarrierLeaderObservation, KaniVerifier> for RustStdStandard<BarrierWaitResult> {
+impl Establish<KaniBarrierLeaderWitnessToken, KaniVerifier> for RustStdStandard<BarrierWaitResult> {
     type Token = RustStdBarrierWaitResultToken;
 
-    fn establish(_credential: &KaniBarrierLeaderObservation) -> Self::Token {
+    fn establish(_credential: KaniBarrierLeaderWitnessToken) -> Self::Token {
         RustStdBarrierWaitResultToken(())
     }
 }
@@ -566,9 +605,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_barrier_wait_result_reports_the_sole_participant_as_leader() {
             let observation = KaniBarrierLeaderObservation::sole_participant();
-            assert!(observation.is_leader());
+            let demonstration = observation.demonstrate_leadership();
 
-            let _token = RustStdStandard::<BarrierWaitResult>::establish(&observation);
+            let _token = RustStdStandard::<BarrierWaitResult>::establish(demonstration);
         }
     }
 }
@@ -596,6 +635,29 @@ bridge_kani_witness!(RustStdStandard<std::sync::Condvar>);
     }
 }
 
+/// Witness that a `KaniWaitTimeoutObservation` instance actually
+/// demonstrated a never-notified wait timing out, minted only by
+/// [`KaniWaitTimeoutObservation::demonstrate_timeout`] — shared by every
+/// `Establish` impl claiming this exact timeout shape (`Condvar` and
+/// `WaitTimeoutResult` both reduce to the identical `did_time_out()`
+/// check).
+pub struct KaniWaitTimeoutWitnessToken(());
+
+impl ProofToken for KaniWaitTimeoutWitnessToken {
+    type Proposition = KaniWaitTimeoutObservation;
+}
+
+impl KaniWaitTimeoutObservation {
+    /// Assert a never-notified wait times out. Consumes `self` for the
+    /// same reason
+    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[must_use]
+    pub fn demonstrate_timeout(self) -> KaniWaitTimeoutWitnessToken {
+        assert!(self.did_time_out(), "a never-notified wait times out");
+        KaniWaitTimeoutWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<std::sync::Condvar>`'s
 /// timed-wait claim has been established from a `KaniWaitTimeoutObservation`.
 pub struct RustStdCondvarToken(());
@@ -604,10 +666,10 @@ impl ProofToken for RustStdCondvarToken {
     type Proposition = RustStdStandard<std::sync::Condvar>;
 }
 
-impl Establish<KaniWaitTimeoutObservation, KaniVerifier> for RustStdStandard<std::sync::Condvar> {
+impl Establish<KaniWaitTimeoutWitnessToken, KaniVerifier> for RustStdStandard<std::sync::Condvar> {
     type Token = RustStdCondvarToken;
 
-    fn establish(_credential: &KaniWaitTimeoutObservation) -> Self::Token {
+    fn establish(_credential: KaniWaitTimeoutWitnessToken) -> Self::Token {
         RustStdCondvarToken(())
     }
 }
@@ -625,9 +687,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_condvar_wait_timeout_reports_timing_out() {
             let observation = KaniWaitTimeoutObservation::timed_out();
-            assert!(observation.did_time_out(), "a never-notified wait times out");
+            let demonstration = observation.demonstrate_timeout();
 
-            let _token = RustStdStandard::<std::sync::Condvar>::establish(&observation);
+            let _token = RustStdStandard::<std::sync::Condvar>::establish(demonstration);
         }
     }
 }
@@ -656,6 +718,33 @@ bridge_kani_witness!(RustStdStandard<PoisonError<MutexGuard<'static, i32>>>);
     }
 }
 
+/// Witness that a `KaniMutexFailureObservation` instance actually
+/// demonstrated recovering the guard's value from the poisoned case,
+/// minted only by [`KaniMutexFailureObservation::demonstrate_poisoned_recovery`].
+pub struct KaniMutexPoisonedRecoveryWitnessToken(());
+
+impl ProofToken for KaniMutexPoisonedRecoveryWitnessToken {
+    type Proposition = KaniMutexFailureObservation;
+}
+
+impl KaniMutexFailureObservation {
+    /// Assert `into_inner` still recovers the guard's value in the
+    /// poisoned case. Consumes `self` for the same reason
+    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[must_use]
+    pub fn demonstrate_poisoned_recovery(
+        self,
+        recovered_value: i32,
+    ) -> KaniMutexPoisonedRecoveryWitnessToken {
+        assert_eq!(
+            self.poisoned_recovered_value(),
+            recovered_value,
+            "into_inner still recovers the guard's value"
+        );
+        KaniMutexPoisonedRecoveryWitnessToken(())
+    }
+}
+
 /// Lawful token minted once
 /// `RustStdStandard<PoisonError<MutexGuard<'static, i32>>>`'s recovery claim
 /// has been established from a `KaniMutexFailureObservation`.
@@ -665,12 +754,12 @@ impl ProofToken for RustStdPoisonErrorToken {
     type Proposition = RustStdStandard<PoisonError<MutexGuard<'static, i32>>>;
 }
 
-impl Establish<KaniMutexFailureObservation, KaniVerifier>
+impl Establish<KaniMutexPoisonedRecoveryWitnessToken, KaniVerifier>
     for RustStdStandard<PoisonError<MutexGuard<'static, i32>>>
 {
     type Token = RustStdPoisonErrorToken;
 
-    fn establish(_credential: &KaniMutexFailureObservation) -> Self::Token {
+    fn establish(_credential: KaniMutexPoisonedRecoveryWitnessToken) -> Self::Token {
         RustStdPoisonErrorToken(())
     }
 }
@@ -692,15 +781,10 @@ amenable_derive::harness! {
             let recovered_value: i32 = kani::any();
             let held_value: i32 = kani::any();
             let observation = KaniMutexFailureObservation::new(recovered_value, held_value);
-
-            assert_eq!(
-                observation.poisoned_recovered_value(),
-                recovered_value,
-                "into_inner still recovers the guard's value"
-            );
+            let demonstration = observation.demonstrate_poisoned_recovery(recovered_value);
 
             let _token = RustStdStandard::<PoisonError<MutexGuard<'static, i32>>>::establish(
-                &observation,
+                demonstration,
             );
         }
     }
@@ -730,6 +814,49 @@ bridge_kani_witness!(RustStdStandard<std::sync::TryLockError<MutexGuard<'static,
     }
 }
 
+/// Witness that a `KaniMutexFailureObservation` instance actually
+/// demonstrated both `try_lock` failure classes (`Poisoned` and
+/// `WouldBlock`), minted only by
+/// [`KaniMutexFailureObservation::demonstrate_failure_classes`].
+pub struct KaniMutexFailureClassesWitnessToken(());
+
+impl ProofToken for KaniMutexFailureClassesWitnessToken {
+    type Proposition = KaniMutexFailureObservation;
+}
+
+impl KaniMutexFailureObservation {
+    /// Assert the poisoned case reports `Poisoned` and preserves the
+    /// guarded value, and the already-held case reports `WouldBlock` and
+    /// keeps the wrapped value. Consumes `self` for the same reason
+    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[must_use]
+    pub fn demonstrate_failure_classes(
+        self,
+        poisoned_value: i32,
+        held_value: i32,
+    ) -> KaniMutexFailureClassesWitnessToken {
+        assert!(
+            self.poisoned_case_reports_poisoned(),
+            "the poisoned case reports Poisoned"
+        );
+        assert_eq!(
+            self.poisoned_recovered_value(),
+            poisoned_value,
+            "the poisoned case preserves the guarded value"
+        );
+        assert!(
+            self.held_case_reports_would_block(),
+            "the already-held case reports WouldBlock"
+        );
+        assert_eq!(
+            self.held_value(),
+            held_value,
+            "the held case keeps the wrapped value"
+        );
+        KaniMutexFailureClassesWitnessToken(())
+    }
+}
+
 /// Lawful token minted once
 /// `RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>`'s
 /// failure-classification claim has been established from a
@@ -740,12 +867,12 @@ impl ProofToken for RustStdTryLockErrorToken {
     type Proposition = RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>;
 }
 
-impl Establish<KaniMutexFailureObservation, KaniVerifier>
+impl Establish<KaniMutexFailureClassesWitnessToken, KaniVerifier>
     for RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>
 {
     type Token = RustStdTryLockErrorToken;
 
-    fn establish(_credential: &KaniMutexFailureObservation) -> Self::Token {
+    fn establish(_credential: KaniMutexFailureClassesWitnessToken) -> Self::Token {
         RustStdTryLockErrorToken(())
     }
 }
@@ -768,29 +895,11 @@ amenable_derive::harness! {
             let poisoned_value: i32 = kani::any();
             let held_value: i32 = kani::any();
             let observation = KaniMutexFailureObservation::new(poisoned_value, held_value);
-
-            assert!(
-                observation.poisoned_case_reports_poisoned(),
-                "the poisoned case reports Poisoned"
-            );
-            assert_eq!(
-                observation.poisoned_recovered_value(),
-                poisoned_value,
-                "the poisoned case preserves the guarded value"
-            );
-            assert!(
-                observation.held_case_reports_would_block(),
-                "the already-held case reports WouldBlock"
-            );
-            assert_eq!(
-                observation.held_value(),
-                held_value,
-                "the held case keeps the wrapped value"
-            );
+            let demonstration = observation.demonstrate_failure_classes(poisoned_value, held_value);
 
             let _token =
                 RustStdStandard::<std::sync::TryLockError<MutexGuard<'static, i32>>>::establish(
-                    &observation,
+                    demonstration,
                 );
         }
     }
@@ -827,10 +936,10 @@ impl ProofToken for RustStdWaitTimeoutResultToken {
     type Proposition = RustStdStandard<WaitTimeoutResult>;
 }
 
-impl Establish<KaniWaitTimeoutObservation, KaniVerifier> for RustStdStandard<WaitTimeoutResult> {
+impl Establish<KaniWaitTimeoutWitnessToken, KaniVerifier> for RustStdStandard<WaitTimeoutResult> {
     type Token = RustStdWaitTimeoutResultToken;
 
-    fn establish(_credential: &KaniWaitTimeoutObservation) -> Self::Token {
+    fn establish(_credential: KaniWaitTimeoutWitnessToken) -> Self::Token {
         RustStdWaitTimeoutResultToken(())
     }
 }
@@ -848,9 +957,9 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_wait_timeout_result_reports_timed_out() {
             let observation = KaniWaitTimeoutObservation::timed_out();
-            assert!(observation.did_time_out());
+            let demonstration = observation.demonstrate_timeout();
 
-            let _token = RustStdStandard::<WaitTimeoutResult>::establish(&observation);
+            let _token = RustStdStandard::<WaitTimeoutResult>::establish(demonstration);
         }
     }
 }
