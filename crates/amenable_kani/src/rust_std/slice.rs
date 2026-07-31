@@ -529,6 +529,52 @@ bridge_kani_witness!(RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> boo
     }
 }
 
+/// Witness that a `KaniChunkByObservation<i32>` instance actually
+/// demonstrated its grouped-or-split pair shape, minted only by
+/// [`KaniChunkByObservation::demonstrate_grouping`].
+pub struct KaniChunkByWitnessToken(());
+
+impl ProofToken for KaniChunkByWitnessToken {
+    type Proposition = KaniChunkByObservation<i32>;
+}
+
+impl KaniChunkByObservation<i32> {
+    /// Assert the grouped-or-split pair shape the observation's own
+    /// construction implies, then mint the witness. Consumes `self`: the
+    /// only way to obtain the token is to have run this check against a
+    /// real observation instance, not to assert it independently.
+    #[must_use]
+    pub fn demonstrate_grouping(
+        self,
+        a: i32,
+        b: i32,
+        grouped_together: bool,
+    ) -> KaniChunkByWitnessToken {
+        assert_eq!(self.first(), a);
+        assert_eq!(self.second(), b);
+        if grouped_together {
+            assert_eq!(
+                self.first_chunk_len(),
+                2,
+                "matching adjacent elements are grouped together"
+            );
+            assert_eq!(self.trailing_chunk_len(), None);
+        } else {
+            assert_eq!(
+                self.first_chunk_len(),
+                1,
+                "a non-matching pair starts a new chunk"
+            );
+            assert_eq!(
+                self.trailing_chunk_len(),
+                Some(1),
+                "the trailing element becomes its own one-element chunk"
+            );
+        }
+        KaniChunkByWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<ChunkBy<'static, i32, ...>>`'s
 /// adjacent-grouping claim has been established from a
 /// `KaniChunkByObservation<i32>` that has itself demonstrated the grouped or
@@ -539,12 +585,12 @@ impl ProofToken for RustStdChunkByToken {
     type Proposition = RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>;
 }
 
-impl Establish<KaniChunkByObservation<i32>, KaniVerifier>
+impl Establish<KaniChunkByWitnessToken, KaniVerifier>
     for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>
 {
     type Token = RustStdChunkByToken;
 
-    fn establish(_credential: &KaniChunkByObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniChunkByWitnessToken) -> Self::Token {
         RustStdChunkByToken(())
     }
 }
@@ -570,32 +616,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let grouped_together = same_parity(&a, &b);
             let observation = KaniChunkByObservation::new(a, b, grouped_together);
-
-            assert_eq!(observation.first(), a);
-            assert_eq!(observation.second(), b);
-            if grouped_together {
-                assert_eq!(
-                    observation.first_chunk_len(),
-                    2,
-                    "matching adjacent elements are grouped together"
-                );
-                assert_eq!(observation.trailing_chunk_len(), None);
-            } else {
-                assert_eq!(
-                    observation.first_chunk_len(),
-                    1,
-                    "a non-matching pair starts a new chunk"
-                );
-                assert_eq!(
-                    observation.trailing_chunk_len(),
-                    Some(1),
-                    "the trailing element becomes its own one-element chunk"
-                );
-            }
+            let demonstration = observation.demonstrate_grouping(a, b, grouped_together);
 
             let _token = RustStdStandard::<
                 ChunkBy<'static, i32, fn(&i32, &i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -674,6 +699,29 @@ bridge_kani_witness!(RustStdStandard<std::slice::Split<'static, i32, fn(&i32) ->
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated its one-delimiter split, minted only by
+/// [`KaniSplitObservation::demonstrate_split`].
+pub struct KaniSplitWitnessToken(());
+
+impl ProofToken for KaniSplitWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.split()` yields the before/after pieces the observation's
+    /// own construction implies, then mint the witness. Consumes `self`
+    /// for the same reason [`crate::KaniChannel::demonstrate_delivery`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_split(self, before: i32, after: i32) -> KaniSplitWitnessToken {
+        let pieces = self.split();
+        assert_eq!(pieces.0, [before]);
+        assert_eq!(pieces.1, [after]);
+        KaniSplitWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<Split<'static, i32, ...>>`'s
 /// subslices-between-matches claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the split.
@@ -683,12 +731,12 @@ impl ProofToken for RustStdSplitToken {
     type Proposition = RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitWitnessToken, KaniVerifier>
     for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitWitnessToken) -> Self::Token {
         RustStdSplitToken(())
     }
 }
@@ -710,14 +758,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
             let observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.split();
-
-            assert_eq!(pieces.0, [a]);
-            assert_eq!(pieces.1, [b]);
+            let demonstration = observation.demonstrate_split(a, b);
 
             let _token = RustStdStandard::<
                 std::slice::Split<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -746,6 +791,42 @@ bridge_kani_witness!(RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>);
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated a writable split with a visible write-through, minted only
+/// by [`KaniSplitObservation::demonstrate_split_mut_write_through`].
+pub struct KaniSplitMutWitnessToken(());
+
+impl ProofToken for KaniSplitMutWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.split()` yields the before/after pieces, then write
+    /// `updated` into the first piece and assert the write is visible in
+    /// the underlying data. Consumes `self` for the same reason
+    /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_split_mut_write_through(
+        mut self,
+        before: i32,
+        after: i32,
+        updated: i32,
+    ) -> KaniSplitMutWitnessToken {
+        let pieces = self.split();
+        assert_eq!(pieces.0, [before]);
+        assert_eq!(pieces.1, [after]);
+
+        self.set_before(updated);
+
+        assert_eq!(
+            self.data(),
+            [updated, 0, after],
+            "a write through the first subslice is visible"
+        );
+        KaniSplitMutWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<SplitMut<'static, i32, ...>>`'s
 /// write-through claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the writable
@@ -756,12 +837,12 @@ impl ProofToken for RustStdSplitMutToken {
     type Proposition = RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitMutWitnessToken, KaniVerifier>
     for RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitMutToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitMutWitnessToken) -> Self::Token {
         RustStdSplitMutToken(())
     }
 }
@@ -783,22 +864,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let updated: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let mut observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.split();
-
-            assert_eq!(pieces.0, [a]);
-            assert_eq!(pieces.1, [b]);
-
-            observation.set_before(updated);
-
-            assert_eq!(
-                observation.data(),
-                [updated, 0, b],
-                "a write through the first subslice is visible"
-            );
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let demonstration = observation.demonstrate_split_mut_write_through(a, b, updated);
 
             let _token = RustStdStandard::<SplitMut<'static, i32, fn(&i32) -> bool>>::establish(
-                &observation,
+                demonstration,
             );
         }
     }
@@ -828,6 +898,36 @@ bridge_kani_witness!(RustStdStandard<std::slice::SplitInclusive<'static, i32, fn
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated the matched element kept at the end of the piece, minted
+/// only by [`KaniSplitObservation::demonstrate_split_inclusive`].
+pub struct KaniSplitInclusiveWitnessToken(());
+
+impl ProofToken for KaniSplitInclusiveWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.split_inclusive()` keeps the matched delimiter at the end
+    /// of the first piece. Consumes `self` for the same reason
+    /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_split_inclusive(
+        self,
+        before: i32,
+        after: i32,
+    ) -> KaniSplitInclusiveWitnessToken {
+        let pieces = self.split_inclusive();
+        assert_eq!(
+            pieces.0,
+            [before, 0],
+            "the matched element stays at the end"
+        );
+        assert_eq!(pieces.1, [after]);
+        KaniSplitInclusiveWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<SplitInclusive<'static, i32,
 /// ...>>`'s inclusive-boundary claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the matched
@@ -838,12 +938,12 @@ impl ProofToken for RustStdSplitInclusiveToken {
     type Proposition = RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitInclusiveWitnessToken, KaniVerifier>
     for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitInclusiveToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitInclusiveWitnessToken) -> Self::Token {
         RustStdSplitInclusiveToken(())
     }
 }
@@ -866,14 +966,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
             let observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.split_inclusive();
-
-            assert_eq!(pieces.0, [a, 0], "the matched element stays at the end");
-            assert_eq!(pieces.1, [b]);
+            let demonstration = observation.demonstrate_split_inclusive(a, b);
 
             let _token = RustStdStandard::<
                 std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -904,6 +1001,32 @@ bridge_kani_witness!(RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) ->
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated the inclusive-boundary piece lengths, minted only by
+/// [`KaniSplitObservation::demonstrate_split_inclusive_lengths`].
+pub struct KaniSplitInclusiveLengthsWitnessToken(());
+
+impl ProofToken for KaniSplitInclusiveLengthsWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.split_inclusive()`'s piece lengths reflect the matched
+    /// element staying at the end of the first piece. Consumes `self` for
+    /// the same reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_split_inclusive_lengths(self) -> KaniSplitInclusiveLengthsWitnessToken {
+        let pieces = self.split_inclusive();
+        assert_eq!(
+            pieces.0.len(),
+            2,
+            "the first piece includes the matched element"
+        );
+        assert_eq!(pieces.1.len(), 1);
+        KaniSplitInclusiveLengthsWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<SplitInclusiveMut<'static,
 /// i32, ...>>`'s inclusive-boundary claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the piece
@@ -914,12 +1037,12 @@ impl ProofToken for RustStdSplitInclusiveMutToken {
     type Proposition = RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitInclusiveLengthsWitnessToken, KaniVerifier>
     for RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitInclusiveMutToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitInclusiveLengthsWitnessToken) -> Self::Token {
         RustStdSplitInclusiveMutToken(())
     }
 }
@@ -941,14 +1064,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
             let observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.split_inclusive();
-
-            assert_eq!(pieces.0.len(), 2, "the first piece includes the matched element");
-            assert_eq!(pieces.1.len(), 1);
+            let demonstration = observation.demonstrate_split_inclusive_lengths();
 
             let _token = RustStdStandard::<
                 SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -977,6 +1097,40 @@ bridge_kani_witness!(RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -
     }
 }
 
+/// Witness that a `KaniSplitNObservation<i32>` instance actually
+/// demonstrated the cap leaving the second delimiter unsplit in the last
+/// piece, minted only by [`KaniSplitNObservation::demonstrate_splitn_two`]
+/// — shared by every `Establish` impl claiming this exact two-piece cap
+/// shape (`SplitN` and `SplitNMut` both reduce to the identical
+/// `splitn_two()` check).
+pub struct KaniSplitNWitnessToken(());
+
+impl ProofToken for KaniSplitNWitnessToken {
+    type Proposition = KaniSplitNObservation<i32>;
+}
+
+impl KaniSplitNObservation<i32> {
+    /// Assert `.splitn_two()` caps at two pieces, leaving the second
+    /// delimiter unsplit in the last piece. Consumes `self` for the same
+    /// reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_splitn_two(
+        self,
+        first: i32,
+        middle: i32,
+        last: i32,
+    ) -> KaniSplitNWitnessToken {
+        let pieces = self.splitn_two();
+        assert_eq!(pieces.0, [first]);
+        assert_eq!(
+            pieces.1,
+            [middle, 0, last],
+            "the cap leaves the second delimiter unsplit in the last piece"
+        );
+        KaniSplitNWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<SplitN<'static, i32, ...>>`'s
 /// cap-at-two claim has been established from a
 /// `KaniSplitNObservation<i32>` that has itself demonstrated the second
@@ -987,12 +1141,12 @@ impl ProofToken for RustStdSplitNToken {
     type Proposition = RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitNWitnessToken, KaniVerifier>
     for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitNToken;
 
-    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitNWitnessToken) -> Self::Token {
         RustStdSplitNToken(())
     }
 }
@@ -1017,18 +1171,11 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
-            let pieces = observation.splitn_two();
-
-            assert_eq!(pieces.0, [a]);
-            assert_eq!(
-                pieces.1,
-                [b, 0, c],
-                "the cap leaves the second delimiter unsplit in the last piece"
-            );
+            let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
             let _token = RustStdStandard::<
                 std::slice::SplitN<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -1067,12 +1214,12 @@ impl ProofToken for RustStdSplitNMutToken {
     type Proposition = RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+impl Establish<KaniSplitNWitnessToken, KaniVerifier>
     for RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdSplitNMutToken;
 
-    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniSplitNWitnessToken) -> Self::Token {
         RustStdSplitNMutToken(())
     }
 }
@@ -1095,18 +1242,11 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
-            let pieces = observation.splitn_two();
-
-            assert_eq!(pieces.0, [a]);
-            assert_eq!(
-                pieces.1,
-                [b, 0, c],
-                "the cap leaves the second delimiter unsplit in the last piece"
-            );
+            let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
             let _token = RustStdStandard::<
                 SplitNMut<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -1135,6 +1275,28 @@ bridge_kani_witness!(RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated the last piece yielded first, minted only by
+/// [`KaniSplitObservation::demonstrate_rsplit`].
+pub struct KaniRSplitWitnessToken(());
+
+impl ProofToken for KaniRSplitWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.rsplit()` yields the last piece first. Consumes `self`
+    /// for the same reason [`crate::KaniChannel::demonstrate_delivery`]
+    /// does.
+    #[must_use]
+    pub fn demonstrate_rsplit(self, before: i32, after: i32) -> KaniRSplitWitnessToken {
+        let pieces = self.rsplit();
+        assert_eq!(pieces.0, [after], "rsplit yields the last piece first");
+        assert_eq!(pieces.1, [before]);
+        KaniRSplitWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RSplit<'static, i32, ...>>`'s
 /// reverse-order claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the last piece
@@ -1145,12 +1307,12 @@ impl ProofToken for RustStdRSplitToken {
     type Proposition = RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniRSplitWitnessToken, KaniVerifier>
     for RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdRSplitToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniRSplitWitnessToken) -> Self::Token {
         RustStdRSplitToken(())
     }
 }
@@ -1172,14 +1334,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
             let observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.rsplit();
-
-            assert_eq!(pieces.0, [b], "rsplit yields the last piece first");
-            assert_eq!(pieces.1, [a]);
+            let demonstration = observation.demonstrate_rsplit(a, b);
 
             let _token = RustStdStandard::<
                 std::slice::RSplit<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -1208,6 +1367,42 @@ bridge_kani_witness!(RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>)
     }
 }
 
+/// Witness that a `KaniSplitObservation<i32>` instance actually
+/// demonstrated the reverse order and a visible write-through, minted only
+/// by [`KaniSplitObservation::demonstrate_rsplit_mut_write_through`].
+pub struct KaniRSplitMutWitnessToken(());
+
+impl ProofToken for KaniRSplitMutWitnessToken {
+    type Proposition = KaniSplitObservation<i32>;
+}
+
+impl KaniSplitObservation<i32> {
+    /// Assert `.rsplit()` yields the last piece first, then write
+    /// `updated` into the rearmost piece and assert the write is visible
+    /// in the underlying data. Consumes `self` for the same reason
+    /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_rsplit_mut_write_through(
+        mut self,
+        before: i32,
+        after: i32,
+        updated: i32,
+    ) -> KaniRSplitMutWitnessToken {
+        let pieces = self.rsplit();
+        assert_eq!(pieces.0, [after]);
+        assert_eq!(pieces.1, [before]);
+
+        self.set_after(updated);
+
+        assert_eq!(
+            self.data(),
+            [before, 0, updated],
+            "a write through the first (rearmost) subslice is visible"
+        );
+        KaniRSplitMutWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RSplitMut<'static, i32,
 /// ...>>`'s write-through claim has been established from a
 /// `KaniSplitObservation<i32>` that has itself demonstrated the reverse
@@ -1218,12 +1413,12 @@ impl ProofToken for RustStdRSplitMutToken {
     type Proposition = RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitObservation<i32>, KaniVerifier>
+impl Establish<KaniRSplitMutWitnessToken, KaniVerifier>
     for RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdRSplitMutToken;
 
-    fn establish(_credential: &KaniSplitObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniRSplitMutWitnessToken) -> Self::Token {
         RustStdRSplitMutToken(())
     }
 }
@@ -1245,22 +1440,11 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let updated: i32 = kani::any();
             kani::assume(a != 0 && b != 0);
-            let mut observation = crate::KaniSplitObservation::new(a, 0, b);
-            let pieces = observation.rsplit();
-
-            assert_eq!(pieces.0, [b]);
-            assert_eq!(pieces.1, [a]);
-
-            observation.set_after(updated);
-
-            assert_eq!(
-                observation.data(),
-                [a, 0, updated],
-                "a write through the first (rearmost) subslice is visible"
-            );
+            let observation = crate::KaniSplitObservation::new(a, 0, b);
+            let demonstration = observation.demonstrate_rsplit_mut_write_through(a, b, updated);
 
             let _token = RustStdStandard::<RSplitMut<'static, i32, fn(&i32) -> bool>>::establish(
-                &observation,
+                demonstration,
             );
         }
     }
@@ -1290,6 +1474,41 @@ bridge_kani_witness!(RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) 
     }
 }
 
+/// Witness that a `KaniSplitNObservation<i32>` instance actually
+/// demonstrated the cap leaving the first delimiter unsplit in the last
+/// piece, minted only by
+/// [`KaniSplitNObservation::demonstrate_rsplitn_two`] — shared by every
+/// `Establish` impl claiming this exact cap-from-the-back shape
+/// (`RSplitN` and `RSplitNMut` both reduce to the identical
+/// `rsplitn_two()` check).
+pub struct KaniRSplitNWitnessToken(());
+
+impl ProofToken for KaniRSplitNWitnessToken {
+    type Proposition = KaniSplitNObservation<i32>;
+}
+
+impl KaniSplitNObservation<i32> {
+    /// Assert `.rsplitn_two()` caps at two pieces from the back, leaving
+    /// the first delimiter unsplit in the last piece. Consumes `self` for
+    /// the same reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_rsplitn_two(
+        self,
+        first: i32,
+        middle: i32,
+        last: i32,
+    ) -> KaniRSplitNWitnessToken {
+        let pieces = self.rsplitn_two();
+        assert_eq!(pieces.0, [last]);
+        assert_eq!(
+            pieces.1,
+            [first, 0, middle],
+            "the cap leaves the first delimiter unsplit in the last piece"
+        );
+        KaniRSplitNWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<RSplitN<'static, i32,
 /// ...>>`'s cap-from-the-back claim has been established from a
 /// `KaniSplitNObservation<i32>` that has itself demonstrated the first
@@ -1300,12 +1519,12 @@ impl ProofToken for RustStdRSplitNToken {
     type Proposition = RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+impl Establish<KaniRSplitNWitnessToken, KaniVerifier>
     for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdRSplitNToken;
 
-    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniRSplitNWitnessToken) -> Self::Token {
         RustStdRSplitNToken(())
     }
 }
@@ -1329,18 +1548,11 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
-            let pieces = observation.rsplitn_two();
-
-            assert_eq!(pieces.0, [c]);
-            assert_eq!(
-                pieces.1,
-                [a, 0, b],
-                "the cap leaves the first delimiter unsplit in the last piece"
-            );
+            let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
             let _token = RustStdStandard::<
                 std::slice::RSplitN<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -1379,12 +1591,12 @@ impl ProofToken for RustStdRSplitNMutToken {
     type Proposition = RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>;
 }
 
-impl Establish<KaniSplitNObservation<i32>, KaniVerifier>
+impl Establish<KaniRSplitNWitnessToken, KaniVerifier>
     for RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
 {
     type Token = RustStdRSplitNMutToken;
 
-    fn establish(_credential: &KaniSplitNObservation<i32>) -> Self::Token {
+    fn establish(_credential: KaniRSplitNWitnessToken) -> Self::Token {
         RustStdRSplitNMutToken(())
     }
 }
@@ -1407,18 +1619,11 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             kani::assume(a != 0 && b != 0 && c != 0);
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
-            let pieces = observation.rsplitn_two();
-
-            assert_eq!(pieces.0, [c]);
-            assert_eq!(
-                pieces.1,
-                [a, 0, b],
-                "the cap leaves the first delimiter unsplit in the last piece"
-            );
+            let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
             let _token = RustStdStandard::<
                 RSplitNMut<'static, i32, fn(&i32) -> bool>,
-            >::establish(&observation);
+            >::establish(demonstration);
         }
     }
 }
@@ -1446,6 +1651,36 @@ bridge_kani_witness!(RustStdStandard<EscapeAscii<'static>>);
     }
 }
 
+/// Witness that a `KaniEscapeAsciiObservation` instance actually
+/// demonstrated its escaped bytes, minted only by
+/// [`KaniEscapeAsciiObservation::demonstrate_escaping`].
+pub struct KaniEscapeAsciiWitnessToken(());
+
+impl ProofToken for KaniEscapeAsciiWitnessToken {
+    type Proposition = KaniEscapeAsciiObservation;
+}
+
+impl KaniEscapeAsciiObservation {
+    /// Assert the printable byte passes through unescaped and the
+    /// trailing newline expands to its two-byte backslash form. Consumes
+    /// `self` for the same reason
+    /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[must_use]
+    pub fn demonstrate_escaping(self, printable: u8) -> KaniEscapeAsciiWitnessToken {
+        assert_eq!(
+            self.source(),
+            [printable, b'\n'],
+            "the bounded source witness keeps the printable byte and newline"
+        );
+        assert_eq!(
+            self.escaped(),
+            [printable, b'\\', b'n'],
+            "printable bytes pass through unescaped and newline expands to two bytes"
+        );
+        KaniEscapeAsciiWitnessToken(())
+    }
+}
+
 /// Lawful token minted once `RustStdStandard<EscapeAscii<'static>>`'s
 /// printable-plus-newline escape claim has been established from a
 /// `KaniEscapeAsciiObservation` that has itself demonstrated the escaped
@@ -1456,10 +1691,12 @@ impl ProofToken for RustStdEscapeAsciiToken {
     type Proposition = RustStdStandard<EscapeAscii<'static>>;
 }
 
-impl Establish<KaniEscapeAsciiObservation, KaniVerifier> for RustStdStandard<EscapeAscii<'static>> {
+impl Establish<KaniEscapeAsciiWitnessToken, KaniVerifier>
+    for RustStdStandard<EscapeAscii<'static>>
+{
     type Token = RustStdEscapeAsciiToken;
 
-    fn establish(_credential: &KaniEscapeAsciiObservation) -> Self::Token {
+    fn establish(_credential: KaniEscapeAsciiWitnessToken) -> Self::Token {
         RustStdEscapeAsciiToken(())
     }
 }
@@ -1482,19 +1719,9 @@ amenable_derive::harness! {
             let printable: u8 = kani::any();
             kani::assume((0x20..=0x7e).contains(&printable));
             let observation = KaniEscapeAsciiObservation::new(printable);
+            let demonstration = observation.demonstrate_escaping(printable);
 
-            assert_eq!(
-                observation.source(),
-                [printable, b'\n'],
-                "the bounded source witness keeps the printable byte and newline"
-            );
-            assert_eq!(
-                observation.escaped(),
-                [printable, b'\\', b'n'],
-                "printable bytes pass through unescaped and newline expands to two bytes"
-            );
-
-            let _token = RustStdStandard::<EscapeAscii<'static>>::establish(&observation);
+            let _token = RustStdStandard::<EscapeAscii<'static>>::establish(demonstration);
         }
     }
 }
