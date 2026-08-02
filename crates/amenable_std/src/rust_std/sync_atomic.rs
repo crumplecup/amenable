@@ -11,7 +11,9 @@ use std::sync::atomic::{
     AtomicU16, AtomicU32, AtomicU64, AtomicUsize, Ordering,
 };
 
-use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_generic1};
+use crate::rust_std::macros::{
+    impl_rust_std_type, impl_rust_std_type_generic1, register_rust_std_standard_evidence,
+};
 
 macro_rules! impl_rust_std_atomic {
     ($($ty:ident => $inner:literal),* $(,)?) => {
@@ -45,6 +47,20 @@ impl_rust_std_atomic!(
     AtomicU32 => "u32",
     AtomicU64 => "u64",
     AtomicUsize => "usize",
+);
+
+register_rust_std_standard_evidence!(
+    AtomicBool,
+    AtomicI8,
+    AtomicI16,
+    AtomicI32,
+    AtomicI64,
+    AtomicIsize,
+    AtomicU8,
+    AtomicU16,
+    AtomicU32,
+    AtomicU64,
+    AtomicUsize,
 );
 
 impl_rust_std_type_generic1!(

@@ -277,6 +277,17 @@ amenable_kani::rust_std::str::verify_split_whitespace_collapses_runs_of_whitespa
 amenable_kani::rust_std::str::verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes,1785099604,passed
 amenable_kani::rust_std::str::verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input,1785099610,passed
 amenable_kani::rust_std::str::verify_utf8_error_reports_the_valid_prefix_length_and_error_span,1785119367,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_bool,1785702144,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_i16,1785702144,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_i32,1785702145,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_i64,1785702146,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_i8,1785702146,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_isize,1785702147,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_u16,1785702148,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_u32,1785702148,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_u64,1785702149,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_u8,1785702149,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_usize,1785702150,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_of_one_is_its_own_leader,1785353068,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_wait_result_reports_the_sole_participant_as_leader,1785353071,passed
 amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_out,1785353074,passed

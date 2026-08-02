@@ -53,6 +53,7 @@ mod std_net;
 mod std_panic;
 mod std_time;
 mod str;
+mod sync_atomic;
 mod sync_lock;
 mod sync_mpsc;
 mod task;
