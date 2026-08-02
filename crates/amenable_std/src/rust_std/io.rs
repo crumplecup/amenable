@@ -9,14 +9,14 @@
 //! that screening, not a bug in the exclusion itself.
 
 use std::io::{
-    BufReader, BufWriter, Bytes, Empty, IntoInnerError, LineWriter, Lines, PipeReader, PipeWriter,
-    Repeat, SeekFrom, Sink, Split, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, Write,
-    WriterPanicked,
+    BufReader, BufWriter, Bytes, Chain, Cursor, Empty, IntoInnerError, IoSlice, IoSliceMut,
+    LineWriter, Lines, PipeReader, PipeWriter, Repeat, SeekFrom, Sink, Split, Stderr, StderrLock,
+    Stdin, StdinLock, Stdout, StdoutLock, Take, Write, WriterPanicked,
 };
 
 use crate::rust_std::macros::{
-    impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime0,
-    register_rust_std_standard_evidence,
+    impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
+    impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type_generic1!(
@@ -79,12 +79,52 @@ impl_rust_std_type_generic1!(
     "The Lines carrier lazily yields the lines of an underlying buffered reader."
 );
 
+impl_rust_std_type_generic2!(
+    Chain,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Chain.html",
+    "The Chain carrier reads one source to exhaustion before reading the next."
+);
+
+impl_rust_std_type_generic1!(
+    Cursor,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Cursor.html",
+    "The Cursor carrier adds Read/Write/Seek over an in-memory byte buffer, tracked by an internal position."
+);
+
 impl_rust_std_type!(
     Empty,
     "std",
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.Empty.html",
     "The Empty carrier is a reader that always reports end-of-file and a writer/seeker that ignores its input."
+);
+
+impl_rust_std_type!(
+    std::io::Error,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Error.html",
+    "The Error carrier reports an I/O failure, carrying a portable ErrorKind and an optional platform or custom payload."
+);
+
+impl_rust_std_type_lifetime0!(
+    IoSlice,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.IoSlice.html",
+    "The IoSlice carrier borrows a byte buffer for vectored I/O reads without owning or copying it."
+);
+
+impl_rust_std_type_lifetime0!(
+    IoSliceMut,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.IoSliceMut.html",
+    "The IoSliceMut carrier mutably borrows a byte buffer for vectored I/O writes without owning or copying it."
 );
 
 impl_rust_std_type!(
@@ -183,6 +223,14 @@ impl_rust_std_type_lifetime0!(
     "The StdoutLock carrier is a locked, exclusive handle to the process's standard output stream."
 );
 
+impl_rust_std_type_generic1!(
+    Take,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Take.html",
+    "The Take carrier caps a reader at a fixed number of remaining bytes."
+);
+
 impl_rust_std_type!(
     WriterPanicked,
     "std",
@@ -195,17 +243,23 @@ impl_rust_std_type!(
 // in-memory Write sink) are the representative reader/writer types this
 // module's proof batch covers.
 //
-// Bytes/Lines/Split are written fully-qualified: all three bare names are
-// shared by other modules (e.g. `std::str::Bytes`, `std::str::Lines`,
-// `std::slice::Split`) — only the qualified path disambiguates which one a
-// given registration means for tooling reading the registry (e.g.
-// `elicit_doc`'s coverage report).
+// Bytes/Chain/Error/Lines/Split/Take are written fully-qualified: all of
+// these bare names are shared by other modules (e.g. `std::str::Bytes`,
+// `std::str::Lines`, `std::slice::Split`, `std::iter::Chain`,
+// `std::iter::Take`, `core::fmt::Error`) — only the qualified path
+// disambiguates which one a given registration means for tooling reading
+// the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     BufReader<&'static [u8]>,
     BufWriter<Vec<u8>>,
     std::io::Bytes<&'static [u8]>,
+    std::io::Chain<&'static [u8], &'static [u8]>,
+    Cursor<&'static [u8]>,
     Empty,
+    std::io::Error,
     IntoInnerError<BufWriter<Vec<u8>>>,
+    IoSlice<'static>,
+    IoSliceMut<'static>,
     LineWriter<Vec<u8>>,
     std::io::Lines<&'static [u8]>,
     PipeReader,
@@ -220,5 +274,6 @@ register_rust_std_standard_evidence!(
     StdinLock<'static>,
     Stdout,
     StdoutLock<'static>,
+    std::io::Take<&'static [u8]>,
     WriterPanicked,
 );

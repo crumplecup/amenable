@@ -19,8 +19,8 @@
 //! preserved in the gallery as a false trail.
 
 use std::io::{
-    BufReader, BufWriter, IntoInnerError, LineWriter, PipeReader, PipeWriter, SeekFrom, Stderr,
-    StderrLock, Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
+    BufReader, BufWriter, Cursor, IntoInnerError, IoSlice, IoSliceMut, LineWriter, PipeReader,
+    PipeWriter, SeekFrom, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
 };
 
 use amenable_core::{Establish, Evidence, ProofToken};
@@ -924,6 +924,325 @@ amenable_derive::harness! {
             let written = writer.write(&data).expect("Sink::write never errors");
             assert_eq!(written, data.len(), "Sink::write reports the full length written");
             writer.flush().expect("Sink::flush never errors");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_chain_reads_the_first_source_then_the_second".to_owned(),
+            claim: VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence:
+            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC, {
+        /// `.chain()` reads its first source to exhaustion before it
+        /// starts reading the second.
+        #[kani::proof]
+        fn verify_chain_reads_the_first_source_then_the_second() {
+            use std::io::Read;
+
+            let first: [u8; 2] = kani::any();
+            let second: [u8; 2] = kani::any();
+            let mut chain = (&first[..]).chain(&second[..]);
+            let mut buffer = [0u8; 2];
+
+            let read_first = chain
+                .read(&mut buffer)
+                .expect("Chain::read over in-memory slices never errors");
+            assert_eq!(
+                read_first,
+                buffer.len(),
+                "Chain::read drains the first source fully before touching the second"
+            );
+            assert_eq!(buffer, first, "Chain::read yields the first source's bytes first");
+
+            let read_second = chain
+                .read(&mut buffer)
+                .expect("Chain::read over in-memory slices never errors");
+            assert_eq!(
+                read_second,
+                buffer.len(),
+                "Chain::read continues into the second source once the first is exhausted"
+            );
+            assert_eq!(
+                buffer, second,
+                "Chain::read yields the second source's bytes once the first is drained"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Cursor<&'static [u8]>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cursor_read_advances_position_and_seek_repositions_it".to_owned(),
+            claim: VERIFY_CURSOR_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Cursor<&'static [u8]>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cursor<&'static [u8]>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Cursor<&'static [u8]>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_CURSOR_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC, {
+        /// `Cursor::read` yields bytes from the current position and
+        /// advances it by the amount read; `Cursor::seek` repositions it.
+        #[kani::proof]
+        fn verify_cursor_read_advances_position_and_seek_repositions_it() {
+            use std::io::{Read, Seek};
+
+            let data: [u8; 4] = kani::any();
+            let mut cursor = Cursor::new(&data[..]);
+            let mut buffer = [0u8; 2];
+
+            let read = cursor
+                .read(&mut buffer)
+                .expect("Cursor::read over an in-memory slice never errors");
+            assert_eq!(read, buffer.len(), "Cursor::read fills the requested buffer");
+            assert_eq!(
+                buffer,
+                [data[0], data[1]],
+                "Cursor::read yields bytes starting from position zero"
+            );
+            assert_eq!(
+                cursor.position(),
+                2,
+                "Cursor::read advances position by the number of bytes read"
+            );
+
+            cursor
+                .seek(SeekFrom::Start(0))
+                .expect("Cursor::seek to a valid offset never errors");
+            assert_eq!(
+                cursor.position(),
+                0,
+                "Cursor::seek(Start(0)) resets position to zero"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Error> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_error_from_error_kind_preserves_the_kind".to_owned(),
+            claim: VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Error>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Error>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Error> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC, {
+        /// `Error::from(kind)` preserves the given `ErrorKind`, recoverable
+        /// unchanged via `.kind()`. `ErrorKind` has no `kani::Arbitrary`
+        /// impl (it's a large foreign enum with no way to derive one), so
+        /// this checks a representative, bounded-exhaustive subset rather
+        /// than a fully symbolic kind.
+        #[kani::proof]
+        fn verify_error_from_error_kind_preserves_the_kind() {
+            use std::io::ErrorKind;
+
+            let kinds = [
+                ErrorKind::NotFound,
+                ErrorKind::PermissionDenied,
+                ErrorKind::AlreadyExists,
+                ErrorKind::InvalidInput,
+            ];
+            let index: usize = kani::any();
+            kani::assume(index < kinds.len());
+            let kind = kinds[index];
+
+            let error = std::io::Error::from(kind);
+            assert_eq!(
+                error.kind(),
+                kind,
+                "Error::from(kind).kind() recovers the given kind"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<IoSlice<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_io_slice_derefs_to_the_wrapped_bytes".to_owned(),
+            claim: VERIFY_IO_SLICE_DEREFS_TO_THE_WRAPPED_BYTES_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<IoSlice<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<IoSlice<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<IoSlice<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_IO_SLICE_DEREFS_TO_THE_WRAPPED_BYTES_SRC, {
+        /// `IoSlice::new` borrows a byte slice without copying it:
+        /// dereferencing the `IoSlice` yields exactly the wrapped bytes.
+        #[kani::proof]
+        fn verify_io_slice_derefs_to_the_wrapped_bytes() {
+            let bytes: [u8; 4] = kani::any();
+            let slice = IoSlice::new(&bytes);
+            assert_eq!(&*slice, &bytes, "IoSlice derefs to exactly the wrapped bytes");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<IoSliceMut<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes"
+                .to_owned(),
+            claim: VERIFY_IO_SLICE_MUT_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC
+                .to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<IoSliceMut<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<IoSliceMut<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<IoSliceMut<'static>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_IO_SLICE_MUT_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC, {
+        /// `IoSliceMut::new` mutably borrows a byte slice without copying
+        /// it: dereferencing yields exactly the wrapped bytes, and writing
+        /// through the `IoSliceMut` mutates the original slice.
+        #[kani::proof]
+        fn verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes() {
+            let mut bytes: [u8; 4] = kani::any();
+            let original = bytes;
+            let new_value: u8 = kani::any();
+
+            let mut slice = IoSliceMut::new(&mut bytes);
+            assert_eq!(&*slice, &original, "IoSliceMut derefs to exactly the wrapped bytes");
+            slice[0] = new_value;
+            drop(slice);
+            assert_eq!(
+                bytes[0], new_value,
+                "mutating through IoSliceMut mutates the wrapped bytes"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_take_caps_reads_at_the_remaining_limit".to_owned(),
+            claim: VERIFY_TAKE_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Take<&'static [u8]>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_TAKE_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC, {
+        /// `.take(limit)` caps a single read at the remaining limit, and
+        /// that limit is exhausted by exactly the bytes read.
+        #[kani::proof]
+        fn verify_take_caps_reads_at_the_remaining_limit() {
+            use std::io::Read;
+
+            let data: [u8; 4] = kani::any();
+            let limit: u64 = kani::any();
+            kani::assume(limit <= data.len() as u64);
+
+            let mut reader = (&data[..]).take(limit);
+            let mut buffer = [0u8; 4];
+            let read = reader
+                .read(&mut buffer)
+                .expect("Take::read over an in-memory slice never errors");
+
+            assert_eq!(
+                read as u64, limit,
+                "Take::read yields exactly the remaining limit when the source has enough bytes"
+            );
+            assert_eq!(
+                reader.limit(),
+                0,
+                "Take::limit reaches zero once a read consumes the whole allowance"
+            );
         }
     }
 }
