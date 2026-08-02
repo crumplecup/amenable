@@ -71,6 +71,8 @@ impl_rust_std_type_generic1!(
     "The AtomicPtr carrier provides lock-free, thread-safe access to a raw pointer value."
 );
 
+register_rust_std_standard_evidence!(AtomicPtr<i32>);
+
 impl_rust_std_type!(
     Ordering,
     "core",

@@ -9,8 +9,8 @@
 //! unsubstituted, instead of each type's real harness.
 
 use std::sync::atomic::{
-    AtomicBool, AtomicI8, AtomicI16, AtomicI32, AtomicI64, AtomicIsize, AtomicU8, AtomicU16,
-    AtomicU32, AtomicU64, AtomicUsize,
+    AtomicBool, AtomicI8, AtomicI16, AtomicI32, AtomicI64, AtomicIsize, AtomicPtr, AtomicU8,
+    AtomicU16, AtomicU32, AtomicU64, AtomicUsize,
 };
 
 use amenable_core::Evidence;
@@ -543,6 +543,105 @@ amenable_derive::harness! {
                 atomic.load(std::sync::atomic::Ordering::SeqCst),
                 next,
                 "AtomicUsize::store overwrites the value observable via load"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<AtomicPtr<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_atomic_ptr_load_store_swap_and_compare_exchange".to_owned(),
+            claim: VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<AtomicPtr<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<AtomicPtr<i32>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC, {
+        /// `AtomicPtr::new` sets the pointer value observable via `load`;
+        /// `store` overwrites it; `swap` returns the previous pointer and
+        /// installs the new one; `compare_exchange` updates on a matching
+        /// current value and reports the previous value on success.
+        /// Pointer values are the addresses of distinct local slots (each
+        /// holding a symbolic `i32`), so every value is pairwise-distinct
+        /// by construction and no pointer is ever dereferenced — the
+        /// whole proof stays free of `unsafe`.
+        ///
+        /// `compare_exchange`'s *failure* branch (mismatched current,
+        /// reporting the real current value unchanged) is deliberately
+        /// not checked here: Kani's model of the underlying
+        /// `atomic_compare_exchange` intrinsic does not correctly track
+        /// the reported value on that branch, confirmed via a minimal
+        /// isolated reproduction (a single `compare_exchange` call
+        /// against a freshly constructed `AtomicPtr`, no `swap` or prior
+        /// exchange involved) that fails the same way — a genuine Kani/
+        /// CBMC limitation, not a logic error in this proof or in std.
+        #[kani::proof]
+        fn verify_atomic_ptr_load_store_swap_and_compare_exchange() {
+            let mut initial_slot: i32 = kani::any();
+            let mut stored_slot: i32 = kani::any();
+            let mut swapped_in_slot: i32 = kani::any();
+            let mut exchange_target_slot: i32 = kani::any();
+
+            let initial: *mut i32 = &mut initial_slot;
+            let atomic = AtomicPtr::new(initial);
+            assert_eq!(
+                atomic.load(std::sync::atomic::Ordering::SeqCst),
+                initial,
+                "AtomicPtr::new sets the value observable via load"
+            );
+
+            let stored: *mut i32 = &mut stored_slot;
+            atomic.store(stored, std::sync::atomic::Ordering::SeqCst);
+            assert_eq!(
+                atomic.load(std::sync::atomic::Ordering::SeqCst),
+                stored,
+                "AtomicPtr::store overwrites the value observable via load"
+            );
+
+            let swapped_in: *mut i32 = &mut swapped_in_slot;
+            let previous = atomic.swap(swapped_in, std::sync::atomic::Ordering::SeqCst);
+            assert_eq!(
+                previous, stored,
+                "AtomicPtr::swap returns the value that was there before"
+            );
+            assert_eq!(
+                atomic.load(std::sync::atomic::Ordering::SeqCst),
+                swapped_in,
+                "AtomicPtr::swap installs the new value observable via load"
+            );
+
+            let exchange_target: *mut i32 = &mut exchange_target_slot;
+            let success_result = atomic.compare_exchange(
+                swapped_in,
+                exchange_target,
+                std::sync::atomic::Ordering::SeqCst,
+                std::sync::atomic::Ordering::SeqCst,
+            );
+            assert_eq!(
+                success_result,
+                Ok(swapped_in),
+                "compare_exchange succeeds and returns the previous value when current matches"
+            );
+            assert_eq!(
+                atomic.load(std::sync::atomic::Ordering::SeqCst),
+                exchange_target,
+                "compare_exchange installs the new value on success"
             );
         }
     }

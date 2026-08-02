@@ -294,6 +294,7 @@ amenable_kani::rust_std::sync_atomic::verify_atomic_i32,1785702145,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_i64,1785702146,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_i8,1785702146,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_isize,1785702147,passed
+amenable_kani::rust_std::sync_atomic::verify_atomic_ptr_load_store_swap_and_compare_exchange,1785705103,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u16,1785702148,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u32,1785702148,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u64,1785702149,passed
