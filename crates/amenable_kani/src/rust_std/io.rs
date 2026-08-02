@@ -1,7 +1,10 @@
 //! `KaniWitness` impls for `std::io`.
 //!
 //! `Bytes` and the simple `BufWriter` flush law still verify directly over
-//! in-memory `&'static [u8]` / `Vec<u8>` readers and writers. The rest of the
+//! in-memory `&'static [u8]` / `Vec<u8>` readers and writers, as do the
+//! zero-state adapters `Empty`, `Repeat`, `SeekFrom`, and `Sink`: none of
+//! them carry internal buffering state, so there's nothing for Kani to
+//! time out on. The rest of the
 //! buffered `std::io` family (`BufReader`, `IntoInnerError`, `LineWriter`,
 //! `Lines`, `Split`, `WriterPanicked`) uses Amenable-owned bounded
 //! observations instead: these direct std paths are pure in-memory, but still
@@ -16,8 +19,8 @@
 //! preserved in the gallery as a false trail.
 
 use std::io::{
-    BufReader, BufWriter, IntoInnerError, LineWriter, PipeReader, PipeWriter, Stderr, StderrLock,
-    Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
+    BufReader, BufWriter, IntoInnerError, LineWriter, PipeReader, PipeWriter, SeekFrom, Stderr,
+    StderrLock, Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
 };
 
 use amenable_core::{Establish, Evidence, ProofToken};
@@ -744,6 +747,183 @@ amenable_derive::harness! {
             let demonstration = observation.demonstrate_recovery(buffered);
 
             let _token = RustStdStandard::<WriterPanicked>::establish(demonstration);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Empty> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_empty_read_reports_end_of_file".to_owned(),
+            claim: VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Empty>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Empty> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC, {
+        /// `std::io::empty()`'s reader always reports zero bytes read,
+        /// regardless of the buffer offered to it.
+        #[kani::proof]
+        fn verify_empty_read_reports_end_of_file() {
+            use std::io::Read;
+
+            let mut buffer: [u8; 4] = kani::any();
+            let mut reader = std::io::empty();
+            let read = reader.read(&mut buffer).expect("Empty::read never errors");
+            assert_eq!(read, 0, "Empty::read always reports zero bytes read");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Repeat> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_repeat_fills_the_buffer_with_the_given_byte".to_owned(),
+            claim: VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Repeat>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Repeat> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC, {
+        /// `std::io::repeat(byte)`'s reader always fills the whole
+        /// buffer offered to it with the given byte.
+        #[kani::proof]
+        fn verify_repeat_fills_the_buffer_with_the_given_byte() {
+            use std::io::Read;
+
+            let byte: u8 = kani::any();
+            let mut buffer = [0u8; 4];
+            let mut reader = std::io::repeat(byte);
+            let read = reader.read(&mut buffer).expect("Repeat::read never errors");
+            assert_eq!(read, buffer.len(), "Repeat::read always fills the whole buffer");
+            for filled in buffer {
+                assert_eq!(filled, byte, "Repeat::read fills every slot with the given byte");
+            }
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SeekFrom> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_seek_from_round_trips_each_variants_offset".to_owned(),
+            claim: VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SeekFrom>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SeekFrom> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
+        /// Each `SeekFrom` variant preserves the offset it was
+        /// constructed with, and stays its own variant.
+        #[kani::proof]
+        fn verify_seek_from_round_trips_each_variants_offset() {
+            let start_offset: u64 = kani::any();
+            let end_offset: i64 = kani::any();
+            let current_offset: i64 = kani::any();
+
+            match SeekFrom::Start(start_offset) {
+                SeekFrom::Start(value) => {
+                    assert_eq!(value, start_offset, "SeekFrom::Start preserves its offset");
+                }
+                _ => panic!("SeekFrom::Start must construct the Start variant"),
+            }
+            match SeekFrom::End(end_offset) {
+                SeekFrom::End(value) => {
+                    assert_eq!(value, end_offset, "SeekFrom::End preserves its offset");
+                }
+                _ => panic!("SeekFrom::End must construct the End variant"),
+            }
+            match SeekFrom::Current(current_offset) {
+                SeekFrom::Current(value) => {
+                    assert_eq!(value, current_offset, "SeekFrom::Current preserves its offset");
+                }
+                _ => panic!("SeekFrom::Current must construct the Current variant"),
+            }
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<std::io::Sink> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_sink_write_reports_full_length_and_discards_content".to_owned(),
+            claim: VERIFY_SINK_WRITE_REPORTS_FULL_LENGTH_AND_DISCARDS_CONTENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::io::Sink>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Sink>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::io::Sink> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SINK_WRITE_REPORTS_FULL_LENGTH_AND_DISCARDS_CONTENT_SRC, {
+        /// `std::io::sink()`'s writer always reports the full length
+        /// written and never errors, regardless of the content offered.
+        #[kani::proof]
+        fn verify_sink_write_reports_full_length_and_discards_content() {
+            use std::io::Write;
+
+            let data: [u8; 4] = kani::any();
+            let mut writer = std::io::sink();
+            let written = writer.write(&data).expect("Sink::write never errors");
+            assert_eq!(written, data.len(), "Sink::write reports the full length written");
+            writer.flush().expect("Sink::flush never errors");
         }
     }
 }

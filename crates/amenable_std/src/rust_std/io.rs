@@ -9,8 +9,9 @@
 //! that screening, not a bug in the exclusion itself.
 
 use std::io::{
-    BufReader, BufWriter, Bytes, IntoInnerError, LineWriter, Lines, PipeReader, PipeWriter, Split,
-    Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, Write, WriterPanicked,
+    BufReader, BufWriter, Bytes, Empty, IntoInnerError, LineWriter, Lines, PipeReader, PipeWriter,
+    Repeat, SeekFrom, Sink, Split, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, Write,
+    WriterPanicked,
 };
 
 use crate::rust_std::macros::{
@@ -79,6 +80,14 @@ impl_rust_std_type_generic1!(
 );
 
 impl_rust_std_type!(
+    Empty,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Empty.html",
+    "The Empty carrier is a reader that always reports end-of-file and a writer/seeker that ignores its input."
+);
+
+impl_rust_std_type!(
     PipeReader,
     "std",
     "std::io",
@@ -92,6 +101,30 @@ impl_rust_std_type!(
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.PipeWriter.html",
     "The PipeWriter carrier is the writing half of an anonymous OS pipe."
+);
+
+impl_rust_std_type!(
+    Repeat,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Repeat.html",
+    "The Repeat carrier is a reader that endlessly repeats a single byte."
+);
+
+impl_rust_std_type!(
+    SeekFrom,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/enum.SeekFrom.html",
+    "The SeekFrom carrier specifies a seek offset relative to the start, end, or current position of a stream."
+);
+
+impl_rust_std_type!(
+    Sink,
+    "std",
+    "std::io",
+    "https://doc.rust-lang.org/std/io/struct.Sink.html",
+    "The Sink carrier is a writer that discards every byte written to it, always reporting success."
 );
 
 impl_rust_std_type_generic1!(
@@ -171,11 +204,15 @@ register_rust_std_standard_evidence!(
     BufReader<&'static [u8]>,
     BufWriter<Vec<u8>>,
     std::io::Bytes<&'static [u8]>,
+    Empty,
     IntoInnerError<BufWriter<Vec<u8>>>,
     LineWriter<Vec<u8>>,
     std::io::Lines<&'static [u8]>,
     PipeReader,
     PipeWriter,
+    Repeat,
+    SeekFrom,
+    Sink,
     std::io::Split<&'static [u8]>,
     Stderr,
     StderrLock<'static>,
