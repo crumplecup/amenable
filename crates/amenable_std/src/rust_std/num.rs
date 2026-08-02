@@ -109,3 +109,13 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/core/num/struct.TryFromIntError.html",
     "The TryFromIntError carrier reports that a fallible integer conversion did not fit the target type."
 );
+
+register_rust_std_standard_evidence!(
+    Wrapping<i32>,
+    Saturating<i32>,
+    core::num::FpCategory,
+    core::num::IntErrorKind,
+    core::num::ParseIntError,
+    core::num::ParseFloatError,
+    core::num::TryFromIntError,
+);

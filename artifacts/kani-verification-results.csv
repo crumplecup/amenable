@@ -180,6 +180,8 @@ amenable_kani::rust_std::net::verify_ipv6_addr_segments_round_trip,1785095244,pa
 amenable_kani::rust_std::net::verify_socket_addr_v4_round_trips_ip_and_port,1785095249,passed
 amenable_kani::rust_std::net::verify_socket_addr_v6_round_trips_all_fields,1785095253,passed
 amenable_kani::rust_std::net::verify_socket_addr_variant_matches_its_kind,1785095258,passed
+amenable_kani::rust_std::num::verify_fp_category_matches_the_value_it_classifies,1785712363,passed
+amenable_kani::rust_std::num::verify_int_error_kind_classifies_parse_failures,1785712357,passed
 amenable_kani::rust_std::num::verify_nonzero_i128,1785095262,passed
 amenable_kani::rust_std::num::verify_nonzero_i16,1785095266,passed
 amenable_kani::rust_std::num::verify_nonzero_i32,1785095271,passed
@@ -192,6 +194,11 @@ amenable_kani::rust_std::num::verify_nonzero_u32,1785095298,passed
 amenable_kani::rust_std::num::verify_nonzero_u64,1785095302,passed
 amenable_kani::rust_std::num::verify_nonzero_u8,1785095306,passed
 amenable_kani::rust_std::num::verify_nonzero_usize,1785095311,passed
+amenable_kani::rust_std::num::verify_parse_float_error_occurs_only_for_unparseable_input,1785712363,passed
+amenable_kani::rust_std::num::verify_parse_int_error_reports_the_kind_of_the_failure,1785712359,passed
+amenable_kani::rust_std::num::verify_saturating_add_matches_the_inner_saturating_add,1785712354,passed
+amenable_kani::rust_std::num::verify_try_from_int_error_occurs_exactly_when_out_of_range,1785712355,passed
+amenable_kani::rust_std::num::verify_wrapping_add_matches_the_inner_wrapping_add,1785712353,passed
 amenable_kani::rust_std::ops::verify_bound_round_trips_its_endpoint,1785095315,passed
 amenable_kani::rust_std::ops::verify_control_flow_continue_and_break_are_disjoint,1785095320,passed
 amenable_kani::rust_std::ops::verify_range_contains_matches_bounds,1785095324,passed
