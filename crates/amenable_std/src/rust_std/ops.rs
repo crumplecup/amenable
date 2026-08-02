@@ -1,8 +1,21 @@
 //! `RustStdType` registrations for `core::ops` (ranges, `Bound`, `ControlFlow`).
 //!
-//! `core::range::*` (the newer, still-unstable range types behind
-//! `new_range_api`) is deliberately not covered here — it isn't nameable
-//! from a stable toolchain, and amenable_std stays on stable.
+//! `core::range::{Range, RangeFrom, RangeInclusive, RangeToInclusive}` are
+//! deliberately not covered here, and are tracked as exceptions in
+//! `seeds/amenable/patches/amenable.json` rather than left as unexplained
+//! gaps. This project's own toolchain (`rustc 1.97.1`, confirmed via a
+//! standalone compile check with no `#[feature]` gate) has them
+//! stabilized, but `cargo kani` rebuilds every dependency — including
+//! `amenable_std` — with Kani's own bundled compiler, which as of
+//! `cargo-kani 0.67.0` is pinned to an earlier rustc (built 2025-11-20)
+//! that still requires `#![feature(new_range_api)]` for these types.
+//! Referencing them here breaks `amenable_std` under Kani's toolchain
+//! even though the exact same code compiles cleanly under the project's
+//! own `just check`/`cargo build`. Revisit once Kani's bundled toolchain
+//! advances past whichever nightly stabilized this feature. Their
+//! associated iterator helpers (`RangeFromIter`, `RangeInclusiveIter`,
+//! `RangeIter`) remain genuinely unstable either way, and stay excluded
+//! for that separate reason.
 
 use std::ops::{Bound, ControlFlow, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive};
 
@@ -80,11 +93,12 @@ impl_rust_std_type_generic2!(
 // element type this module's proof batch covers.
 //
 // Range/RangeFrom/RangeInclusive/RangeToInclusive are written
-// fully-qualified: each bare name is shared by the newer, still-unstable
-// `core::range` family (already present in rustdoc's own inventory) —
-// only the qualified path disambiguates which one a given registration
-// means for tooling reading the registry (e.g. `elicit_doc`'s coverage
-// report).
+// fully-qualified: `core::range` defines its own carrier under each of
+// these same bare names (currently excluded from this crate for the
+// Kani-toolchain reason documented at the top of this module, but still
+// present in rustdoc's own inventory) — only the qualified path
+// disambiguates which one a given registration means for tooling reading
+// the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
     std::ops::Range<i32>,
     std::ops::RangeFrom<i32>,
