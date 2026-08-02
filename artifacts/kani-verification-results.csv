@@ -90,6 +90,16 @@ amenable_kani::rust_std::cell::verify_ref_cell_dynamic_borrow_rules,1785091247,p
 amenable_kani::rust_std::cell::verify_ref_derefs_to_the_borrowed_value,1785091253,passed
 amenable_kani::rust_std::cell::verify_ref_mut_derefs_and_writes_through_to_the_cell,1785091259,passed
 amenable_kani::rust_std::cell::verify_unsafe_cell_get_mut_and_into_inner_round_trip,1785091264,passed
+amenable_kani::rust_std::char::verify_char_escape_debug_escapes_a_newline,1785713069,passed
+amenable_kani::rust_std::char::verify_char_escape_default_escapes_a_newline,1785713078,passed
+amenable_kani::rust_std::char::verify_char_escape_unicode_renders_the_codepoint_escape,1785713082,passed
+amenable_kani::rust_std::char::verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range,1785713054,passed
+amenable_kani::rust_std::char::verify_decode_utf16_error_reports_the_unpaired_surrogate,1785713059,passed
+amenable_kani::rust_std::char::verify_decode_utf16_round_trips_a_bmp_code_unit,1785713057,passed
+amenable_kani::rust_std::char::verify_parse_char_error_occurs_for_empty_or_multi_character_strings,1785713060,passed
+amenable_kani::rust_std::char::verify_to_lowercase_maps_an_uppercase_ascii_letter,1785713063,passed
+amenable_kani::rust_std::char::verify_to_uppercase_maps_a_lowercase_ascii_letter,1785713065,passed
+amenable_kani::rust_std::char::verify_try_from_char_error_occurs_exactly_when_out_of_range,1785713055,passed
 amenable_kani::rust_std::cmp::verify_ordering_reverse_involution,1785091269,passed
 amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison,1785091274,passed
 amenable_kani::rust_std::env::verify_args_os_reports_at_least_the_program_path,1785091280,passed

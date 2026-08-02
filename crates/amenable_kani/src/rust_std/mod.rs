@@ -22,6 +22,7 @@ mod alloc_vec;
 mod array;
 mod backtrace;
 mod cell;
+mod char;
 mod cmp;
 mod convert;
 mod env;

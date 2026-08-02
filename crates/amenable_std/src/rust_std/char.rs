@@ -1,11 +1,11 @@
 //! `RustStdType` registrations for `core::char`.
 
 use core::char::{
-    CharTryFromError, DecodeUtf16, DecodeUtf16Error, ParseCharError, ToLowercase, ToUppercase,
-    TryFromCharError,
+    CharTryFromError, DecodeUtf16, DecodeUtf16Error, EscapeDebug, EscapeDefault, EscapeUnicode,
+    ParseCharError, ToLowercase, ToUppercase, TryFromCharError,
 };
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     CharTryFromError,
@@ -38,6 +38,30 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
+    EscapeDebug,
+    "core",
+    "core::char",
+    "https://doc.rust-lang.org/core/char/struct.EscapeDebug.html",
+    "The EscapeDebug carrier lazily yields a char's Debug-escaped representation, one char at a time."
+);
+
+impl_rust_std_type!(
+    EscapeDefault,
+    "core",
+    "core::char",
+    "https://doc.rust-lang.org/core/char/struct.EscapeDefault.html",
+    "The EscapeDefault carrier lazily yields a char's representation as in a Rust string literal, one char at a time."
+);
+
+impl_rust_std_type!(
+    EscapeUnicode,
+    "core",
+    "core::char",
+    "https://doc.rust-lang.org/core/char/struct.EscapeUnicode.html",
+    "The EscapeUnicode carrier lazily yields a char's \\u{{...}} escape sequence, one char at a time."
+);
+
+impl_rust_std_type!(
     ParseCharError,
     "core",
     "core::char",
@@ -67,4 +91,22 @@ impl_rust_std_type!(
     "core::char",
     "https://doc.rust-lang.org/core/char/struct.TryFromCharError.html",
     "The TryFromCharError carrier reports that a char could not be converted into a narrower integer type."
+);
+
+// EscapeDebug/EscapeDefault/EscapeUnicode are written fully-qualified:
+// `core::str` and `core::ascii` each define their own carrier by the same
+// bare name — only the qualified path disambiguates which one a given
+// registration means for tooling reading the registry (e.g. `elicit_doc`'s
+// coverage report).
+register_rust_std_standard_evidence!(
+    CharTryFromError,
+    DecodeUtf16<std::array::IntoIter<u16, 1>>,
+    DecodeUtf16Error,
+    core::char::EscapeDebug,
+    core::char::EscapeDefault,
+    core::char::EscapeUnicode,
+    ParseCharError,
+    ToLowercase,
+    ToUppercase,
+    TryFromCharError,
 );
