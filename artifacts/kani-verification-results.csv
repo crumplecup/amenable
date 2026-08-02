@@ -44,6 +44,7 @@ amenable_kani::gallery::utf8_validation_algorithm_cost::full_branch_validation_o
 amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass,1785090857,passed
 amenable_kani::gallery::vacuity::bounded_assumption_passes_nonvacuously,1785090862,passed
 amenable_kani::gallery::vacuity::explicit_contradiction_fails,1785090867,failed
+amenable_kani::rust_std::alloc_borrow::verify_cow_borrowed_and_owned_agree_on_their_value,1785702404,passed
 amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through,1785090873,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_drain_yields_every_pushed_element_once,1785090891,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_into_iter_yields_every_pushed_element_once,1785090908,passed

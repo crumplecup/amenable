@@ -2,6 +2,8 @@
 
 use std::borrow::{Cow, ToOwned};
 
+use crate::rust_std::macros::register_rust_std_standard_evidence;
+
 impl<'a, T: ToOwned + ?Sized> crate::RustStdType for Cow<'a, T> {
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::borrow")
@@ -15,3 +17,5 @@ impl<'a, T: ToOwned + ?Sized> crate::RustStdType for Cow<'a, T> {
         "The Cow carrier holds either a borrowed reference or an owned value, cloning to owned only when mutation is needed."
     }
 }
+
+register_rust_std_standard_evidence!(Cow<'static, i32>);

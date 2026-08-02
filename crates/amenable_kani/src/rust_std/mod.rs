@@ -11,6 +11,7 @@
 //! harness, captured verbatim via `amenable_derive::harness!` so it can
 //! never drift from what `cargo kani` would actually run).
 
+mod alloc_borrow;
 mod alloc_boxed;
 mod alloc_collections;
 mod alloc_ffi;
