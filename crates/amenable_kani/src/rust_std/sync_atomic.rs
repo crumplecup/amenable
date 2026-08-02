@@ -586,11 +586,13 @@ amenable_derive::harness! {
         /// reporting the real current value unchanged) is deliberately
         /// not checked here: Kani's model of the underlying
         /// `atomic_compare_exchange` intrinsic does not correctly track
-        /// the reported value on that branch, confirmed via a minimal
-        /// isolated reproduction (a single `compare_exchange` call
-        /// against a freshly constructed `AtomicPtr`, no `swap` or prior
-        /// exchange involved) that fails the same way — a genuine Kani/
-        /// CBMC limitation, not a logic error in this proof or in std.
+        /// the reported value on that branch, and that false trail remains
+        /// preserved in `gallery::atomic_ptr_compare_exchange` — a minimal,
+        /// isolated reproduction (a single `compare_exchange` call against
+        /// a freshly constructed `AtomicPtr`, no `swap` or prior exchange
+        /// involved) that fails the same way, confirming this is a genuine
+        /// Kani/CBMC limitation rather than a logic error in this proof or
+        /// in std.
         #[kani::proof]
         fn verify_atomic_ptr_load_store_swap_and_compare_exchange() {
             let mut initial_slot: i32 = kani::any();
