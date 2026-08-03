@@ -90,6 +90,34 @@ macro_rules! impl_rust_std_type_lifetime1 {
     };
 }
 
+/// As [`impl_rust_std_type_lifetime1`], for a type whose type parameter is
+/// *not* unconstrained on the struct itself (e.g. `str::Split<'a, P: Pattern>`,
+/// where `Pattern` is a sealed, unstable trait). An unconstrained `impl<'a,
+/// T> RustStdType for $ty<'a, T>` fails to compile for these — the struct
+/// definition's own bound is checked at every usage site of the type,
+/// including this impl, so `T` must be resolved to a concrete type that
+/// already satisfies it (confirmed empirically: `Pattern` itself can't be
+/// named in a bound from stable, but a concrete instantiation like
+/// `Split<'a, char>` compiles fine, since `char: Pattern` is already
+/// established inside std). `$inner` picks that concrete instantiation.
+macro_rules! impl_rust_std_type_lifetime1_concrete {
+    ($ty:ident, $inner:ty, $source_crate:literal, $source_module:literal, $url:expr, $summary:expr) => {
+        impl<'a> $crate::RustStdType for $ty<'a, $inner> {
+            fn rust_language_provenance() -> $crate::RustLanguageProvenance {
+                $crate::RustLanguageProvenance::for_source($source_crate, $source_module)
+            }
+
+            fn rust_doc_url() -> &'static str {
+                $url
+            }
+
+            fn rust_semantics_summary() -> &'static str {
+                $summary
+            }
+        }
+    };
+}
+
 /// As [`impl_rust_std_type_generic1`], for a type generic over three
 /// unconstrained type parameters (e.g. `iter::FlatMap<I, U, F>`).
 macro_rules! impl_rust_std_type_generic3 {
@@ -177,7 +205,8 @@ macro_rules! impl_rust_std_type_lifetime2_pred2 {
 pub(crate) use {
     impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_generic2,
     impl_rust_std_type_generic3, impl_rust_std_type_lifetime0, impl_rust_std_type_lifetime1,
-    impl_rust_std_type_lifetime2_pred1, impl_rust_std_type_lifetime2_pred2,
+    impl_rust_std_type_lifetime1_concrete, impl_rust_std_type_lifetime2_pred1,
+    impl_rust_std_type_lifetime2_pred2,
 };
 
 /// Register `RustStdStandard<T>`'s evidence link once per concrete `T`.

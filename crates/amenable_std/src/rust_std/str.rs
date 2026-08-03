@@ -1,28 +1,28 @@
 //! `RustStdType` registrations for `core::str`.
 //!
-//! `core::str::pattern::*` is deliberately
-//! not covered here — the whole `Pattern`/`Searcher` API sits behind the
-//! unstable `pattern` feature.
-//!
-//! Every iterator type generic over a `Pattern` (`MatchIndices`, `Matches`,
-//! `RMatchIndices`, `RMatches`, `RSplit`, `RSplitN`, `RSplitTerminator`,
-//! `Split`, `SplitInclusive`, `SplitN`, `SplitTerminator`) is *also* not
-//! covered, for the same underlying reason even though the struct itself
-//! isn't marked `#[unstable]`: each one's definition bounds its pattern
-//! parameter by `P: Pattern`, and `Pattern` can't be named or bounded by
-//! from a stable toolchain — so no unconstrained impl over them type-checks
-//! on stable regardless of the carrier struct's own stability. This is a
-//! real gap in item-level stability screening: it only catches a type
-//! that's itself `#[unstable]`, not one whose *definition* transitively
-//! requires an unstable trait bound.
+//! `core::str::pattern::*` is deliberately not covered here — the whole
+//! `Pattern`/`Searcher` API sits behind the unstable `pattern` feature, and
+//! `Pattern` can't be named in a trait bound from a stable toolchain
+//! (confirmed empirically). But that unnameability only blocks an
+//! *unconstrained* impl generic over `P`; it doesn't block a concrete
+//! instantiation. Every iterator type generic over a `Pattern`
+//! (`MatchIndices`, `Matches`, `RMatchIndices`, `RMatches`, `RSplit`,
+//! `RSplitN`, `RSplitTerminator`, `Split`, `SplitInclusive`, `SplitN`,
+//! `SplitTerminator`) *is* covered below, monomorphized on `char` — the
+//! same representative concrete pattern this module already uses
+//! elsewhere — via [`impl_rust_std_type_lifetime1_concrete`], which fixes
+//! the inner type parameter instead of leaving it unconstrained.
 
 use std::str::{
     Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode, Lines,
-    ParseBoolError, SplitAsciiWhitespace, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
+    MatchIndices, Matches, ParseBoolError, RMatchIndices, RMatches, RSplit, RSplitN,
+    RSplitTerminator, Split, SplitAsciiWhitespace, SplitInclusive, SplitN, SplitTerminator,
+    SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
 use crate::rust_std::macros::{
-    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+    impl_rust_std_type, impl_rust_std_type_lifetime0, impl_rust_std_type_lifetime1_concrete,
+    register_rust_std_standard_evidence,
 };
 
 macro_rules! str_iter0 {
@@ -123,12 +123,76 @@ impl<'a> crate::RustStdType for std::str::LinesAny<'a> {
     }
 }
 
+macro_rules! str_pattern_iter_char {
+    ($ty:ident, $summary:expr) => {
+        impl_rust_std_type_lifetime1_concrete!(
+            $ty,
+            char,
+            "core",
+            "core::str",
+            concat!(
+                "https://doc.rust-lang.org/core/str/struct.",
+                stringify!($ty),
+                ".html"
+            ),
+            $summary
+        );
+    };
+}
+
+str_pattern_iter_char!(
+    Split,
+    "The Split carrier lazily splits a str on a pattern, yielding substrings."
+);
+str_pattern_iter_char!(
+    RSplit,
+    "The RSplit carrier lazily splits a str on a pattern, yielding substrings from the back."
+);
+str_pattern_iter_char!(
+    SplitN,
+    "The SplitN carrier lazily splits a str on a pattern into at most n substrings."
+);
+str_pattern_iter_char!(
+    RSplitN,
+    "The RSplitN carrier lazily splits a str on a pattern into at most n substrings, from the back."
+);
+str_pattern_iter_char!(
+    SplitInclusive,
+    "The SplitInclusive carrier lazily splits a str on a pattern, keeping the matched delimiter at the end of each substring."
+);
+str_pattern_iter_char!(
+    SplitTerminator,
+    "The SplitTerminator carrier lazily splits a str on a pattern, not yielding a trailing empty substring after a terminal match."
+);
+str_pattern_iter_char!(
+    RSplitTerminator,
+    "The RSplitTerminator carrier lazily splits a str on a pattern from the back, not yielding a trailing empty substring after a terminal match."
+);
+str_pattern_iter_char!(
+    Matches,
+    "The Matches carrier lazily yields the non-overlapping substrings of a str that match a pattern."
+);
+str_pattern_iter_char!(
+    RMatches,
+    "The RMatches carrier lazily yields the non-overlapping substrings of a str that match a pattern, from the back."
+);
+str_pattern_iter_char!(
+    MatchIndices,
+    "The MatchIndices carrier lazily yields the non-overlapping substrings of a str that match a pattern, paired with their byte offset."
+);
+str_pattern_iter_char!(
+    RMatchIndices,
+    "The RMatchIndices carrier lazily yields the non-overlapping substrings of a str that match a pattern, paired with their byte offset, from the back."
+);
+
 // `'static` is the representative lifetime this module's proof batch
 // covers.
 //
-// Bytes/Lines/EscapeDebug/EscapeDefault/EscapeUnicode are written
-// fully-qualified: each bare name is shared by another module (e.g.
-// `std::io::Bytes`/`std::io::Lines`, `char`'s escape iterators) — only the
+// Bytes/Lines/EscapeDebug/EscapeDefault/EscapeUnicode/Split/RSplit/SplitN/
+// RSplitN/SplitInclusive are written fully-qualified: each bare name is
+// shared by another module (e.g. `std::io::Bytes`/`std::io::Lines`,
+// `char`'s escape iterators, `core::slice`'s differently-shaped
+// `Split`/`RSplit`/`SplitN`/`RSplitN`/`SplitInclusive` family) — only the
 // qualified path disambiguates which one a given registration means for
 // tooling reading the registry (e.g. `elicit_doc`'s coverage report).
 register_rust_std_standard_evidence!(
@@ -147,4 +211,15 @@ register_rust_std_standard_evidence!(
     ParseBoolError,
     Utf8Error,
     LinesAny<'static>,
+    std::str::Split<'static, char>,
+    std::str::RSplit<'static, char>,
+    std::str::SplitN<'static, char>,
+    std::str::RSplitN<'static, char>,
+    std::str::SplitInclusive<'static, char>,
+    SplitTerminator<'static, char>,
+    RSplitTerminator<'static, char>,
+    Matches<'static, char>,
+    RMatches<'static, char>,
+    MatchIndices<'static, char>,
+    RMatchIndices<'static, char>,
 );

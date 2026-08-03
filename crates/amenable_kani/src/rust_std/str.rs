@@ -8,10 +8,44 @@
 //! turns on specific character classes (whitespace, control characters,
 //! invalid byte sequences) that don't reduce to a single symbolic byte the
 //! way plain iteration does.
+//!
+//! The `Pattern`-generic split/match family is monomorphized on `char`,
+//! mirroring `amenable_std::rust_std::str`'s registration choice, and
+//! checked against fixed representative strings rather than a symbolic
+//! character. Of the 11 such types, only `Split`/`SplitN`/`SplitInclusive`
+//! (all forward, via `.collect()`) actually verify here; the other 8
+//! (`RSplit`, `RSplitN`, `SplitTerminator`, `RSplitTerminator`, `Matches`,
+//! `RMatches`, `MatchIndices`, `RMatchIndices`) have **no `KaniWitness`
+//! here**, deliberately — their `RustStdType` registration
+//! (`amenable_std::rust_std::str`) stands, but no direct Kani proof passes
+//! for two distinct reasons:
+//!
+//! - **Reverse traversal** (`RSplit`/`RSplitN`/`RSplitTerminator`/
+//!   `RMatches`/`RMatchIndices`): root-caused via an isolated probe --
+//!   `CharSearcher::next_match_back` bottoms out in `memchr::memrchr`,
+//!   whose internal scan loop CBMC can't bound even for a single `.next()`
+//!   call on a five-byte fixed str (confirmed unwinding past 580
+//!   iterations). Independent of proof style.
+//! - **Forward `SplitTerminator`/`Matches`/`MatchIndices`**: root cause
+//!   not fully isolated. Switching from `.collect()` to explicit
+//!   sequential `.next()` calls passed instantly in a minimal standalone
+//!   probe crate, but the identical harness still timed out when actually
+//!   run inside this crate — an isolated probe crate's timing does not
+//!   reliably predict real-crate behavior for Kani/CBMC (whole-crate
+//!   reachability/compilation scale appears to matter on its own). Always
+//!   re-verify a proof-style "fix" with a real `amenable verify kani
+//!   --proof <id>` run before trusting a probe result.
+//!
+//! See the gallery false trails at
+//! `gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call`.
+//! Closing either gap for real needs an accommodation model that doesn't
+//! route through the real `Pattern`/`Searcher` machinery — left as a
+//! follow-up, the same shape as `io::split`'s (see
+//! `amenable_kani::rust_std::io`).
 
 use std::str::{
-    CharIndices, Chars, EncodeUtf16, ParseBoolError, SplitAsciiWhitespace, SplitWhitespace,
-    Utf8Chunk, Utf8Chunks, Utf8Error,
+    CharIndices, Chars, EncodeUtf16, ParseBoolError, Split, SplitAsciiWhitespace, SplitInclusive,
+    SplitN, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
 use amenable_core::Evidence;
@@ -584,6 +618,112 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some("a"));
             assert_eq!(it.next(), Some("b"));
             assert_eq!(it.next(), None);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Split<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_yields_substrings_between_pattern_matches".to_owned(),
+            claim: VERIFY_SPLIT_YIELDS_SUBSTRINGS_BETWEEN_PATTERN_MATCHES_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Split<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Split<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Split<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLIT_YIELDS_SUBSTRINGS_BETWEEN_PATTERN_MATCHES_SRC, {
+        /// `.split(pat)` yields the substrings between matches, in
+        /// forward order.
+        #[kani::proof]
+        fn verify_split_yields_substrings_between_pattern_matches() {
+            let parts: Vec<&str> = "a,b,c".split(',').collect();
+            assert_eq!(parts, vec!["a", "b", "c"], "split yields substrings between matches, forward");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SplitN<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_splitn_limits_to_n_substrings".to_owned(),
+            claim: VERIFY_SPLITN_LIMITS_TO_N_SUBSTRINGS_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SplitN<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::SplitN<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SplitN<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLITN_LIMITS_TO_N_SUBSTRINGS_SRC, {
+        /// `.splitn(n, pat)` stops after `n` substrings, leaving the
+        /// remainder of the str unsplit in the final item.
+        #[kani::proof]
+        fn verify_splitn_limits_to_n_substrings() {
+            let parts: Vec<&str> = "a,b,c".splitn(2, ',').collect();
+            assert_eq!(parts, vec!["a", "b,c"], "splitn stops after n items, leaving the remainder unsplit");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SplitInclusive<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_inclusive_keeps_the_delimiter_attached".to_owned(),
+            claim: VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_DELIMITER_ATTACHED_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SplitInclusive<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::SplitInclusive<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SplitInclusive<'static, char>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_DELIMITER_ATTACHED_SRC, {
+        /// `.split_inclusive(pat)` keeps each matched delimiter attached
+        /// to the end of the substring that precedes it.
+        #[kani::proof]
+        fn verify_split_inclusive_keeps_the_delimiter_attached() {
+            let parts: Vec<&str> = "a,b,c".split_inclusive(',').collect();
+            assert_eq!(parts, vec!["a,", "b,", "c"], "split_inclusive keeps the delimiter attached to each substring");
         }
     }
 }
