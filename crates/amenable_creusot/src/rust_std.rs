@@ -30,7 +30,7 @@ use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
 use std::cmp::Ordering;
 #[cfg(creusot)]
-use std::num::NonZero;
+use std::num::{NonZero, Wrapping};
 #[cfg(creusot)]
 use std::time::Duration;
 
@@ -257,6 +257,46 @@ amenable_derive::harness! {
         })]
         fn verify_ordering_reverse_swaps_less_and_greater(o: Ordering) -> Ordering {
             o.reverse()
+        }
+    }
+}
+
+// Unlike `NonZero<T>`, `Wrapping<T>`'s arithmetic impls aren't one
+// generic `impl<T: Sealed> Add for Wrapping<T>` — std generates a
+// separate, concrete `impl Add for Wrapping<i32>` (and one per other
+// width) via a `macro_rules!` (`library/core/src/num/wrapping.rs`,
+// confirmed by reading the real source, not assumed), so an
+// `extern_spec!` targeting this one concrete instantiation matches the
+// real signature exactly, the same way `Ordering::reverse`'s did.
+// `.0` is a public tuple-field projection, not a method call, so it's
+// fine inside `#[ensures]` without a trusted wrapper; the plain
+// (non-`@`) `+` between the two `i32` fields relies on Pearlite's native
+// machine-integer semantics matching real wraparound, the same
+// convention `creusot-std`'s own `spec_op_common!` macro uses for
+// `i32::wrapping_add`'s postcondition.
+#[cfg(creusot)]
+extern_spec! {
+    impl std::ops::Add for Wrapping<i32> {
+        #[check(ghost)]
+        #[ensures(result.0 == self.0 + rhs.0)]
+        fn add(self, rhs: Wrapping<i32>) -> Wrapping<i32>;
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC, {
+        /// `Wrapping<T>`'s `+` operator wraps on overflow exactly like the
+        /// inner type's `wrapping_add` — the same claim
+        /// `amenable_kani::rust_std::num::verify_wrapping_add_matches_the_inner_wrapping_add`
+        /// checks by symbolic execution (there, comparing against
+        /// `a.wrapping_add(b)` directly). Rests on the local `extern_spec!`
+        /// above, the same relationship every other non-`char`/`String`
+        /// harness in this file has to a trusted axiom on the real method
+        /// it exercises.
+        #[requires(true)]
+        #[ensures(result.0 == a.0 + b.0)]
+        fn verify_wrapping_i32_add_wraps(a: Wrapping<i32>, b: Wrapping<i32>) -> Wrapping<i32> {
+            a + b
         }
     }
 }

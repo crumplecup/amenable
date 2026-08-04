@@ -1,6 +1,6 @@
 #![cfg(feature = "creusot")]
 
-use std::num::NonZero;
+use std::num::{NonZero, Wrapping};
 use std::time::Duration;
 
 use amenable_core::Witness;
@@ -64,5 +64,16 @@ fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <std::cmp::Ordering as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Wrapping<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_wrapping_i32_add_wraps");
+    assert_eq!(
+        proof.provenance,
+        <Wrapping<i32> as RustStdType>::provenance()
     );
 }

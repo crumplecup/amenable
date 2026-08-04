@@ -1,0 +1,31 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 298 8 298 93 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 299 12 299 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 296 19 296 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 297 18 297 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 281 18 281 44
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Wrapping_i32 = { f0: Int32.t }
+
+let rec add_Wrapping_i32 (self_: t_Wrapping_i32) (rhs: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = any
+  [ return (result: t_Wrapping_i32) -> {[@stop_split] [@expl:add ensures] [%#srust_std'2] result.f0
+    = Int32.add self_.f0 rhs.f0}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_wrapping_i32_add_wraps
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 298 8 298 93] (a: t_Wrapping_i32)
+  (b: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = add_Wrapping_i32 [%#srust_std] {a} {b} (fun (_x: t_Wrapping_i32) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Wrapping_i32 = Any.any_l () | & a: t_Wrapping_i32 = a | & b: t_Wrapping_i32 = b ])
+  [ return (result: t_Wrapping_i32) ->
+  {[@stop_split] [@expl:verify_wrapping_i32_add_wraps ensures] [%#srust_std'1] result.f0 = Int32.add a.f0 b.f0}
+    (! return {result}) ]

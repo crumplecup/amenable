@@ -55,7 +55,7 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
-use std::num::NonZero;
+use std::num::{NonZero, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
 
 use amenable_core::{Evidence, Provenance, Witness};
@@ -63,7 +63,7 @@ use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
-    VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_STRING_ROUNDTRIP_SRC, VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -264,5 +264,28 @@ bridge_creusot_witness!(RustStdStandard<std::cmp::Ordering>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
         verifier: "creusot",
         describe: || <RustStdStandard<std::cmp::Ordering> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Wrapping<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_wrapping_i32_add_wraps",
+            claim: VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Wrapping<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Wrapping<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Wrapping<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
