@@ -41,6 +41,7 @@ mod rust_std;
 mod slice_escape_ascii_model;
 mod slice_split_model;
 mod stoplight;
+mod str_pattern_model;
 mod string_drain_model;
 mod sync_lock_model;
 mod utf8_model;
@@ -90,6 +91,10 @@ pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniS
 pub use stoplight::{
     Color, Established, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow,
     YellowToken, next,
+};
+pub use str_pattern_model::{
+    KaniStrMatchObservation, KaniStrRSplitNObservation, KaniStrRSplitObservation,
+    KaniStrSplitTerminatorObservation,
 };
 pub use string_drain_model::KaniStringDrainObservation;
 pub use sync_lock_model::{

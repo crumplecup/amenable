@@ -10,42 +10,42 @@
 //! way plain iteration does.
 //!
 //! The `Pattern`-generic split/match family is monomorphized on `char`,
-//! mirroring `amenable_std::rust_std::str`'s registration choice, and
-//! checked against fixed representative strings rather than a symbolic
-//! character. Of the 11 such types, only `Split`/`SplitN`/`SplitInclusive`
-//! (all forward, via `.collect()`) actually verify here; the other 8
+//! mirroring `amenable_std::rust_std::str`'s registration choice. Of the
+//! 11 such types, `Split`/`SplitN`/`SplitInclusive` verify directly
+//! against fixed representative strings via `.collect()`. The other 8
 //! (`RSplit`, `RSplitN`, `SplitTerminator`, `RSplitTerminator`, `Matches`,
-//! `RMatches`, `MatchIndices`, `RMatchIndices`) have **no `KaniWitness`
-//! here**, deliberately — their `RustStdType` registration
-//! (`amenable_std::rust_std::str`) stands, but no direct Kani proof passes
-//! for two distinct reasons:
+//! `RMatches`, `MatchIndices`, `RMatchIndices`) don't have a passing
+//! direct proof for two distinct reasons, both still preserved as gallery
+//! false trails:
 //!
 //! - **Reverse traversal** (`RSplit`/`RSplitN`/`RSplitTerminator`/
 //!   `RMatches`/`RMatchIndices`): root-caused via an isolated probe --
 //!   `CharSearcher::next_match_back` bottoms out in `memchr::memrchr`,
 //!   whose internal scan loop CBMC can't bound even for a single `.next()`
 //!   call on a five-byte fixed str (confirmed unwinding past 580
-//!   iterations). Independent of proof style.
+//!   iterations). Independent of proof style. See
+//!   `gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call`.
 //! - **Forward `SplitTerminator`/`Matches`/`MatchIndices`**: root cause
 //!   not fully isolated. Switching from `.collect()` to explicit
 //!   sequential `.next()` calls passed instantly in a minimal standalone
 //!   probe crate, but the identical harness still timed out when actually
 //!   run inside this crate — an isolated probe crate's timing does not
 //!   reliably predict real-crate behavior for Kani/CBMC (whole-crate
-//!   reachability/compilation scale appears to matter on its own). Always
-//!   re-verify a proof-style "fix" with a real `amenable verify kani
-//!   --proof <id>` run before trusting a probe result.
+//!   reachability/compilation scale appears to matter on its own). See
+//!   `gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate`.
 //!
-//! See the gallery false trails at
-//! `gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call`.
-//! Closing either gap for real needs an accommodation model that doesn't
-//! route through the real `Pattern`/`Searcher` machinery — left as a
-//! follow-up, the same shape as `io::split`'s (see
-//! `amenable_kani::rust_std::io`).
+//! All 8 instead go through `crate::str_pattern_model`'s bounded,
+//! symbolic-`char` accommodation model (`KaniStrRSplitObservation`,
+//! `KaniStrRSplitNObservation`, `KaniStrSplitTerminatorObservation`,
+//! `KaniStrMatchObservation`): each proof is conditional on the real
+//! `core::str` path refining the model's fixed window shape, exactly as
+//! `slice_split_model`'s proofs already are for `std::slice::Split` and
+//! friends (see `amenable_kani::rust_std::slice`).
 
 use std::str::{
-    CharIndices, Chars, EncodeUtf16, ParseBoolError, Split, SplitAsciiWhitespace, SplitInclusive,
-    SplitN, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
+    CharIndices, Chars, EncodeUtf16, MatchIndices, Matches, ParseBoolError, RMatchIndices,
+    RMatches, RSplit, RSplitN, RSplitTerminator, Split, SplitAsciiWhitespace, SplitInclusive,
+    SplitN, SplitTerminator, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
 use amenable_core::Evidence;
@@ -724,6 +724,425 @@ amenable_derive::harness! {
         fn verify_split_inclusive_keeps_the_delimiter_attached() {
             let parts: Vec<&str> = "a,b,c".split_inclusive(',').collect();
             assert_eq!(parts, vec!["a,", "b,", "c"], "split_inclusive keeps the delimiter attached to each substring");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<RSplit<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rsplit_yields_substrings_from_the_back".to_owned(),
+            claim: VERIFY_RSPLIT_YIELDS_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<RSplit<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::RSplit<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<RSplit<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RSPLIT_YIELDS_SUBSTRINGS_FROM_THE_BACK_SRC, {
+        /// `.rsplit(pat)` yields the piece after the match, then the
+        /// piece before it. This proof uses the Amenable-owned bounded
+        /// str-pattern accommodation model (`KaniStrRSplitObservation`,
+        /// symbolic over all three ASCII positions): if the real
+        /// `rsplit` path refines this one-occurrence
+        /// `[before, pattern, after]` window, the Rust-facing claim
+        /// follows. The direct path times out under Kani even for a
+        /// single `.next()` call on a fixed five-byte str -- see
+        /// `gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call`.
+        #[kani::proof]
+        fn verify_rsplit_yields_substrings_from_the_back() {
+            let before: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let after: u8 = kani::any();
+            kani::assume(before < 128 && pattern < 128 && after < 128);
+            kani::assume(before != pattern && after != pattern);
+            let observation =
+                crate::KaniStrRSplitObservation::new(before as char, pattern as char, after as char);
+            assert_eq!(
+                observation.rsplit(),
+                [after as char, before as char],
+                "rsplit yields the piece after the match, then the piece before it"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<RSplitN<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rsplitn_limits_to_n_substrings_from_the_back".to_owned(),
+            claim: VERIFY_RSPLITN_LIMITS_TO_N_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<RSplitN<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::RSplitN<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<RSplitN<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RSPLITN_LIMITS_TO_N_SUBSTRINGS_FROM_THE_BACK_SRC, {
+        /// `.rsplitn(2, pat)` yields the piece after the last match,
+        /// then everything before it uncut. This proof uses the
+        /// Amenable-owned bounded str-pattern accommodation model
+        /// (`KaniStrRSplitNObservation`, symbolic over all four ASCII
+        /// positions): if the real `rsplitn` path refines this
+        /// two-occurrence `[a, pattern, b, pattern, c]` window, the
+        /// Rust-facing claim follows. The direct path hits the same
+        /// reverse-search timeout as `RSplit` -- see
+        /// `gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call`.
+        #[kani::proof]
+        fn verify_rsplitn_limits_to_n_substrings_from_the_back() {
+            let a: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let b: u8 = kani::any();
+            let c: u8 = kani::any();
+            kani::assume(a < 128 && pattern < 128 && b < 128 && c < 128);
+            kani::assume(a != pattern && b != pattern && c != pattern);
+            let observation =
+                crate::KaniStrRSplitNObservation::new(a as char, pattern as char, b as char, c as char);
+            let (first, rest) = observation.rsplitn_two();
+            assert_eq!(first, c as char, "rsplitn's first piece is everything after the last match");
+            assert_eq!(
+                rest,
+                [a as char, pattern as char, b as char],
+                "rsplitn's second piece is everything before the last match, uncut"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<SplitTerminator<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_terminator_suppresses_a_trailing_empty_substring".to_owned(),
+            claim: VERIFY_SPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<SplitTerminator<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SplitTerminator<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<SplitTerminator<'static, char>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_SRC, {
+        /// `.split_terminator(pat)` treats the pattern as a terminator
+        /// rather than a separator: a match at the very end of the str
+        /// does not produce a trailing empty substring. This proof uses
+        /// the Amenable-owned bounded str-pattern accommodation model
+        /// (`KaniStrSplitTerminatorObservation`, symbolic over all three
+        /// ASCII positions): if the real `split_terminator` path refines
+        /// this two-occurrence, nothing-after-the-last-match
+        /// `[a, pattern, b, pattern]` window, the Rust-facing claim
+        /// follows. The direct path times out for real inside this
+        /// crate despite passing in an isolated probe crate -- see
+        /// `gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate`.
+        #[kani::proof]
+        fn verify_split_terminator_suppresses_a_trailing_empty_substring() {
+            let a: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let b: u8 = kani::any();
+            kani::assume(a < 128 && pattern < 128 && b < 128);
+            kani::assume(a != pattern && b != pattern);
+            let observation =
+                crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
+            assert_eq!(
+                observation.split_terminator(),
+                [a as char, b as char],
+                "no trailing empty substring after the terminal match"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<RSplitTerminator<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rsplit_terminator_suppresses_a_trailing_empty_substring_from_the_back"
+                .to_owned(),
+            claim: VERIFY_RSPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_FROM_THE_BACK_SRC
+                .to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<RSplitTerminator<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RSplitTerminator<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<RSplitTerminator<'static, char>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RSPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_FROM_THE_BACK_SRC, {
+        /// Same terminator-suppression behavior as `SplitTerminator`,
+        /// traversed from the back. This proof uses the same
+        /// `KaniStrSplitTerminatorObservation` model as `SplitTerminator`
+        /// -- see that proof's doc comment.
+        #[kani::proof]
+        fn verify_rsplit_terminator_suppresses_a_trailing_empty_substring_from_the_back() {
+            let a: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let b: u8 = kani::any();
+            kani::assume(a < 128 && pattern < 128 && b < 128);
+            kani::assume(a != pattern && b != pattern);
+            let observation =
+                crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
+            assert_eq!(
+                observation.rsplit_terminator(),
+                [b as char, a as char],
+                "no trailing empty substring after the terminal match, traversed from the back"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<Matches<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_matches_yields_every_non_overlapping_occurrence".to_owned(),
+            claim: VERIFY_MATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Matches<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Matches<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Matches<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_MATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC, {
+        /// `.matches(pat)` yields every non-overlapping occurrence of
+        /// the pattern. This proof uses the Amenable-owned bounded
+        /// str-pattern accommodation model (`KaniStrMatchObservation`,
+        /// symbolic over all three filler ASCII positions and the
+        /// pattern itself): if the real `matches` path refines this
+        /// two-occurrence `[f0, pattern, f1, pattern, f2]` window, the
+        /// Rust-facing claim follows. The direct path times out for
+        /// real inside this crate despite passing in an isolated probe
+        /// crate -- see
+        /// `gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate`.
+        #[kani::proof]
+        fn verify_matches_yields_every_non_overlapping_occurrence() {
+            let f0: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let f1: u8 = kani::any();
+            let f2: u8 = kani::any();
+            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
+            let observation =
+                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+            assert_eq!(
+                observation.matches(),
+                [pattern as char, pattern as char],
+                "matches finds every non-overlapping occurrence"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<RMatches<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rmatches_yields_every_non_overlapping_occurrence".to_owned(),
+            claim: VERIFY_RMATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<RMatches<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RMatches<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<RMatches<'static, char>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RMATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC, {
+        /// Same non-overlapping-occurrence behavior as `Matches`,
+        /// traversed from the back; content alone can't distinguish
+        /// traversal order for a `char` pattern (see this module's own
+        /// doc). This proof uses the same `KaniStrMatchObservation`
+        /// model as `Matches` -- see that proof's doc comment.
+        #[kani::proof]
+        fn verify_rmatches_yields_every_non_overlapping_occurrence() {
+            let f0: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let f1: u8 = kani::any();
+            let f2: u8 = kani::any();
+            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
+            let observation =
+                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+            assert_eq!(
+                observation.rmatches(),
+                [pattern as char, pattern as char],
+                "rmatches finds every non-overlapping occurrence"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<MatchIndices<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_match_indices_pairs_each_match_with_its_byte_offset".to_owned(),
+            claim: VERIFY_MATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<MatchIndices<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<MatchIndices<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<MatchIndices<'static, char>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_MATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC, {
+        /// `.match_indices(pat)` pairs each match with its byte offset,
+        /// in forward (left-to-right) order. This proof uses the same
+        /// `KaniStrMatchObservation` model as `Matches` -- see that
+        /// proof's doc comment. The window's fixed byte offsets (1 and
+        /// 3) hold because every field is exactly one ASCII byte.
+        #[kani::proof]
+        fn verify_match_indices_pairs_each_match_with_its_byte_offset() {
+            let f0: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let f1: u8 = kani::any();
+            let f2: u8 = kani::any();
+            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
+            let observation =
+                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+            assert_eq!(
+                observation.match_indices(),
+                [(1, pattern as char), (3, pattern as char)],
+                "match_indices pairs each match with its byte offset, forward"
+            );
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<RMatchIndices<'static, char>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rmatch_indices_pairs_each_match_with_its_byte_offset_from_the_back"
+                .to_owned(),
+            claim: VERIFY_RMATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC
+                .to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<RMatchIndices<'static, char>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RMatchIndices<'static, char>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<RMatchIndices<'static, char>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_RMATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC, {
+        /// `.rmatch_indices(pat)` pairs each match with its byte offset,
+        /// same set as `match_indices` but in reverse (right-to-left)
+        /// order -- the one place in this cluster where forward/reverse
+        /// traversal is directly assertable by value, since the byte
+        /// offset (unlike the matched substring itself) differs per
+        /// occurrence. This proof uses the same `KaniStrMatchObservation`
+        /// model as `Matches` -- see that proof's doc comment.
+        #[kani::proof]
+        fn verify_rmatch_indices_pairs_each_match_with_its_byte_offset_from_the_back() {
+            let f0: u8 = kani::any();
+            let pattern: u8 = kani::any();
+            let f1: u8 = kani::any();
+            let f2: u8 = kani::any();
+            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
+            let observation =
+                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+            assert_eq!(
+                observation.rmatch_indices(),
+                [(3, pattern as char), (1, pattern as char)],
+                "rmatch_indices pairs each match with its byte offset, in reverse"
+            );
         }
     }
 }
