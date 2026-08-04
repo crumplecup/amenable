@@ -1,0 +1,14 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 35 29 42 *)
+
+(* <witness::CreusotVerifierMetadata as std::default::Default> *)
+
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec default_CreusotVerifierMetadata
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 35 29 42] (return (x: ())) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- () ] s1 | s1 = return {_ret} ] ] [ & _ret: () = Any.any_l () ])
+  [ return (result: ()) -> (! return {result}) ]

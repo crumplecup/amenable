@@ -14,5 +14,13 @@ categories = ["development-tools", "rust-patterns"]
 
 [dependencies]
 amenable_core = { workspace = true }
+amenable_creusot = { workspace = true, optional = true }
 amenable_derive = { workspace = true }
 inventory = "0.3"
+
+[features]
+# See `amenable`'s own `creusot` feature for the full rationale: an
+# experimental, still-partial backend, kept optional rather than pulled in
+# unconditionally by every crate that depends on `amenable_std` (which is
+# all of them).
+creusot = ["dep:amenable_creusot"]

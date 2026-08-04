@@ -1,0 +1,12 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_fmt_CreusotVerifierMetadata": {
+        "prover": "alt-ergo",
+        "time": 0.019
+      },
+      "vc_write_str": { "prover": "alt-ergo", "time": 0.019 }
+    }
+  }
+}

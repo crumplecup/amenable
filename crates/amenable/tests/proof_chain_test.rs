@@ -1,6 +1,12 @@
 use amenable::ChainError;
 
+// These three verifier-completeness assertions only hold when
+// `amenable_creusot`'s registrations are linked in, which only happens
+// under the `creusot` feature (nightly-only, see justfile's
+// `test-creusot`) — `amenable_creusot` depends on `creusot-std`, which
+// can't compile on stable, so it's not in `amenable`'s default features.
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() {
     let report =
         amenable::proof_chain("RustStdStandard<bool>").expect("bool's evidence link is registered");
@@ -97,6 +103,7 @@ fn calculation_over_two_arguments_fans_out_into_a_tree_that_bottoms_out_in_std()
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn calculation_chain_is_incomplete_for_creusot_and_verus() {
     for verifier in ["creusot", "verus"] {
         match amenable::proof_chain_for_verifiers("AddEvidence", Some(&[verifier])) {
@@ -123,6 +130,7 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
     // Auto-discovery finds kani, creusot, and verus (all present on the
     // std leaf); AddEvidence/Debit/Credit only ever proved kani, so the

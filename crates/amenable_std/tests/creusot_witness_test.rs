@@ -1,3 +1,5 @@
+#![cfg(feature = "creusot")]
+
 use amenable_core::Witness;
 use amenable_creusot::CreusotVerifier;
 use amenable_std::{RustStdStandard, RustStdType};

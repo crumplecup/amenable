@@ -1,16 +1,21 @@
 //! Creusot verifier backend for the `amenable` constitutional trait family.
 //!
-//! `CreusotVerifier` is defined *here*, not in `amenable_core` — there is
-//! only one verifier Creusot works with, Creusot, so the marker belongs
-//! with the crate that means it. That locality is what makes
-//! `impl amenable_core::Witness<CreusotVerifier> for amenable_std::RustStdStandard<T>`
-//! legal under Rust's orphan rule, one concrete type at a time: the rule
-//! requires *some* type in `Witness<CreusotVerifier>`'s type list to be
-//! local, and `CreusotVerifier` now is. A blanket impl over a bare type
-//! parameter still isn't legal (the parameter itself is never "covered"),
-//! which is why each type gets its own [`CreusotWitness`] impl plus a
-//! one-line mechanical bridge, rather than one generic impl for all of
-//! them — see `rust_std.rs`.
+//! `CreusotVerifier` and the [`CreusotWitness`] trait are defined *here* —
+//! there is only one verifier Creusot works with, Creusot, so the marker
+//! belongs with the crate that means it. But unlike Kani and Verus, the
+//! impls bridging `CreusotWitness`/`Witness<CreusotVerifier>` to concrete
+//! std carriers (`RustStdStandard<T>`) live in `amenable_std` instead of
+//! here — see `amenable_std::creusot_witness`'s doc comment for why (in
+//! short: `creusot-rustc`'s whole-crate translation pass can't handle the
+//! ordinary Rust machinery that bridge needs, so this crate stays pure
+//! Pearlite proof-function content, the thing `cargo creusot` actually
+//! translates). That split is legal under Rust's orphan rule via a
+//! different justification than usual: it's `RustStdStandard<T>` (the
+//! `Self` type, local to `amenable_std`) satisfying the "one local type"
+//! requirement there, rather than the verifier marker (local here).
+//!
+//! `rust_std.rs` holds the actual harness functions; `witness.rs` holds
+//! the trait/marker definitions `amenable_std` implements against.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
@@ -18,5 +23,5 @@
 mod rust_std;
 mod witness;
 
-pub use rust_std::CheckedProof;
+pub use rust_std::{VERIFY_CHAR_ROUNDTRIP_SRC, VERIFY_STRING_ROUNDTRIP_SRC};
 pub use witness::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};

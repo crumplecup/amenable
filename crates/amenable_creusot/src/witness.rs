@@ -1,22 +1,55 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
 use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
+use creusot_std::macros::trusted;
 
 /// The Creusot verifier, local to this crate: there is only one verifier
-/// Creusot works with — Creusot. Being local here (not imported from
-/// `amenable_core`) is what makes the per-type bridges in `rust_std.rs`
-/// legal under Rust's orphan rule — a blanket bridge over a bare type
-/// parameter is not: the orphan rule requires every uncovered generic
-/// parameter to be covered before the first local type, and `Self` in a
-/// blanket impl never is.
+/// Creusot works with — Creusot. Unlike Kani/Verus's own markers, the
+/// per-type `Witness<CreusotVerifier>` bridges for `RustStdStandard<T>`
+/// live in `amenable_std`, not here (see the crate-level doc comment) —
+/// legal there because `RustStdStandard<T>` itself is local to that crate,
+/// not because `CreusotVerifier` is. `CreusotVerifier` still belongs here
+/// rather than `amenable_core`, though: it's what makes each per-type
+/// impl in `amenable_std` a *bridge to Creusot specifically*, not a
+/// generic one no other verifier could also legally claim.
 pub struct CreusotVerifier;
 
 /// Provenance surface for the Creusot verifier backend.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+///
+/// No `PartialEq`/`Eq`/`PartialOrd`/`Ord` here, unlike every sibling
+/// verifier's own metadata marker (Kani, Verus) — `Verifier::Metadata`
+/// only requires `Provenance + Default`, nothing in this workspace
+/// compares two `CreusotVerifierMetadata` values, and deriving `PartialEq`
+/// specifically (which `Eq`, `PartialOrd`, and `Ord` all require in turn)
+/// breaks under real translation: `creusot-rustc` requires a `DeepModel`
+/// impl for any type deriving it, confirmed by a real error (`the trait
+/// bound witness::CreusotVerifierMetadata: creusot_std::model::DeepModel
+/// is not satisfied`), and this crate is the one sibling whose code is
+/// actually swept up by that translator. `Hash` alone doesn't trigger it.
+#[derive(Debug, Clone, Copy, Hash, Default)]
 pub struct CreusotVerifierMetadata;
 
 impl Provenance for CreusotVerifierMetadata {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
+    // `Vec::IntoIter`, not `Box<dyn Iterator<...>>` like every other
+    // verifier's own metadata (see `amenable_kani`/`amenable_verus`'s own
+    // `witness.rs`) — this is the one `Provenance` impl in this workspace
+    // that's actually swept up by `creusot-rustc`'s translation of
+    // `amenable_creusot` (it's local, unlike `amenable_std`'s registrations,
+    // which only ever compile in ordinary mode as a dependency). `dyn` is
+    // confirmed unsupported there: `error: forbidden dyn type: dyn
+    // std::iter::Iterator<...> (dyn support is currently minimal)`.
+    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
+
+    // Ordinary reporting code, not a proof claim — nothing here states or
+    // needs a Pearlite postcondition, but creusot-rustc still generates a
+    // real verification condition for every translated function unless
+    // told not to, and that VC is unprovable as stated: `MetadataEntry::
+    // new` has no contract, so calling it "yields an impossible
+    // precondition" (its own warning, confirmed by why3find actually
+    // failing this exact goal — `Coma.vc_metadata_CreusotVerifierMetadata`
+    // — before this attribute was added).
+    #[trusted]
+    fn metadata(&self) -> Self::MetadataIter {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "creusot"),
             ("authority", "Creusot project"),
@@ -31,7 +64,11 @@ impl Provenance for CreusotVerifierMetadata {
                 "package selection, flags, binary path, timeout, and report output",
             ),
         ];
-        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+        FACTS
+            .iter()
+            .map(|&(k, v)| MetadataEntry::new(k, v))
+            .collect::<Vec<_>>()
+            .into_iter()
     }
 }
 

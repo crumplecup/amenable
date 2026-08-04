@@ -1,1 +1,8 @@
 /target
+
+# Creusot: local why3find scratch state and crash reports; `verif/` (the
+# proof cache) and `why3find.json` ARE tracked, matching elicitation's own
+# convention — durable evidence a contract actually proved, not rebuilt
+# from scratch every time.
+.why3find/
+rustc-ice-*.txt

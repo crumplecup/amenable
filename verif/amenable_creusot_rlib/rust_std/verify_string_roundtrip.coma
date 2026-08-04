@@ -1,0 +1,31 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 89 8 89 55 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 89 35 89 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 86 19 86 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 89 49 89 55
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 87 18 87 29
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 88 18 88 55
+
+use creusot.prelude.Any
+use creusot.int.UInt64
+
+type t_String
+
+predicate inv_String (_1: t_String)
+
+function string_len [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 69 0 69 35] (_s: t_String) : UInt64.t
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 89 8 89 55]
+  (s: t_String) (return (x: t_String)) =
+  {[@stop_split] [@expl:verify_string_roundtrip 's' type invariant] [%#srust_std] inv_String s}
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- s ] s1 | s1 = return {_ret} ] ] [ & _ret: t_String = Any.any_l () | & s: t_String = s ])
+  [ return (result: t_String) ->
+  {[@stop_split] [@expl:verify_string_roundtrip ensures] ([@stop_split] [@expl:verify_string_roundtrip result type invariant] [%#srust_std'1] inv_String result)
+    /\ ([@stop_split] [@expl:verify_string_roundtrip ensures #0] [%#srust_std'2] result = s)
+    /\ ([@stop_split] [@expl:verify_string_roundtrip ensures #1] [%#srust_std'3] string_len result = string_len s)}
+    (! return {result}) ]

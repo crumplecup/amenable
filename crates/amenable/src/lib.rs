@@ -37,9 +37,8 @@ pub use amenable_core::{
     RegistryReport, Sidecar, Standard, StateMachine, Verifier, Witness, proof_chain,
     proof_chain_for_verifiers,
 };
-pub use amenable_creusot::{
-    CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
-};
+#[cfg(feature = "creusot")]
+pub use amenable_creusot::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};
 pub use amenable_kani::{
     AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Color, Credit,
     Debit, Green, GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition,
@@ -47,6 +46,8 @@ pub use amenable_kani::{
     KaniVerifier, KaniVerifierMetadata, KaniWitness, Red, RedToken, SequentialCycle, Stoplight,
     Sum, Yellow, YellowToken, add,
 };
+#[cfg(feature = "creusot")]
+pub use amenable_std::CheckedProof as CreusotCheckedProof;
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
     RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,

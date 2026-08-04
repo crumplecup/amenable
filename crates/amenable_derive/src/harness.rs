@@ -73,7 +73,10 @@ pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
         #[cfg(#cfg_name)]
         #item
 
-        const #const_name: &str = #source;
+        /// Verbatim source of this harness, whitespace and all, captured
+        /// at macro-expansion time (via `amenable_derive::harness!`) so it
+        /// can never drift from the real contract.
+        pub const #const_name: &str = #source;
 
         #kani_record
     })
