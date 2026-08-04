@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 56 8 56 49 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 58 8 58 49 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 53 19 53 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 54 18 54 29
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 55 18 55 66
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 55 19 55 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 56 18 56 29
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 57 18 57 66
 
 use creusot.prelude.Char
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_char_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 56 8 56 49]
+let rec verify_char_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 58 8 58 49]
   (c: Char.t) (return (x: Char.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- c ] s1 | s1 = return {_ret} ] ] [ & _ret: Char.t = Any.any_l () | & c: Char.t = c ])
   [ return (result: Char.t) ->

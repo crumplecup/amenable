@@ -3,21 +3,21 @@
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
-fn all_seven_translator_findings_are_registered_and_distinct() {
+fn all_eight_translator_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        7,
-        "expected exactly the 7 findings from this session's real pipeline work: {cases:#?}"
+        8,
+        "expected exactly the 8 findings from this session's real pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 7, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 8, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
@@ -33,8 +33,8 @@ fn all_seven_translator_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == CreusotGalleryExpectation::TranslationError)
         .count();
     assert_eq!(
-        translation_error_count, 6,
-        "the other six findings were real, diagnosed translation errors"
+        translation_error_count, 7,
+        "the other seven findings were real, diagnosed translation errors"
     );
 
     for case in &cases {

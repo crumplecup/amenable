@@ -1,5 +1,6 @@
 #![cfg(feature = "creusot")]
 
+use std::num::NonZero;
 use std::time::Duration;
 
 use amenable_core::Witness;
@@ -39,4 +40,15 @@ fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
         "verify_duration_new_normalizes_nanos_and_carries_into_secs"
     );
     assert_eq!(proof.provenance, <Duration as RustStdType>::provenance());
+}
+
+#[test]
+fn nonzero_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<NonZero<i16>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_nonzero_i16_roundtrips");
+    assert_eq!(
+        proof.provenance,
+        <NonZero<i16> as RustStdType>::provenance()
+    );
 }

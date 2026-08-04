@@ -1,6 +1,6 @@
 //! Creusot proof gallery: documented findings about `creusot-rustc`'s own
 //! translation behavior, discovered while building the real char/String/
-//! Duration proof pipeline in `amenable_creusot`.
+//! Duration/`NonZero<i16>` proof pipeline in `amenable_creusot`.
 //!
 //! Mirrors `amenable_kani`'s gallery in spirit — production proofs answer
 //! "does this harness establish the intended claim?", the gallery answers
@@ -404,6 +404,60 @@ fn verify_duration_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: 
 // These are the exact terms as_secs/subsec_nanos's own postconditions are
 // stated in, so this proves the same underlying fact their (untouchable)
 // contracts would give, without ever invoking the methods themselves.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::nonzero_new_extern_spec_needs_a_sealed_unstable_trait_bound".to_owned(),
+            title: "extern_spec!-ing NonZero<T>::new isn't practical: it needs the sealed, unstable ZeroablePrimitive bound".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (this exact shape was in amenable_creusot::rust_std before
+// the fix — an extern_spec targeting the concrete NonZero<i16> alone,
+// bypassing the generic std::num::NonZero<T>::new):
+extern_spec! {
+    impl NonZero<i16> {
+        #[check(ghost)]
+        #[ensures(value != 0i16 ==> match result { Some(_) => true, None => false })]
+        #[ensures(value == 0i16 ==> match result { Some(_) => false, None => true })]
+        fn new(value: i16) -> Option<NonZero<i16>>;
+    }
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot`:
+//   error: extern spec generics don't match
+//           rust_std::extern_spec_... []
+//           std::num::NonZero::<T>::new [i16]
+// extern_spec! requires the declared signature to match the REAL one
+// structurally, generics included — `new` is defined once, generically,
+// on `impl<T: ZeroablePrimitive> NonZero<T>`, not per-instantiation, so a
+// non-generic `impl NonZero<i16>` extern_spec doesn't match no matter what
+// the body says. Writing the generic version faithfully would need
+// `impl<T: ZeroablePrimitive> NonZero<T> { fn new(value: T) -> ... }` —
+// but `core::num::ZeroablePrimitive` is `pub unsafe trait ... : ... +
+// private::Sealed`, and its own doc comment calls it "currently
+// permanently unstable": not nameable as a bound from outside `std` on
+// stable Rust at all, confirmed by reading the real std source
+// (library/core/src/num/nonzero.rs), not assumed.
+//
+// Unlike every other case in this gallery, there's no "working form" that
+// stays a real, why3find-discharged proof — `NonZero::new` genuinely
+// cannot be given a contract from outside `std` under these constraints.
+// The honest fallback (this is the real content, in
+// amenable_creusot::rust_std today): state the same claim Kani checks by
+// symbolic execution, but mark the whole harness #[trusted] rather than
+// silently dropping the postconditions or pretending they're verified:
+#[trusted]
+#[ensures(match result { Some(_) => value != 0i16, None => value == 0i16 })]
+#[ensures(match result { Some(nz) => nonzero_i16_get(&nz) == value, None => true })]
+fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
+    NonZero::new(value)
+}
 "#,
         },
     }

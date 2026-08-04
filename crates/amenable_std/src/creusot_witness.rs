@@ -55,12 +55,14 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
+use std::num::NonZero;
 use std::time::{Duration, TryFromFloatSecsError};
 
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
-    VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+    VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -210,5 +212,28 @@ bridge_creusot_witness!(RustStdStandard<Duration>);
         evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
         verifier: "creusot",
         describe: || <RustStdStandard<Duration> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<NonZero<i16>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_nonzero_i16_roundtrips",
+            claim: VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<NonZero<i16>> as CreusotWitness>::proof().to_string(),
     }
 }

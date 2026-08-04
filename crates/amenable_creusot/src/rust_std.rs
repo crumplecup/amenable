@@ -28,6 +28,8 @@ use creusot_std::macros::{ensures, logic, requires, trusted};
 #[cfg(creusot)]
 use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
+use std::num::NonZero;
+#[cfg(creusot)]
 use std::time::Duration;
 
 amenable_derive::harness! {
@@ -140,6 +142,60 @@ amenable_derive::harness! {
             nanos: u32,
         ) -> Duration {
             Duration::new(secs, nanos)
+        }
+    }
+}
+
+// `NonZero::get` is a plain program function too — same restriction as
+// `String::len`, no `#[check(ghost)]` contract to trip over this time
+// since creusot-std has no extern_spec for `NonZero<T>` at all. Trusted
+// wrapper, same shape as `string_len`.
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+fn nonzero_i16_get(_nz: &NonZero<i16>) -> i16 {
+    dead
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, {
+        /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
+        /// round-trips the wrapped value unchanged — the same claim
+        /// `amenable_kani::rust_std::num::verify_nonzero_i16` checks by
+        /// symbolic execution, restated as a Creusot postcondition.
+        ///
+        /// `#[trusted]`, unlike every other harness in this file: `new`
+        /// is uncontracted (creusot-std covers plain integers and
+        /// Duration, not `NonZero<T>` at all), and giving it one myself
+        /// isn't practical — `extern_spec!` requires matching the real
+        /// generic signature exactly (confirmed: `extern spec generics
+        /// don't match` when targeting the concrete `NonZero<i16>`
+        /// alone), and the real bound is `T: ZeroablePrimitive`, an
+        /// `unsafe`, sealed, doc-comment-flagged-"currently permanently
+        /// unstable" trait — not something nameable from outside `std`
+        /// on stable Rust. So this states the same claim Kani checks by
+        /// symbolic execution, honestly marked as asserted rather than
+        /// mechanically discharged, the same way `elicitation`'s own
+        /// reference pattern uses `#[trusted]` for claims judged "too
+        /// hard to prove" rather than silently weakening them.
+        ///
+        /// One width, not all twelve `amenable_kani` proves separately
+        /// (`i8` through `u128`/`usize`): the coverage checklist resolves
+        /// every `NonZero{I,U}*` type alias back to the same evidence,
+        /// `RustStdStandard<NonZero<i16>>`, so one representative case is
+        /// what actually closes the gap there.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            Some(_) => value != 0i16,
+            None => value == 0i16,
+        })]
+        #[ensures(match result {
+            Some(nz) => nonzero_i16_get(&nz) == value,
+            None => true,
+        })]
+        fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
+            NonZero::new(value)
         }
     }
 }
