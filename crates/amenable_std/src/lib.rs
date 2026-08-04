@@ -15,10 +15,17 @@
 
 mod cert;
 #[cfg(feature = "creusot")]
+mod creusot_gallery;
+#[cfg(feature = "creusot")]
 mod creusot_witness;
 mod rust_std;
 
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
+#[cfg(feature = "creusot")]
+pub use creusot_gallery::{
+    CreusotGalleryCase, CreusotGalleryDisposition, CreusotGalleryExpectation,
+    CreusotGalleryRegistration,
+};
 #[cfg(feature = "creusot")]
 pub use creusot_witness::CheckedProof;
 pub use rust_std::{
