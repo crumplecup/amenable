@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  linux:
+    name: check-all (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: extractions/setup-just@v3
+      - run: just check-all
+
+  windows:
+    name: check-all (windows-latest)
+    # Kani/CBMC don't run on Windows, so this validates the #[cfg(windows)]
+    # registrations in amenable_std/rust_std/os_windows.rs for real (native
+    # compile + clippy + test, not the cross/Podman check in the justfile's
+    # check-windows recipe) -- everything except the actual Kani proofs,
+    # which stay Linux-only and reference an accommodation model instead
+    # (see amenable_kani/src/windows_handle_model.rs and
+    # windows_socket_model.rs).
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: extractions/setup-just@v3
+      - run: just check-all

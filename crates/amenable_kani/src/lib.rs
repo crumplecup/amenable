@@ -32,6 +32,7 @@ mod hash_model;
 mod io_model;
 mod linked_list_extract_model;
 mod mpsc_model;
+mod os_windows_model;
 mod panic_model;
 mod path_model;
 mod pipe_model;
@@ -73,6 +74,10 @@ pub use io_model::{
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
+pub use os_windows_model::{
+    KANI_INVALID_HANDLE_VALUE, KaniWindowsHandle, KaniWindowsHandleOrInvalid, KaniWindowsSocket,
+    kani_encode_wide_bmp_char,
+};
 pub use panic_model::{KaniCallerLocationObservation, KaniPanicHookObservation};
 pub use path_model::{KaniPathDisplayObservation, KaniWindowsPrefixObservation};
 pub use pipe_model::{KaniPipe, KaniPipeReader, KaniPipeWriter};
