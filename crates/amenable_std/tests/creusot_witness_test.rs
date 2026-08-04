@@ -1,6 +1,6 @@
 #![cfg(feature = "creusot")]
 
-use std::num::{NonZero, Wrapping};
+use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
 
 use amenable_core::Witness;
@@ -75,5 +75,16 @@ fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() 
     assert_eq!(
         proof.provenance,
         <Wrapping<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Saturating<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_saturating_i32_add_clamps");
+    assert_eq!(
+        proof.provenance,
+        <Saturating<i32> as RustStdType>::provenance()
     );
 }

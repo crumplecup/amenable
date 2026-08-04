@@ -30,7 +30,7 @@ use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
 use std::cmp::Ordering;
 #[cfg(creusot)]
-use std::num::{NonZero, Wrapping};
+use std::num::{NonZero, Saturating, Wrapping};
 #[cfg(creusot)]
 use std::time::Duration;
 
@@ -296,6 +296,51 @@ amenable_derive::harness! {
         #[requires(true)]
         #[ensures(result.0 == a.0 + b.0)]
         fn verify_wrapping_i32_add_wraps(a: Wrapping<i32>, b: Wrapping<i32>) -> Wrapping<i32> {
+            a + b
+        }
+    }
+}
+
+// Same per-concrete-type macro shape as `Wrapping<T>` (confirmed by
+// reading the real source, `library/core/src/num/saturating.rs`: `impl
+// const Add for Saturating<$t>` generated once per width, not one
+// generic sealed-trait impl), so a local `extern_spec!` is practical
+// here too — but the semantics are clamping, not wraparound, so the
+// postcondition restates `creusot-std`'s own three-way `@`-lifted
+// contract for the plain `i32::saturating_add` method (`spec_op_common!`
+// in `creusot_std::std::num`) in terms of the wrapper's `.0` fields,
+// rather than reusing Wrapping's plain-`+` idiom.
+#[cfg(creusot)]
+extern_spec! {
+    impl std::ops::Add for Saturating<i32> {
+        #[check(ghost)]
+        #[ensures(
+            (self.0@ + rhs.0@) >= i32::MIN@ && (self.0@ + rhs.0@) <= i32::MAX@
+            ==> result.0@ == (self.0@ + rhs.0@)
+        )]
+        #[ensures((self.0@ + rhs.0@) < i32::MIN@ ==> result.0@ == i32::MIN@)]
+        #[ensures((self.0@ + rhs.0@) > i32::MAX@ ==> result.0@ == i32::MAX@)]
+        fn add(self, rhs: Saturating<i32>) -> Saturating<i32>;
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, {
+        /// `Saturating<T>`'s `+` operator saturates at the numeric bounds
+        /// exactly like the inner type's `saturating_add` — the same
+        /// claim `amenable_kani::rust_std::num::verify_saturating_add_matches_the_inner_saturating_add`
+        /// checks by symbolic execution. Rests on the local `extern_spec!`
+        /// above, which restates `creusot-std`'s own trusted axiom for
+        /// `i32::saturating_add` in terms of `Saturating<i32>`'s wrapper
+        /// field.
+        #[requires(true)]
+        #[ensures(
+            (a.0@ + b.0@) >= i32::MIN@ && (a.0@ + b.0@) <= i32::MAX@
+            ==> result.0@ == (a.0@ + b.0@)
+        )]
+        #[ensures((a.0@ + b.0@) < i32::MIN@ ==> result.0@ == i32::MIN@)]
+        #[ensures((a.0@ + b.0@) > i32::MAX@ ==> result.0@ == i32::MAX@)]
+        fn verify_saturating_i32_add_clamps(a: Saturating<i32>, b: Saturating<i32>) -> Saturating<i32> {
             a + b
         }
     }
