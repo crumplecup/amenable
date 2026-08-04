@@ -1,0 +1,82 @@
+//! `KaniWitness` impls for `core::alloc`.
+
+use std::alloc::{Layout, LayoutError};
+
+use amenable_core::Evidence;
+use amenable_std::RustStdStandard;
+
+use super::CheckedProof;
+use crate::KaniWitness;
+use crate::rust_std::macros::bridge_kani_witness;
+
+impl KaniWitness for RustStdStandard<Layout> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_layout_new_reports_the_types_size_and_alignment".to_owned(),
+            claim: VERIFY_LAYOUT_NEW_REPORTS_THE_TYPES_SIZE_AND_ALIGNMENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Layout>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Layout>",
+        verifier: "kani",
+        describe: || <RustStdStandard<Layout> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_LAYOUT_NEW_REPORTS_THE_TYPES_SIZE_AND_ALIGNMENT_SRC, {
+        /// `Layout::new::<T>()` reports `T`'s real size and alignment.
+        #[kani::proof]
+        fn verify_layout_new_reports_the_types_size_and_alignment() {
+            let layout = Layout::new::<i32>();
+            assert_eq!(layout.size(), 4, "Layout::new::<i32>() reports i32's size");
+            assert_eq!(layout.align(), 4, "Layout::new::<i32>() reports i32's alignment");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<LayoutError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
+                .to_owned(),
+            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC
+                .to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<LayoutError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LayoutError>",
+        verifier: "kani",
+        describe: || <RustStdStandard<LayoutError> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC, {
+        /// `Layout::from_size_align` rejects an alignment that isn't a
+        /// power of two.
+        #[kani::proof]
+        fn verify_layout_from_size_align_rejects_a_non_power_of_two_alignment() {
+            let result = Layout::from_size_align(4, 3);
+            assert!(result.is_err(), "a non-power-of-two alignment is rejected");
+        }
+    }
+}

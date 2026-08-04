@@ -20,6 +20,7 @@ amenable_kani::gallery::replace_recommendations::default_hasher_determinism_time
 amenable_kani::gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model,1785089313,failed
 amenable_kani::gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model,1785089323,failed
 amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path,1785089511,timeout
+amenable_kani::gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path,1785858049,timeout
 amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector,1785089699,timeout
 amenable_kani::gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry,1785855419,timeout
 amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path,1785089887,timeout
@@ -83,7 +84,10 @@ amenable_kani::rust_std::alloc_vec::verify_vec_drain_removes_and_yields_in_order
 amenable_kani::rust_std::alloc_vec::verify_vec_extract_if_partitions_by_the_predicate,1785091192,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_into_iter_yields_owned_values_in_order,1785091202,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_push_pop_round_trips,1785091210,passed
+amenable_kani::rust_std::any::verify_type_id_is_reflexive_and_distinguishes_distinct_types,1785857196,passed
+amenable_kani::rust_std::array::verify_array_into_iter_yields_elements_in_order,1785857844,passed
 amenable_kani::rust_std::array::verify_try_from_slice_rejects_a_length_mismatch,1785091215,passed
+amenable_kani::rust_std::ascii::verify_escape_default_escapes_a_control_byte,1785857245,passed
 amenable_kani::rust_std::backtrace::verify_backtrace_force_capture_always_actually_captures,1785091220,passed
 amenable_kani::rust_std::backtrace::verify_backtrace_status_reports_captured_after_force_capture,1785091225,passed
 amenable_kani::rust_std::cell::verify_cell_get_set_replace_take_round_trip,1785091230,passed
@@ -105,6 +109,8 @@ amenable_kani::rust_std::char::verify_to_uppercase_maps_a_lowercase_ascii_letter
 amenable_kani::rust_std::char::verify_try_from_char_error_occurs_exactly_when_out_of_range,1785713055,passed
 amenable_kani::rust_std::cmp::verify_ordering_reverse_involution,1785091269,passed
 amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison,1785091274,passed
+amenable_kani::rust_std::core_alloc::verify_layout_from_size_align_rejects_a_non_power_of_two_alignment,1785857210,passed
+amenable_kani::rust_std::core_alloc::verify_layout_new_reports_the_types_size_and_alignment,1785857203,passed
 amenable_kani::rust_std::env::verify_args_os_reports_at_least_the_program_path,1785091280,passed
 amenable_kani::rust_std::env::verify_args_reports_at_least_the_program_path,1785091285,passed
 amenable_kani::rust_std::env::verify_join_paths_error_reports_an_unjoinable_path,1785091297,passed
@@ -120,6 +126,7 @@ amenable_kani::rust_std::fmt::verify_debug_set_renders_entries_in_braces,1785091
 amenable_kani::rust_std::fmt::verify_debug_struct_renders_named_fields,1785091371,passed
 amenable_kani::rust_std::fmt::verify_debug_tuple_renders_positional_fields,1785091377,passed
 amenable_kani::rust_std::fmt::verify_formatter_exposes_the_parsed_width_and_precision,1785091387,passed
+amenable_kani::rust_std::fmt::verify_from_fn_forwards_display_to_the_supplied_closure,1785857497,passed
 amenable_kani::rust_std::fs::verify_dir_builder_creates_nested_directories_recursively,1785347511,passed
 amenable_kani::rust_std::fs::verify_dir_entry_reports_the_created_files_name_and_path,1785347676,passed
 amenable_kani::rust_std::fs::verify_file_times_sets_the_recorded_modification_time,1785347869,passed
@@ -281,8 +288,10 @@ amenable_kani::rust_std::slice::verify_split_n_caps_the_number_of_pieces,1785350
 amenable_kani::rust_std::slice::verify_split_n_mut_caps_the_number_of_pieces,1785350220,passed
 amenable_kani::rust_std::slice::verify_split_yields_subslices_between_matches,1785349810,passed
 amenable_kani::rust_std::slice::verify_windows_yields_overlapping_slices,1785099118,passed
+amenable_kani::rust_std::std_alloc::verify_system_allocates_and_deallocates_a_layout,1785857237,passed
 amenable_kani::rust_std::std_collections::verify_hash_map_insert_then_get_recovers_the_value,1785855116,passed
 amenable_kani::rust_std::std_collections::verify_hash_set_insert_then_contains_reports_membership,1785855123,passed
+amenable_kani::rust_std::std_ffi::verify_os_str_display_renders_valid_utf8_content_unchanged,1785857860,passed
 amenable_kani::rust_std::std_ffi::verify_os_str_valid_utf8_content_round_trips_through_to_str,1785346257,passed
 amenable_kani::rust_std::std_ffi::verify_os_string_push_appends_to_the_existing_content,1785099310,passed
 amenable_kani::rust_std::std_hash::verify_default_hasher_is_deterministic_across_fresh_instances,1785099317,passed
@@ -316,7 +325,7 @@ amenable_kani::rust_std::str::verify_split_ascii_whitespace_collapses_runs_of_wh
 amenable_kani::rust_std::str::verify_split_inclusive_keeps_the_delimiter_attached,1785718592,passed
 amenable_kani::rust_std::str::verify_split_terminator_suppresses_a_trailing_empty_substring,1785852086,passed
 amenable_kani::rust_std::str::verify_split_whitespace_collapses_runs_of_whitespace,1785099599,passed
-amenable_kani::rust_std::str::verify_split_yields_substrings_between_pattern_matches,1785718193,passed
+amenable_kani::rust_std::str::verify_split_yields_substrings_between_pattern_matches,1785857180,passed
 amenable_kani::rust_std::str::verify_splitn_limits_to_n_substrings,1785718393,passed
 amenable_kani::rust_std::str::verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes,1785099604,passed
 amenable_kani::rust_std::str::verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input,1785099610,passed
@@ -333,6 +342,7 @@ amenable_kani::rust_std::sync_atomic::verify_atomic_u32,1785702148,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u64,1785702149,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u8,1785702149,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_usize,1785702150,passed
+amenable_kani::rust_std::sync_atomic::verify_relaxed_ordering_still_makes_a_store_observable,1785857850,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_of_one_is_its_own_leader,1785353068,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_wait_result_reports_the_sole_participant_as_leader,1785353071,passed
 amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_out,1785353074,passed

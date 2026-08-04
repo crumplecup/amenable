@@ -625,6 +625,32 @@ amenable_derive::harness! {
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration {
         case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
+            harness: "gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct fmt::from_fn rendering can still time out".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, FROM_FN_RENDERING_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
+        /// Same formatting-machinery timeout class as
+        /// `format_arguments_rendering_times_out_in_the_direct_std_path`,
+        /// confirmed separately for `fmt::from_fn`.
+        #[kani::proof]
+        fn from_fn_rendering_times_out_in_the_direct_std_path() {
+            let wrapped = core::fmt::from_fn(|f| write!(f, "hi"));
+            assert_eq!(wrapped.to_string(), "hi", "from_fn's Display forwards to the closure");
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
             id: "amenable_kani::gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
             harness: "gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
             package: "amenable_kani".to_owned(),

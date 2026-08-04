@@ -5,7 +5,7 @@
 
 use std::alloc::System;
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     System,
@@ -14,3 +14,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/std/alloc/struct.System.html",
     "The System carrier is a GlobalAlloc implementation that requests memory from the operating system's allocator."
 );
+
+register_rust_std_standard_evidence!(System);

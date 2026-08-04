@@ -155,3 +155,39 @@ amenable_derive::harness! {
         }
     }
 }
+
+impl KaniWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_os_str_display_renders_valid_utf8_content_unchanged".to_owned(),
+            claim: VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Display<'static>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::ffi::os_str::Display<'static>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC, {
+        /// `.display()` renders valid-UTF-8 content exactly as written,
+        /// with no lossy substitution needed.
+        #[kani::proof]
+        fn verify_os_str_display_renders_valid_utf8_content_unchanged() {
+            let os_str = OsStr::new("hello");
+            assert_eq!(os_str.display().to_string(), "hello", "display renders valid UTF-8 content unchanged");
+        }
+    }
+}

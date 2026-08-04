@@ -19,6 +19,7 @@ mod alloc_sync;
 mod alloc_vec;
 mod any;
 mod array;
+mod ascii;
 mod backtrace;
 mod cell;
 mod certificate;

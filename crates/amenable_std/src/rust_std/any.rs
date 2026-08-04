@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     TypeId,
@@ -11,3 +11,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/core/any/struct.TypeId.html",
     "The TypeId carrier is an opaque, globally unique identifier for a 'static Rust type."
 );
+
+register_rust_std_standard_evidence!(TypeId);

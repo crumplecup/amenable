@@ -6,7 +6,7 @@
 
 use core::alloc::{Layout, LayoutError};
 
-use crate::rust_std::macros::impl_rust_std_type;
+use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 
 impl_rust_std_type!(
     Layout,
@@ -23,3 +23,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/core/alloc/struct.LayoutError.html",
     "The LayoutError carrier reports that computing a Layout would violate its size or alignment invariants."
 );
+
+register_rust_std_standard_evidence!(Layout, LayoutError);

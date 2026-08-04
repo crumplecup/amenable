@@ -58,3 +58,45 @@ amenable_derive::harness! {
         }
     }
 }
+
+impl KaniWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_array_into_iter_yields_elements_in_order".to_owned(),
+            claim: VERIFY_ARRAY_INTO_ITER_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<IntoIter<i32, 3>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<std::array::IntoIter<i32, 3>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ARRAY_INTO_ITER_YIELDS_ELEMENTS_IN_ORDER_SRC, {
+        /// `[T; N]::into_iter()` yields the array's elements by value, in
+        /// order.
+        #[kani::proof]
+        fn verify_array_into_iter_yields_elements_in_order() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            let c: i32 = kani::any();
+            let mut it = [a, b, c].into_iter();
+            assert_eq!(it.next(), Some(a));
+            assert_eq!(it.next(), Some(b));
+            assert_eq!(it.next(), Some(c));
+            assert_eq!(it.next(), None, "into_iter yields exactly N elements");
+        }
+    }
+}

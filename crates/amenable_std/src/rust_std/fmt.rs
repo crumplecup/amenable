@@ -6,10 +6,12 @@
 
 use core::fmt::{
     Alignment, Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Error, Formatter,
+    FromFn,
 };
 
 use crate::rust_std::macros::{
-    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
+    impl_rust_std_type, impl_rust_std_type_generic1, impl_rust_std_type_lifetime0,
+    register_rust_std_standard_evidence,
 };
 
 impl_rust_std_type!(
@@ -91,6 +93,14 @@ impl_debug_builder!(
     "The DebugTuple carrier incrementally builds a Debug-formatted tuple representation."
 );
 
+impl_rust_std_type_generic1!(
+    FromFn,
+    "core",
+    "core::fmt",
+    "https://doc.rust-lang.org/core/fmt/struct.FromFn.html",
+    "The FromFn carrier implements Debug and Display by forwarding to a supplied closure."
+);
+
 // `'static` is the representative lifetime this module's proof batch
 // covers (the Debug*-builder family needs two, `'a, 'b`, per its own
 // `impl<'a, 'b: 'a>` shape above).
@@ -110,4 +120,5 @@ register_rust_std_standard_evidence!(
     DebugSet<'static, 'static>,
     DebugStruct<'static, 'static>,
     DebugTuple<'static, 'static>,
+    FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>,
 );

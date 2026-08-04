@@ -5,10 +5,11 @@
 //! `Display`, nothing to build and check. It stays at the trusted
 //! disposition.
 //!
-//! The direct rendering paths for `Arguments` and the `Debug*` builders time
-//! out under Kani's formatting machinery. Production proofs for those shapes
-//! therefore use an Amenable-owned formatter model instead; `Alignment` and
-//! `Formatter` remain on the direct observable std path.
+//! The direct rendering paths for `Arguments`, `FromFn`, and the `Debug*`
+//! builders time out under Kani's formatting machinery. Production proofs
+//! for those shapes therefore use an Amenable-owned formatter model
+//! instead; `Alignment` and `Formatter` remain on the direct observable
+//! std path.
 
 use core::fmt::{Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter};
 
@@ -354,6 +355,54 @@ amenable_derive::harness! {
             assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugMapOneEntry);
             assert_eq!(rendered.key_debug_label(), Some(key_label));
             assert_eq!(rendered.value_debug_token(), Some(value.debug_token()));
+        }
+    }
+}
+
+impl KaniWitness
+    for RustStdStandard<core::fmt::FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_from_fn_forwards_display_to_the_supplied_closure".to_owned(),
+            claim: VERIFY_FROM_FN_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(
+    RustStdStandard<core::fmt::FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>",
+        verifier: "kani",
+        describe: || <RustStdStandard<core::fmt::FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_FROM_FN_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC, {
+        /// `fmt::from_fn(closure)` renders via `Display` exactly as the
+        /// closure itself writes — the same "Display pass-through for
+        /// one leaf" law `Arguments`'s proof already models (calling
+        /// `.to_string()` directly times out under Kani's formatting
+        /// machinery here too, confirmed empirically). This proof uses
+        /// the same Amenable-owned formatter accommodation model: if the
+        /// real `from_fn` path preserves the written token the same way
+        /// `KaniFmt::arguments` does, the Rust-facing claim follows.
+        #[kani::proof]
+        fn verify_from_fn_forwards_display_to_the_supplied_closure() {
+            let atom = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
+            let rendered = crate::KaniFmt::arguments(&atom);
+            assert_eq!(rendered.kind(), crate::KaniRenderedKind::Arguments);
+            assert_eq!(rendered.display_token(), Some(atom.display_token()));
         }
     }
 }

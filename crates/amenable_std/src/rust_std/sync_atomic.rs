@@ -80,3 +80,5 @@ impl_rust_std_type!(
     "https://doc.rust-lang.org/core/sync/atomic/enum.Ordering.html",
     "The Ordering carrier specifies how memory operations around an atomic access are synchronized across threads."
 );
+
+register_rust_std_standard_evidence!(Ordering);
