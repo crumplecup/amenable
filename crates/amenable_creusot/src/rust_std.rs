@@ -25,6 +25,10 @@
 
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires, trusted};
+#[cfg(creusot)]
+use creusot_std::std::time::nanos_to_secs;
+#[cfg(creusot)]
+use std::time::Duration;
 
 amenable_derive::harness! {
     creusot, VERIFY_CHAR_ROUNDTRIP_SRC, {
@@ -88,6 +92,54 @@ amenable_derive::harness! {
         #[ensures(string_len(&result) == string_len(&s))]
         fn verify_string_roundtrip(s: String) -> String {
             s
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, {
+        /// `Duration::new` does not require `nanos < 1_000_000_000` — it
+        /// normalizes: any whole-second carry in `nanos` is added to
+        /// `secs`, and `subsec_nanos()` reports the remainder. Same claim
+        /// as the Kani harness (`amenable_kani::rust_std::time`), restated
+        /// as a Creusot postcondition — right down to the `secs.checked_add
+        /// (carry).is_some()` precondition Kani assumes, here expressed as
+        /// `secs@ + (nanos@ / 1_000_000_000) <= u64::MAX@` (Pearlite's `@`
+        /// operator lifts to arbitrary-precision `Int`, so this is exactly
+        /// "the real u64 addition wouldn't overflow", not an approximation).
+        ///
+        /// `creusot-std` ships its own trusted `extern_spec!` for
+        /// `Duration::new`/`as_secs`/`subsec_nanos` (`creusot_std::std::
+        /// time`) — but `#[check(ghost)]` extern-spec methods are still
+        /// *program* functions, not `#[logic]` ones, so `result.as_secs()`
+        /// can't be called directly inside `#[ensures]` any more than
+        /// `String::len()` could — confirmed by a real translation error,
+        /// not a guess: `error: called program function 'std::time::
+        /// Duration::as_secs' in logic context`. Unlike `String::len`,
+        /// no local `#[trusted]` wrapper is needed to route around it:
+        /// `creusot_std::std::time` already exports `nanos_to_secs`/
+        /// `secs_to_nanos` as plain `#[logic(open)]` functions (the exact
+        /// terms `as_secs`/`subsec_nanos`'s own postconditions are stated
+        /// in), so the claim below is expressed directly in terms of
+        /// `result@` (the `View` operator, Duration's total nanosecond
+        /// count as Pearlite's arbitrary-precision `Int`) and those
+        /// existing logic functions instead.
+        ///
+        /// This also means this harness proves less than the Kani one:
+        /// Kani exercises the real `std::time::Duration` implementation,
+        /// symbolically; this proves only that `creusot-std`'s OWN trusted
+        /// axiom for `Duration::new`'s total nanosecond count decomposes
+        /// the way `as_secs`/`subsec_nanos`'s OWN trusted axioms claim it
+        /// should — internal consistency between two independently-trusted
+        /// specifications, not agreement with the real implementation.
+        #[requires(secs@ + (nanos@ / 1_000_000_000) <= u64::MAX@)]
+        #[ensures(nanos_to_secs(result@) == secs@ + (nanos@ / 1_000_000_000))]
+        #[ensures(result@ % 1_000_000_000 == nanos@ % 1_000_000_000)]
+        fn verify_duration_new_normalizes_nanos_and_carries_into_secs(
+            secs: u64,
+            nanos: u32,
+        ) -> Duration {
+            Duration::new(secs, nanos)
         }
     }
 }

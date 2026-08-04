@@ -1,6 +1,6 @@
 //! Creusot proof gallery: documented findings about `creusot-rustc`'s own
-//! translation behavior, discovered while building the real char/String
-//! proof pipeline in `amenable_creusot`.
+//! translation behavior, discovered while building the real char/String/
+//! Duration proof pipeline in `amenable_creusot`.
 //!
 //! Mirrors `amenable_kani`'s gallery in spirit — production proofs answer
 //! "does this harness establish the intended claim?", the gallery answers
@@ -353,6 +353,57 @@ pub struct CreusotVerifierMetadata;
 // confirmed here specifically (Verifier::Metadata only requires Provenance
 // + Default; nothing compares two CreusotVerifierMetadata values anywhere
 // in this workspace) before dropping them, not as a blanket rule.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::check_ghost_extern_spec_methods_are_still_program_functions".to_owned(),
+            title: "creusot-std's own #[check(ghost)] extern_spec methods can't be called inside #[ensures] either".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (this exact shape was in amenable_creusot::rust_std's
+// Duration contract before the fix — calling creusot-std's own trusted
+// extern_spec methods for Duration::as_secs/subsec_nanos directly inside
+// #[ensures]):
+#[ensures(result.as_secs()@ == secs@ + (nanos@ / 1_000_000_000))]
+#[ensures(result.subsec_nanos()@ == nanos@ % 1_000_000_000)]
+fn verify_duration_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: u32) -> Duration {
+    Duration::new(secs, nanos)
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot`:
+//   error: called program function `std::time::Duration::as_secs` in
+//   logic context
+//   error: called program function `std::time::Duration::subsec_nanos`
+//   in logic context
+// `creusot_std::std::time`'s extern_spec! block marks Duration::as_secs/
+// subsec_nanos/etc. with #[check(ghost)], which gives them a real
+// postcondition creusot-rustc trusts — but #[check(ghost)] only makes a
+// function callable from GHOST program context (ghost! blocks and the
+// like), not from Pearlite LOGIC context (#[requires]/#[ensures]). Same
+// underlying restriction as the plain String::len() case, just easy to
+// miss here because the method genuinely does have a stated
+// postcondition, unlike String::len().
+
+// Working form (this is the real, proven contract, in
+// amenable_creusot::rust_std today) — expressed via `result@` (Duration's
+// View, its total nanosecond count as Pearlite's Int) and creusot-std's
+// own PUBLIC #[logic(open)] helper functions (nanos_to_secs et al, from
+// creusot_std::std::time — plain logic functions, not extern_spec
+// methods, so freely callable) instead of calling the methods at all:
+#[ensures(nanos_to_secs(result@) == secs@ + (nanos@ / 1_000_000_000))]
+#[ensures(result@ % 1_000_000_000 == nanos@ % 1_000_000_000)]
+fn verify_duration_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: u32) -> Duration {
+    Duration::new(secs, nanos)
+}
+// These are the exact terms as_secs/subsec_nanos's own postconditions are
+// stated in, so this proves the same underlying fact their (untouchable)
+// contracts would give, without ever invoking the methods themselves.
 "#,
         },
     }

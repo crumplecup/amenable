@@ -55,9 +55,12 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
+use std::time::{Duration, TryFromFloatSecsError};
+
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
+    VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -101,7 +104,22 @@ macro_rules! impl_creusot_witness_trusted {
 }
 
 impl_creusot_witness_trusted!(
-    bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
+    bool,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    f32,
+    f64,
+    TryFromFloatSecsError
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Creusot
@@ -169,5 +187,28 @@ bridge_creusot_witness!(RustStdStandard<String>);
         evidence: "amenable_std::rust_std::RustStdStandard<String>",
         verifier: "creusot",
         describe: || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Duration> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_duration_new_normalizes_nanos_and_carries_into_secs",
+            claim: VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Duration>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Duration> as CreusotWitness>::proof().to_string(),
     }
 }

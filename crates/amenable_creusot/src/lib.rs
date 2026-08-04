@@ -23,5 +23,8 @@
 mod rust_std;
 mod witness;
 
-pub use rust_std::{VERIFY_CHAR_ROUNDTRIP_SRC, VERIFY_STRING_ROUNDTRIP_SRC};
+pub use rust_std::{
+    VERIFY_CHAR_ROUNDTRIP_SRC, VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+    VERIFY_STRING_ROUNDTRIP_SRC,
+};
 pub use witness::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};
