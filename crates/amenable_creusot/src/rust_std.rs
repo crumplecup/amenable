@@ -24,9 +24,11 @@
 //! — every goal in this crate discharges, including these two.
 
 #[cfg(creusot)]
-use creusot_std::macros::{ensures, logic, requires, trusted};
+use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
 use creusot_std::std::time::nanos_to_secs;
+#[cfg(creusot)]
+use std::cmp::Ordering;
 #[cfg(creusot)]
 use std::num::NonZero;
 #[cfg(creusot)]
@@ -196,6 +198,65 @@ amenable_derive::harness! {
         })]
         fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
             NonZero::new(value)
+        }
+    }
+}
+
+// `Ordering::reverse` is uncontracted (creusot-std has no coverage for
+// `core::cmp::Ordering` at all) — and unlike `String::len`/`Duration::
+// as_secs`, matching the `(o, result)` pair structurally in `#[ensures]`
+// *without* calling `.reverse()` there doesn't route around it: the
+// harness body still calls `.reverse()` to produce `result`, and calling
+// any uncontracted external function yields an impossible precondition
+// for the WHOLE goal, not just for logic-context call sites — confirmed
+// by a real prove failure (`Goal ...vc_verify_ordering_reverse_swaps_
+// less_and_greater: ✘`), not a guess. Unlike `NonZero::new`, though,
+// `Ordering::reverse` has no generics and no sealed trait bound
+// (`pub const fn reverse(self) -> Ordering`), so a local `extern_spec!`
+// for it is actually practical — the same trusted-axiom pattern
+// `creusot-std` itself uses for `Duration::new`, just written here
+// instead of shipped upstream.
+#[cfg(creusot)]
+extern_spec! {
+    impl Ordering {
+        #[check(ghost)]
+        #[ensures(match (self, result) {
+            (Ordering::Less, Ordering::Greater) => true,
+            (Ordering::Equal, Ordering::Equal) => true,
+            (Ordering::Greater, Ordering::Less) => true,
+            _ => false,
+        })]
+        fn reverse(self) -> Ordering;
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC, {
+        /// `Ordering` has exactly three inhabitants, and `.reverse()`
+        /// swaps `Less`/`Greater` while fixing `Equal` — the same claim
+        /// `amenable_kani::rust_std::cmp::verify_ordering_reverse_involution`
+        /// checks (there, stated as an involution:
+        /// `o.reverse().reverse() == o`, over an explicit enumeration of
+        /// all three variants, since Kani has no `Arbitrary` impl for
+        /// `Ordering`). Rests on the local `extern_spec!` above, which
+        /// states the same swap as a trusted axiom on `reverse` itself —
+        /// this harness just confirms the axiom is available and usable
+        /// where a real proof needs it, the same relationship every
+        /// `Duration` clause here has to `creusot-std`'s own axioms.
+        ///
+        /// Matching the `(o, result)` pair, not calling `.reverse()`
+        /// again inside `#[ensures]`, already implies the involution
+        /// Kani checks explicitly (applying the same swap twice is the
+        /// identity), so no separate reverse-twice clause is needed.
+        #[requires(true)]
+        #[ensures(match (o, result) {
+            (Ordering::Less, Ordering::Greater) => true,
+            (Ordering::Equal, Ordering::Equal) => true,
+            (Ordering::Greater, Ordering::Less) => true,
+            _ => false,
+        })]
+        fn verify_ordering_reverse_swaps_less_and_greater(o: Ordering) -> Ordering {
+            o.reverse()
         }
     }
 }

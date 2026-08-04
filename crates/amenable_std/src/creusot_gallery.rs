@@ -1,6 +1,6 @@
 //! Creusot proof gallery: documented findings about `creusot-rustc`'s own
 //! translation behavior, discovered while building the real char/String/
-//! Duration/`NonZero<i16>` proof pipeline in `amenable_creusot`.
+//! Duration/`NonZero<i16>`/`Ordering` proof pipeline in `amenable_creusot`.
 //!
 //! Mirrors `amenable_kani`'s gallery in spirit — production proofs answer
 //! "does this harness establish the intended claim?", the gallery answers
@@ -457,6 +457,67 @@ extern_spec! {
 #[ensures(match result { Some(nz) => nonzero_i16_get(&nz) == value, None => true })]
 fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
     NonZero::new(value)
+}
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::uncontracted_calls_poison_the_whole_goal_not_just_logic_context".to_owned(),
+            title: "an uncontracted external call anywhere in a harness body blocks the goal, not just calls inside #[ensures]".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::Unproved,
+            claim: r#"
+// Failing form (this exact shape was in amenable_creusot::rust_std before
+// the fix — the postcondition matches the (o, result) PAIR structurally,
+// never calling .reverse() inside #[ensures], which was expected to route
+// around "called program function in logic context" the same way it did
+// for char/Duration's range/decomposition claims):
+#[ensures(match (o, result) {
+    (Ordering::Less, Ordering::Greater) => true,
+    (Ordering::Equal, Ordering::Equal) => true,
+    (Ordering::Greater, Ordering::Less) => true,
+    _ => false,
+})]
+fn verify_ordering_reverse_swaps_less_and_greater(o: Ordering) -> Ordering {
+    o.reverse()
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` (translates
+// clean, no compile error — the difference from every earlier finding
+// here — but fails at the SMT stage):
+//   warning: calling external function `reverse` with no contract will
+//   yield an impossible precondition
+//   Goal Coma.vc_verify_ordering_reverse_swaps_less_and_greater: ✘
+// The earlier String::len()/Duration::as_secs() cases were about what's
+// callABLE inside #[ensures] specifically. This is a different, wider
+// restriction: `.reverse()` is called in the harness BODY, not inside any
+// ensures clause, yet the goal still fails — an uncontracted external
+// call anywhere in the function poisons the whole verification condition,
+// because WP has no idea what the call actually does and assumes the
+// worst (an impossible precondition) for everything downstream of it,
+// logic context or not.
+//
+// Working form (this is the real, proven contract, in
+// amenable_creusot::rust_std today) — give `Ordering::reverse` a local
+// extern_spec! instead. Unlike NonZero::new, this one is actually
+// practical: `reverse` has no generics and no sealed trait bound
+// (`pub const fn reverse(self) -> Ordering`), so it's a real,
+// why3find-discharged proof, not a #[trusted] fallback:
+extern_spec! {
+    impl Ordering {
+        #[check(ghost)]
+        #[ensures(match (self, result) {
+            (Ordering::Less, Ordering::Greater) => true,
+            (Ordering::Equal, Ordering::Equal) => true,
+            (Ordering::Greater, Ordering::Less) => true,
+            _ => false,
+        })]
+        fn reverse(self) -> Ordering;
+    }
 }
 "#,
         },

@@ -52,3 +52,17 @@ fn nonzero_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <NonZero<i16> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cmp::Ordering> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordering_reverse_swaps_less_and_greater"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::cmp::Ordering as RustStdType>::provenance()
+    );
+}

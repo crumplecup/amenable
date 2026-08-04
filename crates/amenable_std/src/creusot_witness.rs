@@ -62,7 +62,8 @@ use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
-    VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+    VERIFY_STRING_ROUNDTRIP_SRC,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -235,5 +236,33 @@ bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
         evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
         verifier: "creusot",
         describe: || <RustStdStandard<NonZero<i16>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Fully qualified, matching `amenable_kani::rust_std::cmp` and
+// `amenable_std::rust_std::cmp`'s own registration exactly: there's also
+// a `core::sync::atomic::Ordering`, so the evidence string must say
+// `std::cmp::Ordering`, not the bare name, or alias resolution won't
+// match this proof to the checklist row.
+impl CreusotWitness for RustStdStandard<std::cmp::Ordering> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_ordering_reverse_swaps_less_and_greater",
+            claim: VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<std::cmp::Ordering>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<std::cmp::Ordering> as CreusotWitness>::proof().to_string(),
     }
 }
