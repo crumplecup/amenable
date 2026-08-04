@@ -24,8 +24,7 @@ jobs:
     # compile + clippy + test, not the cross/Podman check in the justfile's
     # check-windows recipe) -- everything except the actual Kani proofs,
     # which stay Linux-only and reference an accommodation model instead
-    # (see amenable_kani/src/windows_handle_model.rs and
-    # windows_socket_model.rs).
+    # (see amenable_kani/src/os_windows_model.rs).
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,3 +33,13 @@ jobs:
           components: rustfmt, clippy
       - uses: extractions/setup-just@v3
       - run: just check-all
+      # Dumped only to confirm, for real, that a #[cfg(windows)] EvidenceLink
+      # (amenable_std) and its hand-wired kani ProofRecord (amenable_kani,
+      # cross-platform) both land in the same registry when built on the
+      # target platform -- the actual mechanism os_windows_model.rs's doc
+      # comment claims, not just the compile check above.
+      - run: cargo run -p amenable --bin amenable -- dump-registry --out registry-dump-windows.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: registry-dump-windows
+          path: registry-dump-windows.json
