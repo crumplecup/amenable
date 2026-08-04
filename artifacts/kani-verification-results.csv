@@ -250,8 +250,15 @@ amenable_kani::rust_std::path::verify_prefix_component_pairs_raw_text_with_parse
 amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,1785354499,passed
 amenable_kani::rust_std::path::verify_strip_prefix_error_reports_a_non_matching_prefix,1785095850,passed
 amenable_kani::rust_std::pin::verify_pin_derefs_and_get_mut_round_trip,1785095855,passed
+amenable_kani::rust_std::primitives::verify_array_indexing_and_length,1785861619,passed
 amenable_kani::rust_std::primitives::verify_char_unicode_scalar,1785095859,passed
+amenable_kani::rust_std::primitives::verify_const_pointer_cast_is_reproducible,1785861761,passed
+amenable_kani::rust_std::primitives::verify_fn_pointer_calls_the_underlying_function,1785861632,passed
+amenable_kani::rust_std::primitives::verify_mut_pointer_cast_is_reproducible,1785861768,passed
+amenable_kani::rust_std::primitives::verify_mutable_reference_dereferences_to_and_updates_the_referent,1785861958,passed
+amenable_kani::rust_std::primitives::verify_shared_reference_dereferences_to_the_referent,1785861951,passed
 amenable_kani::rust_std::primitives::verify_string_utf8_valid,1785346249,passed
+amenable_kani::rust_std::primitives::verify_tuple_field_access,1785861625,passed
 amenable_kani::rust_std::process::verify_child_has_a_process_id_and_can_be_waited_on,1785357348,passed
 amenable_kani::rust_std::process::verify_child_stderr_captures_what_the_child_wrote_to_stderr,1785357361,passed
 amenable_kani::rust_std::process::verify_child_stdin_is_readable_by_the_child_process,1785357368,passed

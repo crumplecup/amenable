@@ -1,4 +1,14 @@
 //! `KaniWitness` impls for Rust's scalar primitives and `String`.
+//!
+//! `array`/`fn`/`pointer`/`reference`/`tuple` (the compound primitives, one
+//! representative concrete instantiation each) get real checked proofs
+//! below rather than the trusted disposition: each has a genuine, non-ZST
+//! semantic property worth checking (indexing, field access, dereferencing,
+//! calling). `pointer`'s proofs deliberately never dereference the raw
+//! pointer -- only checked properties safe code can establish (address
+//! reproducibility from a cast), never `unsafe`. `unit` (`()`) is the one
+//! exception, trusted alongside the scalars: it has exactly one possible
+//! value, nothing to check.
 
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
@@ -9,7 +19,22 @@ use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl_kani_witness_trusted!(
-    bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
+    bool,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    f32,
+    f64,
+    ()
 );
 
 impl KaniWitness for RustStdStandard<char> {
@@ -145,6 +170,281 @@ amenable_derive::harness! {
                     unreachable!("len is assumed <= the buffer's own capacity")
                 }
             }
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<[i32; 3]> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_array_indexing_and_length".to_owned(),
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<[i32; 3]>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+        verifier: "kani",
+        describe: || <RustStdStandard<[i32; 3]> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC, {
+        /// A fixed-size array's `.len()` is the compile-time-known
+        /// element count, and each index recovers the element it was
+        /// constructed with.
+        #[kani::proof]
+        fn verify_array_indexing_and_length() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            let c: i32 = kani::any();
+            let arr = [a, b, c];
+            assert_eq!(arr.len(), 3, "the array's length is its fixed compile-time size");
+            assert_eq!(arr[0], a);
+            assert_eq!(arr[1], b);
+            assert_eq!(arr[2], c);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<(i32, i32)> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_tuple_field_access".to_owned(),
+            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<(i32, i32)>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        verifier: "kani",
+        describe: || <RustStdStandard<(i32, i32)> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_TUPLE_FIELD_ACCESS_SRC, {
+        /// A tuple's `.0`/`.1` recover exactly the values it was
+        /// constructed with, in position order.
+        #[kani::proof]
+        fn verify_tuple_field_access() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            let t = (a, b);
+            assert_eq!(t.0, a);
+            assert_eq!(t.1, b);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<fn(i32) -> i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_fn_pointer_calls_the_underlying_function".to_owned(),
+            claim: VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<fn(i32) -> i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        verifier: "kani",
+        describe: || <RustStdStandard<fn(i32) -> i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, {
+        /// Calling through a `fn` pointer invokes exactly the function it
+        /// was assigned from.
+        #[kani::proof]
+        fn verify_fn_pointer_calls_the_underlying_function() {
+            fn increment(x: i32) -> i32 {
+                x.wrapping_add(1)
+            }
+            let f: fn(i32) -> i32 = increment;
+            let value: i32 = kani::any();
+            assert_eq!(f(value), increment(value), "the fn pointer calls the function it was assigned from");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<*const i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_const_pointer_cast_is_reproducible".to_owned(),
+            claim: VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<*const i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
+        verifier: "kani",
+        describe: || <RustStdStandard<*const i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC, {
+        /// Casting the same reference to a raw pointer twice gives the
+        /// same address, without ever dereferencing the pointer -- a
+        /// safe property of the cast itself, deliberately checked without
+        /// `unsafe` (this crate forbids it in its own source).
+        #[kani::proof]
+        fn verify_const_pointer_cast_is_reproducible() {
+            let value: i32 = kani::any();
+            let first: *const i32 = &value;
+            let second: *const i32 = &value;
+            assert_eq!(first, second, "casting the same reference twice gives the same address");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<*mut i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_mut_pointer_cast_is_reproducible".to_owned(),
+            claim: VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<*mut i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        verifier: "kani",
+        describe: || <RustStdStandard<*mut i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC, {
+        /// Same as the `*const i32` proof, for a mutable raw pointer:
+        /// casting the same exclusive reference to a raw pointer twice
+        /// gives the same address, without ever dereferencing it.
+        #[kani::proof]
+        fn verify_mut_pointer_cast_is_reproducible() {
+            let mut value: i32 = kani::any();
+            let first: *mut i32 = &mut value;
+            let second: *mut i32 = &mut value;
+            assert_eq!(first, second, "casting the same reference twice gives the same address");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<&'static i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_shared_reference_dereferences_to_the_referent".to_owned(),
+            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<&'static i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        verifier: "kani",
+        describe: || <RustStdStandard<&'static i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
+        /// Dereferencing a shared reference recovers exactly the value
+        /// it borrows. `Box::leak` gives a genuinely `'static` reference
+        /// to symbolic heap data without needing a `const`/`static` item
+        /// (which can't hold a `kani::any()` value) -- ordinary safe
+        /// Rust, not a workaround for anything unsafe.
+        #[kani::proof]
+        fn verify_shared_reference_dereferences_to_the_referent() {
+            let value: i32 = kani::any();
+            let leaked: &'static i32 = Box::leak(Box::new(value));
+            assert_eq!(*leaked, value, "dereferencing recovers the referent");
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<&'static mut i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_owned(),
+            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<&'static mut i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        verifier: "kani",
+        describe: || <RustStdStandard<&'static mut i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, {
+        /// Dereferencing a mutable reference recovers the value it
+        /// borrows, and writing through it updates the referent visibly
+        /// through the same reference.
+        #[kani::proof]
+        fn verify_mutable_reference_dereferences_to_and_updates_the_referent() {
+            let initial: i32 = kani::any();
+            let next: i32 = kani::any();
+            let leaked: &'static mut i32 = Box::leak(Box::new(initial));
+            assert_eq!(*leaked, initial, "dereferencing recovers the referent");
+            *leaked = next;
+            assert_eq!(*leaked, next, "writing through the reference updates the referent");
         }
     }
 }

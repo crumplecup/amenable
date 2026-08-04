@@ -94,6 +94,79 @@ impl RustStdType for String {
     }
 }
 
+// `array`/`fn`/`pointer`/`reference`/`tuple`/`unit` are compound primitives
+// (rustdoc documents them the same way as `bool`/`char`/the integers: one
+// `ItemKind::Primitive` doc page each, under both `core` and `std`). `str`
+// and `slice` share this same primitive-page shape but are unsized (`str`,
+// `[T]`) — deliberately not covered here pending a decision on what a
+// Kani proof for an unsized type even means, since a value can only exist
+// behind a reference (`&str`/`&[T]`, both already covered as their own
+// distinct carriers elsewhere).
+impl_rust_std_primitive!(
+    [i32; 3],
+    "https://doc.rust-lang.org/std/primitive.array.html",
+    "The array carrier stores a fixed number of elements of one type, with the length fixed at compile time."
+);
+impl_rust_std_primitive!(
+    fn(i32) -> i32,
+    "https://doc.rust-lang.org/std/primitive.fn.html",
+    "The fn pointer carrier holds the address of a plain (non-capturing) function with a fixed signature."
+);
+impl_rust_std_primitive!(
+    *const i32,
+    "https://doc.rust-lang.org/std/primitive.pointer.html",
+    "The raw pointer carrier holds an address with no ownership, borrowing, or validity guarantees enforced by the compiler."
+);
+impl_rust_std_primitive!(
+    *mut i32,
+    "https://doc.rust-lang.org/std/primitive.pointer.html",
+    "The raw pointer carrier holds an address with no ownership, borrowing, or validity guarantees enforced by the compiler."
+);
+impl_rust_std_primitive!(
+    &'static i32,
+    "https://doc.rust-lang.org/std/primitive.reference.html",
+    "The reference carrier borrows a value, guaranteeing it stays valid and (for a shared reference) unchanged for the reference's lifetime."
+);
+impl_rust_std_primitive!(
+    &'static mut i32,
+    "https://doc.rust-lang.org/std/primitive.reference.html",
+    "The reference carrier borrows a value, guaranteeing it stays valid and (for a mutable reference) exclusively accessible for the reference's lifetime."
+);
+impl_rust_std_primitive!(
+    (i32, i32),
+    "https://doc.rust-lang.org/std/primitive.tuple.html",
+    "The tuple carrier groups a fixed number of possibly-different-typed values into one compound value."
+);
+impl_rust_std_primitive!(
+    (),
+    "https://doc.rust-lang.org/std/primitive.unit.html",
+    "The unit carrier is the zero-element tuple, holding no data -- Rust's answer to \"no meaningful value\"."
+);
+
 register_rust_std_standard_evidence!(
-    bool, char, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64, String,
+    bool,
+    char,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    f32,
+    f64,
+    String,
+    [i32; 3],
+    fn(i32) -> i32,
+    *const i32,
+    *mut i32,
+    &'static i32,
+    &'static mut i32,
+    (i32, i32),
+    (),
 );
