@@ -36,8 +36,11 @@ impl KaniCurrentThreadObservation {
 }
 
 impl Provenance for KaniCurrentThreadObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "repeated queries for the already-running current thread return the same handle and thread id",
@@ -50,6 +53,7 @@ impl Provenance for KaniCurrentThreadObservation {
             MetadataEntry::new("id_stable", "true"),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -73,8 +77,11 @@ impl KaniInstantObservation {
 }
 
 impl Provenance for KaniInstantObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a later monotonic clock reading is never earlier than an earlier one",
@@ -86,5 +93,6 @@ impl Provenance for KaniInstantObservation {
             MetadataEntry::new("monotonic", "true"),
         ]
         .into_iter()
+        })
     }
 }

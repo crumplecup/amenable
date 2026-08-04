@@ -37,8 +37,11 @@ impl KaniPathDisplayObservation {
 }
 
 impl Provenance for KaniPathDisplayObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a path made entirely of valid Unicode renders through Display exactly as its own source text",
@@ -50,6 +53,7 @@ impl Provenance for KaniPathDisplayObservation {
             MetadataEntry::new("text", self.text),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -85,8 +89,11 @@ impl KaniWindowsPrefixObservation {
 }
 
 impl Provenance for KaniWindowsPrefixObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a Windows drive-letter prefix component preserves both its raw text and its parsed Disk drive letter",
@@ -99,5 +106,6 @@ impl Provenance for KaniWindowsPrefixObservation {
             MetadataEntry::new("drive_letter", char::from(self.drive_letter).to_string()),
         ]
         .into_iter()
+        })
     }
 }

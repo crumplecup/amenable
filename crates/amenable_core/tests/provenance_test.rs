@@ -12,13 +12,17 @@ struct ManualProvenance {
 }
 
 impl Provenance for ManualProvenance {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
-            MetadataEntry::new("authority_kind", self.authority_kind.clone()),
-            MetadataEntry::new("authority", self.authority.clone()),
-            MetadataEntry::new("source", self.source.clone()),
-        ]
-        .into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new(
+            vec![
+                MetadataEntry::new("authority_kind", self.authority_kind.clone()),
+                MetadataEntry::new("authority", self.authority.clone()),
+                MetadataEntry::new("source", self.source.clone()),
+            ]
+            .into_iter(),
+        )
     }
 }
 
@@ -123,10 +127,14 @@ impl Registry for ManualRegistry {
 struct ManualVerifierMetadata;
 
 impl Provenance for ManualVerifierMetadata {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        const FACTS: &[(&str, &str)] =
-            &[("verifier_family", "manual"), ("authority", "Test Fixture")];
-        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            const FACTS: &[(&str, &str)] =
+                &[("verifier_family", "manual"), ("authority", "Test Fixture")];
+            FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+        })
     }
 }
 

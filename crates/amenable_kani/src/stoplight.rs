@@ -51,12 +51,16 @@ use crate::{CalculationProof, KaniVerifier};
 pub struct Green;
 
 impl Provenance for Green {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![MetadataEntry::new(
-            "asserted",
-            "traffic light state, by design convention (power-on default)",
-        )]
-        .into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![MetadataEntry::new(
+                "asserted",
+                "traffic light state, by design convention (power-on default)",
+            )]
+            .into_iter()
+        })
     }
 }
 
@@ -69,12 +73,16 @@ impl Provenance for Green {
 pub struct Yellow;
 
 impl Provenance for Yellow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![MetadataEntry::new(
-            "asserted",
-            "traffic light state, reachable only via a proven Green -> Yellow exchange",
-        )]
-        .into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![MetadataEntry::new(
+                "asserted",
+                "traffic light state, reachable only via a proven Green -> Yellow exchange",
+            )]
+            .into_iter()
+        })
     }
 }
 
@@ -84,12 +92,16 @@ impl Provenance for Yellow {
 pub struct Red;
 
 impl Provenance for Red {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![MetadataEntry::new(
-            "asserted",
-            "traffic light state, reachable only via a proven Yellow -> Red exchange",
-        )]
-        .into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![MetadataEntry::new(
+                "asserted",
+                "traffic light state, reachable only via a proven Yellow -> Red exchange",
+            )]
+            .into_iter()
+        })
     }
 }
 

@@ -17,8 +17,11 @@ use amenable_derive::Standard;
 pub struct KaniBufferedReadWindow;
 
 impl Provenance for KaniBufferedReadWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a bounded buffered read preserves the exact underlying byte order while abstracting over std::io::BufReader's internal refill machinery",
@@ -29,6 +32,7 @@ impl Provenance for KaniBufferedReadWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -71,8 +75,11 @@ impl Evidence for KaniBufferedReadObservation {
 pub struct KaniFlushErrorWindow;
 
 impl Provenance for KaniFlushErrorWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a bounded flush failure reports failure while still recovering the buffered writer state needed by IntoInnerError",
@@ -83,6 +90,7 @@ impl Provenance for KaniFlushErrorWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -131,8 +139,11 @@ impl Evidence for KaniFlushErrorObservation {
 pub struct KaniLineWriterWindow;
 
 impl Provenance for KaniLineWriterWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a bounded line writer flushes immediately after a completed line ending in newline, while a trailing partial line remains buffered until an explicit flush",
@@ -143,6 +154,7 @@ impl Provenance for KaniLineWriterWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -201,8 +213,11 @@ impl Evidence for KaniLineWriterObservation {
 pub struct KaniLinesWindow;
 
 impl Provenance for KaniLinesWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a bounded buffered reader with newline separators yields each line body without its trailing terminator",
@@ -213,6 +228,7 @@ impl Provenance for KaniLinesWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -261,8 +277,11 @@ impl Evidence for KaniLinesObservation {
 pub struct KaniBufReadSplitWindow;
 
 impl Provenance for KaniBufReadSplitWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a bounded buffered reader split on one repeated delimiter yields the delimiter-separated segments and drops the delimiter itself",
@@ -273,6 +292,7 @@ impl Provenance for KaniBufReadSplitWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -329,8 +349,11 @@ impl Evidence for KaniBufReadSplitObservation {
 pub struct KaniWriterPanickedWindow;
 
 impl Provenance for KaniWriterPanickedWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "if a buffered writer's inner write panics after bytes are already buffered, WriterPanicked recovers those buffered bytes intact",
@@ -341,6 +364,7 @@ impl Provenance for KaniWriterPanickedWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 

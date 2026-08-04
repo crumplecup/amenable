@@ -81,13 +81,16 @@ pub struct KaniChannel<T> {
 }
 
 impl<T> Provenance for KaniChannel<T> {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        let capacity = match self.capacity {
-            None => "unbounded".to_owned(),
-            Some(capacity) => capacity.to_string(),
-        };
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
-        vec![
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            let capacity = match self.capacity {
+                None => "unbounded".to_owned(),
+                Some(capacity) => capacity.to_string(),
+            };
+
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "std::sync::mpsc's flavor-switching, atomics-backed queue is fully captured by this small FIFO/open-flag/capacity state machine",
@@ -102,6 +105,7 @@ impl<T> Provenance for KaniChannel<T> {
             MetadataEntry::new("queue_len", self.queue.len().to_string()),
         ]
         .into_iter()
+        })
     }
 }
 

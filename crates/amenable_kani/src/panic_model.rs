@@ -57,8 +57,11 @@ impl KaniCallerLocationObservation {
 }
 
 impl Provenance for KaniCallerLocationObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "two calls to the same track_caller function from different lines in one file report that shared file and different immediate caller lines",
@@ -72,6 +75,7 @@ impl Provenance for KaniCallerLocationObservation {
             MetadataEntry::new("second_line", self.second_line.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -100,8 +104,11 @@ impl KaniPanicHookObservation {
 }
 
 impl Provenance for KaniPanicHookObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a panic hook installed for one panic observes that panic's own payload message exactly",
@@ -113,5 +120,6 @@ impl Provenance for KaniPanicHookObservation {
             MetadataEntry::new("message", self.message),
         ]
         .into_iter()
+        })
     }
 }

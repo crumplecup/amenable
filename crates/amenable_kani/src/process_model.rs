@@ -40,8 +40,11 @@ impl KaniChildObservation {
 }
 
 impl Provenance for KaniChildObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a spawned child reports a nonzero process id and waiting on it yields the modeled exit code",
@@ -54,6 +57,7 @@ impl Provenance for KaniChildObservation {
             MetadataEntry::new("exit_code", self.exit_code.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -92,8 +96,11 @@ impl KaniChildStderrObservation {
 }
 
 impl Provenance for KaniChildStderrObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a child with piped stderr preserves stderr bytes independently of stdout",
@@ -106,6 +113,7 @@ impl Provenance for KaniChildStderrObservation {
             MetadataEntry::new("stderr_text", self.stderr_text),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -144,8 +152,11 @@ impl KaniChildStdinObservation {
 }
 
 impl Provenance for KaniChildStdinObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "bytes written to a piped child stdin are delivered to the child and can be echoed back on stdout",
@@ -158,6 +169,7 @@ impl Provenance for KaniChildStdinObservation {
             MetadataEntry::new("echoed_stdout", self.echoed_stdout),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -183,8 +195,11 @@ impl KaniChildStdoutObservation {
 }
 
 impl Provenance for KaniChildStdoutObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a child with piped stdout preserves the bytes it wrote there",
@@ -196,6 +211,7 @@ impl Provenance for KaniChildStdoutObservation {
             MetadataEntry::new("stdout_text", self.stdout_text),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -221,8 +237,11 @@ impl KaniCommandArgsObservation {
 }
 
 impl Provenance for KaniCommandArgsObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "command builder argument introspection preserves the configured argument sequence",
@@ -235,6 +254,7 @@ impl Provenance for KaniCommandArgsObservation {
             MetadataEntry::new("second_arg", self.args[1]),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -285,8 +305,11 @@ impl KaniCommandEnvObservation {
 }
 
 impl Provenance for KaniCommandEnvObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a command environment override is visible to the spawned child under the same key and value",
@@ -300,6 +323,7 @@ impl Provenance for KaniCommandEnvObservation {
             MetadataEntry::new("visible_stdout", self.visible_stdout),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -335,8 +359,11 @@ impl KaniCommandEnvsObservation {
 }
 
 impl Provenance for KaniCommandEnvsObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "command builder environment introspection preserves configured key-value overrides",
@@ -349,6 +376,7 @@ impl Provenance for KaniCommandEnvsObservation {
             MetadataEntry::new("value", self.value),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -380,8 +408,11 @@ impl KaniExitStatusObservation {
 }
 
 impl Provenance for KaniExitStatusObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a completed child exit status preserves the modeled exit code and success flag",
@@ -393,6 +424,7 @@ impl Provenance for KaniExitStatusObservation {
             MetadataEntry::new("exit_code", self.exit_code.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -434,8 +466,11 @@ impl KaniOutputObservation {
 }
 
 impl Provenance for KaniOutputObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "Command::output preserves the completed exit status together with the captured stdout bytes",
@@ -448,6 +483,7 @@ impl Provenance for KaniOutputObservation {
             MetadataEntry::new("stdout_text", self.stdout_text),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -486,8 +522,11 @@ impl KaniStdioObservation {
 }
 
 impl Provenance for KaniStdioObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "stdio handle presence reflects the configured stdout policy for null versus piped children",
@@ -506,5 +545,6 @@ impl Provenance for KaniStdioObservation {
             ),
         ]
         .into_iter()
+        })
     }
 }

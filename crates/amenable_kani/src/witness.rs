@@ -15,22 +15,26 @@ pub struct KaniVerifier;
 pub struct KaniVerifierMetadata;
 
 impl Provenance for KaniVerifierMetadata {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        const FACTS: &[(&str, &str)] = &[
-            ("verifier_family", "kani"),
-            ("authority", "Kani Rust Verifier"),
-            ("source_url", "https://model-checking.github.io/kani/"),
-            ("proof_artifact", "Rust proof harness token stream"),
-            (
-                "configuration_channel",
-                "CLI arguments and KANI_* or PROVE_* environment variables",
-            ),
-            (
-                "configuration_surface",
-                "package selection, flags, timeout, and report output",
-            ),
-        ];
-        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            const FACTS: &[(&str, &str)] = &[
+                ("verifier_family", "kani"),
+                ("authority", "Kani Rust Verifier"),
+                ("source_url", "https://model-checking.github.io/kani/"),
+                ("proof_artifact", "Rust proof harness token stream"),
+                (
+                    "configuration_channel",
+                    "CLI arguments and KANI_* or PROVE_* environment variables",
+                ),
+                (
+                    "configuration_surface",
+                    "package selection, flags, timeout, and report output",
+                ),
+            ];
+            FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+        })
     }
 }
 

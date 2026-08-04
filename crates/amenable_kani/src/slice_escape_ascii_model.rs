@@ -16,8 +16,11 @@ use amenable_derive::Standard;
 pub struct KaniEscapeAsciiWindow;
 
 impl Provenance for KaniEscapeAsciiWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a fixed two-byte source [printable, newline] escapes to [printable, backslash, n]",
@@ -28,6 +31,7 @@ impl Provenance for KaniEscapeAsciiWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 

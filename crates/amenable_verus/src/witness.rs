@@ -16,22 +16,26 @@ pub struct VerusVerifier;
 pub struct VerusVerifierMetadata;
 
 impl Provenance for VerusVerifierMetadata {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        const FACTS: &[(&str, &str)] = &[
-            ("verifier_family", "verus"),
-            ("authority", "Verus project"),
-            ("source_url", "https://verus-lang.github.io/verus/"),
-            ("proof_artifact", "Verus proof module token stream"),
-            (
-                "configuration_channel",
-                "CLI arguments and VERUS_* environment variables",
-            ),
-            (
-                "configuration_surface",
-                "binary path, source selection, flags, timeout, and report output",
-            ),
-        ];
-        FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            const FACTS: &[(&str, &str)] = &[
+                ("verifier_family", "verus"),
+                ("authority", "Verus project"),
+                ("source_url", "https://verus-lang.github.io/verus/"),
+                ("proof_artifact", "Verus proof module token stream"),
+                (
+                    "configuration_channel",
+                    "CLI arguments and VERUS_* environment variables",
+                ),
+                (
+                    "configuration_surface",
+                    "binary path, source selection, flags, timeout, and report output",
+                ),
+            ];
+            FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
+        })
     }
 }
 

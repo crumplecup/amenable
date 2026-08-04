@@ -147,8 +147,10 @@ fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStrea
 
     Ok(quote! {
         impl #impl_generics ::#crate_path::Provenance for #name #ty_generics #where_clause {
-            fn metadata(&self) -> impl ::core::iter::Iterator<Item = ::#crate_path::MetadataEntry> {
-                #metadata_body
+            type MetadataIter = ::std::boxed::Box<dyn ::core::iter::Iterator<Item = ::#crate_path::MetadataEntry>>;
+
+            fn metadata(&self) -> Self::MetadataIter {
+                ::std::boxed::Box::new({ #metadata_body })
             }
         }
     })

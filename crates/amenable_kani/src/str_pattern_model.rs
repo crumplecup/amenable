@@ -39,8 +39,11 @@ use amenable_derive::Standard;
 pub struct KaniStrRSplitWindow;
 
 impl Provenance for KaniStrRSplitWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a one-occurrence rsplit reduces to a fixed [before, pattern, after] window, reversed to [after, before], standing in for str::RSplit's internal CharSearcher::next_match_back search",
@@ -51,6 +54,7 @@ impl Provenance for KaniStrRSplitWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -110,8 +114,11 @@ impl Evidence for KaniStrRSplitObservation {
 pub struct KaniStrRSplitNWindow;
 
 impl Provenance for KaniStrRSplitNWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a two-occurrence rsplitn(2, pattern) reduces to a fixed [a, pattern, b, pattern, c] window capped at two pieces, standing in for str::RSplitN's internal reverse CharSearcher search",
@@ -122,6 +129,7 @@ impl Provenance for KaniStrRSplitNWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -176,8 +184,11 @@ impl Evidence for KaniStrRSplitNObservation {
 pub struct KaniStrSplitTerminatorWindow;
 
 impl Provenance for KaniStrSplitTerminatorWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a two-occurrence split_terminator/rsplit_terminator reduces to a fixed [a, pattern, b, pattern] window with nothing after the final match, standing in for str::SplitTerminator's/RSplitTerminator's internal search",
@@ -188,6 +199,7 @@ impl Provenance for KaniStrSplitTerminatorWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -248,8 +260,11 @@ impl Evidence for KaniStrSplitTerminatorObservation {
 pub struct KaniStrMatchWindow;
 
 impl Provenance for KaniStrMatchWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a two-occurrence matches/rmatches/match_indices/rmatch_indices reduces to a fixed [f0, pattern, f1, pattern, f2] window with matches at byte offsets 1 and 3, standing in for str::MatchIndicesInternal's internal search",
@@ -260,6 +275,7 @@ impl Provenance for KaniStrMatchWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 

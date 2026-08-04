@@ -49,8 +49,11 @@ impl KaniRandomStateObservation {
 }
 
 impl Provenance for KaniRandomStateObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "two hashers built from the same RandomState instance hash the same input to the same digest",
@@ -63,5 +66,6 @@ impl Provenance for KaniRandomStateObservation {
             MetadataEntry::new("digest", self.digest.to_string()),
         ]
         .into_iter()
+        })
     }
 }

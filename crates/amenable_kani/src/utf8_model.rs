@@ -67,8 +67,11 @@ impl KaniAssumedUtf8Validity {
 }
 
 impl Provenance for KaniAssumedUtf8Validity {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "UTF-8 validity, standing in for the real std::str::from_utf8 algorithm",
@@ -80,6 +83,7 @@ impl Provenance for KaniAssumedUtf8Validity {
             MetadataEntry::new("valid", self.valid.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 

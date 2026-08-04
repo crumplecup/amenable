@@ -46,8 +46,11 @@ impl KaniMutexExclusionObservation {
 }
 
 impl Provenance for KaniMutexExclusionObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "locking once exposes the wrapped value, rejects a second lock while the first guard is live, and allows a fresh lock once that guard is released",
@@ -59,6 +62,7 @@ impl Provenance for KaniMutexExclusionObservation {
             MetadataEntry::new("held_value", self.held_value.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -82,8 +86,11 @@ impl KaniBarrierLeaderObservation {
 }
 
 impl Provenance for KaniBarrierLeaderObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a barrier configured for exactly one participant returns immediately and reports that participant as the leader",
@@ -95,6 +102,7 @@ impl Provenance for KaniBarrierLeaderObservation {
             MetadataEntry::new("leader", "true"),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -118,8 +126,11 @@ impl KaniWaitTimeoutObservation {
 }
 
 impl Provenance for KaniWaitTimeoutObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a never-notified conditional-variable wait with a timeout reports that it timed out",
@@ -131,6 +142,7 @@ impl Provenance for KaniWaitTimeoutObservation {
             MetadataEntry::new("timed_out", "true"),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -178,8 +190,11 @@ impl KaniMutexFailureObservation {
 }
 
 impl Provenance for KaniMutexFailureObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a panic while a guard is live poisons the lock without discarding the guarded value, and a separate already-held try_lock case reports WouldBlock",
@@ -192,5 +207,6 @@ impl Provenance for KaniMutexFailureObservation {
             MetadataEntry::new("held_value", self.held_value.to_string()),
         ]
         .into_iter()
+        })
     }
 }

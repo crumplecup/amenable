@@ -26,8 +26,11 @@ pub struct KaniStringDrainObservation {
 }
 
 impl Provenance for KaniStringDrainObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "draining a whole string yields its exact UTF-8 content in order and leaves the source empty, standing in for the direct String::drain iterator path",
@@ -39,6 +42,7 @@ impl Provenance for KaniStringDrainObservation {
             MetadataEntry::new("yielded_bytes", format!("{:?}", self.yielded.as_bytes())),
         ]
         .into_iter()
+        })
     }
 }
 

@@ -117,10 +117,25 @@ where
 /// deterministic stream of metadata entries without forcing every provenance
 /// carrier into one storage representation.
 pub trait Provenance {
+    /// Concrete iterator type backing [`metadata`](Provenance::metadata).
+    ///
+    /// An associated type rather than a return-position `impl Trait`: the
+    /// latter desugars to a compiler-synthesized opaque type at every impl
+    /// site, and at least one verifier toolchain (Creusot's `creusot-rustc`,
+    /// as of the `0.11.0` release pinned in `amenable_creusot`) panics
+    /// enumerating local def-ids when a translated crate contains one —
+    /// confirmed via a real ICE on `CreusotVerifierMetadata`'s own impl, not
+    /// a defensive guess. An associated type is an ordinary named item, not
+    /// an opaque one, and sidesteps the bug entirely while still letting
+    /// each implementor pick its own concrete iterator rather than being
+    /// forced into one storage representation (e.g. `Vec<MetadataEntry>`)
+    /// for every carrier.
+    type MetadataIter: Iterator<Item = MetadataEntry>;
+
     /// Iterate over the provenance facts describing this claim's source of
     /// trust, generated on demand rather than pre-built into a stored
     /// collection.
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry>;
+    fn metadata(&self) -> Self::MetadataIter;
 
     /// Backward-compatible alias for the projected metadata stream.
     fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
@@ -179,8 +194,10 @@ macro_rules! impl_scalar_provenance {
     ($($ty:ty),* $(,)?) => {
         $(
             impl Provenance for $ty {
-                fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-                    vec![MetadataEntry::new("value", self.to_string())].into_iter()
+                type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+                fn metadata(&self) -> Self::MetadataIter {
+                    Box::new(vec![MetadataEntry::new("value", self.to_string())].into_iter())
                 }
             }
         )*

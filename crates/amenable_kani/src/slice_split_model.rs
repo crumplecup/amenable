@@ -34,8 +34,11 @@ use amenable_derive::Standard;
 pub struct KaniSplitWindow;
 
 impl Provenance for KaniSplitWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a one-delimiter split reduces to a fixed [before, delimiter, after] window, standing in for std::slice::Split's internal symbolic-length delimiter search",
@@ -46,6 +49,7 @@ impl Provenance for KaniSplitWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -128,8 +132,11 @@ impl<T: Copy> Evidence for KaniSplitObservation<T> {
 pub struct KaniSplitNWindow;
 
 impl Provenance for KaniSplitNWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a two-delimiter splitn/rsplitn reduces to a fixed [first, d1, middle, d2, last] window capped at two pieces, standing in for std::slice::SplitN's internal symbolic-length delimiter search",
@@ -140,6 +147,7 @@ impl Provenance for KaniSplitNWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -212,8 +220,11 @@ impl<T: Copy> Evidence for KaniSplitNObservation<T> {
 pub struct KaniChunkByWindow;
 
 impl Provenance for KaniChunkByWindow {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a two-element chunk_by witness reduces to either one grouped pair or two one-element chunks depending only on whether the adjacent predicate holds",
@@ -224,6 +235,7 @@ impl Provenance for KaniChunkByWindow {
             ),
         ]
         .into_iter()
+        })
     }
 }
 

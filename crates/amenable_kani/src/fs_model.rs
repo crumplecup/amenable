@@ -177,8 +177,11 @@ pub struct KaniRecursiveDirObservation {
 }
 
 impl Provenance for KaniRecursiveDirObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "recursive directory creation reaches exactly the ancestors implied by repeated path-segment joins, standing in for the real OS-backed directory tree",
@@ -192,6 +195,7 @@ impl Provenance for KaniRecursiveDirObservation {
             MetadataEntry::new("leaf", format!("{:?}", self.leaf)),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -253,8 +257,11 @@ pub struct KaniDirEntryObservation {
 }
 
 impl Provenance for KaniDirEntryObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a directory entry yielded for a created file reports that file's own name and full path exactly, standing in for the real OS-backed directory listing",
@@ -266,6 +273,7 @@ impl Provenance for KaniDirEntryObservation {
             MetadataEntry::new("entry_path", format!("{:?}", self.entry.path())),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -403,8 +411,11 @@ pub struct KaniFileTypeObservation {
 }
 
 impl Provenance for KaniFileTypeObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a regular file's FileType reports is_file() and a directory's reports is_dir(), never both, standing in for the real OS-backed type distinction",
@@ -417,6 +428,7 @@ impl Provenance for KaniFileTypeObservation {
             MetadataEntry::new("directory", format!("{:?}", self.directory)),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -478,8 +490,11 @@ pub struct KaniFileContentObservation {
 }
 
 impl Provenance for KaniFileContentObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "bytes written to a file and flushed by Drop are read back unchanged through a fresh handle, standing in for the real OS-backed write/read path",
@@ -491,6 +506,7 @@ impl Provenance for KaniFileContentObservation {
             MetadataEntry::new("content", format!("{:?}", self.content)),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -525,8 +541,11 @@ pub struct KaniFileLenObservation {
 }
 
 impl Provenance for KaniFileLenObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 ".len() reports exactly the number of bytes written to the file, standing in for the real OS-backed metadata query",
@@ -538,6 +557,7 @@ impl Provenance for KaniFileLenObservation {
             MetadataEntry::new("len", self.len.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -578,8 +598,11 @@ pub struct KaniFileTimesObservation {
 }
 
 impl Provenance for KaniFileTimesObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a target modification time set via .set_modified() is reflected exactly in the file's metadata, standing in for the real OS-backed filesystem clock",
@@ -594,6 +617,7 @@ impl Provenance for KaniFileTimesObservation {
             ),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -631,14 +655,17 @@ pub struct KaniCreateNewObservation {
 }
 
 impl Provenance for KaniCreateNewObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        let prior_kind = match self.kind {
-            None => "missing",
-            Some(KaniFsNodeKind::File) => "existing_file",
-            Some(KaniFsNodeKind::Directory) => "existing_directory",
-        };
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
-        vec![
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            let prior_kind = match self.kind {
+                None => "missing",
+                Some(KaniFsNodeKind::File) => "existing_file",
+                Some(KaniFsNodeKind::Directory) => "existing_directory",
+            };
+
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "create_new's outcome is determined entirely by a ternary prior existence state, standing in for the real OS-backed existence check",
@@ -650,6 +677,7 @@ impl Provenance for KaniCreateNewObservation {
             MetadataEntry::new("prior_kind", prior_kind),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -720,8 +748,11 @@ pub struct KaniPermissionsObservation {
 }
 
 impl Provenance for KaniPermissionsObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "flipping .set_readonly() and applying it via fs::set_permissions is reflected the next time the file's permissions are read, standing in for the real OS-backed permission bit",
@@ -733,6 +764,7 @@ impl Provenance for KaniPermissionsObservation {
             MetadataEntry::new("readonly", self.readonly.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -782,8 +814,11 @@ pub struct KaniReadDirObservation {
 }
 
 impl Provenance for KaniReadDirObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 ".read_dir() yields exactly the files that were created in that directory, no more and no fewer, standing in for the real OS-backed directory listing",
@@ -796,6 +831,7 @@ impl Provenance for KaniReadDirObservation {
             MetadataEntry::new("second", format!("{:?}", self.second.path())),
         ]
         .into_iter()
+        })
     }
 }
 
@@ -833,8 +869,11 @@ pub struct KaniLockObservation {
 }
 
 impl Provenance for KaniLockObservation {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new({
+            vec![
             MetadataEntry::new(
                 "assumed",
                 "a second handle's .try_lock() fails while a first handle still holds the file lock, standing in for the real OS-backed advisory lock",
@@ -846,6 +885,7 @@ impl Provenance for KaniLockObservation {
             MetadataEntry::new("locked", self.locked.to_string()),
         ]
         .into_iter()
+        })
     }
 }
 

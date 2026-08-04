@@ -34,8 +34,10 @@ impl Debit {
 }
 
 impl Provenance for Debit {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![MetadataEntry::new("value", self.value.to_string())].into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
     }
 }
 
@@ -105,8 +107,10 @@ impl Credit {
 }
 
 impl Provenance for Credit {
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        vec![MetadataEntry::new("value", self.value.to_string())].into_iter()
+    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
     }
 }
 
