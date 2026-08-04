@@ -49,6 +49,7 @@ mod primitives;
 mod process;
 mod ptr;
 mod slice;
+mod std_collections;
 mod std_ffi;
 mod std_hash;
 mod std_net;

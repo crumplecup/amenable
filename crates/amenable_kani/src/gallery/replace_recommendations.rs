@@ -19,7 +19,8 @@
 //! - OS-backed filesystem boundaries with real external state
 //! - pure in-memory std implementation blow-up that still times out under the
 //!   native multi-minute harness timeout (`hash`, `fmt`, `BTree*`,
-//!   `LinkedList::extract_if`, `String::from_utf8`, and similar cases)
+//!   `HashMap`/`HashSet`, `LinkedList::extract_if`, `String::from_utf8`,
+//!   and similar cases)
 //! - OS entropy-source boundaries reached by process-randomized seeding
 //!   (`RandomState::new()`)
 //! - thread-local-storage boundaries reached by `std::thread::current()`
@@ -510,6 +511,38 @@ amenable_derive::harness! {
                 second.finish(),
                 "freshly built default hashers should agree on the same input"
             );
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration {
+        case: || ::amenable_kani::KaniGalleryCase {
+            id: "amenable_kani::gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
+            harness: "gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
+            package: "amenable_kani".to_owned(),
+            title: "direct HashMap insert-then-get can still time out even for one fixed entry".to_owned(),
+            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
+        },
+    }
+}
+
+amenable_derive::harness! {
+    kani, HASH_MAP_INSERT_THEN_GET_TIMES_OUT_EVEN_FOR_A_FIXED_ENTRY_SRC, {
+        /// Another representative for the pure in-memory std blow-up class
+        /// (same bucket as `default_hasher_determinism_times_out_in_the_direct_std_path`):
+        /// `HashMap::new()` defaults to `RandomState`, so every insert/get
+        /// routes through the same hashing machinery, and the timeout
+        /// shows up even for a single fixed (non-symbolic) key/value pair
+        /// -- confirmed empirically before building
+        /// `amenable_kani::hash_collections_model`'s accommodation model.
+        /// `HashSet` shares this exact cause.
+        #[kani::proof]
+        fn hash_map_insert_then_get_times_out_even_for_a_fixed_entry() {
+            let mut map: std::collections::HashMap<i32, i32> = std::collections::HashMap::new();
+            map.insert(1, 2);
+            assert_eq!(map.get(&1), Some(&2), "insert then get recovers the same value");
         }
     }
 }

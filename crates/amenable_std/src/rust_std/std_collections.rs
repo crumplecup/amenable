@@ -9,7 +9,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::rust_std::macros::{impl_rust_std_type_generic1, impl_rust_std_type_generic2};
+use crate::rust_std::macros::{
+    impl_rust_std_type_generic1, impl_rust_std_type_generic2, register_rust_std_standard_evidence,
+};
 
 impl_rust_std_type_generic2!(
     HashMap,
@@ -26,3 +28,5 @@ impl_rust_std_type_generic1!(
     "https://doc.rust-lang.org/std/collections/struct.HashSet.html",
     "The HashSet carrier is an unordered set backed by a hash table."
 );
+
+register_rust_std_standard_evidence!(HashMap<i32, i32>, HashSet<i32>);
