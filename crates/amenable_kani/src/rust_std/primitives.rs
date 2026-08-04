@@ -216,6 +216,97 @@ amenable_derive::harness! {
     }
 }
 
+impl KaniWitness for RustStdStandard<[i32]> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_slice_indexing_and_length".to_owned(),
+            claim: VERIFY_SLICE_INDEXING_AND_LENGTH_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<[i32]>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
+        verifier: "kani",
+        describe: || <RustStdStandard<[i32]> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC, {
+        /// A slice's `.len()` reports the number of elements it views,
+        /// and each index recovers the underlying element. Checked via a
+        /// safe unsizing coercion from a concrete array (`&arr` coerces
+        /// `&[i32; 3]` to `&[i32]`): a bare `[i32]` value can never exist
+        /// as a local, only a `&[i32]` reference can, so this is the
+        /// only way any code -- proof or otherwise -- interacts with a
+        /// slice value at all.
+        #[kani::proof]
+        fn verify_slice_indexing_and_length() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            let c: i32 = kani::any();
+            let arr = [a, b, c];
+            let s: &[i32] = &arr;
+            assert_eq!(s.len(), 3, "the slice's length is the number of elements it views");
+            assert_eq!(s[0], a);
+            assert_eq!(s[1], b);
+            assert_eq!(s[2], c);
+        }
+    }
+}
+
+impl KaniWitness for RustStdStandard<str> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_str_byte_length_and_content".to_owned(),
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<str>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "kani",
+        describe: || <RustStdStandard<str> as KaniWitness>::proof().to_string(),
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, {
+        /// A `str`'s `.len()` reports its UTF-8 byte length, and its
+        /// bytes are exactly its content's UTF-8 encoding -- checked for
+        /// any single-byte (ASCII) character, mirroring
+        /// `rust_std::str`'s own symbolic-byte convention. A bare `str`
+        /// value can never exist as a local, only a `&str` reference
+        /// can (here, borrowed from an owned `String`), so this is the
+        /// only way any code interacts with a `str` value at all.
+        #[kani::proof]
+        fn verify_str_byte_length_and_content() {
+            let byte: u8 = kani::any();
+            kani::assume(byte < 128);
+            let owned = (byte as char).to_string();
+            let s: &str = &owned;
+            assert_eq!(s.len(), 1, "a single ASCII char is exactly one UTF-8 byte");
+            assert_eq!(s.as_bytes()[0], byte);
+        }
+    }
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

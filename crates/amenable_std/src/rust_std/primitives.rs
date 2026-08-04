@@ -94,18 +94,32 @@ impl RustStdType for String {
     }
 }
 
-// `array`/`fn`/`pointer`/`reference`/`tuple`/`unit` are compound primitives
-// (rustdoc documents them the same way as `bool`/`char`/the integers: one
-// `ItemKind::Primitive` doc page each, under both `core` and `std`). `str`
-// and `slice` share this same primitive-page shape but are unsized (`str`,
-// `[T]`) — deliberately not covered here pending a decision on what a
-// Kani proof for an unsized type even means, since a value can only exist
-// behind a reference (`&str`/`&[T]`, both already covered as their own
-// distinct carriers elsewhere).
+// `array`/`fn`/`pointer`/`reference`/`slice`/`str`/`tuple`/`unit` are
+// compound primitives (rustdoc documents them the same way as
+// `bool`/`char`/the integers: one `ItemKind::Primitive` doc page each,
+// under both `core` and `std`). `slice`/`str` are unsized (`[T]`, `str`)
+// and registered as the bare unsized type itself, not `&[T]`/`&str` --
+// registering a reference would get credited to the `reference` primitive
+// page instead (elicit_doc's shape matcher checks the `&` prefix first),
+// leaving `slice`/`str` themselves looking uncovered. `RustStdType`'s
+// methods take no `self`, so implementing it for an unsized type is no
+// different from any other type here; only the Kani proof (which must
+// construct a value) needs to go through `&[T]`/`&str`, same as it always
+// has for every other slice/str-shaped carrier in this project.
 impl_rust_std_primitive!(
     [i32; 3],
     "https://doc.rust-lang.org/std/primitive.array.html",
     "The array carrier stores a fixed number of elements of one type, with the length fixed at compile time."
+);
+impl_rust_std_primitive!(
+    [i32],
+    "https://doc.rust-lang.org/std/primitive.slice.html",
+    "The slice carrier is an unsized, dynamically-sized view over a contiguous run of elements of one type."
+);
+impl_rust_std_primitive!(
+    str,
+    "https://doc.rust-lang.org/std/primitive.str.html",
+    "The str carrier is an unsized, dynamically-sized view over a contiguous run of valid UTF-8 bytes."
 );
 impl_rust_std_primitive!(
     fn(i32) -> i32,
@@ -162,6 +176,8 @@ register_rust_std_standard_evidence!(
     f64,
     String,
     [i32; 3],
+    [i32],
+    str,
     fn(i32) -> i32,
     *const i32,
     *mut i32,

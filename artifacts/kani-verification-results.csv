@@ -257,6 +257,8 @@ amenable_kani::rust_std::primitives::verify_fn_pointer_calls_the_underlying_func
 amenable_kani::rust_std::primitives::verify_mut_pointer_cast_is_reproducible,1785861768,passed
 amenable_kani::rust_std::primitives::verify_mutable_reference_dereferences_to_and_updates_the_referent,1785861958,passed
 amenable_kani::rust_std::primitives::verify_shared_reference_dereferences_to_the_referent,1785861951,passed
+amenable_kani::rust_std::primitives::verify_slice_indexing_and_length,1785863695,passed
+amenable_kani::rust_std::primitives::verify_str_byte_length_and_content,1785863704,passed
 amenable_kani::rust_std::primitives::verify_string_utf8_valid,1785346249,passed
 amenable_kani::rust_std::primitives::verify_tuple_field_access,1785861625,passed
 amenable_kani::rust_std::process::verify_child_has_a_process_id_and_can_be_waited_on,1785357348,passed
