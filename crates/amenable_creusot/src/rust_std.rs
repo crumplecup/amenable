@@ -36,7 +36,7 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
@@ -316,6 +316,78 @@ amenable_derive::harness! {
             };
 
             (first, second, after_pop, after_drop_popped, after_drop_heap)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
+        /// `LinkedList::push_back` followed by `pop_front` behaves as a
+        /// FIFO queue, and ownership transfers out of the list without
+        /// dropping the popped value.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `LinkedList`, so Creusot cannot express or discharge this
+        /// over the concrete std carrier today. This keeps the same
+        /// representative observation as the Kani proof, including the
+        /// explicit drop-count behavior, while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, third, empty, after_pop, after_drop_popped, after_drop_list) =>
+                first == Some(a)
+                    && second == Some(b)
+                    && third == None
+                    && empty
+                    && after_pop == 0u32
+                    && after_drop_popped == 1u32
+                    && after_drop_list == 2u32,
+        })]
+        fn verify_linked_list_is_fifo_through_back_and_front(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, bool, u32, u32, u32) {
+            let mut list = LinkedList::new();
+            list.push_back(a);
+            list.push_back(b);
+            let first = list.pop_front();
+            let second = list.pop_front();
+            let third = list.pop_front();
+            let empty = list.is_empty();
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_pop, after_drop_popped, after_drop_list) = {
+                let mut witness_list = LinkedList::new();
+                witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+                witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
+                let popped = witness_list.pop_front().unwrap();
+                let after_pop = drop_count.get();
+                drop(popped);
+                let after_drop_popped = drop_count.get();
+                drop(witness_list);
+                let after_drop_list = drop_count.get();
+                (after_pop, after_drop_popped, after_drop_list)
+            };
+
+            (
+                first,
+                second,
+                third,
+                empty,
+                after_pop,
+                after_drop_popped,
+                after_drop_list,
+            )
         }
     }
 }

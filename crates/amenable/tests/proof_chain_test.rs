@@ -123,6 +123,33 @@ fn binary_heap_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<LinkedList<i32>>")
+        .expect("LinkedList's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<LinkedList<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for LinkedList");
+    assert!(kani_description.contains("verify_linked_list_is_fifo_through_back_and_front"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for LinkedList");
+    assert!(creusot_description.contains("verify_linked_list_is_fifo_through_back_and_front"));
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),

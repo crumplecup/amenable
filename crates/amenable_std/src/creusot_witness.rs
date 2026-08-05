@@ -58,7 +58,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
@@ -72,6 +72,7 @@ use amenable_creusot::{
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+    VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
     VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
@@ -303,6 +304,29 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeap<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BinaryHeap<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<LinkedList<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_is_fifo_through_back_and_front",
+            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
@@ -83,6 +83,20 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <BinaryHeap<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<LinkedList<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_linked_list_is_fifo_through_back_and_front"
+    );
+    assert_eq!(
+        proof.provenance,
+        <LinkedList<i32> as RustStdType>::provenance()
     );
 }
 
