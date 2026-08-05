@@ -343,6 +343,102 @@ fn vec_deque_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn vec_deque_drain_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>").expect("VecDeque drain's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for VecDeque drain");
+    assert!(kani_description.contains("verify_vec_deque_drain_removes_and_yields_in_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for VecDeque drain");
+    assert!(creusot_description.contains("verify_vec_deque_drain_removes_and_yields_in_order"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn vec_deque_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>").expect("VecDeque iter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for VecDeque iter");
+    assert!(kani_description.contains("verify_vec_deque_iter_yields_references_in_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for VecDeque iter");
+    assert!(creusot_description.contains("verify_vec_deque_iter_yields_references_in_order"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>").expect("VecDeque iter_mut's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for VecDeque iter_mut");
+    assert!(kani_description.contains("verify_vec_deque_iter_mut_writes_through"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for VecDeque iter_mut");
+    assert!(creusot_description.contains("verify_vec_deque_iter_mut_writes_through"));
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),

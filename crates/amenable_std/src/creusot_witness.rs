@@ -60,7 +60,10 @@ use std::boxed::Box;
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
-use std::collections::vec_deque::IntoIter as VecDequeIntoIter;
+use std::collections::vec_deque::{
+    Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
+    IterMut as VecDequeIterMut,
+};
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -88,7 +91,10 @@ use amenable_creusot::{
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+    VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+    VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
+    VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
@@ -474,6 +480,75 @@ bridge_creusot_witness!(RustStdStandard<VecDequeIntoIter<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<VecDequeIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VecDequeDrain<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_vec_deque_drain_removes_and_yields_in_order",
+            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VecDequeDrain<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VecDequeDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VecDequeIter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_vec_deque_iter_yields_references_in_order",
+            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VecDequeIter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VecDequeIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VecDequeIterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_vec_deque_iter_mut_writes_through",
+            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VecDequeIterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VecDequeIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

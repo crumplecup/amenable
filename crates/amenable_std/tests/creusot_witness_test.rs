@@ -5,7 +5,10 @@ use std::boxed::Box;
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
-use std::collections::vec_deque::IntoIter as VecDequeIntoIter;
+use std::collections::vec_deque::{
+    Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
+    IterMut as VecDequeIterMut,
+};
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -185,6 +188,46 @@ fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_proven
     assert_eq!(
         proof.provenance,
         <VecDequeIntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<VecDequeDrain<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_drain_removes_and_yields_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <VecDequeDrain<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<VecDequeIter<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_iter_yields_references_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <VecDequeIter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<VecDequeIterMut<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_vec_deque_iter_mut_writes_through");
+    assert_eq!(
+        proof.provenance,
+        <VecDequeIterMut<'static, i32> as RustStdType>::provenance()
     );
 }
 

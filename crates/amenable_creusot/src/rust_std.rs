@@ -892,6 +892,190 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC, {
+        /// `VecDeque::drain(..)` yields every element in front-to-back
+        /// order, leaves the deque empty, and transfers yielded
+        /// ownership to the caller without dropping it. Dropping an
+        /// unfinished whole-deque drain destroys every remaining owned
+        /// value exactly once and still leaves the deque empty.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `VecDeque` or its `Drain` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof, including the explicit
+        /// unfinished-drain drop-count behavior, while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, third, empty, after_next, after_drop_yielded, after_drop_drain, empty_after_partial_drop) =>
+                first == Some(a)
+                    && second == Some(b)
+                    && third == None
+                    && empty
+                    && after_next == 0u32
+                    && after_drop_yielded == 1u32
+                    && after_drop_drain == 3u32
+                    && empty_after_partial_drop,
+        })]
+        fn verify_vec_deque_drain_removes_and_yields_in_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, bool, u32, u32, u32, bool) {
+            let mut dq = VecDeque::new();
+            dq.push_back(a);
+            dq.push_back(b);
+            let mut drain = dq.drain(..);
+            let first = drain.next();
+            let second = drain.next();
+            let third = drain.next();
+            drop(drain);
+            let empty = dq.is_empty();
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_next, after_drop_yielded, after_drop_drain, empty_after_partial_drop) = {
+                let mut witness_deque = VecDeque::new();
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                let mut drain = witness_deque.drain(..);
+                let first = drain.next().unwrap();
+                let after_next = drop_count.get();
+                drop(first);
+                let after_drop_yielded = drop_count.get();
+                drop(drain);
+                let after_drop_drain = drop_count.get();
+                let empty_after_partial_drop = witness_deque.is_empty();
+                (
+                    after_next,
+                    after_drop_yielded,
+                    after_drop_drain,
+                    empty_after_partial_drop,
+                )
+            };
+
+            (
+                first,
+                second,
+                third,
+                empty,
+                after_next,
+                after_drop_yielded,
+                after_drop_drain,
+                empty_after_partial_drop,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC, {
+        /// `VecDeque::iter` yields shared references in front-to-back
+        /// order and leaves the deque unchanged.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `VecDeque` or its `Iter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, exhausted, popped_first, popped_second, empty) =>
+                first_seen == Some(a)
+                    && second_seen == Some(b)
+                    && exhausted == None
+                    && popped_first == Some(a)
+                    && popped_second == Some(b)
+                    && empty,
+        })]
+        fn verify_vec_deque_iter_yields_references_in_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool) {
+            let mut dq = VecDeque::new();
+            dq.push_back(a);
+            dq.push_back(b);
+            let (first_seen, second_seen, exhausted) = {
+                let mut it = dq.iter();
+                (it.next().copied(), it.next().copied(), it.next().copied())
+            };
+            let popped_first = dq.pop_front();
+            let popped_second = dq.pop_front();
+            let empty = dq.is_empty();
+
+            (
+                first_seen,
+                second_seen,
+                exhausted,
+                popped_first,
+                popped_second,
+                empty,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC, {
+        /// `VecDeque::iter_mut` yields mutable references in
+        /// front-to-back order, and writes through those references are
+        /// reflected at the corresponding deque positions.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `VecDeque` or its `IterMut` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first_after, second_after, empty) =>
+                first_after == Some(updated_first)
+                    && second_after == Some(updated_second)
+                    && empty,
+        })]
+        fn verify_vec_deque_iter_mut_writes_through(
+            first: i32,
+            second: i32,
+            updated_first: i32,
+            updated_second: i32,
+        ) -> (Option<i32>, Option<i32>, bool) {
+            let mut dq = VecDeque::new();
+            dq.push_back(first);
+            dq.push_back(second);
+            {
+                let mut iterator = dq.iter_mut();
+                *iterator.next().unwrap() = updated_first;
+                *iterator.next().unwrap() = updated_second;
+            }
+            let first_after = dq.pop_front();
+            let second_after = dq.pop_front();
+            let empty = dq.is_empty();
+            (first_after, second_after, empty)
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, {
         /// `Duration::new` does not require `nanos < 1_000_000_000` — it
         /// normalizes: any whole-second carry in `nanos` is added to
