@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
@@ -111,6 +111,20 @@ fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenan
     assert_eq!(
         proof.provenance,
         <TryReserveError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<VecDeque<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_pushes_and_pops_from_both_ends"
+    );
+    assert_eq!(
+        proof.provenance,
+        <VecDeque<i32> as RustStdType>::provenance()
     );
 }
 

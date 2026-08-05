@@ -36,7 +36,7 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
@@ -441,6 +441,83 @@ amenable_derive::harness! {
         fn verify_box_new_preserves_the_wrapped_value(value: i32) -> i32 {
             let boxed = Box::new(value);
             *boxed.as_ref()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC, {
+        /// `VecDeque` is genuinely double-ended: pushing one element to
+        /// the back and another to the front, then popping from each
+        /// end, returns the value pushed to that end. Ownership also
+        /// transfers out of the deque without dropping the popped
+        /// value.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `VecDeque`, so Creusot cannot express or discharge this
+        /// over the concrete std carrier directly today. This keeps the
+        /// same representative observation as the Kani proof,
+        /// including the explicit drop-count behavior, while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (front, back, exhausted_front, exhausted_back, empty, after_pop, after_drop_popped, after_drop_deque) =>
+                front == Some(b)
+                    && back == Some(a)
+                    && exhausted_front == None
+                    && exhausted_back == None
+                    && empty
+                    && after_pop == 0u32
+                    && after_drop_popped == 1u32
+                    && after_drop_deque == 2u32,
+        })]
+        fn verify_vec_deque_pushes_and_pops_from_both_ends(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool, u32, u32, u32) {
+            let mut dq = VecDeque::new();
+            dq.push_back(a);
+            dq.push_front(b);
+            let front = dq.pop_front();
+            let back = dq.pop_back();
+            let exhausted_front = dq.pop_front();
+            let exhausted_back = dq.pop_back();
+            let empty = dq.is_empty();
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_pop, after_drop_popped, after_drop_deque) = {
+                let mut witness_dq = VecDeque::new();
+                witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
+                witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
+                let popped = witness_dq.pop_front().unwrap();
+                let after_pop = drop_count.get();
+                drop(popped);
+                let after_drop_popped = drop_count.get();
+                drop(witness_dq);
+                let after_drop_deque = drop_count.get();
+                (after_pop, after_drop_popped, after_drop_deque)
+            };
+
+            (
+                front,
+                back,
+                exhausted_front,
+                exhausted_back,
+                empty,
+                after_pop,
+                after_drop_popped,
+                after_drop_deque,
+            )
         }
     }
 }
