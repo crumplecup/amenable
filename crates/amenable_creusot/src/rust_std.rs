@@ -427,35 +427,56 @@ extern_spec! {
     }
 }
 
+// `NonZero<i32>::from_str` is a *different* `FromStr` impl from `i32`'s own
+// (`impl FromStr for NonZero<$Int>`, generated once per concrete width by
+// the same `nonzero_integer!` macro that generates `Wrapping`/`Saturating`'s
+// per-width arithmetic impls — confirmed by reading the real source, not
+// assumed), so it needs its own extern_spec rather than following from the
+// one above. The real impl parses via `from_str_radix`/`from_ascii_radix`
+// (accepts a valid `i32` first, then checks nonzero), so "the input is
+// exactly the one-character string `\"0\"`" is both real and exact for the
+// `Zero` outcome — not a narrowed sufficient condition the way the
+// Pos/NegOverflow clauses above are, since it's the only single-digit
+// all-zero string there is.
+#[cfg(creusot)]
+extern_spec! {
+    impl core::str::FromStr for NonZero<i32> {
+        #[check(ghost)]
+        #[ensures(s@.len() == 1 && s@[0] == '0' ==> match result {
+            Err(ref e) => parse_int_error_kind(e) == IntErrorKind::Zero,
+            Ok(_) => false,
+        })]
+        fn from_str(s: &str) -> Result<NonZero<i32>, ParseIntError>;
+    }
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, {
         /// Each representative integer-parse failure mode produces the
         /// matching `IntErrorKind` variant — the same claim
         /// `amenable_kani::rust_std::num::verify_int_error_kind_classifies_parse_failures`
         /// checks, restated as a real, `why3find`-discharged Creusot
-        /// postcondition against the local `FromStr` extern_spec above,
-        /// not `#[trusted]`.
+        /// postcondition against the local `FromStr` extern_specs above,
+        /// not `#[trusted]`. All five of Kani's cases, not four: `Zero`
+        /// (parsing `"0"` as `NonZero<i32>`) is now covered too, via the
+        /// second extern_spec above.
         ///
-        /// Calls `<i32 as FromStr>::from_str` directly, not
-        /// `s.parse::<i32>()`: `str::parse<F>` is a distinct generic
-        /// wrapper method (`FromStr::from_str(self)`, called through, not
-        /// inlined), so extern-speccing `from_str` doesn't cover calls made
-        /// through `parse` — confirmed by a real warning
-        /// (`calling external function 'parse' with no contract will
-        /// yield an impossible precondition`) before switching call sites.
-        ///
-        /// Four of Kani's five cases: `Zero` (parsing `"0"` as
-        /// `NonZero<i32>`) isn't covered here — that goes through a
-        /// *different* `FromStr` impl (`NonZero<i32>`'s, not `i32`'s),
-        /// which needs its own extern_spec and is tracked separately
-        /// rather than blocking these four.
+        /// Calls `<i32 as FromStr>::from_str`/`<NonZero<i32> as
+        /// FromStr>::from_str` directly, not `s.parse::<T>()`:
+        /// `str::parse<F>` is a distinct generic wrapper method
+        /// (`FromStr::from_str(self)`, called through, not inlined), so
+        /// extern-speccing `from_str` doesn't cover calls made through
+        /// `parse` — confirmed by a real warning (`calling external
+        /// function 'parse' with no contract will yield an impossible
+        /// precondition`) before switching call sites.
         #[requires(true)]
         #[ensures(match result {
-            (Err(ref e1), Err(ref e2), Err(ref e3), Err(ref e4)) => {
+            (Err(ref e1), Err(ref e2), Err(ref e3), Err(ref e4), Err(ref e5)) => {
                 parse_int_error_kind(e1) == IntErrorKind::Empty
                     && parse_int_error_kind(e2) == IntErrorKind::InvalidDigit
                     && parse_int_error_kind(e3) == IntErrorKind::PosOverflow
                     && parse_int_error_kind(e4) == IntErrorKind::NegOverflow
+                    && parse_int_error_kind(e5) == IntErrorKind::Zero
             }
             _ => false,
         })]
@@ -464,12 +485,14 @@ amenable_derive::harness! {
             Result<i32, ParseIntError>,
             Result<i32, ParseIntError>,
             Result<i32, ParseIntError>,
+            Result<NonZero<i32>, ParseIntError>,
         ) {
             (
                 <i32 as std::str::FromStr>::from_str(""),
                 <i32 as std::str::FromStr>::from_str("not a number"),
                 <i32 as std::str::FromStr>::from_str("99999999999999999999"),
                 <i32 as std::str::FromStr>::from_str("-99999999999999999999"),
+                <NonZero<i32> as std::str::FromStr>::from_str("0"),
             )
         }
     }

@@ -2,6 +2,7 @@
   "profile": [],
   "proofs": {
     "Coma": {
+      "vc_from_str_NonZero_i32": { "prover": "alt-ergo", "time": 0.013 },
       "vc_from_str_i32": { "prover": "alt-ergo", "time": 0.013 },
       "vc_verify_int_error_kind_classifies_parse_failures": {
         "prover": "alt-ergo",
