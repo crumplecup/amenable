@@ -435,6 +435,99 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC, {
+        /// `BinaryHeap::into_iter` yields every pushed element exactly
+        /// once in arbitrary order. A partially-consumed iterator also
+        /// transfers a yielded value to its caller without dropping it,
+        /// and dropping the unfinished iterator destroys every element
+        /// it still owns exactly once.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `BinaryHeap` or its `IntoIter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof, including the explicit
+        /// unfinished-iterator drop-count behavior, while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, after_next, after_drop_yielded, after_drop_iter) =>
+                ((first == Some(a) && second == Some(b))
+                    || (first == Some(b) && second == Some(a)))
+                    && after_next == 0u32
+                    && after_drop_yielded == 1u32
+                    && after_drop_iter == 3u32,
+        })]
+        fn verify_binary_heap_into_iter_yields_every_pushed_element_once(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, u32, u32, u32) {
+            let mut heap = BinaryHeap::new();
+            heap.push(a);
+            heap.push(b);
+            let mut collected: Vec<i32> = heap.into_iter().collect();
+            collected.sort_unstable();
+            let first = collected.first().copied();
+            let second = collected.get(1).copied();
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_next, after_drop_yielded, after_drop_iter) = {
+                let mut witness_heap = BinaryHeap::new();
+                witness_heap.push(OrderedDropWitness {
+                    id: 1,
+                    drop_count: drop_count.clone(),
+                });
+                witness_heap.push(OrderedDropWitness {
+                    id: 2,
+                    drop_count: drop_count.clone(),
+                });
+                witness_heap.push(OrderedDropWitness {
+                    id: 3,
+                    drop_count: drop_count.clone(),
+                });
+                let mut iterator = witness_heap.into_iter();
+                let first = iterator.next().unwrap();
+                let after_next = drop_count.get();
+                drop(first);
+                let after_drop_yielded = drop_count.get();
+                drop(iterator);
+                let after_drop_iter = drop_count.get();
+                (after_next, after_drop_yielded, after_drop_iter)
+            };
+
+            (first, second, after_next, after_drop_yielded, after_drop_iter)
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
         /// `LinkedList::push_back` followed by `pop_front` behaves as a
         /// FIFO queue, and ownership transfers out of the list without

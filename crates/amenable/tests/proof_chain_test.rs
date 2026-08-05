@@ -158,6 +158,43 @@ fn binary_heap_drain_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::binary_heap::IntoIter<i32>>").expect("BinaryHeap into_iter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::binary_heap::IntoIter<i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BinaryHeap into_iter");
+    assert!(
+        kani_description.contains("verify_binary_heap_into_iter_yields_every_pushed_element_once")
+    );
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for BinaryHeap into_iter");
+    assert!(
+        creusot_description
+            .contains("verify_binary_heap_into_iter_yields_every_pushed_element_once")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<LinkedList<i32>>")
         .expect("LinkedList's evidence link is registered");
