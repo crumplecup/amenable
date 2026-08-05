@@ -811,6 +811,87 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
+        /// `VecDeque::into_iter` consumes the deque and yields its
+        /// owned values in front-to-back order. A partially-consumed
+        /// iterator transfers its yielded value to the caller without
+        /// dropping it, and dropping the unfinished iterator destroys
+        /// every remaining owned value exactly once.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `VecDeque` or its `IntoIter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof, including the explicit
+        /// unfinished-iterator drop-count behavior, while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, third, after_next, after_drop_yielded, after_drop_iter) =>
+                first == Some(a)
+                    && second == Some(b)
+                    && third == None
+                    && after_next == 0u32
+                    && after_drop_yielded == 1u32
+                    && after_drop_iter == 3u32,
+        })]
+        fn verify_vec_deque_into_iter_yields_owned_values_in_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, u32, u32, u32) {
+            let mut dq = VecDeque::new();
+            dq.push_back(a);
+            dq.push_back(b);
+            let mut it = dq.into_iter();
+            let first = it.next();
+            let second = it.next();
+            let third = it.next();
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_next, after_drop_yielded, after_drop_iter) = {
+                let mut witness_deque = VecDeque::new();
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_deque.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                let mut iterator = witness_deque.into_iter();
+                let first = iterator.next().unwrap();
+                let after_next = drop_count.get();
+                drop(first);
+                let after_drop_yielded = drop_count.get();
+                drop(iterator);
+                let after_drop_iter = drop_count.get();
+                (after_next, after_drop_yielded, after_drop_iter)
+            };
+
+            (
+                first,
+                second,
+                third,
+                after_next,
+                after_drop_yielded,
+                after_drop_iter,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, {
         /// `Duration::new` does not require `nanos < 1_000_000_000` — it
         /// normalizes: any whole-second carry in `nanos` is added to

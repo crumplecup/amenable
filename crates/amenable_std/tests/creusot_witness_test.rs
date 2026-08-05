@@ -5,6 +5,7 @@ use std::boxed::Box;
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
+use std::collections::vec_deque::IntoIter as VecDequeIntoIter;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -170,6 +171,20 @@ fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <VecDeque<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<VecDequeIntoIter<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_into_iter_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <VecDequeIntoIter<i32> as RustStdType>::provenance()
     );
 }
 

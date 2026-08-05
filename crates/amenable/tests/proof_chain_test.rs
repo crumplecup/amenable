@@ -309,6 +309,40 @@ fn vec_deque_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn vec_deque_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::vec_deque::IntoIter<i32>>").expect("VecDeque into_iter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::vec_deque::IntoIter<i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for VecDeque into_iter");
+    assert!(kani_description.contains("verify_vec_deque_into_iter_yields_owned_values_in_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for VecDeque into_iter");
+    assert!(
+        creusot_description.contains("verify_vec_deque_into_iter_yields_owned_values_in_order")
+    );
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),

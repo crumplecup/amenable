@@ -60,6 +60,7 @@ use std::boxed::Box;
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
+use std::collections::vec_deque::IntoIter as VecDequeIntoIter;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -87,6 +88,7 @@ use amenable_creusot::{
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+    VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
@@ -449,6 +451,29 @@ bridge_creusot_witness!(RustStdStandard<VecDeque<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<VecDeque<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VecDequeIntoIter<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order",
+            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VecDequeIntoIter<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VecDequeIntoIter<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 
