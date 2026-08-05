@@ -1,6 +1,7 @@
 #![cfg(feature = "creusot")]
 
 use std::borrow::Cow;
+use std::boxed::Box;
 use std::cmp::Reverse;
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -46,6 +47,14 @@ fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
         proof.provenance,
         <Cow<'static, i32> as RustStdType>::provenance()
     );
+}
+
+#[test]
+fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Box<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_box_new_preserves_the_wrapped_value");
+    assert_eq!(proof.provenance, <Box<i32> as RustStdType>::provenance());
 }
 
 #[test]

@@ -32,6 +32,8 @@ use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
 use std::borrow::Cow;
 #[cfg(creusot)]
+use std::boxed::Box;
+#[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
@@ -130,6 +132,24 @@ amenable_derive::harness! {
                 Cow::Borrowed(borrowed) => *borrowed,
                 Cow::Owned(owned) => owned,
             }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, {
+        /// `Box::new` stores the supplied `i32`, and `Box::as_ref`
+        /// exposes that same wrapped value through a shared borrow.
+        ///
+        /// This leans directly on `creusot-std`'s own upstream
+        /// contracts for `Box::new` (`*result == val`) and
+        /// `Box::as_ref` (`**self == *result`) instead of postulating
+        /// any local model.
+        #[requires(true)]
+        #[ensures(result == value)]
+        fn verify_box_new_preserves_the_wrapped_value(value: i32) -> i32 {
+            let boxed = Box::new(value);
+            *boxed.as_ref()
         }
     }
 }
