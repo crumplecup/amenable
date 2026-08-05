@@ -1,0 +1,102 @@
+[
+  {
+    "path": "alloc::boxed::BoxedArrayIntoIter",
+    "reason": "does not resolve via std::boxed::BoxedArrayIntoIter on the current stable toolchain (error[E0425]: cannot find type, verified empirically) — not merely deprecated or feature-gated-with-a-warning, genuinely unnameable from outside alloc"
+  },
+  {
+    "path": "core::fmt::NumBuffer",
+    "reason": "unstable (int_format_into) and generic over the sealed NumBufferTrait; item-level stability screening misses it because the struct itself isn't marked #[unstable], only its usage is"
+  },
+  {
+    "path": "core::io::Cursor",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046); a very recent no_std-compatible mirror of a std::io subset"
+  },
+  {
+    "path": "core::io::ErrorKind",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046)"
+  },
+  {
+    "path": "core::io::IoSlice",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046)"
+  },
+  {
+    "path": "core::io::IoSliceMut",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046)"
+  },
+  {
+    "path": "core::io::SeekFrom",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046)"
+  },
+  {
+    "path": "core::io::Sink",
+    "reason": "core::io is entirely unstable (core_io, rust-lang/rust#154046)"
+  },
+  {
+    "path": "core::range::Range",
+    "reason": "stable on this project's own toolchain (rustc 1.97.1, confirmed via a standalone compile check with no #[feature] gate) but not on cargo-kani 0.67.0's bundled compiler (built 2025-11-20), which predates whenever upstream Rust stabilized these types and still requires #![feature(new_range_api)] — referencing it breaks amenable_std under `cargo kani` specifically, even though the exact same code compiles cleanly under `just check`/`cargo build`; see amenable_std::rust_std::ops's module doc"
+  },
+  {
+    "path": "core::range::RangeFrom",
+    "reason": "stable on this project's own toolchain but not on cargo-kani 0.67.0's bundled compiler; see core::range::Range"
+  },
+  {
+    "path": "core::range::RangeFromIter",
+    "reason": "core::range (the new_range_api) is entirely unstable; item-level stability screening misses it because these helper iterator structs aren't individually marked #[unstable]"
+  },
+  {
+    "path": "core::range::RangeInclusive",
+    "reason": "stable on this project's own toolchain but not on cargo-kani 0.67.0's bundled compiler; see core::range::Range"
+  },
+  {
+    "path": "core::range::RangeInclusiveIter",
+    "reason": "core::range (the new_range_api) is entirely unstable; item-level stability screening misses it"
+  },
+  {
+    "path": "core::range::RangeIter",
+    "reason": "core::range (the new_range_api) is entirely unstable; item-level stability screening misses it"
+  },
+  {
+    "path": "core::range::RangeToInclusive",
+    "reason": "stable on this project's own toolchain but not on cargo-kani 0.67.0's bundled compiler; see core::range::Range"
+  },
+  {
+    "path": "core::slice::ArrayWindows",
+    "reason": "unstable (array_windows) and const-generic (<'a, T, const N: usize>); no macro models a const parameter, and item-level stability screening misses the unstable marker"
+  },
+  {
+    "path": "libc::unix::gid_t",
+    "reason": "not std::os::unix::raw::gid_t (already covered, resolves to u32 via std's own rustdoc index) -- a distinct occurrence surfaced by SocketCred::get_gid/set_gid's signatures in std::os::unix::net::ancillary, which reference libc::gid_t directly. libc is never given its own rustdoc pass by the coverage pipeline (only std/core/alloc are), so std's rustdoc JSON only carries a bare paths-table stub for this id -- {crate_id, path, kind}, no type information at all -- and libc::gid_t's real definition (u32, confirmed by reading libc 0.2.189's own src/unix/mod.rs) can't be recovered from that. The value is the same u32 either way and is already proven; this is a rustdoc-metadata artifact for an un-rustdoc'd external crate, not a missing proof. Same reasoning for pid_t (i32) and uid_t (u32)."
+  },
+  {
+    "path": "libc::unix::pid_t",
+    "reason": "same rustdoc-metadata artifact as libc::unix::gid_t -- SocketCred::get_pid/set_pid reference libc::pid_t (i32) directly; std::os::unix::raw::pid_t already covers the same underlying type"
+  },
+  {
+    "path": "libc::unix::uid_t",
+    "reason": "same rustdoc-metadata artifact as libc::unix::gid_t -- SocketCred::get_uid/set_uid reference libc::uid_t (u32) directly; std::os::unix::raw::uid_t already covers the same underlying type"
+  },
+  {
+    "path": "std::os::linux::raw::stat",
+    "reason": "deprecated (\"these type aliases are no longer supported by the standard library, the libc crate on crates.io should be used instead\"), confirmed via a real cross-target check against x86_64-unknown-linux-gnu; dropped deliberately rather than covered with a warning"
+  },
+  {
+    "path": "std::os::unix::prelude::BorrowedFd",
+    "reason": "covered in amenable_std's rust_std/os_unix.rs (#[cfg(unix)]), but that impl is invisible when the coverage check itself is built on Windows (this host); verified via cargo check -p amenable_std --target x86_64-unknown-linux-gnu"
+  },
+  {
+    "path": "std::os::unix::prelude::OwnedFd",
+    "reason": "covered in amenable_std's rust_std/os_unix.rs (#[cfg(unix)]), invisible when checked from Windows; see BorrowedFd"
+  },
+  {
+    "path": "std::os::unix::prelude::RawFd",
+    "reason": "type alias resolving to i32 (covered) via os_unix.rs's cfg(unix) impls, but resolution is only visible when the coverage check is built on a unix target"
+  },
+  {
+    "path": "std::os::unix::raw::pthread_t",
+    "reason": "platform-specific type alias only resolvable when the coverage check is built on a unix target"
+  },
+  {
+    "path": "std::os::unix::thread::RawPthread",
+    "reason": "platform-specific type alias only resolvable when the coverage check is built on a unix target"
+  }
+]
