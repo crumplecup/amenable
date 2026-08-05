@@ -13,9 +13,14 @@ use std::char::{
     TryFromCharError,
 };
 use std::cmp::Reverse;
-use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
+use std::collections::binary_heap::{
+    Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter, Iter as BinaryHeapIter,
+    PeekMut as BinaryHeapPeekMut,
+};
 use std::collections::hash_map::DefaultHasher;
-use std::collections::linked_list::IntoIter as LinkedListIntoIter;
+use std::collections::linked_list::{
+    IntoIter as LinkedListIntoIter, Iter as LinkedListIter, IterMut as LinkedListIterMut,
+};
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
     IterMut as VecDequeIterMut,
@@ -179,6 +184,36 @@ fn binary_heap_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
 }
 
 #[test]
+fn binary_heap_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<BinaryHeapIter<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_binary_heap_iter_yields_every_pushed_element_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BinaryHeapIter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn binary_heap_peek_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_binary_heap_peek_mut_exposes_the_maximum"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BinaryHeapPeekMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<LinkedList<i32>> as Witness<CreusotVerifier>>::proof();
 
@@ -189,6 +224,33 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <LinkedList<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<LinkedListIter<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_linked_list_iter_yields_references_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <LinkedListIter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<LinkedListIterMut<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_linked_list_iter_mut_writes_through");
+    assert_eq!(
+        proof.provenance,
+        <LinkedListIterMut<'static, i32> as RustStdType>::provenance()
     );
 }
 

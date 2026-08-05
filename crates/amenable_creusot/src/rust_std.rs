@@ -36,6 +36,10 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
+use std::collections::binary_heap::PeekMut as BinaryHeapPeekMut;
+#[cfg(creusot)]
+use std::collections::linked_list::{Iter as LinkedListIter, IterMut as LinkedListIterMut};
+#[cfg(creusot)]
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 #[cfg(creusot)]
 use std::ffi::{CStr, CString};
@@ -553,6 +557,110 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC, {
+        /// `BinaryHeap::iter` yields a shared reference to every pushed
+        /// element exactly once, does not consume the heap, and
+        /// preserves the heap's later pop order.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `BinaryHeap` or its `Iter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, len_after_iter, first_pop, second_pop) =>
+                ((first == Some(a) && second == Some(b))
+                    || (first == Some(b) && second == Some(a)))
+                    && len_after_iter == 2usize
+                    && first_pop == Some(if a >= b { a } else { b })
+                    && second_pop == Some(if a >= b { b } else { a }),
+        })]
+        fn verify_binary_heap_iter_yields_every_pushed_element_once(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, usize, Option<i32>, Option<i32>) {
+            let mut heap = BinaryHeap::new();
+            heap.push(a);
+            heap.push(b);
+
+            let (first, second) = {
+                let mut collected: Vec<i32> = heap.iter().copied().collect();
+                collected.sort_unstable();
+                (collected.first().copied(), collected.get(1).copied())
+            };
+
+            let len_after_iter = heap.len();
+            let first_pop = heap.pop();
+            let second_pop = heap.pop();
+
+            (first, second, len_after_iter, first_pop, second_pop)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC, {
+        /// `BinaryHeap::peek_mut` exposes the current maximum through a
+        /// mutable guard. Leaving that guard untouched preserves the
+        /// current maximum, and lowering it re-establishes the heap
+        /// invariant when the guard is dropped.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `BinaryHeap` or its `PeekMut` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(a < b)]
+        #[ensures(match result {
+            (before_mutation, top_after_observing, after_mutation, top_after_mutation, first_pop, second_pop) =>
+                before_mutation == b
+                    && top_after_observing == Some(b)
+                    && after_mutation == a
+                    && top_after_mutation == Some(a)
+                    && first_pop == Some(a)
+                    && second_pop == Some(a),
+        })]
+        fn verify_binary_heap_peek_mut_exposes_the_maximum(
+            a: i32,
+            b: i32,
+        ) -> (i32, Option<i32>, i32, Option<i32>, Option<i32>, Option<i32>) {
+            let mut heap = BinaryHeap::new();
+            heap.push(a);
+            heap.push(b);
+
+            let before_mutation = {
+                let peek: BinaryHeapPeekMut<'_, i32> = heap.peek_mut().unwrap();
+                *peek
+            };
+            let top_after_observing = heap.peek().copied();
+
+            let after_mutation = {
+                let mut peek: BinaryHeapPeekMut<'_, i32> = heap.peek_mut().unwrap();
+                *peek = a;
+                *peek
+            };
+            let top_after_mutation = heap.peek().copied();
+            let first_pop = heap.pop();
+            let second_pop = heap.pop();
+
+            (
+                before_mutation,
+                top_after_observing,
+                after_mutation,
+                top_after_mutation,
+                first_pop,
+                second_pop,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
         /// `LinkedList::push_back` followed by `pop_front` behaves as a
         /// FIFO queue, and ownership transfers out of the list without
@@ -620,6 +728,107 @@ amenable_derive::harness! {
                 after_drop_popped,
                 after_drop_list,
             )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC, {
+        /// `LinkedList::iter` borrows instead of consuming, yielding
+        /// shared references in front-to-back order while leaving the
+        /// list intact for later removal.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `LinkedList` or its `Iter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, exhausted, front_after_iter, next_after_iter, empty) =>
+                first == Some(a)
+                    && second == Some(b)
+                    && exhausted == None
+                    && front_after_iter == Some(a)
+                    && next_after_iter == Some(b)
+                    && empty,
+        })]
+        fn verify_linked_list_iter_yields_references_in_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool) {
+            let mut list = LinkedList::new();
+            list.push_back(a);
+            list.push_back(b);
+
+            let (first, second, exhausted) = {
+                let mut iterator: LinkedListIter<'_, i32> = list.iter();
+                (
+                    iterator.next().copied(),
+                    iterator.next().copied(),
+                    iterator.next().copied(),
+                )
+            };
+
+            let front_after_iter = list.pop_front();
+            let next_after_iter = list.pop_front();
+            let empty = list.is_empty();
+
+            (
+                first,
+                second,
+                exhausted,
+                front_after_iter,
+                next_after_iter,
+                empty,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC, {
+        /// `LinkedList::iter_mut` yields mutable references in
+        /// front-to-back order, and writes through those borrows are
+        /// visible at the corresponding list positions afterward.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `LinkedList` or its `IterMut` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (exhausted, front_after_write, next_after_write) =>
+                exhausted
+                    && front_after_write == Some(updated_first)
+                    && next_after_write == Some(updated_second),
+        })]
+        fn verify_linked_list_iter_mut_writes_through(
+            first: i32,
+            second: i32,
+            updated_first: i32,
+            updated_second: i32,
+        ) -> (bool, Option<i32>, Option<i32>) {
+            let mut list = LinkedList::new();
+            list.push_back(first);
+            list.push_back(second);
+
+            let exhausted = {
+                let mut iterator: LinkedListIterMut<'_, i32> = list.iter_mut();
+                *iterator.next().unwrap() = updated_first;
+                *iterator.next().unwrap() = updated_second;
+                iterator.next().is_none()
+            };
+
+            let front_after_write = list.pop_front();
+            let next_after_write = list.pop_front();
+
+            (exhausted, front_after_write, next_after_write)
         }
     }
 }

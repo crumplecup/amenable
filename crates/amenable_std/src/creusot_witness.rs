@@ -68,9 +68,14 @@ use std::char::{
     TryFromCharError,
 };
 use std::cmp::Reverse;
-use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
+use std::collections::binary_heap::{
+    Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter, Iter as BinaryHeapIter,
+    PeekMut as BinaryHeapPeekMut,
+};
 use std::collections::hash_map::DefaultHasher;
-use std::collections::linked_list::IntoIter as LinkedListIntoIter;
+use std::collections::linked_list::{
+    IntoIter as LinkedListIntoIter, Iter as LinkedListIter, IterMut as LinkedListIterMut,
+};
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
     IterMut as VecDequeIterMut,
@@ -108,6 +113,8 @@ use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+    VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+    VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
     VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
     VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
     VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, VERIFY_CHAR_ROUNDTRIP_SRC,
@@ -124,6 +131,8 @@ use amenable_creusot::{
     VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
     VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+    VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
+    VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
     VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
     VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
@@ -576,6 +585,52 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeapIntoIter<i32>>);
     }
 }
 
+impl CreusotWitness for RustStdStandard<BinaryHeapIter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_binary_heap_iter_yields_every_pushed_element_once",
+            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BinaryHeapIter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BinaryHeapIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_binary_heap_peek_mut_exposes_the_maximum",
+            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BinaryHeapPeekMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
 impl CreusotWitness for RustStdStandard<LinkedList<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -596,6 +651,52 @@ bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<LinkedListIter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_iter_yields_references_in_order",
+            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinkedListIter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<LinkedListIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<LinkedListIterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_iter_mut_writes_through",
+            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinkedListIterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<LinkedListIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

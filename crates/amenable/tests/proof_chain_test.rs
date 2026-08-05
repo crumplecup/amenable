@@ -743,6 +743,72 @@ fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn binary_heap_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>").expect("BinaryHeap iter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BinaryHeap iter");
+    assert!(kani_description.contains("verify_binary_heap_iter_yields_every_pushed_element_once"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for BinaryHeap iter");
+    assert!(
+        creusot_description.contains("verify_binary_heap_iter_yields_every_pushed_element_once")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn binary_heap_peek_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>").expect("BinaryHeap peek_mut's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BinaryHeap peek_mut");
+    assert!(kani_description.contains("verify_binary_heap_peek_mut_exposes_the_maximum"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for BinaryHeap peek_mut");
+    assert!(creusot_description.contains("verify_binary_heap_peek_mut_exposes_the_maximum"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<LinkedList<i32>>")
         .expect("LinkedList's evidence link is registered");
@@ -766,6 +832,70 @@ fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() {
         .find(|(verifier, _)| *verifier == "creusot")
         .expect("creusot proof registered for LinkedList");
     assert!(creusot_description.contains("verify_linked_list_is_fifo_through_back_and_front"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn linked_list_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::linked_list::Iter<'static, i32>>").expect("LinkedList iter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::linked_list::Iter<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for LinkedList iter");
+    assert!(kani_description.contains("verify_linked_list_iter_yields_references_in_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for LinkedList iter");
+    assert!(creusot_description.contains("verify_linked_list_iter_yields_references_in_order"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn linked_list_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>").expect("LinkedList iter_mut's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for LinkedList iter_mut");
+    assert!(kani_description.contains("verify_linked_list_iter_mut_writes_through"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for LinkedList iter_mut");
+    assert!(creusot_description.contains("verify_linked_list_iter_mut_writes_through"));
 }
 
 #[test]
