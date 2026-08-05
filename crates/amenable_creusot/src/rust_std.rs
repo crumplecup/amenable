@@ -33,7 +33,8 @@ use creusot_std::std::time::nanos_to_secs;
 use std::cmp::Ordering;
 #[cfg(creusot)]
 use std::num::{
-    FpCategory, IntErrorKind, NonZero, ParseIntError, Saturating, TryFromIntError, Wrapping,
+    FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
+    Wrapping,
 };
 #[cfg(creusot)]
 use std::time::Duration;
@@ -618,6 +619,54 @@ amenable_derive::harness! {
                 0.0f64.classify(),
                 f64::MIN_POSITIVE.classify(),
                 subnormal.classify(),
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC, {
+        /// A non-numeric string fails to parse as `f64` with
+        /// `ParseFloatError`, while a valid numeric string succeeds — the
+        /// same claim
+        /// `amenable_kani::rust_std::num::verify_parse_float_error_occurs_only_for_unparseable_input`
+        /// checks by symbolic execution.
+        ///
+        /// `#[trusted]`, unlike `ParseIntError`'s analogous harness: this
+        /// claim never needs to characterize a float VALUE (only
+        /// `Result::is_ok`/`is_err`), so it looked tractable by the same
+        /// char/int-literal-only technique `IntErrorKind`'s Pos/NegOverflow
+        /// clauses use — and a real `extern_spec!` for `FromStr for f64`
+        /// using exactly that technique DOES translate cleanly (`cargo
+        /// creusot -- -p amenable_creusot` succeeds, including a
+        /// well-formedness check on the extern_spec itself). But
+        /// `why3find prove`'s automatic strategy fails to discharge the
+        /// harness's own goal against it: the goal splits into two
+        /// sub-cases and one is left unattempted (`null` in the emitted
+        /// `proof.json`, not a reported counterexample) — reproduced with
+        /// the Err clause alone, the Ok clause alone, and both together,
+        /// all three isolate to the same unresolved split. The identical
+        /// technique (`s@.len()`/`s@[i]` char comparisons via
+        /// `is_ascii_digit`) proves fine for `i32`'s `FromStr` in this
+        /// same file, so the difference is specific to `f64` appearing in
+        /// the `Result` — not fully root-caused (no diagnostic points at
+        /// a specific cause the way the `f64` View/literal ICEs do for
+        /// `FpCategory`), but confirmed reproducible across several
+        /// independent attempts, not a "looks hard" guess. See
+        /// `amenable_std::creusot_gallery`'s
+        /// `parse_float_error_extern_spec_translates_but_wont_discharge`
+        /// finding for the full repro.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (Err(_), Ok(_)) => true,
+            _ => false,
+        })]
+        fn verify_parse_float_error_occurs_only_for_unparseable_input()
+        -> (Result<f64, ParseFloatError>, Result<f64, ParseFloatError>) {
+            (
+                <f64 as std::str::FromStr>::from_str("not a float"),
+                <f64 as std::str::FromStr>::from_str("3.14"),
             )
         }
     }

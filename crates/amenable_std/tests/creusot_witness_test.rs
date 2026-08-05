@@ -144,3 +144,17 @@ fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <core::num::FpCategory as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::ParseFloatError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_parse_float_error_occurs_only_for_unparseable_input"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::ParseFloatError as RustStdType>::provenance()
+    );
+}

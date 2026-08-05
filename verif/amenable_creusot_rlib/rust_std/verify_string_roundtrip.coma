@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 101 8 101 55 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 102 8 102 55 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 101 35 101 36
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 98 19 98 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 101 49 101 55
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 99 18 99 29
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 100 18 100 55
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 102 35 102 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 99 19 99 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 102 49 102 55
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 100 18 100 29
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 101 18 101 55
 
 use creusot.prelude.Any
 use creusot.int.UInt64
@@ -13,13 +13,13 @@ type t_String
 
 predicate inv_String (_1: t_String)
 
-function string_len [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 81 0 81 35] (_s: t_String) : UInt64.t
+function string_len [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 82 0 82 35] (_s: t_String) : UInt64.t
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 101 8 101 55]
+let rec verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 102 8 102 55]
   (s: t_String) (return (x: t_String)) =
   {[@stop_split] [@expl:verify_string_roundtrip 's' type invariant] [%#srust_std] inv_String s}
   (! bb0

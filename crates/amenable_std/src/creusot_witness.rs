@@ -65,6 +65,7 @@ use amenable_creusot::{
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+    VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
@@ -435,6 +436,41 @@ bridge_creusot_witness!(RustStdStandard<core::num::FpCategory>);
         verifier: "creusot",
         describe: || {
             <RustStdStandard<core::num::FpCategory> as CreusotWitness>::proof().to_string()
+        },
+    }
+}
+
+// Fully qualified, matching `amenable_std::rust_std::num`'s own
+// registration exactly (`register_rust_std_standard_evidence!(...,
+// core::num::ParseFloatError, ...)`, confirmed against the checklist's
+// own `evidence_name` column: `RustStdStandard<core::num::ParseFloatError>`).
+//
+// `#[trusted]`: a real extern_spec for `FromStr for f64` translates
+// cleanly but `why3find prove` doesn't discharge the harness's own goal
+// against it — confirmed reproducible, not a convenience shortcut; see
+// `amenable_std::creusot_gallery`'s
+// `parse_float_error_extern_spec_translates_but_wont_discharge` finding.
+impl CreusotWitness for RustStdStandard<core::num::ParseFloatError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_parse_float_error_occurs_only_for_unparseable_input",
+            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::num::ParseFloatError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<core::num::ParseFloatError> as CreusotWitness>::proof().to_string()
         },
     }
 }

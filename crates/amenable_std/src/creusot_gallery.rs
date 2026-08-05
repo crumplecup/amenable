@@ -701,6 +701,94 @@ extern_spec! {
 // FpCategory proof stays the honest fallback: state the same five-case
 // claim Kani checks by symbolic execution, marked #[trusted] rather than
 // silently dropped, the same as NonZero::new's sealed-trait case.
+//
+// Not float-specific, it turns out: attempting a `f64::from_str`
+// extern_spec afterward (see the
+// `parse_float_error_extern_spec_translates_but_wont_discharge` finding
+// below) hit the identical ICE from a bare STRING literal
+// (`s@ == "not a float"@`, same panic site) — so "Unsupported literal"
+// applies to Pearlite literal kinds more broadly than just floats; only
+// integer/bool/char literals are confirmed to translate.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::parse_float_error_extern_spec_translates_but_wont_discharge".to_owned(),
+            title: "a real, char/int-literal-only extern_spec for FromStr for f64 translates cleanly but why3find's automatic strategy won't discharge the goal against it".to_owned(),
+            disposition: CreusotGalleryDisposition::Hypothesis,
+            expected: CreusotGalleryExpectation::Unproved,
+            claim: r#"
+// Attempted after `f64_has_no_view_impl_at_all`/
+// `float_literals_in_pearlite_ice_the_compiler` ruled out `@` and float
+// literals: ParseFloatError's own claim never needs a float VALUE (only
+// Result::is_ok/is_err), so the same char/int-literal-only technique
+// IntErrorKind's Pos/NegOverflow clauses use looked applicable:
+extern_spec! {
+    impl core::str::FromStr for f64 {
+        #[check(ghost)]
+        #[ensures(
+            s@.len() > 0 && !is_ascii_digit(s@[0]) && s@[0] != '.' && s@[0] != '-' && s@[0] != '+'
+            ==> match result { Err(_) => true, Ok(_) => false }
+        )]
+        #[ensures(
+            s@.len() == 4
+                && is_ascii_digit(s@[0]) && s@[1] == '.'
+                && is_ascii_digit(s@[2]) && is_ascii_digit(s@[3])
+            ==> match result { Err(_) => false, Ok(_) => true }
+        )]
+        fn from_str(s: &str) -> Result<f64, ParseFloatError>;
+    }
+}
+
+fn verify_parse_float_error_occurs_only_for_unparseable_input()
+-> (Result<f64, ParseFloatError>, Result<f64, ParseFloatError>) {
+    (
+        <f64 as std::str::FromStr>::from_str("not a float"),
+        <f64 as std::str::FromStr>::from_str("3.14"),
+    )
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot`: translates
+// clean (no ICE, no "generics don't match" — the extern_spec's own
+// well-formedness VC, `vc_from_str_f64`, proves in 0.012s), but the
+// harness's own goal fails:
+//   Goal Coma.vc_verify_parse_float_error_occurs_only_for_unparseable_input: ✘ (1/2)
+// The emitted proof.json shows the goal split (split_vc) into two
+// sub-cases, one proved (alt-ergo, 0.017s) and one left `null` —
+// unattempted, not a reported counterexample. Reproduced isolating the
+// Err clause alone, the Ok clause alone, and both together: all three
+// isolate to the same unresolved split. The IDENTICAL technique
+// (`s@.len()`/`s@[i]` via the same local `is_ascii_digit` helper) proves
+// fine for `i32 as FromStr` in this same file (see
+// `verify_int_error_kind_classifies_parse_failures`'s InvalidDigit
+// clause) — inspecting both `.coma` files side by side shows `view_str`
+// is declared identically (an uninterpreted `function view_str (self:
+// string) : Seq.seq Char.t`, no visible axiom in either file) in both
+// cases, so the difference isn't about string-literal reasoning itself.
+// The only structural difference between the two goals is `f64`/
+// `Float64.t` appearing in one `Result` and not the other.
+//
+// Disposition: Hypothesis, not FalseTrail — genuinely attempted (three
+// independent isolation experiments, real `.coma`/`proof.json`
+// inspection), but not root-caused to a specific creusot-rustc/why3find
+// mechanism the way the other findings here are. A different solver or
+// explicit split-vc tactic might discharge it; not explored further given
+// the effort already spent relative to one checklist row. Confirmed
+// reproducible, not a "looks hard" guess — the honest fallback (this is
+// the real content, in amenable_creusot::rust_std today) states the same
+// claim Kani checks by symbolic execution, marked #[trusted]:
+#[trusted]
+#[ensures(match result { (Err(_), Ok(_)) => true, _ => false })]
+fn verify_parse_float_error_occurs_only_for_unparseable_input() -> (...) {
+    (
+        <f64 as std::str::FromStr>::from_str("not a float"),
+        <f64 as std::str::FromStr>::from_str("3.14"),
+    )
+}
 "#,
         },
     }
