@@ -30,7 +30,7 @@ use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted}
 #[cfg(creusot)]
 use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
-use std::cmp::Ordering;
+use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
 use std::num::{
     FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
@@ -668,6 +668,58 @@ amenable_derive::harness! {
                 <f64 as std::str::FromStr>::from_str("not a float"),
                 <f64 as std::str::FromStr>::from_str("3.14"),
             )
+        }
+    }
+}
+
+// `Reverse<T>: Ord` is ONE generic impl (`impl<T: Ord> Ord for
+// Reverse<T>`, confirmed by reading the real source,
+// `library/core/src/cmp.rs`), not a per-concrete-type macro like
+// `Wrapping`/`Saturating` — closer in shape to `NonZero::new`'s generic
+// impl than to those. A concrete `impl Ord for Reverse<i32>` extern_spec
+// hits the identical "extern spec generics don't match" error
+// `NonZero::new` did (confirmed, not assumed): `cmp` is defined once,
+// generically. Unlike `ZeroablePrimitive`, though, `Ord` is an ordinary,
+// nameable, stable trait, so the generic form is actually writable — with
+// one addition: comparing `T` values via `>`/`==`/`<` inside `#[ensures]`
+// needs `T: creusot_std::logic::OrdLogic` (a real, non-guessed
+// requirement — the compiler's own error names it exactly:
+// `the trait bound T: creusot_std::logic::OrdLogic is not satisfied`),
+// creusot-std's logic-context comparison trait, distinct from the
+// program-level `Ord` the real impl itself requires. So this proof is
+// real and general over every `T: Ord + OrdLogic`, not narrowed to
+// `i32` the way `Wrapping`/`Saturating`'s per-width proofs are.
+#[cfg(creusot)]
+extern_spec! {
+    impl<T: Ord + creusot_std::logic::OrdLogic> Ord for Reverse<T> {
+        #[check(ghost)]
+        #[ensures(match result {
+            Ordering::Less => other.0 > self.0,
+            Ordering::Equal => other.0 == self.0,
+            Ordering::Greater => other.0 < self.0,
+        })]
+        fn cmp(&self, other: &Reverse<T>) -> Ordering;
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_REVERSE_INVERTS_COMPARISON_SRC, {
+        /// `Reverse<T>` inverts `T`'s comparison direction, and its `.0`
+        /// field round-trips the wrapped value unchanged — the same claim
+        /// `amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison`
+        /// checks by symbolic execution. Rests on the local `extern_spec!`
+        /// above, the same relationship every non-`char`/`String` harness
+        /// in this file has to a trusted axiom on the real method it
+        /// exercises.
+        #[requires(true)]
+        #[ensures(match result.0 {
+            Ordering::Less => b > a,
+            Ordering::Equal => b == a,
+            Ordering::Greater => b < a,
+        })]
+        #[ensures(result.1 == a)]
+        fn verify_reverse_inverts_comparison(a: i32, b: i32) -> (Ordering, i32) {
+            (Reverse(a).cmp(&Reverse(b)), Reverse(a).0)
         }
     }
 }

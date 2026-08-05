@@ -1,5 +1,6 @@
 #![cfg(feature = "creusot")]
 
+use std::cmp::Reverse;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
 
@@ -156,5 +157,16 @@ fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenan
     assert_eq!(
         proof.provenance,
         <core::num::ParseFloatError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Reverse<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_reverse_inverts_comparison");
+    assert_eq!(
+        proof.provenance,
+        <Reverse<i32> as RustStdType>::provenance()
     );
 }

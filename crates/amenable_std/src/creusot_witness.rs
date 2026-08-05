@@ -55,6 +55,7 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
+use std::cmp::Reverse;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
 
@@ -67,6 +68,7 @@ use amenable_creusot::{
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
+    VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
@@ -472,5 +474,32 @@ bridge_creusot_witness!(RustStdStandard<core::num::ParseFloatError>);
         describe: || {
             <RustStdStandard<core::num::ParseFloatError> as CreusotWitness>::proof().to_string()
         },
+    }
+}
+
+// Bare `Reverse<i32>`, matching `amenable_std::rust_std::cmp`'s own
+// registration exactly (`register_rust_std_standard_evidence!(std::cmp::
+// Ordering, Reverse<i32>)`, confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<Reverse<i32>>`).
+impl CreusotWitness for RustStdStandard<Reverse<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_reverse_inverts_comparison",
+            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Reverse<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Reverse<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
