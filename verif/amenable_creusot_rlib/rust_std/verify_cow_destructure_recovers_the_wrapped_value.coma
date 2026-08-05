@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 161 8 161 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 264 8 264 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 156 19 156 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 157 18 160 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 259 19 259 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 260 18 263 9
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -29,7 +29,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_cow_destructure_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 161 8 161 93] (value: t_Cow_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 264 8 264 93] (value: t_Cow_i32)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = any [ br0 (x0: Int32.t) -> {value = Borrowed x0} (! bb4) | br1 (x0: Int32.t) -> {value = Owned x0} (! bb3) ]
   | bb3 = s0

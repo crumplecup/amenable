@@ -1,0 +1,44 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 235 8 238 23 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 232 19 232 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 233 18 233 37
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 234 18 234 34
+
+use creusot.prelude.MutBorrow
+use creusot.int.Int32
+use creusot.prelude.Any
+
+predicate resolve_refmut_i32 [@inline:trivial] (_1: MutBorrow.t Int32.t) = _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_i32
+
+type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_mutable_reference_dereferences_to_and_updates_the_referent
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 235 8 238 23] (initial: Int32.t) (next: Int32.t)
+  (return (x: tup2_i32_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &value <- initial ] s1
+    | s1 = MutBorrow.borrow_mut <Int32.t> {value}
+        (fun (_bor: MutBorrow.t Int32.t) -> [ &reference <- _bor ] [ &value <- _bor.final ] s2)
+    | s2 = [ &before <- reference.current ] s3
+    | s3 = [ &reference <- { reference with current = next } ] s4
+    | s4 = -{resolve_refmut_i32 reference}- s5
+    | s5 = [ &_ret <- { f0 = before; f1 = reference.current } ] s6
+    | s6 = return {_ret} ] ]
+  [ & _ret: tup2_i32_i32 = Any.any_l ()
+  | & initial: Int32.t = initial
+  | & next: Int32.t = next
+  | & value: Int32.t = Any.any_l ()
+  | & reference: MutBorrow.t Int32.t = Any.any_l ()
+  | & before: Int32.t = Any.any_l () ])
+  [ return (result: tup2_i32_i32) ->
+  {[@stop_split] [@expl:verify_mutable_reference_dereferences_to_and_updates_the_referent ensures] ([@stop_split] [@expl:verify_mutable_reference_dereferences_to_and_updates_the_referent ensures #0] [%#srust_std'0] result.f0
+      = initial)
+    /\ ([@stop_split] [@expl:verify_mutable_reference_dereferences_to_and_updates_the_referent ensures #1] [%#srust_std'1] result.f1
+    = next)}
+    (! return {result}) ]

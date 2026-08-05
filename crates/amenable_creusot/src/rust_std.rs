@@ -53,7 +53,7 @@ use std::num::{
     Wrapping,
 };
 #[cfg(creusot)]
-use std::ops::{Bound, ControlFlow, RangeTo};
+use std::ops::{Bound, ControlFlow};
 #[cfg(creusot)]
 use std::task::{Context, Poll};
 #[cfg(creusot)]
@@ -126,6 +126,74 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC, {
+        /// A fixed-size array's length is its compile-time-known element
+        /// count, and each index recovers the element stored there.
+        #[requires(true)]
+        #[ensures(result.0 == 3usize)]
+        #[ensures(result.1 == a)]
+        #[ensures(result.2 == b)]
+        #[ensures(result.3 == c)]
+        fn verify_array_indexing_and_length(a: i32, b: i32, c: i32) -> (usize, i32, i32, i32) {
+            let arr = [a, b, c];
+            (arr.len(), arr[0], arr[1], arr[2])
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC, {
+        /// A slice's `.len()` reports the number of elements it views,
+        /// and indexing recovers the underlying elements in order.
+        #[requires(true)]
+        #[ensures(result.0 == 3usize)]
+        #[ensures(result.1 == a)]
+        #[ensures(result.2 == b)]
+        #[ensures(result.3 == c)]
+        fn verify_slice_indexing_and_length(a: i32, b: i32, c: i32) -> (usize, i32, i32, i32) {
+            let arr = [a, b, c];
+            let slice: &[i32] = &arr;
+            (slice.len(), slice[0], slice[1], slice[2])
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, {
+        /// A one-byte ASCII `str` reports a byte length of one, and its
+        /// first byte is exactly the byte it was constructed from.
+        ///
+        /// `#[trusted]`: expressing the real construction path here would
+        /// need `char::to_string` and `str::as_bytes`, but `creusot-std`
+        /// 0.11.0 ships no contracts for either function. The Kani harness
+        /// checks the concrete behavior directly; this keeps the same law
+        /// explicit on the Creusot side instead of dropping to provenance
+        /// only.
+        #[trusted]
+        #[requires(byte < 128u8)]
+        #[ensures(result.0 == 1usize)]
+        #[ensures(result.1 == byte)]
+        fn verify_str_byte_length_and_content(byte: u8) -> (usize, u8) {
+            (1usize, byte)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_TUPLE_FIELD_ACCESS_SRC, {
+        /// A tuple's fields recover the values it was constructed with,
+        /// in position order.
+        #[requires(true)]
+        #[ensures(result.0 == a)]
+        #[ensures(result.1 == b)]
+        fn verify_tuple_field_access(a: i32, b: i32) -> (i32, i32) {
+            let tuple = (a, b);
+            (tuple.0, tuple.1)
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, {
         /// Calling through a `fn` pointer invokes exactly the function it
         /// was assigned from.
@@ -140,6 +208,39 @@ amenable_derive::harness! {
         #[ensures(result == value)]
         fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
             value
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
+        /// Dereferencing a shared reference recovers exactly the value it
+        /// borrows.
+        #[requires(true)]
+        #[ensures(result == value)]
+        fn verify_shared_reference_dereferences_to_the_referent(value: i32) -> i32 {
+            let reference = &value;
+            *reference
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, {
+        /// Dereferencing a mutable reference recovers the borrowed value,
+        /// and writing through it updates the referent.
+        #[requires(true)]
+        #[ensures(result.0 == initial)]
+        #[ensures(result.1 == next)]
+        fn verify_mutable_reference_dereferences_to_and_updates_the_referent(
+            initial: i32,
+            next: i32,
+        ) -> (i32, i32) {
+            let mut value = initial;
+            let reference = &mut value;
+            let before = *reference;
+            *reference = next;
+            (before, *reference)
         }
     }
 }

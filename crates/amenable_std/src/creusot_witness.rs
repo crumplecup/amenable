@@ -112,7 +112,8 @@ use std::vec::Vec;
 
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+    CreusotVerifier, CreusotWitness, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+    VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
@@ -136,8 +137,9 @@ use amenable_creusot::{
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
     VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
     VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
-    VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
-    VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
+    VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC,
+    VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC,
+    VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
     VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
     VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
@@ -150,9 +152,11 @@ use amenable_creusot::{
     VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
     VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
     VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
-    VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC,
+    VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC,
+    VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
-    VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+    VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, VERIFY_TUPLE_FIELD_ACCESS_SRC,
     VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
@@ -223,6 +227,7 @@ impl_creusot_witness_trusted!(
     usize,
     f32,
     f64,
+    (),
     Cell<i32>,
     RefCell<i32>,
     Ref<'static, i32>,
@@ -424,6 +429,98 @@ bridge_creusot_witness!(RustStdStandard<String>);
     }
 }
 
+impl CreusotWitness for RustStdStandard<[i32; 3]> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_array_indexing_and_length",
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<[i32; 3]>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<[i32; 3]> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<[i32]> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_slice_indexing_and_length",
+            claim: VERIFY_SLICE_INDEXING_AND_LENGTH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<[i32]>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<[i32]> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<str> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_str_byte_length_and_content",
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<str>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<str> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<(i32, i32)> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_tuple_field_access",
+            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<(i32, i32)>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<(i32, i32)> as CreusotWitness>::proof().to_string(),
+    }
+}
+
 impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -444,6 +541,52 @@ bridge_creusot_witness!(RustStdStandard<fn(i32) -> i32>);
         evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
         verifier: "creusot",
         describe: || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<&'static i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_shared_reference_dereferences_to_the_referent",
+            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<&'static i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<&'static i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<&'static mut i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent",
+            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<&'static mut i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<&'static mut i32> as CreusotWitness>::proof().to_string(),
     }
 }
 

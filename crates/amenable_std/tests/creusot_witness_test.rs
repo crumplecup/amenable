@@ -92,6 +92,38 @@ fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn array_i32_3_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<[i32; 3]> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_array_indexing_and_length");
+    assert_eq!(proof.provenance, <[i32; 3] as RustStdType>::provenance());
+}
+
+#[test]
+fn slice_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<[i32]> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_slice_indexing_and_length");
+    assert_eq!(proof.provenance, <[i32] as RustStdType>::provenance());
+}
+
+#[test]
+fn str_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<str> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_str_byte_length_and_content");
+    assert_eq!(proof.provenance, <str as RustStdType>::provenance());
+}
+
+#[test]
+fn tuple_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<(i32, i32)> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_tuple_field_access");
+    assert_eq!(proof.provenance, <(i32, i32) as RustStdType>::provenance());
+}
+
+#[test]
 fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<fn(i32) -> i32> as Witness<CreusotVerifier>>::proof();
 
@@ -102,6 +134,42 @@ fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <fn(i32) -> i32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn shared_reference_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<&'static i32> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_shared_reference_dereferences_to_the_referent"
+    );
+    assert_eq!(
+        proof.provenance,
+        <&'static i32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mutable_reference_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<&'static mut i32> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_mutable_reference_dereferences_to_and_updates_the_referent"
+    );
+    assert_eq!(
+        proof.provenance,
+        <&'static mut i32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn unit_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<()> as Witness<CreusotVerifier>>::proof(),
+        <() as RustStdType>::provenance()
     );
 }
 
