@@ -19,7 +19,8 @@ use std::collections::binary_heap::{
 };
 use std::collections::hash_map::DefaultHasher;
 use std::collections::linked_list::{
-    IntoIter as LinkedListIntoIter, Iter as LinkedListIter, IterMut as LinkedListIterMut,
+    ExtractIf as LinkedListExtractIf, IntoIter as LinkedListIntoIter, Iter as LinkedListIter,
+    IterMut as LinkedListIterMut,
 };
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
@@ -265,6 +266,23 @@ fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
     assert_eq!(
         proof.provenance,
         <LinkedListIntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
+            CreusotVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_linked_list_extract_if_partitions_by_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool> as RustStdType>::provenance()
     );
 }
 

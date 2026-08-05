@@ -69,6 +69,38 @@ fn fn_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn cow_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Cow<'static, i32>>").expect("Cow<'static, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<Cow<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Cow<'static, i32>");
+    assert!(kani_description.contains("verify_cow_borrowed_and_owned_agree_on_their_value"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Cow<'static, i32>");
+    assert!(creusot_description.contains("verify_cow_destructure_recovers_the_wrapped_value"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Cell<i32>>")
         .expect("Cell's evidence link is registered");
@@ -929,6 +961,40 @@ fn linked_list_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
         .expect("creusot proof registered for LinkedList into_iter");
     assert!(
         creusot_description.contains("verify_linked_list_into_iter_yields_owned_values_in_order")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn linked_list_extract_if_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>").expect("LinkedList extract_if's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for LinkedList extract_if");
+    assert!(kani_description.contains("verify_linked_list_extract_if_partitions_by_the_predicate"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for LinkedList extract_if");
+    assert!(
+        creusot_description.contains("verify_linked_list_extract_if_partitions_by_the_predicate")
     );
 }
 
@@ -2561,6 +2627,35 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
     assert!(
         creusot_description.contains("verify_from_bytes_with_nul_requires_the_nul_only_at_the_end")
     );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Box<i32>>").expect("Box<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Box<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Box<i32>");
+    assert!(kani_description.contains("verify_box_derefs_and_writes_through"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Box<i32>");
+    assert!(creusot_description.contains("verify_box_new_preserves_the_wrapped_value"));
 }
 
 #[test]

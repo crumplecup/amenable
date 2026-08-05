@@ -968,6 +968,125 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC, {
+        /// `LinkedList::extract_if` yields matching elements in
+        /// front-to-back order, leaves non-matches in place, and when
+        /// dropped early preserves the unvisited suffix.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `LinkedList` or its `ExtractIf` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// partition and early-drop law as the Kani harness while
+        /// making the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (
+                first,
+                second,
+                exhausted,
+                remaining_first,
+                remaining_second,
+                remaining_exhausted,
+                early_drop_first,
+                early_drop_second,
+                early_drop_third,
+                early_drop_exhausted,
+            ) =>
+                first == Some(2i32)
+                    && second == Some(4i32)
+                    && exhausted == None
+                    && remaining_first == Some(1i32)
+                    && remaining_second == Some(3i32)
+                    && remaining_exhausted == None
+                    && early_drop_first == Some(1i32)
+                    && early_drop_second == Some(3i32)
+                    && early_drop_third == Some(4i32)
+                    && early_drop_exhausted == None,
+        })]
+        fn verify_linked_list_extract_if_partitions_by_the_predicate() -> (
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+            Option<i32>,
+        ) {
+            fn is_even(x: &mut i32) -> bool {
+                *x % 2 == 0
+            }
+
+            let (
+                first,
+                second,
+                exhausted,
+                remaining_first,
+                remaining_second,
+                remaining_exhausted,
+            ) = {
+                let mut list = LinkedList::new();
+                list.push_back(1);
+                list.push_back(2);
+                list.push_back(3);
+                list.push_back(4);
+
+                let (first, second, exhausted) = {
+                    let mut extracted = list.extract_if(is_even as fn(&mut i32) -> bool);
+                    (extracted.next(), extracted.next(), extracted.next())
+                };
+
+                (
+                    first,
+                    second,
+                    exhausted,
+                    list.pop_front(),
+                    list.pop_front(),
+                    list.pop_front(),
+                )
+            };
+
+            let (early_drop_first, early_drop_second, early_drop_third, early_drop_exhausted) = {
+                let mut list = LinkedList::new();
+                list.push_back(1);
+                list.push_back(2);
+                list.push_back(3);
+                list.push_back(4);
+
+                {
+                    let mut extracted = list.extract_if(is_even as fn(&mut i32) -> bool);
+                    let _ = extracted.next();
+                }
+
+                (
+                    list.pop_front(),
+                    list.pop_front(),
+                    list.pop_front(),
+                    list.pop_front(),
+                )
+            };
+
+            (
+                first,
+                second,
+                exhausted,
+                remaining_first,
+                remaining_second,
+                remaining_exhausted,
+                early_drop_first,
+                early_drop_second,
+                early_drop_third,
+                early_drop_exhausted,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC, {
         /// `VecDeque` is genuinely double-ended: pushing one element to
         /// the back and another to the front, then popping from each

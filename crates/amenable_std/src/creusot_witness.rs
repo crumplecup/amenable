@@ -74,7 +74,8 @@ use std::collections::binary_heap::{
 };
 use std::collections::hash_map::DefaultHasher;
 use std::collections::linked_list::{
-    IntoIter as LinkedListIntoIter, Iter as LinkedListIter, IterMut as LinkedListIterMut,
+    ExtractIf as LinkedListExtractIf, IntoIter as LinkedListIntoIter, Iter as LinkedListIter,
+    IterMut as LinkedListIterMut,
 };
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
@@ -129,6 +130,7 @@ use amenable_creusot::{
     VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
     VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
+    VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
     VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
     VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
@@ -720,6 +722,32 @@ bridge_creusot_witness!(RustStdStandard<LinkedListIntoIter<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<LinkedListIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_extract_if_partitions_by_the_predicate",
+            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> as CreusotWitness>::proof()
+                .to_string()
+        },
     }
 }
 
