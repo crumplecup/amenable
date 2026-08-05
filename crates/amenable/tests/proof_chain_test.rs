@@ -2682,6 +2682,125 @@ fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs()
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn range_to_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<RangeTo<i32>>").expect("RangeTo<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<RangeTo<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for RangeTo<i32>");
+    assert!(kani_description.contains("verify_range_to_contains_matches_bound"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for RangeTo<i32>");
+    assert!(creusot_description.contains("verify_range_to_contains_matches_bound"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn range_full_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<RangeFull>").expect("RangeFull's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<RangeFull>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for RangeFull");
+    assert!(kani_description.contains("verify_range_full_contains_everything"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for RangeFull");
+    assert!(creusot_description.contains("verify_range_full_contains_everything"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn bound_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Bound<i32>>").expect("Bound<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Bound<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Bound<i32>");
+    assert!(kani_description.contains("verify_bound_round_trips_its_endpoint"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Bound<i32>");
+    assert!(creusot_description.contains("verify_bound_round_trips_its_endpoint"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn control_flow_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<ControlFlow<i32, i32>>").expect("ControlFlow<i32, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<ControlFlow<i32, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for ControlFlow<i32, i32>");
+    assert!(kani_description.contains("verify_control_flow_continue_and_break_are_disjoint"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for ControlFlow<i32, i32>");
+    assert!(creusot_description.contains("verify_control_flow_continue_and_break_are_disjoint"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.

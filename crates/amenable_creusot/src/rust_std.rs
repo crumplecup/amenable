@@ -53,6 +53,8 @@ use std::num::{
     Wrapping,
 };
 #[cfg(creusot)]
+use std::ops::{Bound, ControlFlow, RangeTo};
+#[cfg(creusot)]
 use std::task::{Context, Poll};
 #[cfg(creusot)]
 use std::time::Duration;
@@ -1695,6 +1697,86 @@ amenable_derive::harness! {
             nanos: u32,
         ) -> Duration {
             Duration::new(secs, nanos)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC, {
+        /// `RangeTo` is unbounded below, so membership reduces to its
+        /// single exclusive upper bound.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 does not currently expose a
+        /// contract surface for `RangeBounds::contains` over the concrete
+        /// std range carriers, so this keeps the same law Kani checks as a
+        /// named trusted boundary instead of dropping to provenance-only
+        /// coverage.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result == (x < end))]
+        fn verify_range_to_contains_matches_bound(end: i32, x: i32) -> bool {
+            std::ops::RangeBounds::contains(&(..end), &x)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC, {
+        /// `RangeFull` carries no fields, but its `..` interval contains
+        /// every value.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 does not currently expose a
+        /// contract surface for `RangeBounds::contains` over `RangeFull`,
+        /// so this keeps the carrier's semantics explicit at the trusted
+        /// boundary rather than pretending missing library contracts were
+        /// discharged.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_range_full_contains_everything(x: i32) -> bool {
+            std::ops::RangeBounds::contains(&(..), &x)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC, {
+        /// `Bound` has exactly three inhabitants; the endpoint variants
+        /// round-trip their payload and `Unbounded` carries no endpoint.
+        #[requires(true)]
+        #[ensures(match value {
+            Bound::Included(inner) => result == (true, false, Some(inner)),
+            Bound::Excluded(inner) => result == (false, true, Some(inner)),
+            Bound::Unbounded => result == (false, false, None),
+        })]
+        fn verify_bound_round_trips_its_endpoint(
+            value: Bound<i32>,
+        ) -> (bool, bool, Option<i32>) {
+            match value {
+                Bound::Included(inner) => (true, false, Some(inner)),
+                Bound::Excluded(inner) => (false, true, Some(inner)),
+                Bound::Unbounded => (false, false, None),
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC, {
+        /// `Continue` and `Break` are mutually exclusive, and each
+        /// variant carries exactly the payload the other lacks.
+        #[requires(true)]
+        #[ensures(match value {
+            ControlFlow::Continue(inner) => result == (true, false, Some(inner), None),
+            ControlFlow::Break(inner) => result == (false, true, None, Some(inner)),
+        })]
+        fn verify_control_flow_continue_and_break_are_disjoint(
+            value: ControlFlow<i32, i32>,
+        ) -> (bool, bool, Option<i32>, Option<i32>) {
+            match value {
+                ControlFlow::Continue(inner) => (true, false, Some(inner), None),
+                ControlFlow::Break(inner) => (false, true, None, Some(inner)),
+            }
         }
     }
 }

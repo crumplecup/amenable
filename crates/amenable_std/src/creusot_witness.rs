@@ -101,7 +101,7 @@ use std::net::{
     AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
 };
 use std::num::{NonZero, Saturating, Wrapping};
-use std::ops::Range;
+use std::ops::{Bound, ControlFlow, Range, RangeFull, RangeTo};
 use std::rc::Rc;
 use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
@@ -116,9 +116,10 @@ use amenable_creusot::{
     VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
-    VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
+    VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC,
     VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
     VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, VERIFY_CHAR_ROUNDTRIP_SRC,
+    VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
     VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
     VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
@@ -144,6 +145,7 @@ use amenable_creusot::{
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC, VERIFY_PENDING_NEVER_RESOLVES_SRC,
     VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+    VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC, VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC,
     VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
     VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
     VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
@@ -1095,6 +1097,100 @@ bridge_creusot_witness!(RustStdStandard<Duration>);
         evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
         verifier: "creusot",
         describe: || <RustStdStandard<Duration> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<RangeTo<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_range_to_contains_matches_bound",
+            claim: VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<RangeTo<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<RangeTo<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<RangeFull> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_range_full_contains_everything",
+            claim: VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<RangeFull>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RangeFull>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<RangeFull> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Bound<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_bound_round_trips_its_endpoint",
+            claim: VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Bound<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Bound<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<ControlFlow<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_control_flow_continue_and_break_are_disjoint",
+            claim: VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<ControlFlow<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<ControlFlow<i32, i32>> as CreusotWitness>::proof().to_string()
+        },
     }
 }
 

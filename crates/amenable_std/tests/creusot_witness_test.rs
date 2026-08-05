@@ -46,7 +46,7 @@ use std::net::{
     AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
 };
 use std::num::{NonZero, Saturating, Wrapping};
-use std::ops::Range;
+use std::ops::{Bound, ControlFlow, Range, RangeFull, RangeTo};
 use std::rc::Rc;
 use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
@@ -1213,6 +1213,47 @@ fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
         "verify_duration_new_normalizes_nanos_and_carries_into_secs"
     );
     assert_eq!(proof.provenance, <Duration as RustStdType>::provenance());
+}
+
+#[test]
+fn range_to_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<RangeTo<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_range_to_contains_matches_bound");
+    assert_eq!(
+        proof.provenance,
+        <RangeTo<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<RangeFull> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_range_full_contains_everything");
+    assert_eq!(proof.provenance, <RangeFull as RustStdType>::provenance());
+}
+
+#[test]
+fn bound_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Bound<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_bound_round_trips_its_endpoint");
+    assert_eq!(proof.provenance, <Bound<i32> as RustStdType>::provenance());
+}
+
+#[test]
+fn control_flow_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<ControlFlow<i32, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_control_flow_continue_and_break_are_disjoint"
+    );
+    assert_eq!(
+        proof.provenance,
+        <ControlFlow<i32, i32> as RustStdType>::provenance()
+    );
 }
 
 #[test]
