@@ -170,3 +170,11 @@ fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <Reverse<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn option_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Option<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_option_some_and_none_are_disjoint");
+    assert_eq!(proof.provenance, <Option<i32> as RustStdType>::provenance());
+}

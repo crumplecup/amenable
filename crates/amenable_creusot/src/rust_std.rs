@@ -723,3 +723,34 @@ amenable_derive::harness! {
         }
     }
 }
+
+// Unlike every non-`char`/`String` type above, `Option<T>` needs no local
+// `extern_spec!` at all: `creusot_std::std::option` already ships real
+// `#[check(ghost)]` contracts for `is_some`/`is_none`/`unwrap`/`unwrap_or`
+// (`Option<T>: PartialEq` lets `!= None`/`== None`/`== Some(x)` appear
+// directly in `#[ensures]` as native Pearlite equality, not a method
+// call, so the "program function in logic context" restriction every
+// other harness in this file routes around doesn't even apply here — the
+// harness body calls the real methods in ordinary ghost/program context,
+// and the postcondition states the same facts via plain equality on the
+// results instead of re-calling them).
+amenable_derive::harness! {
+    creusot, VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC, {
+        /// `Some` round-trips its value through `unwrap`, and `None`
+        /// falls back to `unwrap_or`'s default — the same claim
+        /// `amenable_kani::rust_std::option_result::verify_option_some_and_none_are_disjoint`
+        /// checks by symbolic execution, restated as a real Creusot
+        /// postcondition against `creusot-std`'s own shipped `Option<T>`
+        /// contracts (not a local `extern_spec!`, and not `#[trusted]`).
+        #[requires(true)]
+        #[ensures(result.0 != None)]
+        #[ensures(result.1 == value)]
+        #[ensures(result.2 == None)]
+        #[ensures(result.3 == 0i32)]
+        fn verify_option_some_and_none_are_disjoint(value: i32) -> (Option<i32>, i32, Option<i32>, i32) {
+            let some: Option<i32> = Some(value);
+            let none: Option<i32> = None;
+            (some, some.unwrap(), none, none.unwrap_or(0))
+        }
+    }
+}

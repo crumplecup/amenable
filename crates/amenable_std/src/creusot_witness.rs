@@ -65,6 +65,7 @@ use amenable_creusot::{
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
+    VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
@@ -501,5 +502,31 @@ bridge_creusot_witness!(RustStdStandard<Reverse<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Reverse<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `Option<i32>`, matching `amenable_std::rust_std::option_result`'s
+// own registration exactly (confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<Option<i32>>`).
+impl CreusotWitness for RustStdStandard<Option<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_option_some_and_none_are_disjoint",
+            claim: VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Option<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Option<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
