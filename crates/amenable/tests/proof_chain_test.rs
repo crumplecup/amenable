@@ -2885,6 +2885,96 @@ fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn pending_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Pending<i32>>").expect("Pending<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Pending<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Pending<i32>");
+    assert!(kani_description.contains("verify_pending_never_resolves"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Pending<i32>");
+    assert!(creusot_description.contains("verify_pending_never_resolves"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn poll_fn_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>").expect("PollFn<fn(&mut Context<'_>) -> Poll<i32>>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for PollFn<fn(&mut Context<'_>) -> Poll<i32>>");
+    assert!(kani_description.contains("verify_poll_fn_dispatches_through_to_its_closure"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for PollFn<fn(&mut Context<'_>) -> Poll<i32>>");
+    assert!(creusot_description.contains("verify_poll_fn_dispatches_through_to_its_closure"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn ready_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Ready<i32>>").expect("Ready<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Ready<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Ready<i32>");
+    assert!(kani_description.contains("verify_ready_resolves_immediately_with_its_value"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Ready<i32>");
+    assert!(creusot_description.contains("verify_ready_resolves_immediately_with_its_value"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_chain_proof_chain_reports_the_kani_and_creusot_harnesses() {
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.

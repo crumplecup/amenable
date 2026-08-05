@@ -40,12 +40,16 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveErr
 #[cfg(creusot)]
 use std::ffi::{CStr, CString};
 #[cfg(creusot)]
+use std::future::{Pending, PollFn, Ready};
+#[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
 use std::num::{
     FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
     Wrapping,
 };
+#[cfg(creusot)]
+use std::task::{Context, Poll};
 #[cfg(creusot)]
 use std::time::Duration;
 
@@ -2124,6 +2128,109 @@ amenable_derive::harness! {
                 (first_seen, second_seen)
             };
             (first_seen, second_seen, res)
+        }
+    }
+}
+
+// `creusot-std` 0.11.0 ships no `core::future` / `core::task` contract
+// surface at all (checked directly against the installed sources), so
+// `Future::poll`, `Context`, `Waker`, and the std `Pending` / `Ready` /
+// `PollFn` carriers are outside Creusot's concrete reasoning boundary
+// today. These harnesses therefore keep the same representative
+// observations as Kani while making that trusted boundary explicit.
+amenable_derive::harness! {
+    creusot, VERIFY_PENDING_NEVER_RESOLVES_SRC, {
+        /// `Pending` always reports `Poll::Pending` when polled,
+        /// including repeated polls.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first_poll, second_poll) =>
+                first_poll == Poll::Pending
+                    && second_poll == Poll::Pending,
+        })]
+        fn verify_pending_never_resolves() -> (Poll<i32>, Poll<i32>) {
+            use std::pin::pin;
+            use std::sync::Arc;
+            use std::task::{Wake, Waker};
+
+            struct NoopWake;
+            impl Wake for NoopWake {
+                fn wake(self: Arc<Self>) {}
+            }
+
+            let waker = Waker::from(Arc::new(NoopWake));
+            let mut cx = Context::from_waker(&waker);
+            let fut: Pending<i32> = std::future::pending();
+            let mut fut = pin!(fut);
+            let first_poll = fut.as_mut().poll(&mut cx);
+            let second_poll = fut.as_mut().poll(&mut cx);
+            (first_poll, second_poll)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC, {
+        /// `Ready` resolves immediately with the value it was
+        /// constructed from.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result == Poll::Ready(value))]
+        fn verify_ready_resolves_immediately_with_its_value(value: i32) -> Poll<i32> {
+            use std::pin::pin;
+            use std::sync::Arc;
+            use std::task::{Wake, Waker};
+
+            struct NoopWake;
+            impl Wake for NoopWake {
+                fn wake(self: Arc<Self>) {}
+            }
+
+            let waker = Waker::from(Arc::new(NoopWake));
+            let mut cx = Context::from_waker(&waker);
+            let fut: Ready<i32> = std::future::ready(value);
+            let mut fut = pin!(fut);
+            fut.as_mut().poll(&mut cx)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC, {
+        /// `poll_fn` turns a poll-shaped function into a `Future`, and
+        /// polling that future dispatches straight through to the
+        /// wrapped function result.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (poll_result, called) =>
+                poll_result == Poll::Ready(value)
+                    && called,
+        })]
+        fn verify_poll_fn_dispatches_through_to_its_closure(
+            value: i32,
+        ) -> (Poll<i32>, bool) {
+            use std::cell::Cell;
+            use std::pin::pin;
+            use std::sync::Arc;
+            use std::task::{Wake, Waker};
+
+            struct NoopWake;
+            impl Wake for NoopWake {
+                fn wake(self: Arc<Self>) {}
+            }
+
+            let called = Cell::new(false);
+            let waker = Waker::from(Arc::new(NoopWake));
+            let mut cx = Context::from_waker(&waker);
+            let fut: PollFn<_> = std::future::poll_fn(|_cx| {
+                called.set(true);
+                Poll::Ready(value)
+            });
+            let mut fut = pin!(fut);
+            let poll_result = fut.as_mut().poll(&mut cx);
+            (poll_result, called.get())
         }
     }
 }

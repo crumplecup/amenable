@@ -82,6 +82,7 @@ use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
+use std::future::{Pending, PollFn, Ready};
 use std::hash::BuildHasherDefault;
 use std::iter::{
     Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map,
@@ -99,6 +100,7 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
 use std::sync::Arc;
+use std::task::{Context, Poll};
 use std::time::{Duration, TryFromFloatSecsError};
 use std::vec::Vec;
 
@@ -128,7 +130,9 @@ use amenable_creusot::{
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
-    VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
+    VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC, VERIFY_PENDING_NEVER_RESOLVES_SRC,
+    VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+    VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
     VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
     VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
     VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
@@ -1374,6 +1378,84 @@ bridge_creusot_witness!(RustStdStandard<core::result::IterMut<'static, i32>>);
         verifier: "creusot",
         describe: || <RustStdStandard<core::result::IterMut<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
+    }
+}
+
+// Bare `Pending<i32>`, matching `amenable_std::rust_std::future`'s own
+// registration exactly (confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<Pending<i32>>`).
+impl CreusotWitness for RustStdStandard<Pending<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_pending_never_resolves",
+            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Pending<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Pending<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `PollFn<fn(&mut Context<'_>) -> Poll<i32>>`, matching
+// `amenable_std::rust_std::future`'s own registration exactly.
+impl CreusotWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_poll_fn_dispatches_through_to_its_closure",
+            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as CreusotWitness>::proof()
+            .to_string(),
+    }
+}
+
+// Bare `Ready<i32>`, matching `amenable_std::rust_std::future`'s own
+// registration exactly (confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<Ready<i32>>`).
+impl CreusotWitness for RustStdStandard<Ready<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_ready_resolves_immediately_with_its_value",
+            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Ready<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Ready<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

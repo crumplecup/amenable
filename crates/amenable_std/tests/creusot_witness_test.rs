@@ -27,6 +27,7 @@ use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
+use std::future::{Pending, PollFn, Ready};
 use std::hash::BuildHasherDefault;
 use std::iter::{
     Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect,
@@ -44,6 +45,7 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
 use std::sync::Arc;
+use std::task::{Context, Poll};
 use std::time::Duration;
 use std::vec::{
     Drain as VecDrain, ExtractIf as VecExtractIf, IntoIter as VecIntoIter, Splice as VecSplice, Vec,
@@ -1324,6 +1326,44 @@ fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
         proof.provenance,
         <core::result::IterMut<'static, i32> as RustStdType>::provenance()
     );
+}
+
+#[test]
+fn pending_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Pending<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_pending_never_resolves");
+    assert_eq!(
+        proof.provenance,
+        <Pending<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn poll_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as Witness<
+        CreusotVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_poll_fn_dispatches_through_to_its_closure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <PollFn<fn(&mut Context<'_>) -> Poll<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ready_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Ready<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ready_resolves_immediately_with_its_value"
+    );
+    assert_eq!(proof.provenance, <Ready<i32> as RustStdType>::provenance());
 }
 
 #[test]
