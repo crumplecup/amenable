@@ -32,7 +32,7 @@ use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
 use std::cmp::Ordering;
 #[cfg(creusot)]
-use std::num::{IntErrorKind, NonZero, ParseIntError, Saturating, Wrapping};
+use std::num::{IntErrorKind, NonZero, ParseIntError, Saturating, TryFromIntError, Wrapping};
 #[cfg(creusot)]
 use std::time::Duration;
 
@@ -494,6 +494,56 @@ amenable_derive::harness! {
                 <i32 as std::str::FromStr>::from_str("-99999999999999999999"),
                 <NonZero<i32> as std::str::FromStr>::from_str("0"),
             )
+        }
+    }
+}
+
+// `impl TryFrom<i32> for u8` is generated once per concrete
+// (source, target) pair by `impl_try_from_both_bounded!`
+// (`library/core/src/convert/num.rs`, confirmed by reading the real
+// source, not assumed) — same per-concrete-instantiation shape as
+// `Wrapping`/`Saturating`'s arithmetic impls and `Ordering::reverse`, so a
+// local `extern_spec!` targeting this one pair matches the real signature
+// exactly. Unlike `IntErrorKind`'s parsing contract, this one is exact, not
+// merely sufficient: the real body is `if u < 0 { Err(NegOverflow) } else
+// if u > 255 { Err(PosOverflow) } else { Ok(u as u8) }`, so "fits in
+// 0..=255" is precisely the success condition, not an approximation of it.
+// No `creusot-std` coverage and no `elicitation` prior art for
+// `TryFromIntError`/`TryFrom` (checked both first).
+#[cfg(creusot)]
+extern_spec! {
+    impl TryFrom<i32> for u8 {
+        #[check(ghost)]
+        #[ensures(match result {
+            Ok(v) => value@ >= 0 && value@ <= 255 && v@ == value@,
+            Err(_) => value@ < 0 || value@ > 255,
+        })]
+        fn try_from(value: i32) -> Result<u8, TryFromIntError>;
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC, {
+        /// `u8::try_from(i32)` fails with `TryFromIntError` exactly when the
+        /// source value doesn't fit in `u8`, and succeeds with the same
+        /// value otherwise — the same claim
+        /// `amenable_kani::rust_std::num::verify_try_from_int_error_occurs_exactly_when_out_of_range`
+        /// checks by symbolic execution over `kani::any()`, restated as a
+        /// real Creusot postcondition against the local `extern_spec`
+        /// above (not `#[trusted]`): both directions of the iff are a
+        /// single `match` clause there, so this harness just confirms the
+        /// axiom is usable at a concrete call site, the same relationship
+        /// every non-`char`/`String` harness in this file has to a trusted
+        /// axiom on the real method it exercises.
+        #[requires(true)]
+        #[ensures(match result {
+            Ok(v) => value@ >= 0 && value@ <= 255 && v@ == value@,
+            Err(_) => value@ < 0 || value@ > 255,
+        })]
+        fn verify_try_from_int_error_occurs_exactly_when_out_of_range(
+            value: i32,
+        ) -> Result<u8, TryFromIntError> {
+            u8::try_from(value)
         }
     }
 }

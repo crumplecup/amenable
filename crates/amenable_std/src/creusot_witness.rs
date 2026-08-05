@@ -65,6 +65,7 @@ use amenable_creusot::{
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
@@ -339,5 +340,34 @@ bridge_creusot_witness!(RustStdStandard<core::num::IntErrorKind>);
         evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
         verifier: "creusot",
         describe: || <RustStdStandard<core::num::IntErrorKind> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Fully qualified, matching `amenable_std::rust_std::num`'s own
+// registration exactly (`register_rust_std_standard_evidence!(...,
+// core::num::TryFromIntError, ...)`, confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<core::num::TryFromIntError>`).
+impl CreusotWitness for RustStdStandard<core::num::TryFromIntError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range",
+            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::num::TryFromIntError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<core::num::TryFromIntError> as CreusotWitness>::proof().to_string()
+        },
     }
 }

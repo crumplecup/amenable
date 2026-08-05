@@ -102,3 +102,17 @@ fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance(
         <core::num::IntErrorKind as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::TryFromIntError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_from_int_error_occurs_exactly_when_out_of_range"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::TryFromIntError as RustStdType>::provenance()
+    );
+}
