@@ -5,6 +5,13 @@ use std::any::TypeId;
 use std::array::{IntoIter as ArrayIntoIter, TryFromSliceError};
 use std::borrow::Cow;
 use std::boxed::Box;
+use std::cell::{
+    BorrowError, BorrowMutError, Cell, LazyCell, OnceCell, Ref, RefCell, RefMut, UnsafeCell,
+};
+use std::char::{
+    CharTryFromError, DecodeUtf16, DecodeUtf16Error, ParseCharError, ToLowercase, ToUppercase,
+    TryFromCharError,
+};
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
@@ -284,6 +291,160 @@ fn vec_splice_witness_is_trusted_and_carries_chain_derived_provenance() {
         <RustStdStandard<VecSplice<'static, VecIntoIter<i32>>> as Witness<CreusotVerifier>>::proof(
         ),
         <VecSplice<'static, VecIntoIter<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn cell_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Cell<i32>> as Witness<CreusotVerifier>>::proof(),
+        <Cell<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ref_cell_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<RefCell<i32>> as Witness<CreusotVerifier>>::proof(),
+        <RefCell<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ref_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Ref<'static, i32>> as Witness<CreusotVerifier>>::proof(),
+        <Ref<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ref_mut_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<RefMut<'static, i32>> as Witness<CreusotVerifier>>::proof(),
+        <RefMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn once_cell_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<OnceCell<i32>> as Witness<CreusotVerifier>>::proof(),
+        <OnceCell<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn unsafe_cell_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<UnsafeCell<i32>> as Witness<CreusotVerifier>>::proof(),
+        <UnsafeCell<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn lazy_cell_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<LazyCell<i32, fn() -> i32>> as Witness<CreusotVerifier>>::proof(),
+        <LazyCell<i32, fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<BorrowError> as Witness<CreusotVerifier>>::proof(),
+        <BorrowError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn borrow_mut_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<BorrowMutError> as Witness<CreusotVerifier>>::proof(),
+        <BorrowMutError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn char_try_from_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<CharTryFromError> as Witness<CreusotVerifier>>::proof(),
+        <CharTryFromError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn decode_utf16_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <DecodeUtf16<std::array::IntoIter<u16, 1>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn decode_utf16_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DecodeUtf16Error> as Witness<CreusotVerifier>>::proof(),
+        <DecodeUtf16Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn char_escape_debug_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::char::EscapeDebug> as Witness<CreusotVerifier>>::proof(),
+        <core::char::EscapeDebug as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn char_escape_default_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::char::EscapeDefault> as Witness<CreusotVerifier>>::proof(),
+        <core::char::EscapeDefault as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn char_escape_unicode_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::char::EscapeUnicode> as Witness<CreusotVerifier>>::proof(),
+        <core::char::EscapeUnicode as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn parse_char_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<ParseCharError> as Witness<CreusotVerifier>>::proof(),
+        <ParseCharError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn to_lowercase_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<ToLowercase> as Witness<CreusotVerifier>>::proof(),
+        <ToLowercase as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn to_uppercase_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<ToUppercase> as Witness<CreusotVerifier>>::proof(),
+        <ToUppercase as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn try_from_char_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<TryFromCharError> as Witness<CreusotVerifier>>::proof(),
+        <TryFromCharError as RustStdType>::provenance()
     );
 }
 

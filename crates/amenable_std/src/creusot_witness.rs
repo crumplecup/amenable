@@ -60,6 +60,13 @@ use std::any::TypeId;
 use std::array::{IntoIter, TryFromSliceError};
 use std::borrow::Cow;
 use std::boxed::Box;
+use std::cell::{
+    BorrowError, BorrowMutError, Cell, LazyCell, OnceCell, Ref, RefCell, RefMut, UnsafeCell,
+};
+use std::char::{
+    CharTryFromError, DecodeUtf16, DecodeUtf16Error, ParseCharError, ToLowercase, ToUppercase,
+    TryFromCharError,
+};
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
@@ -173,6 +180,25 @@ impl_creusot_witness_trusted!(
     usize,
     f32,
     f64,
+    Cell<i32>,
+    RefCell<i32>,
+    Ref<'static, i32>,
+    RefMut<'static, i32>,
+    OnceCell<i32>,
+    UnsafeCell<i32>,
+    LazyCell<i32, fn() -> i32>,
+    BorrowError,
+    BorrowMutError,
+    CharTryFromError,
+    DecodeUtf16<std::array::IntoIter<u16, 1>>,
+    DecodeUtf16Error,
+    core::char::EscapeDebug,
+    core::char::EscapeDefault,
+    core::char::EscapeUnicode,
+    ParseCharError,
+    ToLowercase,
+    ToUppercase,
+    TryFromCharError,
     TypeId,
     TryFromFloatSecsError,
     Infallible,
