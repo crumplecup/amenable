@@ -547,3 +547,26 @@ amenable_derive::harness! {
         }
     }
 }
+
+amenable_derive::harness! {
+    creusot, VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC, {
+        /// `ParseIntError::kind()` reports the specific reason the parse
+        /// failed, not just that it failed — the same claim
+        /// `amenable_kani::rust_std::num::verify_parse_int_error_reports_the_kind_of_the_failure`
+        /// checks by symbolic execution. Already implied by the
+        /// `InvalidDigit` clause of the `FromStr for i32` `extern_spec!`
+        /// above (which every other `IntErrorKind` harness in this file
+        /// also rests on): this harness just states that same fact as
+        /// `ParseIntError`'s own claim, at the one concrete input Kani
+        /// exercises.
+        #[requires(true)]
+        #[ensures(match &result {
+            Err(e) => parse_int_error_kind(e) == IntErrorKind::InvalidDigit,
+            Ok(_) => false,
+        })]
+        fn verify_parse_int_error_reports_the_kind_of_the_failure() -> Result<i32, ParseIntError>
+        {
+            <i32 as std::str::FromStr>::from_str("not a number")
+        }
+    }
+}

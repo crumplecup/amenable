@@ -116,3 +116,17 @@ fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provena
         <core::num::TryFromIntError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn parse_int_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::ParseIntError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_parse_int_error_reports_the_kind_of_the_failure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::ParseIntError as RustStdType>::provenance()
+    );
+}
