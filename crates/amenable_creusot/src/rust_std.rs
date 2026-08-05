@@ -120,6 +120,25 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, {
+        /// Calling through a `fn` pointer invokes exactly the function it
+        /// was assigned from.
+        ///
+        /// `#[trusted]`: `creusot-rustc` rejects a real `f(value)` call
+        /// here with `error: unsupported function call type`. The
+        /// reduced repro is recorded in `amenable_std::creusot_gallery`;
+        /// this trusted boundary keeps the dispatch law explicit for the
+        /// carrier instead of falling back to provenance-only coverage.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result == value)]
+        fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
+            value
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC, {
         /// `Cow` stores either a borrowed or owned value, and
         /// destructuring the enum recovers that wrapped `i32`

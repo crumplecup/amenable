@@ -115,6 +115,7 @@ use amenable_creusot::{
     VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
     VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+    VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
     VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
@@ -407,6 +408,29 @@ bridge_creusot_witness!(RustStdStandard<String>);
         evidence: "amenable_std::rust_std::RustStdStandard<String>",
         verifier: "creusot",
         describe: || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_fn_pointer_calls_the_underlying_function",
+            claim: VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<fn(i32) -> i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
     }
 }
 

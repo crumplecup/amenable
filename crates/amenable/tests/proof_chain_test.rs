@@ -40,6 +40,35 @@ fn char_proof_chain_carries_the_checked_harness_name_per_verifier() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn fn_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<fn(i32) -> i32>").expect("fn(i32) -> i32's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<fn(i32) -> i32>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for fn(i32) -> i32");
+    assert!(kani_description.contains("verify_fn_pointer_calls_the_underlying_function"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for fn(i32) -> i32");
+    assert!(creusot_description.contains("verify_fn_pointer_calls_the_underlying_function"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Cell<i32>>")
         .expect("Cell's evidence link is registered");

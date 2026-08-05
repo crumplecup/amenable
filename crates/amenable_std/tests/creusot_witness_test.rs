@@ -86,6 +86,20 @@ fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<fn(i32) -> i32> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_fn_pointer_calls_the_underlying_function"
+    );
+    assert_eq!(
+        proof.provenance,
+        <fn(i32) -> i32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Cow<'static, i32>> as Witness<CreusotVerifier>>::proof();
 

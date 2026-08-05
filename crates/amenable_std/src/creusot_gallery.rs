@@ -849,3 +849,44 @@ extern_spec! {
         },
     }
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::fn_pointer_calls_are_unsupported".to_owned(),
+            title: "calling through a plain fn pointer is rejected as an unsupported function call type".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (attempted while adding Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>):
+#[ensures(result == value)]
+fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
+    fn identity(x: i32) -> i32 { x }
+    let f: fn(i32) -> i32 = identity;
+    f(value)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on
+// August 5, 2026:
+//   error: unsupported function call type
+//     | f(value)
+//     | ^^^^^^^^
+// A bare `fn` pointer value is accepted as a Rust type and can appear in
+// Amenable's provenance/witness registry, but creusot-rustc refuses to
+// translate the actual call-through expression in the proof body.
+
+// Working fallback (this is the real content in
+// amenable_creusot::rust_std today):
+#[trusted]
+#[ensures(result == value)]
+fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
+    value
+}
+// The trusted boundary states the dispatch law explicitly for the carrier,
+// while the gallery preserves the exact translator limitation that blocked
+// a real call-through proof.
+"#,
+        },
+    }
+}
