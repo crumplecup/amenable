@@ -617,3 +617,91 @@ fn verify_int_error_kind_classifies_parse_failures() -> ... {
         },
     }
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::f64_has_no_view_impl_at_all".to_owned(),
+            title: "f64/f32 have no View impl in creusot-std, so `self@` is unavailable for any float postcondition".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Attempted while investigating FpCategory coverage (a candidate contract
+// for f64::classify(), the same idiom every other extern_spec in this
+// crate uses for its own input — `self@` to reach an arbitrary-precision
+// value in logic context):
+extern_spec! {
+    impl f64 {
+        #[check(ghost)]
+        #[ensures(self@ == 0.0 ==> result == FpCategory::Zero)]
+        fn classify(self) -> FpCategory;
+    }
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot`:
+//   error[E0599]: Cannot take the view of `f64`
+//     |
+//     | #[ensures(self@ == 0.0 ==> result == FpCategory::Zero)]
+//     |           ^^^^^ no implementation for `f64@`
+//     = note: the following trait bounds were not satisfied:
+//             `f64: creusot_std::model::View`
+//             `&f64: creusot_std::model::View`
+//             `&mut f64: creusot_std::model::View`
+// Unlike char (View -> Int via a builtin) or the fixed-width integers
+// (View -> Int natively), creusot-std ships no View impl for f32/f64 at
+// all — confirmed by grepping the real creusot-std/creusot source trees
+// (`~/repos/creusot`), not assumed. So no float postcondition can use `@`
+// to reach an arbitrary-precision numeric value the way every other
+// harness in this crate does for its own inputs.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::float_literals_in_pearlite_ice_the_compiler".to_owned(),
+            title: "a plain float literal (e.g. 0.0) inside #[ensures]/#[requires] panics creusot-rustc outright, not just an unsupported-construct error".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::Ice,
+            claim: r#"
+// Attempted next, after `f64_has_no_view_impl_at_all` ruled out `@`:
+// compare the plain (non-View) f64 value directly, the same way `.0` field
+// projections in the Wrapping/Saturating contracts compare plain i32s:
+extern_spec! {
+    impl f64 {
+        #[check(ghost)]
+        #[ensures(self == 0.0 ==> result == FpCategory::Zero)]
+        fn classify(self) -> FpCategory;
+    }
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot` — not a reported
+// diagnostic, a real compiler panic with a backtrace:
+//   error: internal compiler error: Unsupported literal
+//     --> ...:580:27
+//     | #[ensures(self == 0.0 ==> result == FpCategory::Zero)]
+//     |                   ^^^
+//   thread 'rustc' panicked at creusot/src/translation/pearlite/from_thir.rs:328:41
+// Substituting a named f64 associated const for the literal (e.g.
+// `self == f64::NAN`) translates and proves fine — the panic is
+// specifically on Pearlite's THIR-to-term lowering hitting a raw float
+// LITERAL token, not on floats in general. But that workaround doesn't
+// rescue a real classify() contract: `self == f64::NAN` is vacuously
+// false under IEEE-754 (NaN != NaN), so a clause built only from named
+// constants proves trivially without exercising classify()'s actual
+// behavior — and the Zero/Subnormal cases Kani's own harness checks need
+// literal values (`0.0`, `f64::MIN_POSITIVE / 2.0`) that hit this ICE
+// directly, with no const-only substitute available.
+//
+// Combined with the missing View impl above, this is a genuine, confirmed
+// structural blocker for any real float-valued Creusot contract under the
+// current toolchain — not a "looks hard" judgment call. `amenable_kani`'s
+// FpCategory proof stays the honest fallback: state the same five-case
+// claim Kani checks by symbolic execution, marked #[trusted] rather than
+// silently dropped, the same as NonZero::new's sealed-trait case.
+"#,
+        },
+    }
+}

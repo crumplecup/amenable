@@ -32,7 +32,9 @@ use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]
 use std::cmp::Ordering;
 #[cfg(creusot)]
-use std::num::{IntErrorKind, NonZero, ParseIntError, Saturating, TryFromIntError, Wrapping};
+use std::num::{
+    FpCategory, IntErrorKind, NonZero, ParseIntError, Saturating, TryFromIntError, Wrapping,
+};
 #[cfg(creusot)]
 use std::time::Duration;
 
@@ -567,6 +569,56 @@ amenable_derive::harness! {
         fn verify_parse_int_error_reports_the_kind_of_the_failure() -> Result<i32, ParseIntError>
         {
             <i32 as std::str::FromStr>::from_str("not a number")
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC, {
+        /// Each representative floating-point value classifies into the
+        /// `FpCategory` variant matching its own `is_*` predicates — the
+        /// same claim
+        /// `amenable_kani::rust_std::num::verify_fp_category_matches_the_value_it_classifies`
+        /// checks by symbolic execution.
+        ///
+        /// `#[trusted]`, unlike every real proof in this file: `f64` has
+        /// no `View` impl in `creusot-std` at all (`self@` is
+        /// unavailable), and a bare float literal inside
+        /// `#[ensures]`/`#[requires]` panics `creusot-rustc` outright (a
+        /// real internal compiler error, not a diagnosed one) — both
+        /// confirmed, not guessed; see the `f64_has_no_view_impl_at_all`
+        /// and `float_literals_in_pearlite_ice_the_compiler` gallery
+        /// findings. The postcondition below never needs a float
+        /// literal or `@` itself (it only compares the resulting
+        /// `FpCategory` values, an ordinary enum), so it parses and would
+        /// translate — but there is no way to give `f64::classify` a real
+        /// `extern_spec!` connecting an arbitrary input float to its
+        /// category under these constraints, so the harness body's own
+        /// float literals (needed to construct the five representative
+        /// inputs) are what force `#[trusted]` here, the same honest
+        /// fallback `NonZero::new` uses for its own genuine, confirmed
+        /// blocker.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (FpCategory::Nan, FpCategory::Infinite, FpCategory::Zero, FpCategory::Normal, FpCategory::Subnormal) => true,
+            _ => false,
+        })]
+        fn verify_fp_category_matches_the_value_it_classifies() -> (
+            FpCategory,
+            FpCategory,
+            FpCategory,
+            FpCategory,
+            FpCategory,
+        ) {
+            let subnormal = f64::MIN_POSITIVE / 2.0;
+            (
+                f64::NAN.classify(),
+                f64::INFINITY.classify(),
+                0.0f64.classify(),
+                f64::MIN_POSITIVE.classify(),
+                subnormal.classify(),
+            )
         }
     }
 }

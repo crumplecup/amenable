@@ -3,29 +3,29 @@
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
-fn all_eleven_translator_findings_are_registered_and_distinct() {
+fn all_thirteen_translator_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        11,
-        "expected exactly the 11 findings from this session's real pipeline work: {cases:#?}"
+        13,
+        "expected exactly the 13 findings from this session's real pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 11, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 13, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
         .filter(|case| case.expected == CreusotGalleryExpectation::Ice)
         .count();
     assert_eq!(
-        ice_count, 1,
-        "exactly one finding was a compiler ICE (RPITIT)"
+        ice_count, 2,
+        "two findings were compiler ICEs (RPITIT, float literal in Pearlite)"
     );
 
     let translation_error_count = cases
@@ -33,8 +33,8 @@ fn all_eleven_translator_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == CreusotGalleryExpectation::TranslationError)
         .count();
     assert_eq!(
-        translation_error_count, 9,
-        "nine findings were real, diagnosed translation errors"
+        translation_error_count, 10,
+        "ten findings were real, diagnosed translation errors"
     );
 
     let unproved_count = cases

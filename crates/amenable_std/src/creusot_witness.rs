@@ -62,6 +62,7 @@ use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+    VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
@@ -398,6 +399,42 @@ bridge_creusot_witness!(RustStdStandard<core::num::ParseIntError>);
         verifier: "creusot",
         describe: || {
             <RustStdStandard<core::num::ParseIntError> as CreusotWitness>::proof().to_string()
+        },
+    }
+}
+
+// Fully qualified, matching `amenable_std::rust_std::num`'s own
+// registration exactly (`register_rust_std_standard_evidence!(...,
+// core::num::FpCategory, ...)`, confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<core::num::FpCategory>`).
+//
+// `#[trusted]`, like `NonZero<i16>` above: `f64` has no `View` impl in
+// `creusot-std`, and a bare float literal in Pearlite panics
+// `creusot-rustc` outright — both confirmed real blockers, not a
+// convenience shortcut; see `amenable_std::creusot_gallery`'s
+// `f64_has_no_view_impl_at_all`/`float_literals_in_pearlite_ice_the_compiler`
+// findings.
+impl CreusotWitness for RustStdStandard<core::num::FpCategory> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_fp_category_matches_the_value_it_classifies",
+            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::num::FpCategory>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<core::num::FpCategory> as CreusotWitness>::proof().to_string()
         },
     }
 }
