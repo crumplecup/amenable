@@ -658,6 +658,14 @@ fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_
 }
 
 #[test]
+fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::ffi::c_void> as Witness<CreusotVerifier>>::proof(),
+        <core::ffi::c_void as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Box<i32>> as Witness<CreusotVerifier>>::proof();
 

@@ -207,6 +207,7 @@ impl_creusot_witness_trusted!(
     TryFromSliceError,
     IntoIter<i32, 3>,
     core::ascii::EscapeDefault,
+    core::ffi::c_void,
     AddrParseError,
     Rc<i32>,
     std::rc::Weak<i32>,

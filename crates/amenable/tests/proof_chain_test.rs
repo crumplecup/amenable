@@ -1751,6 +1751,28 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<core::ffi::c_void>").expect("core::ffi::c_void's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<core::ffi::c_void>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    assert!(verifiers.contains(&"kani"));
+    assert!(verifiers.contains(&"creusot"));
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
