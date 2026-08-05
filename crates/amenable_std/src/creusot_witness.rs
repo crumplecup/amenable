@@ -78,6 +78,9 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveErr
 use std::convert::Infallible;
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
+use std::fmt::{
+    Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
+};
 use std::mem::ManuallyDrop;
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -208,6 +211,16 @@ impl_creusot_witness_trusted!(
     IntoIter<i32, 3>,
     core::ascii::EscapeDefault,
     core::ffi::c_void,
+    std::fmt::Alignment,
+    Arguments<'static>,
+    std::fmt::Error,
+    Formatter<'static>,
+    DebugList<'static, 'static>,
+    DebugMap<'static, 'static>,
+    DebugSet<'static, 'static>,
+    DebugStruct<'static, 'static>,
+    DebugTuple<'static, 'static>,
+    FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>,
     AddrParseError,
     Rc<i32>,
     std::rc::Weak<i32>,

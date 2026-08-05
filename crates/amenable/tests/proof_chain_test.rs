@@ -1773,6 +1773,306 @@ fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_alignment_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::fmt::Alignment>").expect("std::fmt::Alignment's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::fmt::Alignment>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for std::fmt::Alignment");
+    assert!(
+        kani_description.contains("verify_alignment_reaches_the_formatter_from_the_format_spec")
+    );
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_arguments_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Arguments<'static>>").expect("Arguments' evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<Arguments<'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Arguments");
+    assert!(kani_description.contains("verify_arguments_renders_the_same_as_the_value_itself"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_error_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<std::fmt::Error>").expect("std::fmt::Error's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<std::fmt::Error>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    assert!(verifiers.contains(&"kani"));
+    assert!(verifiers.contains(&"creusot"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_formatter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Formatter<'static>>").expect("Formatter's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<Formatter<'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Formatter");
+    assert!(kani_description.contains("verify_formatter_exposes_the_parsed_width_and_precision"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_debug_list_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<DebugList<'static, 'static>>").expect("DebugList's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<DebugList<'static, 'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for DebugList");
+    assert!(kani_description.contains("verify_debug_list_renders_entries_in_brackets"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_debug_map_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<DebugMap<'static, 'static>>").expect("DebugMap's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<DebugMap<'static, 'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for DebugMap");
+    assert!(kani_description.contains("verify_debug_map_renders_key_value_pairs"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_debug_set_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<DebugSet<'static, 'static>>").expect("DebugSet's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<DebugSet<'static, 'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for DebugSet");
+    assert!(kani_description.contains("verify_debug_set_renders_entries_in_braces"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_debug_struct_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<DebugStruct<'static, 'static>>").expect("DebugStruct's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<DebugStruct<'static, 'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for DebugStruct");
+    assert!(kani_description.contains("verify_debug_struct_renders_named_fields"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_debug_tuple_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<DebugTuple<'static, 'static>>").expect("DebugTuple's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<DebugTuple<'static, 'static>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for DebugTuple");
+    assert!(kani_description.contains("verify_debug_tuple_renders_positional_fields"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>").expect("FromFn's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for FromFn");
+    assert!(kani_description.contains("verify_from_fn_forwards_display_to_the_supplied_closure"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),

@@ -23,6 +23,9 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveErr
 use std::convert::Infallible;
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
+use std::fmt::{
+    Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
+};
 use std::mem::ManuallyDrop;
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -662,6 +665,88 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<core::ffi::c_void> as Witness<CreusotVerifier>>::proof(),
         <core::ffi::c_void as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_alignment_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::fmt::Alignment> as Witness<CreusotVerifier>>::proof(),
+        <core::fmt::Alignment as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_arguments_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Arguments<'static>> as Witness<CreusotVerifier>>::proof(),
+        <Arguments<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::fmt::Error> as Witness<CreusotVerifier>>::proof(),
+        <core::fmt::Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_formatter_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Formatter<'static>> as Witness<CreusotVerifier>>::proof(),
+        <Formatter<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_list_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DebugList<'static, 'static>> as Witness<CreusotVerifier>>::proof(),
+        <DebugList<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_map_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DebugMap<'static, 'static>> as Witness<CreusotVerifier>>::proof(),
+        <DebugMap<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_set_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DebugSet<'static, 'static>> as Witness<CreusotVerifier>>::proof(),
+        <DebugSet<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_struct_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DebugStruct<'static, 'static>> as Witness<CreusotVerifier>>::proof(),
+        <DebugStruct<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_tuple_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<DebugTuple<'static, 'static>> as Witness<CreusotVerifier>>::proof(),
+        <DebugTuple<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_from_fn_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result> as RustStdType>::provenance()
     );
 }
 

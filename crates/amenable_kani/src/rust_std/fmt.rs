@@ -20,7 +20,7 @@ use super::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 
-impl KaniWitness for RustStdStandard<core::fmt::Alignment> {
+impl KaniWitness for RustStdStandard<std::fmt::Alignment> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
@@ -33,13 +33,13 @@ impl KaniWitness for RustStdStandard<core::fmt::Alignment> {
     }
 }
 
-bridge_kani_witness!(RustStdStandard<core::fmt::Alignment>);
+bridge_kani_witness!(RustStdStandard<std::fmt::Alignment>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::fmt::Alignment>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Alignment>",
         verifier: "kani",
-        describe: || <RustStdStandard<core::fmt::Alignment> as KaniWitness>::proof().to_string(),
+        describe: || <RustStdStandard<std::fmt::Alignment> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -105,7 +105,7 @@ amenable_derive::harness! {
     }
 }
 
-impl_kani_witness_trusted!(core::fmt::Error);
+impl_kani_witness_trusted!(std::fmt::Error);
 
 impl KaniWitness for RustStdStandard<Formatter<'static>> {
     type SupportingEvidence = Self;
