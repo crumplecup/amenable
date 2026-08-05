@@ -28,11 +28,14 @@ use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
 use std::hash::BuildHasherDefault;
+use std::iter::{Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten};
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
+use std::ops::Range;
 use std::rc::Rc;
+use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
 use std::sync::Arc;
 use std::time::Duration;
@@ -682,6 +685,96 @@ fn build_hasher_default_witness_is_trusted_and_carries_chain_derived_provenance(
     assert_eq!(
         <RustStdStandard<BuildHasherDefault<DefaultHasher>> as Witness<CreusotVerifier>>::proof(),
         <BuildHasherDefault<DefaultHasher> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_chain_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <std::iter::Chain<Range<i32>, Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_cloned_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Cloned<Iter<'static, i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Cloned<Iter<'static, i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_copied_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Copied<Iter<'static, i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Copied<Iter<'static, i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_cycle_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Cycle<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Cycle<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_empty_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Empty<i32>> as Witness<CreusotVerifier>>::proof(),
+        <Empty<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_enumerate_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Enumerate<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Enumerate<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_filter_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_filter_map_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<
+            FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
+        > as Witness<CreusotVerifier>>::proof(),
+        <FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_flat_map_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<
+            FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>,
+        > as Witness<CreusotVerifier>>::proof(),
+        <FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_flatten_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <Flatten<std::vec::IntoIter<Range<i32>>> as RustStdType>::provenance()
     );
 }
 

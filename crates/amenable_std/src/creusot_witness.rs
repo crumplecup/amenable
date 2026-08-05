@@ -83,11 +83,14 @@ use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
 use std::hash::BuildHasherDefault;
+use std::iter::{Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten};
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
+use std::ops::Range;
 use std::rc::Rc;
+use std::slice::Iter;
 use std::string::{FromUtf8Error, FromUtf16Error};
 use std::sync::Arc;
 use std::time::{Duration, TryFromFloatSecsError};
@@ -221,6 +224,15 @@ impl_creusot_witness_trusted!(
     core::ascii::EscapeDefault,
     core::ffi::c_void,
     BuildHasherDefault<DefaultHasher>,
+    std::iter::Chain<Range<i32>, Range<i32>>,
+    Cloned<Iter<'static, i32>>,
+    Copied<Iter<'static, i32>>,
+    Cycle<Range<i32>>,
+    std::iter::Empty<i32>,
+    Enumerate<Range<i32>>,
+    Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>,
+    FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
+    FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>,
     PhantomData<i32>,
     PhantomPinned,
     std::fmt::Alignment,
@@ -265,6 +277,29 @@ bridge_creusot_witness!(RustStdStandard<SipHasherAlias>);
         evidence: "amenable_std::rust_std::RustStdStandard<SipHasher>",
         verifier: "creusot",
         describe: || <RustStdStandard<SipHasherAlias> as CreusotWitness>::proof().report().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Flatten<IntoIter<Range<i32>>>>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>> as CreusotWitness>::proof()
+                .report()
+                .to_string()
+        },
     }
 }
 
