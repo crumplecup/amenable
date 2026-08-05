@@ -83,7 +83,11 @@ use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
 use std::hash::BuildHasherDefault;
-use std::iter::{Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten};
+use std::iter::{
+    Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map,
+    MapWhile, OnceWith, Peekable, RepeatN, RepeatWith, Rev, Scan, Skip, SkipWhile, StepBy,
+    Successors, TakeWhile, Zip,
+};
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
@@ -224,15 +228,34 @@ impl_creusot_witness_trusted!(
     core::ascii::EscapeDefault,
     core::ffi::c_void,
     BuildHasherDefault<DefaultHasher>,
+    Map<Range<i32>, fn(i32) -> i32>,
     std::iter::Chain<Range<i32>, Range<i32>>,
+    Zip<Range<i32>, Range<i32>>,
     Cloned<Iter<'static, i32>>,
     Copied<Iter<'static, i32>>,
     Cycle<Range<i32>>,
     std::iter::Empty<i32>,
     Enumerate<Range<i32>>,
+    Rev<Range<i32>>,
     Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>,
     FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
     FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>,
+    Fuse<Range<i32>>,
+    Inspect<Range<i32>, fn(&i32)>,
+    Peekable<Range<i32>>,
+    Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>,
+    Skip<Range<i32>>,
+    SkipWhile<Range<i32>, fn(&i32) -> bool>,
+    StepBy<Range<i32>>,
+    std::iter::Take<Range<i32>>,
+    TakeWhile<Range<i32>, fn(&i32) -> bool>,
+    MapWhile<Range<i32>, fn(i32) -> Option<i32>>,
+    std::iter::Once<i32>,
+    OnceWith<fn() -> i32>,
+    std::iter::Repeat<i32>,
+    RepeatWith<fn() -> i32>,
+    RepeatN<i32>,
+    Successors<i32, fn(&i32) -> Option<i32>>,
     PhantomData<i32>,
     PhantomPinned,
     std::fmt::Alignment,

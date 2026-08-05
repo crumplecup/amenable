@@ -28,7 +28,11 @@ use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
 use std::hash::BuildHasherDefault;
-use std::iter::{Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten};
+use std::iter::{
+    Cloned, Copied, Cycle, Empty, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect,
+    Map, MapWhile, OnceWith, Peekable, RepeatN, RepeatWith, Rev, Scan, Skip, SkipWhile, StepBy,
+    Successors, TakeWhile, Zip,
+};
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
@@ -689,6 +693,14 @@ fn build_hasher_default_witness_is_trusted_and_carries_chain_derived_provenance(
 }
 
 #[test]
+fn iter_map_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> as Witness<CreusotVerifier>>::proof(),
+        <Map<Range<i32>, fn(i32) -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn iter_chain_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> as Witness<
@@ -775,6 +787,160 @@ fn iter_flatten_witness_is_trusted_and_carries_chain_derived_provenance() {
             CreusotVerifier,
         >>::proof(),
         <Flatten<std::vec::IntoIter<Range<i32>>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_zip_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Zip<Range<i32>, Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Zip<Range<i32>, Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_rev_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Rev<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Rev<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_fuse_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Fuse<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Fuse<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_inspect_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Inspect<Range<i32>, fn(&i32)>> as Witness<CreusotVerifier>>::proof(),
+        <Inspect<Range<i32>, fn(&i32)> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_peekable_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Peekable<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Peekable<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_scan_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_skip_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Skip<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Skip<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_skip_while_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <SkipWhile<Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_step_by_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<StepBy<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <StepBy<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_take_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::iter::Take<Range<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <std::iter::Take<Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_take_while_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <TakeWhile<Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_map_while_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <MapWhile<Range<i32>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_once_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::iter::Once<i32>> as Witness<CreusotVerifier>>::proof(),
+        <std::iter::Once<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_once_with_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<OnceWith<fn() -> i32>> as Witness<CreusotVerifier>>::proof(),
+        <OnceWith<fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::iter::Repeat<i32>> as Witness<CreusotVerifier>>::proof(),
+        <std::iter::Repeat<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_with_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<RepeatWith<fn() -> i32>> as Witness<CreusotVerifier>>::proof(),
+        <RepeatWith<fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_n_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<RepeatN<i32>> as Witness<CreusotVerifier>>::proof(),
+        <RepeatN<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_successors_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>> as Witness<
+            CreusotVerifier,
+        >>::proof(),
+        <Successors<i32, fn(&i32) -> Option<i32>> as RustStdType>::provenance()
     );
 }
 
