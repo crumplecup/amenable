@@ -1267,6 +1267,66 @@ fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
 }
 
 #[test]
+fn option_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::option::Iter<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_option_iter_yields_zero_or_one_reference"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::option::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn option_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::option::IterMut<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_option_iter_mut_writes_through_to_the_option"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::option::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn result_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::result::Iter<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_result_iter_yields_a_reference_to_the_ok_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::result::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::result::IterMut<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_result_iter_mut_writes_through_to_the_result"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::result::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<ManuallyDrop<i32>> as Witness<CreusotVerifier>>::proof();
 

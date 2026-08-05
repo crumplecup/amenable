@@ -2757,6 +2757,134 @@ fn result_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn option_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<core::option::Iter<'static, i32>>").expect("core::option::Iter<'static, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<core::option::Iter<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for core::option::Iter<'static, i32>");
+    assert!(kani_description.contains("verify_option_iter_yields_zero_or_one_reference"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for core::option::Iter<'static, i32>");
+    assert!(creusot_description.contains("verify_option_iter_yields_zero_or_one_reference"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn option_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<core::option::IterMut<'static, i32>>").expect("core::option::IterMut<'static, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<core::option::IterMut<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for core::option::IterMut<'static, i32>");
+    assert!(kani_description.contains("verify_option_iter_mut_writes_through_to_the_option"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for core::option::IterMut<'static, i32>");
+    assert!(creusot_description.contains("verify_option_iter_mut_writes_through_to_the_option"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn result_iter_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<core::result::Iter<'static, i32>>").expect("core::result::Iter<'static, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<core::result::Iter<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for core::result::Iter<'static, i32>");
+    assert!(kani_description.contains("verify_result_iter_yields_a_reference_to_the_ok_value"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for core::result::Iter<'static, i32>");
+    assert!(creusot_description.contains("verify_result_iter_yields_a_reference_to_the_ok_value"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<core::result::IterMut<'static, i32>>").expect("core::result::IterMut<'static, i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<core::result::IterMut<'static, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for core::result::IterMut<'static, i32>");
+    assert!(kani_description.contains("verify_result_iter_mut_writes_through_to_the_result"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for core::result::IterMut<'static, i32>");
+    assert!(creusot_description.contains("verify_result_iter_mut_writes_through_to_the_result"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_chain_proof_chain_reports_the_kani_and_creusot_harnesses() {
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.

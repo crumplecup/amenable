@@ -1975,6 +1975,159 @@ amenable_derive::harness! {
     }
 }
 
+// `creusot-std` 0.11.0 also ships real contracts for `Option::iter` and
+// `Option::iter_mut`, plus `Iterator::next` over the resulting carriers, so
+// these borrowed-iterator laws can stay fully checked rather than trusted.
+amenable_derive::harness! {
+    creusot, VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC, {
+        /// `Option::iter` yields a shared reference to the contained
+        /// value once, then ends, and leaves the underlying `Option`
+        /// unchanged.
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, final_opt) =>
+                first_seen == Some(value)
+                    && second_seen == None
+                    && final_opt == Some(value),
+        })]
+        fn verify_option_iter_yields_zero_or_one_reference(
+            value: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>) {
+            let opt = Some(value);
+            let (first_seen, second_seen) = {
+                let mut it = opt.iter();
+                let first_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                let second_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                (first_seen, second_seen)
+            };
+            (first_seen, second_seen, opt)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC, {
+        /// `Option::iter_mut` yields a mutable reference to the
+        /// contained value once, and a write through that reference is
+        /// visible in the `Option` afterward.
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, final_opt) =>
+                first_seen == Some(value)
+                    && second_seen == None
+                    && final_opt == Some(updated),
+        })]
+        fn verify_option_iter_mut_writes_through_to_the_option(
+            value: i32,
+            updated: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>) {
+            let mut opt = Some(value);
+            let (first_seen, second_seen) = {
+                let mut it = opt.iter_mut();
+                let first_seen = match it.next() {
+                    Some(r) => {
+                        let seen = *r;
+                        *r = updated;
+                        Some(seen)
+                    }
+                    None => None,
+                };
+                let second_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                (first_seen, second_seen)
+            };
+            (first_seen, second_seen, opt)
+        }
+    }
+}
+
+// `creusot-std` 0.11.0 ships contracts for `Result<T, E>` itself, but not
+// for the borrowed iterator adapters `core::result::Iter` / `IterMut`
+// (checked directly against the installed sources). These keep the same
+// observations as Amenable's Kani proofs while making the trusted boundary
+// explicit instead of pretending Creusot has a concrete contract surface it
+// does not.
+amenable_derive::harness! {
+    creusot, VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC, {
+        /// `Result::iter` yields a shared reference to the `Ok` value
+        /// once, then ends, and leaves the underlying `Result`
+        /// unchanged.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, final_res) =>
+                first_seen == Some(value)
+                    && second_seen == None
+                    && final_res == Ok(value),
+        })]
+        fn verify_result_iter_yields_a_reference_to_the_ok_value(
+            value: i32,
+        ) -> (Option<i32>, Option<i32>, Result<i32, i32>) {
+            let res: Result<i32, i32> = Ok(value);
+            let (first_seen, second_seen) = {
+                let mut it = res.iter();
+                let first_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                let second_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                (first_seen, second_seen)
+            };
+            (first_seen, second_seen, res)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC, {
+        /// `Result::iter_mut` yields a mutable reference to the `Ok`
+        /// value once, and a write through that reference is visible in
+        /// the `Result` afterward.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, final_res) =>
+                first_seen == Some(value)
+                    && second_seen == None
+                    && final_res == Ok(updated),
+        })]
+        fn verify_result_iter_mut_writes_through_to_the_result(
+            value: i32,
+            updated: i32,
+        ) -> (Option<i32>, Option<i32>, Result<i32, i32>) {
+            let mut res: Result<i32, i32> = Ok(value);
+            let (first_seen, second_seen) = {
+                let mut it = res.iter_mut();
+                let first_seen = match it.next() {
+                    Some(r) => {
+                        let seen = *r;
+                        *r = updated;
+                        Some(seen)
+                    }
+                    None => None,
+                };
+                let second_seen = match it.next() {
+                    Some(r) => Some(*r),
+                    None => None,
+                };
+                (first_seen, second_seen)
+            };
+            (first_seen, second_seen, res)
+        }
+    }
+}
+
 // `ManuallyDrop<T>` is uncontracted everywhere — no `creusot-std`
 // coverage (checked), no `elicitation` prior art (checked). Its private
 // field (`value: MaybeDangling<T>`, not a public `.0`) and `into_inner`'s

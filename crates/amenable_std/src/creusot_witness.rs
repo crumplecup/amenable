@@ -123,10 +123,14 @@ use amenable_creusot::{
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
     VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
+    VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
+    VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
+    VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
+    VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
     VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
@@ -1266,6 +1270,110 @@ bridge_creusot_witness!(RustStdStandard<Result<i32, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Fully qualified to distinguish `core::option::Iter` from the many other
+// std carriers also named `Iter` in the checklist and registry.
+impl CreusotWitness for RustStdStandard<core::option::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_option_iter_yields_zero_or_one_reference",
+            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::option::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::option::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<core::option::Iter<'static, i32>> as CreusotWitness>::proof()
+            .to_string(),
+    }
+}
+
+// Fully qualified to distinguish `core::option::IterMut` from the many other
+// std carriers also named `IterMut` in the checklist and registry.
+impl CreusotWitness for RustStdStandard<core::option::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_option_iter_mut_writes_through_to_the_option",
+            claim: VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::option::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::option::IterMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<core::option::IterMut<'static, i32>> as CreusotWitness>::proof()
+            .to_string(),
+    }
+}
+
+// Fully qualified to distinguish `core::result::Iter` from the many other
+// std carriers also named `Iter` in the checklist and registry.
+impl CreusotWitness for RustStdStandard<core::result::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_result_iter_yields_a_reference_to_the_ok_value",
+            claim: VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::result::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::result::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<core::result::Iter<'static, i32>> as CreusotWitness>::proof()
+            .to_string(),
+    }
+}
+
+// Fully qualified to distinguish `core::result::IterMut` from the many other
+// std carriers also named `IterMut` in the checklist and registry.
+impl CreusotWitness for RustStdStandard<core::result::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_result_iter_mut_writes_through_to_the_result",
+            claim: VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::result::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::result::IterMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<core::result::IterMut<'static, i32>> as CreusotWitness>::proof()
+            .to_string(),
     }
 }
 
