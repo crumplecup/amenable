@@ -14,6 +14,7 @@ use std::char::{
 };
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
+use std::collections::hash_map::DefaultHasher;
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
@@ -26,7 +27,9 @@ use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
-use std::mem::ManuallyDrop;
+use std::hash::BuildHasherDefault;
+use std::marker::{PhantomData, PhantomPinned};
+use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::rc::Rc;
@@ -40,6 +43,12 @@ use std::vec::{
 use amenable_core::Witness;
 use amenable_creusot::CreusotVerifier;
 use amenable_std::{RustStdStandard, RustStdType};
+
+#[expect(
+    deprecated,
+    reason = "SipHasher itself is stable, only deprecated as a recommendation to use DefaultHasher instead; covering it is a coverage-completeness question, not a call to use it"
+)]
+type SipHasherAlias = std::hash::SipHasher;
 
 #[test]
 fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
@@ -669,6 +678,38 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn build_hasher_default_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<BuildHasherDefault<DefaultHasher>> as Witness<CreusotVerifier>>::proof(),
+        <BuildHasherDefault<DefaultHasher> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn sip_hasher_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<SipHasherAlias> as Witness<CreusotVerifier>>::proof(),
+        <SipHasherAlias as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn phantom_data_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<PhantomData<i32>> as Witness<CreusotVerifier>>::proof(),
+        <PhantomData<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn phantom_pinned_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<PhantomPinned> as Witness<CreusotVerifier>>::proof(),
+        <PhantomPinned as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn fmt_alignment_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<core::fmt::Alignment> as Witness<CreusotVerifier>>::proof(),
@@ -927,5 +968,13 @@ fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenan
     assert_eq!(
         proof.provenance,
         <ManuallyDrop<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn discriminant_option_i32_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Discriminant<Option<i32>>> as Witness<CreusotVerifier>>::proof(),
+        <Discriminant<Option<i32>> as RustStdType>::provenance()
     );
 }

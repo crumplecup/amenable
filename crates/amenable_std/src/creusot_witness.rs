@@ -69,6 +69,7 @@ use std::char::{
 };
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
+use std::collections::hash_map::DefaultHasher;
 use std::collections::linked_list::IntoIter as LinkedListIntoIter;
 use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
@@ -81,7 +82,9 @@ use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
-use std::mem::ManuallyDrop;
+use std::hash::BuildHasherDefault;
+use std::marker::{PhantomData, PhantomPinned};
+use std::mem::{Discriminant, ManuallyDrop};
 use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::rc::Rc;
@@ -128,6 +131,12 @@ use amenable_creusot::{
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
+
+#[expect(
+    deprecated,
+    reason = "SipHasher itself is stable, only deprecated as a recommendation to use DefaultHasher instead; covering it is a coverage-completeness question, not a call to use it"
+)]
+type SipHasherAlias = std::hash::SipHasher;
 
 macro_rules! bridge_creusot_witness {
     ($ty:ty) => {
@@ -211,6 +220,9 @@ impl_creusot_witness_trusted!(
     IntoIter<i32, 3>,
     core::ascii::EscapeDefault,
     core::ffi::c_void,
+    BuildHasherDefault<DefaultHasher>,
+    PhantomData<i32>,
+    PhantomPinned,
     std::fmt::Alignment,
     Arguments<'static>,
     std::fmt::Error,
@@ -221,6 +233,7 @@ impl_creusot_witness_trusted!(
     DebugStruct<'static, 'static>,
     DebugTuple<'static, 'static>,
     FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>,
+    Discriminant<Option<i32>>,
     AddrParseError,
     Rc<i32>,
     std::rc::Weak<i32>,
@@ -235,6 +248,25 @@ impl_creusot_witness_trusted!(
     std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
     std::vec::Splice<'static, std::vec::IntoIter<i32>>
 );
+
+impl CreusotWitness for RustStdStandard<SipHasherAlias> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<SipHasherAlias>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SipHasher>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<SipHasherAlias> as CreusotWitness>::proof().report().to_string(),
+    }
+}
 
 /// Proof artifact for a carrier with a real, machine-checked Creusot
 /// contract: names the contract function, carries its verbatim source as

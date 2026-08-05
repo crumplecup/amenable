@@ -2073,6 +2073,165 @@ fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn hash_build_hasher_default_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<BuildHasherDefault<DefaultHasher>>").expect("BuildHasherDefault's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<BuildHasherDefault<DefaultHasher>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BuildHasherDefault");
+    assert!(kani_description.contains("verify_build_hasher_default_produces_consistent_hashers"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn hash_sip_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<SipHasher>").expect("SipHasher's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<SipHasher>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for SipHasher");
+    assert!(kani_description.contains("verify_sip_hasher_produces_consistent_hashes"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn marker_phantom_data_i32_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<PhantomData<i32>>").expect("PhantomData<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<PhantomData<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    assert!(verifiers.contains(&"kani"));
+    assert!(verifiers.contains(&"creusot"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn marker_phantom_pinned_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<PhantomPinned>").expect("PhantomPinned's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<PhantomPinned>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    assert!(verifiers.contains(&"kani"));
+    assert!(verifiers.contains(&"creusot"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn mem_manually_drop_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<ManuallyDrop<i32>>").expect("ManuallyDrop<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<ManuallyDrop<i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for ManuallyDrop<i32>");
+    assert!(kani_description.contains("verify_manually_drop_derefs_and_into_inner_round_trip"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn mem_discriminant_option_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Discriminant<Option<i32>>>").expect("Discriminant<Option<i32>>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<Discriminant<Option<i32>>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Discriminant<Option<i32>>");
+    assert!(kani_description.contains("verify_discriminant_identifies_variant_not_payload"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
