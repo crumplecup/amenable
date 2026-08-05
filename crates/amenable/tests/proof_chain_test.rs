@@ -2631,6 +2631,57 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn duration_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<Duration>")
+        .expect("Duration's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Duration>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Duration");
+    assert!(
+        kani_description.contains("verify_duration_new_normalizes_nanos_and_carries_into_secs")
+    );
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Duration");
+    assert!(
+        creusot_description.contains("verify_duration_new_normalizes_nanos_and_carries_into_secs")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs() {
+    let report = amenable::proof_chain("RustStdStandard<TryFromFloatSecsError>")
+        .expect("TryFromFloatSecsError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<TryFromFloatSecsError>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    assert!(verifiers.contains(&"kani"));
+    assert!(verifiers.contains(&"creusot"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
@@ -2978,6 +3029,35 @@ fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() {
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn option_i32_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Option<i32>>").expect("Option<i32>'s evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Option<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Option<i32>");
+    assert!(kani_description.contains("verify_option_some_and_none_are_disjoint"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for Option<i32>");
+    assert!(creusot_description.contains("verify_option_some_and_none_are_disjoint"));
 }
 
 #[test]
