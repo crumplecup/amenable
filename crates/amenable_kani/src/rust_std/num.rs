@@ -635,7 +635,7 @@ bridge_kani_witness!(RustStdStandard<TryFromIntError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryFromIntError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
         verifier: "kani",
         describe: || <RustStdStandard<TryFromIntError> as KaniWitness>::proof().to_string(),
     }
@@ -683,7 +683,7 @@ bridge_kani_witness!(RustStdStandard<IntErrorKind>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IntErrorKind>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
         verifier: "kani",
         describe: || <RustStdStandard<IntErrorKind> as KaniWitness>::proof().to_string(),
     }
@@ -741,7 +741,7 @@ bridge_kani_witness!(RustStdStandard<ParseIntError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ParseIntError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
         verifier: "kani",
         describe: || <RustStdStandard<ParseIntError> as KaniWitness>::proof().to_string(),
     }
@@ -780,7 +780,7 @@ bridge_kani_witness!(RustStdStandard<ParseFloatError>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ParseFloatError>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
         verifier: "kani",
         describe: || <RustStdStandard<ParseFloatError> as KaniWitness>::proof().to_string(),
     }
@@ -824,7 +824,7 @@ bridge_kani_witness!(RustStdStandard<FpCategory>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FpCategory>",
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
         verifier: "kani",
         describe: || <RustStdStandard<FpCategory> as KaniWitness>::proof().to_string(),
     }
