@@ -138,6 +138,28 @@ fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn const_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<*const i32> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_const_pointer_cast_preserves_the_address"
+    );
+    assert_eq!(proof.provenance, <*const i32 as RustStdType>::provenance());
+}
+
+#[test]
+fn mut_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<*mut i32> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_mut_pointer_cast_preserves_the_address"
+    );
+    assert_eq!(proof.provenance, <*mut i32 as RustStdType>::provenance());
+}
+
+#[test]
 fn shared_reference_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<&'static i32> as Witness<CreusotVerifier>>::proof();
 

@@ -213,6 +213,32 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC, {
+        /// Casting a raw const pointer changes its pointee type without
+        /// changing its logical address.
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_const_pointer_cast_preserves_the_address(ptr: *const i32) -> bool {
+            let cast = ptr.cast::<u8>();
+            cast.addr() == ptr.addr()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_MUT_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC, {
+        /// Casting a raw mutable pointer changes its pointee type without
+        /// changing its logical address.
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_mut_pointer_cast_preserves_the_address(ptr: *mut i32) -> bool {
+            let cast = ptr.cast::<u8>();
+            cast.addr() == ptr.addr()
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
         /// Dereferencing a shared reference recovers exactly the value it
         /// borrows.

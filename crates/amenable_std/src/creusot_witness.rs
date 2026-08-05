@@ -120,6 +120,7 @@ use amenable_creusot::{
     VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC,
     VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
     VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, VERIFY_CHAR_ROUNDTRIP_SRC,
+    VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
     VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
     VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
@@ -138,6 +139,7 @@ use amenable_creusot::{
     VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
     VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
     VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC,
+    VERIFY_MUT_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
     VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC,
     VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
     VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
@@ -541,6 +543,52 @@ bridge_creusot_witness!(RustStdStandard<fn(i32) -> i32>);
         evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
         verifier: "creusot",
         describe: || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<*const i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_const_pointer_cast_preserves_the_address",
+            claim: VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<*const i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<*const i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<*mut i32> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_mut_pointer_cast_preserves_the_address",
+            claim: VERIFY_MUT_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<*mut i32>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<*mut i32> as CreusotWitness>::proof().to_string(),
     }
 }
 
