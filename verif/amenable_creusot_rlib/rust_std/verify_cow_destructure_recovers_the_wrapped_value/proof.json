@@ -1,0 +1,13 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Borrowed": { "prover": "alt-ergo", "time": 0.013 },
+      "vc_elim_Owned": { "prover": "alt-ergo", "time": 0.013 },
+      "vc_verify_cow_destructure_recovers_the_wrapped_value": {
+        "prover": "alt-ergo",
+        "time": 0.019
+      }
+    }
+  }
+}

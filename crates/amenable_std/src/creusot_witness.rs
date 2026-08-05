@@ -55,6 +55,7 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
+use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -63,6 +64,7 @@ use std::time::{Duration, TryFromFloatSecsError};
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
+    VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
@@ -201,6 +203,33 @@ bridge_creusot_witness!(RustStdStandard<String>);
         evidence: "amenable_std::rust_std::RustStdStandard<String>",
         verifier: "creusot",
         describe: || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `Cow<'static, i32>`, matching `amenable_std::rust_std::
+// alloc_borrow`'s own registration exactly (confirmed against the
+// checklist's own `evidence_name` column:
+// `RustStdStandard<Cow<'static, i32>>`).
+impl CreusotWitness for RustStdStandard<Cow<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cow_destructure_recovers_the_wrapped_value",
+            claim: VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Cow<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Cow<'static, i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

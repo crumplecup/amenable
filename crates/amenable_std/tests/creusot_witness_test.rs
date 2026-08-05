@@ -1,5 +1,6 @@
 #![cfg(feature = "creusot")]
 
+use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -31,6 +32,20 @@ fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     assert_eq!(proof.harness, "verify_string_roundtrip");
     assert_eq!(proof.provenance, <String as RustStdType>::provenance());
+}
+
+#[test]
+fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Cow<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cow_destructure_recovers_the_wrapped_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <Cow<'static, i32> as RustStdType>::provenance()
+    );
 }
 
 #[test]
