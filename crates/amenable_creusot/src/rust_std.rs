@@ -754,3 +754,28 @@ amenable_derive::harness! {
         }
     }
 }
+
+// Same shape as `Option<i32>` above: `creusot_std::std::result` already
+// ships real `#[check(ghost)]` contracts for
+// `is_ok`/`is_err`/`unwrap`/`unwrap_err`, and `Result<T, E>: PartialEq`
+// (via `T: PartialEq, E: PartialEq`) lets `== Ok(x)`/`== Err(x)` appear
+// directly in `#[ensures]` as native Pearlite equality — no local
+// `extern_spec!` needed.
+amenable_derive::harness! {
+    creusot, VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, {
+        /// `Ok` round-trips its value through `unwrap`, and `Err`
+        /// round-trips its value through `unwrap_err` — the same claim
+        /// `amenable_kani::rust_std::option_result::verify_result_ok_and_err_are_disjoint`
+        /// checks by symbolic execution, restated as a real Creusot
+        /// postcondition against `creusot-std`'s own shipped `Result<T, E>`
+        /// contracts (not a local `extern_spec!`, and not `#[trusted]`).
+        #[requires(true)]
+        #[ensures(result.0 == value)]
+        #[ensures(result.1 == err_value)]
+        fn verify_result_ok_and_err_are_disjoint(value: i32, err_value: i32) -> (i32, i32) {
+            let ok: Result<i32, i32> = Ok(value);
+            let err: Result<i32, i32> = Err(err_value);
+            (ok.unwrap(), err.unwrap_err())
+        }
+    }
+}

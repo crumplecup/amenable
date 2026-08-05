@@ -69,7 +69,7 @@ use amenable_creusot::{
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
-    VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
+    VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
@@ -528,5 +528,31 @@ bridge_creusot_witness!(RustStdStandard<Option<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Option<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `Result<i32, i32>`, matching `amenable_std::rust_std::option_result`'s
+// own registration exactly (confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<Result<i32, i32>>`).
+impl CreusotWitness for RustStdStandard<Result<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_result_ok_and_err_are_disjoint",
+            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Result<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
     }
 }
