@@ -1,6 +1,7 @@
 //! Creusot proof gallery: documented findings about `creusot-rustc`'s own
 //! translation behavior, discovered while building the real char/String/
-//! Duration/`NonZero<i16>`/`Ordering` proof pipeline in `amenable_creusot`.
+//! Duration/`NonZero<i16>`/`Ordering`/`Wrapping<i32>`/`Saturating<i32>`/
+//! `IntErrorKind` proof pipeline in `amenable_creusot`.
 //!
 //! Mirrors `amenable_kani`'s gallery in spirit — production proofs answer
 //! "does this harness establish the intended claim?", the gallery answers
@@ -518,6 +519,99 @@ extern_spec! {
         })]
         fn reverse(self) -> Ordering;
     }
+}
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::view_operator_needs_pearlite_macro_outside_attributes".to_owned(),
+            title: "the @ View operator only parses inside #[requires]/#[ensures]; a #[logic] function body needs pearlite! {} to use it".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (this exact shape was attempted while writing
+// amenable_creusot::rust_std's IntErrorKind contract — a plain #[logic]
+// helper function using `@` directly in its body, the same operator
+// every #[ensures]/#[requires] clause in this crate already uses freely):
+#[logic(open)]
+fn is_ascii_digit(c: char) -> bool {
+    c@ >= 48 && c@ <= 57
+}
+
+// Observed under plain `cargo check -p amenable_creusot` (not even real
+// translation — a hard parse error, before creusot-rustc is involved at
+// all):
+//   error: expected one of `!`, `.`, `::`, `;`, `?`, `{`, `}`, or an
+//   operator, found `@`
+// `#[requires(...)]`/`#[ensures(...)]` attribute *arguments* are consumed
+// as an opaque token stream by their own proc-macro (parsed internally
+// via pearlite-syn, never by rustc's ordinary expression grammar) — `@`
+// is legal there regardless of context. An ordinary function BODY,
+// even one annotated `#[logic]`, is parsed by rustc's normal expression
+// grammar first; `@` isn't a valid operator there at all, so this fails
+// to even parse, unconditionally, `#[cfg(creusot)]` gating or not (cfg
+// stripping happens after parsing, not before).
+
+// Working form (this is the real, proven helper, in
+// amenable_creusot::rust_std today) — wrap the body in creusot-std's own
+// `pearlite! {}` macro, which (like `requires!`/`ensures!`) receives its
+// contents as an opaque token stream too, making `@` legal inside it
+// even in an ordinary expression position:
+#[logic(open)]
+fn is_ascii_digit(c: char) -> bool {
+    pearlite! { c@ >= 48 && c@ <= 57 }
+}
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::str_parse_is_a_distinct_uncontracted_wrapper_around_from_str".to_owned(),
+            title: "extern_spec-ing FromStr::from_str doesn't cover calls through str::parse<F>, a separate generic wrapper method".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (this exact call shape was in amenable_creusot::rust_std's
+// IntErrorKind harness before the fix — calling through the ordinary,
+// idiomatic `.parse()` method, after already giving `<i32 as
+// FromStr>::from_str` a real local extern_spec!):
+fn verify_int_error_kind_classifies_parse_failures() -> ... {
+    (
+        "".parse::<i32>(),
+        "not a number".parse::<i32>(),
+        // ...
+    )
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot` (translates, but
+// with a warning that predicts the same "impossible precondition" class
+// of goal failure the Ordering::reverse finding hit):
+//   warning: calling external function `parse` with no contract will
+//   yield an impossible precondition
+// `str::parse<F>(&self) -> Result<F, F::Err>` is its own distinct,
+// generic method (`{ FromStr::from_str(self) }`, forwarding at runtime)
+// — extern-speccing the trait method `FromStr::from_str` doesn't
+// automatically cover calls made through this separate wrapper; Creusot
+// reasons about exactly the function actually called, not what it
+// happens to delegate to internally.
+
+// Working form (this is the real, proven harness, in
+// amenable_creusot::rust_std today) — call the contracted trait method
+// directly; semantically identical at runtime, since `parse` just
+// forwards to it anyway:
+fn verify_int_error_kind_classifies_parse_failures() -> ... {
+    (
+        <i32 as std::str::FromStr>::from_str(""),
+        <i32 as std::str::FromStr>::from_str("not a number"),
+        // ...
+    )
 }
 "#,
         },

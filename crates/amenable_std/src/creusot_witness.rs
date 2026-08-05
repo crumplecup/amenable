@@ -62,7 +62,8 @@ use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
-    VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+    VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
+    VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
@@ -311,5 +312,32 @@ bridge_creusot_witness!(RustStdStandard<Saturating<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Saturating<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Saturating<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Fully qualified, matching `amenable_std::rust_std::num`'s own
+// registration exactly (`register_rust_std_standard_evidence!(...,
+// core::num::IntErrorKind, ...)`, confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<core::num::IntErrorKind>`).
+impl CreusotWitness for RustStdStandard<core::num::IntErrorKind> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_int_error_kind_classifies_parse_failures",
+            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<core::num::IntErrorKind>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<core::num::IntErrorKind> as CreusotWitness>::proof().to_string(),
     }
 }
