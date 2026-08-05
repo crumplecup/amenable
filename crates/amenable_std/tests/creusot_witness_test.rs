@@ -10,6 +10,7 @@ use std::collections::vec_deque::{
     IterMut as VecDequeIterMut,
 };
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
+use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -280,6 +281,45 @@ fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
         "verify_nul_error_reports_the_interior_nuls_position"
     );
     assert_eq!(proof.provenance, <NulError as RustStdType>::provenance());
+}
+
+#[test]
+fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<CStr> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cstr_excludes_the_terminating_nul_from_to_bytes"
+    );
+    assert_eq!(proof.provenance, <CStr as RustStdType>::provenance());
+}
+
+#[test]
+fn from_bytes_until_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<FromBytesUntilNulError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"
+    );
+    assert_eq!(
+        proof.provenance,
+        <FromBytesUntilNulError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<FromBytesWithNulError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end"
+    );
+    assert_eq!(
+        proof.provenance,
+        <FromBytesWithNulError as RustStdType>::provenance()
+    );
 }
 
 #[test]

@@ -38,7 +38,7 @@ use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 #[cfg(creusot)]
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
@@ -1201,6 +1201,101 @@ amenable_derive::harness! {
             let first_of_two_index =
                 CString::new(vec![byte, 0, 0, byte]).unwrap_err().nul_position();
             (single_nul_index, first_of_two_index)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC, {
+        /// `CStr::from_bytes_with_nul` accepts a nul-terminated byte
+        /// sequence, `to_bytes` omits the final terminator, and
+        /// `to_bytes_with_nul` preserves the original borrowed
+        /// representation.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CStr` construction or observation, so Creusot cannot
+        /// discharge this directly over the concrete std carrier today.
+        /// This keeps the same representative observation as the Kani
+        /// harness while making the trusted boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (payload_len, observed_byte, borrowed_len, terminator) =>
+                payload_len == 1usize
+                    && observed_byte == Some(byte)
+                    && borrowed_len == 2usize
+                    && terminator == Some(0u8),
+        })]
+        fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(
+            byte: u8,
+        ) -> (usize, Option<u8>, usize, Option<u8>) {
+            let bytes = [byte, 0];
+            let cstr = CStr::from_bytes_with_nul(&bytes).unwrap();
+            let payload = cstr.to_bytes();
+            let borrowed = cstr.to_bytes_with_nul();
+            (
+                payload.len(),
+                payload.first().copied(),
+                borrowed.len(),
+                borrowed.get(1).copied(),
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC, {
+        /// `CStr::from_bytes_until_nul` succeeds when a nul byte
+        /// appears anywhere in the borrowed slice, and fails only when
+        /// none is present at all.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CStr::from_bytes_until_nul` or its error carrier, so
+        /// Creusot cannot discharge this over the concrete std types
+        /// directly today. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (accepted, rejected) => accepted && rejected,
+        })]
+        fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere(byte: u8) -> (bool, bool) {
+            let with_nul = [byte, 0, byte];
+            let without_nul = [byte, byte, byte];
+            (
+                CStr::from_bytes_until_nul(&with_nul).is_ok(),
+                CStr::from_bytes_until_nul(&without_nul).is_err(),
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC, {
+        /// `CStr::from_bytes_with_nul` accepts a borrowed byte slice
+        /// only when the sole nul byte is the final one.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CStr::from_bytes_with_nul` or its error carrier, so
+        /// Creusot cannot discharge this over the concrete std types
+        /// directly today. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (accepted, missing_nul_rejected, interior_nul_rejected) =>
+                accepted && missing_nul_rejected && interior_nul_rejected,
+        })]
+        fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(
+            byte: u8,
+        ) -> (bool, bool, bool) {
+            (
+                CStr::from_bytes_with_nul(&[byte, 0]).is_ok(),
+                CStr::from_bytes_with_nul(&[byte, byte]).is_err(),
+                CStr::from_bytes_with_nul(&[0, byte]).is_err(),
+            )
         }
     }
 }

@@ -558,6 +558,99 @@ fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn cstr_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report =
+        amenable::proof_chain("RustStdStandard<CStr>").expect("CStr's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<CStr>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for CStr");
+    assert!(kani_description.contains("verify_cstr_excludes_the_terminating_nul_from_to_bytes"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for CStr");
+    assert!(creusot_description.contains("verify_cstr_excludes_the_terminating_nul_from_to_bytes"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn from_bytes_until_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<FromBytesUntilNulError>")
+        .expect("FromBytesUntilNulError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<FromBytesUntilNulError>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for FromBytesUntilNulError");
+    assert!(kani_description.contains("verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for FromBytesUntilNulError");
+    assert!(
+        creusot_description.contains("verify_from_bytes_until_nul_requires_a_nul_byte_somewhere")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<FromBytesWithNulError>")
+        .expect("FromBytesWithNulError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<FromBytesWithNulError>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for FromBytesWithNulError");
+    assert!(
+        kani_description.contains("verify_from_bytes_with_nul_requires_the_nul_only_at_the_end")
+    );
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for FromBytesWithNulError");
+    assert!(
+        creusot_description.contains("verify_from_bytes_with_nul_requires_the_nul_only_at_the_end")
+    );
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
