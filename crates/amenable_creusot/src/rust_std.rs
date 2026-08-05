@@ -600,6 +600,87 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
+        /// `LinkedList::into_iter` consumes the list and yields its
+        /// owned values in front-to-back order. A partially-consumed
+        /// iterator transfers its yielded value to the caller without
+        /// dropping it, and dropping the unfinished iterator destroys
+        /// every remaining owned value exactly once.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `LinkedList` or its `IntoIter` carrier, so Creusot cannot
+        /// currently express or discharge this over the concrete std
+        /// carrier directly. This keeps the same representative
+        /// observation as Amenable's Kani proof, including the explicit
+        /// unfinished-iterator drop-count behavior, while making the
+        /// trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, third, after_next, after_drop_yielded, after_drop_iter) =>
+                first == Some(a)
+                    && second == Some(b)
+                    && third == None
+                    && after_next == 0u32
+                    && after_drop_yielded == 1u32
+                    && after_drop_iter == 3u32,
+        })]
+        fn verify_linked_list_into_iter_yields_owned_values_in_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, u32, u32, u32) {
+            let mut list = LinkedList::new();
+            list.push_back(a);
+            list.push_back(b);
+            let mut it = list.into_iter();
+            let first = it.next();
+            let second = it.next();
+            let third = it.next();
+
+            struct DropWitness {
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl Drop for DropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_next, after_drop_yielded, after_drop_iter) = {
+                let mut witness_list = LinkedList::new();
+                witness_list.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_list.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                witness_list.push_back(DropWitness {
+                    drop_count: drop_count.clone(),
+                });
+                let mut iterator = witness_list.into_iter();
+                let first = iterator.next().unwrap();
+                let after_next = drop_count.get();
+                drop(first);
+                let after_drop_yielded = drop_count.get();
+                drop(iterator);
+                let after_drop_iter = drop_count.get();
+                (after_next, after_drop_yielded, after_drop_iter)
+            };
+
+            (
+                first,
+                second,
+                third,
+                after_next,
+                after_drop_yielded,
+                after_drop_iter,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, {
         /// `Vec::try_reserve` reports failure via `TryReserveError`
         /// for an impossible reservation request, without disturbing

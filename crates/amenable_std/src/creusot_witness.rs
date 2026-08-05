@@ -59,6 +59,7 @@ use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
 use std::collections::binary_heap::{Drain as BinaryHeapDrain, IntoIter as BinaryHeapIntoIter};
+use std::collections::linked_list::IntoIter as LinkedListIntoIter;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -75,6 +76,7 @@ use amenable_creusot::{
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+    VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
     VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
@@ -378,6 +380,29 @@ bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<LinkedListIntoIter<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_into_iter_yields_owned_values_in_order",
+            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinkedListIntoIter<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<LinkedListIntoIter<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 
