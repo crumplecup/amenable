@@ -56,6 +56,7 @@
 //! without also touching the crate that's actually translated.
 
 use std::cmp::Reverse;
+use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
 
@@ -64,7 +65,8 @@ use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
-    VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
+    VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+    VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
@@ -554,5 +556,33 @@ bridge_creusot_witness!(RustStdStandard<Result<i32, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `ManuallyDrop<i32>`, matching `amenable_std::rust_std::mem`'s own
+// registration exactly (confirmed against the checklist's own
+// `evidence_name` column: `RustStdStandard<ManuallyDrop<i32>>`).
+impl CreusotWitness for RustStdStandard<ManuallyDrop<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_manually_drop_derefs_and_into_inner_round_trip",
+            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<ManuallyDrop<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<ManuallyDrop<i32>> as CreusotWitness>::proof().to_string()
+        },
     }
 }

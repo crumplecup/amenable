@@ -2,10 +2,10 @@
 
 (* <witness::CreusotVerifierMetadata as std::fmt::Debug> *)
 
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14
 let%span sfmt = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 8 26 8 30
 let%span sfmt'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 7 19 7 23
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any

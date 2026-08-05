@@ -1,6 +1,7 @@
 #![cfg(feature = "creusot")]
 
 use std::cmp::Reverse;
+use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
 
@@ -187,5 +188,19 @@ fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
     assert_eq!(
         proof.provenance,
         <Result<i32, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<ManuallyDrop<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_manually_drop_derefs_and_into_inner_round_trip"
+    );
+    assert_eq!(
+        proof.provenance,
+        <ManuallyDrop<i32> as RustStdType>::provenance()
     );
 }

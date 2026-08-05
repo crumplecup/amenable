@@ -2,8 +2,8 @@
 
 (* <witness::CreusotVerifierMetadata as std::hash::Hash> *)
 
-let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 29 29 33
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
+let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 29 29 33
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any

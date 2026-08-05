@@ -793,3 +793,59 @@ fn verify_parse_float_error_occurs_only_for_unparseable_input() -> (...) {
         },
     }
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::derefs_own_postcondition_cant_reference_self_via_deref".to_owned(),
+            title: "*self inside deref's OWN #[ensures] yields Self, not Target -- circular, and a real type error".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (attempted while writing ManuallyDrop<T>'s extern_spec —
+// ManuallyDrop's own field is private, so there's no `.0` to compare
+// against the way Wrapping/Saturating/Reverse's postconditions do):
+extern_spec! {
+    impl<T> std::ops::Deref for ManuallyDrop<T> {
+        #[check(ghost)]
+        #[ensures(*result == *self)]
+        fn deref(&self) -> &T;
+    }
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot`:
+//   error[E0308]: mismatched types
+//     | #[ensures(*result == *self)]
+//     |                       ^^^^^ expected type parameter `T`, found
+//     |                             struct `std::mem::ManuallyDrop<T>`
+// `self: &ManuallyDrop<T>` inside the contract, so `*self` yields
+// `ManuallyDrop<T>` (one layer of reference removed) — reaching the
+// wrapped `T` needs ANOTHER deref, i.e. calling the very method this
+// postcondition is trying to specify. Not fixable by stating deref's
+// contract in terms of itself, structurally, no matter the phrasing.
+
+// Working form (this is the real, proven contract, in
+// amenable_creusot::rust_std today) — same shape `String::len`/
+// `NonZero::get`'s private-field cases use: a `#[trusted]
+// #[logic(opaque)]` accessor axiomatizing the wrapped value
+// independently, generic over `T` this time (every earlier trusted
+// wrapper in this file was monomorphic):
+#[trusted]
+#[logic(opaque)]
+fn manually_drop_value<T>(_m: &ManuallyDrop<T>) -> T { dead }
+
+extern_spec! {
+    impl<T> std::ops::Deref for ManuallyDrop<T> {
+        #[check(ghost)]
+        #[ensures(*result == manually_drop_value(self))]
+        fn deref(&self) -> &T;
+    }
+}
+// `new`/`into_inner`'s extern_specs are stated in terms of the same
+// logic function, so the harness can connect "the value passed to new"
+// to "what deref/into_inner return" without ever needing `*self` inside
+// deref's own contract.
+"#,
+        },
+    }
+}
