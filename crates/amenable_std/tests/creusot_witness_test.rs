@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
@@ -69,6 +69,20 @@ fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <BTreeSet<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<BinaryHeap<i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_binary_heap_pop_yields_the_maximum_first"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BinaryHeap<i32> as RustStdType>::provenance()
     );
 }
 

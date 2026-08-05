@@ -36,7 +36,7 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
@@ -239,6 +239,83 @@ amenable_derive::harness! {
             let removed_second = set.remove(&b);
 
             (first, second, removed_first, removed_second, set.is_empty())
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC, {
+        /// `BinaryHeap::pop` returns the greatest remaining element
+        /// first, and ownership transfers out of the heap without
+        /// dropping the popped value.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `BinaryHeap`, so Creusot cannot state or discharge this over
+        /// the concrete std carrier directly today. This keeps the same
+        /// representative claim as Amenable's Kani proof, including the
+        /// explicit drop-count observation, but marks the boundary
+        /// honestly as trusted.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (first, second, after_pop, after_drop_popped, after_drop_heap) =>
+                first == Some(if a >= b { a } else { b })
+                    && second == Some(if a >= b { b } else { a })
+                    && after_pop == 0u32
+                    && after_drop_popped == 1u32
+                    && after_drop_heap == 2u32,
+        })]
+        fn verify_binary_heap_pop_yields_the_maximum_first(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, u32, u32, u32) {
+            let mut heap = BinaryHeap::new();
+            heap.push(a);
+            heap.push(b);
+            let first = heap.pop();
+            let second = heap.pop();
+
+            struct OrderedDropWitness {
+                id: i32,
+                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+            }
+            impl PartialEq for OrderedDropWitness {
+                fn eq(&self, other: &Self) -> bool {
+                    self.id == other.id
+                }
+            }
+            impl Eq for OrderedDropWitness {}
+            impl PartialOrd for OrderedDropWitness {
+                fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+                    Some(self.cmp(other))
+                }
+            }
+            impl Ord for OrderedDropWitness {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.id.cmp(&other.id)
+                }
+            }
+            impl Drop for OrderedDropWitness {
+                fn drop(&mut self) {
+                    self.drop_count.set(self.drop_count.get() + 1);
+                }
+            }
+
+            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let (after_pop, after_drop_popped, after_drop_heap) = {
+                let mut witness_heap = BinaryHeap::new();
+                witness_heap.push(OrderedDropWitness { id: 1, drop_count: drop_count.clone() });
+                witness_heap.push(OrderedDropWitness { id: 2, drop_count: drop_count.clone() });
+                let popped = witness_heap.pop().unwrap();
+                let after_pop = drop_count.get();
+                drop(popped);
+                let after_drop_popped = drop_count.get();
+                drop(witness_heap);
+                let after_drop_heap = drop_count.get();
+                (after_pop, after_drop_popped, after_drop_heap)
+            };
+
+            (first, second, after_pop, after_drop_popped, after_drop_heap)
         }
     }
 }
