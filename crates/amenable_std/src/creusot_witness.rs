@@ -58,6 +58,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
+use std::collections::binary_heap::Drain as BinaryHeapDrain;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -65,7 +66,8 @@ use std::time::{Duration, TryFromFloatSecsError};
 
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
+    CreusotVerifier, CreusotWitness, VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+    VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
     VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
     VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
@@ -306,6 +308,29 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeap<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BinaryHeap<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<BinaryHeapDrain<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_binary_heap_drain_yields_every_pushed_element_once",
+            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BinaryHeapDrain<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BinaryHeapDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

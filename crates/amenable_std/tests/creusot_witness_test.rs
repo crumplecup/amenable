@@ -3,6 +3,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
+use std::collections::binary_heap::Drain as BinaryHeapDrain;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
@@ -83,6 +84,21 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <BinaryHeap<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn binary_heap_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<BinaryHeapDrain<'static, i32>> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_binary_heap_drain_yields_every_pushed_element_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BinaryHeapDrain<'static, i32> as RustStdType>::provenance()
     );
 }
 
