@@ -55,6 +55,9 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
+use std::alloc::{Layout, LayoutError};
+use std::any::TypeId;
+use std::array::{IntoIter, TryFromSliceError};
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
@@ -65,11 +68,17 @@ use std::collections::vec_deque::{
     IterMut as VecDequeIterMut,
 };
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
+use std::convert::Infallible;
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::mem::ManuallyDrop;
+use std::net::AddrParseError;
 use std::num::{NonZero, Saturating, Wrapping};
+use std::rc::Rc;
+use std::string::{FromUtf8Error, FromUtf16Error};
+use std::sync::Arc;
 use std::time::{Duration, TryFromFloatSecsError};
+use std::vec::Vec;
 
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
@@ -164,7 +173,27 @@ impl_creusot_witness_trusted!(
     usize,
     f32,
     f64,
-    TryFromFloatSecsError
+    TypeId,
+    TryFromFloatSecsError,
+    Infallible,
+    Layout,
+    LayoutError,
+    TryFromSliceError,
+    IntoIter<i32, 3>,
+    core::ascii::EscapeDefault,
+    AddrParseError,
+    Rc<i32>,
+    std::rc::Weak<i32>,
+    std::string::Drain<'static>,
+    FromUtf16Error,
+    FromUtf8Error,
+    Arc<i32>,
+    std::sync::Weak<i32>,
+    Vec<i32>,
+    std::vec::Drain<'static, i32>,
+    std::vec::IntoIter<i32>,
+    std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    std::vec::Splice<'static, std::vec::IntoIter<i32>>
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Creusot
