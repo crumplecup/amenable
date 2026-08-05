@@ -58,6 +58,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
+use std::collections::{BTreeMap, BTreeSet};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
@@ -65,8 +66,8 @@ use std::time::{Duration, TryFromFloatSecsError};
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC,
-    VERIFY_CHAR_ROUNDTRIP_SRC,
-    VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+    VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC,
+    VERIFY_CHAR_ROUNDTRIP_SRC, VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
@@ -232,6 +233,52 @@ bridge_creusot_witness!(RustStdStandard<Cow<'static, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Cow<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<BTreeMap<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_btree_map_iterates_in_key_order",
+            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BTreeMap<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BTreeMap<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<BTreeSet<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_btree_set_iterates_in_sorted_order",
+            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BTreeSet<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BTreeSet<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 

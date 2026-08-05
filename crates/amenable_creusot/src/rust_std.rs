@@ -36,6 +36,8 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
+use std::collections::{BTreeMap, BTreeSet};
+#[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
 use std::num::{
@@ -132,6 +134,111 @@ amenable_derive::harness! {
                 Cow::Borrowed(borrowed) => *borrowed,
                 Cow::Owned(owned) => owned,
             }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC, {
+        /// `BTreeMap::iter` yields entries in ascending key order,
+        /// regardless of insertion order, and observing iteration does
+        /// not remove entries from the map.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts or
+        /// `ShallowModel` for `BTreeMap`, and the `elicitation`
+        /// reference guide already calls that out as the reason the real
+        /// container remains opaque to Creusot. That blocks a real
+        /// iterator/refinement proof over the concrete std type today.
+        /// So this states the same representative claim the Kani harness
+        /// checks with Amenable's accommodation model, but marks the
+        /// Creusot boundary honestly as trusted rather than pretending we
+        /// discharged a proof Creusot cannot currently express.
+        #[trusted]
+        #[requires(k1 < k2)]
+        #[ensures(match result {
+            (Some((first_k, first_v)), Some((second_k, second_v)), Some(removed_first), Some(removed_second), empty) =>
+                first_k == k1
+                    && first_v == v1
+                    && second_k == k2
+                    && second_v == v2
+                    && removed_first == v1
+                    && removed_second == v2
+                    && empty,
+            _ => false,
+        })]
+        fn verify_btree_map_iterates_in_key_order(
+            k1: i32,
+            k2: i32,
+            v1: i32,
+            v2: i32,
+        ) -> (
+            Option<(i32, i32)>,
+            Option<(i32, i32)>,
+            Option<i32>,
+            Option<i32>,
+            bool,
+        ) {
+            let mut map = BTreeMap::new();
+            map.insert(k2, v2);
+            map.insert(k1, v1);
+
+            let (first, second) = {
+                let mut iter = map.iter();
+                (
+                    iter.next().map(|(k, v)| (*k, *v)),
+                    iter.next().map(|(k, v)| (*k, *v)),
+                )
+            };
+
+            let removed_first = map.remove(&k1);
+            let removed_second = map.remove(&k2);
+
+            (first, second, removed_first, removed_second, map.is_empty())
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, {
+        /// `BTreeSet::iter` yields elements in ascending order,
+        /// regardless of insertion order, and observing iteration does
+        /// not remove elements from the set.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts or
+        /// `ShallowModel` for `BTreeSet`, so the concrete std carrier is
+        /// still opaque to Creusot today. This states the same
+        /// representative claim the Kani harness checks with Amenable's
+        /// ordered-set accommodation model, but keeps the Creusot
+        /// boundary explicit instead of pretending the real std type was
+        /// machine-proved.
+        #[trusted]
+        #[requires(a < b)]
+        #[ensures(match result {
+            (Some(first), Some(second), removed_first, removed_second, empty) =>
+                first == a
+                    && second == b
+                    && removed_first
+                    && removed_second
+                    && empty,
+            _ => false,
+        })]
+        fn verify_btree_set_iterates_in_sorted_order(
+            a: i32,
+            b: i32,
+        ) -> (Option<i32>, Option<i32>, bool, bool, bool) {
+            let mut set = BTreeSet::new();
+            set.insert(b);
+            set.insert(a);
+
+            let (first, second) = {
+                let mut iter = set.iter();
+                (iter.next().copied(), iter.next().copied())
+            };
+
+            let removed_first = set.remove(&a);
+            let removed_second = set.remove(&b);
+
+            (first, second, removed_first, removed_second, set.is_empty())
         }
     }
 }

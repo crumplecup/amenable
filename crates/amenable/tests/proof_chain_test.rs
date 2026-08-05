@@ -39,6 +39,63 @@ fn char_proof_chain_carries_the_checked_harness_name_per_verifier() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn btree_map_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<BTreeMap<i32, i32>>")
+        .expect("BTreeMap's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<BTreeMap<i32, i32>>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BTreeMap");
+    assert!(kani_description.contains("verify_btree_map_iterates_in_key_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for BTreeMap");
+    assert!(creusot_description.contains("verify_btree_map_iterates_in_key_order"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn btree_set_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<BTreeSet<i32>>")
+        .expect("BTreeSet's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<BTreeSet<i32>>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for BTreeSet");
+    assert!(kani_description.contains("verify_btree_set_iterates_in_sorted_order"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for BTreeSet");
+    assert!(creusot_description.contains("verify_btree_set_iterates_in_sorted_order"));
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
