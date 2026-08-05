@@ -38,6 +38,8 @@ use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 #[cfg(creusot)]
+use std::ffi::CString;
+#[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
 use std::num::{
@@ -1071,6 +1073,134 @@ amenable_derive::harness! {
             let second_after = dq.pop_front();
             let empty = dq.is_empty();
             (first_after, second_after, empty)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC, {
+        /// `CString::new` appends its own terminating nul, exposes the
+        /// payload bytes without that terminator through `as_bytes`,
+        /// and rejects any input that already contains an interior nul
+        /// byte.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CString` construction or observation, so Creusot cannot
+        /// express this directly over the concrete std carrier today.
+        /// This keeps the same representative observation as the Kani
+        /// harness while making the trusted boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (payload_len, observed_byte, payload_with_nul_len, terminator, interior_nul_rejected) =>
+                payload_len == 1usize
+                    && observed_byte == Some(byte)
+                    && payload_with_nul_len == 2usize
+                    && terminator == Some(0u8)
+                    && interior_nul_rejected,
+        })]
+        fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul(
+            byte: u8,
+        ) -> (usize, Option<u8>, usize, Option<u8>, bool) {
+            let cstring = CString::new(vec![byte]).unwrap();
+            let payload = cstring.as_bytes();
+            let payload_with_nul = cstring.as_bytes_with_nul();
+            let interior_nul_rejected = CString::new(vec![byte, 0, byte]).is_err();
+            (
+                payload.len(),
+                payload.first().copied(),
+                payload_with_nul.len(),
+                payload_with_nul.get(1).copied(),
+                interior_nul_rejected,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC, {
+        /// `CString::from_vec_with_nul` accepts a nul-terminated byte
+        /// vector only when the sole nul byte is the final one.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CString::from_vec_with_nul` or its error carrier, so
+        /// Creusot cannot discharge this over the concrete std type
+        /// directly today. This keeps the same representative
+        /// observation as the Kani harness while making the trusted
+        /// boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (accepted, missing_nul_rejected, interior_nul_rejected) =>
+                accepted && missing_nul_rejected && interior_nul_rejected,
+        })]
+        fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(
+            byte: u8,
+        ) -> (bool, bool, bool) {
+            (
+                CString::from_vec_with_nul(vec![byte, 0]).is_ok(),
+                CString::from_vec_with_nul(vec![byte, byte]).is_err(),
+                CString::from_vec_with_nul(vec![byte, 0, byte]).is_err(),
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC, {
+        /// `CString::into_string` fails on non-UTF-8 payload bytes, and
+        /// `IntoStringError::into_cstring` recovers exactly the
+        /// original owned `CString`.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CString::into_string` or `IntoStringError`, so Creusot
+        /// cannot discharge this over the concrete std types directly
+        /// today. This keeps the same representative observation as the
+        /// Kani harness while making the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (payload_len, first, second, terminator) =>
+                payload_len == 3usize
+                    && first == Some(0xFFu8)
+                    && second == Some(120u8)
+                    && terminator == Some(0u8),
+        })]
+        fn verify_into_string_error_recovers_the_original_cstring() -> (usize, Option<u8>, Option<u8>, Option<u8>) {
+            let invalid = CString::new(vec![0xFFu8, b'x']).unwrap();
+            let recovered = invalid.into_string().unwrap_err().into_cstring().into_bytes_with_nul();
+            (
+                recovered.len(),
+                recovered.first().copied(),
+                recovered.get(1).copied(),
+                recovered.get(2).copied(),
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC, {
+        /// `NulError::nul_position` reports the index of the first
+        /// interior nul byte that caused `CString::new` to reject the
+        /// input.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `CString::new` or `NulError`, so Creusot cannot discharge
+        /// this over the concrete std types directly today. This keeps
+        /// the same representative observation as the Kani harness
+        /// while making the trusted boundary explicit.
+        #[trusted]
+        #[requires(byte@ != 0)]
+        #[ensures(match result {
+            (single_nul_index, first_of_two_index) =>
+                single_nul_index == 1usize && first_of_two_index == 1usize,
+        })]
+        fn verify_nul_error_reports_the_interior_nuls_position(byte: u8) -> (usize, usize) {
+            let single_nul_index = CString::new(vec![byte, 0, byte]).unwrap_err().nul_position();
+            let first_of_two_index =
+                CString::new(vec![byte, 0, 0, byte]).unwrap_err().nul_position();
+            (single_nul_index, first_of_two_index)
         }
     }
 }

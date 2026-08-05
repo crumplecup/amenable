@@ -10,6 +10,7 @@ use std::collections::vec_deque::{
     IterMut as VecDequeIterMut,
 };
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
+use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
@@ -229,6 +230,56 @@ fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provena
         proof.provenance,
         <VecDequeIterMut<'static, i32> as RustStdType>::provenance()
     );
+}
+
+#[test]
+fn cstring_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<CString> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
+    );
+    assert_eq!(proof.provenance, <CString as RustStdType>::provenance());
+}
+
+#[test]
+fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<FromVecWithNulError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_vec_with_nul_requires_the_nul_only_at_the_end"
+    );
+    assert_eq!(
+        proof.provenance,
+        <FromVecWithNulError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<IntoStringError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_into_string_error_recovers_the_original_cstring"
+    );
+    assert_eq!(
+        proof.provenance,
+        <IntoStringError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<NulError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_nul_error_reports_the_interior_nuls_position"
+    );
+    assert_eq!(proof.provenance, <NulError as RustStdType>::provenance());
 }
 
 #[test]

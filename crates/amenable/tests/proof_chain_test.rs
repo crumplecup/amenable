@@ -439,6 +439,125 @@ fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<CString>")
+        .expect("CString's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<CString>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for CString");
+    assert!(
+        kani_description
+            .contains("verify_cstring_excludes_the_terminator_and_rejects_interior_nul")
+    );
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for CString");
+    assert!(
+        creusot_description
+            .contains("verify_cstring_excludes_the_terminator_and_rejects_interior_nul")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn from_vec_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<FromVecWithNulError>")
+        .expect("FromVecWithNulError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<FromVecWithNulError>")
+    );
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for FromVecWithNulError");
+    assert!(kani_description.contains("verify_from_vec_with_nul_requires_the_nul_only_at_the_end"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for FromVecWithNulError");
+    assert!(
+        creusot_description.contains("verify_from_vec_with_nul_requires_the_nul_only_at_the_end")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn into_string_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<IntoStringError>")
+        .expect("IntoStringError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<IntoStringError>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for IntoStringError");
+    assert!(kani_description.contains("verify_into_string_error_recovers_the_original_cstring"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for IntoStringError");
+    assert!(creusot_description.contains("verify_into_string_error_recovers_the_original_cstring"));
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
+    let report = amenable::proof_chain("RustStdStandard<NulError>")
+        .expect("NulError's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<NulError>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for NulError");
+    assert!(kani_description.contains("verify_nul_error_reports_the_interior_nuls_position"));
+
+    let (_, creusot_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "creusot")
+        .expect("creusot proof registered for NulError");
+    assert!(creusot_description.contains("verify_nul_error_reports_the_interior_nuls_position"));
+}
+
+#[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
         Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
