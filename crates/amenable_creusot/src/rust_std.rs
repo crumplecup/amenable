@@ -36,7 +36,7 @@ use std::boxed::Box;
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError};
 #[cfg(creusot)]
 use std::mem::ManuallyDrop;
 #[cfg(creusot)]
@@ -388,6 +388,41 @@ amenable_derive::harness! {
                 after_drop_popped,
                 after_drop_list,
             )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, {
+        /// `Vec::try_reserve` reports failure via `TryReserveError`
+        /// for an impossible reservation request, without disturbing
+        /// values already stored in the vector.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no contracts for
+        /// `Vec::try_reserve` or for the `TryReserveError` carrier it
+        /// returns, so Creusot cannot currently express or discharge
+        /// the concrete allocation-failure path over the std type
+        /// itself. This keeps the same representative observation as
+        /// the Kani harness and makes the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (Some(_error), observed_first, observed_second, observed_len) =>
+                observed_first == first
+                    && observed_second == second
+                    && observed_len == 2usize,
+            _ => false,
+        })]
+        fn verify_try_reserve_rejects_an_impossible_capacity(
+            first: i32,
+            second: i32,
+        ) -> (Option<TryReserveError>, i32, i32, usize) {
+            let mut values = vec![first, second];
+            let error = values.try_reserve(usize::MAX).err();
+            let observed_first = values[0];
+            let observed_second = values[1];
+            let observed_len = values.len();
+            (error, observed_first, observed_second, observed_len)
         }
     }
 }

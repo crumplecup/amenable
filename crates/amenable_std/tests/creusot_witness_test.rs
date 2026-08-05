@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::Duration;
@@ -97,6 +97,20 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(
         proof.provenance,
         <LinkedList<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<TryReserveError> as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_reserve_rejects_an_impossible_capacity"
+    );
+    assert_eq!(
+        proof.provenance,
+        <TryReserveError as RustStdType>::provenance()
     );
 }
 

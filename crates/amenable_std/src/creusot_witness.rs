@@ -58,7 +58,7 @@
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError};
 use std::mem::ManuallyDrop;
 use std::num::{NonZero, Saturating, Wrapping};
 use std::time::{Duration, TryFromFloatSecsError};
@@ -81,6 +81,7 @@ use amenable_creusot::{
     VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
+    VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
@@ -327,6 +328,29 @@ bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<TryReserveError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_try_reserve_rejects_an_impossible_capacity",
+            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<TryReserveError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<TryReserveError>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<TryReserveError> as CreusotWitness>::proof().to_string(),
     }
 }
 
