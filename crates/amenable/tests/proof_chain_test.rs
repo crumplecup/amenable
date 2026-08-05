@@ -1540,6 +1540,174 @@ fn addr_parse_error_proof_chain_registers_the_kani_and_creusot_proofs() {
 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
+fn ip_addr_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<IpAddr>").expect("IpAddr's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<IpAddr>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for IpAddr");
+    assert!(kani_description.contains("verify_ip_addr_variant_matches_its_kind"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn ipv4_addr_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Ipv4Addr>").expect("Ipv4Addr's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Ipv4Addr>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Ipv4Addr");
+    assert!(kani_description.contains("verify_ipv4_addr_octets_round_trip"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn ipv6_addr_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<Ipv6Addr>").expect("Ipv6Addr's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<Ipv6Addr>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for Ipv6Addr");
+    assert!(kani_description.contains("verify_ipv6_addr_segments_round_trip"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn socket_addr_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<SocketAddr>").expect("SocketAddr's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<SocketAddr>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for SocketAddr");
+    assert!(kani_description.contains("verify_socket_addr_variant_matches_its_kind"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn socket_addr_v4_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<SocketAddrV4>").expect("SocketAddrV4's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<SocketAddrV4>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for SocketAddrV4");
+    assert!(kani_description.contains("verify_socket_addr_v4_round_trips_ip_and_port"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
+fn socket_addr_v6_proof_chain_registers_the_kani_and_creusot_proofs() {
+    // Keep the subject literal on this line: `elicit_doc` currently
+    // scans proof-chain test subjects line-by-line.
+    #[rustfmt::skip]
+    let report = amenable::proof_chain("RustStdStandard<SocketAddrV6>").expect("SocketAddrV6's evidence link is registered");
+
+    let root = &report.root;
+    assert!(root.evidence.ends_with("RustStdStandard<SocketAddrV6>"));
+    assert!(root.is_root());
+    assert_eq!(root.proofs.len(), 2);
+    assert_eq!(report.verifiers.len(), 2);
+
+    let (_, kani_description) = root
+        .proofs
+        .iter()
+        .find(|(verifier, _)| *verifier == "kani")
+        .expect("kani proof registered for SocketAddrV6");
+    assert!(kani_description.contains("verify_socket_addr_v6_round_trips_all_fields"));
+
+    assert!(
+        root.proofs
+            .iter()
+            .any(|(verifier, _)| *verifier == "creusot")
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "creusot"), ignore)]
 fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<CString>")
         .expect("CString's evidence link is registered");

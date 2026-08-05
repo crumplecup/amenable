@@ -35,7 +35,9 @@ use std::iter::{
 };
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
-use std::net::AddrParseError;
+use std::net::{
+    AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
+};
 use std::num::{NonZero, Saturating, Wrapping};
 use std::ops::Range;
 use std::rc::Rc;
@@ -584,6 +586,54 @@ fn addr_parse_error_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<AddrParseError> as Witness<CreusotVerifier>>::proof(),
         <AddrParseError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ip_addr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<IpAddr> as Witness<CreusotVerifier>>::proof(),
+        <IpAddr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ipv4_addr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Ipv4Addr> as Witness<CreusotVerifier>>::proof(),
+        <Ipv4Addr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ipv6_addr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<Ipv6Addr> as Witness<CreusotVerifier>>::proof(),
+        <Ipv6Addr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<SocketAddr> as Witness<CreusotVerifier>>::proof(),
+        <SocketAddr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_v4_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<SocketAddrV4> as Witness<CreusotVerifier>>::proof(),
+        <SocketAddrV4 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_v6_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<SocketAddrV6> as Witness<CreusotVerifier>>::proof(),
+        <SocketAddrV6 as RustStdType>::provenance()
     );
 }
 

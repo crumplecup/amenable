@@ -90,7 +90,9 @@ use std::iter::{
 };
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
-use std::net::AddrParseError;
+use std::net::{
+    AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
+};
 use std::num::{NonZero, Saturating, Wrapping};
 use std::ops::Range;
 use std::rc::Rc;
@@ -270,6 +272,12 @@ impl_creusot_witness_trusted!(
     FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>,
     Discriminant<Option<i32>>,
     AddrParseError,
+    IpAddr,
+    Ipv4Addr,
+    Ipv6Addr,
+    SocketAddr,
+    SocketAddrV4,
+    SocketAddrV6,
     Rc<i32>,
     std::rc::Weak<i32>,
     std::string::Drain<'static>,
