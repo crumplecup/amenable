@@ -40,6 +40,7 @@ pub mod layout_carrier;
 pub mod lazy_cell_carrier;
 pub mod linked_list_carrier;
 pub mod manually_drop_carrier;
+pub mod non_zero_carrier;
 pub mod once_cell_carrier;
 pub mod option_carrier;
 pub mod ordered_pair_into_iter_carrier;

@@ -3140,6 +3140,50 @@ bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
     }
 }
 
+macro_rules! impl_non_zero_verus_witness {
+    ($($ty:ty => $harness:literal),* $(,)?) => {
+        $(
+            impl VerusWitness for RustStdStandard<std::num::NonZero<$ty>> {
+                type SupportingEvidence = Self;
+                type ProofArtifact = VerusCheckedProof;
+
+                fn proof() -> Self::ProofArtifact {
+                    VerusCheckedProof {
+                        harness: $harness,
+                        claim: include_str!("../../amenable_verus/src/rust_std/non_zero_carrier.rs"),
+                        provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                    }
+                }
+            }
+
+            bridge_verus_witness!(RustStdStandard<std::num::NonZero<$ty>>);
+
+            ::inventory::submit! {
+                ::amenable_core::ProofRecord {
+                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                    verifier: "verus",
+                    describe: || <RustStdStandard<std::num::NonZero<$ty>> as VerusWitness>::proof().to_string(),
+                }
+            }
+        )*
+    };
+}
+
+impl_non_zero_verus_witness!(
+    i8 => "verify_non_zero_i8_model_round_trips_iff_nonzero",
+    i16 => "verify_non_zero_i16_model_round_trips_iff_nonzero",
+    i32 => "verify_non_zero_i32_model_round_trips_iff_nonzero",
+    i64 => "verify_non_zero_i64_model_round_trips_iff_nonzero",
+    i128 => "verify_non_zero_i128_model_round_trips_iff_nonzero",
+    isize => "verify_non_zero_isize_model_round_trips_iff_nonzero",
+    u8 => "verify_non_zero_u8_model_round_trips_iff_nonzero",
+    u16 => "verify_non_zero_u16_model_round_trips_iff_nonzero",
+    u32 => "verify_non_zero_u32_model_round_trips_iff_nonzero",
+    u64 => "verify_non_zero_u64_model_round_trips_iff_nonzero",
+    u128 => "verify_non_zero_u128_model_round_trips_iff_nonzero",
+    usize => "verify_non_zero_usize_model_round_trips_iff_nonzero",
+);
+
 const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
 

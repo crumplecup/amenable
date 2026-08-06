@@ -1221,6 +1221,83 @@ fn fmt_debug_map_witness_is_checked_and_still_carries_chain_derived_provenance()
     );
 }
 
+macro_rules! non_zero_witness_test {
+    ($name:ident, $ty:ty, $harness:literal) => {
+        #[test]
+        fn $name() {
+            let proof =
+                <RustStdStandard<std::num::NonZero<$ty>> as Witness<VerusVerifier>>::proof();
+
+            assert_eq!(proof.harness, $harness);
+            assert_eq!(
+                proof.provenance,
+                <std::num::NonZero<$ty> as RustStdType>::provenance()
+            );
+        }
+    };
+}
+
+non_zero_witness_test!(
+    non_zero_i8_witness_is_checked_and_still_carries_chain_derived_provenance,
+    i8,
+    "verify_non_zero_i8_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_i16_witness_is_checked_and_still_carries_chain_derived_provenance,
+    i16,
+    "verify_non_zero_i16_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_i32_witness_is_checked_and_still_carries_chain_derived_provenance,
+    i32,
+    "verify_non_zero_i32_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_i64_witness_is_checked_and_still_carries_chain_derived_provenance,
+    i64,
+    "verify_non_zero_i64_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_i128_witness_is_checked_and_still_carries_chain_derived_provenance,
+    i128,
+    "verify_non_zero_i128_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_isize_witness_is_checked_and_still_carries_chain_derived_provenance,
+    isize,
+    "verify_non_zero_isize_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_u8_witness_is_checked_and_still_carries_chain_derived_provenance,
+    u8,
+    "verify_non_zero_u8_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_u16_witness_is_checked_and_still_carries_chain_derived_provenance,
+    u16,
+    "verify_non_zero_u16_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_u32_witness_is_checked_and_still_carries_chain_derived_provenance,
+    u32,
+    "verify_non_zero_u32_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_u64_witness_is_checked_and_still_carries_chain_derived_provenance,
+    u64,
+    "verify_non_zero_u64_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_u128_witness_is_checked_and_still_carries_chain_derived_provenance,
+    u128,
+    "verify_non_zero_u128_model_round_trips_iff_nonzero"
+);
+non_zero_witness_test!(
+    non_zero_usize_witness_is_checked_and_still_carries_chain_derived_provenance,
+    usize,
+    "verify_non_zero_usize_model_round_trips_iff_nonzero"
+);
+
 #[test]
 fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
