@@ -464,3 +464,59 @@ bridge_verus_witness!(RustStdStandard<core::num::IntErrorKind>);
         },
     }
 }
+
+const VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/parse_float_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::num::ParseFloatError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_parse_float_error_occurs_only_for_unparseable_input",
+            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::num::ParseFloatError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::num::ParseFloatError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/try_from_int_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::num::TryFromIntError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range",
+            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::num::TryFromIntError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

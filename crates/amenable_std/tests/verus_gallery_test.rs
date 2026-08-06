@@ -3,21 +3,21 @@
 use amenable_std::{VerusGalleryExpectation, VerusGalleryRegistration};
 
 #[test]
-fn all_five_gallery_findings_are_registered_and_distinct() {
+fn all_six_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<VerusGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        5,
-        "expected exactly the 5 findings from this session's real Verus pipeline work: {cases:#?}"
+        6,
+        "expected exactly the 6 findings from this session's real Verus pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 5, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 6, "gallery case ids must be unique");
 
     let not_supported_count = cases
         .iter()
@@ -35,6 +35,15 @@ fn all_five_gallery_findings_are_registered_and_distinct() {
     assert_eq!(
         unproved_count, 3,
         "three findings (Wrapping's + operator, Reverse's cmp, the cfg(verus) hypothesis) were accepted but failed to establish the intended claim"
+    );
+
+    let ice_count = cases
+        .iter()
+        .filter(|case| case.expected == VerusGalleryExpectation::Ice)
+        .count();
+    assert_eq!(
+        ice_count, 1,
+        "one finding (a duplicate assume_specification for a trait method vstd already specifies) crashed verus outright"
     );
 
     for case in &cases {

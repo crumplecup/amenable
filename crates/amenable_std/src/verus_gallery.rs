@@ -52,13 +52,14 @@ impl VerusGalleryDisposition {
 
 /// Expected or observed real `verus` outcome for a gallery case.
 ///
-/// Not `amenable_std::CreusotGalleryExpectation`'s translation-pipeline
-/// shape (`TranslationError`/`Ice`) — `verus` is invoked as a bare
-/// compiler over a single file tree, not a `cargo`-driven translation
-/// pass, and its own real failure modes are different: it either rejects
-/// a pattern outright as unsupported, fails an ordinary Rust name/type
-/// resolution before verification even starts, or accepts the pattern
-/// but can't discharge a resulting proof obligation.
+/// Not exactly `amenable_std::CreusotGalleryExpectation`'s
+/// translation-pipeline shape — `verus` is invoked as a bare compiler
+/// over a single file tree, not a `cargo`-driven translation pass — but
+/// it turns out to share one real failure mode with Creusot after all:
+/// `verus` itself can genuinely crash (an internal panic in its own
+/// `vir` crate, not a diagnosed error), confirmed directly, not assumed
+/// from Creusot's case (see `try_from_int_error_occurs_via_duplicate_
+/// assume_specification_ice`, below).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum VerusGalleryExpectation {
     /// Verifies cleanly: every proof obligation discharges.
@@ -75,6 +76,9 @@ pub enum VerusGalleryExpectation {
     /// name/type-resolution error (e.g. an unresolved crate), not a
     /// proof-related one.
     CompileError,
+    /// `verus` itself panics (an internal compiler error in its own
+    /// `vir`/`rustc` integration), not a diagnosed, reported error.
+    Ice,
 }
 
 impl VerusGalleryExpectation {
@@ -85,6 +89,7 @@ impl VerusGalleryExpectation {
             Self::Unproved => "unproved",
             Self::NotSupported => "not_supported",
             Self::CompileError => "compile_error",
+            Self::Ice => "ice",
         }
     }
 
@@ -95,6 +100,7 @@ impl VerusGalleryExpectation {
             "unproved" => Some(Self::Unproved),
             "not_supported" => Some(Self::NotSupported),
             "compile_error" => Some(Self::CompileError),
+            "ice" => Some(Self::Ice),
             _ => None,
         }
     }
@@ -434,6 +440,64 @@ verus! {
 // the proof itself (see option_carrier.rs/result_carrier.rs: take the
 // Option/Result as a `requires`-constrained parameter, not a literal
 // constructed inline).
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::try_from_int_error_occurs_via_duplicate_assume_specification_ice".to_owned(),
+            title: "declaring assume_specification for a trait method vstd already specifies crashes verus outright, not a diagnosed conflict".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::Ice,
+            claim: r#"
+// Attempt: axiomatize u8::try_from(i32), the same claim amenable_kani's
+// verify_try_from_int_error_occurs_exactly_when_out_of_range harness
+// checks over every possible i32.
+pub assume_specification [<u8 as std::convert::TryFrom<i32>>::try_from] (value: i32) -> (result: Result<u8, <u8 as std::convert::TryFrom<i32>>::Error>)
+    ensures
+        (0 <= value && value <= u8::MAX as i32) ==> (result is Ok && result->Ok_0 == value as u8),
+        (value < 0 || value > u8::MAX as i32) ==> result is Err,
+;
+
+// Observed under `verus --crate-type=lib` — NOT a diagnosed error:
+//   thread 'rustc' panicked at vir/src/traits.rs:511:13:
+//   assertion failed: !method_impls.contains(&p)
+// Confirmed this is a genuine internal crash, not a syntax problem: the
+// exact same panic reproduces regardless of surface form (fully
+// qualified `<u8 as TryFrom<i32>>::try_from` vs. the short `u8::try_from`
+// path, with or without an explicit `<u8 as TryFrom<i32>>::Error`
+// associated-type return — every variant that reaches signature-match
+// crashes identically).
+
+// Root cause, found by reading vstd's own source
+// (vstd/std_specs/convert.rs), not guessed: vstd ALREADY declares an
+// assume_specification for this exact trait-method instantiation, via
+// its impl_int_try_from_spec! macro (`impl_int_try_from_spec! { i32 =>
+// [u8 u16 u32 u64 u128 i8 i16 usize isize] }`), with real, matching
+// semantics (`if Self::MIN <= v <= Self::MAX { Ok(v as Self) } else {
+// Err(arbitrary()) }`, `obeys_try_from_spec()` unconditionally true for
+// this pair). A second, local assume_specification for the identical
+// (Self, T) instantiation doesn't produce a diagnosed "already declared"
+// error the way redeclaring an ordinary Rust item would — verus's
+// internal trait-impl bookkeeping (`vir::traits`) asserts the impl slot
+// is unclaimed and panics when it finds it already is.
+
+// Fix: don't declare a local assume_specification for a trait method
+// vstd already specifies at all — just call it. amenable_verus::rust_std
+// ::try_from_int_error_carrier's real, working proof relies on vstd's
+// own spec directly and states the same postcondition as its own
+// function-level ensures clause instead, with no local
+// assume_specification for try_from whatsoever.
+
+// General lesson: before writing a new assume_specification for any std
+// trait method, check vstd's own std_specs/*.rs for an existing one
+// first (as amenable_std::creusot_gallery's own findings already
+// establish for Creusot's extern_spec! equivalent) — not just to avoid
+// duplicate effort, but because here a duplicate isn't merely wasted
+// work, it crashes the toolchain.
 "#,
         },
     }
