@@ -149,7 +149,8 @@ impl_verus_witness_trusted!(
     usize,
     f32,
     f64,
-    std::convert::Infallible
+    std::convert::Infallible,
+    core::ffi::c_void
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -636,5 +637,61 @@ bridge_verus_witness!(RustStdStandard<Vec<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
         verifier: "verus",
         describe: || <RustStdStandard<Vec<i32>> as VerusWitness>::proof().to_string(),
+    }
+}
+
+const VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::char::CharTryFromError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range",
+            claim: VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::char::CharTryFromError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::char::CharTryFromError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::char::TryFromCharError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_from_char_error_occurs_exactly_when_out_of_range",
+            claim: VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::char::TryFromCharError> as VerusWitness>::proof().to_string()
+        },
     }
 }

@@ -226,3 +226,39 @@ fn vec_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     assert_eq!(proof.harness, "verify_vec_push_pop_round_trips");
     assert_eq!(proof.provenance, <Vec<i32> as RustStdType>::provenance());
 }
+
+#[test]
+fn char_try_from_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::char::CharTryFromError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::char::CharTryFromError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn try_from_char_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::char::TryFromCharError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_from_char_error_occurs_exactly_when_out_of_range"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::char::TryFromCharError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::ffi::c_void> as Witness<VerusVerifier>>::proof(),
+        <core::ffi::c_void as RustStdType>::provenance()
+    );
+}
