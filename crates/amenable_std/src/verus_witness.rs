@@ -168,7 +168,8 @@ impl_verus_witness_trusted!(
     std::cell::BorrowMutError,
     std::fmt::Error,
     std::marker::PhantomData<i32>,
-    std::marker::PhantomPinned
+    std::marker::PhantomPinned,
+    std::net::AddrParseError
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -3167,6 +3168,174 @@ macro_rules! impl_non_zero_verus_witness {
             }
         )*
     };
+}
+
+const VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::Ipv4Addr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ipv4_addr_model_octets_round_trip",
+            claim: VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::Ipv4Addr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Ipv4Addr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::Ipv4Addr> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::Ipv6Addr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ipv6_addr_model_segments_round_trip",
+            claim: VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::Ipv6Addr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Ipv6Addr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::Ipv6Addr> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::IpAddr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ip_addr_model_variant_matches_its_kind",
+            claim: VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::IpAddr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::IpAddr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::IpAddr> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::SocketAddrV4> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_socket_addr_v4_model_round_trips_ip_and_port",
+            claim: VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV4>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV4>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::SocketAddrV4> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::SocketAddrV6> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_socket_addr_v6_model_round_trips_all_fields",
+            claim: VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV6>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV6>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::SocketAddrV6> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::SocketAddr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_socket_addr_model_variant_matches_its_kind",
+            claim: VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::SocketAddr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::SocketAddr> as VerusWitness>::proof().to_string()
+        },
+    }
 }
 
 impl_non_zero_verus_witness!(

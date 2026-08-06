@@ -288,6 +288,14 @@ fn phantom_pinned_witness_is_trusted_and_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn addr_parse_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::net::AddrParseError> as Witness<VerusVerifier>>::proof(),
+        <std::net::AddrParseError as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<std::cell::BorrowError> as Witness<VerusVerifier>>::proof(),
@@ -1297,6 +1305,84 @@ non_zero_witness_test!(
     usize,
     "verify_non_zero_usize_model_round_trips_iff_nonzero"
 );
+
+#[test]
+fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::Ipv4Addr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_ipv4_addr_model_octets_round_trip");
+    assert_eq!(
+        proof.provenance,
+        <std::net::Ipv4Addr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ipv6_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::Ipv6Addr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_ipv6_addr_model_segments_round_trip");
+    assert_eq!(
+        proof.provenance,
+        <std::net::Ipv6Addr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ip_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::IpAddr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ip_addr_model_variant_matches_its_kind"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::IpAddr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_v4_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::SocketAddrV4> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_socket_addr_v4_model_round_trips_ip_and_port"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::SocketAddrV4 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_v6_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::SocketAddrV6> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_socket_addr_v6_model_round_trips_all_fields"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::SocketAddrV6 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn socket_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::SocketAddr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_socket_addr_model_variant_matches_its_kind"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::SocketAddr as RustStdType>::provenance()
+    );
+}
 
 #[test]
 fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() {
