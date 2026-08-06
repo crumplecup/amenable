@@ -1292,3 +1292,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static,
         },
     }
 }
+
+const VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/chars_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_chars_yields_characters_in_order",
+            claim: VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::str::Chars<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::str::Chars<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

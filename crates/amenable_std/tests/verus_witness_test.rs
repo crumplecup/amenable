@@ -558,3 +558,14 @@ fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
         <std::collections::vec_deque::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn chars_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Chars<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_chars_yields_characters_in_order");
+    assert_eq!(
+        proof.provenance,
+        <std::str::Chars<'static> as RustStdType>::provenance()
+    );
+}

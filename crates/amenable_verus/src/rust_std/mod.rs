@@ -12,6 +12,7 @@ pub mod box_carrier;
 pub mod btree_carrier;
 pub mod char_carrier;
 pub mod char_try_from_carrier;
+pub mod chars_carrier;
 pub mod cow_carrier;
 pub mod cstr_carrier;
 pub mod cstring_carrier;
