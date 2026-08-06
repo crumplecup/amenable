@@ -76,3 +76,17 @@ fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <std::num::Wrapping<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::num::Saturating<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_saturating_field_roundtrips_the_constructed_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::num::Saturating<i32> as RustStdType>::provenance()
+    );
+}

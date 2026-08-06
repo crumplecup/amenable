@@ -324,3 +324,31 @@ bridge_verus_witness!(RustStdStandard<std::num::Wrapping<i32>>);
         },
     }
 }
+
+const VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/saturating_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::num::Saturating<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_saturating_field_roundtrips_the_constructed_value",
+            claim: VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::num::Saturating<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::num::Saturating<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::num::Saturating<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

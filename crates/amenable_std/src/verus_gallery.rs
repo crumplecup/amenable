@@ -213,6 +213,53 @@ pub assume_specification [<Wrapping<i32> as std::ops::Add>::add] (a: Wrapping<i3
 ::inventory::submit! {
     VerusGalleryRegistration {
         case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::saturating_add_operator_blocked_by_coherence_and_missing_primitive_spec".to_owned(),
+            title: "Saturating<i32>'s `+` operator hits Wrapping's same coherence block, plus i32::saturating_add itself has no vstd spec at all".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::NotSupported,
+            claim: r#"
+// Attempt: the same claim amenable_kani's verify_saturating_add_matches_
+// the_inner_saturating_add harness checks, via the same
+// external_type_specification approach that got Wrapping<i32> as far as
+// a real "precondition not satisfied" (see
+// wrapping_add_operator_blocked_by_coherence, above).
+use std::num::Saturating;
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+pub struct ExSaturating<T>(Saturating<T>);
+
+pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) -> (result: Saturating<i32>)
+    ensures
+        result.0 == a.saturating_add(b),
+{
+    Saturating(a) + Saturating(b)
+}
+
+// Observed under `verus --crate-type=lib`: TWO independent unsupported
+// errors, not one:
+//   error: `core::num::impl&%2::saturating_add` is not supported (note:
+//   you may be able to add a Verus specification to this function with
+//   `assume_specification`)
+//     --> result.0 == a.saturating_add(b),
+//   error: [same AddSpecImpl-routed operator failure Wrapping<i32> hits]
+//     --> Saturating(a) + Saturating(b)
+// Worse than Wrapping's case in one respect: vstd gives `wrapping_add`
+// a real spec for the primitive integer types (referencing it in an
+// `ensures` clause works fine), but `saturating_add` has no vstd spec at
+// all — even stating the claim's right-hand side fails before the
+// left-hand side's operator-coherence problem is reached.
+
+// Real, narrower coverage lands instead, same shape as Wrapping:
+// Saturating(value).0 == value, the tuple constructor/field-access
+// roundtrip, via ExSaturating, without touching Add or saturating_add.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
             id: "amenable_std::verus_gallery::nonzero_new_blocked_by_sealed_zeroable_primitive".to_owned(),
             title: "NonZero::new can't be given a Verus spec: its real signature bounds on the sealed, unstable ZeroablePrimitive trait".to_owned(),
             disposition: VerusGalleryDisposition::FalseTrail,
