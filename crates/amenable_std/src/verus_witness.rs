@@ -962,3 +962,59 @@ bridge_verus_witness!(RustStdStandard<std::ffi::IntoStringError>);
         },
     }
 }
+
+const VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere",
+            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesUntilNulError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::ffi::FromBytesUntilNulError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::ffi::FromBytesWithNulError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
+            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::ffi::FromBytesWithNulError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

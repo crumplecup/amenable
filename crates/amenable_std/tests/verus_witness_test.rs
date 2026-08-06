@@ -393,3 +393,33 @@ fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenan
         <std::ffi::IntoStringError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn from_bytes_until_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::ffi::FromBytesUntilNulError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::ffi::FromBytesUntilNulError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::ffi::FromBytesWithNulError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::ffi::FromBytesWithNulError as RustStdType>::provenance()
+    );
+}
