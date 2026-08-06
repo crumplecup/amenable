@@ -3336,3 +3336,142 @@ fn stdio_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::process::Stdio as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn ancestors_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Ancestors<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ancestors_model_yields_self_then_each_parent_up_to_root"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Ancestors<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_component_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Component<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_component_model_distinguishes_root_from_normal_segments"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Component<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_components_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::path::Components<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_components_model_yields_root_then_named_segments_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Components<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Iter<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_iter_model_yields_the_named_segments");
+    assert_eq!(
+        proof.provenance,
+        <std::path::Iter<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_display_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Display<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_display_model_renders_a_valid_utf8_path_verbatim"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Display<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Path> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_path_model_derives_extension_file_name_and_parent"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Path as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn path_buf_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::PathBuf> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_path_buf_model_push_pop_and_join_build_the_expected_path"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::PathBuf as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn prefix_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::Prefix<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_prefix_model_disk_identifies_the_drive_letter"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::Prefix<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn prefix_component_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::path::PrefixComponent<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_prefix_component_model_pairs_raw_text_with_parsed_prefix"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::PrefixComponent<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn strip_prefix_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::path::StripPrefixError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_strip_prefix_error_model_reports_a_non_matching_prefix"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::path::StripPrefixError as RustStdType>::provenance()
+    );
+}
