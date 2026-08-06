@@ -1548,6 +1548,32 @@ bridge_verus_witness!(RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>);
     }
 }
 
+impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_lazy_cell_model_caches_its_initializer_result",
+            claim: VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 

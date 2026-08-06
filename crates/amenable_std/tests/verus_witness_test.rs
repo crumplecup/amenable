@@ -699,6 +699,21 @@ fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_lazy_cell_model_caches_its_initializer_result"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::LazyLock<i32, fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
 

@@ -21,6 +21,12 @@
 //! which `amenable_kani`'s harness (checking the real
 //! `LazyCell<i32, fn() -> i32>` directly) already confirms
 //! independently, for the identical claim.
+//!
+//! `std::sync::LazyLock<i32, fn() -> i32>` checks its own real Kani
+//! harness against the identical run-once-and-cache claim (only its
+//! thread-safety is different, which this model doesn't address either
+//! way), so `amenable_std::verus_witness` reuses this same carrier and
+//! harness for both types rather than duplicating the model.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
