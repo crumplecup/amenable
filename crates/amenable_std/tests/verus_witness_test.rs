@@ -459,3 +459,18 @@ fn sip_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::hash::SipHasher as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::borrow::Cow<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cow_borrowed_and_owned_agree_on_their_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::borrow::Cow<'static, i32> as RustStdType>::provenance()
+    );
+}

@@ -1094,3 +1094,31 @@ bridge_verus_witness!(RustStdStandard<std::hash::SipHasher>);
         },
     }
 }
+
+const VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cow_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::borrow::Cow<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cow_borrowed_and_owned_agree_on_their_value",
+            claim: VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::borrow::Cow<'static, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

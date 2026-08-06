@@ -11,6 +11,7 @@ pub mod arc_carrier;
 pub mod box_carrier;
 pub mod char_carrier;
 pub mod char_try_from_carrier;
+pub mod cow_carrier;
 pub mod cstr_carrier;
 pub mod cstring_carrier;
 pub mod fp_category_carrier;

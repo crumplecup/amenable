@@ -677,3 +677,61 @@ arr[0] == matching[0] && arr[1] == matching[1]  // verifies cleanly
         },
     }
 }
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::cow_deref_lifetime_elision_ambiguity".to_owned(),
+            title: "Cow<'a, B>::deref can't be axiomatized: spelling the receiver out concretely creates a lifetime ambiguity plain Rust elision can't resolve".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::CompileError,
+            claim: r#"
+// Attempt: the deref half of the claim amenable_kani's
+// verify_cow_borrowed_and_owned_agree_on_their_value harness checks --
+// Cow::Borrowed and Cow::Owned both deref to the wrapped value.
+pub assume_specification<'a, B: ToOwned + ?Sized> [<Cow<'a, B> as core::ops::Deref>::deref] (cow: &Cow<'a, B>) -> (result: &B);
+
+// Observed under `verus --crate-type=lib`:
+//   error[E0106]: missing lifetime specifier
+//   this function's return type contains a borrowed value, but the
+//   signature does not say which one of `cow`'s 2 lifetimes it is
+//   borrowed from
+// Real std::ops::Deref::deref is `fn deref(&self) -> &Self::Target` --
+// its return elides to `&self`'s own lifetime with no ambiguity,
+// because `Self` stays abstract in the trait definition. Spelling the
+// receiver out concretely as `&Cow<'a, B>` (required to name the
+// function for assume_specification at all) introduces a SECOND,
+// competing candidate lifetime -- Cow's own `'a` -- that Rust's plain
+// elision rules cannot disambiguate between.
+
+// Tried every combination of naming/eliding both lifetimes:
+//   (result: &'a B)                          -- typechecks, but then
+//     doesn't match assume_specification's required generic-binder
+//     shape (`for<'_0, B> for<'_> (&Cow<'_0, B>) -> &B`, a BARE `&B`
+//     return with no name)
+//   cow: &Cow<'_, B> ... -> &B                -- same "missing lifetime
+//     specifier" error as the fully-named version; anonymizing Cow's
+//     own lifetime with `_` doesn't remove the ambiguity, since there
+//     are still two candidate sources
+//   cow: &'b Cow<'a, B> ... -> &'b B           -- typechecks (like
+//     TryFromSliceError's phantom-lifetime fix), but produces a single
+//     combined `for<'a, 'b>` binder group, not the required TWO
+//     separate groups
+// Every variant either fails to typecheck as ordinary Rust at all, or
+// typechecks into a shape assume_specification's exact-match
+// requirement rejects. This is a different KIND of blocker than
+// TryFromSliceError's (that one was about binder ORDER once the
+// underlying signature was unambiguous; this one is a genuine
+// unresolvable ambiguity in the concrete spelling itself).
+
+// Real, narrower coverage lands instead (amenable_verus::rust_std::
+// cow_carrier's actual, live proof): the variant-construction facts
+// (Cow::Borrowed(_)/Cow::Owned(_) pattern matching needs no axiom,
+// vstd's own ExCow registration keeps Cow's variants transparent) plus
+// the full into_owned claim (no receiver reference, so no elision
+// ambiguity at all) -- covering two of the claim's three original
+// facts in full, with only the deref half left uncovered.
+"#,
+        },
+    }
+}

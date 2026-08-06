@@ -3,21 +3,21 @@
 use amenable_std::{VerusGalleryExpectation, VerusGalleryRegistration};
 
 #[test]
-fn all_nine_gallery_findings_are_registered_and_distinct() {
+fn all_ten_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<VerusGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        9,
-        "expected exactly the 9 findings from this session's real Verus pipeline work: {cases:#?}"
+        10,
+        "expected exactly the 10 findings from this session's real Verus pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 9, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 10, "gallery case ids must be unique");
 
     let not_supported_count = cases
         .iter()
@@ -53,6 +53,15 @@ fn all_nine_gallery_findings_are_registered_and_distinct() {
     assert_eq!(
         proved_count, 1,
         "one finding (TryFromSliceError's phantom-lifetime-binder + match-ergonomics lessons) was fully resolved, not just a documented dead end"
+    );
+
+    let compile_error_count = cases
+        .iter()
+        .filter(|case| case.expected == VerusGalleryExpectation::CompileError)
+        .count();
+    assert_eq!(
+        compile_error_count, 1,
+        "one finding (Cow::deref's lifetime elision ambiguity) failed as an ordinary Rust compile error, not a verus-specific one"
     );
 
     for case in &cases {
