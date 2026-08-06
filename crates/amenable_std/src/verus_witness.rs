@@ -214,3 +214,31 @@ bridge_verus_witness!(RustStdStandard<String>);
         describe: || <RustStdStandard<String> as VerusWitness>::proof().to_string(),
     }
 }
+
+const VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ordering_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cmp::Ordering> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ordering_reverse_swaps_less_and_greater",
+            claim: VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cmp::Ordering>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cmp::Ordering> as VerusWitness>::proof().to_string()
+        },
+    }
+}

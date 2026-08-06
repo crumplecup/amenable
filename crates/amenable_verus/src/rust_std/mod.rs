@@ -8,4 +8,5 @@
 //! function at a time.
 
 pub mod char_carrier;
+pub mod ordering_carrier;
 pub mod string_carrier;
