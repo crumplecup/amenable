@@ -612,3 +612,29 @@ bridge_verus_witness!(RustStdStandard<core::alloc::LayoutError>);
         },
     }
 }
+
+const VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/vec_carrier.rs");
+
+impl VerusWitness for RustStdStandard<Vec<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_vec_push_pop_round_trips",
+            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<Vec<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+        verifier: "verus",
+        describe: || <RustStdStandard<Vec<i32>> as VerusWitness>::proof().to_string(),
+    }
+}

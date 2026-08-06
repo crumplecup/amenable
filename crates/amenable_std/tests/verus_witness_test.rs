@@ -218,3 +218,11 @@ fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <core::alloc::LayoutError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn vec_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Vec<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_vec_push_pop_round_trips");
+    assert_eq!(proof.provenance, <Vec<i32> as RustStdType>::provenance());
+}
