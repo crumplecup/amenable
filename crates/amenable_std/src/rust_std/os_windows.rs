@@ -1,24 +1,41 @@
 //! `RustStdType` registrations for `std::os::windows`.
 //!
-//! `#[cfg(windows)]`-gated, mirroring how real std itself gates this
-//! module — compiles as a no-op on every other platform. Verified
-//! empirically on this machine (Windows). `RawHandle`/`RawSocket` are
-//! aliases to `isize`/`u64` respectively, already covered via
-//! `rust_std::primitives` — nothing separate to impl. `ProcThreadAttributeList`/
-//! `ProcThreadAttributeListBuilder` are deliberately not covered — unstable
+//! The real `impl_rust_std_type*!` blocks below are `#[cfg(windows)]`-gated
+//! individually, mirroring how real std itself gates this module — they
+//! need the actual `std::os::windows::*` types to exist, which is only
+//! true when compiled on Windows. Verified empirically on that platform
+//! (this crate's primary development host).
+//!
+//! The `register_rust_std_standard_evidence!` call at the bottom is
+//! deliberately NOT gated, unlike everything else here: its whole body is
+//! `stringify!($ty)` — pure token-to-text conversion, no name resolution —
+//! so it doesn't need the real types to exist to register the exact
+//! evidence string the cfg(windows) impls above produce when actually
+//! compiled on Windows (confirmed empirically: the identical macro shape
+//! compiles fine even naming a type declared nowhere in the crate).
+//! Registering it unconditionally means `evidence_link` is visible from
+//! any host's coverage checklist, not just a Windows one — the same
+//! "prove/register on Linux, reference the real type's evidence string"
+//! move `amenable_kani::os_windows_model` already makes for the witness
+//! layer, applied one layer up, to the evidence layer itself.
+//! `RawHandle`/`RawSocket` are aliases to `isize`/`u64` respectively,
+//! already covered via `rust_std::primitives` — nothing separate to impl.
+//! `ProcThreadAttributeList`/`ProcThreadAttributeListBuilder` are
+//! deliberately not covered — unstable
 //! (`windows_process_extensions_main_thread_state` or a related gate).
 
-#![cfg(windows)]
-
+#[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
+#[cfg(windows)]
 use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::rust_std::macros::{
-    impl_rust_std_type, impl_rust_std_type_lifetime0, register_rust_std_standard_evidence,
-};
+use crate::rust_std::macros::register_rust_std_standard_evidence;
+#[cfg(windows)]
+use crate::rust_std::macros::{impl_rust_std_type, impl_rust_std_type_lifetime0};
 
+#[cfg(windows)]
 impl_rust_std_type_lifetime0!(
     EncodeWide,
     "std",
@@ -27,6 +44,7 @@ impl_rust_std_type_lifetime0!(
     "The EncodeWide carrier lazily encodes an OsStr as UTF-16 code units, as Windows APIs expect."
 );
 
+#[cfg(windows)]
 impl_rust_std_type_lifetime0!(
     BorrowedHandle,
     "std",
@@ -35,6 +53,7 @@ impl_rust_std_type_lifetime0!(
     "The BorrowedHandle carrier borrows a raw Windows HANDLE without taking ownership of it."
 );
 
+#[cfg(windows)]
 impl_rust_std_type_lifetime0!(
     BorrowedSocket,
     "std",
@@ -43,6 +62,7 @@ impl_rust_std_type_lifetime0!(
     "The BorrowedSocket carrier borrows a raw Windows SOCKET without taking ownership of it."
 );
 
+#[cfg(windows)]
 impl_rust_std_type!(
     HandleOrInvalid,
     "std",
@@ -51,6 +71,7 @@ impl_rust_std_type!(
     "The HandleOrInvalid carrier owns a Windows HANDLE that may be the sentinel INVALID_HANDLE_VALUE, deferring that check to conversion time."
 );
 
+#[cfg(windows)]
 impl_rust_std_type!(
     OwnedHandle,
     "std",
@@ -59,6 +80,7 @@ impl_rust_std_type!(
     "The OwnedHandle carrier owns a raw Windows HANDLE, closing it on drop."
 );
 
+#[cfg(windows)]
 impl_rust_std_type!(
     OwnedSocket,
     "std",
