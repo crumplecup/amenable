@@ -760,6 +760,54 @@ fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
 }
 
 #[test]
+fn binary_heap_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_unordered_pair_model_yields_every_element_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::binary_heap::Drain<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn binary_heap_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::binary_heap::IntoIter<i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_unordered_pair_model_yields_every_element_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::binary_heap::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn binary_heap_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_unordered_pair_model_yields_every_element_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::binary_heap::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::collections::linked_list::Iter<'static, i32>> as Witness<
         VerusVerifier,

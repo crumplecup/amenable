@@ -1872,6 +1872,87 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IterMut<'st
     }
 }
 
+const VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/unordered_pair_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_unordered_pair_model_yields_every_element_once",
+            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_unordered_pair_model_yields_every_element_once",
+            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::IntoIter<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::binary_heap::IntoIter<i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_unordered_pair_model_yields_every_element_once",
+            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 
