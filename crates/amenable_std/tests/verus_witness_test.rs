@@ -605,6 +605,20 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn string_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::string::Drain<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::string::Drain<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn binary_heap_peek_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> as Witness<

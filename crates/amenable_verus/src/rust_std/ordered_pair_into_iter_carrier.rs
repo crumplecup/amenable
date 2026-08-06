@@ -25,6 +25,18 @@
 //! encode either way (it tracks position and value, not real borrow
 //! semantics) — so it's registered against this same carrier and
 //! harness too.
+//!
+//! `alloc::string::Drain<'static>` checks an even weaker version of the
+//! same shape in `amenable_kani`: the direct `String::drain` path times
+//! out under Kani even for a single ASCII character (see
+//! `amenable_kani::string_drain_model`'s own doc comment), so that
+//! crate's own witness is a documented *assumption* (a `Standard` with
+//! `basis = "Self"`), not a proof, that draining yields the source
+//! content in order and leaves it empty — the identical "in order, then
+//! exhausted" shape this model states, over `i32` in place of `char`
+//! matching this crate's own established representative-element
+//! convention throughout. Registered against this same carrier and
+//! harness too.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]

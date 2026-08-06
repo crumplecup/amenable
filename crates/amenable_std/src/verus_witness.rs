@@ -1817,6 +1817,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::Iter<'stati
     }
 }
 
+impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order",
+            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::string::Drain<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::string::Drain<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
 
