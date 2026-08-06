@@ -242,3 +242,57 @@ bridge_verus_witness!(RustStdStandard<std::cmp::Ordering>);
         },
     }
 }
+
+const VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/option_carrier.rs");
+
+impl VerusWitness for RustStdStandard<Option<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_option_unwrap_returns_the_wrapped_value",
+            claim: VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<Option<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        verifier: "verus",
+        describe: || <RustStdStandard<Option<i32>> as VerusWitness>::proof().to_string(),
+    }
+}
+
+const VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/result_carrier.rs");
+
+impl VerusWitness for RustStdStandard<Result<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_result_unwrap_returns_the_ok_value",
+            claim: VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<Result<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<Result<i32, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

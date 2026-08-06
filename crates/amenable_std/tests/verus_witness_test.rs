@@ -40,3 +40,25 @@ fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cmp::Ordering as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn option_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Option<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_option_unwrap_returns_the_wrapped_value"
+    );
+    assert_eq!(proof.provenance, <Option<i32> as RustStdType>::provenance());
+}
+
+#[test]
+fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Result<i32, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_result_unwrap_returns_the_ok_value");
+    assert_eq!(
+        proof.provenance,
+        <Result<i32, i32> as RustStdType>::provenance()
+    );
+}
