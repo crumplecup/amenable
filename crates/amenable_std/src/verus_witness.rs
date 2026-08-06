@@ -1574,6 +1574,59 @@ bridge_verus_witness!(RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>);
     }
 }
 
+const VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/weak_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::rc::Weak<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero",
+            claim: VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::rc::Weak<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::rc::Weak<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero",
+            claim: VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::Weak<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Weak<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::Weak<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 

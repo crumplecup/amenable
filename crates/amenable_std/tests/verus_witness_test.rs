@@ -714,6 +714,34 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn rc_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::rc::Weak<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::rc::Weak<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn sync_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::Weak<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::Weak<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
 
