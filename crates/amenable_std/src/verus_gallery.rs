@@ -557,3 +557,70 @@ pub assume_specification [Layout::new::<i32>] () -> (result: Layout)
         },
     }
 }
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::cell_hidden_state_unreachable_via_plain_assume_specification".to_owned(),
+            title: "Cell<T>'s get/set/replace/take can't be chained: assume_specification only relates one call's own inputs/outputs, never a prior call's effect".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::Unproved,
+            claim: r#"
+// Attempt: the same claim amenable_kani's verify_cell_get_set_replace_
+// take_round_trip harness checks — new stores the initial value, set
+// overwrites it, replace overwrites it and hands back the old value,
+// take does the same against T::default().
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+#[verifier::external_body]
+pub struct ExCell<T: core::marker::MetaSized>(std::cell::Cell<T>);
+
+pub assume_specification<T> [std::cell::Cell::<T>::new] (value: T) -> (result: std::cell::Cell<T>);
+pub assume_specification<T: Copy> [std::cell::Cell::<T>::get] (cell: &std::cell::Cell<T>) -> (result: T);
+pub assume_specification<T> [std::cell::Cell::<T>::set] (cell: &std::cell::Cell<T>, value: T);
+pub assume_specification<T> [std::cell::Cell::<T>::replace] (cell: &std::cell::Cell<T>, value: T) -> (result: T);
+pub assume_specification<T: Default + Default> [std::cell::Cell::<T>::take] (cell: &std::cell::Cell<T>) -> (result: T);
+
+pub fn verify_cell_round_trip(initial: i32) -> (result: i32)
+    ensures
+        result == initial,
+{
+    let cell = std::cell::Cell::new(initial);
+    cell.get()
+}
+
+// Getting the bounds to even reach the signature-match stage needed two
+// real fixes along the way, not guesses: ExCell's real bound is
+// `T: core::marker::MetaSized` (a newer nightly supertrait of `Sized`
+// this toolchain's std uses — Verus compares bound lists structurally,
+// not by trait implication, so `T: Sized` alone doesn't satisfy it even
+// though Sized: MetaSized); Cell::take's real where-clause lists
+// `T: Default` TWICE (an upstream quirk), which the proxy has to match
+// literally.
+
+// Observed under `verus --crate-type=lib`, once past both bound issues:
+//   error: postcondition not satisfied
+//     result == initial
+// Root cause: none of the assume_specification declarations above have
+// an ensures clause connecting them to each other — and none CAN,
+// because assume_specification only states a fact about ONE function's
+// own arguments and return value. Cell's whole contract is inherently
+// relational across calls (what get() returns depends on what a PRIOR
+// set()/new() call did through the SAME shared reference) — the same
+// class of "hidden state behind a shared reference" problem vstd's own
+// answer for Cell-like types (pcell::PCell) solves with an entirely
+// different API shape: explicit Tracked<PermissionToken> objects
+// threaded through every call, not std::cell::Cell's plain &self
+// methods. There is no way to retrofit that onto the REAL, unmodified
+// std::cell::Cell from outside vstd — assume_specification has no
+// mechanism for "this call's postcondition may reference a previous
+// call's effect."
+
+// Not attempted: no known workaround from a downstream crate. Would
+// need vstd itself to ship a real spec module for std::cell::Cell
+// (as it does, differently, for Cell-like PCell) before this becomes
+// provable.
+"#,
+        },
+    }
+}
