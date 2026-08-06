@@ -276,3 +276,28 @@ fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <core::any::TypeId as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn try_from_slice_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::array::TryFromSliceError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_from_slice_rejects_a_length_mismatch"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::array::TryFromSliceError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn from_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::string::FromUtf16Error> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_from_utf16_rejects_a_lone_surrogate");
+    assert_eq!(
+        proof.provenance,
+        <std::string::FromUtf16Error as RustStdType>::provenance()
+    );
+}

@@ -721,3 +721,59 @@ bridge_verus_witness!(RustStdStandard<core::any::TypeId>);
         describe: || <RustStdStandard<core::any::TypeId> as VerusWitness>::proof().to_string(),
     }
 }
+
+const VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/try_from_slice_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::array::TryFromSliceError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_from_slice_rejects_a_length_mismatch",
+            claim: VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::array::TryFromSliceError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::array::TryFromSliceError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::array::TryFromSliceError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/from_utf16_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::string::FromUtf16Error> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_utf16_rejects_a_lone_surrogate",
+            claim: VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::string::FromUtf16Error> as VerusWitness>::proof().to_string()
+        },
+    }
+}

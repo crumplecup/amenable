@@ -33,8 +33,8 @@ fn all_nine_gallery_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == VerusGalleryExpectation::Unproved)
         .count();
     assert_eq!(
-        unproved_count, 6,
-        "six findings (Wrapping's + operator, Reverse's cmp, the cfg(verus) hypothesis, Layout::new's size/align, Cell's hidden state, TryFromSliceError's postcondition) were accepted but failed to establish the intended claim"
+        unproved_count, 5,
+        "five findings (Wrapping's + operator, Reverse's cmp, the cfg(verus) hypothesis, Layout::new's size/align, Cell's hidden state) were accepted but failed to establish the intended claim"
     );
 
     let ice_count = cases
@@ -44,6 +44,15 @@ fn all_nine_gallery_findings_are_registered_and_distinct() {
     assert_eq!(
         ice_count, 1,
         "one finding (a duplicate assume_specification for a trait method vstd already specifies) crashed verus outright"
+    );
+
+    let proved_count = cases
+        .iter()
+        .filter(|case| case.expected == VerusGalleryExpectation::Proved)
+        .count();
+    assert_eq!(
+        proved_count, 1,
+        "one finding (TryFromSliceError's phantom-lifetime-binder + match-ergonomics lessons) was fully resolved, not just a documented dead end"
     );
 
     for case in &cases {
