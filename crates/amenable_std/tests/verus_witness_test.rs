@@ -504,3 +504,18 @@ fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::collections::BTreeSet<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::VecDeque<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_pushes_and_pops_from_both_ends"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::VecDeque<i32> as RustStdType>::provenance()
+    );
+}

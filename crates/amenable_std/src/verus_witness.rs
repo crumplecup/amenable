@@ -1179,3 +1179,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::BTreeSet<i32>>);
         },
     }
 }
+
+const VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/vec_deque_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::VecDeque<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_vec_deque_pushes_and_pops_from_both_ends",
+            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::VecDeque<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::VecDeque<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::VecDeque<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
