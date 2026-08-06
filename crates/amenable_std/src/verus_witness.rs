@@ -854,3 +854,31 @@ bridge_verus_witness!(RustStdStandard<std::ffi::FromVecWithNulError>);
         },
     }
 }
+
+const VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/parse_char_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::char::ParseCharError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_parse_char_error_occurs_for_empty_or_multi_character_strings",
+            claim: VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::char::ParseCharError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::ParseCharError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::char::ParseCharError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

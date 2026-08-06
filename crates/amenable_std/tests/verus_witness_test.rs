@@ -343,3 +343,17 @@ fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_pr
         <std::ffi::FromVecWithNulError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::char::ParseCharError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_parse_char_error_occurs_for_empty_or_multi_character_strings"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::char::ParseCharError as RustStdType>::provenance()
+    );
+}
