@@ -177,7 +177,12 @@ impl_verus_witness_trusted!(
     std::io::StdinLock<'static>,
     std::io::Stdout,
     std::io::StdoutLock<'static>,
-    std::process::ExitCode
+    std::process::ExitCode,
+    std::thread::AccessError,
+    std::thread::Builder,
+    std::thread::JoinHandle<i32>,
+    std::thread::Scope<'static, 'static>,
+    std::thread::ScopedJoinHandle<'static, i32>
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -6045,6 +6050,89 @@ bridge_verus_witness!(RustStdStandard<std::fs::TryLockError>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::fs::TryLockError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_LOCAL_KEY_MODEL_WITH_READS_THE_INITIALIZED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/thread_local_key_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_local_key_model_with_reads_the_initialized_value",
+            claim: VERIFY_LOCAL_KEY_MODEL_WITH_READS_THE_INITIALIZED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence:
+            "amenable_std::rust_std::RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/thread_current_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::thread::Thread> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_thread_current_model_is_stable_across_repeated_calls",
+            claim: VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::thread::Thread>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::thread::Thread>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::thread::Thread> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::thread::ThreadId> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_thread_current_model_is_stable_across_repeated_calls",
+            claim: VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::thread::ThreadId>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::thread::ThreadId>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::thread::ThreadId> as VerusWitness>::proof().to_string()
         },
     }
 }

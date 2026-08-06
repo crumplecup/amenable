@@ -3615,3 +3615,89 @@ fn fs_try_lock_error_witness_is_checked_and_still_carries_chain_derived_provenan
         <std::fs::TryLockError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn thread_access_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::thread::AccessError> as Witness<VerusVerifier>>::proof(),
+        <std::thread::AccessError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn thread_builder_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::thread::Builder> as Witness<VerusVerifier>>::proof(),
+        <std::thread::Builder as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn join_handle_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::thread::JoinHandle<i32>> as Witness<VerusVerifier>>::proof(),
+        <std::thread::JoinHandle<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn thread_scope_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::thread::Scope<'static, 'static>> as Witness<VerusVerifier>>::proof(),
+        <std::thread::Scope<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn scoped_join_handle_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::thread::ScopedJoinHandle<'static, i32>> as Witness<
+            VerusVerifier,
+        >>::proof(),
+        <std::thread::ScopedJoinHandle<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn local_key_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_local_key_model_with_reads_the_initialized_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::thread::LocalKey<std::cell::Cell<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn thread_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::thread::Thread> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_thread_current_model_is_stable_across_repeated_calls"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::thread::Thread as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn thread_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::thread::ThreadId> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_thread_current_model_is_stable_across_repeated_calls"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::thread::ThreadId as RustStdType>::provenance()
+    );
+}
