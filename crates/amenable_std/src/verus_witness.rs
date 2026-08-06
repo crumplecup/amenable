@@ -1432,3 +1432,31 @@ bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
         },
     }
 }
+
+const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ref_cell_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ref_cell_model_dynamic_borrow_rules",
+            claim: VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::RefCell<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

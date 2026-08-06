@@ -34,6 +34,7 @@ pub mod parse_char_error_carrier;
 pub mod parse_float_error_carrier;
 pub mod rc_carrier;
 pub mod result_carrier;
+pub mod ref_cell_carrier;
 pub mod reverse_carrier;
 pub mod saturating_carrier;
 pub mod sip_hasher_carrier;
