@@ -569,3 +569,15 @@ fn chars_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::str::Chars<'static> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::BinaryHeap<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_max_heap_pair_pops_the_maximum_first");
+    assert_eq!(
+        proof.provenance,
+        <std::collections::BinaryHeap<i32> as RustStdType>::provenance()
+    );
+}
