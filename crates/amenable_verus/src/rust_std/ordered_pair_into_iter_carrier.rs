@@ -1,0 +1,96 @@
+//! Verus accommodation model for the "yields two owned values in push
+//! order, then `None`" law shared by `alloc::vec::Drain`,
+//! `alloc::collections::vec_deque::IntoIter`, and
+//! `alloc::collections::linked_list::IntoIter`.
+//!
+//! Same zero-`vstd`-coverage gap the other accommodation-model carriers
+//! document. All three real types check the identical law in
+//! `amenable_kani` — push (or collect) two elements, then consume in
+//! order (`verify_vec_drain_removes_and_yields_in_order`,
+//! `verify_vec_deque_into_iter_yields_owned_values_in_order`,
+//! `verify_linked_list_into_iter_yields_owned_values_in_order`) — so
+//! `VerusOrderedPairIntoIterModel` models that one shared law once, and
+//! `amenable_std::verus_witness` registers all three real types against
+//! this single carrier and harness, the same way `weak_carrier.rs`
+//! backs both `Rc`'s and `Arc`'s `Weak`. `VerusOrderedPairIntoIterModel`
+//! isn't any of these three types and doesn't claim to be — the proof
+//! is conditional: sound if the real types refine this law, which each
+//! type's own `amenable_kani` harness (checking the real type directly)
+//! already confirms independently, for the identical claim.
+
+use verus_builtin_macros::verus;
+#[allow(unused_imports)]
+use vstd::prelude::*;
+
+verus! {
+
+/// Models the "yields two owned values in order, then `None`" law —
+/// not `Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::IntoIter`
+/// themselves.
+pub struct VerusOrderedPairIntoIterModel {
+    pub first: i32,
+    pub second: i32,
+    pub position: u8,
+}
+
+impl VerusOrderedPairIntoIterModel {
+    /// Construct the model from two values, in order, positioned
+    /// before the first.
+    pub fn from_pair(first: i32, second: i32) -> (result: Self)
+        ensures
+            result.first == first,
+            result.second == second,
+            result.position == 0,
+    {
+        Self { first, second, position: 0 }
+    }
+
+    /// Advance and yield the next value by value, or `None` once both
+    /// have been yielded.
+    pub fn advance(&mut self) -> (result: Option<i32>)
+        ensures
+            old(self).position == 0 ==> result == Some(old(self).first) && final(self).position
+                == 1,
+            old(self).position == 1 ==> result == Some(old(self).second) && final(self).position
+                == 2,
+            old(self).position >= 2 ==> result is None && final(self).position
+                == old(self).position,
+            final(self).first == old(self).first,
+            final(self).second == old(self).second,
+    {
+        let result = if self.position == 0 {
+            Some(self.first)
+        } else if self.position == 1 {
+            Some(self.second)
+        } else {
+            None
+        };
+
+        if self.position < 2 {
+            self.position += 1;
+        }
+
+        result
+    }
+}
+
+/// Two values pushed/collected in order are yielded back in the same
+/// order, then `None` once exhausted — the law the real
+/// `Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::IntoIter` are each
+/// expected to refine.
+pub fn verify_ordered_pair_into_iter_model_yields_owned_values_in_order(a: i32, b: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
+    ensures
+        result.0 == Some(a),
+        result.1 == Some(b),
+        result.2 is None,
+{
+    let mut it = VerusOrderedPairIntoIterModel::from_pair(a, b);
+
+    let first = it.advance();
+    let second = it.advance();
+    let exhausted = it.advance();
+
+    (first, second, exhausted)
+}
+
+} // verus!

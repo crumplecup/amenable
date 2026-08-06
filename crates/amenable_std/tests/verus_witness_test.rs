@@ -714,6 +714,52 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn vec_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::vec::Drain<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::vec::Drain<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::vec_deque::IntoIter<i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::vec_deque::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::linked_list::IntoIter<i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::linked_list::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::ffi::CStr> as Witness<VerusVerifier>>::proof();
 
