@@ -1791,6 +1791,87 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IntoIter<i3
     }
 }
 
+impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order",
+            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::linked_list::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::linked_list::Iter<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ordered_pair_iter_mut_model_writes_through_in_order",
+            claim: VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ordered_pair_iter_mut_model_writes_through_in_order",
+            claim: VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 

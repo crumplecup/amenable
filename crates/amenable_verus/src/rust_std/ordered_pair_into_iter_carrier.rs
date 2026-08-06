@@ -17,6 +17,14 @@
 //! is conditional: sound if the real types refine this law, which each
 //! type's own `amenable_kani` harness (checking the real type directly)
 //! already confirms independently, for the identical claim.
+//!
+//! `alloc::collections::linked_list::Iter<'static, i32>` checks the same
+//! positional order law in `amenable_kani`
+//! (`verify_linked_list_iter_yields_references_in_order`) — only by
+//! reference rather than by value, a distinction this model doesn't
+//! encode either way (it tracks position and value, not real borrow
+//! semantics) — so it's registered against this same carrier and
+//! harness too.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]

@@ -760,6 +760,55 @@ fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
 }
 
 #[test]
+fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::linked_list::Iter<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::linked_list::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_iter_mut_model_writes_through_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::vec_deque::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ordered_pair_iter_mut_model_writes_through_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::linked_list::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::ffi::CStr> as Witness<VerusVerifier>>::proof();
 

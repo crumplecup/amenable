@@ -36,6 +36,7 @@ pub mod manually_drop_carrier;
 pub mod once_cell_carrier;
 pub mod option_carrier;
 pub mod ordered_pair_into_iter_carrier;
+pub mod ordered_pair_iter_mut_carrier;
 pub mod ordering_carrier;
 pub mod parse_char_error_carrier;
 pub mod parse_float_error_carrier;
