@@ -545,3 +545,16 @@ fn vec_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
         <std::vec::IntoIter<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(proof.harness, "verify_vec_deque_iter_round_trips_via_collect");
+    assert_eq!(
+        proof.provenance,
+        <std::collections::vec_deque::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}

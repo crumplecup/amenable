@@ -1263,3 +1263,32 @@ bridge_verus_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
         },
     }
 }
+
+const VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/vec_deque_iter_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_vec_deque_iter_round_trips_via_collect",
+            claim: VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
