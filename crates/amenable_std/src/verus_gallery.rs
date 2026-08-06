@@ -135,7 +135,7 @@ inventory::collect!(VerusGalleryRegistration);
     VerusGalleryRegistration {
         case: || VerusGalleryCase {
             id: "amenable_std::verus_gallery::wrapping_add_operator_blocked_by_coherence".to_owned(),
-            title: "Wrapping<i32>'s `+` operator can't be verified from outside vstd: the generic AddSpecImpl extension trait can't be implemented for a foreign type here".to_owned(),
+            title: "Wrapping<i32>'s `+` operator can't be verified from outside vstd (coherence); real, narrower field-roundtrip coverage lands instead".to_owned(),
             disposition: VerusGalleryDisposition::FalseTrail,
             expected: VerusGalleryExpectation::Unproved,
             claim: r#"
@@ -189,13 +189,22 @@ pub assume_specification [<Wrapping<i32> as std::ops::Add>::add] (a: Wrapping<i3
 // `impl AddSpecImpl for Wrapping<i32>` (AddSpecImpl and Wrapping are both
 // foreign here), so the precondition can never be discharged this way.
 
-// Not yet attempted: vstd's own docs (external_trait_specifications.md,
-// "The obeys_* pattern in vstd") name the documented last-resort escape
-// hatch for exactly this situation — an assume_specification asserting
-// `obeys_add_spec()` (and presumably `add_spec`) directly, sidestepping
-// the need for a real AddSpecImpl at all. Exact syntax not yet confirmed
-// against the real toolchain; next step if Wrapping/Saturating coverage
-// is revisited.
+// Checked against vstd's own docs (external_trait_specifications.md,
+// "The obeys_* pattern in vstd"), which name assume_specification as the
+// escape hatch — but on `obeys_add_spec()`/`add_spec`, both SPEC-mode
+// functions. assume_specification's own reference doc (reference-assume-
+// specification.md) is explicit: it only applies to `exec`-mode
+// functions. There's no route to axiomatize a spec fn this way, and
+// AddSpecImpl (the only other route) is coherence-blocked as above — so
+// this is a real dead end, not just an unconfirmed syntax question.
+//
+// Real, narrower coverage lands instead (amenable_verus::rust_std::
+// wrapping_carrier's actual, live proof): Wrapping(value).0 == value, the
+// tuple constructor/field-access roundtrip via the same ExWrapping
+// external_type_specification, WITHOUT going through Add at all. Genuine
+// machine-checked coverage for Wrapping<i32> exists; the specific
+// operator-overload claim Kani/Creusot check remains unprovable under
+// Verus from this crate.
 "#,
         },
     }

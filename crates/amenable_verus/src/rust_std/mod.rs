@@ -12,3 +12,4 @@ pub mod option_carrier;
 pub mod ordering_carrier;
 pub mod result_carrier;
 pub mod string_carrier;
+pub mod wrapping_carrier;
