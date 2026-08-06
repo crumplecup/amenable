@@ -581,3 +581,15 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::collections::BinaryHeap<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::LinkedList<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_fifo_queue_pair_pops_in_push_order");
+    assert_eq!(
+        proof.provenance,
+        <std::collections::LinkedList<i32> as RustStdType>::provenance()
+    );
+}

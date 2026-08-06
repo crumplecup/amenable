@@ -1348,3 +1348,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::BinaryHeap<i32>>);
         },
     }
 }
+
+const VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/linked_list_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::LinkedList<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_fifo_queue_pair_pops_in_push_order",
+            claim: VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::LinkedList<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::LinkedList<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

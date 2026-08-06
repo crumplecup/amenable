@@ -24,6 +24,7 @@ pub mod hash_carrier;
 pub mod int_error_kind_carrier;
 pub mod into_string_error_carrier;
 pub mod layout_carrier;
+pub mod linked_list_carrier;
 pub mod manually_drop_carrier;
 pub mod option_carrier;
 pub mod ordering_carrier;
