@@ -31,6 +31,7 @@ pub mod int_error_kind_carrier;
 pub mod into_string_error_carrier;
 pub mod iter_generator_carrier;
 pub mod iter_sequence_carrier;
+pub mod iter_stateful_carrier;
 pub mod iter_transform_carrier;
 pub mod iter_window_carrier;
 pub mod layout_carrier;

@@ -915,6 +915,154 @@ fn iter_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn iter_cycle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cycle_model_repeats_its_sequence_forever"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Cycle<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_fuse_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_fuse_model_keeps_returning_none_once_exhausted"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Fuse<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_inspect_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_inspect_model_calls_once_per_item_without_changing_values"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Inspect<std::ops::Range<i32>, fn(&i32)> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_peekable_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(proof.harness, "verify_peekable_model_peek_does_not_consume");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Peekable<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_scan_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_scan_model_threads_state_through_its_closure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_flat_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::FlatMap<
+            std::array::IntoIter<i32, 1>,
+            std::ops::Range<i32>,
+            fn(i32) -> std::ops::Range<i32>,
+        >,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_flat_map_model_flattens_each_generated_iterator"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::FlatMap<
+            std::array::IntoIter<i32, 1>,
+            std::ops::Range<i32>,
+            fn(i32) -> std::ops::Range<i32>,
+        > as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_flatten_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_flatten_model_concatenates_the_inner_iterators"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_successors_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_successors_model_generates_from_the_previous_item"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Successors<i32, fn(&i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_fn_model_yields_until_the_closure_returns_none"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::FromFn<fn() -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
