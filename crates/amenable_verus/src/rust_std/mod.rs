@@ -10,6 +10,7 @@
 pub mod arc_carrier;
 pub mod array_into_iter_carrier;
 pub mod ascii_escape_carrier;
+pub mod atomic_ptr_carrier;
 pub mod binary_heap_carrier;
 pub mod box_carrier;
 pub mod btree_carrier;
@@ -89,6 +90,8 @@ pub mod str_pattern_terminator_carrier;
 pub mod str_utf8_chunks_carrier;
 pub mod str_whitespace_carrier;
 pub mod string_carrier;
+pub mod sync_atomic_carrier;
+pub mod sync_atomic_ordering_carrier;
 pub mod try_from_int_error_carrier;
 pub mod try_from_slice_carrier;
 pub mod try_reserve_error_carrier;

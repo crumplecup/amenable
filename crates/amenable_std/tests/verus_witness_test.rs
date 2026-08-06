@@ -3020,3 +3020,155 @@ fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::io::Take<&'static [u8]> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn atomic_bool_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicBool> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_bool_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicBool as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_i8_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicI8> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_i8_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicI8 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicI16> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_i16_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicI16 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicI32> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_i32_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicI32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_i64_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicI64> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_i64_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicI64 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_isize_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::atomic::AtomicIsize> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_isize_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicIsize as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_u8_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicU8> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_u8_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicU8 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_u16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicU16> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_u16_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicU16 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_u32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicU32> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_u32_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicU32 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_u64_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::AtomicU64> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_u64_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicU64 as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_usize_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::atomic::AtomicUsize> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_atomic_usize_model_load_store");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicUsize as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_ptr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_atomic_ptr_model_load_store_swap_and_compare_exchange"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::AtomicPtr<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn atomic_ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::atomic::Ordering> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_atomic_ordering_model_relaxed_store_is_observable"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::atomic::Ordering as RustStdType>::provenance()
+    );
+}

@@ -5030,3 +5030,151 @@ bridge_verus_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
         },
     }
 }
+
+macro_rules! impl_sync_atomic_verus_witness {
+    ($ty:ty, $harness:literal, $const_name:ident) => {
+        const $const_name: &str =
+            include_str!("../../amenable_verus/src/rust_std/sync_atomic_carrier.rs");
+
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: $harness,
+                    claim: $const_name,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicBool,
+    "verify_atomic_bool_model_load_store",
+    VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicI8,
+    "verify_atomic_i8_model_load_store",
+    VERIFY_ATOMIC_I8_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicI16,
+    "verify_atomic_i16_model_load_store",
+    VERIFY_ATOMIC_I16_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicI32,
+    "verify_atomic_i32_model_load_store",
+    VERIFY_ATOMIC_I32_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicI64,
+    "verify_atomic_i64_model_load_store",
+    VERIFY_ATOMIC_I64_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicIsize,
+    "verify_atomic_isize_model_load_store",
+    VERIFY_ATOMIC_ISIZE_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicU8,
+    "verify_atomic_u8_model_load_store",
+    VERIFY_ATOMIC_U8_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicU16,
+    "verify_atomic_u16_model_load_store",
+    VERIFY_ATOMIC_U16_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicU32,
+    "verify_atomic_u32_model_load_store",
+    VERIFY_ATOMIC_U32_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicU64,
+    "verify_atomic_u64_model_load_store",
+    VERIFY_ATOMIC_U64_MODEL_LOAD_STORE_SRC
+);
+impl_sync_atomic_verus_witness!(
+    std::sync::atomic::AtomicUsize,
+    "verify_atomic_usize_model_load_store",
+    VERIFY_ATOMIC_USIZE_MODEL_LOAD_STORE_SRC
+);
+
+const VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/atomic_ptr_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_atomic_ptr_model_load_store_swap_and_compare_exchange",
+            claim: VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::atomic::AtomicPtr<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_atomic_ordering_carrier.rs");
+
+// Bare `Ordering`, matching `amenable_std::rust_std::sync_atomic`'s own
+// registration and the Kani/Creusot witnesses' evidence strings for the
+// same type — this is `core::sync::atomic::Ordering`, not
+// `std::cmp::Ordering` (see `ordering_carrier.rs`/that type's own
+// witness above for the comparison-result enum).
+impl VerusWitness for RustStdStandard<std::sync::atomic::Ordering> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_atomic_ordering_model_relaxed_store_is_observable",
+            claim: VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::atomic::Ordering>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::atomic::Ordering> as VerusWitness>::proof().to_string()
+        },
+    }
+}
