@@ -30,6 +30,19 @@
 //! `VerusWitness` are defined *here* too, not in `amenable_verus` — they
 //! need `amenable_core::{Verifier, Evidence, ...}`, which `amenable_verus`
 //! no longer depends on.
+//!
+//! `SipHasher`'s witness block below references a deprecated item, and
+//! `#[expect(deprecated)]` attached to the individual impl/macro-
+//! invocation/`inventory::submit!` sites didn't line up with where the
+//! lint actually fires through macro expansion (confirmed: those
+//! per-site attributes reported "unused attribute" while the warning
+//! still fired elsewhere) — expecting it at the whole-module level
+//! instead, the same fix `amenable_verus::rust_std::sip_hasher_carrier`
+//! already uses for the identical reason.
+#![expect(
+    deprecated,
+    reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
+)]
 
 use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier, Witness};
 
@@ -1050,6 +1063,34 @@ bridge_verus_witness!(
                 std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
             > as VerusWitness>::proof()
             .to_string()
+        },
+    }
+}
+
+const VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sip_hasher_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::hash::SipHasher> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_sip_hasher_produces_consistent_hashes",
+            claim: VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::hash::SipHasher>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::hash::SipHasher>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::hash::SipHasher> as VerusWitness>::proof().to_string()
         },
     }
 }

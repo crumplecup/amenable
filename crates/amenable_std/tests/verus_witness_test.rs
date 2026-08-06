@@ -441,3 +441,21 @@ fn build_hasher_default_witness_is_checked_and_still_carries_chain_derived_prove
         > as RustStdType>::provenance()
     );
 }
+
+#[test]
+#[expect(
+    deprecated,
+    reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
+)]
+fn sip_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::hash::SipHasher> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_sip_hasher_produces_consistent_hashes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::hash::SipHasher as RustStdType>::provenance()
+    );
+}

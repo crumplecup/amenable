@@ -29,6 +29,7 @@ pub mod rc_carrier;
 pub mod result_carrier;
 pub mod reverse_carrier;
 pub mod saturating_carrier;
+pub mod sip_hasher_carrier;
 pub mod string_carrier;
 pub mod try_from_int_error_carrier;
 pub mod try_from_slice_carrier;
