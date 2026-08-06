@@ -166,7 +166,9 @@ impl_verus_witness_trusted!(
     core::ffi::c_void,
     std::cell::BorrowError,
     std::cell::BorrowMutError,
-    std::fmt::Error
+    std::fmt::Error,
+    std::marker::PhantomData<i32>,
+    std::marker::PhantomPinned
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -3104,6 +3106,35 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/discriminant_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::mem::Discriminant<Option<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_discriminant_model_identifies_variant_not_payload",
+            claim: VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::mem::Discriminant<Option<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::mem::Discriminant<Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
     }

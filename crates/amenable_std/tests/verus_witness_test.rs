@@ -272,6 +272,22 @@ fn fmt_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn phantom_data_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::marker::PhantomData<i32>> as Witness<VerusVerifier>>::proof(),
+        <std::marker::PhantomData<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn phantom_pinned_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::marker::PhantomPinned> as Witness<VerusVerifier>>::proof(),
+        <std::marker::PhantomPinned as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<std::cell::BorrowError> as Witness<VerusVerifier>>::proof(),
@@ -1202,6 +1218,21 @@ fn fmt_debug_map_witness_is_checked_and_still_carries_chain_derived_provenance()
     assert_eq!(
         proof.provenance,
         <std::fmt::DebugMap<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::mem::Discriminant<Option<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_discriminant_model_identifies_variant_not_payload"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::mem::Discriminant<Option<i32>> as RustStdType>::provenance()
     );
 }
 
