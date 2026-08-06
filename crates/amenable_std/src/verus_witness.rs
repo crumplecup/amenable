@@ -1460,3 +1460,31 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
         },
     }
 }
+
+const VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/once_cell_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::OnceCell<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_cell_model_initializes_exactly_once",
+            claim: VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::OnceCell<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::OnceCell<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::OnceCell<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

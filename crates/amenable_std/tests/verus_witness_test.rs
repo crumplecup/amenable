@@ -630,3 +630,17 @@ fn ref_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cell::RefCell<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn once_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cell::OnceCell<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_once_cell_model_initializes_exactly_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::cell::OnceCell<i32> as RustStdType>::provenance()
+    );
+}
