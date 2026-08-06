@@ -262,3 +262,17 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
         <core::ffi::c_void as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::any::TypeId> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_type_id_is_reflexive_and_distinguishes_distinct_types"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::any::TypeId as RustStdType>::provenance()
+    );
+}

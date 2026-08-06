@@ -695,3 +695,29 @@ bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
         },
     }
 }
+
+const VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/type_id_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::any::TypeId> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_type_id_is_reflexive_and_distinguishes_distinct_types",
+            claim: VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::any::TypeId>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::any::TypeId>",
+        verifier: "verus",
+        describe: || <RustStdStandard<core::any::TypeId> as VerusWitness>::proof().to_string(),
+    }
+}
