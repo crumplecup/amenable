@@ -352,3 +352,59 @@ bridge_verus_witness!(RustStdStandard<std::num::Saturating<i32>>);
         },
     }
 }
+
+const VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/reverse_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cmp::Reverse<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_reverse_field_roundtrips_the_constructed_value",
+            claim: VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cmp::Reverse<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Reverse<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cmp::Reverse<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/manually_drop_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::mem::ManuallyDrop<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_manually_drop_derefs_and_into_inner_round_trip",
+            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::mem::ManuallyDrop<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::mem::ManuallyDrop<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::mem::ManuallyDrop<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

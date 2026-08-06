@@ -260,6 +260,64 @@ pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) ->
 ::inventory::submit! {
     VerusGalleryRegistration {
         case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::reverse_cmp_blocked_by_coherence_through_ord_not_add".to_owned(),
+            title: "Reverse<i32>'s comparison-inversion claim hits the same coherence wall as Wrapping's +, through Ord's OrdSpecImpl instead of Add's AddSpecImpl".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::Unproved,
+            claim: r#"
+// Attempt 1: the same claim amenable_kani's verify_reverse_inverts_
+// comparison harness checks — Reverse<T>'s .cmp() swaps T's ordering.
+use std::cmp::Reverse;
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+pub struct ExReverse<T>(Reverse<T>);
+
+pub assume_specification [<Reverse<i32> as core::cmp::Ord>::cmp] (a: &Reverse<i32>, b: &Reverse<i32>) -> (result: core::cmp::Ordering)
+    ensures
+        a.0 < b.0 ==> result == core::cmp::Ordering::Greater,
+        a.0 == b.0 ==> result == core::cmp::Ordering::Equal,
+        a.0 > b.0 ==> result == core::cmp::Ordering::Less,
+;
+
+// Observed under `verus --crate-type=lib`: signature mismatch — the real
+// `cmp` is generic over T (Reverse<T>: Ord requires T: Ord), so a
+// concrete i32 instantiation is rejected outright:
+//   error: assume_specification requires function type signature to
+//   match `core::cmp::impl&%2::cmp` exactly
+//   expected: `for<T> for<'_, '_> (&Reverse<T>, &Reverse<T>) -> Ordering`
+
+// Attempt 2: match the real generic signature exactly, dropping the
+// concrete i32 ensures (a fully generic T has no comparison result to
+// state one against):
+pub assume_specification<T> [<Reverse<T> as core::cmp::Ord>::cmp] (a: &Reverse<T>, b: &Reverse<T>) -> (result: core::cmp::Ordering)
+    where
+        T: core::cmp::Ord,
+;
+
+// Observed: this compiles (past the signature-match stage this time),
+// but with no ensures clause the caller's own postcondition
+// (result.0 == Greater when a < b, etc.) is now genuinely unproved —
+// `verus` reports real "postcondition not satisfied" errors, not a
+// signature/type error. Adding an ensures clause generic over T would
+// need to reference T's OWN comparison result symbolically (e.g.
+// `result == b.0.cmp(&a.0)`), which regresses into exactly the same
+// obeys_*_spec machinery Wrapping's Add claim is blocked by (see
+// wrapping_add_operator_blocked_by_coherence, above) — Ord is under the
+// identical vstd `external_trait_extension` treatment as Add
+// (OrdSpecImpl instead of AddSpecImpl), so this is confirmed to be the
+// same root cause, not a coincidence of two unrelated blockers.
+
+// Real, narrower coverage lands instead, same shape as Wrapping/
+// Saturating: Reverse(value).0 == value, the tuple constructor/field-
+// access roundtrip, via ExReverse, without touching Ord or cmp.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
             id: "amenable_std::verus_gallery::nonzero_new_blocked_by_sealed_zeroable_primitive".to_owned(),
             title: "NonZero::new can't be given a Verus spec: its real signature bounds on the sealed, unstable ZeroablePrimitive trait".to_owned(),
             disposition: VerusGalleryDisposition::FalseTrail,

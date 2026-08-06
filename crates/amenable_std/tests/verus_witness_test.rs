@@ -90,3 +90,31 @@ fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
         <std::num::Saturating<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cmp::Reverse<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_reverse_field_roundtrips_the_constructed_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::cmp::Reverse<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::mem::ManuallyDrop<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_manually_drop_derefs_and_into_inner_round_trip"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::mem::ManuallyDrop<i32> as RustStdType>::provenance()
+    );
+}
