@@ -1,0 +1,37 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 922 8 925 23 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 919 19 919 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 920 18 920 35
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 921 18 921 37
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_AssertUnwindSafe_i32 = { f0: Int32.t }
+
+type tup2_i32_i32 = { f0'0: Int32.t; f1'0: Int32.t }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_assert_unwind_safe_derefs_transparently
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 922 8 925 23] (value: Int32.t)
+  (updated: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &wrapped <- { f0 = value } ] s1
+    | s1 = [ &first <- wrapped.f0 ] s2
+    | s2 = [ &wrapped <- { f0 = updated } ] s3
+    | s3 = [ &_ret <- { f0'0 = first; f1'0 = wrapped.f0 } ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: tup2_i32_i32 = Any.any_l ()
+  | & value: Int32.t = value
+  | & updated: Int32.t = updated
+  | & wrapped: t_AssertUnwindSafe_i32 = Any.any_l ()
+  | & first: Int32.t = Any.any_l () ])
+  [ return (result: tup2_i32_i32) ->
+  {[@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures] ([@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures #0] [%#srust_std'0] result.f0'0
+      = value)
+    /\ ([@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures #1] [%#srust_std'1] result.f1'0
+    = updated)}
+    (! return {result}) ]

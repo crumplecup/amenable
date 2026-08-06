@@ -325,8 +325,14 @@ fn incoming_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Incoming<'static>>").expect("Incoming<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Incoming<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_incoming_yields_an_already_queued_connection"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/net/struct.Incoming.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_incoming_yields_an_already_queued_connection")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/net/struct.Incoming.html")
+    );
 }
 
 #[test]
@@ -336,8 +342,14 @@ fn tcp_listener_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<TcpListener>").expect("TcpListener's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<TcpListener>");
-    assert!(proof_description(&report, "kani").contains("verify_tcp_listener_accepts_a_connecting_stream"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/net/struct.TcpListener.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_tcp_listener_accepts_a_connecting_stream")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/net/struct.TcpListener.html")
+    );
 }
 
 #[test]
@@ -347,8 +359,14 @@ fn tcp_stream_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<TcpStream>").expect("TcpStream's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<TcpStream>");
-    assert!(proof_description(&report, "kani").contains("verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/net/struct.TcpStream.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/net/struct.TcpStream.html")
+    );
 }
 
 #[test]
@@ -358,8 +376,14 @@ fn udp_socket_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<UdpSocket>").expect("UdpSocket's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<UdpSocket>");
-    assert!(proof_description(&report, "kani").contains("verify_udp_socket_send_to_recv_from_round_trips_a_datagram"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/net/struct.UdpSocket.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_udp_socket_send_to_recv_from_round_trips_a_datagram")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/net/struct.UdpSocket.html")
+    );
 }
 
 #[test]
@@ -369,8 +393,14 @@ fn child_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Child>").expect("Child's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Child>");
-    assert!(proof_description(&report, "kani").contains("verify_child_has_a_process_id_and_can_be_waited_on"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.Child.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_child_has_a_process_id_and_can_be_waited_on")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.Child.html")
+    );
 }
 
 #[test]
@@ -380,8 +410,14 @@ fn child_stderr_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<ChildStderr>").expect("ChildStderr's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ChildStderr>");
-    assert!(proof_description(&report, "kani").contains("verify_child_stderr_captures_what_the_child_wrote_to_stderr"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.ChildStderr.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_child_stderr_captures_what_the_child_wrote_to_stderr")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.ChildStderr.html")
+    );
 }
 
 #[test]
@@ -391,8 +427,14 @@ fn child_stdin_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<ChildStdin>").expect("ChildStdin's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ChildStdin>");
-    assert!(proof_description(&report, "kani").contains("verify_child_stdin_is_readable_by_the_child_process"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.ChildStdin.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_child_stdin_is_readable_by_the_child_process")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.ChildStdin.html")
+    );
 }
 
 #[test]
@@ -402,8 +444,14 @@ fn child_stdout_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<ChildStdout>").expect("ChildStdout's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ChildStdout>");
-    assert!(proof_description(&report, "kani").contains("verify_child_stdout_captures_what_the_child_wrote_to_stdout"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.ChildStdout.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_child_stdout_captures_what_the_child_wrote_to_stdout")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.ChildStdout.html")
+    );
 }
 
 #[test]
@@ -413,8 +461,14 @@ fn command_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Command>").expect("Command's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Command>");
-    assert!(proof_description(&report, "kani").contains("verify_command_env_override_is_visible_to_the_spawned_process"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.Command.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_command_env_override_is_visible_to_the_spawned_process")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.Command.html")
+    );
 }
 
 #[test]
@@ -424,8 +478,14 @@ fn command_args_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<CommandArgs<'static>>").expect("CommandArgs<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<CommandArgs<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_command_args_reports_the_configured_arguments"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.CommandArgs.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_command_args_reports_the_configured_arguments")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.CommandArgs.html")
+    );
 }
 
 #[test]
@@ -435,8 +495,14 @@ fn command_envs_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<CommandEnvs<'static>>").expect("CommandEnvs<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<CommandEnvs<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_command_envs_reports_the_configured_overrides"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.CommandEnvs.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_command_envs_reports_the_configured_overrides")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.CommandEnvs.html")
+    );
 }
 
 #[test]
@@ -446,8 +512,14 @@ fn exit_code_proof_chain_reports_the_trusted_kani_and_creusot_provenance() {
     let report = amenable::proof_chain("RustStdStandard<ExitCode>").expect("ExitCode's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ExitCode>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/process/struct.ExitCode.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.ExitCode.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/process/struct.ExitCode.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.ExitCode.html")
+    );
 }
 
 #[test]
@@ -457,8 +529,14 @@ fn exit_status_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<ExitStatus>").expect("ExitStatus's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ExitStatus>");
-    assert!(proof_description(&report, "kani").contains("verify_exit_status_reports_a_nonzero_exit_code"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.ExitStatus.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_exit_status_reports_a_nonzero_exit_code")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.ExitStatus.html")
+    );
 }
 
 #[test]
@@ -468,8 +546,14 @@ fn output_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Output>").expect("Output's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Output>");
-    assert!(proof_description(&report, "kani").contains("verify_output_captures_stdout_and_the_exit_status"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.Output.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_output_captures_stdout_and_the_exit_status")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.Output.html")
+    );
 }
 
 #[test]
@@ -479,8 +563,14 @@ fn stdio_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Stdio>").expect("Stdio's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Stdio>");
-    assert!(proof_description(&report, "kani").contains("verify_stdio_null_discards_the_childs_output_handle"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/process/struct.Stdio.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_stdio_null_discards_the_childs_output_handle")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/process/struct.Stdio.html")
+    );
 }
 
 #[test]
@@ -490,8 +580,14 @@ fn ancestors_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Ancestors<'static>>").expect("Ancestors<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Ancestors<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_ancestors_yields_self_then_each_parent_up_to_root"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.Ancestors.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_ancestors_yields_self_then_each_parent_up_to_root")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.Ancestors.html")
+    );
 }
 
 #[test]
@@ -501,8 +597,14 @@ fn component_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Component<'static>>").expect("Component<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Component<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_component_distinguishes_root_from_normal_segments"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/enum.Component.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_component_distinguishes_root_from_normal_segments")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/enum.Component.html")
+    );
 }
 
 #[test]
@@ -512,8 +614,14 @@ fn components_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Components<'static>>").expect("Components<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Components<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_components_yields_root_then_named_segments_in_order"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.Components.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_components_yields_root_then_named_segments_in_order")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.Components.html")
+    );
 }
 
 #[test]
@@ -523,8 +631,14 @@ fn path_display_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::path::Display<'static>>").expect("std::path::Display<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::path::Display<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_display_renders_a_valid_utf8_path_verbatim"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.Display.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_display_renders_a_valid_utf8_path_verbatim")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.Display.html")
+    );
 }
 
 #[test]
@@ -535,7 +649,10 @@ fn path_iter_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::path::Iter<'static>>");
     assert!(proof_description(&report, "kani").contains("verify_iter_yields_the_named_segments"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.Iter.html"));
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.Iter.html")
+    );
 }
 
 #[test]
@@ -545,8 +662,14 @@ fn path_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Path>").expect("Path's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Path>");
-    assert!(proof_description(&report, "kani").contains("verify_path_derives_extension_file_name_and_parent"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.Path.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_path_derives_extension_file_name_and_parent")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.Path.html")
+    );
 }
 
 #[test]
@@ -556,8 +679,14 @@ fn path_buf_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<PathBuf>").expect("PathBuf's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<PathBuf>");
-    assert!(proof_description(&report, "kani").contains("verify_path_buf_push_pop_and_join_build_the_expected_path"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.PathBuf.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_path_buf_push_pop_and_join_build_the_expected_path")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.PathBuf.html")
+    );
 }
 
 #[test]
@@ -567,8 +696,14 @@ fn prefix_static_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Prefix<'static>>").expect("Prefix<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Prefix<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_prefix_disk_identifies_the_drive_letter"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/enum.Prefix.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_prefix_disk_identifies_the_drive_letter")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/enum.Prefix.html")
+    );
 }
 
 #[test]
@@ -578,8 +713,14 @@ fn prefix_component_static_proof_chain_reports_the_kani_and_creusot_harnesses() 
     let report = amenable::proof_chain("RustStdStandard<PrefixComponent<'static>>").expect("PrefixComponent<'static>'s evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<PrefixComponent<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_prefix_component_pairs_raw_text_with_parsed_prefix"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.PrefixComponent.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_prefix_component_pairs_raw_text_with_parsed_prefix")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.PrefixComponent.html")
+    );
 }
 
 #[test]
@@ -589,8 +730,14 @@ fn strip_prefix_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<StripPrefixError>").expect("StripPrefixError's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<StripPrefixError>");
-    assert!(proof_description(&report, "kani").contains("verify_strip_prefix_error_reports_a_non_matching_prefix"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/path/struct.StripPrefixError.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_strip_prefix_error_reports_a_non_matching_prefix")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/path/struct.StripPrefixError.html")
+    );
 }
 
 #[test]
@@ -600,8 +747,14 @@ fn instant_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Instant>").expect("Instant's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Instant>");
-    assert!(proof_description(&report, "kani").contains("verify_instant_is_monotonically_nondecreasing"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/time/struct.Instant.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_instant_is_monotonically_nondecreasing")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/time/struct.Instant.html")
+    );
 }
 
 #[test]
@@ -611,8 +764,14 @@ fn system_time_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<SystemTime>").expect("SystemTime's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<SystemTime>");
-    assert!(proof_description(&report, "kani").contains("verify_system_time_duration_since_computes_the_elapsed_span"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/time/struct.SystemTime.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_system_time_duration_since_computes_the_elapsed_span")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/time/struct.SystemTime.html")
+    );
 }
 
 #[test]
@@ -622,8 +781,14 @@ fn system_time_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<SystemTimeError>").expect("SystemTimeError's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<SystemTimeError>");
-    assert!(proof_description(&report, "kani").contains("verify_system_time_error_recovers_how_far_backward_it_went"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/time/struct.SystemTimeError.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_system_time_error_recovers_how_far_backward_it_went")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/time/struct.SystemTimeError.html")
+    );
 }
 
 #[test]
@@ -634,50 +799,92 @@ fn panic_and_sync_lock_proof_chains_report_the_kani_and_creusot_harnesses() {
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<PanicHookInfo<'static>>").expect("PanicHookInfo<'static>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<PanicHookInfo<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_panic_hook_info_reports_the_panics_own_message"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/panic/struct.PanicHookInfo.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_panic_hook_info_reports_the_panics_own_message")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/panic/struct.PanicHookInfo.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<Barrier>").expect("Barrier's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Barrier>");
     assert!(proof_description(&report, "kani").contains("verify_barrier_of_one_is_its_own_leader"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.Barrier.html"));
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.Barrier.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<BarrierWaitResult>").expect("BarrierWaitResult's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<BarrierWaitResult>");
-    assert!(proof_description(&report, "kani").contains("verify_barrier_wait_result_reports_the_sole_participant_as_leader"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.BarrierWaitResult.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_barrier_wait_result_reports_the_sole_participant_as_leader")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.BarrierWaitResult.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<LazyLock<i32, fn() -> i32>>").expect("LazyLock<i32, fn() -> i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<LazyLock<i32, fn() -> i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_lazy_lock_caches_its_initializer_result"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.LazyLock.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_lazy_lock_caches_its_initializer_result")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.LazyLock.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<std::sync::Once>").expect("std::sync::Once's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::sync::Once>");
-    assert!(proof_description(&report, "kani").contains("verify_once_runs_its_closure_exactly_once"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.Once.html"));
+    assert!(
+        proof_description(&report, "kani").contains("verify_once_runs_its_closure_exactly_once")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.Once.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<OnceLock<i32>>").expect("OnceLock<i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<OnceLock<i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_once_lock_initializes_exactly_once"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.OnceLock.html"));
+    assert!(
+        proof_description(&report, "kani").contains("verify_once_lock_initializes_exactly_once")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.OnceLock.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<OnceState>").expect("OnceState's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<OnceState>");
-    assert!(proof_description(&report, "kani").contains("verify_once_state_reports_not_poisoned_on_a_clean_run"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.OnceState.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_once_state_reports_not_poisoned_on_a_clean_run")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.OnceState.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<WaitTimeoutResult>").expect("WaitTimeoutResult's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<WaitTimeoutResult>");
-    assert!(proof_description(&report, "kani").contains("verify_wait_timeout_result_reports_timed_out"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/struct.WaitTimeoutResult.html"));
+    assert!(
+        proof_description(&report, "kani").contains("verify_wait_timeout_result_reports_timed_out")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/struct.WaitTimeoutResult.html")
+    );
 }
 
 #[test]
@@ -687,33 +894,68 @@ fn sync_mpsc_proof_chains_report_the_kani_and_creusot_harnesses() {
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<std::sync::mpsc::Iter<'static, i32>>").expect("std::sync::mpsc::Iter<'static, i32>'s evidence link is registered");
-    assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::sync::mpsc::Iter<'static, i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_iter_yields_sent_values_then_stops"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Iter.html"));
+    assert_root_has_kani_and_creusot(
+        &report,
+        "RustStdStandard<std::sync::mpsc::Iter<'static, i32>>",
+    );
+    assert!(
+        proof_description(&report, "kani").contains("verify_iter_yields_sent_values_then_stops")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Iter.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<std::sync::mpsc::Receiver<i32>>").expect("std::sync::mpsc::Receiver<i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::sync::mpsc::Receiver<i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_receiver_fails_once_every_sender_is_dropped"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_receiver_fails_once_every_sender_is_dropped")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<std::sync::mpsc::Sender<i32>>").expect("std::sync::mpsc::Sender<i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::sync::mpsc::Sender<i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_sender_delivers_to_the_paired_receiver"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_sender_delivers_to_the_paired_receiver")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<SyncSender<i32>>").expect("SyncSender<i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<SyncSender<i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_sync_sender_delivers_to_the_paired_receiver"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/mpsc/struct.SyncSender.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_sync_sender_delivers_to_the_paired_receiver")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/mpsc/struct.SyncSender.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>").expect("std::sync::mpsc::TryIter<'static, i32>'s evidence link is registered");
-    assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>");
-    assert!(proof_description(&report, "kani").contains("verify_try_iter_does_not_block_on_an_empty_open_channel"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/sync/mpsc/struct.TryIter.html"));
+    assert_root_has_kani_and_creusot(
+        &report,
+        "RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
+    );
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_try_iter_does_not_block_on_an_empty_open_channel")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/sync/mpsc/struct.TryIter.html")
+    );
 }
 
 #[test]
@@ -724,50 +966,98 @@ fn thread_proof_chains_report_the_kani_and_creusot_harnesses() {
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<AccessError>").expect("AccessError's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<AccessError>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/thread/struct.AccessError.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.AccessError.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/thread/struct.AccessError.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.AccessError.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<Builder>").expect("Builder's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Builder>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/thread/struct.Builder.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.Builder.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/thread/struct.Builder.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.Builder.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<JoinHandle<i32>>").expect("JoinHandle<i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<JoinHandle<i32>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/thread/struct.JoinHandle.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.JoinHandle.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/thread/struct.JoinHandle.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.JoinHandle.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<LocalKey<std::cell::Cell<i32>>>").expect("LocalKey<std::cell::Cell<i32>>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<LocalKey<std::cell::Cell<i32>>>");
-    assert!(proof_description(&report, "kani").contains("verify_local_key_with_reads_the_initialized_value"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.LocalKey.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_local_key_with_reads_the_initialized_value")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.LocalKey.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<Scope<'static, 'static>>").expect("Scope<'static, 'static>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Scope<'static, 'static>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/thread/struct.Scope.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.Scope.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/thread/struct.Scope.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.Scope.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<ScopedJoinHandle<'static, i32>>").expect("ScopedJoinHandle<'static, i32>'s evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ScopedJoinHandle<'static, i32>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/thread/struct.ScopedJoinHandle.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.ScopedJoinHandle.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/thread/struct.ScopedJoinHandle.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.ScopedJoinHandle.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<Thread>").expect("Thread's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Thread>");
-    assert!(proof_description(&report, "kani").contains("verify_thread_current_is_stable_across_repeated_calls"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.Thread.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_thread_current_is_stable_across_repeated_calls")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.Thread.html")
+    );
 
     #[rustfmt::skip]
     let report = amenable::proof_chain("RustStdStandard<ThreadId>").expect("ThreadId's evidence link is registered");
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ThreadId>");
-    assert!(proof_description(&report, "kani").contains("verify_thread_id_is_stable_across_repeated_calls"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/thread/struct.ThreadId.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_thread_id_is_stable_across_repeated_calls")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/thread/struct.ThreadId.html")
+    );
 }
 
 #[test]
@@ -4656,7 +4946,10 @@ fn permissions_proof_chain_reports_the_kani_and_creusot_harnesses() {
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .expect("kani proof registered for Permissions");
-    assert!(kani_description.contains("verify_permissions_readonly_round_trips_through_set_permissions"));
+    assert!(
+        kani_description
+            .contains("verify_permissions_readonly_round_trips_through_set_permissions")
+    );
 
     let (_, creusot_description) = report
         .root
@@ -4792,7 +5085,10 @@ fn os_str_display_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::ffi::os_str::Display<'static>>").expect("std::ffi::os_str::Display<'static>'s evidence link is registered");
 
     let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<std::ffi::os_str::Display<'static>>"));
+    assert!(
+        root.evidence
+            .ends_with("RustStdStandard<std::ffi::os_str::Display<'static>>")
+    );
     assert!(root.is_root());
     assert_eq!(root.proofs.len(), 2);
     assert_eq!(report.verifiers.len(), 2);
@@ -7189,8 +7485,13 @@ fn buf_reader_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<BufReader<&'static [u8]>>").expect("BufReader's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<BufReader<&'static [u8]>>");
-    assert!(proof_description(&report, "kani").contains("verify_buf_reader_reads_the_underlying_bytes"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.BufReader.html"));
+    assert!(
+        proof_description(&report, "kani").contains("verify_buf_reader_reads_the_underlying_bytes")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.BufReader.html")
+    );
 }
 
 #[test]
@@ -7200,8 +7501,14 @@ fn buf_writer_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<BufWriter<Vec<u8>>>").expect("BufWriter's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<BufWriter<Vec<u8>>>");
-    assert!(proof_description(&report, "kani").contains("verify_buf_writer_flushes_to_the_underlying_writer"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.BufWriter.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_buf_writer_flushes_to_the_underlying_writer")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.BufWriter.html")
+    );
 }
 
 #[test]
@@ -7212,7 +7519,10 @@ fn io_bytes_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Bytes<&'static [u8]>>");
     assert!(proof_description(&report, "kani").contains("verify_bytes_yields_one_byte_at_a_time"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Bytes.html"));
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Bytes.html")
+    );
 }
 
 #[test]
@@ -7225,8 +7535,14 @@ fn io_chain_proof_chain_reports_the_kani_and_creusot_harnesses() {
         &report,
         "RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
     );
-    assert!(proof_description(&report, "kani").contains("verify_chain_reads_the_first_source_then_the_second"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Chain.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_chain_reads_the_first_source_then_the_second")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Chain.html")
+    );
 }
 
 #[test]
@@ -7236,8 +7552,14 @@ fn cursor_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Cursor<&'static [u8]>>").expect("Cursor's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Cursor<&'static [u8]>>");
-    assert!(proof_description(&report, "kani").contains("verify_cursor_read_advances_position_and_seek_repositions_it"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Cursor.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_cursor_read_advances_position_and_seek_repositions_it")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Cursor.html")
+    );
 }
 
 #[test]
@@ -7248,7 +7570,10 @@ fn io_empty_proof_chain_reports_the_kani_and_creusot_harnesses() {
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Empty>");
     assert!(proof_description(&report, "kani").contains("verify_empty_read_reports_end_of_file"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Empty.html"));
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Empty.html")
+    );
 }
 
 #[test]
@@ -7258,8 +7583,14 @@ fn io_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Error>").expect("io::Error's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Error>");
-    assert!(proof_description(&report, "kani").contains("verify_error_from_error_kind_preserves_the_kind"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Error.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_error_from_error_kind_preserves_the_kind")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Error.html")
+    );
 }
 
 #[test]
@@ -7272,8 +7603,14 @@ fn into_inner_error_proof_chain_reports_the_kani_and_creusot_harnesses() {
         &report,
         "RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>",
     );
-    assert!(proof_description(&report, "kani").contains("verify_into_inner_error_recovers_the_writer_and_the_flush_error"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.IntoInnerError.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_into_inner_error_recovers_the_writer_and_the_flush_error")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.IntoInnerError.html")
+    );
 }
 
 #[test]
@@ -7283,8 +7620,13 @@ fn io_slice_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<IoSlice<'static>>").expect("IoSlice's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<IoSlice<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_io_slice_derefs_to_the_wrapped_bytes"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.IoSlice.html"));
+    assert!(
+        proof_description(&report, "kani").contains("verify_io_slice_derefs_to_the_wrapped_bytes")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.IoSlice.html")
+    );
 }
 
 #[test]
@@ -7294,8 +7636,14 @@ fn io_slice_mut_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<IoSliceMut<'static>>").expect("IoSliceMut's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<IoSliceMut<'static>>");
-    assert!(proof_description(&report, "kani").contains("verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.IoSliceMut.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.IoSliceMut.html")
+    );
 }
 
 #[test]
@@ -7305,8 +7653,14 @@ fn line_writer_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<LineWriter<Vec<u8>>>").expect("LineWriter's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<LineWriter<Vec<u8>>>");
-    assert!(proof_description(&report, "kani").contains("verify_line_writer_flushes_on_a_newline_but_not_before_one"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.LineWriter.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_line_writer_flushes_on_a_newline_but_not_before_one")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.LineWriter.html")
+    );
 }
 
 #[test]
@@ -7316,8 +7670,14 @@ fn io_lines_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Lines<&'static [u8]>>").expect("io::Lines' evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Lines<&'static [u8]>>");
-    assert!(proof_description(&report, "kani").contains("verify_lines_splits_on_newlines_and_drops_the_terminator"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Lines.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_lines_splits_on_newlines_and_drops_the_terminator")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Lines.html")
+    );
 }
 
 #[test]
@@ -7327,8 +7687,14 @@ fn pipe_reader_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<PipeReader>").expect("PipeReader's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<PipeReader>");
-    assert!(proof_description(&report, "kani").contains("verify_pipe_reader_reads_what_the_paired_writer_wrote"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.PipeReader.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_pipe_reader_reads_what_the_paired_writer_wrote")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.PipeReader.html")
+    );
 }
 
 #[test]
@@ -7338,8 +7704,14 @@ fn pipe_writer_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<PipeWriter>").expect("PipeWriter's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<PipeWriter>");
-    assert!(proof_description(&report, "kani").contains("verify_pipe_writer_writes_arrive_at_the_paired_reader"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.PipeWriter.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_pipe_writer_writes_arrive_at_the_paired_reader")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.PipeWriter.html")
+    );
 }
 
 #[test]
@@ -7349,8 +7721,14 @@ fn io_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Repeat>").expect("io::Repeat's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Repeat>");
-    assert!(proof_description(&report, "kani").contains("verify_repeat_fills_the_buffer_with_the_given_byte"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Repeat.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_repeat_fills_the_buffer_with_the_given_byte")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Repeat.html")
+    );
 }
 
 #[test]
@@ -7360,8 +7738,14 @@ fn sink_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Sink>").expect("Sink's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Sink>");
-    assert!(proof_description(&report, "kani").contains("verify_sink_write_reports_full_length_and_discards_content"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Sink.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_sink_write_reports_full_length_and_discards_content")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Sink.html")
+    );
 }
 
 #[test]
@@ -7371,8 +7755,14 @@ fn io_split_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Split<&'static [u8]>>").expect("io::Split's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Split<&'static [u8]>>");
-    assert!(proof_description(&report, "kani").contains("verify_split_segments_on_the_given_byte_and_drops_it"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Split.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_split_segments_on_the_given_byte_and_drops_it")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Split.html")
+    );
 }
 
 #[test]
@@ -7382,8 +7772,14 @@ fn stderr_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Stderr>").expect("Stderr's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Stderr>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.Stderr.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Stderr.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stderr.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stderr.html")
+    );
 }
 
 #[test]
@@ -7393,8 +7789,14 @@ fn stderr_lock_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<StderrLock<'static>>").expect("StderrLock's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<StderrLock<'static>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.StderrLock.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.StderrLock.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.StderrLock.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.StderrLock.html")
+    );
 }
 
 #[test]
@@ -7404,8 +7806,14 @@ fn stdin_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Stdin>").expect("Stdin's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Stdin>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.Stdin.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Stdin.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stdin.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stdin.html")
+    );
 }
 
 #[test]
@@ -7415,8 +7823,14 @@ fn stdin_lock_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<StdinLock<'static>>").expect("StdinLock's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<StdinLock<'static>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.StdinLock.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.StdinLock.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.StdinLock.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.StdinLock.html")
+    );
 }
 
 #[test]
@@ -7426,8 +7840,14 @@ fn stdout_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<Stdout>").expect("Stdout's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Stdout>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.Stdout.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Stdout.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stdout.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Stdout.html")
+    );
 }
 
 #[test]
@@ -7437,8 +7857,14 @@ fn stdout_lock_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<StdoutLock<'static>>").expect("StdoutLock's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<StdoutLock<'static>>");
-    assert!(proof_description(&report, "kani").contains("https://doc.rust-lang.org/std/io/struct.StdoutLock.html"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.StdoutLock.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("https://doc.rust-lang.org/std/io/struct.StdoutLock.html")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.StdoutLock.html")
+    );
 }
 
 #[test]
@@ -7448,8 +7874,14 @@ fn take_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<std::io::Take<&'static [u8]>>").expect("io::Take's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::io::Take<&'static [u8]>>");
-    assert!(proof_description(&report, "kani").contains("verify_take_caps_reads_at_the_remaining_limit"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.Take.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_take_caps_reads_at_the_remaining_limit")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.Take.html")
+    );
 }
 
 #[test]
@@ -7459,6 +7891,12 @@ fn writer_panicked_proof_chain_reports_the_kani_and_creusot_harnesses() {
     let report = amenable::proof_chain("RustStdStandard<WriterPanicked>").expect("WriterPanicked's evidence link is registered");
 
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<WriterPanicked>");
-    assert!(proof_description(&report, "kani").contains("verify_writer_panicked_recovers_the_buffered_data"));
-    assert!(proof_description(&report, "creusot").contains("https://doc.rust-lang.org/std/io/struct.WriterPanicked.html"));
+    assert!(
+        proof_description(&report, "kani")
+            .contains("verify_writer_panicked_recovers_the_buffered_data")
+    );
+    assert!(
+        proof_description(&report, "creusot")
+            .contains("https://doc.rust-lang.org/std/io/struct.WriterPanicked.html")
+    );
 }

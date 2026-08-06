@@ -9,9 +9,9 @@
 //! that screening, not a bug in the exclusion itself.
 
 use std::io::{
-    BufReader, BufWriter, Bytes, Chain, Cursor, Empty, IntoInnerError, IoSlice, IoSliceMut,
-    LineWriter, Lines, PipeReader, PipeWriter, Repeat, SeekFrom, Sink, Split, Stderr, StderrLock,
-    Stdin, StdinLock, Stdout, StdoutLock, Take, Write, WriterPanicked,
+    BufReader, BufWriter, Bytes, Chain, Cursor, IntoInnerError, IoSlice, IoSliceMut, LineWriter,
+    Lines, PipeReader, PipeWriter, SeekFrom, Split, Stderr, StderrLock, Stdin, StdinLock, Stdout,
+    StdoutLock, Take, Write, WriterPanicked,
 };
 
 use crate::rust_std::macros::{
@@ -96,7 +96,7 @@ impl_rust_std_type_generic1!(
 );
 
 impl_rust_std_type!(
-    Empty,
+    std::io::Empty,
     "std",
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.Empty.html",
@@ -144,7 +144,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    Repeat,
+    std::io::Repeat,
     "std",
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.Repeat.html",
@@ -160,7 +160,7 @@ impl_rust_std_type!(
 );
 
 impl_rust_std_type!(
-    Sink,
+    std::io::Sink,
     "std",
     "std::io",
     "https://doc.rust-lang.org/std/io/struct.Sink.html",
@@ -255,7 +255,7 @@ register_rust_std_standard_evidence!(
     std::io::Bytes<&'static [u8]>,
     std::io::Chain<&'static [u8], &'static [u8]>,
     Cursor<&'static [u8]>,
-    Empty,
+    std::io::Empty,
     std::io::Error,
     IntoInnerError<BufWriter<Vec<u8>>>,
     IoSlice<'static>,
@@ -264,9 +264,9 @@ register_rust_std_standard_evidence!(
     std::io::Lines<&'static [u8]>,
     PipeReader,
     PipeWriter,
-    Repeat,
+    std::io::Repeat,
     SeekFrom,
-    Sink,
+    std::io::Sink,
     std::io::Split<&'static [u8]>,
     Stderr,
     StderrLock<'static>,

@@ -15,7 +15,7 @@ categories = ["development-tools"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
-creusot-std = "0.11.0"
+creusot-std = { version = "0.11.0", features = ["sc-drf"] }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(creusot)"] }

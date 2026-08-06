@@ -890,3 +890,554 @@ fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
         },
     }
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::atomic_sc_empty_callbacks_leave_the_store_load_relation_unproved".to_owned(),
+            title: "atomic_sc callbacks must shoot the committer permission; empty callbacks translate but leave the store/load relation unproved".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::Unproved,
+            claim: r#"
+// Failing form (attempted first while adding direct Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<AtomicBool> and the rest of
+// core::sync::atomic):
+#[ensures(result.0 == initial)]
+#[ensures(result.1 == next)]
+fn verify_atomic_bool_load_store(initial: bool, next: bool) -> (bool, bool) {
+    let (atomic, _own) = CreusotAtomicBool::new(initial);
+    let observed_initial =
+        atomic.load(ghost!(|_: &Committer<CreusotAtomicBool, bool, AtomicSeqCst, AtomicNone>| ()));
+    atomic.store(
+        next,
+        ghost!(|_: &mut Committer<CreusotAtomicBool, bool, AtomicNone, AtomicSeqCst>| ()),
+    );
+    let observed_next =
+        atomic.load(ghost!(|_: &Committer<CreusotAtomicBool, bool, AtomicSeqCst, AtomicNone>| ()));
+    (observed_initial, observed_next)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on
+// August 5, 2026:
+//   Goal Coma.vc_verify_atomic_bool_load_store: ✘
+//   Goal Coma.vc_verify_atomic_i32_load_store: ✘
+// Translation succeeds, but the postconditions don't follow because the
+// callbacks never connect the committer's logical `val_load`/`val_store`
+// facts back to the `Perm` returned by `Atomic*_sc::new`.
+
+// Working form (this is the real, proved pattern in
+// amenable_creusot::rust_std today):
+let (atomic, mut own) = CreusotAtomicBool::new(initial);
+let observed_initial = atomic.load(ghost!(
+    |c: &Committer<CreusotAtomicBool, bool, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+));
+atomic.store(
+    next,
+    ghost!(
+        |c: &mut Committer<CreusotAtomicBool, bool, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut **own)
+    ),
+);
+let observed_next = atomic.load(ghost!(
+    |c: &Committer<CreusotAtomicBool, bool, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+));
+// `atomic_sc` is usable, but only if the ghost callback actually "shoots"
+// the committer against the permission token returned by `new`.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::borrowed_slice_chunk_iterators_lack_creusot_contracts".to_owned(),
+            title: "borrowed slice chunk/window iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (attempted while adding direct Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<Chunks<'static, i32>> and the
+// related ChunksExact/ChunksMut/ChunksExactMut/Windows carriers):
+#[ensures(match result {
+    (first_chunk, second_chunk, exhausted) =>
+        first_chunk == Some((a, b))
+            && second_chunk == Some(c)
+            && exhausted,
+})]
+fn verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk(
+    a: i32,
+    b: i32,
+    c: i32,
+) -> (Option<(i32, i32)>, Option<i32>, bool) {
+    let data = [a, b, c];
+    let mut chunks = data.chunks(2);
+    let first_chunk = match chunks.next() {
+        Some(chunk) => match chunk {
+            [first, second] => Some((*first, *second)),
+            _ => None,
+        },
+        None => None,
+    };
+    let second_chunk = match chunks.next() {
+        Some(chunk) => match chunk {
+            [only] => Some(*only),
+            _ => None,
+        },
+        None => None,
+    };
+    let exhausted = match chunks.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first_chunk, second_chunk, exhausted)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `chunks` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `std::slice::Chunks<'_, i32>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// The direct route fails before the law can be discharged: `creusot-std`
+// does not currently provide the `IteratorSpec`/`next` contract coverage
+// this borrowed carrier family needs. While reducing the repro, matching
+// yielded slices with patterns like `[first, second]` also triggered a
+// separate creusot-rustc ICE:
+//   error: internal compiler error: Unsupported projection
+//   ConstantIndex { offset: 0, min_length: 2, from_end: false }
+// So this is not a one-harness typo or a bad postcondition shape; the
+// family is blocked on real translator/library gaps.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep these carriers registered for
+// Creusot via explicit trusted witnesses whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable law.
+impl CreusotWitness for RustStdStandard<Chunks<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+// The same trusted boundary is used for ChunksExact, ChunksMut,
+// ChunksExactMut, and Windows until creusot-std grows the missing
+// contracts and creusot-rustc stops ICE-ing on the slice-pattern route.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::borrowed_slice_reverse_chunk_iterators_lack_creusot_contracts".to_owned(),
+            title: "borrowed reverse chunk iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (attempted while adding direct Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<RChunks<'static, i32>> and the
+// related RChunksExact/RChunksExactMut/RChunksMut carriers):
+#[ensures(match result {
+    (first_len, first_second_last, second_len, second_first, exhausted) =>
+        first_len == 2usize
+            && first_second_last == Some((b, c))
+            && second_len == 1usize
+            && second_first == Some(a)
+            && exhausted,
+})]
+fn verify_rchunks_groups_from_the_back(
+    a: i32,
+    b: i32,
+    c: i32,
+) -> (usize, Option<(i32, i32)>, usize, Option<i32>, bool) {
+    let data = [a, b, c];
+    let mut it = data.rchunks(2);
+    let (first_len, first_second_last) = match it.next() {
+        Some(chunk) => {
+            let pair = if chunk.len() == 2 {
+                Some((chunk[0], chunk[1]))
+            } else {
+                None
+            };
+            (chunk.len(), pair)
+        }
+        None => (0usize, None),
+    };
+    let (second_len, second_first) = match it.next() {
+        Some(chunk) => {
+            let first = if chunk.len() == 1 {
+                Some(chunk[0])
+            } else {
+                None
+            };
+            (chunk.len(), first)
+        }
+        None => (0usize, None),
+    };
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (
+        first_len,
+        first_second_last,
+        second_len,
+        second_first,
+        exhausted,
+    )
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `rchunks` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `std::slice::RChunks<'_, i32>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// The same pattern repeated for `RChunksExact`, `RChunksExactMut`, and
+// `RChunksMut`, with companion contractless-external warnings on
+// `rchunks_exact`, `rchunks_exact_mut`, `rchunks_mut`, `remainder`, and
+// `into_remainder`. This is a real `creusot-std` contract gap for the
+// reverse borrowed chunk family, not a mistaken harness.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep these carriers registered for
+// Creusot via explicit trusted witnesses whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable law.
+impl CreusotWitness for RustStdStandard<RChunks<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+// The same trusted boundary is used for RChunksExact, RChunksExactMut, and
+// RChunksMut until creusot-std grows the missing contracts.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::slice_predicate_iterators_lack_creusot_iterator_contracts".to_owned(),
+            title: "slice predicate carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (representative probes run while adding direct Creusot
+// coverage for the remaining predicate-driven slice carriers in
+// amenable_std::rust_std):
+#[ensures(match result {
+    (first_len, second_len, exhausted) =>
+        first_len >= 1usize && second_len <= 1usize && exhausted,
+})]
+fn verify_slice_chunk_by_groups_adjacent_equality(a: i32, b: i32) -> (usize, usize, bool) {
+    let data = [a, b];
+    let mut it = data.chunk_by(|left, right| *left == *right);
+    let first_len = match it.next() {
+        Some(chunk) => chunk.len(),
+        None => 0usize,
+    };
+    let second_len = match it.next() {
+        Some(chunk) => chunk.len(),
+        None => 0usize,
+    };
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first_len, second_len, exhausted)
+}
+
+#[ensures(match result {
+    (first_len, second_len, exhausted) =>
+        first_len == 1usize && second_len == 1usize && exhausted,
+})]
+fn verify_slice_split_separates_on_zero(a: i32, b: i32) -> (usize, usize, bool) {
+    let data = [a, 0, b];
+    let mut it = data.split(|value| *value == 0);
+    let first_len = match it.next() {
+        Some(piece) => piece.len(),
+        None => 0usize,
+    };
+    let second_len = match it.next() {
+        Some(piece) => piece.len(),
+        None => 0usize,
+    };
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first_len, second_len, exhausted)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `chunk_by` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `ChunkBy<'_, i32, {closure@...}>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// and likewise:
+//   warning: calling external function `split` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `Split<'_, i32, {closure@...}>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// The same boundary applies to the rest of the predicate-driven slice
+// family: `ChunkByMut`, `RSplit`, `RSplitMut`, `RSplitN`, `RSplitNMut`,
+// `SplitInclusive`, `SplitInclusiveMut`, `SplitMut`, `SplitN`, and
+// `SplitNMut`. This is a real `creusot-std` contract gap for these
+// carriers, not a mistaken harness.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep these carriers registered for
+// Creusot via explicit trusted witnesses whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable laws
+// through direct proofs or accommodation models as appropriate.
+impl CreusotWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+// The same trusted boundary is used for ChunkByMut, RSplit, RSplitMut,
+// RSplitN, RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut,
+// SplitN, and SplitNMut until creusot-std grows the missing contracts.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::str_iterators_lack_creusot_iterator_contracts".to_owned(),
+            title: "core::str iterator carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (representative probes run while assessing whether the
+// remaining `core::str` carriers in amenable_std::rust_std::str could be
+// moved from trusted witnesses to direct Creusot proofs):
+#[ensures(match result {
+    (first, exhausted) => first == Some(byte) && exhausted,
+})]
+fn verify_bytes_yields_the_utf8_encoding(byte: u8) -> (Option<u8>, bool) {
+    let c = if byte < 128 { byte as char } else { 'a' };
+    let s = c.to_string();
+    let mut it = s.bytes();
+    let first = it.next();
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first, exhausted)
+}
+
+#[ensures(match result {
+    (first, second, exhausted) =>
+        first == Some("a") && second == Some("b") && exhausted,
+})]
+fn verify_lines_split_on_newlines() -> (Option<&'static str>, Option<&'static str>, bool) {
+    let mut it = "a\nb".lines();
+    let first = it.next();
+    let second = it.next();
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first, second, exhausted)
+}
+
+#[ensures(match result {
+    (first, second, exhausted) =>
+        first == Some("a") && second == Some("b") && exhausted,
+})]
+fn verify_split_char_separates_on_the_pattern() -> (Option<&'static str>, Option<&'static str>, bool) {
+    let mut it = "a,b".split(',');
+    let first = it.next();
+    let second = it.next();
+    let exhausted = match it.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (first, second, exhausted)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `bytes` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `std::str::Bytes<'_>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// and likewise:
+//   warning: calling external function `lines` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `std::str::Lines<'_>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// and:
+//   warning: calling external function `split` with no contract will
+//   yield an impossible precondition
+//   error[E0277]: the trait bound `std::str::Split<'_, char>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// The same boundary applies across the rest of the `core::str` iterator
+// family: `CharIndices`, `Chars`, `EncodeUtf16`, `EscapeDebug`,
+// `EscapeDefault`, `EscapeUnicode`, `LinesAny`, `SplitAsciiWhitespace`,
+// `SplitWhitespace`, `Utf8Chunks`, and the pattern-generic family
+// monomorphized on `char` (`RSplit`, `SplitN`, `RSplitN`,
+// `SplitInclusive`, `SplitTerminator`, `RSplitTerminator`, `Matches`,
+// `RMatches`, `MatchIndices`, `RMatchIndices`). This is a real
+// `creusot-std` contract gap for these carriers, not a mistaken harness.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep these carriers registered for
+// Creusot via explicit trusted witnesses whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable laws
+// through direct proofs or accommodation models as appropriate.
+impl CreusotWitness for RustStdStandard<std::str::Bytes<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+// The same trusted boundary is used for the rest of the `core::str`
+// iterator family until creusot-std grows the missing contracts.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::slice_escape_ascii_lacks_creusot_iterator_contracts".to_owned(),
+            title: "slice escape_ascii still needs a trusted boundary because creusot-std has neither iterator contracts nor stable byte-literal ergonomics for the direct proof".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Failing form (attempted while adding direct Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<EscapeAscii<'static>>):
+#[ensures(match result {
+    (first_matches, second_is_backslash, third_is_n, exhausted) =>
+        first_matches && second_is_backslash && third_is_n && exhausted,
+})]
+fn verify_escape_ascii_leaves_printable_bytes_unescaped() -> (bool, bool, bool, bool) {
+    let data = [b'A', b'\n'];
+    let mut escaped = data.escape_ascii();
+    let first = match escaped.next() {
+        Some(value) => value,
+        None => 0,
+    };
+    let second = match escaped.next() {
+        Some(value) => value,
+        None => 0,
+    };
+    let third = match escaped.next() {
+        Some(value) => value,
+        None => 0,
+    };
+    let exhausted = match escaped.next() {
+        Some(_) => false,
+        None => true,
+    };
+    (
+        first == b'A',
+        second == b'\\',
+        third == b'n',
+        exhausted,
+    )
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `escape_ascii` with no contract
+//   will yield an impossible precondition
+//   error[E0277]: the trait bound `std::slice::EscapeAscii<'_>:
+//   creusot_std::prelude::IteratorSpec` is not satisfied
+// So the direct iterator route is blocked on the same `IteratorSpec` gap
+// as the chunk families. While reducing the repro, an earlier postcondition
+// that wrote the byte literals directly also triggered a separate
+// creusot-rustc ICE:
+//   error: internal compiler error: Unsupported literal
+// at `second == b'\\'` inside `#[ensures]`
+// The literal-free postcondition above still fails on the missing iterator
+// contracts, so the carrier is blocked even without the ICE-inducing form.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep the carrier registered for
+// Creusot via an explicit trusted witness whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable law
+// through its bounded accommodation model.
+impl CreusotWitness for RustStdStandard<EscapeAscii<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::get_disjoint_mut_without_a_contract_can_appear_proved_but_is_still_unusable".to_owned(),
+            title: "get_disjoint_mut can appear proved under Creusot even though the call is contractless and therefore not acceptable proof evidence".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::Proved,
+            claim: r#"
+// Failing form (attempted while adding direct Creusot coverage for
+// amenable_std::rust_std::RustStdStandard<GetDisjointMutError>):
+#[ensures(match result {
+    (disjoint_ok, overlap_err, out_of_bounds_err) =>
+        disjoint_ok && overlap_err && out_of_bounds_err,
+})]
+fn verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds(
+    a: i32,
+    b: i32,
+) -> (bool, bool, bool) {
+    let mut data = [a, b, 0, 0];
+    let disjoint_ok = data.get_disjoint_mut([0, 2]).is_ok();
+    let overlap_err = data.get_disjoint_mut([0, 0]).is_err();
+    let out_of_bounds_err = data.get_disjoint_mut([0, 10]).is_err();
+    (disjoint_ok, overlap_err, out_of_bounds_err)
+}
+
+// Observed under `cargo creusot prove -- -p amenable_creusot` on August
+// 5, 2026:
+//   warning: calling external function `get_disjoint_mut` with no contract
+//   will yield an impossible precondition
+// and then the crate still finishes with:
+//   Proved (34 files) ✔
+// This is exactly the dangerous false trail documented elsewhere in the
+// gallery: a contractless external call can let a harness "prove" for the
+// wrong reason. The reported success is not acceptable evidence for
+// Amenable's registry because `creusot-std` still has no contract telling
+// the verifier what `get_disjoint_mut` actually does.
+
+// Working fallback (this is the real content in
+// amenable_std::creusot_witness today): keep the carrier registered for
+// Creusot via an explicit trusted witness whose provenance still comes from
+// the same proof chain, while Kani continues to carry the executable law.
+impl CreusotWitness for RustStdStandard<GetDisjointMutError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+"#,
+        },
+    }
+}

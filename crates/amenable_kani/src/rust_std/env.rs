@@ -6,7 +6,7 @@
 //! model instead; the direct std path remains preserved in the gallery as a
 //! false trail.
 
-use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, Vars, VarsOs};
+use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs};
 
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
@@ -185,4 +185,4 @@ amenable_derive::harness! {
 // `VarError` likewise depends on ambient process state: a harness cannot
 // establish that an arbitrary external variable is absent without that same
 // unsafe mutation. Keep it provenance-only as well.
-impl_kani_witness_trusted!(std::env::VarError, Vars, VarsOs);
+impl_kani_witness_trusted!(VarError, Vars, VarsOs);

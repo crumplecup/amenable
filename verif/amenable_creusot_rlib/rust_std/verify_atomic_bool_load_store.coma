@@ -1,0 +1,503 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 577 16 577 90 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 578 44 578 68
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 579 55 581 21
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 579 55 581 21
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 579 43 581 22
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 584 24 586 25
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 584 24 586 25
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 582 20 587 21
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 588 52 590 21
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 588 52 590 21
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 588 40 590 22
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 574 27 574 31
+let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 575 26 575 45
+let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 576 26 576 42
+let%span srust_std'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 580 104 580 108
+let%span srust_std'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 580 89 580 109
+let%span srust_std'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 585 117 585 121
+let%span srust_std'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 585 97 585 122
+let%span srust_std'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 589 104 589 108
+let%span srust_std'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 589 89 589 109
+let%span srust_std'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 585 28 585 96
+let%span srust_std'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 580 24 580 88
+let%span srust_std'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 589 24 589 88
+let%span satomic_sc = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 32 12 32 87
+let%span satomic_sc'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 28 22 28 44
+let%span satomic_sc'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 29 22 29 50
+let%span satomic_sc'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 56 28 56 32
+let%span satomic_sc'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 48 23 49 78
+let%span satomic_sc'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 51 22 52 112
+let%span satomic_sc'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 76 29 76 33
+let%span satomic_sc'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 66 23 68 94
+let%span satomic_sc'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 70 22 72 46
+let%span sfn_ghost = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost/fn_ghost.rs" 76 14 76 27
+let%span sghost = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost.rs" 155 14 155 26
+let%span sghost'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost.rs" 73 14 73 31
+let%span sghost'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost.rs" 84 14 84 35
+let%span scommitter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 116 15 116 33
+let%span scommitter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 117 15 117 44
+let%span scommitter'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 118 14 118 43
+let%span scommitter'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 189 15 189 36
+let%span scommitter'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 190 15 190 44
+let%span scommitter'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 191 14 191 37
+let%span scommitter'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 192 14 192 34
+let%span scommitter'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 193 14 193 44
+let%span scommitter'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 194 14 194 50
+let%span scommitter'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 58 8 60 52
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 126 15 126 59
+let%span sops'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 127 14 127 38
+let%span sops'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 132 14 132 33
+let%span sops'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 137 15 137 31
+let%span sops'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 138 15 138 28
+let%span sops'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 139 14 139 30
+let%span sops'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 144 14 145 104
+let%span sperm = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost/perm.rs" 102 8 102 27
+
+use creusot.prelude.Any
+use creusot.prelude.MutBorrow
+
+type t_AtomicBool
+
+type t_Perm_AtomicBool
+
+type tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global = { f0: t_AtomicBool; f1: t_Perm_AtomicBool }
+
+predicate inv_AtomicBool (_1: t_AtomicBool)
+
+predicate inv_tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global [@inline:trivial] (_1: tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global) =
+  inv_AtomicBool _1.f0
+
+meta "rewrite_def" predicate inv_tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global
+
+function val_AtomicBool (self: t_Perm_AtomicBool) : bool
+
+function ward_AtomicBool (self: t_Perm_AtomicBool) : t_AtomicBool
+
+let rec new (val': bool) (return (x: tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global)) = any
+  [ return (result: tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global) ->
+  {[@stop_split] [@expl:new ensures] ([@stop_split] [@expl:new result type invariant] [%#satomic_sc] inv_tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global result)
+    /\ ([@stop_split] [@expl:new ensures #0] [%#satomic_sc'0] val_AtomicBool result.f1 = val')
+    /\ ([@stop_split] [@expl:new ensures #1] [%#satomic_sc'1] ward_AtomicBool result.f1 = result.f0)}
+    (! return {result}) ]
+
+type closure3 = { c0: t_Perm_AtomicBool }
+
+let rec deref_Ghost_Box_Perm_AtomicBool_Global (self: t_Perm_AtomicBool) (return (x: t_Perm_AtomicBool)) = any
+  [ return (result: t_Perm_AtomicBool) -> {[@stop_split] [@expl:deref ensures] [%#sghost'0] result = self}
+    (! return {result}) ]
+
+type t_Committer_AtomicBool_bool_SeqCst_None
+
+predicate shot_store_AtomicBool (self: t_Committer_AtomicBool_bool_SeqCst_None)
+
+function ward_AtomicBool'0 (self: t_Committer_AtomicBool_bool_SeqCst_None) : t_AtomicBool
+
+predicate val_load_AtomicBool (self: t_Committer_AtomicBool_bool_SeqCst_None)
+
+let rec shoot_load_AtomicBool (self: t_Committer_AtomicBool_bool_SeqCst_None) (own: t_Perm_AtomicBool)
+  (return (x: ())) =
+  {[@stop_split] [@expl:shoot_load_AtomicBool requires] ([@stop_split] [@expl:shoot_load requires #0] [%#scommitter] not shot_store_AtomicBool self)
+  /\ ([@stop_split] [@expl:shoot_load requires #1] [%#scommitter'0] ward_AtomicBool'0 self = ward_AtomicBool own)}
+  any
+  [ return (result: ()) -> {[@stop_split] [@expl:shoot_load ensures] [%#scommitter'1] val_load_AtomicBool self
+    = val_AtomicBool own}
+    (! return {result}) ]
+
+let rec closure3 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 580 24 580 88] [@coma:extspec]
+  (self: closure3) (c: t_Committer_AtomicBool_bool_SeqCst_None) (return (x: ())) = bb0
+  [ bb0 = s0
+    [ s0 = deref_Ghost_Box_Perm_AtomicBool_Global [%#srust_std'12] {self.c0}
+        (fun (_x: t_Perm_AtomicBool) -> [ &_6 <- _x ] s1)
+    | s1 = [ &_5 <- _6 ] s2
+    | s2 = shoot_load_AtomicBool [%#srust_std'13] {c} {_5} (fun (_x: ()) -> [ &_ret <- _x ] s3)
+    | s3 = return {_ret} ] ]
+  [ & _ret: () = Any.any_l ()
+  | & self: closure3 = self
+  | & c: t_Committer_AtomicBool_bool_SeqCst_None = c
+  | & _5: t_Perm_AtomicBool = Any.any_l ()
+  | & _6: t_Perm_AtomicBool = Any.any_l () ] [ return (result: ()) -> return {result} ]
+
+meta "rewrite_def" predicate closure3'pre
+
+meta "rewrite_def" predicate closure3'post'return
+
+type t_FnGhostWrapper_closure3 = { f0'0: closure3 }
+
+let rec __new_closure3 (f: closure3) (return (x: t_FnGhostWrapper_closure3)) = any
+  [ return (result: t_FnGhostWrapper_closure3) -> {[@stop_split] [@expl:__new ensures] [%#sfn_ghost] result.f0'0 = f}
+    (! return {result}) ]
+
+let rec new_FnGhostWrapper_closure3 (x: t_FnGhostWrapper_closure3) (return (x'0: t_FnGhostWrapper_closure3)) = any
+  [ return (result: t_FnGhostWrapper_closure3) -> {[@stop_split] [@expl:new ensures] [%#sghost] result = x}
+    (! return {result}) ]
+
+predicate invariant_ref_AtomicBool [@inline:trivial] (self: t_AtomicBool) = [%#sinvariant] inv_AtomicBool self
+
+meta "rewrite_def" predicate invariant_ref_AtomicBool
+
+predicate inv_ref_AtomicBool [@inline:trivial] (_1: t_AtomicBool) = invariant_ref_AtomicBool _1
+
+meta "rewrite_def" predicate inv_ref_AtomicBool
+
+predicate precondition_closure3 [@inline:trivial] (self: closure3) (args: t_Committer_AtomicBool_bool_SeqCst_None) =
+  [%#srust_std'19] let c = args in closure3'pre self c
+
+meta "rewrite_def" predicate precondition_closure3
+
+predicate precondition_FnGhostWrapper_closure3 [@inline:trivial] (self: t_FnGhostWrapper_closure3) (args: t_Committer_AtomicBool_bool_SeqCst_None) =
+  precondition_closure3 self.f0'0 args
+
+meta "rewrite_def" predicate precondition_FnGhostWrapper_closure3
+
+predicate postcondition_once_closure3 [@inline:trivial] (self: closure3) (args: t_Committer_AtomicBool_bool_SeqCst_None) (result: ()) =
+  [%#srust_std'19] let c = args in closure3'post'return self c result
+
+meta "rewrite_def" predicate postcondition_once_closure3
+
+predicate postcondition_once_FnGhostWrapper_closure3 [@inline:trivial] (self: t_FnGhostWrapper_closure3) (args: t_Committer_AtomicBool_bool_SeqCst_None) (result: ()) =
+  postcondition_once_closure3 self.f0'0 args result
+
+meta "rewrite_def" predicate postcondition_once_FnGhostWrapper_closure3
+
+let rec load_FnGhostWrapper_closure3 (self: t_AtomicBool) (f: t_FnGhostWrapper_closure3) (return (x: bool)) =
+  {[@stop_split] [@expl:load_FnGhostWrapper_closure3 requires] ([@stop_split] [@expl:load 'self' type invariant] [%#satomic_sc'2] inv_ref_AtomicBool self)
+  /\ ([@stop_split] [@expl:load requires] [%#satomic_sc'3] forall c: t_Committer_AtomicBool_bool_SeqCst_None. not shot_store_AtomicBool c
+    -> ward_AtomicBool'0 c = self -> precondition_FnGhostWrapper_closure3 f c)}
+  any
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:load ensures] [%#satomic_sc'4] exists c: t_Committer_AtomicBool_bool_SeqCst_None. not shot_store_AtomicBool c
+      /\ ward_AtomicBool'0 c = self
+      /\ val_load_AtomicBool c = result /\ postcondition_once_FnGhostWrapper_closure3 f c ()}
+    (! return {result}) ]
+
+type closure4 = { c0'0: MutBorrow.t t_Perm_AtomicBool }
+
+let rec deref_mut_Ghost_Box_Perm_AtomicBool_Global (self: MutBorrow.t t_Perm_AtomicBool)
+  (return (x: MutBorrow.t t_Perm_AtomicBool)) = any
+  [ return (result: MutBorrow.t t_Perm_AtomicBool) -> {[@stop_split] [@expl:deref_mut ensures] [%#sghost'1] result
+    = self}
+    (! return {result}) ]
+
+type t_Committer_AtomicBool_bool_None_SeqCst
+
+predicate shot_store_AtomicBool'0 (self: t_Committer_AtomicBool_bool_None_SeqCst)
+
+function ward_AtomicBool'1 (self: t_Committer_AtomicBool_bool_None_SeqCst) : t_AtomicBool
+
+predicate val_load_AtomicBool'0 (self: t_Committer_AtomicBool_bool_None_SeqCst)
+
+predicate val_store_AtomicBool (self: t_Committer_AtomicBool_bool_None_SeqCst)
+
+predicate hist_inv_AtomicBool [@inline:trivial] (self: t_Committer_AtomicBool_bool_None_SeqCst) (other: t_Committer_AtomicBool_bool_None_SeqCst) =
+  [%#scommitter'8] ward_AtomicBool'1 self = ward_AtomicBool'1 other
+  /\ val_load_AtomicBool'0 self = val_load_AtomicBool'0 other /\ val_store_AtomicBool self = val_store_AtomicBool other
+
+meta "rewrite_def" predicate hist_inv_AtomicBool
+
+let rec shoot_store_AtomicBool (self: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst)
+  (own: MutBorrow.t t_Perm_AtomicBool) (return (x: ())) =
+  {[@stop_split] [@expl:shoot_store_AtomicBool requires] ([@stop_split] [@expl:shoot_store requires #0] [%#scommitter'2] not shot_store_AtomicBool'0 self.current)
+  /\ ([@stop_split] [@expl:shoot_store requires #1] [%#scommitter'3] ward_AtomicBool'1 self.current
+  = ward_AtomicBool own.current)}
+  any
+  [ return (result: ()) ->
+  {[@stop_split] [@expl:shoot_store_AtomicBool ensures] ([@stop_split] [@expl:shoot_store ensures #0] [%#scommitter'4] hist_inv_AtomicBool self.current self.final)
+    /\ ([@stop_split] [@expl:shoot_store ensures #1] [%#scommitter'5] shot_store_AtomicBool'0 self.final)
+    /\ ([@stop_split] [@expl:shoot_store ensures #2] [%#scommitter'6] ward_AtomicBool own.current
+      = ward_AtomicBool own.final)
+    /\ ([@stop_split] [@expl:shoot_store ensures #3] [%#scommitter'7] val_AtomicBool own.final
+    = val_store_AtomicBool self.current)}
+    (! return {result}) ]
+
+predicate resolve_refmut_Box_Perm_AtomicBool_Global [@inline:trivial] (_1: MutBorrow.t t_Perm_AtomicBool) =
+  _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_Box_Perm_AtomicBool_Global
+
+predicate resolve_refmut_Perm_AtomicBool [@inline:trivial] (_1: MutBorrow.t t_Perm_AtomicBool) = _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_Perm_AtomicBool
+
+predicate resolve_refmut_Committer_AtomicBool_bool_None_SeqCst [@inline:trivial] (_1: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) =
+  _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_Committer_AtomicBool_bool_None_SeqCst
+
+predicate resolve_refmut_closure4 [@inline:trivial] (_1: MutBorrow.t closure4) = _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_closure4
+
+predicate resolve_refmut_Ghost_Box_Perm_AtomicBool_Global [@inline:trivial] (_1: MutBorrow.t t_Perm_AtomicBool) =
+  _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_Ghost_Box_Perm_AtomicBool_Global
+
+predicate resolve_closure4 [@inline:trivial] (_1: closure4) = resolve_refmut_Ghost_Box_Perm_AtomicBool_Global _1.c0'0
+
+meta "rewrite_def" predicate resolve_closure4
+
+predicate hist_inv_closure4 [@inline:trivial] (self: closure4) (result_state: closure4) =
+  [%#srust_std'18] result_state.c0'0.final = self.c0'0.final
+
+meta "rewrite_def" predicate hist_inv_closure4
+
+let rec closure4 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 585 28 585 96] [@coma:extspec]
+  (self: MutBorrow.t closure4) (c: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (return (x: ())) = bb0
+  [ bb0 = s0
+    [ s0 = MutBorrow.borrow_mut <t_Perm_AtomicBool> {self.current.c0'0.current}
+        (fun (_bor: MutBorrow.t t_Perm_AtomicBool) ->
+          [ &_7 <- _bor ]
+          [ &self <- { self with current = { c0'0 = { self.current.c0'0 with current = _bor.final } } } ] s1)
+    | s1 = deref_mut_Ghost_Box_Perm_AtomicBool_Global [%#srust_std'14] {_7}
+        (fun (_x: MutBorrow.t t_Perm_AtomicBool) -> [ &_6 <- _x ] s2)
+    | s2 = MutBorrow.borrow_final <t_Perm_AtomicBool> {_6.current} {MutBorrow.get_id _6}
+        (fun (_bor: MutBorrow.t t_Perm_AtomicBool) -> [ &_5 <- _bor ] [ &_6 <- { _6 with current = _bor.final } ] s3)
+    | s3 = MutBorrow.borrow_final <t_Committer_AtomicBool_bool_None_SeqCst> {c.current} {MutBorrow.get_id c}
+        (fun (_bor: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) ->
+          [ &_3 <- _bor ] [ &c <- { c with current = _bor.final } ] s4)
+    | s4 = MutBorrow.borrow_final <t_Perm_AtomicBool> {_5.current} {MutBorrow.get_id _5}
+        (fun (_bor: MutBorrow.t t_Perm_AtomicBool) -> [ &_4 <- _bor ] [ &_5 <- { _5 with current = _bor.final } ] s5)
+    | s5 = shoot_store_AtomicBool [%#srust_std'15] {_3} {_4} (fun (_x: ()) -> [ &_ret <- _x ] s6)
+    | s6 = -{resolve_refmut_Box_Perm_AtomicBool_Global _6}- s7
+    | s7 = -{resolve_refmut_Perm_AtomicBool _5}- s8
+    | s8 = -{resolve_refmut_Committer_AtomicBool_bool_None_SeqCst c}- s9
+    | s9 = -{resolve_refmut_closure4 self}- s10
+    | s10 = return {_ret} ] ]
+  [ & _ret: () = Any.any_l ()
+  | & self: MutBorrow.t closure4 = self
+  | & c: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst = c
+  | & _3: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst = Any.any_l ()
+  | & _4: MutBorrow.t t_Perm_AtomicBool = Any.any_l ()
+  | & _5: MutBorrow.t t_Perm_AtomicBool = Any.any_l ()
+  | & _6: MutBorrow.t t_Perm_AtomicBool = Any.any_l ()
+  | & _7: MutBorrow.t t_Perm_AtomicBool = Any.any_l () ]
+  [ return (result: ()) -> {[@stop_split] [@expl:closure hist_inv post] hist_inv_closure4 self.current self.final}
+    return {result} ]
+
+meta "rewrite_def" predicate closure4'pre
+
+meta "rewrite_def" predicate closure4'post'return
+
+predicate postcondition_once_closure4 [@inline:trivial] (self: closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (result: ()) =
+  [%#srust_std'18] let c = args in exists e: closure4. (exists bor_self: MutBorrow.t closure4. bor_self.current = self
+        /\ bor_self.final = e /\ closure4'post'return bor_self c result /\ hist_inv_closure4 self e)
+    /\ resolve_closure4 e
+
+meta "rewrite_def" predicate postcondition_once_closure4
+
+predicate postcondition_mut_closure4 [@inline:trivial] (self: closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (result_state: closure4) (result: ()) =
+  [%#srust_std'18] let c = args in exists bor_self: MutBorrow.t closure4. bor_self.current = self
+    /\ bor_self.final = result_state /\ closure4'post'return bor_self c result /\ hist_inv_closure4 self result_state
+
+meta "rewrite_def" predicate postcondition_mut_closure4
+
+function fn_mut_once_closure4 (self: closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (res: ()) : ()
+
+axiom fn_mut_once_closure4_spec:
+  forall self: closure4, args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst, res: (). [%#sops'5] postcondition_once_closure4 self args res
+    = (exists res_state: closure4. postcondition_mut_closure4 self args res_state res /\ resolve_closure4 res_state)
+
+function hist_inv_trans_closure4 (self: closure4) (b: closure4) (c: closure4) : ()
+
+axiom hist_inv_trans_closure4_spec:
+  forall self: closure4, b: closure4, c: closure4. ([%#sops'2] hist_inv_closure4 self b)
+    -> ([%#sops'3] hist_inv_closure4 b c) -> ([%#sops'4] hist_inv_closure4 self c)
+
+function hist_inv_refl_closure4 (self: closure4) : ()
+
+axiom hist_inv_refl_closure4_spec: forall self: closure4. [%#sops'1] hist_inv_closure4 self self
+
+function postcondition_mut_hist_inv_closure4 (self: closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (res_state: closure4) (res: ()) : ()
+
+axiom postcondition_mut_hist_inv_closure4_spec:
+  forall self: closure4, args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst, res_state: closure4, res: (). ([%#sops] postcondition_mut_closure4 self args res_state res)
+    -> ([%#sops'0] hist_inv_closure4 self res_state)
+
+type t_FnGhostWrapper_closure4 = { f0'1: closure4 }
+
+let rec __new_closure4 (f: closure4) (return (x: t_FnGhostWrapper_closure4)) = any
+  [ return (result: t_FnGhostWrapper_closure4) -> {[@stop_split] [@expl:__new ensures] [%#sfn_ghost] result.f0'1 = f}
+    (! return {result}) ]
+
+let rec new_FnGhostWrapper_closure4 (x: t_FnGhostWrapper_closure4) (return (x'0: t_FnGhostWrapper_closure4)) = any
+  [ return (result: t_FnGhostWrapper_closure4) -> {[@stop_split] [@expl:new ensures] [%#sghost] result = x}
+    (! return {result}) ]
+
+predicate precondition_closure4 [@inline:trivial] (self: closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) =
+  [%#srust_std'18] let c = args in forall bor_self: MutBorrow.t closure4. bor_self.current = self
+    -> closure4'pre bor_self c
+
+meta "rewrite_def" predicate precondition_closure4
+
+predicate precondition_FnGhostWrapper_closure4 [@inline:trivial] (self: t_FnGhostWrapper_closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) =
+  precondition_closure4 self.f0'1 args
+
+meta "rewrite_def" predicate precondition_FnGhostWrapper_closure4
+
+predicate postcondition_once_FnGhostWrapper_closure4 [@inline:trivial] (self: t_FnGhostWrapper_closure4) (args: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst) (result: ()) =
+  postcondition_once_closure4 self.f0'1 args result
+
+meta "rewrite_def" predicate postcondition_once_FnGhostWrapper_closure4
+
+let rec store_FnGhostWrapper_closure4 (self: t_AtomicBool) (val': bool) (f: t_FnGhostWrapper_closure4)
+  (return (x: ())) =
+  {[@stop_split] [@expl:store_FnGhostWrapper_closure4 requires] ([@stop_split] [@expl:store 'self' type invariant] [%#satomic_sc'5] inv_ref_AtomicBool self)
+  /\ ([@stop_split] [@expl:store requires] [%#satomic_sc'6] forall c: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst. not shot_store_AtomicBool'0 c.current
+    -> ward_AtomicBool'1 c.current = self
+    -> val_store_AtomicBool c.current = val'
+    -> precondition_FnGhostWrapper_closure4 f c
+    /\ (postcondition_once_FnGhostWrapper_closure4 f c () -> shot_store_AtomicBool'0 c.final))}
+  any
+  [ return (result: ()) ->
+  {[@stop_split] [@expl:store ensures] [%#satomic_sc'7] exists c: MutBorrow.t t_Committer_AtomicBool_bool_None_SeqCst. not shot_store_AtomicBool'0 c.current
+      /\ ward_AtomicBool'1 c.current = self
+      /\ val_store_AtomicBool c.current = val' /\ postcondition_once_FnGhostWrapper_closure4 f c ()}
+    (! return {result}) ]
+
+predicate resolve_AtomicBool (_1: t_AtomicBool)
+
+predicate resolve_ref_bool [@inline:trivial] (_1: bool) = true
+
+meta "rewrite_def" predicate resolve_ref_bool
+
+predicate resolve_Perm_AtomicBool [@inline:trivial] (self: t_Perm_AtomicBool) =
+  [%#sperm] resolve_ref_bool (val_AtomicBool self)
+
+meta "rewrite_def" predicate resolve_Perm_AtomicBool
+
+predicate resolve_Perm_AtomicBool'0 (_1: t_Perm_AtomicBool)
+
+axiom resolve_axiom: forall x: t_Perm_AtomicBool [resolve_Perm_AtomicBool'0 x]. resolve_Perm_AtomicBool'0 x
+    -> resolve_Perm_AtomicBool x
+
+predicate resolve_Box_Perm_AtomicBool_Global [@inline:trivial] (_1: t_Perm_AtomicBool) = resolve_Perm_AtomicBool'0 _1
+
+meta "rewrite_def" predicate resolve_Box_Perm_AtomicBool_Global
+
+predicate resolve_Ghost_Box_Perm_AtomicBool_Global [@inline:trivial] (_1: t_Perm_AtomicBool) =
+  resolve_Box_Perm_AtomicBool_Global _1
+
+meta "rewrite_def" predicate resolve_Ghost_Box_Perm_AtomicBool_Global
+
+type closure5 = { c0'1: t_Perm_AtomicBool }
+
+let rec closure5 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 589 24 589 88] [@coma:extspec]
+  (self: closure5) (c: t_Committer_AtomicBool_bool_SeqCst_None) (return (x: ())) = bb0
+  [ bb0 = s0
+    [ s0 = deref_Ghost_Box_Perm_AtomicBool_Global [%#srust_std'16] {self.c0'1}
+        (fun (_x: t_Perm_AtomicBool) -> [ &_6 <- _x ] s1)
+    | s1 = [ &_5 <- _6 ] s2
+    | s2 = shoot_load_AtomicBool [%#srust_std'17] {c} {_5} (fun (_x: ()) -> [ &_ret <- _x ] s3)
+    | s3 = return {_ret} ] ]
+  [ & _ret: () = Any.any_l ()
+  | & self: closure5 = self
+  | & c: t_Committer_AtomicBool_bool_SeqCst_None = c
+  | & _5: t_Perm_AtomicBool = Any.any_l ()
+  | & _6: t_Perm_AtomicBool = Any.any_l () ] [ return (result: ()) -> return {result} ]
+
+meta "rewrite_def" predicate closure5'pre
+
+meta "rewrite_def" predicate closure5'post'return
+
+type t_FnGhostWrapper_closure5 = { f0'2: closure5 }
+
+let rec __new_closure5 (f: closure5) (return (x: t_FnGhostWrapper_closure5)) = any
+  [ return (result: t_FnGhostWrapper_closure5) -> {[@stop_split] [@expl:__new ensures] [%#sfn_ghost] result.f0'2 = f}
+    (! return {result}) ]
+
+let rec new_FnGhostWrapper_closure5 (x: t_FnGhostWrapper_closure5) (return (x'0: t_FnGhostWrapper_closure5)) = any
+  [ return (result: t_FnGhostWrapper_closure5) -> {[@stop_split] [@expl:new ensures] [%#sghost] result = x}
+    (! return {result}) ]
+
+predicate precondition_closure5 [@inline:trivial] (self: closure5) (args: t_Committer_AtomicBool_bool_SeqCst_None) =
+  [%#srust_std'20] let c = args in closure5'pre self c
+
+meta "rewrite_def" predicate precondition_closure5
+
+predicate precondition_FnGhostWrapper_closure5 [@inline:trivial] (self: t_FnGhostWrapper_closure5) (args: t_Committer_AtomicBool_bool_SeqCst_None) =
+  precondition_closure5 self.f0'2 args
+
+meta "rewrite_def" predicate precondition_FnGhostWrapper_closure5
+
+predicate postcondition_once_closure5 [@inline:trivial] (self: closure5) (args: t_Committer_AtomicBool_bool_SeqCst_None) (result: ()) =
+  [%#srust_std'20] let c = args in closure5'post'return self c result
+
+meta "rewrite_def" predicate postcondition_once_closure5
+
+predicate postcondition_once_FnGhostWrapper_closure5 [@inline:trivial] (self: t_FnGhostWrapper_closure5) (args: t_Committer_AtomicBool_bool_SeqCst_None) (result: ()) =
+  postcondition_once_closure5 self.f0'2 args result
+
+meta "rewrite_def" predicate postcondition_once_FnGhostWrapper_closure5
+
+let rec load_FnGhostWrapper_closure5 (self: t_AtomicBool) (f: t_FnGhostWrapper_closure5) (return (x: bool)) =
+  {[@stop_split] [@expl:load_FnGhostWrapper_closure5 requires] ([@stop_split] [@expl:load 'self' type invariant] [%#satomic_sc'2] inv_ref_AtomicBool self)
+  /\ ([@stop_split] [@expl:load requires] [%#satomic_sc'3] forall c: t_Committer_AtomicBool_bool_SeqCst_None. not shot_store_AtomicBool c
+    -> ward_AtomicBool'0 c = self -> precondition_FnGhostWrapper_closure5 f c)}
+  any
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:load ensures] [%#satomic_sc'4] exists c: t_Committer_AtomicBool_bool_SeqCst_None. not shot_store_AtomicBool c
+      /\ ward_AtomicBool'0 c = self
+      /\ val_load_AtomicBool c = result /\ postcondition_once_FnGhostWrapper_closure5 f c ()}
+    (! return {result}) ]
+
+type tup2_bool_bool = { f0'3: bool; f1'3: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_atomic_bool_load_store
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 577 16 577 90] (initial: bool) (next: bool)
+  (return (x: tup2_bool_bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = new [%#srust_std] {initial} (fun (_x: tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global) -> [ &_10 <- _x ] s1)
+    | s1 = [ &atomic <- _10.f0 ] s2
+    | s2 = [ &own <- _10.f1 ] s3
+    | s3 = [ &_16 <- { c0 = own } ] s4
+    | s4 = __new_closure3 [%#srust_std'0] {_16} (fun (_x: t_FnGhostWrapper_closure3) -> [ &_15 <- _x ] s5)
+    | s5 = new_FnGhostWrapper_closure3 [%#srust_std'1] {_15} (fun (_x: t_FnGhostWrapper_closure3) -> [ &_14 <- _x ] s6)
+    | s6 = load_FnGhostWrapper_closure3 [%#srust_std'2] {atomic} {_14}
+        (fun (_x: bool) -> [ &observed_initial <- _x ] s7)
+    | s7 = MutBorrow.borrow_mut <t_Perm_AtomicBool> {own}
+        (fun (_bor: MutBorrow.t t_Perm_AtomicBool) -> [ &_24 <- _bor ] [ &own <- _bor.final ] s8)
+    | s8 = [ &_23 <- { c0'0 = _24 } ] s9
+    | s9 = __new_closure4 [%#srust_std'3] {_23} (fun (_x: t_FnGhostWrapper_closure4) -> [ &_22 <- _x ] s10)
+    | s10 = new_FnGhostWrapper_closure4 [%#srust_std'4] {_22}
+        (fun (_x: t_FnGhostWrapper_closure4) -> [ &_21 <- _x ] s11)
+    | s11 = store_FnGhostWrapper_closure4 [%#srust_std'5] {atomic} {next} {_21} (fun (_x: ()) -> [ &_18 <- _x ] s12)
+    | s12 = s13 [ _ck -> (! {[@expl:type invariant] inv_AtomicBool atomic} any) ]
+    | s13 = -{resolve_AtomicBool atomic}- s14
+    | s14 = -{resolve_Ghost_Box_Perm_AtomicBool_Global own}- s15
+    | s15 = [ &_29 <- { c0'1 = own } ] s16
+    | s16 = __new_closure5 [%#srust_std'6] {_29} (fun (_x: t_FnGhostWrapper_closure5) -> [ &_28 <- _x ] s17)
+    | s17 = new_FnGhostWrapper_closure5 [%#srust_std'7] {_28}
+        (fun (_x: t_FnGhostWrapper_closure5) -> [ &_27 <- _x ] s18)
+    | s18 = load_FnGhostWrapper_closure5 [%#srust_std'8] {atomic} {_27} (fun (_x: bool) -> [ &observed_next <- _x ] s19)
+    | s19 = [ &_ret <- { f0'3 = observed_initial; f1'3 = observed_next } ] s20
+    | s20 = return {_ret} ] ]
+  [ & _ret: tup2_bool_bool = Any.any_l ()
+  | & initial: bool = initial
+  | & next: bool = next
+  | & atomic: t_AtomicBool = Any.any_l ()
+  | & own: t_Perm_AtomicBool = Any.any_l ()
+  | & _10: tup2_AtomicBool_Ghost_Box_Perm_AtomicBool_Global = Any.any_l ()
+  | & observed_initial: bool = Any.any_l ()
+  | & _14: t_FnGhostWrapper_closure3 = Any.any_l ()
+  | & _15: t_FnGhostWrapper_closure3 = Any.any_l ()
+  | & _16: closure3 = Any.any_l ()
+  | & _18: () = Any.any_l ()
+  | & _21: t_FnGhostWrapper_closure4 = Any.any_l ()
+  | & _22: t_FnGhostWrapper_closure4 = Any.any_l ()
+  | & _23: closure4 = Any.any_l ()
+  | & _24: MutBorrow.t t_Perm_AtomicBool = Any.any_l ()
+  | & observed_next: bool = Any.any_l ()
+  | & _27: t_FnGhostWrapper_closure5 = Any.any_l ()
+  | & _28: t_FnGhostWrapper_closure5 = Any.any_l ()
+  | & _29: closure5 = Any.any_l () ])
+  [ return (result: tup2_bool_bool) ->
+  {[@stop_split] [@expl:verify_atomic_bool_load_store ensures] ([@stop_split] [@expl:verify_atomic_bool_load_store ensures #0] [%#srust_std'10] result.f0'3
+      = initial)
+    /\ ([@stop_split] [@expl:verify_atomic_bool_load_store ensures #1] [%#srust_std'11] result.f1'3 = next)}
+    (! return {result}) ]

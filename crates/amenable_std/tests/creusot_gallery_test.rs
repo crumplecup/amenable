@@ -3,21 +3,21 @@
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
-fn all_sixteen_translator_findings_are_registered_and_distinct() {
+fn all_twenty_three_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        16,
-        "expected exactly the 16 findings from this session's real pipeline work: {cases:#?}"
+        23,
+        "expected exactly the 23 findings from this session's real pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 16, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 23, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
@@ -33,8 +33,8 @@ fn all_sixteen_translator_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == CreusotGalleryExpectation::TranslationError)
         .count();
     assert_eq!(
-        translation_error_count, 12,
-        "twelve findings were real, diagnosed translation errors"
+        translation_error_count, 17,
+        "seventeen findings were real, diagnosed translation errors"
     );
 
     let unproved_count = cases
@@ -42,8 +42,17 @@ fn all_sixteen_translator_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == CreusotGalleryExpectation::Unproved)
         .count();
     assert_eq!(
-        unproved_count, 2,
-        "two findings (Ordering::reverse, f64 FromStr) translated clean but failed at the SMT stage"
+        unproved_count, 3,
+        "three findings (Ordering::reverse, f64 FromStr, empty atomic_sc callbacks) translated clean but failed at the SMT stage"
+    );
+
+    let proved_count = cases
+        .iter()
+        .filter(|case| case.expected == CreusotGalleryExpectation::Proved)
+        .count();
+    assert_eq!(
+        proved_count, 1,
+        "one finding is a dangerous false-trail proof that Creusot reported as proved despite contractless externals"
     );
 
     for case in &cases {

@@ -1,0 +1,80 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3408 8 3410 42 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3414 33 3414 38
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3413 34 3413 38
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3418 33 3418 37
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3417 34 3417 39
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3428 33 3428 37
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3427 34 3427 39
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3432 33 3432 38
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3431 34 3431 38
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3399 19 3399 23
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3400 18 3407 9
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Poll_i32 = Ready Int32.t | Pending
+
+let rec elim_Ready (_x: t_Poll_i32) (return (f0: Int32.t)) = any
+  [ _k (f0: Int32.t) -> {Ready f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Ready] match _x with
+      | Ready _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+type tup5_bool_bool_i32_bool_bool = { f0: bool; f1: bool; f2: Int32.t; f3: bool; f4: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_poll_ready_and_pending_are_disjoint
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3408 8 3410 42] (value: Int32.t)
+  (return (x: tup5_bool_bool_i32_bool_bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &ready <- Ready value ] s1
+    | s1 = any [ br0 (x0: Int32.t) -> {ready = Ready x0} (! bb4) | br1 -> {ready = Pending} (! bb3) ] ]
+  | bb3 = s0 [ s0 = [ &ready_is_ready <- [%#srust_std] false ] s1 | s1 = bb5 ]
+  | bb4 = s0 [ s0 = [ &ready_is_ready <- [%#srust_std'0] true ] s1 | s1 = bb5 ]
+  | bb5 = any [ br0 (x0: Int32.t) -> {ready = Ready x0} (! bb9) | br1 -> {ready = Pending} (! bb8) ]
+  | bb8 = s0 [ s0 = [ &ready_is_pending <- [%#srust_std'1] true ] s1 | s1 = bb10 ]
+  | bb9 = s0 [ s0 = [ &ready_is_pending <- [%#srust_std'2] false ] s1 | s1 = bb10 ]
+  | bb10 = any [ br0 (x0: Int32.t) -> {ready = Ready x0} (! bb14) | br1 -> {ready = Pending} (! bb13) ]
+  | bb13 = s0 [ s0 = [ &ready_value <- value ] s1 | s1 = bb15 ]
+  | bb14 = s0
+    [ s0 = elim_Ready {ready} (fun (r0: Int32.t) -> [ &inner <- r0 ] s1)
+    | s1 = [ &ready_value <- inner ] s2
+    | s2 = bb15 ]
+  | bb15 = s0
+    [ s0 = [ &pending <- Pending ] s1
+    | s1 = any [ br0 (x0: Int32.t) -> {pending = Ready x0} (! bb19) | br1 -> {pending = Pending} (! bb18) ] ]
+  | bb18 = s0 [ s0 = [ &pending_is_pending <- [%#srust_std'3] true ] s1 | s1 = bb20 ]
+  | bb19 = s0 [ s0 = [ &pending_is_pending <- [%#srust_std'4] false ] s1 | s1 = bb20 ]
+  | bb20 = any [ br0 (x0: Int32.t) -> {pending = Ready x0} (! bb24) | br1 -> {pending = Pending} (! bb23) ]
+  | bb23 = s0 [ s0 = [ &pending_is_ready <- [%#srust_std'5] false ] s1 | s1 = bb25 ]
+  | bb24 = s0 [ s0 = [ &pending_is_ready <- [%#srust_std'6] true ] s1 | s1 = bb25 ]
+  | bb25 = s0
+    [ s0 = [ &_ret <- { f0 = ready_is_ready;
+                        f1 = ready_is_pending;
+                        f2 = ready_value;
+                        f3 = pending_is_pending;
+                        f4 = pending_is_ready } ] s1
+    | s1 = return {_ret} ] ]
+  [ & _ret: tup5_bool_bool_i32_bool_bool = Any.any_l ()
+  | & value: Int32.t = value
+  | & ready: t_Poll_i32 = Any.any_l ()
+  | & ready_is_ready: bool = Any.any_l ()
+  | & ready_is_pending: bool = Any.any_l ()
+  | & ready_value: Int32.t = Any.any_l ()
+  | & inner: Int32.t = Any.any_l ()
+  | & pending: t_Poll_i32 = Any.any_l ()
+  | & pending_is_pending: bool = Any.any_l ()
+  | & pending_is_ready: bool = Any.any_l () ])
+  [ return (result: tup5_bool_bool_i32_bool_bool) ->
+  {[@stop_split] [@expl:verify_poll_ready_and_pending_are_disjoint ensures] [%#srust_std'8] match result with
+      | {f0 = ready_is_ready; f1 = ready_is_pending; f2 = ready_value; f3 = pending_is_pending; f4 = pending_is_ready} -> ready_is_ready
+      /\ not ready_is_pending /\ ready_value = value /\ pending_is_pending /\ not pending_is_ready
+      end}
+    (! return {result}) ]

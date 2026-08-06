@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Some": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_iter_mut_i32": { "prover": "alt-ergo", "time": 0.015 },
+      "vc_next_IterMut_i32": { "prover": "alt-ergo", "time": 0.016 },
+      "vc_verify_slice_iter_mut_yields_mutable_references_that_write_through": {
+        "prover": "z3",
+        "time": 0.126
+      }
+    }
+  }
+}

@@ -13,22 +13,39 @@
 //! `impl Trait` panicked its intrinsics pass outright; the `static` item
 //! `::inventory::submit!` expands to hits "unsupported definition kind").
 //!
-//! `char` and `String` carry a genuine constraint worth stating as a real
-//! Creusot postcondition; every other std carrier `amenable_std` proves
-//! about has no invariant beyond what the type system already guarantees,
-//! so there's nothing to translate for them here at all.
-//!
-//! Both contracts here are machine-checked, not just syntactically valid:
-//! `just verify-creusot` runs `cargo creusot prove -- -p amenable_creusot`
-//! (translation + `why3find` SMT solving) and reports `Proved (7 files) ✔`
-//! — every goal in this crate discharges, including these two.
+//! Some carriers here admit real machine-checked postconditions (`char`,
+//! `String`, slices, enums, etc.). Others still need explicit trusted
+//! semantic boundaries because the relevant std implementation or external
+//! contract surface remains opaque to Creusot (`HashMap`, `HashSet`,
+//! `DefaultHasher`, `RandomState`, platform/runtime-backed types, and so
+//! on). Either way, the witness layer in `amenable_std` imports these
+//! source strings verbatim so the reported claim cannot drift from the
+//! actual harness.
 
 #[cfg(creusot)]
 use creusot_std::logic::Int;
 #[cfg(creusot)]
 use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
+use creusot_std::prelude::ghost;
+#[cfg(creusot)]
+use creusot_std::std::sync::atomic::Ordering::{None as AtomicNone, SeqCst as AtomicSeqCst};
+#[cfg(creusot)]
+use creusot_std::std::sync::atomic_sc::{
+    AtomicBool as CreusotAtomicBool, AtomicI8 as CreusotAtomicI8, AtomicI16 as CreusotAtomicI16,
+    AtomicI32 as CreusotAtomicI32, AtomicI64 as CreusotAtomicI64,
+    AtomicIsize as CreusotAtomicIsize, AtomicPtr as CreusotAtomicPtr, AtomicU8 as CreusotAtomicU8,
+    AtomicU16 as CreusotAtomicU16, AtomicU32 as CreusotAtomicU32, AtomicU64 as CreusotAtomicU64,
+    AtomicUsize as CreusotAtomicUsize,
+};
+#[cfg(creusot)]
+use creusot_std::std::sync::committer::Committer;
+#[cfg(creusot)]
 use creusot_std::std::time::nanos_to_secs;
+#[cfg(creusot)]
+use std::alloc::System;
+#[cfg(creusot)]
+use std::backtrace::{Backtrace, BacktraceStatus};
 #[cfg(creusot)]
 use std::borrow::Cow;
 #[cfg(creusot)]
@@ -40,13 +57,23 @@ use std::collections::binary_heap::PeekMut as BinaryHeapPeekMut;
 #[cfg(creusot)]
 use std::collections::linked_list::{Iter as LinkedListIter, IterMut as LinkedListIterMut};
 #[cfg(creusot)]
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
+use std::collections::{
+    BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, TryReserveError, VecDeque,
+};
 #[cfg(creusot)]
-use std::ffi::{CStr, CString};
+use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError};
+#[cfg(creusot)]
+use std::ffi::{CStr, CString, OsStr, OsString};
 #[cfg(creusot)]
 use std::future::{Pending, PollFn, Ready};
 #[cfg(creusot)]
+use std::hash::{BuildHasher, DefaultHasher, Hash, Hasher, RandomState};
+#[cfg(creusot)]
+use std::io::SeekFrom;
+#[cfg(creusot)]
 use std::mem::ManuallyDrop;
+#[cfg(creusot)]
+use std::net::Shutdown;
 #[cfg(creusot)]
 use std::num::{
     FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
@@ -55,9 +82,419 @@ use std::num::{
 #[cfg(creusot)]
 use std::ops::{Bound, ControlFlow};
 #[cfg(creusot)]
+use std::panic::AssertUnwindSafe;
+#[cfg(creusot)]
+use std::path::PathBuf;
+#[cfg(creusot)]
+use std::sync::atomic::Ordering as AtomicOrdering;
+#[cfg(creusot)]
+use std::task::Waker;
+#[cfg(creusot)]
 use std::task::{Context, Poll};
 #[cfg(creusot)]
 use std::time::Duration;
+
+amenable_derive::harness! {
+    creusot, VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC, {
+        /// `System` is the process's default global allocator in this crate,
+        /// so a `Box` allocation and drop is serviced by `System` even though
+        /// the allocator hooks stay behind ordinary Rust library code.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result == value)]
+        fn verify_system_allocates_and_deallocates_a_layout(value: i32) -> i32 {
+            let _allocator = System;
+            let boxed = Box::new(value);
+            let round_trip = *boxed;
+            drop(boxed);
+            round_trip
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC, {
+        /// `Backtrace::force_capture()` always produces a captured backtrace.
+        /// This stays trusted in Creusot for the same reason as Kani's
+        /// accommodation-model proof: the real capture path lives at the
+        /// platform unwinding boundary, not inside Creusot's contract surface.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_backtrace_force_capture_always_actually_captures() -> bool {
+            let backtrace = Backtrace::force_capture();
+            match backtrace.status() {
+                BacktraceStatus::Captured => true,
+                BacktraceStatus::Disabled | BacktraceStatus::Unsupported => false,
+                _ => false,
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC, {
+        /// The `BacktraceStatus` observed after `Backtrace::force_capture()`
+        /// is `Captured`.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_backtrace_status_reports_captured_after_force_capture() -> bool {
+            let status = Backtrace::force_capture().status();
+            match status {
+                BacktraceStatus::Captured => true,
+                BacktraceStatus::Disabled | BacktraceStatus::Unsupported => false,
+                _ => false,
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC, {
+        /// `.shutdown(Shutdown::Write)` closes the write half, so a later
+        /// write on that stream fails.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_shutdown_write_prevents_further_writes() -> bool {
+            use std::io::Write;
+            use std::net::{TcpListener, TcpStream};
+
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let addr = listener.local_addr().unwrap();
+            let mut client = TcpStream::connect(addr).unwrap();
+            let _server_side = listener.accept().unwrap();
+
+            client.shutdown(Shutdown::Write).unwrap();
+            client.write(b"more data").is_err()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
+        /// Each `SeekFrom` variant preserves the offset it was constructed
+        /// with and remains its own variant.
+        #[requires(true)]
+        #[ensures(match result {
+            (start_value, end_value, current_value) =>
+                start_value == start_offset
+                    && end_value == end_offset
+                    && current_value == current_offset,
+        })]
+        fn verify_seek_from_round_trips_each_variants_offset(
+            start_offset: u64,
+            end_offset: i64,
+            current_offset: i64,
+        ) -> (u64, i64, i64) {
+            let start_value = match SeekFrom::Start(start_offset) {
+                SeekFrom::Start(value) => value,
+                SeekFrom::End(_) | SeekFrom::Current(_) => start_offset,
+            };
+            let end_value = match SeekFrom::End(end_offset) {
+                SeekFrom::End(value) => value,
+                SeekFrom::Start(_) | SeekFrom::Current(_) => end_offset,
+            };
+            let current_value = match SeekFrom::Current(current_offset) {
+                SeekFrom::Current(value) => value,
+                SeekFrom::Start(_) | SeekFrom::End(_) => current_offset,
+            };
+
+            (start_value, end_value, current_value)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC, {
+        /// `DefaultHasher::new()` starts from the same fixed seed, so
+        /// hashing the same value through two fresh instances produces the
+        /// same digest.
+        ///
+        /// `#[trusted]`: Creusot does not ship contracts for the concrete
+        /// `Hasher` API on `DefaultHasher`, so this keeps the same
+        /// representative determinism claim as the Kani proof while making
+        /// the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_default_hasher_is_deterministic_across_fresh_instances() -> bool {
+            let mut first = DefaultHasher::new();
+            "some value".hash(&mut first);
+
+            let mut second = DefaultHasher::new();
+            "some value".hash(&mut second);
+
+            first.finish() == second.finish()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC, {
+        /// A single `RandomState` instance chooses its seed once, so two
+        /// hashers built from that same instance agree on the same input.
+        ///
+        /// `#[trusted]`: the real `RandomState` constructor and `Hasher`
+        /// operations sit behind std contracts Creusot does not model
+        /// today. This states the same observation-backed law the Kani
+        /// proof carries, but keeps the Creusot boundary honest.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_random_state_gives_the_same_hasher_seed_across_calls() -> bool {
+            let state = RandomState::new();
+
+            let mut first = state.build_hasher();
+            "some value".hash(&mut first);
+
+            let mut second = state.build_hasher();
+            "some value".hash(&mut second);
+
+            first.finish() == second.finish()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC, {
+        /// Inserting one key/value pair into an empty `HashMap` makes a
+        /// later `get` recover that value, and removing the same key hands
+        /// the value back out and leaves the map empty.
+        ///
+        /// `#[trusted]`: `creusot-std` still provides no model for the
+        /// concrete `HashMap` carrier, the same hard wall already noted in
+        /// elicitation's Creusot guide. This keeps the exact one-entry law
+        /// Amenable's Kani accommodation model claims, but over the real
+        /// std carrier and with an explicit trusted boundary.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (Some(got), Some(removed), empty) => got == value && removed == value && empty,
+            _ => false,
+        })]
+        fn verify_hash_map_insert_then_get_recovers_the_value(
+            key: i32,
+            value: i32,
+        ) -> (Option<i32>, Option<i32>, bool) {
+            let mut map = HashMap::new();
+            map.insert(key, value);
+
+            let got = map.get(&key).copied();
+            let removed = map.remove(&key);
+
+            (got, removed, map.is_empty())
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, {
+        /// Inserting one value into an empty `HashSet` makes the set report
+        /// membership for that value, and removing it clears membership.
+        ///
+        /// `#[trusted]`: like `HashMap`, `HashSet` still has no Creusot
+        /// model today, so this keeps the same one-entry membership law as
+        /// the Kani accommodation proof while making the trusted boundary
+        /// explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (inserted, contains_before_remove, removed, contains_after_remove) =>
+                inserted && contains_before_remove && removed && !contains_after_remove,
+        })]
+        fn verify_hash_set_insert_then_contains_reports_membership(
+            value: i32,
+        ) -> (bool, bool, bool, bool) {
+            let mut set = HashSet::new();
+            let inserted = set.insert(value);
+            let contains_before_remove = set.contains(&value);
+            let removed = set.remove(&value);
+            let contains_after_remove = set.contains(&value);
+
+            (
+                inserted,
+                contains_before_remove,
+                removed,
+                contains_after_remove,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, {
+        /// A real process presents its own program slot in argv, so
+        /// `std::env::args()` yields at least one element.
+        ///
+        /// `#[trusted]`: Creusot has no contract surface for the ambient
+        /// process argv, so this keeps the same explicit carrier law the
+        /// Kani accommodation-model proof states while marking the host
+        /// boundary honestly.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_args_reports_at_least_the_program_path() -> bool {
+            let mut args: Args = std::env::args();
+            args.next().is_some()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, {
+        /// Same guarantee as `Args`, in the raw `OsString` form.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_args_os_reports_at_least_the_program_path() -> bool {
+            let mut args: ArgsOs = std::env::args_os();
+            args.next().is_some()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC, {
+        /// `join_paths()` rejects a path containing the platform's own list
+        /// separator, so the carrier arises exactly at the PATH-joining
+        /// boundary.
+        ///
+        /// `#[trusted]`: the concrete path-parsing logic is std-owned and
+        /// unmodeled in `creusot-std` today, so this harness states the
+        /// representative rejection law directly.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_join_paths_error_reports_an_unjoinable_path() -> bool {
+            let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" };
+            let joined: Result<_, JoinPathsError> = std::env::join_paths([bad_path]);
+            joined.is_err()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC, {
+        /// Joining a small separator-free path list and then splitting it
+        /// back recovers the same paths in order.
+        ///
+        /// `#[trusted]`: `join_paths()` / `split_paths()` remain ordinary
+        /// std library code outside Creusot's contract surface, so this
+        /// harness records the same bounded subset law used by the Kani
+        /// accommodation model.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_split_paths_recovers_paths_joined_by_join_paths() -> bool {
+            let joined = std::env::join_paths(["one", "two", "three"])
+                .expect("separator-free paths stay inside the modeled subset");
+            let split: Vec<PathBuf> = std::env::split_paths(&joined).collect();
+            let _iter: SplitPaths<'_> = std::env::split_paths(&joined);
+
+            split
+                == vec![
+                    PathBuf::from("one"),
+                    PathBuf::from("two"),
+                    PathBuf::from("three"),
+                ]
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC, {
+        /// `VarError`'s public variants are disjoint, and the
+        /// `NotUnicode` payload is preserved by pattern matching.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (not_present_is_distinct, not_unicode_is_detected, payload_len) =>
+                not_present_is_distinct && not_unicode_is_detected && payload_len == 2usize,
+        })]
+        fn verify_var_error_distinguishes_not_present_from_not_unicode() -> (bool, bool, usize) {
+            let not_present_is_distinct = !matches!(VarError::NotPresent, VarError::NotUnicode(_));
+            let not_unicode = VarError::NotUnicode(OsString::from("hi"));
+            let not_unicode_is_detected = matches!(not_unicode, VarError::NotUnicode(_));
+            let payload_len = match VarError::NotUnicode(OsString::from("hi")) {
+                VarError::NotUnicode(payload) => payload.len(),
+                VarError::NotPresent => 0,
+            };
+
+            (
+                not_present_is_distinct,
+                not_unicode_is_detected,
+                payload_len,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC, {
+        /// An `OsStr` constructed from valid UTF-8 content exposes that same
+        /// content through `.to_str()`, and `.len()` reports the byte length
+        /// of the borrowed platform string.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no usable contracts for
+        /// `OsStr::new`, `OsStr::to_str`, or `OsStr::len`, so Creusot cannot
+        /// discharge this directly over the concrete std carrier today. This
+        /// keeps the same representative observation as the Kani harness while
+        /// making the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (round_trips, byte_len) => round_trips && byte_len == 2usize,
+        })]
+        fn verify_os_str_valid_utf8_content_round_trips_through_to_str() -> (bool, usize) {
+            let os_str = OsStr::new("hi");
+            (os_str.to_str() == Some("hi"), os_str.len())
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC, {
+        /// `OsString::push` appends new content without disturbing the
+        /// existing prefix.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no usable contracts for
+        /// `OsString` construction, mutation, or observation, so Creusot
+        /// cannot discharge this directly over the concrete std carrier today.
+        /// This keeps the same representative observation as the Kani harness
+        /// while making the trusted boundary explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_os_string_push_appends_to_the_existing_content() -> bool {
+            let mut os_string = OsString::from("hello");
+            os_string.push(", world");
+            os_string == OsString::from("hello, world")
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC, {
+        /// `OsStr::display()` renders valid UTF-8 content exactly as written,
+        /// with no lossy substitution needed.
+        ///
+        /// `#[trusted]`: `creusot-std` 0.11.0 ships no usable contracts for
+        /// `OsStr::display`, the returned `os_str::Display` carrier, or its
+        /// formatting path, so Creusot cannot discharge this directly over the
+        /// concrete std carrier today. This keeps the same representative
+        /// observation as the Kani harness while making the trusted boundary
+        /// explicit.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_os_str_display_renders_valid_utf8_content_unchanged() -> bool {
+            let os_str = OsStr::new("hello");
+            os_str.display().to_string() == "hello"
+        }
+    }
+}
 
 amenable_derive::harness! {
     creusot, VERIFY_CHAR_ROUNDTRIP_SRC, {
@@ -125,6 +562,143 @@ amenable_derive::harness! {
     }
 }
 
+macro_rules! atomic_sc_load_store_harness {
+    ($const_name:ident, $fn_name:ident, $atomic_ty:ident, $value_ty:ty, $doc_atomic:literal) => {
+        amenable_derive::harness! {
+            creusot, $const_name, {
+                #[doc = concat!(
+                    "`",
+                    $doc_atomic,
+                    "::new` sets the value observable via `load`, and `store` overwrites it, under sequentially consistent ordering."
+                )]
+                #[requires(true)]
+                #[ensures(result.0 == initial)]
+                #[ensures(result.1 == next)]
+                fn $fn_name(initial: $value_ty, next: $value_ty) -> ($value_ty, $value_ty) {
+                    let (atomic, mut own) = $atomic_ty::new(initial);
+                    let observed_initial = atomic.load(ghost!(
+                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                    ));
+                    atomic.store(
+                        next,
+                        ghost!(
+                            |c: &mut Committer<$atomic_ty, $value_ty, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut **own)
+                        ),
+                    );
+                    let observed_next = atomic.load(ghost!(
+                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                    ));
+                    (observed_initial, observed_next)
+                }
+            }
+        }
+    };
+}
+
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
+    verify_atomic_bool_load_store,
+    CreusotAtomicBool,
+    bool,
+    "AtomicBool"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_I8_LOAD_STORE_SRC,
+    verify_atomic_i8_load_store,
+    CreusotAtomicI8,
+    i8,
+    "AtomicI8"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
+    verify_atomic_i16_load_store,
+    CreusotAtomicI16,
+    i16,
+    "AtomicI16"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_I32_LOAD_STORE_SRC,
+    verify_atomic_i32_load_store,
+    CreusotAtomicI32,
+    i32,
+    "AtomicI32"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_I64_LOAD_STORE_SRC,
+    verify_atomic_i64_load_store,
+    CreusotAtomicI64,
+    i64,
+    "AtomicI64"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_ISIZE_LOAD_STORE_SRC,
+    verify_atomic_isize_load_store,
+    CreusotAtomicIsize,
+    isize,
+    "AtomicIsize"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_U8_LOAD_STORE_SRC,
+    verify_atomic_u8_load_store,
+    CreusotAtomicU8,
+    u8,
+    "AtomicU8"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_U16_LOAD_STORE_SRC,
+    verify_atomic_u16_load_store,
+    CreusotAtomicU16,
+    u16,
+    "AtomicU16"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_U32_LOAD_STORE_SRC,
+    verify_atomic_u32_load_store,
+    CreusotAtomicU32,
+    u32,
+    "AtomicU32"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_U64_LOAD_STORE_SRC,
+    verify_atomic_u64_load_store,
+    CreusotAtomicU64,
+    u64,
+    "AtomicU64"
+);
+atomic_sc_load_store_harness!(
+    VERIFY_ATOMIC_USIZE_LOAD_STORE_SRC,
+    verify_atomic_usize_load_store,
+    CreusotAtomicUsize,
+    usize,
+    "AtomicUsize"
+);
+
+amenable_derive::harness! {
+    creusot, VERIFY_ATOMIC_PTR_LOAD_STORE_SRC, {
+        /// `AtomicPtr::new` sets the pointer observable via `load`, and
+        /// `store` overwrites it, under sequentially consistent ordering.
+        #[requires(true)]
+        #[ensures(result.0)]
+        #[ensures(result.1)]
+        fn verify_atomic_ptr_load_store(initial: *mut i32, next: *mut i32) -> (bool, bool) {
+            let (atomic, mut own) = CreusotAtomicPtr::new(initial);
+            let observed_initial = atomic.load(ghost!(
+                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+            ));
+            atomic.store(
+                next,
+                ghost!(
+                    |c: &mut Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut **own)
+                ),
+            );
+            let observed_next = atomic.load(ghost!(
+                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+            ));
+            (observed_initial.addr() == initial.addr(), observed_next.addr() == next.addr())
+        }
+    }
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC, {
         /// A fixed-size array's length is its compile-time-known element
@@ -154,6 +728,105 @@ amenable_derive::harness! {
             let arr = [a, b, c];
             let slice: &[i32] = &arr;
             (slice.len(), slice[0], slice[1], slice[2])
+        }
+    }
+}
+
+// `creusot-std` 0.11.0 ships enough contracts to keep the core borrowed
+// slice iterators below fully checked. The other slice carriers we cover in
+// `amenable_std` still need trusted boundaries today: predicate-driven
+// `ChunkBy`/`ChunkByMut` and `Split`/`RSplit`/`*N`/`*Mut` all hit the same
+// "contractless external + missing `IteratorSpec`" boundary, chunk/window and
+// reverse-chunk iterators still lack borrowed-carrier iterator contracts (and
+// the forward family also hit slice-pattern translation ICEs while being
+// reduced), `EscapeAscii` hits the same missing iterator contracts, and
+// `get_disjoint_mut` remains contractless. Those laws stay behind explicit
+// trusted boundaries instead of pretending to be checked here.
+amenable_derive::harness! {
+    creusot, VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, {
+        /// `slice::Iter` yields shared references to each element in
+        /// order, then ends.
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, third_seen, exhausted) =>
+                first_seen == Some(a)
+                    && second_seen == Some(b)
+                    && third_seen == Some(c)
+                    && exhausted,
+        })]
+        fn verify_slice_iter_yields_shared_references_in_order(
+            a: i32,
+            b: i32,
+            c: i32,
+        ) -> (Option<i32>, Option<i32>, Option<i32>, bool) {
+            let data = [a, b, c];
+            let mut it = data.iter();
+            let first_seen = match it.next() {
+                Some(r) => Some(*r),
+                None => None,
+            };
+            let second_seen = match it.next() {
+                Some(r) => Some(*r),
+                None => None,
+            };
+            let third_seen = match it.next() {
+                Some(r) => Some(*r),
+                None => None,
+            };
+            let exhausted = match it.next() {
+                Some(_) => false,
+                None => true,
+            };
+            (first_seen, second_seen, third_seen, exhausted)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC, {
+        /// `slice::IterMut` yields mutable references in order, and
+        /// writes through them update the underlying slice.
+        #[requires(true)]
+        #[ensures(match result {
+            (first_seen, second_seen, exhausted, final_first, final_second) =>
+                first_seen == Some(a)
+                    && second_seen == Some(b)
+                    && exhausted
+                    && final_first == updated_a
+                    && final_second == updated_b,
+        })]
+        fn verify_slice_iter_mut_yields_mutable_references_that_write_through(
+            a: i32,
+            b: i32,
+            updated_a: i32,
+            updated_b: i32,
+        ) -> (Option<i32>, Option<i32>, bool, i32, i32) {
+            let mut data = [a, b];
+            let (first_seen, second_seen, exhausted) = {
+                let mut it = data.iter_mut();
+                let first_seen = match it.next() {
+                    Some(r) => {
+                        let seen = *r;
+                        *r = updated_a;
+                        Some(seen)
+                    }
+                    None => None,
+                };
+                let second_seen = match it.next() {
+                    Some(r) => {
+                        let seen = *r;
+                        *r = updated_b;
+                        Some(seen)
+                    }
+                    None => None,
+                };
+                let exhausted = match it.next() {
+                    Some(_) => false,
+                    None => true,
+                };
+                (first_seen, second_seen, exhausted)
+            };
+            (first_seen, second_seen, exhausted, data[0], data[1])
         }
     }
 }
@@ -234,6 +907,26 @@ amenable_derive::harness! {
         fn verify_mut_pointer_cast_preserves_the_address(ptr: *mut i32) -> bool {
             let cast = ptr.cast::<u8>();
             cast.addr() == ptr.addr()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, {
+        /// `AssertUnwindSafe` is a transparent tuple wrapper around the
+        /// carried value; Creusot can prove the wrapper-level round trip
+        /// directly through its public field.
+        #[requires(true)]
+        #[ensures(result.0 == value)]
+        #[ensures(result.1 == updated)]
+        fn verify_assert_unwind_safe_derefs_transparently(
+            value: i32,
+            updated: i32,
+        ) -> (i32, i32) {
+            let mut wrapped = AssertUnwindSafe(value);
+            let first = wrapped.0;
+            wrapped.0 = updated;
+            (first, wrapped.0)
         }
     }
 }
@@ -2694,6 +3387,85 @@ amenable_derive::harness! {
 // `PollFn` carriers are outside Creusot's concrete reasoning boundary
 // today. These harnesses therefore keep the same representative
 // observations as Kani while making that trusted boundary explicit.
+//
+// `Poll<T>` itself is the one exception here: it is just a plain enum, so
+// Creusot can check the Ready/Pending disjointness law directly even though
+// the surrounding task ecosystem stays outside its current std-contract
+// surface.
+amenable_derive::harness! {
+    creusot, VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC, {
+        /// `Poll::Ready` and `Poll::Pending` are disjoint, and `Ready`
+        /// round-trips its payload.
+        #[requires(true)]
+        #[ensures(match result {
+            (ready_is_ready, ready_is_pending, ready_value, pending_is_pending, pending_is_ready) =>
+                ready_is_ready
+                    && !ready_is_pending
+                    && ready_value == value
+                    && pending_is_pending
+                    && !pending_is_ready,
+        })]
+        fn verify_poll_ready_and_pending_are_disjoint(
+            value: i32,
+        ) -> (bool, bool, i32, bool, bool) {
+            let ready = Poll::Ready(value);
+            let ready_is_ready = match ready {
+                Poll::Ready(_) => true,
+                Poll::Pending => false,
+            };
+            let ready_is_pending = match ready {
+                Poll::Ready(_) => false,
+                Poll::Pending => true,
+            };
+            let ready_value = match ready {
+                Poll::Ready(inner) => inner,
+                Poll::Pending => value,
+            };
+
+            let pending: Poll<i32> = Poll::Pending;
+            let pending_is_pending = match pending {
+                Poll::Ready(_) => false,
+                Poll::Pending => true,
+            };
+            let pending_is_ready = match pending {
+                Poll::Ready(_) => true,
+                Poll::Pending => false,
+            };
+
+            (
+                ready_is_ready,
+                ready_is_pending,
+                ready_value,
+                pending_is_pending,
+                pending_is_ready,
+            )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC, {
+        /// `Context::from_waker` exposes the same wake target through
+        /// `Context::waker`.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result)]
+        fn verify_context_from_waker_exposes_the_same_waker() -> bool {
+            use std::sync::Arc;
+            use std::task::Wake;
+
+            struct NoopWake;
+            impl Wake for NoopWake {
+                fn wake(self: Arc<Self>) {}
+            }
+
+            let waker = Waker::from(Arc::new(NoopWake));
+            let cx = Context::from_waker(&waker);
+            cx.waker().will_wake(&waker)
+        }
+    }
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_PENDING_NEVER_RESOLVES_SRC, {
         /// `Pending` always reports `Poll::Pending` when polled,
@@ -2748,6 +3520,57 @@ amenable_derive::harness! {
             let fut: Ready<i32> = std::future::ready(value);
             let mut fut = pin!(fut);
             fut.as_mut().poll(&mut cx)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC, {
+        /// `Waker::wake_by_ref` dispatches through to the wrapped
+        /// `Wake` implementation exactly once.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(result == 1usize)]
+        fn verify_waker_wake_by_ref_invokes_the_wake_impl() -> usize {
+            use std::sync::Arc;
+            use std::task::Wake;
+
+            struct CountingWake(std::sync::atomic::AtomicUsize);
+            impl Wake for CountingWake {
+                fn wake(self: Arc<Self>) {
+                    self.0.fetch_add(1, AtomicOrdering::SeqCst);
+                }
+
+                fn wake_by_ref(self: &Arc<Self>) {
+                    self.0.fetch_add(1, AtomicOrdering::SeqCst);
+                }
+            }
+
+            let inner = Arc::new(CountingWake(std::sync::atomic::AtomicUsize::new(0)));
+            let waker = Waker::from(inner.clone());
+            waker.wake_by_ref();
+            inner.0.load(AtomicOrdering::SeqCst)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC, {
+        /// A `Relaxed` store is still observable through a later
+        /// `Relaxed` load on the same atomic in the same thread.
+        #[trusted]
+        #[requires(true)]
+        #[ensures(match result {
+            (before, after) => before == 0i32 && after == value,
+        })]
+        fn verify_relaxed_ordering_still_makes_a_store_observable(
+            value: i32,
+        ) -> (i32, i32) {
+            let atomic = std::sync::atomic::AtomicI32::new(0);
+            let before = atomic.load(AtomicOrdering::Relaxed);
+            atomic.store(value, AtomicOrdering::Relaxed);
+            let after = atomic.load(AtomicOrdering::Relaxed);
+            (before, after)
         }
     }
 }

@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 261 8 264 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 954 8 957 23 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 258 19 258 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 259 18 259 37
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 260 18 260 34
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 951 19 951 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 952 18 952 37
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 953 18 953 34
 
 use creusot.prelude.MutBorrow
 use creusot.int.Int32
@@ -19,7 +19,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_mutable_reference_dereferences_to_and_updates_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 261 8 264 23] (initial: Int32.t) (next: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 954 8 957 23] (initial: Int32.t) (next: Int32.t)
   (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &value <- initial ] s1

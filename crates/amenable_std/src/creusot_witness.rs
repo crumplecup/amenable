@@ -90,18 +90,17 @@ use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs}
 use std::ffi::os_str::Display as OsStrDisplay;
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError, OsStr, OsString};
-use std::fs::{
-    DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
-};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
+};
+use std::fs::{
+    DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
 };
 use std::future::{Pending, PollFn, Ready};
 use std::hash::{BuildHasherDefault, RandomState};
 use std::io::{
     BufReader, BufWriter, Cursor, IntoInnerError, IoSlice, IoSliceMut, LineWriter, PipeReader,
-    PipeWriter, SeekFrom, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock,
-    WriterPanicked,
+    PipeWriter, SeekFrom, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
 };
 use std::iter::{
     Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map,
@@ -117,15 +116,15 @@ use std::net::{
 use std::num::{NonZero, Saturating, Wrapping};
 use std::ops::{Bound, ControlFlow, Range, RangeFull, RangeTo};
 use std::panic::{AssertUnwindSafe, PanicHookInfo};
-use std::pin::Pin;
-use std::ptr::NonNull;
 use std::path::{
     Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
 };
+use std::pin::Pin;
 use std::process::{
     Child, ChildStderr, ChildStdin, ChildStdout, Command, CommandArgs, CommandEnvs, ExitCode,
     ExitStatus, Output, Stdio,
 };
+use std::ptr::NonNull;
 use std::rc::Rc;
 use std::slice::{
     ChunkBy, ChunkByMut, Chunks, ChunksExact, ChunksExactMut, ChunksMut, EscapeAscii,
@@ -138,13 +137,13 @@ use std::str::{
     Utf8Chunks, Utf8Error,
 };
 use std::string::{FromUtf8Error, FromUtf16Error};
-use std::sync::{
-    Arc, Barrier, BarrierWaitResult, LazyLock, OnceLock, OnceState, WaitTimeoutResult,
-};
-use std::sync::mpsc::SyncSender;
 use std::sync::atomic::{
     AtomicBool, AtomicI8, AtomicI16, AtomicI32, AtomicI64, AtomicIsize, AtomicPtr, AtomicU8,
     AtomicU16, AtomicU32, AtomicU64, AtomicUsize, Ordering as AtomicOrdering,
+};
+use std::sync::mpsc::SyncSender;
+use std::sync::{
+    Arc, Barrier, BarrierWaitResult, LazyLock, OnceLock, OnceState, WaitTimeoutResult,
 };
 use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 use std::thread::{
