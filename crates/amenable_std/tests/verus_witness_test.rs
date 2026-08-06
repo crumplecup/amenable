@@ -1957,3 +1957,367 @@ fn escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance(
         <std::char::EscapeUnicode as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn slice_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::Chunks<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::Chunks<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_chunks_exact_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::ChunksExact<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunks_exact_model_discards_a_short_remainder"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::ChunksExact<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_chunks_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::ChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunks_mut_model_writes_through_every_chunk"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::ChunksMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_chunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::ChunksExactMut<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunks_exact_mut_model_leaves_the_remainder_untouched"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::ChunksExactMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rchunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::RChunks<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_rchunks_model_groups_from_the_back");
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RChunks<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rchunks_exact_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::RChunksExact<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rchunks_exact_model_discards_a_short_remainder_at_the_front"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RChunksExact<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rchunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::RChunksExactMut<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RChunksExactMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rchunks_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::RChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rchunks_mut_model_writes_through_every_chunk"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RChunksMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_windows_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::Windows<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_windows_model_yields_overlapping_slices"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::Windows<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_chunk_by_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_chunk_by_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_model_yields_subslices_between_matches"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::Split<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_split_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::SplitMut<'static, i32, fn(&i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_mut_model_writes_through_the_first_piece"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::SplitMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_split_inclusive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_split_inclusive_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::slice::SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::SplitInclusiveMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance(
+        )
+    );
+}
+
+#[test]
+fn slice_split_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_n_model_caps_the_number_of_pieces"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::SplitN<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_split_n_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::SplitNMut<'static, i32, fn(&i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_n_model_caps_the_number_of_pieces"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::SplitNMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rsplit_model_yields_subslices_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RSplit<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rsplit_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::RSplitMut<'static, i32, fn(&i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rsplit_mut_model_writes_through_the_rearmost_piece"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RSplitMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rsplit_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RSplitN<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_rsplit_n_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::RSplitNMut<'static, i32, fn(&i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::RSplitNMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_escape_ascii_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::EscapeAscii<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_escape_ascii_model_leaves_printable_bytes_unescaped"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::EscapeAscii<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::GetDisjointMutError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::GetDisjointMutError as RustStdType>::provenance()
+    );
+}

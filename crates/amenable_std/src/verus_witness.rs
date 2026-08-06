@@ -3821,3 +3821,249 @@ bridge_verus_witness!(RustStdStandard<std::char::EscapeUnicode>);
         },
     }
 }
+
+macro_rules! impl_slice_chunks_verus_witness {
+    ($ty:ty, $harness:literal, $const_name:ident) => {
+        const $const_name: &str =
+            include_str!("../../amenable_verus/src/rust_std/slice_chunks_carrier.rs");
+
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: $harness,
+                    claim: $const_name,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_slice_chunks_verus_witness!(
+    std::slice::Chunks<'static, i32>,
+    "verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk",
+    VERIFY_CHUNKS_MODEL_YIELDS_NON_OVERLAPPING_GROUPS_WITH_A_SHORT_LAST_CHUNK_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::ChunksExact<'static, i32>,
+    "verify_chunks_exact_model_discards_a_short_remainder",
+    VERIFY_CHUNKS_EXACT_MODEL_DISCARDS_A_SHORT_REMAINDER_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::ChunksMut<'static, i32>,
+    "verify_chunks_mut_model_writes_through_every_chunk",
+    VERIFY_CHUNKS_MUT_MODEL_WRITES_THROUGH_EVERY_CHUNK_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::ChunksExactMut<'static, i32>,
+    "verify_chunks_exact_mut_model_leaves_the_remainder_untouched",
+    VERIFY_CHUNKS_EXACT_MUT_MODEL_LEAVES_THE_REMAINDER_UNTOUCHED_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::RChunks<'static, i32>,
+    "verify_rchunks_model_groups_from_the_back",
+    VERIFY_RCHUNKS_MODEL_GROUPS_FROM_THE_BACK_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::RChunksExact<'static, i32>,
+    "verify_rchunks_exact_model_discards_a_short_remainder_at_the_front",
+    VERIFY_RCHUNKS_EXACT_MODEL_DISCARDS_A_SHORT_REMAINDER_AT_THE_FRONT_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::RChunksExactMut<'static, i32>,
+    "verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched",
+    VERIFY_RCHUNKS_EXACT_MUT_MODEL_LEAVES_THE_FRONT_REMAINDER_UNTOUCHED_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::RChunksMut<'static, i32>,
+    "verify_rchunks_mut_model_writes_through_every_chunk",
+    VERIFY_RCHUNKS_MUT_MODEL_WRITES_THROUGH_EVERY_CHUNK_SRC
+);
+impl_slice_chunks_verus_witness!(
+    std::slice::Windows<'static, i32>,
+    "verify_windows_model_yields_overlapping_slices",
+    VERIFY_WINDOWS_MODEL_YIELDS_OVERLAPPING_SLICES_SRC
+);
+
+const VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/slice_chunk_by_carrier.rs");
+
+macro_rules! impl_chunk_by_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate",
+                    claim: VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_chunk_by_verus_witness!(std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>);
+impl_chunk_by_verus_witness!(std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>);
+
+macro_rules! impl_slice_split_verus_witness {
+    ($ty:ty, $harness:literal, $const_name:ident) => {
+        const $const_name: &str =
+            include_str!("../../amenable_verus/src/rust_std/slice_split_carrier.rs");
+
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: $harness,
+                    claim: $const_name,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_slice_split_verus_witness!(
+    std::slice::Split<'static, i32, fn(&i32) -> bool>,
+    "verify_split_model_yields_subslices_between_matches",
+    VERIFY_SPLIT_MODEL_YIELDS_SUBSLICES_BETWEEN_MATCHES_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::SplitMut<'static, i32, fn(&i32) -> bool>,
+    "verify_split_mut_model_writes_through_the_first_piece",
+    VERIFY_SPLIT_MUT_MODEL_WRITES_THROUGH_THE_FIRST_PIECE_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>,
+    "verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece",
+    VERIFY_SPLIT_INCLUSIVE_MODEL_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
+    "verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece",
+    VERIFY_SPLIT_INCLUSIVE_MUT_MODEL_KEEPS_THE_MATCH_AT_THE_END_OF_EACH_PIECE_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::SplitN<'static, i32, fn(&i32) -> bool>,
+    "verify_split_n_model_caps_the_number_of_pieces",
+    VERIFY_SPLIT_N_MODEL_CAPS_THE_NUMBER_OF_PIECES_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::SplitNMut<'static, i32, fn(&i32) -> bool>,
+    "verify_split_n_model_caps_the_number_of_pieces",
+    VERIFY_SPLIT_N_MUT_MODEL_CAPS_THE_NUMBER_OF_PIECES_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::RSplit<'static, i32, fn(&i32) -> bool>,
+    "verify_rsplit_model_yields_subslices_from_the_back",
+    VERIFY_RSPLIT_MODEL_YIELDS_SUBSLICES_FROM_THE_BACK_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::RSplitMut<'static, i32, fn(&i32) -> bool>,
+    "verify_rsplit_mut_model_writes_through_the_rearmost_piece",
+    VERIFY_RSPLIT_MUT_MODEL_WRITES_THROUGH_THE_REARMOST_PIECE_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::RSplitN<'static, i32, fn(&i32) -> bool>,
+    "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back",
+    VERIFY_RSPLIT_N_MODEL_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC
+);
+impl_slice_split_verus_witness!(
+    std::slice::RSplitNMut<'static, i32, fn(&i32) -> bool>,
+    "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back",
+    VERIFY_RSPLIT_N_MUT_MODEL_CAPS_THE_NUMBER_OF_PIECES_FROM_THE_BACK_SRC
+);
+
+const VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/escape_ascii_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_escape_ascii_model_leaves_printable_bytes_unescaped",
+            claim: VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::slice::EscapeAscii<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::slice::EscapeAscii<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/get_disjoint_mut_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::slice::GetDisjointMutError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds",
+            claim: VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::slice::GetDisjointMutError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::GetDisjointMutError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::slice::GetDisjointMutError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
