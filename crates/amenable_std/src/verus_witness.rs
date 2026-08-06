@@ -3170,6 +3170,63 @@ macro_rules! impl_non_zero_verus_witness {
     };
 }
 
+const VERIFY_ITER_MODEL_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/slice_iter_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_iter_model_yields_shared_references_in_order",
+            claim: VERIFY_ITER_MODEL_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::slice::Iter<'static, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/slice_iter_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_iter_mut_model_yields_mutable_references_that_write_through",
+            claim: VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::slice::IterMut<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");
 

@@ -1307,6 +1307,36 @@ non_zero_witness_test!(
 );
 
 #[test]
+fn slice_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_iter_model_yields_shared_references_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn slice_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::slice::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_iter_mut_model_yields_mutable_references_that_write_through"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::slice::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::Ipv4Addr> as Witness<VerusVerifier>>::proof();
 
