@@ -1235,3 +1235,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::TryReserveError>);
         },
     }
 }
+
+const VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/vec_into_iter_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::vec::IntoIter<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_vec_into_iter_round_trips_via_collect",
+            claim: VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::IntoIter<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::vec::IntoIter<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
