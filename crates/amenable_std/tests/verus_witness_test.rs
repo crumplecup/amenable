@@ -604,3 +604,18 @@ fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cell::Cell<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::array::IntoIter<i32, 3>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_array_into_iter_model_yields_elements_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::array::IntoIter<i32, 3> as RustStdType>::provenance()
+    );
+}

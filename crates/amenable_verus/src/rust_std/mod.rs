@@ -8,6 +8,7 @@
 //! function at a time.
 
 pub mod arc_carrier;
+pub mod array_into_iter_carrier;
 pub mod binary_heap_carrier;
 pub mod box_carrier;
 pub mod btree_carrier;

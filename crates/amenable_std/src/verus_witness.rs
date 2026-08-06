@@ -1404,3 +1404,31 @@ bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
         },
     }
 }
+
+const VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/array_into_iter_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_array_into_iter_model_yields_elements_in_order",
+            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::array::IntoIter<i32, 3>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::array::IntoIter<i32, 3>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
