@@ -14,6 +14,7 @@ pub mod box_carrier;
 pub mod btree_carrier;
 pub mod cell_carrier;
 pub mod char_carrier;
+pub mod char_transform_carrier;
 pub mod char_try_from_carrier;
 pub mod chars_carrier;
 pub mod cow_carrier;

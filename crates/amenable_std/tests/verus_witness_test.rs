@@ -757,3 +757,73 @@ fn decode_utf16_error_witness_is_checked_and_still_carries_chain_derived_provena
         <std::char::DecodeUtf16Error as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn to_lowercase_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::ToLowercase> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_to_lowercase_model_maps_an_uppercase_ascii_letter"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::ToLowercase as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn to_uppercase_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::ToUppercase> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_to_uppercase_model_maps_a_lowercase_ascii_letter"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::ToUppercase as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::EscapeDebug> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_escape_debug_model_escapes_a_newline"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::EscapeDebug as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::EscapeDefault> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_escape_default_model_escapes_a_newline"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::EscapeDefault as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::EscapeUnicode> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_escape_unicode_model_renders_the_codepoint_escape"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::EscapeUnicode as RustStdType>::provenance()
+    );
+}

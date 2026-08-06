@@ -1657,3 +1657,143 @@ bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16Error>);
         },
     }
 }
+
+const VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::ToLowercase> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_to_lowercase_model_maps_an_uppercase_ascii_letter",
+            claim: VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::ToLowercase>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::ToLowercase>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::ToLowercase> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::ToUppercase> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_to_uppercase_model_maps_a_lowercase_ascii_letter",
+            claim: VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::ToUppercase>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::ToUppercase>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::ToUppercase> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::EscapeDebug> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_char_escape_debug_model_escapes_a_newline",
+            claim: VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::EscapeDebug>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeDebug>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::EscapeDebug> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::EscapeDefault> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_char_escape_default_model_escapes_a_newline",
+            claim: VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::EscapeDefault>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeDefault>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::EscapeDefault> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::EscapeUnicode> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_char_escape_unicode_model_renders_the_codepoint_escape",
+            claim: VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::EscapeUnicode>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeUnicode>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::EscapeUnicode> as VerusWitness>::proof().to_string()
+        },
+    }
+}
