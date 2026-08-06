@@ -118,3 +118,17 @@ fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenan
         <std::mem::ManuallyDrop<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::FpCategory> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_fp_category_matches_the_value_it_classifies"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::FpCategory as RustStdType>::provenance()
+    );
+}

@@ -408,3 +408,31 @@ bridge_verus_witness!(RustStdStandard<std::mem::ManuallyDrop<i32>>);
         },
     }
 }
+
+const VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fp_category_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::num::FpCategory> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_fp_category_matches_the_value_it_classifies",
+            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::num::FpCategory> as VerusWitness>::proof().to_string()
+        },
+    }
+}
