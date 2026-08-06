@@ -329,3 +329,17 @@ fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::ffi::NulError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::FromVecWithNulError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_vec_with_nul_requires_the_nul_only_at_the_end"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::FromVecWithNulError as RustStdType>::provenance()
+    );
+}

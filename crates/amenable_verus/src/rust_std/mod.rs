@@ -13,6 +13,7 @@ pub mod char_try_from_carrier;
 pub mod cstring_carrier;
 pub mod fp_category_carrier;
 pub mod from_utf16_error_carrier;
+pub mod from_vec_with_nul_carrier;
 pub mod int_error_kind_carrier;
 pub mod layout_carrier;
 pub mod manually_drop_carrier;

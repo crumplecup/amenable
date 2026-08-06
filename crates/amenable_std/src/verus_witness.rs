@@ -826,3 +826,31 @@ bridge_verus_witness!(RustStdStandard<std::ffi::NulError>);
         describe: || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
     }
 }
+
+const VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/from_vec_with_nul_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
+            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::FromVecWithNulError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ffi::FromVecWithNulError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
