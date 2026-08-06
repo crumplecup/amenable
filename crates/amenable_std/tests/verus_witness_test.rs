@@ -593,3 +593,14 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::collections::LinkedList<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cell::Cell<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_cell_model_get_set_replace_round_trip");
+    assert_eq!(
+        proof.provenance,
+        <std::cell::Cell<i32> as RustStdType>::provenance()
+    );
+}

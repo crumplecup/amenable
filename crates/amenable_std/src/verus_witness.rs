@@ -1376,3 +1376,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
         },
     }
 }
+
+const VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cell_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cell_model_get_set_replace_round_trip",
+            claim: VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::Cell<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
