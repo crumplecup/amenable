@@ -714,6 +714,20 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn from_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::string::FromUtf8Error> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_utf8_error_model_recovers_the_original_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::string::FromUtf8Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn rc_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::rc::Weak<i32>> as Witness<VerusVerifier>>::proof();
 

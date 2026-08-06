@@ -1627,6 +1627,34 @@ bridge_verus_witness!(RustStdStandard<std::sync::Weak<i32>>);
     }
 }
 
+const VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/from_utf8_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_utf8_error_model_recovers_the_original_bytes",
+            claim: VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::string::FromUtf8Error> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 
