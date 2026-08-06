@@ -22,6 +22,7 @@ pub mod cow_carrier;
 pub mod cstr_carrier;
 pub mod cstring_carrier;
 pub mod decode_utf16_carrier;
+pub mod fmt_carrier;
 pub mod fp_category_carrier;
 pub mod from_utf16_error_carrier;
 pub mod from_utf8_error_carrier;

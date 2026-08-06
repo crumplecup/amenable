@@ -264,6 +264,14 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn fmt_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::fmt::Error> as Witness<VerusVerifier>>::proof(),
+        <std::fmt::Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<std::cell::BorrowError> as Witness<VerusVerifier>>::proof(),
@@ -1059,6 +1067,141 @@ fn iter_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() 
     assert_eq!(
         proof.provenance,
         <std::iter::FromFn<fn() -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_alignment_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fmt::Alignment> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_alignment_model_reaches_the_formatter_from_the_format_spec"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::Alignment as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_formatter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fmt::Formatter<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_formatter_model_exposes_the_parsed_width_and_precision"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::Formatter<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_arguments_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fmt::Arguments<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_arguments_model_renders_the_same_as_the_value_itself"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::Arguments<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_from_fn_model_forwards_display_to_the_supplied_closure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_struct_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fmt::DebugStruct<'static, 'static>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_debug_struct_model_renders_named_fields"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::DebugStruct<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_tuple_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fmt::DebugTuple<'static, 'static>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_debug_tuple_model_renders_positional_fields"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::DebugTuple<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::fmt::DebugList<'static, 'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_debug_list_model_renders_entries_in_brackets"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::DebugList<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::fmt::DebugSet<'static, 'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_debug_set_model_renders_entries_in_braces"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::DebugSet<'static, 'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fmt_debug_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_debug_map_model_renders_key_value_pairs"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fmt::DebugMap<'static, 'static> as RustStdType>::provenance()
     );
 }
 

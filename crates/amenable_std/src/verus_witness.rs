@@ -165,7 +165,8 @@ impl_verus_witness_trusted!(
     std::convert::Infallible,
     core::ffi::c_void,
     std::cell::BorrowError,
-    std::cell::BorrowMutError
+    std::cell::BorrowMutError,
+    std::fmt::Error
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -2841,6 +2842,268 @@ bridge_verus_witness!(RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::Alignment> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_alignment_model_reaches_the_formatter_from_the_format_spec",
+            claim: VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::Alignment>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Alignment>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::Alignment> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::Formatter<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_formatter_model_exposes_the_parsed_width_and_precision",
+            claim: VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::Formatter<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Formatter<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::Formatter<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::Arguments<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_arguments_model_renders_the_same_as_the_value_itself",
+            claim: VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::Arguments<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::Arguments<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_from_fn_model_forwards_display_to_the_supplied_closure",
+            claim: VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::DebugStruct<'static, 'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_debug_struct_model_renders_named_fields",
+            claim: VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::DebugStruct<'static, 'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::DebugStruct<'static, 'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::DebugTuple<'static, 'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_debug_tuple_model_renders_positional_fields",
+            claim: VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::DebugTuple<'static, 'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::DebugTuple<'static, 'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::DebugList<'static, 'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_debug_list_model_renders_entries_in_brackets",
+            claim: VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::DebugList<'static, 'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::DebugList<'static, 'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::DebugSet<'static, 'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_debug_set_model_renders_entries_in_braces",
+            claim: VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::DebugSet<'static, 'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::DebugSet<'static, 'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fmt::DebugMap<'static, 'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_debug_map_model_renders_key_value_pairs",
+            claim: VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
     }
