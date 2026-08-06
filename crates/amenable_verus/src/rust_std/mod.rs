@@ -58,6 +58,8 @@ pub mod unsafe_cell_carrier;
 pub mod vec_carrier;
 pub mod vec_deque_carrier;
 pub mod vec_deque_iter_carrier;
+pub mod vec_extract_if_carrier;
 pub mod vec_into_iter_carrier;
+pub mod vec_splice_carrier;
 pub mod weak_carrier;
 pub mod wrapping_carrier;

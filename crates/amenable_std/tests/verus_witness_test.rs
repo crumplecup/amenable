@@ -605,6 +605,55 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_extract_if_model_partitions_by_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn linked_list_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_extract_if_model_partitions_by_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_splice_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_splice_model_replaces_a_range_and_yields_what_it_removed"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::vec::Splice<'static, std::vec::IntoIter<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn string_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::string::Drain<'static>> as Witness<VerusVerifier>>::proof();
 
