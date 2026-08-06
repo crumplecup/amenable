@@ -436,3 +436,31 @@ bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
         },
     }
 }
+
+const VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/int_error_kind_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::num::IntErrorKind> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_int_error_kind_classifies_parse_failures",
+            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::num::IntErrorKind>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::num::IntErrorKind> as VerusWitness>::proof().to_string()
+        },
+    }
+}

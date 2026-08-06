@@ -9,6 +9,7 @@
 
 pub mod char_carrier;
 pub mod fp_category_carrier;
+pub mod int_error_kind_carrier;
 pub mod manually_drop_carrier;
 pub mod option_carrier;
 pub mod ordering_carrier;

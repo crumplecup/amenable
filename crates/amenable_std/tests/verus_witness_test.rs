@@ -132,3 +132,17 @@ fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <core::num::FpCategory as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::IntErrorKind> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_int_error_kind_classifies_parse_failures"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::IntErrorKind as RustStdType>::provenance()
+    );
+}
