@@ -624,3 +624,71 @@ pub fn verify_cell_round_trip(initial: i32) -> (result: i32)
         },
     }
 }
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::try_from_slice_signature_solved_postcondition_still_open".to_owned(),
+            title: "<[T; N]>::try_from(&[T])'s signature needed a phantom outer lifetime binder to match; the postcondition itself remains genuinely unresolved".to_owned(),
+            disposition: VerusGalleryDisposition::Hypothesis,
+            expected: VerusGalleryExpectation::Unproved,
+            claim: r#"
+// Attempt: the same claim amenable_kani's verify_try_from_slice_
+// rejects_a_length_mismatch harness checks — <[T; N]>::try_from(&[T])
+// succeeds exactly when the slice's length matches N, round-tripping
+// the elements.
+
+// Round 1 (concrete i32/N=2, no lifetime):
+pub assume_specification [<[i32; 2] as core::convert::TryFrom<&[i32]>>::try_from] (slice: &[i32]) -> (result: Result<[i32; 2], <[i32; 2] as core::convert::TryFrom<&[i32]>>::Error>)
+    ensures ...;
+// error: signature mismatch — expected the fully generic
+// `for<'_0, T, N> for<'_> (&[T]) -> Result<[T; N], TryFromSliceError>`.
+
+// Round 2 (generic T/N, error type still wrong — used the associated-
+// type form that TryFromIntError's finding taught, reasonably, but
+// wrong here):
+pub assume_specification<T: Copy, const N: usize> [...] (slice: &[T]) -> (result: Result<[T; N], TryFromSliceError>)
+// error: still missing an outer lifetime binder — expected shows TWO
+// separate `for<...>` groups: `for<'_0, T, N>` THEN `for<'_>` — my
+// declaration only produced one `for<T, N>` group.
+
+// Round 3 (added an explicit lifetime, tied to the argument):
+pub assume_specification<'a, T: Copy, const N: usize> [<[T; N] as core::convert::TryFrom<&'a [T]>>::try_from] (slice: &'a [T]) -> ...
+// error: same shape mismatch — my single combined for<'a, T, N> still
+// isn't the expected TWO-group for<'_0, T, N> for<'_>.
+
+// Round 4 (the fix that finally matched): declare the lifetime in the
+// TRAIT REFERENCE (`&'a [T]` inside `TryFrom<&'a [T]>`) but leave the
+// ARGUMENT itself with an elided lifetime (bare `&[T]`, not `&'a [T]`)
+// — this genuinely doesn't look like it should typecheck as the "same"
+// function (the argument's lifetime looks unconstrained relative to the
+// impl), but it's what verus's own signature-matcher wants, and it
+// compiles:
+pub assume_specification<'a, T: Copy, const N: usize> [<[T; N] as core::convert::TryFrom<&'a [T]>>::try_from] (slice: &[T]) -> (result: Result<[T; N], TryFromSliceError>)
+    ensures
+        slice@.len() == N ==> (result is Ok && result->Ok_0@ == slice@),
+        slice@.len() != N ==> result is Err,
+;
+// This is a genuinely useful, reusable lesson for any future const-
+// generic-array TryFrom axiom: the impl's own lifetime parameter and
+// the function's argument lifetime print as separate binder groups, and
+// only the SECOND one governs the argument's actual type.
+
+// With the signature finally accepted, the postcondition itself
+// remained unproved through several real variations — matches! with an
+// `if` guard referencing `@` (rejected outright: `@` isn't valid inside
+// a plain matches! guard, only inside verus!-transformed match/if
+// expressions), a plain match returning `arr@ == matching@` as a runtime
+// bool (rejected: Seq<i32> has no PartialEq, so `@`-comparisons can only
+// live in spec context, never as an actual exec-mode bool value), and
+// finally elementwise indexing (`arr[0] == matching[0]`) with an
+// explicit `assert(arr@ =~= matching@)` extensional-equality hint before
+// it — still "postcondition not satisfied" at the caller. Not yet
+// diagnosed further within the effort budget for this pass; the
+// signature-matching lesson above is the durable, reusable finding here,
+// not a claim that the postcondition is impossible — just not yet
+// closed.
+"#,
+        },
+    }
+}
