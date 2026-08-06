@@ -357,3 +357,25 @@ fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenanc
         <core::char::ParseCharError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn rc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::rc::Rc<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_rc_derefs_to_the_wrapped_value");
+    assert_eq!(
+        proof.provenance,
+        <std::rc::Rc<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn arc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::Arc<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_arc_derefs_to_the_wrapped_value");
+    assert_eq!(
+        proof.provenance,
+        <std::sync::Arc<i32> as RustStdType>::provenance()
+    );
+}

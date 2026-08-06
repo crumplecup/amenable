@@ -7,6 +7,7 @@
 //! `amenable_creusot` get from `amenable_derive::harness!` capturing one
 //! function at a time.
 
+pub mod arc_carrier;
 pub mod box_carrier;
 pub mod char_carrier;
 pub mod char_try_from_carrier;
@@ -21,6 +22,7 @@ pub mod option_carrier;
 pub mod ordering_carrier;
 pub mod parse_char_error_carrier;
 pub mod parse_float_error_carrier;
+pub mod rc_carrier;
 pub mod result_carrier;
 pub mod reverse_carrier;
 pub mod saturating_carrier;

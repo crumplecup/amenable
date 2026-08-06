@@ -882,3 +882,55 @@ bridge_verus_witness!(RustStdStandard<core::char::ParseCharError>);
         },
     }
 }
+
+const VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/rc_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::rc::Rc<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_rc_derefs_to_the_wrapped_value",
+            claim: VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::rc::Rc<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::rc::Rc<i32>>",
+        verifier: "verus",
+        describe: || <RustStdStandard<std::rc::Rc<i32>> as VerusWitness>::proof().to_string(),
+    }
+}
+
+const VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/arc_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::Arc<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_arc_derefs_to_the_wrapped_value",
+            claim: VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::Arc<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Arc<i32>>",
+        verifier: "verus",
+        describe: || <RustStdStandard<std::sync::Arc<i32>> as VerusWitness>::proof().to_string(),
+    }
+}
