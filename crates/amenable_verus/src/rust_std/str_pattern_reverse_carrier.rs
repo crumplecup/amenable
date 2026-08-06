@@ -1,0 +1,65 @@
+//! Verus accommodation model for `core::str::{RSplit, RSplitN}`
+//! (monomorphized on `char`).
+//!
+//! Same zero-`vstd`-coverage gap the other accommodation-model carriers
+//! document. `amenable_kani`'s own harnesses use a bounded
+//! `KaniStrRSplitObservation`/`KaniStrRSplitNObservation` rather than
+//! the real iterators directly, since reverse pattern search
+//! (`memchr::memrchr` under the hood) times out under Kani even for a
+//! single `.next()` call on a fixed five-byte str — see
+//! `amenable_kani::rust_std::str`'s module doc. This carrier states the
+//! resulting laws directly as functions symbolic over three (or four)
+//! distinct ASCII characters, generalizing the bounded observation's
+//! fixed window shape. Neither function is `RSplit`/`RSplitN`
+//! themselves — each proof is conditional: sound if the real type
+//! refines the stated law, which `amenable_kani`'s own harness for that
+//! exact type (checking the real type via the bounded observation)
+//! already confirms independently, for the identical claim.
+
+use verus_builtin_macros::verus;
+#[allow(unused_imports)]
+use vstd::prelude::*;
+
+verus! {
+
+/// Over the one-occurrence window `[before, pattern, after]`,
+/// `.rsplit(pattern)` yields the piece after the match, then the piece
+/// before it.
+pub fn verify_str_rsplit_model_yields_substrings_from_the_back(before: char, pattern: char, after: char) -> (result: (char, char))
+    requires
+        (before as u32) < 128,
+        (pattern as u32) < 128,
+        (after as u32) < 128,
+        before != pattern,
+        after != pattern,
+    ensures
+        result.0 == after,
+        result.1 == before,
+{
+    // `pattern` plays no role beyond appearing in the window's `requires`
+    // (distinct from `before`/`after`) — the claim doesn't depend on its
+    // value.
+    let _ = pattern;
+    (after, before)
+}
+
+/// Over the two-occurrence window `[a, pattern, b, pattern, c]`,
+/// `.rsplitn(2, pattern)` yields the piece after the last match (`c`),
+/// then everything before it uncut (`[a, pattern, b]`).
+pub fn verify_str_rsplitn_model_limits_to_n_substrings_from_the_back(a: char, pattern: char, b: char, c: char) -> (result: (char, (char, char, char)))
+    requires
+        (a as u32) < 128,
+        (pattern as u32) < 128,
+        (b as u32) < 128,
+        (c as u32) < 128,
+        a != pattern,
+        b != pattern,
+        c != pattern,
+    ensures
+        result.0 == c,
+        result.1 == (a, pattern, b),
+{
+    (c, (a, pattern, b))
+}
+
+} // verus!

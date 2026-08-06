@@ -3,6 +3,12 @@
 use amenable_core::Witness;
 use amenable_std::{RustStdStandard, RustStdType, VerusVerifier};
 
+#[expect(
+    deprecated,
+    reason = "LinesAny is stable, only deprecated in favor of Lines; covering it is a coverage-completeness question, not a call to use it"
+)]
+type LinesAnyStatic = std::str::LinesAny<'static>;
+
 #[test]
 fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
@@ -292,6 +298,14 @@ fn addr_parse_error_witness_is_trusted_and_carries_chain_derived_provenance() {
     assert_eq!(
         <RustStdStandard<std::net::AddrParseError> as Witness<VerusVerifier>>::proof(),
         <std::net::AddrParseError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn parse_bool_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::str::ParseBoolError> as Witness<VerusVerifier>>::proof(),
+        <std::str::ParseBoolError as RustStdType>::provenance()
     );
 }
 
@@ -2319,5 +2333,358 @@ fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_deriv
     assert_eq!(
         proof.provenance,
         <std::slice::GetDisjointMutError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Bytes<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_bytes_model_yields_the_utf8_encoding");
+    assert_eq!(
+        proof.provenance,
+        <std::str::Bytes<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_char_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::CharIndices<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_indices_model_pairs_each_char_with_its_byte_offset"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::CharIndices<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_encode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::EncodeUtf16<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_encode_utf16_model_yields_utf16_code_units"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::EncodeUtf16<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::EscapeDebug<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_escape_debug_model_escapes_control_characters"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::EscapeDebug<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::EscapeDefault<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_escape_default_model_escapes_control_characters"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::EscapeDefault<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::EscapeUnicode<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_escape_unicode_model_renders_the_codepoint_escape"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::EscapeUnicode<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Lines<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_lines_model_splits_on_line_endings");
+    assert_eq!(
+        proof.provenance,
+        <std::str::Lines<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_lines_any_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<LinesAnyStatic> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_lines_any_model_splits_on_any_line_ending"
+    );
+    assert_eq!(
+        proof.provenance,
+        <LinesAnyStatic as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_split_ascii_whitespace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::SplitAsciiWhitespace<'static>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_ascii_whitespace_model_collapses_runs_of_whitespace"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::SplitAsciiWhitespace<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_split_whitespace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::SplitWhitespace<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_whitespace_model_collapses_runs_of_whitespace"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::SplitWhitespace<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_utf8_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Utf8Chunks<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_utf8_chunks_model_yields_one_chunk_for_wholly_valid_input"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::Utf8Chunks<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_utf8_chunk_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Utf8Chunk<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_utf8_chunk_model_separates_the_valid_prefix_from_invalid_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::Utf8Chunk<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::Utf8Error> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_utf8_error_model_reports_the_valid_prefix_length_and_error_span"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::Utf8Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::Split<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_split_model_yields_substrings_between_pattern_matches"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::Split<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_splitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::SplitN<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_splitn_model_limits_to_n_substrings"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::SplitN<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_split_inclusive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::SplitInclusive<'static, char>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_split_inclusive_model_keeps_the_delimiter_attached"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::SplitInclusive<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::RSplit<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_rsplit_model_yields_substrings_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::RSplit<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_rsplitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::RSplitN<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::RSplitN<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_split_terminator_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::SplitTerminator<'static, char>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::SplitTerminator<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_rsplit_terminator_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::RSplitTerminator<'static, char>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::RSplitTerminator<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_matches_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::Matches<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_matches_model_yields_every_non_overlapping_occurrence"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::Matches<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_rmatches_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::RMatches<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_matches_model_yields_every_non_overlapping_occurrence"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::RMatches<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_match_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::str::MatchIndices<'static, char>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::MatchIndices<'static, char> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn str_rmatch_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::str::RMatchIndices<'static, char>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::str::RMatchIndices<'static, char> as RustStdType>::provenance()
     );
 }
