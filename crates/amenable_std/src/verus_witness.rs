@@ -1655,6 +1655,34 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
     }
 }
 
+const VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ascii_escape_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::ascii::EscapeDefault> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_escape_default_model_escapes_a_control_byte",
+            claim: VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::ascii::EscapeDefault>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::ascii::EscapeDefault> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 
