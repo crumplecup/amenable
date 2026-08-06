@@ -507,6 +507,34 @@ bridge_verus_witness!(RustStdStandard<core::num::IntErrorKind>);
     }
 }
 
+const VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/int_error_kind_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::num::ParseIntError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_parse_int_error_model_reports_the_kind_of_the_failure",
+            claim: VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::num::ParseIntError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::num::ParseIntError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/parse_float_error_carrier.rs");
 

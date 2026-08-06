@@ -34,6 +34,8 @@ pub assume_specification [ParseIntError::kind] (err: &ParseIntError) -> (result:
 pub assume_specification [<i32 as std::str::FromStr>::from_str] (s: &str) -> (result: Result<i32, ParseIntError>)
     ensures
         s@.len() == 0 ==> result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::Empty,
+        (s@.len() > 0 && s@[0] as u8 >= 97 && s@[0] as u8 <= 122) ==>
+            result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::InvalidDigit,
 ;
 
 /// An empty string fails to parse as `i32` with exactly
@@ -53,6 +55,31 @@ pub fn verify_int_error_kind_classifies_parse_failures(s: &str) -> (result: IntE
         s@.len() == 0,
     ensures
         result == IntErrorKind::Empty,
+{
+    match <i32 as std::str::FromStr>::from_str(s) {
+        #[cfg(verus_keep_ghost)]
+        Ok(_) => unreached(),
+        #[cfg(not(verus_keep_ghost))]
+        Ok(_) => unreachable!(),
+        Err(err) => *err.kind(),
+    }
+}
+
+/// A lowercase ASCII letter can never start a valid integer literal, so
+/// any such string fails to parse as `i32` with exactly
+/// `IntErrorKind::InvalidDigit` — the same claim
+/// `verify_parse_int_error_reports_the_kind_of_the_failure`'s Kani/
+/// Creusot harnesses check for the literal `"not a number"`, generalized
+/// to any string starting with a lowercase letter. Same "parameter, not
+/// inline literal" shape as `verify_int_error_kind_classifies_parse_
+/// failures` above, for the same reason.
+pub fn verify_parse_int_error_model_reports_the_kind_of_the_failure(s: &str) -> (result: IntErrorKind)
+    requires
+        s@.len() > 0,
+        s@[0] as u8 >= 97,
+        s@[0] as u8 <= 122,
+    ensures
+        result == IntErrorKind::InvalidDigit,
 {
     match <i32 as std::str::FromStr>::from_str(s) {
         #[cfg(verus_keep_ghost)]

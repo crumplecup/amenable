@@ -154,6 +154,20 @@ fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance(
 }
 
 #[test]
+fn parse_int_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::num::ParseIntError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_parse_int_error_model_reports_the_kind_of_the_failure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::num::ParseIntError as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::num::ParseFloatError> as Witness<VerusVerifier>>::proof();
 
