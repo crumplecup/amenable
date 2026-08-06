@@ -2391,6 +2391,174 @@ bridge_verus_witness!(
     }
 }
 
+const VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_model_yields_exactly_one_value",
+            claim: VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Once<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Once<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Once<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::OnceWith<fn() -> i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_with_model_calls_its_closure_exactly_once",
+            claim: VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::OnceWith<fn() -> i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::OnceWith<fn() -> i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::OnceWith<fn() -> i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Repeat<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_repeat_model_yields_the_same_value_forever",
+            claim: VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Repeat<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Repeat<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Repeat<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::RepeatWith<fn() -> i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_repeat_with_model_calls_its_closure_once_per_item",
+            claim: VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::RepeatWith<fn() -> i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::RepeatWith<fn() -> i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::RepeatWith<fn() -> i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::RepeatN<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_repeat_n_model_yields_the_value_exactly_n_times",
+            claim: VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::RepeatN<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::RepeatN<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::RepeatN<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Empty<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_empty_model_yields_nothing",
+            claim: VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Empty<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Empty<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Empty<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
 

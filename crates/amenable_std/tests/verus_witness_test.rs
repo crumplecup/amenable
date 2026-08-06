@@ -835,6 +835,86 @@ fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance
 }
 
 #[test]
+fn iter_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Once<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_once_model_yields_exactly_one_value");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Once<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_once_with_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::OnceWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_once_with_model_calls_its_closure_exactly_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::OnceWith<fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Repeat<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_repeat_model_yields_the_same_value_forever"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Repeat<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_with_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::RepeatWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_repeat_with_model_calls_its_closure_once_per_item"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::RepeatWith<fn() -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_repeat_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::RepeatN<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_repeat_n_model_yields_the_value_exactly_n_times"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::RepeatN<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Empty<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_empty_model_yields_nothing");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Empty<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
