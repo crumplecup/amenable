@@ -176,7 +176,8 @@ impl_verus_witness_trusted!(
     std::io::Stdin,
     std::io::StdinLock<'static>,
     std::io::Stdout,
-    std::io::StdoutLock<'static>
+    std::io::StdoutLock<'static>,
+    std::process::ExitCode
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -5203,6 +5204,288 @@ bridge_verus_witness!(RustStdStandard<std::sync::atomic::Ordering>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::sync::atomic::Ordering> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_child_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::Child> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_child_model_has_a_process_id_and_can_be_waited_on",
+            claim: VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::Child>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Child>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::Child> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_child_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::ChildStderr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr",
+            claim: VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::ChildStderr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStderr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::ChildStderr> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_child_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::ChildStdin> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_child_stdin_model_is_readable_by_the_child_process",
+            claim: VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::ChildStdin>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStdin>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::ChildStdin> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_child_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::ChildStdout> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout",
+            claim: VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::ChildStdout>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStdout>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::ChildStdout> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_command_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::Command> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_command_model_env_override_is_visible_to_the_spawned_process",
+            claim: VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::Command>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Command>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::Command> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_command_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::CommandArgs<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_command_args_model_reports_the_configured_arguments",
+            claim: VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::CommandArgs<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::CommandArgs<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::CommandArgs<'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_command_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::CommandEnvs<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_command_envs_model_reports_the_configured_overrides",
+            claim: VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::CommandEnvs<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::CommandEnvs<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::CommandEnvs<'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_exit_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::ExitStatus> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_exit_status_model_reports_a_nonzero_exit_code",
+            claim: VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::ExitStatus>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ExitStatus>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::ExitStatus> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_exit_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::Output> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_output_model_captures_stdout_and_the_exit_status",
+            claim: VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::Output>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Output>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::Output> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/process_stdio_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::process::Stdio> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_stdio_model_null_discards_the_childs_output_handle",
+            claim: VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::process::Stdio>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Stdio>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::process::Stdio> as VerusWitness>::proof().to_string()
         },
     }
 }

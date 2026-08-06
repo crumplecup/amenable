@@ -3186,3 +3186,153 @@ fn atomic_ordering_witness_is_checked_and_still_carries_chain_derived_provenance
         <std::sync::atomic::Ordering as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn exit_code_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::process::ExitCode> as Witness<VerusVerifier>>::proof(),
+        <std::process::ExitCode as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn process_child_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::Child> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_child_model_has_a_process_id_and_can_be_waited_on"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::Child as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn child_stderr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::ChildStderr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::ChildStderr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn child_stdin_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::ChildStdin> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_child_stdin_model_is_readable_by_the_child_process"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::ChildStdin as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn child_stdout_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::ChildStdout> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::ChildStdout as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn process_command_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::Command> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_command_model_env_override_is_visible_to_the_spawned_process"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::Command as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn command_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::process::CommandArgs<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_command_args_model_reports_the_configured_arguments"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::CommandArgs<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn command_envs_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::process::CommandEnvs<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_command_envs_model_reports_the_configured_overrides"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::CommandEnvs<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn exit_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::ExitStatus> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_exit_status_model_reports_a_nonzero_exit_code"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::ExitStatus as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn process_output_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::Output> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_output_model_captures_stdout_and_the_exit_status"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::Output as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stdio_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::process::Stdio> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_stdio_model_null_discards_the_childs_output_handle"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::process::Stdio as RustStdType>::provenance()
+    );
+}
