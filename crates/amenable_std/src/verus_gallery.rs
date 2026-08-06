@@ -265,7 +265,7 @@ pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) ->
             disposition: VerusGalleryDisposition::FalseTrail,
             expected: VerusGalleryExpectation::NotSupported,
             claim: r#"
-// Attempt: axiomatize the real, unmodified std::num::NonZero::<T>::new,
+// Attempt 1: axiomatize the real, unmodified std::num::NonZero::<T>::new,
 // generic over T, the same shape amenable_kani/amenable_creusot both
 // check concretely (e.g. for i8).
 pub assume_specification<T> [std::num::NonZero::<T>::new] (value: T) -> (result: Option<std::num::NonZero<T>>)
@@ -275,26 +275,66 @@ pub assume_specification<T> [std::num::NonZero::<T>::new] (value: T) -> (result:
         result.is_some() <==> value != T::ZERO,
 ;
 
-// Observed under `verus --crate-type=lib`:
-//   error: cannot use external trait `std::num::ZeroablePrimitive` as a
-//   bound without declaring the trait via `external_trait_specification`
-//   (`ZeroablePrimitive` is sealed and marked #[unstable] in std; Verus
-//   still needs a spec declaration for any trait named in a bound, stable
-//   or not)
-// A concrete (non-generic, e.g. T = i8) assume_specification also fails,
-// separately: NonZero::<T>::new's real signature is itself generic, so
-// `verus` rejects a concrete instantiation as not matching:
-//   error: assume_specification requires function type signature to
-//   match ... exactly ... expected: `for<T> (T) -> ...`
+// Observed under `verus --crate-type=lib`: T::ZERO doesn't exist at all
+// (rustc E0599 — ZeroablePrimitive has no such associated item; wrong
+// guess at its shape) and, separately, Option<NonZero<T>> as a return
+// type isn't a registered external type yet either.
 
-// Not attempted: declaring an external_trait_specification for
-// ZeroablePrimitive would need to reproduce std's own sealed-trait
-// internals (an associated const, associated NonZero-ish type) that
-// aren't part of NonZero's stable public contract — the same shape of
-// dead end amenable_creusot hit for the identical reason (see
-// amenable_creusot's own NonZero coverage notes: Creusot's extern_spec!
-// hits the same sealed-trait wall). No known workaround in either
-// verifier without std itself exposing a stable, nameable bound.
+// Attempt 2: drop the guessed T::ZERO postcondition, register NonZero
+// itself via external_type_specification + external_body (its field is
+// private, unlike Wrapping/Saturating's public .0 — plain
+// external_type_specification alone fails with "private fields not
+// supported for transparent datatypes").
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+#[verifier::external_body]
+pub struct ExNonZero<T: std::num::ZeroablePrimitive>(std::num::NonZero<T>);
+
+pub assume_specification<T> [std::num::NonZero::<T>::new] (value: T) -> (result: Option<std::num::NonZero<T>>)
+    where
+        T: std::num::ZeroablePrimitive,
+;
+
+// Observed: NonZero itself is now accepted, but the ZeroablePrimitive
+// bound produces (for now) only a WARNING ("cannot use external trait ...
+// as a bound without declaring the trait ... this is a warning for now
+// but will eventually be an error") alongside a real, blocking error:
+// Verus synthesizes an internal shadow trait name for the unrecognized
+// bound and then can't resolve it ("cannot find trait
+// `T15_ZeroablePrimitive` in this scope").
+
+// Attempt 3: follow the warning's own advice and declare
+// ZeroablePrimitive via external_trait_specification, reproducing its
+// real (checked directly against std's own source,
+// core::num::nonzero::ZeroablePrimitive) shape: `pub impl(self) unsafe
+// trait ZeroablePrimitive: Sized + Copy { type NonZeroInner: Sized +
+// Copy; }`.
+#[verifier::external_trait_specification]
+pub trait ExZeroablePrimitive: Sized + Copy {
+    type ExternalTraitSpecificationFor: std::num::ZeroablePrimitive;
+    type NonZeroInner: Sized + Copy;
+}
+
+// Observed — the real, final, confirmed dead end:
+//   error: external_trait_specification trait bound mismatch
+//   the external trait bounds are:
+//     - ...ExternalTraitSpecificationFor: std::marker::Sized
+//     - ...ExternalTraitSpecificationFor: std::marker::Copy
+//     - ...ExternalTraitSpecificationFor: core::num::nonzero::private::Sealed
+// ZeroablePrimitive's REAL bound set includes a third supertrait,
+// `core::num::nonzero::private::Sealed` — `impl(self)` (an unstable
+// "sealed impl" restriction) desugars to exactly this: a hidden
+// supertrait in a `mod private` that is not `pub`, so it cannot be named
+// from any downstream crate, amenable_verus included. There is no
+// syntax to declare a bound on a trait we cannot name. This is not a
+// missing-syntax problem to retry differently — it is std deliberately
+// making ZeroablePrimitive unnameable outside `core` itself.
+//
+// Matches the identical wall amenable_creusot's extern_spec! hit for
+// NonZero, confirming this is a genuine cross-verifier limitation, not
+// a Verus-specific gap: NonZero::new cannot be given a real spec by any
+// downstream crate in either verifier until std stabilizes a nameable
+// bound.
 "#,
         },
     }
