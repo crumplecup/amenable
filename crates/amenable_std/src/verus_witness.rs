@@ -777,3 +777,52 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
         },
     }
 }
+
+const VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cstring_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::CString> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
+            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::CString>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        verifier: "verus",
+        describe: || <RustStdStandard<std::ffi::CString> as VerusWitness>::proof().to_string(),
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::ffi::NulError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
+            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::NulError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        verifier: "verus",
+        describe: || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
+    }
+}

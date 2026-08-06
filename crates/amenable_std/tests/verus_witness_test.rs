@@ -301,3 +301,31 @@ fn from_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenanc
         <std::string::FromUtf16Error as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn cstring_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::CString> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::CString as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::NulError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::NulError as RustStdType>::provenance()
+    );
+}
