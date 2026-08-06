@@ -644,3 +644,17 @@ fn once_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cell::OnceCell<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn unsafe_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cell::UnsafeCell<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_unsafe_cell_model_get_mut_and_into_inner_round_trip"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::cell::UnsafeCell<i32> as RustStdType>::provenance()
+    );
+}
