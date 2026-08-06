@@ -2118,6 +2118,126 @@ bridge_verus_witness!(RustStdStandard<std::iter::Copied<std::slice::Iter<'static
     }
 }
 
+const VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_chain_model_sequences_two_iterators_end_to_end",
+            claim: VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_zip_model_pairs_items_from_two_iterators",
+            claim: VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_enumerate_model_pairs_each_item_with_its_index",
+            claim: VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_rev_model_reverses_iteration_order",
+            claim: VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
 

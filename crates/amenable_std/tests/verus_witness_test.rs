@@ -702,6 +702,67 @@ fn iter_copied_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn iter_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chain_model_sequences_two_iterators_end_to_end"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_zip_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_zip_model_pairs_items_from_two_iterators"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_enumerate_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_enumerate_model_pairs_each_item_with_its_index"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Enumerate<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_rev_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_rev_model_reverses_iteration_order");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Rev<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
