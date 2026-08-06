@@ -763,6 +763,78 @@ fn iter_rev_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn iter_skip_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_skip_model_discards_the_first_n_items"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Skip<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_skip_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_skip_while_model_discards_items_while_the_predicate_holds"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_step_by_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(proof.harness, "verify_step_by_model_yields_every_nth_item");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::StepBy<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Take<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_take_model_yields_at_most_n_items");
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Take<std::ops::Range<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_take_while_model_yields_items_while_the_predicate_holds"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<

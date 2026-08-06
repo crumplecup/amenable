@@ -2238,6 +2238,159 @@ bridge_verus_witness!(RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>);
     }
 }
 
+const VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_skip_model_discards_the_first_n_items",
+            claim: VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_skip_while_model_discards_items_while_the_predicate_holds",
+            claim: VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_step_by_model_yields_every_nth_item",
+            claim: VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::iter::Take<std::ops::Range<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_take_model_yields_at_most_n_items",
+            claim: VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::iter::Take<std::ops::Range<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Take<std::ops::Range<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::Take<std::ops::Range<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_take_while_model_yields_items_while_the_predicate_holds",
+            claim: VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
 
