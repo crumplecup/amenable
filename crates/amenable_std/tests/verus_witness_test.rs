@@ -264,6 +264,22 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::cell::BorrowError> as Witness<VerusVerifier>>::proof(),
+        <std::cell::BorrowError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn borrow_mut_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::cell::BorrowMutError> as Witness<VerusVerifier>>::proof(),
+        <std::cell::BorrowMutError as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::any::TypeId> as Witness<VerusVerifier>>::proof();
 
@@ -539,7 +555,10 @@ fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenan
 fn vec_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::vec::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_vec_into_iter_round_trips_via_collect");
+    assert_eq!(
+        proof.harness,
+        "verify_vec_into_iter_round_trips_via_collect"
+    );
     assert_eq!(
         proof.provenance,
         <std::vec::IntoIter<i32> as RustStdType>::provenance()
@@ -552,7 +571,10 @@ fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
         VerusVerifier,
     >>::proof();
 
-    assert_eq!(proof.harness, "verify_vec_deque_iter_round_trips_via_collect");
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_iter_round_trips_via_collect"
+    );
     assert_eq!(
         proof.provenance,
         <std::collections::vec_deque::Iter<'static, i32> as RustStdType>::provenance()
@@ -598,7 +620,10 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Cell<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_cell_model_get_set_replace_round_trip");
+    assert_eq!(
+        proof.harness,
+        "verify_cell_model_get_set_replace_round_trip"
+    );
     assert_eq!(
         proof.provenance,
         <std::cell::Cell<i32> as RustStdType>::provenance()
@@ -607,8 +632,7 @@ fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
-    let proof =
-        <RustStdStandard<std::array::IntoIter<i32, 3>> as Witness<VerusVerifier>>::proof();
+    let proof = <RustStdStandard<std::array::IntoIter<i32, 3>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
         proof.harness,
@@ -661,9 +685,8 @@ fn unsafe_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
-    let proof = <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as Witness<
-        VerusVerifier,
-    >>::proof();
+    let proof =
+        <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
         proof.harness,
@@ -679,7 +702,10 @@ fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_ref_model_derefs_to_the_borrowed_value");
+    assert_eq!(
+        proof.harness,
+        "verify_ref_model_derefs_to_the_borrowed_value"
+    );
     assert_eq!(
         proof.provenance,
         <std::cell::Ref<'static, i32> as RustStdType>::provenance()

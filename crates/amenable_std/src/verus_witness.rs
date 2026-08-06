@@ -163,7 +163,9 @@ impl_verus_witness_trusted!(
     f32,
     f64,
     std::convert::Infallible,
-    core::ffi::c_void
+    core::ffi::c_void,
+    std::cell::BorrowError,
+    std::cell::BorrowMutError
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
