@@ -423,3 +423,21 @@ fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_
         <core::ffi::FromBytesWithNulError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn build_hasher_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_build_hasher_default_produces_consistent_hashers"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::hash::BuildHasherDefault<
+            std::collections::hash_map::DefaultHasher,
+        > as RustStdType>::provenance()
+    );
+}

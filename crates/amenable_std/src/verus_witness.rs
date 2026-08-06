@@ -1018,3 +1018,38 @@ bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
         },
     }
 }
+
+const VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/hash_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_build_hasher_default_produces_consistent_hashers",
+            claim: VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<
+                std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
+            > as VerusWitness>::proof()
+            .to_string()
+        },
+    }
+}
