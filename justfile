@@ -71,6 +71,42 @@ verify-creusot-translate:
 verify-creusot:
     env {{creusot_env}} cargo creusot prove -- -p amenable_creusot
 
+# `amenable_verus` compiles fine on plain stable (`verus_builtin_macros`/
+# `vstd` are ordinary crates.io deps -- the `verus! {}` macro expands to
+# plain Rust for ordinary rustc, spec clauses erased) -- these recipes just
+# turn on the `verus` feature, which is off by default (an experimental,
+# still-partial verifier backend, not yet part of the default proof-chain
+# surface). `amenable_verus` itself is never gated: it's never a Cargo
+# dependency of anything (see `amenable_std::verus_witness`'s own doc
+# comment for why), so it has no feature to turn on.
+check-verus:
+    cargo check -p amenable_verus
+    cargo check -p amenable_std --features verus
+    cargo check -p amenable --features verus
+
+clippy-verus:
+    cargo clippy -p amenable_verus --all-targets -- -D warnings
+    cargo clippy -p amenable_std --features verus --all-targets -- -D warnings
+    cargo clippy -p amenable --features verus --all-targets -- -D warnings
+
+test-verus:
+    cargo test -p amenable_std --features verus
+    cargo test -p amenable --features verus
+
+check-all-verus:
+    just check-verus
+    just clippy-verus
+    just test-verus
+
+# Real Verus verification: invoked as a bare compiler over a single file
+# tree (never reads Cargo.toml), so `amenable_verus` must depend on
+# nothing but `verus_builtin_macros`/`vstd` -- see `amenable_verus::lib`'s
+# own doc comment. Requires `verus` on PATH (~/.cargo/bin/verus after the
+# usual `verus-lang/verus` build); see VERUS_GUIDE.md in ~/repos/elicitation
+# for the reference invocation this mirrors.
+verify-verus:
+    verus --crate-type=lib crates/amenable_verus/src/lib.rs
+
 # Cross-checks the Windows-gated std paths (std::os::windows, etc.) that
 # only compile on a matching host otherwise. Requires `cross`
 # (cargo install cross) and Podman as the container engine; no real

@@ -6,3 +6,9 @@
 # from scratch every time.
 .why3find/
 rustc-ice-*.txt
+
+# Verus: `verus --crate-type=lib` (invoked as a bare compiler, not through
+# Cargo) drops its compiled rlib in the current directory with no way to
+# redirect it -- a throwaway build artifact, not evidence (unlike
+# Creusot's verif/ .coma/proof.json files, which stay tracked).
+/liblib.rlib

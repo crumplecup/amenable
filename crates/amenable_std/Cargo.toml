@@ -24,3 +24,13 @@ inventory = "0.3"
 # unconditionally by every crate that depends on `amenable_std` (which is
 # all of them).
 creusot = ["dep:amenable_creusot"]
+# No `dep:amenable_verus` here, unlike `creusot` above: `amenable_verus` is
+# a standalone crate Verus compiles directly (no `amenable_core`/
+# `inventory` dependency at all — Verus never sees `Cargo.toml`, so it
+# can't resolve either), so there is nothing for `amenable_std` to depend
+# on as an ordinary Cargo edge. `verus_witness` instead `include_str!`s
+# `amenable_verus`'s real proof source files by relative path — a
+# real, if informal, coupling (this build breaks if those files move),
+# which is exactly why this stays gated behind a feature like `creusot`
+# rather than being unconditional.
+verus = []

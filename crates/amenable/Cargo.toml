@@ -17,7 +17,6 @@ amenable_core = { workspace = true }
 amenable_std = { workspace = true }
 amenable_kani = { workspace = true }
 amenable_creusot = { workspace = true, optional = true }
-amenable_verus = { workspace = true }
 clap = { version = "4", features = ["derive"] }
 derive_more = { version = "2", features = ["display", "error", "from"] }
 inventory = "0.3"
@@ -44,3 +43,9 @@ cli = ["dep:miette"]
 # creusot` works fine). `dump-registry`'s output only includes Creusot's
 # registered ProofRecords when this feature is on.
 creusot = ["dep:amenable_creusot", "amenable_std/creusot"]
+# `amenable_verus` itself is never a Cargo dependency of anything (see
+# `amenable_std::verus_witness`'s own doc comment for why: Verus never
+# resolves `Cargo.toml`, so there's no witness/registry machinery to
+# depend on there at all) -- this only toggles `amenable_std/verus`, which
+# `include_str!`s `amenable_verus`'s real proof source by relative path.
+verus = ["amenable_std/verus"]

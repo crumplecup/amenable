@@ -13,10 +13,12 @@ keywords = ["formal-verification", "verus", "proof"]
 categories = ["development-tools"]
 
 [dependencies]
-amenable_core = { workspace = true }
-amenable_derive = { workspace = true }
-amenable_std = { workspace = true }
-inventory = "0.3"
+verus_builtin_macros = "0.0.0-2026-05-31-0205"
+vstd = "0.0.0-2026-05-31-0205"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(verus)"] }
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(verus)',
+  'cfg(verus_verify_core)',
+  'cfg(verus_keep_ghost)',
+] }

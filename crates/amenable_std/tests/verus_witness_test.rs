@@ -1,6 +1,7 @@
+#![cfg(feature = "verus")]
+
 use amenable_core::Witness;
-use amenable_std::{RustStdStandard, RustStdType};
-use amenable_verus::VerusVerifier;
+use amenable_std::{RustStdStandard, RustStdType, VerusVerifier};
 
 #[test]
 fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {

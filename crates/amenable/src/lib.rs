@@ -8,9 +8,13 @@
 //! rule — see `CLAUDE.md`'s Workspace Organization section.
 //!
 //! Crates that are themselves part of the family (`amenable_kani`,
-//! `amenable_creusot`, `amenable_verus`, `amenable_code`, and `amenable_std`
-//! itself) depend on `amenable_core` directly, never on this facade, to
-//! avoid a circular dependency.
+//! `amenable_creusot`, `amenable_code`, and `amenable_std` itself) depend
+//! on `amenable_core` directly, never on this facade, to avoid a circular
+//! dependency. `amenable_verus` is the one exception: Verus never resolves
+//! `Cargo.toml`, so it depends on nothing from this workspace at all (not
+//! even `amenable_core`) — see `amenable_std::verus_witness`'s doc comment
+//! for the full split rationale. This facade re-exports Verus's witness
+//! types from `amenable_std` (where they now live) instead.
 //!
 //! See `AMENABLE_PLAN.md` and `amenable.md` in the repository root for the
 //! full design rationale.
@@ -52,6 +56,5 @@ pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
     RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,
 };
-pub use amenable_verus::{
-    CheckedProof as VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness,
-};
+#[cfg(feature = "verus")]
+pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
