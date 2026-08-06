@@ -134,7 +134,22 @@ macro_rules! impl_verus_witness_trusted {
 }
 
 impl_verus_witness_trusted!(
-    bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
+    bool,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    f32,
+    f64,
+    std::convert::Infallible
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -518,5 +533,31 @@ bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
         describe: || {
             <RustStdStandard<core::num::TryFromIntError> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+const VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/box_carrier.rs");
+
+impl VerusWitness for RustStdStandard<Box<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_box_derefs_and_writes_through",
+            claim: VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<Box<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        verifier: "verus",
+        describe: || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
     }
 }

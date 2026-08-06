@@ -174,3 +174,19 @@ fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provena
         <core::num::TryFromIntError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<Box<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_box_derefs_and_writes_through");
+    assert_eq!(proof.provenance, <Box<i32> as RustStdType>::provenance());
+}
+
+#[test]
+fn infallible_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::convert::Infallible> as Witness<VerusVerifier>>::proof(),
+        <std::convert::Infallible as RustStdType>::provenance()
+    );
+}
