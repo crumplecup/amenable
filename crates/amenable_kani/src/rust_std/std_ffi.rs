@@ -173,7 +173,7 @@ bridge_kani_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Display<'static>>",
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
         verifier: "kani",
         describe: || <RustStdStandard<std::ffi::os_str::Display<'static>> as KaniWitness>::proof()
             .to_string(),

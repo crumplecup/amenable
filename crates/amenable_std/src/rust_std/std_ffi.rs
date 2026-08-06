@@ -35,4 +35,4 @@ impl_rust_std_type_lifetime0!(
     "The Display carrier renders an OsStr for user-facing output, lossily substituting invalid UTF-8 where necessary."
 );
 
-register_rust_std_standard_evidence!(OsStr, OsString, Display<'static>);
+register_rust_std_standard_evidence!(OsStr, OsString, std::ffi::os_str::Display<'static>);

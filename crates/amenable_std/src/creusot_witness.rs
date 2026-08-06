@@ -55,9 +55,10 @@
 //! function itself, so the claim can never drift from the real contract
 //! without also touching the crate that's actually translated.
 
-use std::alloc::{Layout, LayoutError};
+use std::alloc::{Layout, LayoutError, System};
 use std::any::TypeId;
 use std::array::{IntoIter, TryFromSliceError};
+use std::backtrace::{Backtrace, BacktraceStatus};
 use std::borrow::Cow;
 use std::boxed::Box;
 use std::cell::{
@@ -81,15 +82,27 @@ use std::collections::vec_deque::{
     Drain as VecDequeDrain, IntoIter as VecDequeIntoIter, Iter as VecDequeIter,
     IterMut as VecDequeIterMut,
 };
-use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
+use std::collections::{
+    BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, TryReserveError, VecDeque,
+};
 use std::convert::Infallible;
+use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs};
+use std::ffi::os_str::Display as OsStrDisplay;
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
-use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
+use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError, OsStr, OsString};
+use std::fs::{
+    DirBuilder, DirEntry, File, FileTimes, FileType, Metadata, OpenOptions, Permissions, ReadDir,
+};
 use std::fmt::{
     Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter, FromFn,
 };
 use std::future::{Pending, PollFn, Ready};
-use std::hash::BuildHasherDefault;
+use std::hash::{BuildHasherDefault, RandomState};
+use std::io::{
+    BufReader, BufWriter, Cursor, IntoInnerError, IoSlice, IoSliceMut, LineWriter, PipeReader,
+    PipeWriter, SeekFrom, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock,
+    WriterPanicked,
+};
 use std::iter::{
     Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map,
     MapWhile, OnceWith, Peekable, RepeatN, RepeatWith, Rev, Scan, Skip, SkipWhile, StepBy,
@@ -98,21 +111,63 @@ use std::iter::{
 use std::marker::{PhantomData, PhantomPinned};
 use std::mem::{Discriminant, ManuallyDrop};
 use std::net::{
-    AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
+    AddrParseError, Incoming, IpAddr, Ipv4Addr, Ipv6Addr, Shutdown, SocketAddr, SocketAddrV4,
+    SocketAddrV6, TcpListener, TcpStream, UdpSocket,
 };
 use std::num::{NonZero, Saturating, Wrapping};
 use std::ops::{Bound, ControlFlow, Range, RangeFull, RangeTo};
+use std::panic::{AssertUnwindSafe, PanicHookInfo};
+use std::pin::Pin;
+use std::ptr::NonNull;
+use std::path::{
+    Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
+};
+use std::process::{
+    Child, ChildStderr, ChildStdin, ChildStdout, Command, CommandArgs, CommandEnvs, ExitCode,
+    ExitStatus, Output, Stdio,
+};
 use std::rc::Rc;
-use std::slice::Iter;
+use std::slice::{
+    ChunkBy, ChunkByMut, Chunks, ChunksExact, ChunksExactMut, ChunksMut, EscapeAscii,
+    GetDisjointMutError, Iter, RChunks, RChunksExact, RChunksExactMut, RChunksMut, RSplitMut,
+    RSplitNMut, SplitInclusiveMut, SplitMut, SplitNMut, Windows,
+};
+use std::str::{
+    CharIndices, Chars, EncodeUtf16, MatchIndices, Matches, ParseBoolError, RMatchIndices,
+    RMatches, RSplitTerminator, SplitAsciiWhitespace, SplitTerminator, SplitWhitespace, Utf8Chunk,
+    Utf8Chunks, Utf8Error,
+};
 use std::string::{FromUtf8Error, FromUtf16Error};
-use std::sync::Arc;
-use std::task::{Context, Poll};
-use std::time::{Duration, TryFromFloatSecsError};
+use std::sync::{
+    Arc, Barrier, BarrierWaitResult, LazyLock, OnceLock, OnceState, WaitTimeoutResult,
+};
+use std::sync::mpsc::SyncSender;
+use std::sync::atomic::{
+    AtomicBool, AtomicI8, AtomicI16, AtomicI32, AtomicI64, AtomicIsize, AtomicPtr, AtomicU8,
+    AtomicU16, AtomicU32, AtomicU64, AtomicUsize, Ordering as AtomicOrdering,
+};
+use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+use std::thread::{
+    AccessError, Builder, JoinHandle, LocalKey, Scope, ScopedJoinHandle, Thread, ThreadId,
+};
+use std::time::{Duration, Instant, SystemTime, SystemTimeError, TryFromFloatSecsError};
 use std::vec::Vec;
+
+use core::panic::{Location, PanicInfo, PanicMessage};
 
 use amenable_core::{Evidence, Provenance, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+    CreusotVerifier, CreusotWitness, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+    VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_I32_LOAD_STORE_SRC, VERIFY_ATOMIC_I64_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_ISIZE_LOAD_STORE_SRC, VERIFY_ATOMIC_PTR_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_U8_LOAD_STORE_SRC, VERIFY_ATOMIC_U16_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_U32_LOAD_STORE_SRC, VERIFY_ATOMIC_U64_LOAD_STORE_SRC,
+    VERIFY_ATOMIC_USIZE_LOAD_STORE_SRC,
+    VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+    VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC,
     VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
     VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
@@ -121,18 +176,23 @@ use amenable_creusot::{
     VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
     VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, VERIFY_CHAR_ROUNDTRIP_SRC,
     VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
+    VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC,
     VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
     VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
     VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
+    VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
     VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
     VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
     VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+    VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+    VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC,
     VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
     VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
+    VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC,
     VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
     VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
@@ -146,24 +206,38 @@ use amenable_creusot::{
     VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
     VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
     VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+    VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC,
+    VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+    VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC,
     VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
     VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC, VERIFY_PENDING_NEVER_RESOLVES_SRC,
     VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+    VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC,
+    VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC,
     VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC, VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC,
     VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
+    VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC,
     VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
     VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
     VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
     VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC,
-    VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC,
+    VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
+    VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
+    VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC,
+    VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+    VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC,
+    VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
     VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, VERIFY_STRING_ROUNDTRIP_SRC,
+    VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC,
     VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
     VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, VERIFY_TUPLE_FIELD_ACCESS_SRC,
+    VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
     VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
     VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
+    VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
@@ -174,6 +248,12 @@ use crate::{RustStdProvenance, RustStdStandard};
     reason = "SipHasher itself is stable, only deprecated as a recommendation to use DefaultHasher instead; covering it is a coverage-completeness question, not a call to use it"
 )]
 type SipHasherAlias = std::hash::SipHasher;
+
+#[expect(
+    deprecated,
+    reason = "LinesAny is stable, only deprecated in favor of Lines; covering it is a coverage-completeness question, not a call to use it"
+)]
+type LinesAnyStatic = std::str::LinesAny<'static>;
 
 macro_rules! bridge_creusot_witness {
     ($ty:ty) => {
@@ -239,6 +319,60 @@ impl_creusot_witness_trusted!(
     LazyCell<i32, fn() -> i32>,
     BorrowError,
     BorrowMutError,
+    Location<'static>,
+    PanicInfo<'static>,
+    PanicMessage<'static>,
+    PanicHookInfo<'static>,
+    Pin<Box<i32>>,
+    NonNull<i32>,
+    Chunks<'static, i32>,
+    ChunksExact<'static, i32>,
+    ChunksMut<'static, i32>,
+    ChunksExactMut<'static, i32>,
+    RChunks<'static, i32>,
+    RChunksExact<'static, i32>,
+    RChunksExactMut<'static, i32>,
+    RChunksMut<'static, i32>,
+    Windows<'static, i32>,
+    ChunkBy<'static, i32, fn(&i32, &i32) -> bool>,
+    ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>,
+    std::slice::RSplit<'static, i32, fn(&i32) -> bool>,
+    RSplitMut<'static, i32, fn(&i32) -> bool>,
+    std::slice::RSplitN<'static, i32, fn(&i32) -> bool>,
+    RSplitNMut<'static, i32, fn(&i32) -> bool>,
+    std::slice::Split<'static, i32, fn(&i32) -> bool>,
+    std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>,
+    SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
+    SplitMut<'static, i32, fn(&i32) -> bool>,
+    std::slice::SplitN<'static, i32, fn(&i32) -> bool>,
+    SplitNMut<'static, i32, fn(&i32) -> bool>,
+    EscapeAscii<'static>,
+    GetDisjointMutError,
+    std::str::Bytes<'static>,
+    CharIndices<'static>,
+    Chars<'static>,
+    EncodeUtf16<'static>,
+    std::str::EscapeDebug<'static>,
+    std::str::EscapeDefault<'static>,
+    std::str::EscapeUnicode<'static>,
+    std::str::Lines<'static>,
+    SplitAsciiWhitespace<'static>,
+    SplitWhitespace<'static>,
+    Utf8Chunk<'static>,
+    Utf8Chunks<'static>,
+    ParseBoolError,
+    Utf8Error,
+    std::str::Split<'static, char>,
+    std::str::RSplit<'static, char>,
+    std::str::SplitN<'static, char>,
+    std::str::RSplitN<'static, char>,
+    std::str::SplitInclusive<'static, char>,
+    SplitTerminator<'static, char>,
+    RSplitTerminator<'static, char>,
+    Matches<'static, char>,
+    RMatches<'static, char>,
+    MatchIndices<'static, char>,
+    RMatchIndices<'static, char>,
     CharTryFromError,
     DecodeUtf16<std::array::IntoIter<u16, 1>>,
     DecodeUtf16Error,
@@ -286,6 +420,31 @@ impl_creusot_witness_trusted!(
     std::iter::Repeat<i32>,
     RepeatWith<fn() -> i32>,
     RepeatN<i32>,
+    BufReader<&'static [u8]>,
+    BufWriter<Vec<u8>>,
+    std::io::Bytes<&'static [u8]>,
+    std::io::Chain<&'static [u8], &'static [u8]>,
+    Cursor<&'static [u8]>,
+    std::io::Empty,
+    std::io::Error,
+    IntoInnerError<BufWriter<Vec<u8>>>,
+    IoSlice<'static>,
+    IoSliceMut<'static>,
+    LineWriter<Vec<u8>>,
+    std::io::Lines<&'static [u8]>,
+    PipeReader,
+    PipeWriter,
+    std::io::Repeat,
+    std::io::Sink,
+    std::io::Split<&'static [u8]>,
+    Stderr,
+    StderrLock<'static>,
+    Stdin,
+    StdinLock<'static>,
+    Stdout,
+    StdoutLock<'static>,
+    std::io::Take<&'static [u8]>,
+    WriterPanicked,
     Successors<i32, fn(&i32) -> Option<i32>>,
     PhantomData<i32>,
     PhantomPinned,
@@ -304,9 +463,47 @@ impl_creusot_witness_trusted!(
     IpAddr,
     Ipv4Addr,
     Ipv6Addr,
+    Incoming<'static>,
     SocketAddr,
     SocketAddrV4,
     SocketAddrV6,
+    TcpListener,
+    TcpStream,
+    UdpSocket,
+    Ancestors<'static>,
+    Component<'static>,
+    Components<'static>,
+    std::path::Display<'static>,
+    std::path::Iter<'static>,
+    Path,
+    PathBuf,
+    Prefix<'static>,
+    PrefixComponent<'static>,
+    StripPrefixError,
+    Child,
+    ChildStderr,
+    ChildStdin,
+    ChildStdout,
+    Command,
+    CommandArgs<'static>,
+    CommandEnvs<'static>,
+    ExitCode,
+    ExitStatus,
+    Output,
+    Stdio,
+    Instant,
+    SystemTime,
+    SystemTimeError,
+    DirBuilder,
+    DirEntry,
+    File,
+    FileTimes,
+    FileType,
+    Metadata,
+    OpenOptions,
+    Permissions,
+    ReadDir,
+    std::fs::TryLockError,
     Rc<i32>,
     std::rc::Weak<i32>,
     std::string::Drain<'static>,
@@ -314,12 +511,51 @@ impl_creusot_witness_trusted!(
     FromUtf8Error,
     Arc<i32>,
     std::sync::Weak<i32>,
+    Barrier,
+    BarrierWaitResult,
+    LazyLock<i32, fn() -> i32>,
+    std::sync::Once,
+    OnceLock<i32>,
+    OnceState,
+    WaitTimeoutResult,
+    std::sync::mpsc::Iter<'static, i32>,
+    std::sync::mpsc::Receiver<i32>,
+    std::sync::mpsc::Sender<i32>,
+    SyncSender<i32>,
+    std::sync::mpsc::TryIter<'static, i32>,
+    AccessError,
+    Builder,
+    JoinHandle<i32>,
+    LocalKey<std::cell::Cell<i32>>,
+    Scope<'static, 'static>,
+    ScopedJoinHandle<'static, i32>,
+    Thread,
+    ThreadId,
     Vec<i32>,
     std::vec::Drain<'static, i32>,
     std::vec::IntoIter<i32>,
     std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
     std::vec::Splice<'static, std::vec::IntoIter<i32>>
 );
+
+impl CreusotWitness for RustStdStandard<LinesAnyStatic> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<LinesAnyStatic>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LinesAny<'static>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<LinesAnyStatic> as CreusotWitness>::proof().report().to_string(),
+    }
+}
 
 impl CreusotWitness for RustStdStandard<SipHasherAlias> {
     type SupportingEvidence = Self;
@@ -431,6 +667,328 @@ bridge_creusot_witness!(RustStdStandard<String>);
     }
 }
 
+macro_rules! impl_creusot_atomic_checked_witness {
+    ($ty:ty, $harness:literal, $claim:ident) => {
+        impl CreusotWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = CheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                CheckedProof {
+                    harness: $harness,
+                    claim: $claim,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_creusot_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "creusot",
+                describe: || <RustStdStandard<$ty> as CreusotWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_creusot_atomic_checked_witness!(
+    AtomicBool,
+    "verify_atomic_bool_load_store",
+    VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicI8,
+    "verify_atomic_i8_load_store",
+    VERIFY_ATOMIC_I8_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicI16,
+    "verify_atomic_i16_load_store",
+    VERIFY_ATOMIC_I16_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicI32,
+    "verify_atomic_i32_load_store",
+    VERIFY_ATOMIC_I32_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicI64,
+    "verify_atomic_i64_load_store",
+    VERIFY_ATOMIC_I64_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicIsize,
+    "verify_atomic_isize_load_store",
+    VERIFY_ATOMIC_ISIZE_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicU8,
+    "verify_atomic_u8_load_store",
+    VERIFY_ATOMIC_U8_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicU16,
+    "verify_atomic_u16_load_store",
+    VERIFY_ATOMIC_U16_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicU32,
+    "verify_atomic_u32_load_store",
+    VERIFY_ATOMIC_U32_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicU64,
+    "verify_atomic_u64_load_store",
+    VERIFY_ATOMIC_U64_LOAD_STORE_SRC
+);
+impl_creusot_atomic_checked_witness!(
+    AtomicUsize,
+    "verify_atomic_usize_load_store",
+    VERIFY_ATOMIC_USIZE_LOAD_STORE_SRC
+);
+// Bare `Ordering`, matching `amenable_std::rust_std::sync_atomic`'s own
+// registration exactly: unlike `std::cmp::Ordering`, this evidence string
+// intentionally stays unqualified so the checklist row resolves to the
+// atomic carrier rather than the comparison carrier.
+impl CreusotWitness for RustStdStandard<AtomicOrdering> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_relaxed_ordering_still_makes_a_store_observable",
+            claim: VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<AtomicOrdering>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<AtomicOrdering> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<System> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_system_allocates_and_deallocates_a_layout",
+            claim: VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<System>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<System>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<System> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Backtrace> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_backtrace_force_capture_always_actually_captures",
+            claim: VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Backtrace>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Backtrace>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Backtrace> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<BacktraceStatus> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_backtrace_status_reports_captured_after_force_capture",
+            claim: VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<BacktraceStatus>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<BacktraceStatus> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<SeekFrom> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_seek_from_round_trips_each_variants_offset",
+            claim: VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<SeekFrom>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<SeekFrom> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Shutdown> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_shutdown_write_prevents_further_writes",
+            claim: VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Shutdown>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Shutdown>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Shutdown> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<DefaultHasher> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_default_hasher_is_deterministic_across_fresh_instances",
+            claim: VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<DefaultHasher>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<DefaultHasher> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<RandomState> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_random_state_gives_the_same_hasher_seed_across_calls",
+            claim: VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<RandomState>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RandomState>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<RandomState> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<HashMap<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_hash_map_insert_then_get_recovers_the_value",
+            claim: VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<HashMap<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<HashMap<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<HashSet<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_hash_set_insert_then_contains_reports_membership",
+            claim: VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<HashSet<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<HashSet<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl_creusot_atomic_checked_witness!(
+    AtomicPtr<i32>,
+    "verify_atomic_ptr_load_store",
+    VERIFY_ATOMIC_PTR_LOAD_STORE_SRC
+);
+
 impl CreusotWitness for RustStdStandard<[i32; 3]> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -474,6 +1032,56 @@ bridge_creusot_witness!(RustStdStandard<[i32]>);
         evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
         verifier: "creusot",
         describe: || <RustStdStandard<[i32]> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_slice_iter_yields_shared_references_in_order",
+            claim: VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<std::slice::Iter<'static, i32>> as CreusotWitness>::proof()
+            .to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_slice_iter_mut_yields_mutable_references_that_write_through",
+            claim: VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        verifier: "creusot",
+        describe: || {
+            <RustStdStandard<std::slice::IterMut<'static, i32>> as CreusotWitness>::proof()
+                .to_string()
+        },
     }
 }
 
@@ -589,6 +1197,29 @@ bridge_creusot_witness!(RustStdStandard<*mut i32>);
         evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
         verifier: "creusot",
         describe: || <RustStdStandard<*mut i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<AssertUnwindSafe<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_assert_unwind_safe_derefs_transparently",
+            claim: VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<AssertUnwindSafe<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<AssertUnwindSafe<i32>> as CreusotWitness>::proof().to_string(),
     }
 }
 
@@ -1079,6 +1710,228 @@ bridge_creusot_witness!(RustStdStandard<VecDequeIterMut<'static, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<VecDequeIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Args> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_args_reports_at_least_the_program_path",
+            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Args>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Args>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Args> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<ArgsOs> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_args_os_reports_at_least_the_program_path",
+            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<ArgsOs>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ArgsOs>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<ArgsOs> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<JoinPathsError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_join_paths_error_reports_an_unjoinable_path",
+            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<JoinPathsError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<JoinPathsError>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<JoinPathsError> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<SplitPaths<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_paths_recovers_paths_joined_by_join_paths",
+            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<SplitPaths<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<SplitPaths<'static>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VarError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_var_error_distinguishes_not_present_from_not_unicode",
+            claim: VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VarError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VarError> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<Vars> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Vars>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Vars>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Vars> as CreusotWitness>::proof().report().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<VarsOs> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = RustStdProvenance;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self::SupportingEvidence as Evidence>::basis().audit()
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<VarsOs>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<VarsOs>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<VarsOs> as CreusotWitness>::proof().report().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<OsStr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str",
+            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<OsStr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<OsStr> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<OsString> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_os_string_push_appends_to_the_existing_content",
+            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<OsString>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsString>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<OsString> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+impl CreusotWitness for RustStdStandard<OsStrDisplay<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_os_str_display_renders_valid_utf8_content_unchanged",
+            claim: VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<OsStrDisplay<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<OsStrDisplay<'static>> as CreusotWitness>::proof().to_string(),
     }
 }
 
@@ -1896,6 +2749,85 @@ bridge_creusot_witness!(RustStdStandard<Ready<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Ready<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `Context<'static>`, matching `amenable_std::rust_std::task`'s own
+// representative lifetime choice exactly.
+impl CreusotWitness for RustStdStandard<Context<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_context_from_waker_exposes_the_same_waker",
+            claim: VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Context<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Context<'static>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Context<'static>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// Bare `Poll<i32>`, matching `amenable_std::rust_std::task`'s own
+// representative instantiation exactly.
+impl CreusotWitness for RustStdStandard<Poll<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_poll_ready_and_pending_are_disjoint",
+            claim: VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Poll<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Poll<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+// `RawWaker` and `RawWakerVTable` stay trusted in Creusot for the same
+// reason they do in Kani: constructing or exercising the concrete vtable
+// semantics requires `unsafe fn` entries, which this proof stack does not
+// admit.
+impl_creusot_witness_trusted!(RawWaker, RawWakerVTable);
+
+impl CreusotWitness for RustStdStandard<Waker> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_waker_wake_by_ref_invokes_the_wake_impl",
+            claim: VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(RustStdStandard<Waker>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
+        verifier: "creusot",
+        describe: || <RustStdStandard<Waker> as CreusotWitness>::proof().to_string(),
     }
 }
 
