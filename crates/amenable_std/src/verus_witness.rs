@@ -1516,3 +1516,32 @@ bridge_verus_witness!(RustStdStandard<std::cell::UnsafeCell<i32>>);
         },
     }
 }
+
+const VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/lazy_cell_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_lazy_cell_model_caches_its_initializer_result",
+            claim: VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
