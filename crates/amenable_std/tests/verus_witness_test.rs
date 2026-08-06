@@ -714,6 +714,20 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::ffi::CStr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cstr_excludes_the_terminating_nul_from_to_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::ffi::CStr as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn ascii_escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::ascii::EscapeDefault> as Witness<VerusVerifier>>::proof();
 

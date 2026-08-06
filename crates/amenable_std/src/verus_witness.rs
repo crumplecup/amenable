@@ -1683,6 +1683,34 @@ bridge_verus_witness!(RustStdStandard<core::ascii::EscapeDefault>);
     }
 }
 
+const VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::ffi::CStr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::ffi::CStr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::ffi::CStr> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 

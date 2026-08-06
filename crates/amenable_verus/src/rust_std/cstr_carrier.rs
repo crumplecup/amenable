@@ -1,4 +1,5 @@
-//! Verus spec for `core::ffi::FromBytesUntilNulError` / `core::ffi::FromBytesWithNulError`.
+//! Verus spec for `core::ffi::CStr` / `core::ffi::FromBytesUntilNulError` /
+//! `core::ffi::FromBytesWithNulError`.
 
 use std::ffi::CStr;
 
@@ -29,12 +30,26 @@ pub assume_specification<'a> [CStr::from_bytes_until_nul] (bytes: &'a [u8]) -> (
         (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Err,
 ;
 
+/// `to_bytes`'s abstract content for a `&CStr` — opaque (uninterpreted),
+/// connected to the bytes a `from_bytes_with_nul` call was constructed
+/// from (minus the terminating nul) by that function's own `ensures`
+/// below, mirroring `cstring_carrier.rs`'s `cstring_bytes_spec` pattern.
+pub uninterp spec fn cstr_bytes_spec(cstr: &CStr) -> Seq<u8>;
+
 pub assume_specification<'a> [CStr::from_bytes_with_nul] (bytes: &'a [u8]) -> (result: Result<&'a CStr, std::ffi::FromBytesWithNulError>)
     ensures
         (bytes@.len() > 0 && bytes@[bytes@.len() - 1] == 0
-            && !exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Ok,
+            && !exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> {
+            &&& result is Ok
+            &&& cstr_bytes_spec(result->Ok_0) == bytes@.subrange(0, bytes@.len() - 1)
+        },
         (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Err,
         (exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err,
+;
+
+pub assume_specification<'a> [CStr::to_bytes] (cstr: &'a CStr) -> (result: &'a [u8])
+    ensures
+        result@ == cstr_bytes_spec(cstr),
 ;
 
 /// `CStr::from_bytes_until_nul` succeeds whenever a nul byte appears
@@ -92,6 +107,27 @@ pub fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> 
     let rejected_interior_nul = interior_nul_result.is_err();
 
     (accepted, rejected_no_nul, rejected_interior_nul)
+}
+
+/// `CStr::from_bytes_with_nul` accepts a nul-terminated byte sequence,
+/// and `.to_bytes()` reports its content without the terminator itself
+/// — the same claim the Kani harness checks.
+pub fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(byte: u8) -> (result: bool)
+    requires
+        byte != 0,
+    ensures
+        result,
+{
+    let with_nul: &[u8] = &[byte, 0];
+    let cstr_result = CStr::from_bytes_with_nul(with_nul);
+    assert(cstr_result is Ok);
+    let cstr = cstr_result.unwrap();
+
+    let bytes = cstr.to_bytes();
+    assert(bytes@.len() == 1);
+    assert(bytes@[0] == byte);
+
+    bytes.len() == 1 && bytes[0] == byte
 }
 
 } // verus!
