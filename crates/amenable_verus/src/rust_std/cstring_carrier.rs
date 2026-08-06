@@ -32,10 +32,16 @@ pub broadcast proof fn axiom_vec_u8_into_vec_u8_is_identity(v: Vec<u8>)
 {
 }
 
+/// The byte content (excluding the appended nul terminator) a real
+/// `CString` carries — opaque (uninterpreted), connected to
+/// `CString::new`'s input below and to `CString::as_bytes`'s result in
+/// `into_string_error_carrier.rs`.
+pub uninterp spec fn cstring_bytes_spec(s: CString) -> Seq<u8>;
+
 pub assume_specification<T: Into<Vec<u8>>> [CString::new::<T>] (bytes: T) -> (result: Result<CString, NulError>)
     ensures
         (!exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0)
-            ==> result is Ok,
+            ==> (result is Ok && cstring_bytes_spec(result->Ok_0) == into_vec_u8_spec(bytes)),
         (exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0)
             ==> result is Err,
 ;

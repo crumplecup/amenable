@@ -934,3 +934,31 @@ bridge_verus_witness!(RustStdStandard<std::sync::Arc<i32>>);
         describe: || <RustStdStandard<std::sync::Arc<i32>> as VerusWitness>::proof().to_string(),
     }
 }
+
+const VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/into_string_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::IntoStringError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_into_string_error_recovers_the_original_cstring",
+            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::IntoStringError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::IntoStringError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ffi::IntoStringError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

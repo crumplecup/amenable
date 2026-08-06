@@ -379,3 +379,17 @@ fn arc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::sync::Arc<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::IntoStringError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_into_string_error_recovers_the_original_cstring"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::IntoStringError as RustStdType>::provenance()
+    );
+}
