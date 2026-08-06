@@ -726,3 +726,34 @@ fn ref_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cell::RefMut<'static, i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn decode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::DecodeUtf16<std::array::IntoIter<u16, 1>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn decode_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::char::DecodeUtf16Error> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::char::DecodeUtf16Error as RustStdType>::provenance()
+    );
+}

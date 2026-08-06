@@ -1603,3 +1603,57 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
         },
     }
 }
+
+const VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/decode_utf16_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates",
+            claim: VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates",
+            claim: VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16Error>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::char::DecodeUtf16Error> as VerusWitness>::proof().to_string()
+        },
+    }
+}
