@@ -1953,6 +1953,32 @@ bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Iter<'stati
     }
 }
 
+impl VerusWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_max_heap_pair_pops_the_maximum_first",
+            claim: VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
 

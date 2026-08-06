@@ -33,6 +33,15 @@
 //! maximum_first` harness (checking the *real* `BinaryHeap<i32>`
 //! directly — Kani has no trouble with a two-element real heap) already
 //! confirms independently, for the identical claim.
+//!
+//! `binary_heap::PeekMut<'static, i32>` checks the same max-exposure
+//! law in `amenable_kani`
+//! (`verify_binary_heap_peek_mut_exposes_the_maximum`) — unlike
+//! `Drain`/`IntoIter`/`Iter` (see `unordered_pair_carrier.rs`),
+//! `PeekMut`'s whole contract genuinely *is* "exposes the current
+//! maximum," so reusing this deterministic max-first model here is
+//! accurate, not an overclaim — so it's registered against this same
+//! carrier and harness too.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
