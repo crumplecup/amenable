@@ -474,3 +474,33 @@ fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::borrow::Cow<'static, i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn btree_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_btree_map_insert_get_remove_round_trips"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::BTreeMap<i32, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::BTreeSet<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_btree_set_insert_contains_remove_round_trips"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::BTreeSet<i32> as RustStdType>::provenance()
+    );
+}

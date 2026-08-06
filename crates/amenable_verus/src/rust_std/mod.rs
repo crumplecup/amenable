@@ -9,6 +9,7 @@
 
 pub mod arc_carrier;
 pub mod box_carrier;
+pub mod btree_carrier;
 pub mod char_carrier;
 pub mod char_try_from_carrier;
 pub mod cow_carrier;

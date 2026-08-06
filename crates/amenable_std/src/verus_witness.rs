@@ -1122,3 +1122,60 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
         },
     }
 }
+
+const VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_btree_map_insert_get_remove_round_trips",
+            claim: VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::BTreeMap<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::BTreeMap<i32, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_btree_set_insert_contains_remove_round_trips",
+            claim: VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::BTreeSet<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::BTreeSet<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
