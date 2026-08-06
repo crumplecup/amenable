@@ -2688,3 +2688,335 @@ fn str_rmatch_indices_witness_is_checked_and_still_carries_chain_derived_provena
         <std::str::RMatchIndices<'static, char> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn stderr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::Stderr> as Witness<VerusVerifier>>::proof(),
+        <std::io::Stderr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stderr_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::StderrLock<'static>> as Witness<VerusVerifier>>::proof(),
+        <std::io::StderrLock<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stdin_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::Stdin> as Witness<VerusVerifier>>::proof(),
+        <std::io::Stdin as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stdin_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::StdinLock<'static>> as Witness<VerusVerifier>>::proof(),
+        <std::io::StdinLock<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stdout_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::Stdout> as Witness<VerusVerifier>>::proof(),
+        <std::io::Stdout as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn stdout_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::io::StdoutLock<'static>> as Witness<VerusVerifier>>::proof(),
+        <std::io::StdoutLock<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn buf_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::io::BufReader<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_buf_reader_model_reads_the_underlying_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::BufReader<&'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn buf_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::BufWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_buf_writer_model_flushes_to_the_underlying_writer"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::BufWriter<Vec<u8>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Bytes<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_bytes_model_yields_one_byte_at_a_time"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Bytes<&'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn into_inner_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_into_inner_error_model_recovers_the_writer_and_the_flush_error"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn line_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::LineWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_line_writer_model_flushes_on_a_newline_but_not_before_one"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::LineWriter<Vec<u8>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Lines<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_lines_model_splits_on_newlines_and_drops_the_terminator"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Lines<&'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn pipe_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::PipeReader> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_pipe_model_delivers_written_bytes_to_the_paired_reader"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::PipeReader as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn pipe_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::PipeWriter> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_pipe_model_delivers_written_bytes_to_the_paired_reader"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::PipeWriter as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Split<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_model_segments_on_the_given_byte_and_drops_it"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Split<&'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn writer_panicked_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::WriterPanicked> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_writer_panicked_model_recovers_the_buffered_data"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::WriterPanicked as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Empty> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_empty_model_read_reports_end_of_file");
+    assert_eq!(
+        proof.provenance,
+        <std::io::Empty as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Repeat> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_repeat_model_fills_the_buffer_with_the_given_byte"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Repeat as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_sink_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Sink> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_sink_model_write_reports_full_length_and_discards_content"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Sink as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn seek_from_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::SeekFrom> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_seek_from_model_round_trips_each_variants_offset"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::SeekFrom as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_chain_model_reads_the_first_source_then_the_second"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Chain<&'static [u8], &'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_cursor_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::io::Cursor<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cursor_model_read_advances_position_and_seek_repositions_it"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Cursor<&'static [u8]> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Error> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_error_model_from_error_kind_preserves_the_kind"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Error as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_slice_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::IoSlice<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_io_slice_model_derefs_to_the_wrapped_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::IoSlice<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_slice_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::IoSliceMut<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::IoSliceMut<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::io::Take<&'static [u8]>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_take_model_caps_reads_at_the_remaining_limit"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::io::Take<&'static [u8]> as RustStdType>::provenance()
+    );
+}

@@ -1,0 +1,35 @@
+//! Verus accommodation model for `std::io::Error`.
+//!
+//! Same zero-`vstd`-coverage gap the other accommodation-model carriers
+//! document. `amenable_kani`'s own harness checks a representative,
+//! bounded-exhaustive subset of `ErrorKind` variants (`ErrorKind` has
+//! no `kani::Arbitrary` impl — it's a large foreign enum with no way to
+//! derive one), indexed `0..4`; this carrier models the same four-way
+//! choice as a plain `u8` tag standing in for the real enum, rather
+//! than naming `ErrorKind` (which `vstd` has no spec support for at
+//! all). The law: `Error::from(kind).kind()` recovers exactly the given
+//! kind. Not `std::io::Error` itself — the proof is conditional: sound
+//! if the real type refines this law, which `amenable_kani`'s own
+//! `verify_error_from_error_kind_preserves_the_kind` harness (checking
+//! the real type directly, over the same four representative kinds)
+//! already confirms independently, for the identical claim.
+
+use verus_builtin_macros::verus;
+#[allow(unused_imports)]
+use vstd::prelude::*;
+
+verus! {
+
+/// `Error::from(kind).kind()` recovers exactly the given kind, over any
+/// of the four representative kinds (modeled as a tag `0..4`, standing
+/// in for `NotFound`/`PermissionDenied`/`AlreadyExists`/`InvalidInput`).
+pub fn verify_error_model_from_error_kind_preserves_the_kind(kind_index: u8) -> (result: u8)
+    requires
+        kind_index < 4,
+    ensures
+        result == kind_index,
+{
+    kind_index
+}
+
+} // verus!
