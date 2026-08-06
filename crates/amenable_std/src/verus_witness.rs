@@ -561,3 +561,54 @@ bridge_verus_witness!(RustStdStandard<Box<i32>>);
         describe: || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
     }
 }
+
+const VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/layout_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::alloc::Layout> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment",
+            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::alloc::Layout>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::alloc::Layout>",
+        verifier: "verus",
+        describe: || <RustStdStandard<core::alloc::Layout> as VerusWitness>::proof().to_string(),
+    }
+}
+
+impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment",
+            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::alloc::LayoutError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::alloc::LayoutError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::alloc::LayoutError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

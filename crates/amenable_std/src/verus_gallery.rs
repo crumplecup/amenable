@@ -502,3 +502,58 @@ pub assume_specification [<u8 as std::convert::TryFrom<i32>>::try_from] (value: 
         },
     }
 }
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::layout_new_size_and_align_are_opaque_even_for_primitives".to_owned(),
+            title: "Layout::new::<i32>()'s size/align values are unprovable: vstd deliberately treats size_of/align_of as fully opaque, even for i32".to_owned(),
+            disposition: VerusGalleryDisposition::FalseTrail,
+            expected: VerusGalleryExpectation::Unproved,
+            claim: r#"
+// Attempt: the same claim amenable_kani's verify_layout_new_reports_
+// the_types_size_and_alignment harness checks — Layout::new::<i32>()
+// reports size 4, align 4.
+pub assume_specification [Layout::new::<i32>] () -> (result: Layout)
+    ensures
+        result.size() == 4,
+        result.align() == 4,
+;
+
+// Observed under `verus --crate-type=lib`: signature mismatch first —
+// the real Layout::new is generic over T, so a concrete i32
+// instantiation is rejected outright (same shape as the Reverse::cmp
+// and TryFromIntError findings above):
+//   error: assume_specification requires function type signature to
+//   match ... exactly ... expected: `for<T> () -> Layout`
+
+// Root cause, found by reading vstd's own source (vstd/layout.rs), not
+// guessed: vstd already gives real, working specs for
+// core::mem::size_of::<V>()/align_of::<V>() — but as `uninterp spec fn
+// size_of<V>() -> nat` / `align_of<V>() -> nat`, deliberately left
+// UNCONSTRAINED for every V, primitives included. The file's own
+// comment explains why: "we are NOT creating an axiom that size_of fits
+// in usize" (soundness concern about reasoning over arbitrarily large,
+// possibly-unmonomorphized generic types in ghost code). So even
+// switching to the correct generic form
+// (`pub assume_specification<T> [Layout::new::<T>] () -> (result:
+// Layout) ensures result.size() == size_of::<T>() as usize, ...`) only
+// relates the result to size_of::<T>()'s ABSTRACT value — never to a
+// concrete number like 4, for ANY T, not just i32. There is no path
+// from this crate to the concrete fact "size_of::<i32>() == 4": the
+// opacity is deliberate upstream design in vstd itself, not a gap we
+// could close with our own assume_specification (declaring one that
+// pins size_of::<i32>() to 4 would itself be a second, conflicting
+// assume_specification for a function vstd already specifies — see the
+// duplicate-assume_specification ICE finding above; the same crash
+// would very likely recur here too).
+
+// Real coverage lands on the independent half of the claim instead
+// (amenable_verus::rust_std::layout_carrier's actual, live proof):
+// Layout::from_size_align rejects a non-power-of-two alignment — a pure
+// fact about the constructor's own validation logic, provable without
+// ever touching size_of/align_of's opacity.
+"#,
+        },
+    }
+}

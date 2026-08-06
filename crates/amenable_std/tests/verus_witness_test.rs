@@ -190,3 +190,31 @@ fn infallible_witness_is_trusted_and_carries_chain_derived_provenance() {
         <std::convert::Infallible as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn layout_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::alloc::Layout> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::alloc::Layout as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::alloc::LayoutError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::alloc::LayoutError as RustStdType>::provenance()
+    );
+}
