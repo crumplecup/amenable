@@ -1207,3 +1207,31 @@ bridge_verus_witness!(RustStdStandard<std::collections::VecDeque<i32>>);
         },
     }
 }
+
+const VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/try_reserve_error_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::TryReserveError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_reserve_preserves_vec_contents_regardless_of_outcome",
+            claim: VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::TryReserveError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::TryReserveError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::TryReserveError> as VerusWitness>::proof().to_string()
+        },
+    }
+}

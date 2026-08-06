@@ -35,6 +35,7 @@ pub mod sip_hasher_carrier;
 pub mod string_carrier;
 pub mod try_from_int_error_carrier;
 pub mod try_from_slice_carrier;
+pub mod try_reserve_error_carrier;
 pub mod type_id_carrier;
 pub mod vec_carrier;
 pub mod vec_deque_carrier;

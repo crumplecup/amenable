@@ -519,3 +519,18 @@ fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::collections::VecDeque<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::TryReserveError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_reserve_preserves_vec_contents_regardless_of_outcome"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::TryReserveError as RustStdType>::provenance()
+    );
+}
