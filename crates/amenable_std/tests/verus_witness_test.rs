@@ -3475,3 +3475,143 @@ fn strip_prefix_error_witness_is_checked_and_still_carries_chain_derived_provena
         <std::path::StripPrefixError as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn dir_builder_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::DirBuilder> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_dir_builder_model_creates_nested_directories_recursively"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::DirBuilder as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn dir_entry_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::DirEntry> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_dir_entry_model_reports_the_created_files_name_and_path"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::DirEntry as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn read_dir_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::ReadDir> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_read_dir_model_iterates_every_entry_in_the_directory"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::ReadDir as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fs_file_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::File> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_file_model_write_then_read_round_trips_the_bytes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::File as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn file_times_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::FileTimes> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_file_times_model_sets_the_recorded_modification_time"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::FileTimes as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fs_metadata_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::Metadata> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_metadata_model_reports_the_written_length"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::Metadata as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn file_type_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::FileType> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_file_type_model_distinguishes_files_from_directories"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::FileType as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn open_options_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::OpenOptions> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_open_options_model_create_new_rejects_an_existing_file"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::OpenOptions as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fs_permissions_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::Permissions> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_permissions_model_readonly_round_trips_through_set_permissions"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::Permissions as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn fs_try_lock_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::fs::TryLockError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_lock_error_model_reports_a_lock_already_held"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::fs::TryLockError as RustStdType>::provenance()
+    );
+}

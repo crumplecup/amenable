@@ -5770,3 +5770,281 @@ bridge_verus_witness!(RustStdStandard<std::path::StripPrefixError>);
         },
     }
 }
+
+const VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::DirBuilder> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_dir_builder_model_creates_nested_directories_recursively",
+            claim: VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::DirBuilder>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::DirBuilder> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::DirEntry> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_dir_entry_model_reports_the_created_files_name_and_path",
+            claim: VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::DirEntry>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::DirEntry> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::ReadDir> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_read_dir_model_iterates_every_entry_in_the_directory",
+            claim: VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::ReadDir>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::ReadDir> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::File> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_file_model_write_then_read_round_trips_the_bytes",
+            claim: VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::File>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::File>",
+        verifier: "verus",
+        describe: || { <RustStdStandard<std::fs::File> as VerusWitness>::proof().to_string() },
+    }
+}
+
+const VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::FileTimes> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_file_times_model_sets_the_recorded_modification_time",
+            claim: VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::FileTimes>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::FileTimes> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::Metadata> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_metadata_model_reports_the_written_length",
+            claim: VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::Metadata>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::Metadata> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_FILE_TYPE_MODEL_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_boolean_laws_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::FileType> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_file_type_model_distinguishes_files_from_directories",
+            claim: VERIFY_FILE_TYPE_MODEL_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::FileType>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileType>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::FileType> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_OPEN_OPTIONS_MODEL_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_boolean_laws_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::OpenOptions> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_open_options_model_create_new_rejects_an_existing_file",
+            claim: VERIFY_OPEN_OPTIONS_MODEL_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::OpenOptions>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::OpenOptions>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::OpenOptions> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_PERMISSIONS_MODEL_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_boolean_laws_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::Permissions> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_permissions_model_readonly_round_trips_through_set_permissions",
+            claim: VERIFY_PERMISSIONS_MODEL_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::Permissions>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Permissions>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::Permissions> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TRY_LOCK_ERROR_MODEL_REPORTS_A_LOCK_ALREADY_HELD_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/fs_boolean_laws_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::fs::TryLockError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_lock_error_model_reports_a_lock_already_held",
+            claim: VERIFY_TRY_LOCK_ERROR_MODEL_REPORTS_A_LOCK_ALREADY_HELD_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::fs::TryLockError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::fs::TryLockError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
