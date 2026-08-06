@@ -1545,3 +1545,59 @@ bridge_verus_witness!(RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>);
         },
     }
 }
+
+const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ref_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ref_model_derefs_to_the_borrowed_value",
+            claim: VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::Ref<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Ref<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::Ref<'static, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ref_mut_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ref_mut_model_derefs_and_writes_through_to_the_cell",
+            claim: VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefMut<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::cell::RefMut<'static, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

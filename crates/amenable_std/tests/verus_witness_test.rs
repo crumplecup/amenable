@@ -674,3 +674,29 @@ fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::cell::LazyCell<i32, fn() -> i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_ref_model_derefs_to_the_borrowed_value");
+    assert_eq!(
+        proof.provenance,
+        <std::cell::Ref<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ref_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::cell::RefMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ref_mut_model_derefs_and_writes_through_to_the_cell"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::cell::RefMut<'static, i32> as RustStdType>::provenance()
+    );
+}
