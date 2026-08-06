@@ -605,6 +605,103 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
 }
 
 #[test]
+fn iter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>> as Witness<
+            VerusVerifier,
+        >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_map_model_applies_its_closure_to_each_item"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_filter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_filter_model_yields_only_items_matching_the_predicate"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_filter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_filter_map_model_applies_and_filters_in_one_step"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_map_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_map_while_model_maps_items_while_the_closure_returns_some"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_cloned_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_cloned_model_clones_each_referenced_item"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Cloned<std::slice::Iter<'static, i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn iter_copied_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_copied_model_copies_each_referenced_item"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::iter::Copied<std::slice::Iter<'static, i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
