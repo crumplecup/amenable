@@ -20,6 +20,8 @@ mod creusot_gallery;
 mod creusot_witness;
 mod rust_std;
 #[cfg(feature = "verus")]
+mod verus_gallery;
+#[cfg(feature = "verus")]
 mod verus_witness;
 
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
@@ -33,6 +35,10 @@ pub use creusot_witness::CheckedProof;
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,
+};
+#[cfg(feature = "verus")]
+pub use verus_gallery::{
+    VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
