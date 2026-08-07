@@ -33,12 +33,29 @@ bridge_kani_witness!(RustStdStandard<core::ascii::EscapeDefault>);
 
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEFAULT_ESCAPES_A_CONTROL_BYTE_SRC, {
-        /// `u8::escape_ascii()` renders a newline byte the same way a
-        /// Rust byte-string literal would: the two-byte escape `\n`.
+        /// `u8::escape_ascii()` renders the three named C-style control
+        /// escapes the same way a Rust byte-string literal would (`\n`,
+        /// `\t`, `\r`), and renders an unnamed control byte as a `\xNN`
+        /// hex escape.
         #[kani::proof]
         fn verify_escape_default_escapes_a_control_byte() {
-            let out: Vec<u8> = b'\n'.escape_ascii().collect();
-            assert_eq!(out, b"\\n", "escape_ascii renders \\n as a two-byte escape");
+            let newline: Vec<u8> = b'\n'.escape_ascii().collect();
+            assert_eq!(newline, b"\\n", "escape_ascii renders \\n as a two-byte escape");
+
+            let tab: Vec<u8> = b'\t'.escape_ascii().collect();
+            assert_eq!(tab, b"\\t", "escape_ascii renders \\t as a two-byte escape");
+
+            let carriage_return: Vec<u8> = b'\r'.escape_ascii().collect();
+            assert_eq!(
+                carriage_return, b"\\r",
+                "escape_ascii renders \\r as a two-byte escape"
+            );
+
+            let bell: Vec<u8> = 0x07u8.escape_ascii().collect();
+            assert_eq!(
+                bell, b"\\x07",
+                "an unnamed control byte renders as a \\xNN hex escape"
+            );
         }
     }
 }

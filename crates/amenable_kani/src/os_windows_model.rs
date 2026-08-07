@@ -309,12 +309,11 @@ amenable_derive::harness! {
         /// exactly one UTF-16 code unit equal to its code point.
         #[kani::proof]
         fn verify_encode_wide_encodes_a_bmp_char_as_one_code_unit() {
-            let byte: u8 = kani::any();
-            kani::assume(byte < 128);
-            let c = byte as char;
+            let c: char = kani::any();
+            kani::assume((c as u32) < 0x10000);
             assert_eq!(
                 crate::kani_encode_wide_bmp_char(c),
-                byte as u16,
+                c as u32 as u16,
                 "a BMP character encodes to one code unit equal to its code point"
             );
         }
