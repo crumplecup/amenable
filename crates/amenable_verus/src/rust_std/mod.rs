@@ -95,6 +95,7 @@ pub mod slice_chunk_by_carrier;
 pub mod slice_chunks_carrier;
 pub mod slice_iter_carrier;
 pub mod slice_split_carrier;
+pub mod std_net_carrier;
 pub mod str_ascii_iter_carrier;
 pub mod str_escape_carrier;
 pub mod str_lines_carrier;

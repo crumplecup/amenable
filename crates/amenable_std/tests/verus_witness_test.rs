@@ -3955,3 +3955,73 @@ fn wait_timeout_result_witness_is_checked_and_still_carries_chain_derived_proven
         <std::sync::WaitTimeoutResult as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn incoming_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::Incoming<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_incoming_model_yields_an_already_queued_connection"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::Incoming<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn shutdown_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::Shutdown> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_shutdown_model_write_prevents_further_writes"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::Shutdown as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn tcp_listener_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::TcpListener> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_tcp_listener_model_accepts_a_connecting_stream"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::TcpListener as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn tcp_stream_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::TcpStream> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::TcpStream as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn udp_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::net::UdpSocket> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::net::UdpSocket as RustStdType>::provenance()
+    );
+}

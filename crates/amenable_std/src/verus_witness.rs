@@ -6514,3 +6514,143 @@ bridge_verus_witness!(RustStdStandard<std::sync::WaitTimeoutResult>);
         },
     }
 }
+
+const VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::Incoming<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_incoming_model_yields_an_already_queued_connection",
+            claim: VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::Incoming<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Incoming<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::Incoming<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::Shutdown> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_shutdown_model_write_prevents_further_writes",
+            claim: VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::Shutdown>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Shutdown>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::Shutdown> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::TcpListener> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_tcp_listener_model_accepts_a_connecting_stream",
+            claim: VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::TcpListener>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::TcpListener>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::TcpListener> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::TcpStream> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer",
+            claim: VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::TcpStream>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::TcpStream>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::TcpStream> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_net_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::net::UdpSocket> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram",
+            claim: VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::net::UdpSocket>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::net::UdpSocket>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::net::UdpSocket> as VerusWitness>::proof().to_string()
+        },
+    }
+}
