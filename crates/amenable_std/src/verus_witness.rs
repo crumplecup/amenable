@@ -7449,3 +7449,59 @@ bridge_verus_witness!(RustStdStandard<&'static mut i32>);
         describe: || { <RustStdStandard<&'static mut i32> as VerusWitness>::proof().to_string() },
     }
 }
+
+const VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_hash_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::hash::DefaultHasher> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_default_hasher_model_is_deterministic_across_fresh_instances",
+            claim: VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::hash::DefaultHasher>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::hash::DefaultHasher> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_hash_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::hash::RandomState> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_random_state_model_gives_the_same_hasher_seed_across_calls",
+            claim: VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::hash::RandomState>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RandomState>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::hash::RandomState> as VerusWitness>::proof().to_string()
+        },
+    }
+}

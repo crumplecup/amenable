@@ -4471,3 +4471,31 @@ fn mutable_reference_witness_is_checked_and_still_carries_chain_derived_provenan
         <&'static mut i32 as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn default_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::hash::DefaultHasher> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_default_hasher_model_is_deterministic_across_fresh_instances"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::hash::DefaultHasher as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn random_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::hash::RandomState> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_random_state_model_gives_the_same_hasher_seed_across_calls"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::hash::RandomState as RustStdType>::provenance()
+    );
+}
