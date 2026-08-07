@@ -187,7 +187,9 @@ impl_verus_witness_trusted!(
     std::env::Vars,
     std::env::VarsOs,
     std::task::RawWaker,
-    std::task::RawWakerVTable
+    std::task::RawWakerVTable,
+    core::panic::PanicInfo<'static>,
+    core::panic::PanicMessage<'static>
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -6737,6 +6739,63 @@ bridge_verus_witness!(RustStdStandard<std::task::Waker>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::task::Waker> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/panic_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::panic::AssertUnwindSafe<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_assert_unwind_safe_model_derefs_transparently",
+            claim: VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::panic::AssertUnwindSafe<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::panic::AssertUnwindSafe<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::panic::AssertUnwindSafe<i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/panic_carrier.rs");
+
+impl VerusWitness for RustStdStandard<core::panic::Location<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_location_model_caller_reflects_the_immediate_call_site",
+            claim: VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<core::panic::Location<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::panic::Location<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<core::panic::Location<'static>> as VerusWitness>::proof().to_string()
         },
     }
 }

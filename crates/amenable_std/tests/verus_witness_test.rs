@@ -4083,3 +4083,49 @@ fn waker_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::task::Waker as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn panic_info_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::panic::PanicInfo<'static>> as Witness<VerusVerifier>>::proof(),
+        <core::panic::PanicInfo<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn panic_message_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::panic::PanicMessage<'static>> as Witness<VerusVerifier>>::proof(),
+        <core::panic::PanicMessage<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn assert_unwind_safe_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::panic::AssertUnwindSafe<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_assert_unwind_safe_model_derefs_transparently"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::panic::AssertUnwindSafe<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn panic_location_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::panic::Location<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_location_model_caller_reflects_the_immediate_call_site"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::panic::Location<'static> as RustStdType>::provenance()
+    );
+}
