@@ -64,6 +64,7 @@ pub mod layout_carrier;
 pub mod lazy_cell_carrier;
 pub mod linked_list_carrier;
 pub mod manually_drop_carrier;
+pub mod misc_singletons_carrier;
 pub mod net_carrier;
 pub mod non_zero_carrier;
 pub mod once_cell_carrier;

@@ -4572,3 +4572,105 @@ fn hash_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::collections::HashSet<i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn pin_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::pin::Pin<Box<i32>>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_pin_model_derefs_and_get_mut_round_trip"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::pin::Pin<Box<i32>> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn non_null_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ptr::NonNull<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_non_null_model_rejects_the_null_pointer"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ptr::NonNull<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn system_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::alloc::System> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_system_model_allocates_and_deallocates_a_layout"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::alloc::System as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn backtrace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::backtrace::Backtrace> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_backtrace_model_force_capture_always_actually_captures"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::backtrace::Backtrace as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn backtrace_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::backtrace::BacktraceStatus> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_backtrace_model_force_capture_always_actually_captures"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::backtrace::BacktraceStatus as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn panic_hook_info_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::panic::PanicHookInfo<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_panic_hook_info_model_reports_the_panics_own_message"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::panic::PanicHookInfo<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_vec_deque_drain_model_removes_and_yields_in_order"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::vec_deque::Drain<'static, i32> as RustStdType>::provenance()
+    );
+}

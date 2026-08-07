@@ -7645,3 +7645,196 @@ bridge_verus_witness!(RustStdStandard<std::collections::HashSet<i32>>);
         },
     }
 }
+
+const VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::pin::Pin<Box<i32>>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_pin_model_derefs_and_get_mut_round_trip",
+            claim: VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::pin::Pin<Box<i32>>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Pin<Box<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::pin::Pin<Box<i32>>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ptr::NonNull<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_non_null_model_rejects_the_null_pointer",
+            claim: VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ptr::NonNull<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<NonNull<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ptr::NonNull<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::alloc::System> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_system_model_allocates_and_deallocates_a_layout",
+            claim: VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::alloc::System>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<System>",
+        verifier: "verus",
+        describe: || { <RustStdStandard<std::alloc::System> as VerusWitness>::proof().to_string() },
+    }
+}
+
+const VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::backtrace::Backtrace> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_backtrace_model_force_capture_always_actually_captures",
+            claim: VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::backtrace::Backtrace>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Backtrace>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::backtrace::Backtrace> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::backtrace::BacktraceStatus> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_backtrace_model_force_capture_always_actually_captures",
+            claim: VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::backtrace::BacktraceStatus>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::backtrace::BacktraceStatus> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::panic::PanicHookInfo<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_panic_hook_info_model_reports_the_panics_own_message",
+            claim: VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::panic::PanicHookInfo<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PanicHookInfo<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::panic::PanicHookInfo<'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_vec_deque_drain_model_removes_and_yields_in_order",
+            claim: VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
