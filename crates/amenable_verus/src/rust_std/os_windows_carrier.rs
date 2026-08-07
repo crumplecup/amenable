@@ -52,7 +52,9 @@
 //! integer — `RawSocket = u64` is the only one of the pair that's
 //! actually an integer alias).
 
+#[cfg(verus_keep_ghost)]
 use std::os::windows::ffi::EncodeWide;
+#[cfg(verus_keep_ghost)]
 use std::os::windows::io::{
     AsRawHandle, AsRawSocket, BorrowedHandle, BorrowedSocket, HandleOrInvalid, InvalidHandleError,
     OwnedHandle, OwnedSocket, RawHandle, RawSocket,
