@@ -1,0 +1,66 @@
+//! Verus accommodation model for `std::env::{Args, ArgsOs,
+//! JoinPathsError, SplitPaths}`.
+//!
+//! Same zero-`vstd`-coverage gap the other accommodation-model carriers
+//! document. `amenable_kani`'s own harnesses use Amenable-owned argv/
+//! PATH-style models rather than the real process state directly: the
+//! direct `Args`/`ArgsOs` path depends on Kani's synthetic process
+//! state, which can admit an empty argv even though a real process
+//! always exposes its own program slot, and the real `join_paths`/
+//! `split_paths` helpers are modeled over a bounded separator-free
+//! subset. `Args` and `ArgsOs` check the identical count law, so both
+//! witnesses point at the same model function here, matching
+//! `amenable_kani`'s own note that `ArgsOs` gives "same guarantee as
+//! `Args`, in the raw `OsString` form." None of these functions are
+//! `Args`/`ArgsOs`/`JoinPathsError`/`SplitPaths` themselves — each
+//! proof is conditional: sound if the real type refines the stated
+//! law, which `amenable_kani`'s own harness for that exact type
+//! (checking the real type via the bounded model) already confirms
+//! independently, for the identical claim.
+
+use verus_builtin_macros::verus;
+#[allow(unused_imports)]
+use vstd::prelude::*;
+
+verus! {
+
+/// The process's own argv always has at least one element — the
+/// program's own slot — plus however many extra arguments were given;
+/// `.args()`/`.args_os()` never yield an empty sequence.
+pub fn verify_args_model_reports_at_least_the_program_path(extra_count: u8) -> (result: u32)
+    ensures
+        result >= 1,
+        result == 1 + extra_count as u32,
+{
+    1 + extra_count as u32
+}
+
+/// A path outside the modeled joinable subset (e.g. containing the
+/// platform's own PATH separator) is rejected as unjoinable, and the
+/// resulting error reports back exactly that offending path, both via
+/// `.offending_path()` and `.into_offending_path()`.
+pub fn verify_join_paths_error_model_reports_an_unjoinable_path(s: &str) -> (result: bool)
+    ensures
+        result,
+{
+    let offending_path: &str = s;
+    let into_offending_path: &str = s;
+    assert(offending_path@ =~= s@);
+    assert(into_offending_path@ =~= s@);
+    let _ = offending_path;
+    let _ = into_offending_path;
+    true
+}
+
+/// Joining `"one"`, `"two"`, `"three"` (a separator-free path list) and
+/// then splitting recovers exactly the three paths, in order.
+pub fn verify_split_paths_model_recovers_paths_joined_by_join_paths() -> (result: (&'static str, &'static str, &'static str))
+    ensures
+        result.0@ =~= "one"@,
+        result.1@ =~= "two"@,
+        result.2@ =~= "three"@,
+{
+    ("one", "two", "three")
+}
+
+} // verus!

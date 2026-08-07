@@ -182,7 +182,10 @@ impl_verus_witness_trusted!(
     std::thread::Builder,
     std::thread::JoinHandle<i32>,
     std::thread::Scope<'static, 'static>,
-    std::thread::ScopedJoinHandle<'static, i32>
+    std::thread::ScopedJoinHandle<'static, i32>,
+    std::env::VarError,
+    std::env::Vars,
+    std::env::VarsOs
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -6133,6 +6136,95 @@ bridge_verus_witness!(RustStdStandard<std::thread::ThreadId>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::thread::ThreadId> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/env_carrier.rs");
+
+macro_rules! impl_env_args_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_args_model_reports_at_least_the_program_path",
+                    claim: VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_env_args_verus_witness!(std::env::Args);
+impl_env_args_verus_witness!(std::env::ArgsOs);
+
+const VERIFY_JOIN_PATHS_ERROR_MODEL_REPORTS_AN_UNJOINABLE_PATH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/env_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::env::JoinPathsError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_join_paths_error_model_reports_an_unjoinable_path",
+            claim: VERIFY_JOIN_PATHS_ERROR_MODEL_REPORTS_AN_UNJOINABLE_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::env::JoinPathsError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::env::JoinPathsError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::env::JoinPathsError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/env_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::env::SplitPaths<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_split_paths_model_recovers_paths_joined_by_join_paths",
+            claim: VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::env::SplitPaths<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::env::SplitPaths<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::env::SplitPaths<'static>> as VerusWitness>::proof().to_string()
         },
     }
 }

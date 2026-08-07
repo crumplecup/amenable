@@ -3701,3 +3701,83 @@ fn thread_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::thread::ThreadId as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn var_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::env::VarError> as Witness<VerusVerifier>>::proof(),
+        <std::env::VarError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vars_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::env::Vars> as Witness<VerusVerifier>>::proof(),
+        <std::env::Vars as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn vars_os_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::env::VarsOs> as Witness<VerusVerifier>>::proof(),
+        <std::env::VarsOs as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn env_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::env::Args> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_args_model_reports_at_least_the_program_path"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::env::Args as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn env_args_os_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::env::ArgsOs> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_args_model_reports_at_least_the_program_path"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::env::ArgsOs as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn join_paths_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::env::JoinPathsError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_join_paths_error_model_reports_an_unjoinable_path"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::env::JoinPathsError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn split_paths_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::env::SplitPaths<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_split_paths_model_recovers_paths_joined_by_join_paths"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::env::SplitPaths<'static> as RustStdType>::provenance()
+    );
+}

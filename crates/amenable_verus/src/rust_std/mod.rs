@@ -24,6 +24,7 @@ pub mod cstr_carrier;
 pub mod cstring_carrier;
 pub mod decode_utf16_carrier;
 pub mod discriminant_carrier;
+pub mod env_carrier;
 pub mod escape_ascii_carrier;
 pub mod fmt_carrier;
 pub mod fp_category_carrier;
