@@ -7024,3 +7024,193 @@ bridge_verus_witness!(RustStdStandard<std::time::Duration>);
         },
     }
 }
+
+const VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+
+macro_rules! impl_option_result_into_iter_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_into_iter_model_yields_zero_or_one_owned_value",
+                    claim: VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_option_result_into_iter_verus_witness!(core::option::IntoIter<i32>);
+impl_option_result_into_iter_verus_witness!(core::result::IntoIter<i32>);
+
+const VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+
+macro_rules! impl_option_result_iter_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_iter_model_yields_zero_or_one_reference",
+                    claim: VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_option_result_iter_verus_witness!(core::option::Iter<'static, i32>);
+impl_option_result_iter_verus_witness!(core::result::Iter<'static, i32>);
+
+const VERIFY_ITER_MUT_MODEL_WRITES_THROUGH_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+
+macro_rules! impl_option_result_iter_mut_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_iter_mut_model_writes_through",
+                    claim: VERIFY_ITER_MUT_MODEL_WRITES_THROUGH_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_option_result_iter_mut_verus_witness!(core::option::IterMut<'static, i32>);
+impl_option_result_iter_mut_verus_witness!(core::result::IterMut<'static, i32>);
+
+const VERIFY_PENDING_MODEL_NEVER_RESOLVES_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/future_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::future::Pending<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_pending_model_never_resolves",
+            claim: VERIFY_PENDING_MODEL_NEVER_RESOLVES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::future::Pending<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::future::Pending<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/future_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::future::Ready<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ready_model_resolves_immediately_with_its_value",
+            claim: VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::future::Ready<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::future::Ready<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/future_carrier.rs");
+
+impl VerusWitness
+    for RustStdStandard<
+        std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>,
+    >
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_poll_fn_model_dispatches_through_to_its_closure",
+            claim: VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(
+    RustStdStandard<std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>>
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}

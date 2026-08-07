@@ -4244,3 +4244,126 @@ fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::time::Duration as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn option_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::option::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_into_iter_model_yields_zero_or_one_owned_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::option::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn result_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<core::result::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_into_iter_model_yields_zero_or_one_owned_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::result::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn option_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::option::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_iter_model_yields_zero_or_one_reference"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::option::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn result_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::result::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_iter_model_yields_zero_or_one_reference"
+    );
+    assert_eq!(
+        proof.provenance,
+        <core::result::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn option_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::option::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_iter_mut_model_writes_through");
+    assert_eq!(
+        proof.provenance,
+        <core::option::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<core::result::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_iter_mut_model_writes_through");
+    assert_eq!(
+        proof.provenance,
+        <core::result::IterMut<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn pending_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::future::Pending<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_pending_model_never_resolves");
+    assert_eq!(
+        proof.provenance,
+        <std::future::Pending<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn ready_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::future::Ready<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_ready_model_resolves_immediately_with_its_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::future::Ready<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn poll_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<
+        std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>,
+    > as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_poll_fn_model_dispatches_through_to_its_closure"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>> as RustStdType>::provenance()
+    );
+}
