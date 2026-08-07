@@ -14,8 +14,8 @@
 //! facade crate, which re-exports this crate's family alongside its
 //! siblings, rather than depending on `amenable_core` directly.
 //!
-//! See `AMENABLE_PLAN.md` and `amenable.md` in the repository root for the
-//! full design rationale.
+//! See `docs/AMENABLE_PLAN.md` and `amenable.md` (repository root) for
+//! the full design rationale.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

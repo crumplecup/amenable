@@ -21,9 +21,10 @@
 
 ### Development Cycle
 
-1. **Plan** → Use planning document (.md) with implementation steps
+1. **Plan** → Use planning document (.md) in `docs/` with implementation
+   steps
 
-- Add the planning document to PLANNING_INDEX.md for tracking.
+- Add the planning document to `docs/PLANNING_INDEX.md` for tracking.
 
 1. **For each step:**
    - Generate code

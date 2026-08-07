@@ -16,8 +16,8 @@
 //! for the full split rationale. This facade re-exports Verus's witness
 //! types from `amenable_std` (where they now live) instead.
 //!
-//! See `AMENABLE_PLAN.md` and `amenable.md` in the repository root for the
-//! full design rationale.
+//! See `docs/AMENABLE_PLAN.md` and `amenable.md` (repository root) for
+//! the full design rationale.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

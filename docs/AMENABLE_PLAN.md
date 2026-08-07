@@ -131,7 +131,7 @@ conversational elicitation, not proof discipline. Its shape reflects that
 history — including gaps that let weak or vacuous proof implementations pass
 silently. Rebuilding this surface in `amenable` is an upgrade to a cleaner,
 unified interface, not a scavenge-and-relocate exercise. The trait family and
-narrative in [amenable.md](amenable.md) are the design target; `elicitation`'s
+narrative in [amenable.md](../amenable.md) are the design target; `elicitation`'s
 existing code is consulted for what worked and what didn't, not copied.
 
 The eventual shape:
@@ -173,7 +173,7 @@ if it tightens one of:
 
 ## Proposed Trait Family
 
-The trait family, as designed in [amenable.md](amenable.md), is implemented:
+The trait family, as designed in [amenable.md](../amenable.md), is implemented:
 
 - `Verifier`
 - `Witness`

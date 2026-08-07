@@ -69,7 +69,7 @@ Methods enumerate the set of Exchanges, all the transitions that are allowing in
 
 ## Homecoming (external)
 
-Source-code capture — a type gives back the code that produced a value instead of the value itself — is not defined here. It lives in its own repository, [homecoming](https://github.com/crumplecup/homecoming), as the `Homecoming` trait. It is not part of the `amenable` trait family; `amenable` is expected to depend on it once its design stabilizes, with `Witness` the leading candidate for a trait that also implements `Homecoming`. See that repository's `homecoming.md` and `HOMECOMING_PLAN.md` for the design, and "Relationship to `homecoming`" in `AMENABLE_PLAN.md` for why it matters here specifically: the code a `Witness` proof ran over is only a meaningful receipt if it can be tied, exactly, to the code that actually ships.
+Source-code capture — a type gives back the code that produced a value instead of the value itself — is not defined here. It lives in its own repository, [homecoming](https://github.com/crumplecup/homecoming), as the `Homecoming` trait. It is not part of the `amenable` trait family; `amenable` is expected to depend on it once its design stabilizes, with `Witness` the leading candidate for a trait that also implements `Homecoming`. See that repository's `homecoming.md` and `HOMECOMING_PLAN.md` for the design, and "Relationship to `homecoming`" in `docs/AMENABLE_PLAN.md` for why it matters here specifically: the code a `Witness` proof ran over is only a meaningful receipt if it can be tied, exactly, to the code that actually ships.
 
 ## Narrative
 

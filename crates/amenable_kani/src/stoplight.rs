@@ -1,5 +1,5 @@
 //! A minimal, real `StateMachine`/`Exchange` worked example: a traffic
-//! light, the same Green/Yellow/Red example `AMENABLE_PLAN.md`'s "States
+//! light, the same Green/Yellow/Red example `docs/AMENABLE_PLAN.md`'s "States
 //! Are Roots, Transitions Are Relations" section already uses to motivate
 //! the split between state claims (`Provenance`, asserted) and transition
 //! claims (`Witness`, proven).
@@ -43,7 +43,7 @@ use amenable_derive::Standard;
 use crate::{CalculationProof, KaniVerifier};
 
 /// The light is green — a root state claim, asserted rather than derived
-/// from a prior transition (see `AMENABLE_PLAN.md`, "States Are Roots,
+/// from a prior transition (see `docs/AMENABLE_PLAN.md`, "States Are Roots,
 /// Transitions Are Relations"): the first assertion any running instance
 /// makes is not computed from anything, it's asserted.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
@@ -107,7 +107,7 @@ impl Provenance for Red {
 
 /// A three-state traffic light: `Green -> Yellow -> Red -> Green`, and
 /// nothing else. Illegal transitions (`Yellow -> Green` directly, the
-/// motivating counter-example in `AMENABLE_PLAN.md`) simply have no
+/// motivating counter-example in `docs/AMENABLE_PLAN.md`) simply have no
 /// `Exchange` impl — there is no runtime check to bypass; the transition
 /// does not exist as code to call.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -203,7 +203,7 @@ impl GreenToken {
     /// about it a model checker could falsify beyond what its own
     /// `Provenance` impl already documents. A root state is "trusted with
     /// provenance," not "trusted because a model checker verified it" —
-    /// see `AMENABLE_PLAN.md`, "States Are Roots, Transitions Are
+    /// see `docs/AMENABLE_PLAN.md`, "States Are Roots, Transitions Are
     /// Relations."
     pub fn new(_state: Green) -> Self {
         Self(())
