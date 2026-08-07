@@ -185,7 +185,9 @@ impl_verus_witness_trusted!(
     std::thread::ScopedJoinHandle<'static, i32>,
     std::env::VarError,
     std::env::Vars,
-    std::env::VarsOs
+    std::env::VarsOs,
+    std::task::RawWaker,
+    std::task::RawWakerVTable
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -6651,6 +6653,90 @@ bridge_verus_witness!(RustStdStandard<std::net::UdpSocket>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::net::UdpSocket> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/task_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::task::Context<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_context_model_from_waker_exposes_the_same_waker",
+            claim: VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::task::Context<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Context<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::task::Context<'static>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/task_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::task::Poll<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_poll_model_ready_and_pending_are_disjoint",
+            claim: VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::task::Poll<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Poll<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::task::Poll<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/task_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::task::Waker> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_waker_model_wake_by_ref_invokes_the_wake_impl",
+            claim: VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::task::Waker>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Waker>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::task::Waker> as VerusWitness>::proof().to_string()
         },
     }
 }

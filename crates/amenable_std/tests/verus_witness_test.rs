@@ -4025,3 +4025,61 @@ fn udp_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::net::UdpSocket as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn raw_waker_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::task::RawWaker> as Witness<VerusVerifier>>::proof(),
+        <std::task::RawWaker as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn raw_waker_vtable_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<std::task::RawWakerVTable> as Witness<VerusVerifier>>::proof(),
+        <std::task::RawWakerVTable as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn task_context_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::task::Context<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_context_model_from_waker_exposes_the_same_waker"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::task::Context<'static> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn poll_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::task::Poll<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_poll_model_ready_and_pending_are_disjoint"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::task::Poll<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn waker_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::task::Waker> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_waker_model_wake_by_ref_invokes_the_wake_impl"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::task::Waker as RustStdType>::provenance()
+    );
+}

@@ -112,6 +112,7 @@ pub mod sync_barrier_carrier;
 pub mod sync_mpsc_carrier;
 pub mod sync_once_carrier;
 pub mod sync_wait_timeout_carrier;
+pub mod task_carrier;
 pub mod thread_current_carrier;
 pub mod thread_local_key_carrier;
 pub mod try_from_int_error_carrier;
