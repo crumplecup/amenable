@@ -7,6 +7,7 @@ repository.workspace = true
 authors.workspace = true
 homepage.workspace = true
 documentation.workspace = true
+readme = "README.md"
 
 description = "Constitutional trait family for lawful proof-carrying software structure"
 keywords = ["formal-verification", "proof", "provenance", "constitutional", "audit"]
