@@ -6799,3 +6799,115 @@ bridge_verus_witness!(RustStdStandard<core::panic::Location<'static>>);
         },
     }
 }
+
+const VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ops_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ops::RangeTo<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_range_to_model_contains_matches_bound",
+            claim: VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ops::RangeTo<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::RangeTo<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ops::RangeTo<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ops_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ops::RangeFull> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_range_full_model_contains_everything",
+            claim: VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ops::RangeFull>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<RangeFull>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ops::RangeFull> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ops_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ops::Bound<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_bound_model_round_trips_its_endpoint",
+            claim: VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ops::Bound<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ops::Bound<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/ops_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ops::ControlFlow<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_control_flow_model_continue_and_break_are_disjoint",
+            claim: VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ops::ControlFlow<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ops::ControlFlow<i32, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

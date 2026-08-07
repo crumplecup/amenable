@@ -4129,3 +4129,54 @@ fn panic_location_witness_is_checked_and_still_carries_chain_derived_provenance(
         <core::panic::Location<'static> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn range_to_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ops::RangeTo<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_range_to_model_contains_matches_bound"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ops::RangeTo<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ops::RangeFull> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_range_full_model_contains_everything");
+    assert_eq!(
+        proof.provenance,
+        <std::ops::RangeFull as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn bound_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ops::Bound<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_bound_model_round_trips_its_endpoint");
+    assert_eq!(
+        proof.provenance,
+        <std::ops::Bound<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn control_flow_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::ops::ControlFlow<i32, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_control_flow_model_continue_and_break_are_disjoint"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ops::ControlFlow<i32, i32> as RustStdType>::provenance()
+    );
+}
