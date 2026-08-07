@@ -4674,3 +4674,97 @@ fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance
         <std::collections::vec_deque::Drain<'static, i32> as RustStdType>::provenance()
     );
 }
+
+// `std::os::windows::*` witnesses: `#[cfg(windows)]`-gated, since the
+// real types themselves (and their `RustStdType` impls) don't exist off
+// Windows. These pass on the `verus-windows` GitHub Actions workflow's
+// `windows-latest` runner, not on this crate's primary development host
+// (Linux) — see `amenable_verus::rust_std::os_windows_carrier`'s module
+// doc comment.
+
+#[cfg(windows)]
+#[test]
+fn encode_wide_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::ffi::EncodeWide;
+
+    let proof = <RustStdStandard<EncodeWide<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "<EncodeWide<'_> as Iterator>::next");
+    assert_eq!(
+        proof.provenance,
+        <EncodeWide<'static> as RustStdType>::provenance()
+    );
+}
+
+#[cfg(windows)]
+#[test]
+fn borrowed_handle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::io::BorrowedHandle;
+
+    let proof = <RustStdStandard<BorrowedHandle<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BorrowedHandle<'static> as RustStdType>::provenance()
+    );
+}
+
+#[cfg(windows)]
+#[test]
+fn borrowed_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::io::BorrowedSocket;
+
+    let proof = <RustStdStandard<BorrowedSocket<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket"
+    );
+    assert_eq!(
+        proof.provenance,
+        <BorrowedSocket<'static> as RustStdType>::provenance()
+    );
+}
+
+#[cfg(windows)]
+#[test]
+fn handle_or_invalid_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::io::HandleOrInvalid;
+
+    let proof = <RustStdStandard<HandleOrInvalid> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from"
+    );
+    assert_eq!(
+        proof.provenance,
+        <HandleOrInvalid as RustStdType>::provenance()
+    );
+}
+
+#[cfg(windows)]
+#[test]
+fn owned_handle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::io::OwnedHandle;
+
+    let proof = <RustStdStandard<OwnedHandle> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "<OwnedHandle as AsRawHandle>::as_raw_handle");
+    assert_eq!(proof.provenance, <OwnedHandle as RustStdType>::provenance());
+}
+
+#[cfg(windows)]
+#[test]
+fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    use std::os::windows::io::OwnedSocket;
+
+    let proof = <RustStdStandard<OwnedSocket> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "<OwnedSocket as AsRawSocket>::as_raw_socket");
+    assert_eq!(proof.provenance, <OwnedSocket as RustStdType>::provenance());
+}

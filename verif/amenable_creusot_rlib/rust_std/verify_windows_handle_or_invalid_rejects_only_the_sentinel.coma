@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3750 8 3750 100 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3751 24 3751 26
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3752 17 3752 21
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3752 23 3752 24
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3754 17 3754 22
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3747 19 3747 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3748 18 3748 43
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3749 18 3749 65
+
+use creusot.int.Int64
+use creusot.prelude.Any
+use int.Int
+
+type tup2_bool_isize = { f0: bool; f1: Int64.t }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_windows_handle_or_invalid_rejects_only_the_sentinel
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3750 8 3750 100] (value: Int64.t)
+  (return (x: tup2_bool_isize)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_7 <- value = ([%#srust_std] (-1: Int64.t)) ] s1
+    | s1 = any [ br0 -> {_7 = false} (! bb2) | br1 -> {_7} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#srust_std'0] true); f1 = ([%#srust_std'1] (0: Int64.t)) } ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- { f0 = ([%#srust_std'2] false); f1 = value } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: tup2_bool_isize = Any.any_l () | & value: Int64.t = value | & _7: bool = Any.any_l () ])
+  [ return (result: tup2_bool_isize) ->
+  {[@stop_split] [@expl:verify_windows_handle_or_invalid_rejects_only_the_sentinel ensures] ([@stop_split] [@expl:verify_windows_handle_or_invalid_rejects_only_the_sentinel ensures #0] [%#srust_std'4] Int64.to_int value
+        = - 1 -> result.f0)
+    /\ ([@stop_split] [@expl:verify_windows_handle_or_invalid_rejects_only_the_sentinel ensures #1] [%#srust_std'5] Int64.to_int value
+      <> - 1 -> not result.f0 /\ result.f1 = value)}
+    (! return {result}) ]

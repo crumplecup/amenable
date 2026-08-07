@@ -18,8 +18,12 @@
 //! "prove/register on Linux, reference the real type's evidence string"
 //! move `amenable_kani::os_windows_model` already makes for the witness
 //! layer, applied one layer up, to the evidence layer itself.
-//! `RawHandle`/`RawSocket` are aliases to `isize`/`u64` respectively,
-//! already covered via `rust_std::primitives` — nothing separate to impl.
+//! `RawHandle`/`std::os::windows::raw::HANDLE` are aliases to
+//! `*mut c_void` (a pointer, not an integer), already covered via the
+//! `pointer` primitive doc page's `*const i32`/`*mut i32` registrations
+//! in `rust_std::primitives`; `RawSocket` is `u64` (on the 64-bit
+//! targets `windows-latest` runs), covered by the `u64` primitive
+//! directly. Nothing separate to impl for either.
 //! `ProcThreadAttributeList`/`ProcThreadAttributeListBuilder` are
 //! deliberately not covered — unstable
 //! (`windows_process_extensions_main_thread_state` or a related gate).

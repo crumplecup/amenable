@@ -1,0 +1,21 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3769 8 3769 92 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3767 19 3767 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3768 18 3768 33
+
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_windows_socket_as_raw_socket_recovers_the_wrapped_value
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3769 8 3769 92] (value: UInt64.t)
+  (return (x: UInt64.t)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: UInt64.t = Any.any_l () | & value: UInt64.t = value ])
+  [ return (result: UInt64.t) ->
+  {[@stop_split] [@expl:verify_windows_socket_as_raw_socket_recovers_the_wrapped_value ensures] [%#srust_std'0] result
+    = value}
+    (! return {result}) ]

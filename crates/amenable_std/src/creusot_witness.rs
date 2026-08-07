@@ -182,6 +182,7 @@ use amenable_creusot::{
     VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
     VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC,
     VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+    VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_SRC,
     VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
     VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
     VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
@@ -237,10 +238,13 @@ use amenable_creusot::{
     VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
     VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
     VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
+    VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+    VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC,
+    VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
-use crate::{RustStdProvenance, RustStdStandard};
+use crate::{RustLanguageProvenance, RustStdProvenance, RustStdStandard};
 
 #[expect(
     deprecated,
@@ -2855,5 +2859,150 @@ bridge_creusot_witness!(RustStdStandard<ManuallyDrop<i32>>);
         describe: || {
             <RustStdStandard<ManuallyDrop<i32>> as CreusotWitness>::proof().to_string()
         },
+    }
+}
+
+// `std::os::windows::{ffi::EncodeWide, io::{BorrowedHandle, BorrowedSocket,
+// HandleOrInvalid, OwnedHandle, OwnedSocket}}`: unlike every other type in
+// this file, these can never get a real `impl CreusotWitness for
+// RustStdStandard<T>` here, on any platform -- not because the type can't
+// be named (on Windows, `amenable_std` names it just fine, `#[cfg(windows)]`,
+// same as the `verus_witness` bridge does), but because `creusot-rustc`
+// itself has no Windows target and cannot run natively on Windows the way
+// `verus` does (see `amenable_verus::rust_std::os_windows_carrier`'s
+// module doc comment for that contrast). There is no host, ever, on which
+// `cargo creusot` could check a claim about the real type. So this bypasses
+// `CreusotWitness`/`bridge_creusot_witness!` entirely, exactly like
+// `amenable_kani::os_windows_model` bypasses `KaniWitness` for the
+// identical reason (Kani/CBMC also never run on Windows): each harness in
+// `amenable_creusot::rust_std`'s windows cluster proves a property of a
+// synthetic, real-type-agnostic model (plain `isize`/`u64`/`u32` values,
+// checked for real by `cargo creusot prove`), and the `evidence` string
+// below connects that proof to the real type's evidence entry by name
+// only -- `amenable_core::ProofRecord`'s `evidence` field is just a
+// string, never required to come from naming a type that actually
+// compiled here. Unconditional (no `#[cfg(windows)]`), for the same
+// reason `os_windows_model.rs`'s own bypass is unconditional: nothing
+// here ever names the real type in Rust syntax, only in a string literal.
+
+fn windows_provenance(
+    source_module: &str,
+    url: &str,
+    type_name: &str,
+    summary: &str,
+) -> RustStdProvenance {
+    RustStdProvenance::new(
+        RustLanguageProvenance::for_source("std", source_module),
+        url,
+        type_name,
+        summary,
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value",
+            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::io",
+                "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedHandle.html",
+                "std::os::windows::io::BorrowedHandle<'static>",
+                "The BorrowedHandle carrier borrows a raw Windows HANDLE without taking ownership of it.",
+            ),
+        }
+        .to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value",
+            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::io",
+                "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedHandle.html",
+                "std::os::windows::io::OwnedHandle",
+                "The OwnedHandle carrier owns a raw Windows HANDLE, closing it on drop.",
+            ),
+        }
+        .to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel",
+            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::io",
+                "https://doc.rust-lang.org/std/os/windows/io/struct.HandleOrInvalid.html",
+                "std::os::windows::io::HandleOrInvalid",
+                "The HandleOrInvalid carrier owns a Windows HANDLE that may be the sentinel INVALID_HANDLE_VALUE, deferring that check to conversion time.",
+            ),
+        }
+        .to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value",
+            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::io",
+                "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedSocket.html",
+                "std::os::windows::io::BorrowedSocket<'static>",
+                "The BorrowedSocket carrier borrows a raw Windows SOCKET without taking ownership of it.",
+            ),
+        }
+        .to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value",
+            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::io",
+                "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedSocket.html",
+                "std::os::windows::io::OwnedSocket",
+                "The OwnedSocket carrier owns a raw Windows SOCKET, closing it on drop.",
+            ),
+        }
+        .to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        verifier: "creusot",
+        describe: || CheckedProof {
+            harness: "verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit",
+            claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_SRC,
+            provenance: windows_provenance(
+                "std::os::windows::ffi",
+                "https://doc.rust-lang.org/std/os/windows/ffi/struct.EncodeWide.html",
+                "std::os::windows::ffi::EncodeWide<'static>",
+                "The EncodeWide carrier lazily encodes an OsStr as UTF-16 code units, as Windows APIs expect.",
+            ),
+        }
+        .to_string(),
     }
 }

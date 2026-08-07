@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit": {
+        "prover": "alt-ergo",
+        "time": 0.016
+      }
+    }
+  }
+}

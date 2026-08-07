@@ -74,6 +74,8 @@ pub mod option_result_iter_carrier;
 pub mod ordered_pair_into_iter_carrier;
 pub mod ordered_pair_iter_mut_carrier;
 pub mod ordering_carrier;
+#[cfg(windows)]
+pub mod os_windows_carrier;
 pub mod panic_carrier;
 pub mod parse_char_error_carrier;
 pub mod parse_float_error_carrier;

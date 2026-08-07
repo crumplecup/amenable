@@ -98,35 +98,5 @@
   {
     "path": "std::os::unix::thread::RawPthread",
     "reason": "platform-specific type alias only resolvable when the coverage check is built on a unix target"
-  },
-  {
-    "path": "std::os::windows::ffi::EncodeWide",
-    "reason": "creusot-rustc has no Windows target at all -- confirmed via creusot's own upstream CI matrix (rust.yml: os: [ubuntu-latest, macos-latest], no Windows entry, ever) and via its bundled toolchain (nightly-2026-02-27, pinned by librustc_driver's exact .so version) having no x86_64-pc-windows-gnu target installed. This is categorically different from amenable_kani's own Windows coverage here, which was verified on a real native Windows machine (`amenable_kani::rust_std::os_windows`'s own doc comment: \"this crate's primary development host\"), not via cross-compilation -- there is no cross-compilation equivalent available for creusot-rustc (the cross/Podman container used for `just check-windows` ships a plain stable rustc, not creusot's pinned nightly driver). Scoped to creusot only: kani already has a real, working witness for this type, and this exception must not hide it.",
-    "verifiers": ["creusot"]
-  },
-  {
-    "path": "std::os::windows::prelude::BorrowedHandle",
-    "reason": "creusot-rustc has no Windows target -- see std::os::windows::ffi::EncodeWide for the full evidence (upstream CI matrix, toolchain target list)",
-    "verifiers": ["creusot"]
-  },
-  {
-    "path": "std::os::windows::prelude::BorrowedSocket",
-    "reason": "creusot-rustc has no Windows target -- see std::os::windows::ffi::EncodeWide",
-    "verifiers": ["creusot"]
-  },
-  {
-    "path": "std::os::windows::prelude::HandleOrInvalid",
-    "reason": "creusot-rustc has no Windows target -- see std::os::windows::ffi::EncodeWide",
-    "verifiers": ["creusot"]
-  },
-  {
-    "path": "std::os::windows::prelude::OwnedHandle",
-    "reason": "creusot-rustc has no Windows target -- see std::os::windows::ffi::EncodeWide",
-    "verifiers": ["creusot"]
-  },
-  {
-    "path": "std::os::windows::prelude::OwnedSocket",
-    "reason": "creusot-rustc has no Windows target -- see std::os::windows::ffi::EncodeWide",
-    "verifiers": ["creusot"]
   }
 ]

@@ -1,0 +1,47 @@
+name: Verus (Windows-only proofs)
+
+# Manually triggered, not run on every push/PR: this checks
+# `#[cfg(windows)]`-gated `assume_specification` axioms against the real
+# `std::os::windows::*` types in `amenable_verus::rust_std::
+# os_windows_carrier`, which name types that don't exist in this repo's
+# Linux CI job (or any Linux dev machine) at all -- there is no local
+# equivalent to run this against. Verus itself runs natively on Windows
+# (unlike Kani/CBMC, which never run there), so this is the one proof
+# backend in the project that can check real Windows-only code directly,
+# rather than needing a Linux-compilable accommodation model. See
+# `os_windows_carrier`'s own module doc comment for the full reasoning.
+on:
+  workflow_dispatch:
+
+jobs:
+  verus-windows:
+    name: verify rust_std::os_windows_carrier (windows-latest)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Verus ships prebuilt Windows release archives (verus.exe, z3.exe,
+      # and the vstd/verus_builtin rlibs it needs, all bundled together)
+      # -- much faster and more reliable in CI than the `vargo build
+      # --release` from-source recipe VERUS_GUIDE.md documents for local
+      # dev machines.
+      - name: Download the latest Verus release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download --repo verus-lang/verus --pattern "*x86-win.zip" --output verus.zip
+        shell: pwsh
+
+      - name: Extract Verus
+        run: Expand-Archive -Path verus.zip -DestinationPath verus-install
+        shell: pwsh
+
+      - name: Add Verus to PATH
+        run: |
+          $dir = Get-ChildItem -Path verus-install -Directory | Select-Object -First 1
+          Add-Content -Path $env:GITHUB_PATH -Value $dir.FullName
+        shell: pwsh
+
+      - run: verus --version
+
+      - name: Verify the Windows-only proof carrier
+        run: verus --crate-type=lib crates/amenable_verus/src/lib.rs --verify-module rust_std::os_windows_carrier
