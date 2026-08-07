@@ -4499,3 +4499,46 @@ fn random_state_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <std::hash::RandomState as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn os_str_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::OsStr> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_os_str_model_valid_utf8_content_round_trips_through_to_str"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::OsStr as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn os_string_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::ffi::OsString> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_os_string_model_push_appends_to_the_existing_content"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::OsString as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn os_str_display_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::ffi::os_str::Display<'static>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_os_str_display_model_renders_valid_utf8_content_unchanged"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::ffi::os_str::Display<'static> as RustStdType>::provenance()
+    );
+}

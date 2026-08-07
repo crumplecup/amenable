@@ -7505,3 +7505,86 @@ bridge_verus_witness!(RustStdStandard<std::hash::RandomState>);
         },
     }
 }
+
+const VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::OsStr> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_os_str_model_valid_utf8_content_round_trips_through_to_str",
+            claim: VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::OsStr>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
+        verifier: "verus",
+        describe: || { <RustStdStandard<std::ffi::OsStr> as VerusWitness>::proof().to_string() },
+    }
+}
+
+const VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::OsString> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_os_string_model_push_appends_to_the_existing_content",
+            claim: VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::OsString>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsString>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ffi::OsString> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_os_str_display_model_renders_valid_utf8_content_unchanged",
+            claim: VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::ffi::os_str::Display<'static>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
