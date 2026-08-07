@@ -4180,3 +4180,67 @@ fn control_flow_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <std::ops::ControlFlow<i32, i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn try_from_float_secs_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    assert_eq!(
+        <RustStdStandard<core::time::TryFromFloatSecsError> as Witness<VerusVerifier>>::proof(),
+        <core::time::TryFromFloatSecsError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn instant_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::time::Instant> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_instant_model_is_monotonically_nondecreasing"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::time::Instant as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn system_time_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::time::SystemTime> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_system_time_model_duration_since_computes_the_elapsed_span"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::time::SystemTime as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn system_time_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::time::SystemTimeError> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_system_time_error_model_recovers_how_far_backward_it_went"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::time::SystemTimeError as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::time::Duration> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_duration_model_new_normalizes_nanos_and_carries_into_secs"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::time::Duration as RustStdType>::provenance()
+    );
+}

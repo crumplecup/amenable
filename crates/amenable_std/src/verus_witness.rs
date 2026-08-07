@@ -189,7 +189,8 @@ impl_verus_witness_trusted!(
     std::task::RawWaker,
     std::task::RawWakerVTable,
     core::panic::PanicInfo<'static>,
-    core::panic::PanicMessage<'static>
+    core::panic::PanicMessage<'static>,
+    core::time::TryFromFloatSecsError
 );
 
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
@@ -6908,6 +6909,118 @@ bridge_verus_witness!(RustStdStandard<std::ops::ControlFlow<i32, i32>>);
         verifier: "verus",
         describe: || {
             <RustStdStandard<std::ops::ControlFlow<i32, i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_time_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::time::Instant> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_instant_model_is_monotonically_nondecreasing",
+            claim: VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::time::Instant>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Instant>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::time::Instant> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_time_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::time::SystemTime> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_system_time_model_duration_since_computes_the_elapsed_span",
+            claim: VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::time::SystemTime>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SystemTime>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::time::SystemTime> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_time_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::time::SystemTimeError> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_system_time_error_model_recovers_how_far_backward_it_went",
+            claim: VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::time::SystemTimeError>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SystemTimeError>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::time::SystemTimeError> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_time_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::time::Duration> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_duration_model_new_normalizes_nanos_and_carries_into_secs",
+            claim: VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::time::Duration>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::time::Duration> as VerusWitness>::proof().to_string()
         },
     }
 }
