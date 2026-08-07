@@ -7588,3 +7588,60 @@ bridge_verus_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
         },
     }
 }
+
+const VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_collections_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::HashMap<i32, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_hash_map_model_insert_then_get_recovers_the_value",
+            claim: VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::HashMap<i32, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::HashMap<i32, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
+
+const VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/std_collections_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::collections::HashSet<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_hash_set_model_insert_then_contains_reports_membership",
+            claim: VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::collections::HashSet<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::collections::HashSet<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}

@@ -4542,3 +4542,33 @@ fn os_str_display_witness_is_checked_and_still_carries_chain_derived_provenance(
         <std::ffi::os_str::Display<'static> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn hash_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::HashMap<i32, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_hash_map_model_insert_then_get_recovers_the_value"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::HashMap<i32, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn hash_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::collections::HashSet<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_hash_set_model_insert_then_contains_reports_membership"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::collections::HashSet<i32> as RustStdType>::provenance()
+    );
+}

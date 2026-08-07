@@ -100,6 +100,7 @@ pub mod slice_chunk_by_carrier;
 pub mod slice_chunks_carrier;
 pub mod slice_iter_carrier;
 pub mod slice_split_carrier;
+pub mod std_collections_carrier;
 pub mod std_ffi_carrier;
 pub mod std_hash_carrier;
 pub mod std_net_carrier;
