@@ -83,6 +83,7 @@ pub mod path_components_carrier;
 pub mod path_display_carrier;
 pub mod path_prefix_carrier;
 pub mod path_strip_prefix_carrier;
+pub mod primitive_shapes_carrier;
 pub mod process_child_carrier;
 pub mod process_command_carrier;
 pub mod process_exit_carrier;
