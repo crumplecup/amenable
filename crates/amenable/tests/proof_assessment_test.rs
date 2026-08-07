@@ -819,7 +819,7 @@ fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
         String::from_utf8_lossy(&output.stderr)
     );
     let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
-    assert!(stdout.contains("Unassessed Kani proofs:"));
+    assert!(stdout.contains("Unassessed proofs:"));
     assert!(!stdout.contains(PROOF_ID));
 
     fs::remove_file(path).expect("assessment artifact should be removed");
