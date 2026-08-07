@@ -6351,3 +6351,166 @@ bridge_verus_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
         },
     }
 }
+
+const VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::Once> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_model_runs_its_closure_exactly_once",
+            claim: VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::Once>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
+        verifier: "verus",
+        describe: || { <RustStdStandard<std::sync::Once> as VerusWitness>::proof().to_string() },
+    }
+}
+
+const VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::OnceState> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_state_model_reports_not_poisoned_on_a_clean_run",
+            claim: VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::OnceState>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::OnceState>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::OnceState> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::OnceLock<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_lock_model_initializes_exactly_once",
+            claim: VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::OnceLock<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::OnceLock<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::OnceLock<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_barrier_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::Barrier> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_barrier_model_of_one_is_its_own_leader",
+            claim: VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::Barrier>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Barrier>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::Barrier> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+impl VerusWitness for RustStdStandard<std::sync::BarrierWaitResult> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_barrier_model_of_one_is_its_own_leader",
+            claim: VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::BarrierWaitResult>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::BarrierWaitResult>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::BarrierWaitResult> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_wait_timeout_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::WaitTimeoutResult> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_wait_timeout_result_model_reports_timed_out",
+            claim: VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::WaitTimeoutResult>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::WaitTimeoutResult>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::WaitTimeoutResult> as VerusWitness>::proof().to_string()
+        },
+    }
+}

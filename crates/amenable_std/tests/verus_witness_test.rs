@@ -3871,3 +3871,87 @@ fn mpsc_try_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
         <std::sync::mpsc::TryIter<'static, i32> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn sync_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::Once> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_once_model_runs_its_closure_exactly_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::Once as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn once_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::OnceState> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_once_state_model_reports_not_poisoned_on_a_clean_run"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::OnceState as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn once_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::OnceLock<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_once_lock_model_initializes_exactly_once"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::OnceLock<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn barrier_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::Barrier> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_barrier_model_of_one_is_its_own_leader"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::Barrier as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn barrier_wait_result_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::BarrierWaitResult> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_barrier_model_of_one_is_its_own_leader"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::BarrierWaitResult as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn wait_timeout_result_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::WaitTimeoutResult> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_wait_timeout_result_model_reports_timed_out"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::WaitTimeoutResult as RustStdType>::provenance()
+    );
+}
