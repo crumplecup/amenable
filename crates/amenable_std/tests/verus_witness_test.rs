@@ -3781,3 +3781,93 @@ fn split_paths_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <std::env::SplitPaths<'static> as RustStdType>::provenance()
     );
 }
+
+#[test]
+fn mpsc_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::mpsc::Sender<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_channel_model_delivers_to_the_paired_receiver"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::Sender<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mpsc_sync_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::mpsc::SyncSender<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_channel_model_delivers_to_the_paired_receiver"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::SyncSender<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mpsc_receiver_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::mpsc::Receiver<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_receiver_model_fails_once_every_sender_is_dropped"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::Receiver<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mpsc_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_channel_iter_model_yields_sent_values_then_stops"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::IntoIter<i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mpsc_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof =
+        <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_channel_iter_model_yields_sent_values_then_stops"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::Iter<'static, i32> as RustStdType>::provenance()
+    );
+}
+
+#[test]
+fn mpsc_try_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    let proof = <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as Witness<
+        VerusVerifier,
+    >>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_try_iter_model_does_not_block_on_an_empty_open_channel"
+    );
+    assert_eq!(
+        proof.provenance,
+        <std::sync::mpsc::TryIter<'static, i32> as RustStdType>::provenance()
+    );
+}

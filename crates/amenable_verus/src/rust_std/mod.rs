@@ -107,6 +107,7 @@ pub mod str_whitespace_carrier;
 pub mod string_carrier;
 pub mod sync_atomic_carrier;
 pub mod sync_atomic_ordering_carrier;
+pub mod sync_mpsc_carrier;
 pub mod thread_current_carrier;
 pub mod thread_local_key_carrier;
 pub mod try_from_int_error_carrier;

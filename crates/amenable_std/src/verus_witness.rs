@@ -6228,3 +6228,126 @@ bridge_verus_witness!(RustStdStandard<std::env::SplitPaths<'static>>);
         },
     }
 }
+
+const VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+
+macro_rules! impl_mpsc_channel_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_channel_model_delivers_to_the_paired_receiver",
+                    claim: VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_mpsc_channel_verus_witness!(std::sync::mpsc::Sender<i32>);
+impl_mpsc_channel_verus_witness!(std::sync::mpsc::SyncSender<i32>);
+
+const VERIFY_RECEIVER_MODEL_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_receiver_model_fails_once_every_sender_is_dropped",
+            claim: VERIFY_RECEIVER_MODEL_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::mpsc::Receiver<i32>> as VerusWitness>::proof().to_string()
+        },
+    }
+}
+
+const VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+
+macro_rules! impl_mpsc_iter_verus_witness {
+    ($ty:ty) => {
+        impl VerusWitness for RustStdStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = VerusCheckedProof;
+
+            fn proof() -> Self::ProofArtifact {
+                VerusCheckedProof {
+                    harness: "verify_channel_iter_model_yields_sent_values_then_stops",
+                    claim: VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC,
+                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+                }
+            }
+        }
+
+        bridge_verus_witness!(RustStdStandard<$ty>);
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+    };
+}
+
+impl_mpsc_iter_verus_witness!(std::sync::mpsc::IntoIter<i32>);
+impl_mpsc_iter_verus_witness!(std::sync::mpsc::Iter<'static, i32>);
+
+const VERIFY_TRY_ITER_MODEL_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+
+impl VerusWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_try_iter_model_does_not_block_on_an_empty_open_channel",
+            claim: VERIFY_TRY_ITER_MODEL_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
+        verifier: "verus",
+        describe: || {
+            <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as VerusWitness>::proof()
+                .to_string()
+        },
+    }
+}
