@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_os_str_valid_utf8_content_round_trips_through_to_str": {
+        "prover": "alt-ergo",
+        "time": 0.013
+      }
+    }
+  }
+}

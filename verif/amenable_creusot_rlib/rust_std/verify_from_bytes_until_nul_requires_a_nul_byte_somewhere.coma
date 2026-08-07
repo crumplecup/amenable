@@ -1,0 +1,29 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1728 8 1728 94 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1730 13 1730 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1730 19 1730 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1724 19 1724 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1725 18 1727 9
+
+use creusot.prelude.Any
+use creusot.int.UInt8
+
+type tup2_bool_bool = { f0: bool; f1: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_from_bytes_until_nul_requires_a_nul_byte_somewhere
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1728 8 1728 94] (byte: UInt8.t)
+  (return (x: tup2_bool_bool)) =
+  {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere requires] [%#srust_std'1] UInt8.t'int byte
+  <> 0}
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] true) } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: tup2_bool_bool = Any.any_l () ])
+  [ return (result: tup2_bool_bool) ->
+  {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere ensures] [%#srust_std'2] match result with
+      | {f0 = accepted; f1 = rejected} -> accepted /\ rejected
+      end}
+    (! return {result}) ]

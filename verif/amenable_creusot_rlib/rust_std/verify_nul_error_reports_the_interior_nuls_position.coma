@@ -1,0 +1,32 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 8 1688 90 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1690 13 1690 19
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1690 21 1690 27
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1683 19 1683 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1684 18 1687 9
+
+use creusot.int.UInt64
+use creusot.prelude.Any
+use creusot.int.UInt8
+
+type tup2_usize_usize = { f0: UInt64.t; f1: UInt64.t }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_nul_error_reports_the_interior_nuls_position
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 8 1688 90] (byte: UInt8.t)
+  (return (x: tup2_usize_usize)) =
+  {[@stop_split] [@expl:verify_nul_error_reports_the_interior_nuls_position requires] [%#srust_std'1] UInt8.t'int byte
+  <> 0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#srust_std] (1: UInt64.t)); f1 = ([%#srust_std'0] (1: UInt64.t)) } ] s1
+    | s1 = return {_ret} ] ] [ & _ret: tup2_usize_usize = Any.any_l () ])
+  [ return (result: tup2_usize_usize) ->
+  {[@stop_split] [@expl:verify_nul_error_reports_the_interior_nuls_position ensures] [%#srust_std'2] match result with
+      | {f0 = single_nul_index; f1 = first_of_two_index} -> single_nul_index = (1: UInt64.t)
+      /\ first_of_two_index = (1: UInt64.t)
+      end}
+    (! return {result}) ]

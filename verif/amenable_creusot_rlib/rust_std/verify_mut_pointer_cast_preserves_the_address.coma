@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 907 8 907 79 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 871 8 871 79 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 908 23 908 39
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 909 12 909 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 909 27 909 37
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 905 19 905 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 906 18 906 24
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 872 23 872 39
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 873 12 873 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 873 27 873 37
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 869 19 869 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 870 18 870 24
 let%span sptr = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 419 18 419 37
 let%span sptr'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 410 18 410 45
 
@@ -29,7 +29,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_mut_pointer_cast_preserves_the_address
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 907 8 907 79] (ptr: Opaque.ptr)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 871 8 871 79] (ptr: Opaque.ptr)
   (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = cast_i32 [%#srust_std] {ptr} (fun (_x: Opaque.ptr) -> [ &cast <- _x ] s1)

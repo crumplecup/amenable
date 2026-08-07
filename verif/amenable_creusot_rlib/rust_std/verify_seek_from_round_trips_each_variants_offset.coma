@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 186 8 190 28 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 174 8 178 28 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 179 19 179 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 180 18 185 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 167 19 167 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 168 18 173 9
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -40,7 +40,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_seek_from_round_trips_each_variants_offset
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 186 8 190 28] (start_offset: UInt64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 174 8 178 28] (start_offset: UInt64.t)
   (end_offset: Int64.t) (current_offset: Int64.t) (return (x: tup3_u64_i64_i64)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_10 <- Start start_offset ] s1

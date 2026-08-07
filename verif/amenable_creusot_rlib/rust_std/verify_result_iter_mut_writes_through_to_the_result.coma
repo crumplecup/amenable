@@ -1,0 +1,39 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2636 8 2639 57 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2629 19 2629 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2630 18 2635 9
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Option_i32 = None | Some Int32.t
+
+type t_Result_i32_i32 = Ok Int32.t | Err Int32.t
+
+type tup3_Option_i32_Option_i32_Result_i32_i32 = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Result_i32_i32 }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_result_iter_mut_writes_through_to_the_result
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2636 8 2639 57] (value: Int32.t)
+  (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_7 <- Some value ] s1
+    | s1 = [ &_9 <- None ] s2
+    | s2 = [ &_10 <- Ok updated ] s3
+    | s3 = [ &_ret <- { f0 = _7; f1 = _9; f2 = _10 } ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: tup3_Option_i32_Option_i32_Result_i32_i32 = Any.any_l ()
+  | & value: Int32.t = value
+  | & updated: Int32.t = updated
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & _9: t_Option_i32 = Any.any_l ()
+  | & _10: t_Result_i32_i32 = Any.any_l () ])
+  [ return (result: tup3_Option_i32_Option_i32_Result_i32_i32) ->
+  {[@stop_split] [@expl:verify_result_iter_mut_writes_through_to_the_result ensures] [%#srust_std'0] match result with
+      | {f0 = first_seen; f1 = second_seen; f2 = final_res} -> first_seen = Some value
+      /\ second_seen = None /\ final_res = Ok updated
+      end}
+    (! return {result}) ]

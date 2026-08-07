@@ -1,17 +1,17 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 711 8 711 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 675 8 675 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 13 713 22
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 28 713 29
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 24 713 30
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 36 713 37
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 32 713 38
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 44 713 45
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 713 40 713 46
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 706 19 706 23
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 707 18 707 36
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 708 18 708 31
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 709 18 709 31
-let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 18 710 31
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 13 677 22
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 28 677 29
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 24 677 30
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 36 677 37
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 32 677 38
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 44 677 45
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 40 677 46
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 670 19 670 23
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 671 18 671 36
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 672 18 672 31
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 673 18 673 31
+let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 674 18 674 31
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 288 18 288 40
 
 use creusot.slice.Slice64
@@ -33,7 +33,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_array_indexing_and_length
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 711 8 711 93] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 675 8 675 93] (a: Int32.t) (b: Int32.t)
   (c: Int32.t) (return (x: tup4_usize_i32_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = any

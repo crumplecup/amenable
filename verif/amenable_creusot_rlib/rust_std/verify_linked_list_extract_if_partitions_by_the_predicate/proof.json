@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_linked_list_extract_if_partitions_by_the_predicate": {
+        "prover": "alt-ergo",
+        "time": 0.013
+      }
+    }
+  }
+}

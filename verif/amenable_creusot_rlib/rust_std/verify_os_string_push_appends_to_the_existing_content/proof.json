@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_os_string_push_appends_to_the_existing_content": {
+        "prover": "alt-ergo",
+        "time": 0.01
+      }
+    }
+  }
+}

@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3750 8 3750 100 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3011 8 3011 100 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3751 24 3751 26
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3752 17 3752 21
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3752 23 3752 24
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3754 17 3754 22
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3747 19 3747 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3748 18 3748 43
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3749 18 3749 65
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3012 24 3012 26
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3013 17 3013 21
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3013 23 3013 24
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3015 17 3015 22
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3008 19 3008 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3009 18 3009 43
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3010 18 3010 65
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -19,7 +19,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_or_invalid_rejects_only_the_sentinel
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3750 8 3750 100] (value: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3011 8 3011 100] (value: Int64.t)
   (return (x: tup2_bool_isize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- value = ([%#srust_std] (-1: Int64.t)) ] s1

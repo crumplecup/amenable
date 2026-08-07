@@ -1,0 +1,18 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 457 8 457 79 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 458 12 458 16
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 455 19 455 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 456 18 456 24
+
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_os_str_display_renders_valid_utf8_content_unchanged
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 457 8 457 79] (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- [%#srust_std] true ] s1 | s1 = return {_ret} ] ] [ & _ret: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_os_str_display_renders_valid_utf8_content_unchanged ensures] [%#srust_std'1] result}
+    (! return {result}) ]

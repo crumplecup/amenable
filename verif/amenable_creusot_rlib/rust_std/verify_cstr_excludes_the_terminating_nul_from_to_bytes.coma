@@ -1,0 +1,42 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1710 8 1712 51 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1713 46 1713 49
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1713 13 1713 19
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1713 33 1713 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1702 19 1702 29
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1703 18 1709 9
+
+use creusot.int.UInt8
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+type t_Option_u8 = None | Some UInt8.t
+
+type tup4_usize_Option_u8_usize_Option_u8 = { f0: UInt64.t; f1: t_Option_u8; f2: UInt64.t; f3: t_Option_u8 }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_cstr_excludes_the_terminating_nul_from_to_bytes
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1710 8 1712 51] (byte: UInt8.t)
+  (return (x: tup4_usize_Option_u8_usize_Option_u8)) =
+  {[@stop_split] [@expl:verify_cstr_excludes_the_terminating_nul_from_to_bytes requires] [%#srust_std'2] UInt8.t'int byte
+  <> 0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_6 <- Some byte ] s1
+    | s1 = [ &_8 <- Some ([%#srust_std] (0: UInt8.t)) ] s2
+    | s2 = [ &_ret <- { f0 = ([%#srust_std'0] (1: UInt64.t)); f1 = _6; f2 = ([%#srust_std'1] (2: UInt64.t)); f3 = _8 } ]
+      s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: tup4_usize_Option_u8_usize_Option_u8 = Any.any_l ()
+  | & byte: UInt8.t = byte
+  | & _6: t_Option_u8 = Any.any_l ()
+  | & _8: t_Option_u8 = Any.any_l () ])
+  [ return (result: tup4_usize_Option_u8_usize_Option_u8) ->
+  {[@stop_split] [@expl:verify_cstr_excludes_the_terminating_nul_from_to_bytes ensures] [%#srust_std'3] match result with
+      | {f0 = payload_len; f1 = observed_byte; f2 = borrowed_len; f3 = terminator} -> payload_len = (1: UInt64.t)
+      /\ observed_byte = Some byte /\ borrowed_len = (2: UInt64.t) /\ terminator = Some (0: UInt8.t)
+      end}
+    (! return {result}) ]

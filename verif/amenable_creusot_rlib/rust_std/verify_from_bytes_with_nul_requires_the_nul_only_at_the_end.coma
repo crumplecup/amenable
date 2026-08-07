@@ -1,0 +1,32 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1746 8 1748 31 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1750 13 1750 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1750 19 1750 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1750 25 1750 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1741 19 1741 29
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1742 18 1745 9
+
+use creusot.prelude.Any
+use creusot.int.UInt8
+
+type tup3_bool_bool_bool = { f0: bool; f1: bool; f2: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_from_bytes_with_nul_requires_the_nul_only_at_the_end
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1746 8 1748 31] (byte: UInt8.t)
+  (return (x: tup3_bool_bool_bool)) =
+  {[@stop_split] [@expl:verify_from_bytes_with_nul_requires_the_nul_only_at_the_end requires] [%#srust_std'2] UInt8.t'int byte
+  <> 0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] true); f2 = ([%#srust_std'1] true) } ] s1
+    | s1 = return {_ret} ] ] [ & _ret: tup3_bool_bool_bool = Any.any_l () ])
+  [ return (result: tup3_bool_bool_bool) ->
+  {[@stop_split] [@expl:verify_from_bytes_with_nul_requires_the_nul_only_at_the_end ensures] [%#srust_std'3] match result with
+      | {f0 = accepted; f1 = missing_nul_rejected; f2 = interior_nul_rejected} -> accepted
+      /\ missing_nul_rejected /\ interior_nul_rejected
+      end}
+    (! return {result}) ]

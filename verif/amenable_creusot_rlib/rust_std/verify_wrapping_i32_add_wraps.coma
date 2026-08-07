@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2751 8 2751 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2030 8 2030 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2752 12 2752 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2749 19 2749 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2750 18 2750 39
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2734 18 2734 44
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2031 12 2031 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2028 19 2028 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2029 18 2029 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2013 18 2013 44
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -20,7 +20,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_wrapping_i32_add_wraps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2751 8 2751 93] (a: t_Wrapping_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2030 8 2030 93] (a: t_Wrapping_i32)
   (b: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Wrapping_i32 [%#srust_std] {a} {b} (fun (_x: t_Wrapping_i32) -> [ &_ret <- _x ] s1)

@@ -1,0 +1,33 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 295 8 297 37 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 299 13 299 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 299 19 299 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 299 25 299 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 299 31 299 36
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 290 19 290 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 291 18 294 9
+
+use creusot.prelude.Any
+use creusot.int.Int32
+
+type tup4_bool_bool_bool_bool = { f0: bool; f1: bool; f2: bool; f3: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_hash_set_insert_then_contains_reports_membership
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 295 8 297 37] (value: Int32.t)
+  (return (x: tup4_bool_bool_bool_bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#srust_std] true);
+                        f1 = ([%#srust_std'0] true);
+                        f2 = ([%#srust_std'1] true);
+                        f3 = ([%#srust_std'2] false) } ] s1
+    | s1 = return {_ret} ] ] [ & _ret: tup4_bool_bool_bool_bool = Any.any_l () ])
+  [ return (result: tup4_bool_bool_bool_bool) ->
+  {[@stop_split] [@expl:verify_hash_set_insert_then_contains_reports_membership ensures] [%#srust_std'4] match result with
+      | {f0 = inserted; f1 = contains_before_remove; f2 = removed; f3 = contains_after_remove} -> inserted
+      /\ contains_before_remove /\ removed /\ not contains_after_remove
+      end}
+    (! return {result}) ]

@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3730 8 3730 96 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2991 8 2991 96 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3728 19 3728 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3729 18 3729 33
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2989 19 2989 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2990 18 2990 33
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -11,7 +11,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_as_raw_handle_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3730 8 3730 96] (value: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2991 8 2991 96] (value: Int64.t)
   (return (x: Int64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
   [ & _ret: Int64.t = Any.any_l () | & value: Int64.t = value ])

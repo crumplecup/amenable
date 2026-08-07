@@ -1,0 +1,53 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1629 8 1631 57 *)
+
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1632 46 1632 49
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1632 13 1632 19
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1632 33 1632 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1632 52 1632 56
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1620 19 1620 29
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1621 18 1628 9
+
+use creusot.int.UInt8
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+type t_Option_u8 = None | Some UInt8.t
+
+type tup5_usize_Option_u8_usize_Option_u8_bool = {
+  f0: UInt64.t;
+  f1: t_Option_u8;
+  f2: UInt64.t;
+  f3: t_Option_u8;
+  f4: bool }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_cstring_excludes_the_terminator_and_rejects_interior_nul
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1629 8 1631 57] (byte: UInt8.t)
+  (return (x: tup5_usize_Option_u8_usize_Option_u8_bool)) =
+  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#srust_std'3] UInt8.t'int byte
+  <> 0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_6 <- Some byte ] s1
+    | s1 = [ &_8 <- Some ([%#srust_std] (0: UInt8.t)) ] s2
+    | s2 = [ &_ret <- { f0 = ([%#srust_std'0] (1: UInt64.t));
+                        f1 = _6;
+                        f2 = ([%#srust_std'1] (2: UInt64.t));
+                        f3 = _8;
+                        f4 = ([%#srust_std'2] true) } ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: tup5_usize_Option_u8_usize_Option_u8_bool = Any.any_l ()
+  | & byte: UInt8.t = byte
+  | & _6: t_Option_u8 = Any.any_l ()
+  | & _8: t_Option_u8 = Any.any_l () ])
+  [ return (result: tup5_usize_Option_u8_usize_Option_u8_bool) ->
+  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul ensures] [%#srust_std'4] match result with
+      | {f0 = payload_len; f1 = observed_byte; f2 = payload_with_nul_len; f3 = terminator; f4 = interior_nul_rejected} -> payload_len
+        = (1: UInt64.t)
+      /\ observed_byte = Some byte
+      /\ payload_with_nul_len = (2: UInt64.t) /\ terminator = Some (0: UInt8.t) /\ interior_nul_rejected
+      end}
+    (! return {result}) ]
