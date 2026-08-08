@@ -19,6 +19,7 @@ mod cert;
 mod creusot_gallery;
 #[cfg(feature = "creusot")]
 mod creusot_witness;
+mod non_nul_byte;
 mod rust_std;
 mod valid_unicode_scalar;
 #[cfg(feature = "verus")]
@@ -35,6 +36,7 @@ pub use creusot_gallery::{
 };
 #[cfg(feature = "creusot")]
 pub use creusot_witness::CheckedProof;
+pub use non_nul_byte::NonNulByte;
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,

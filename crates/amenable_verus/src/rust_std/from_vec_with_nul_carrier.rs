@@ -30,6 +30,8 @@ pub assume_specification [CString::from_vec_with_nul] (bytes: Vec<u8>) -> (resul
 /// symbolic value.
 pub fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (result: (bool, bool, bool))
     requires
+        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
+        // impl (rust_std::cstr_carrier) names this exact fragment.
         byte != 0,
     ensures
         result.0,

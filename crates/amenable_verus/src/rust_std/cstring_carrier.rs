@@ -53,6 +53,8 @@ pub assume_specification<T: Into<Vec<u8>>> [CString::new::<T>] (bytes: T) -> (re
 /// `option_carrier.rs`) rather than a `kani::any()` symbolic value.
 pub fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul(byte: u8) -> (result: bool)
     requires
+        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
+        // impl (rust_std::cstr_carrier) names this exact fragment.
         byte != 0,
     ensures
         result,

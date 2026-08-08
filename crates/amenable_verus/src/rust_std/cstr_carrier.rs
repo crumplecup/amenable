@@ -82,6 +82,8 @@ pub fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere(with_nul: &[u8]
 /// trailing data after it — the same claim the Kani harness checks.
 pub fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (result: (bool, bool, bool))
     requires
+        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
+        // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
         byte != 0,
     ensures
         result.0,
@@ -114,6 +116,8 @@ pub fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> 
 /// — the same claim the Kani harness checks.
 pub fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(byte: u8) -> (result: bool)
     requires
+        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
+        // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
         byte != 0,
     ensures
         result,

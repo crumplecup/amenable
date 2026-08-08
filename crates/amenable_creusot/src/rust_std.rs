@@ -1627,6 +1627,8 @@ amenable_derive::harness! {
         /// and rejects any input that already contains an interior nul
         /// byte. See this cluster's leading comment for the
         /// accommodation-model rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (payload_len, observed_byte, payload_with_nul_len, terminator, interior_nul_rejected) =>
@@ -1650,6 +1652,8 @@ amenable_derive::harness! {
         /// vector only when the sole nul byte is the final one. See
         /// this cluster's leading comment for the accommodation-model
         /// rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (accepted, missing_nul_rejected, interior_nul_rejected) =>
@@ -1690,6 +1694,8 @@ amenable_derive::harness! {
         /// interior nul byte that caused `CString::new` to reject the
         /// input. See this cluster's leading comment for the
         /// accommodation-model rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (single_nul_index, first_of_two_index) =>
@@ -1709,6 +1715,8 @@ amenable_derive::harness! {
         /// `to_bytes_with_nul` preserves the original borrowed
         /// representation. See this cluster's leading comment for the
         /// accommodation-model rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (payload_len, observed_byte, borrowed_len, terminator) =>
@@ -1731,6 +1739,8 @@ amenable_derive::harness! {
         /// appears anywhere in the borrowed slice, and fails only when
         /// none is present at all. See this cluster's leading comment
         /// for the accommodation-model rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (accepted, rejected) => accepted && rejected,
@@ -1748,6 +1758,8 @@ amenable_derive::harness! {
         /// only when the sole nul byte is the final one. See this
         /// cluster's leading comment for the accommodation-model
         /// rationale.
+        // Canonical home: amenable_std::NonNulByte's Requires<CreusotVerifier>
+        // impl names this exact fragment.
         #[requires(byte@ != 0)]
         #[ensures(match result {
             (accepted, missing_nul_rejected, interior_nul_rejected) =>

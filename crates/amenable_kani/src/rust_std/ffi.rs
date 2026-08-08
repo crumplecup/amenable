@@ -6,8 +6,8 @@
 
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 
-use amenable_core::Evidence;
-use amenable_std::RustStdStandard;
+use amenable_core::{Evidence, Requires};
+use amenable_std::{NonNulByte, RustStdStandard};
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -36,6 +36,39 @@ bridge_kani_witness!(RustStdStandard<CStr>);
     }
 }
 
+/// [`NonNulByte`] reuses the same harness rather than adding a new Kani
+/// proof — it names the precondition every `CStr`/`CString`-family proof
+/// in this crate already assumes, it doesn't prove anything new.
+impl KaniWitness for NonNulByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(NonNulByte);
+
+impl Requires<crate::KaniVerifier> for NonNulByte {
+    fn requires() -> &'static str {
+        "byte != 0"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NonNulByte",
+        verifier: "kani",
+        kind: "requires",
+        fragment: <NonNulByte as Requires<crate::KaniVerifier>>::requires,
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC, {
         /// `CStr::from_bytes_with_nul` accepts a nul-terminated byte
@@ -44,6 +77,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_cstr_excludes_the_terminating_nul_from_to_bytes() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
             kani::assume(byte != 0);
             let bytes = [byte, 0];
             let cstr = CStr::from_bytes_with_nul(&bytes).unwrap();
@@ -94,6 +129,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
             kani::assume(byte != 0);
             let with_nul = [byte, 0, byte];
             assert!(
@@ -142,6 +179,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
             kani::assume(byte != 0);
             assert!(
                 CStr::from_bytes_with_nul(&[byte, 0]).is_ok(),

@@ -245,7 +245,8 @@ use amenable_creusot::{
 };
 
 use crate::{
-    AsciiByte, RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
+    AsciiByte, NonNulByte, RustLanguageProvenance, RustStdProvenance, RustStdStandard,
+    ValidUnicodeScalar,
 };
 
 #[expect(
@@ -2127,6 +2128,39 @@ bridge_creusot_witness!(RustStdStandard<CStr>);
         evidence: "amenable_std::rust_std::RustStdStandard<CStr>",
         verifier: "creusot",
         describe: || <RustStdStandard<CStr> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// [`NonNulByte`] reuses the same harness rather than adding a new
+/// Creusot proof — it names the precondition every `CStr`/`CString`-family
+/// proof in this crate already requires, it doesn't prove anything new.
+impl CreusotWitness for NonNulByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(NonNulByte);
+
+impl Requires<CreusotVerifier> for NonNulByte {
+    fn requires() -> &'static str {
+        "byte@ != 0"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NonNulByte",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: <NonNulByte as Requires<CreusotVerifier>>::requires,
     }
 }
 

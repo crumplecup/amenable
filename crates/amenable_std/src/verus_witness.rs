@@ -52,7 +52,7 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::{AsciiByte, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
+use crate::{AsciiByte, NonNulByte, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
 
 /// The Verus verifier, local to this crate: there is only one verifier
 /// Verus works with — Verus. Being local here (not imported from
@@ -1809,6 +1809,39 @@ bridge_verus_witness!(RustStdStandard<core::ffi::CStr>);
         describe: || {
             <RustStdStandard<core::ffi::CStr> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+/// [`NonNulByte`] reuses the same harness rather than adding a new Verus
+/// proof — it names the precondition every `CStr`/`CString`-family proof
+/// in this crate already requires, it doesn't prove anything new.
+impl VerusWitness for NonNulByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(NonNulByte);
+
+impl Requires<VerusVerifier> for NonNulByte {
+    fn requires() -> &'static str {
+        "byte != 0"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NonNulByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: <NonNulByte as Requires<VerusVerifier>>::requires,
     }
 }
 

@@ -40,6 +40,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (rust_std::ffi) names this exact fragment.
             kani::assume(byte != 0);
             let cstring = CString::new(vec![byte]).unwrap();
             assert_eq!(cstring.as_bytes(), &[byte], "as_bytes excludes the terminator");
@@ -89,6 +91,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (rust_std::ffi) names this exact fragment.
             kani::assume(byte != 0);
             assert!(
                 CString::from_vec_with_nul(vec![byte, 0]).is_ok(),
@@ -178,6 +182,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_nul_error_reports_the_interior_nuls_position() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::NonNulByte's Requires<KaniVerifier>
+            // impl (rust_std::ffi) names this exact fragment.
             kani::assume(byte != 0);
             let err = CString::new(vec![byte, 0, byte]).unwrap_err();
             assert_eq!(err.nul_position(), 1, "nul_position reports the nul's index");
