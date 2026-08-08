@@ -697,14 +697,35 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, INDEXING_AND_LENGTH_HOLDS_SRC, {
+        /// The `amenable_std::IndexingAndLength` postcondition -- real,
+        /// callable Pearlite content, not just descriptive text
+        /// alongside it. A three-element container's reported length
+        /// is `3`, and each index recovers the element it was
+        /// constructed with.
+        #[logic(open)]
+        fn indexing_and_length_holds(
+            a: i32,
+            b: i32,
+            c: i32,
+            container_result: (usize, i32, i32, i32),
+        ) -> bool {
+            pearlite! {
+                container_result.0 == 3usize
+                    && container_result.1 == a
+                    && container_result.2 == b
+                    && container_result.3 == c
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC, {
         /// A fixed-size array's length is its compile-time-known element
         /// count, and each index recovers the element stored there.
         #[requires(true)]
-        #[ensures(result.0 == 3usize)]
-        #[ensures(result.1 == a)]
-        #[ensures(result.2 == b)]
-        #[ensures(result.3 == c)]
+        #[ensures(indexing_and_length_holds(a, b, c, result))]
         fn verify_array_indexing_and_length(a: i32, b: i32, c: i32) -> (usize, i32, i32, i32) {
             let arr = [a, b, c];
             (arr.len(), arr[0], arr[1], arr[2])
@@ -717,10 +738,7 @@ amenable_derive::harness! {
         /// A slice's `.len()` reports the number of elements it views,
         /// and indexing recovers the underlying elements in order.
         #[requires(true)]
-        #[ensures(result.0 == 3usize)]
-        #[ensures(result.1 == a)]
-        #[ensures(result.2 == b)]
-        #[ensures(result.3 == c)]
+        #[ensures(indexing_and_length_holds(a, b, c, result))]
         fn verify_slice_indexing_and_length(a: i32, b: i32, c: i32) -> (usize, i32, i32, i32) {
             let arr = [a, b, c];
             let slice: &[i32] = &arr;

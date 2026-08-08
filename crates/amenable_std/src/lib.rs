@@ -21,6 +21,7 @@ mod creusot_gallery;
 #[cfg(feature = "creusot")]
 mod creusot_witness;
 mod increment_headroom;
+mod indexing_and_length;
 mod non_nul_byte;
 mod nul_only_at_the_end_validates;
 mod rust_std;
@@ -42,6 +43,7 @@ pub use creusot_gallery::{
 #[cfg(feature = "creusot")]
 pub use creusot_witness::CheckedProof;
 pub use increment_headroom::IncrementHeadroom;
+pub use indexing_and_length::IndexingAndLength;
 pub use non_nul_byte::NonNulByte;
 pub use nul_only_at_the_end_validates::NulOnlyAtTheEndValidates;
 pub use rust_std::{

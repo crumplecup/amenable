@@ -1,17 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 708 8 708 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 729 8 729 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 13 710 22
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 28 710 29
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 24 710 30
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 36 710 37
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 32 710 38
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 44 710 45
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 710 40 710 46
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 703 19 703 23
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 704 18 704 36
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 705 18 705 31
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 706 18 706 31
-let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 707 18 707 31
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 13 731 22
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 28 731 29
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 24 731 30
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 36 731 37
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 32 731 38
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 44 731 45
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 731 40 731 46
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 727 19 727 23
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 728 18 728 60
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 714 16 717 46
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 288 18 288 40
 
 use creusot.slice.Slice64
@@ -28,12 +26,16 @@ let rec len_i32 (self_: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
 
 type tup4_usize_i32_i32_i32 = { f0: UInt64.t; f1: Int32.t; f2: Int32.t; f3: Int32.t }
 
+predicate indexing_and_length_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 707 8 712 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (container_result: tup4_usize_i32_i32_i32) =
+  [%#srust_std'8] container_result.f0 = (3: UInt64.t)
+  /\ container_result.f1 = a /\ container_result.f2 = b /\ container_result.f3 = c
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_array_indexing_and_length
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 708 8 708 93] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 729 8 729 93] (a: Int32.t) (b: Int32.t)
   (c: Int32.t) (return (x: tup4_usize_i32_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = any
@@ -41,40 +43,36 @@ let rec verify_array_indexing_and_length
         /\ Seq.get __arr_temp.Slice64.elts 1 = b
         /\ Seq.get __arr_temp.Slice64.elts 2 = c /\ Seq.length __arr_temp.Slice64.elts = 3}-
         [ &arr <- __arr_temp ] s1) ]
-    | s1 = len_i32 [%#srust_std] {arr} (fun (_x: UInt64.t) -> [ &_16 <- _x ] s2)
-    | s2 = [ &_20 <- [%#srust_std'0] (0: UInt64.t) ] s3
-    | s3 = [ &_21 <- UInt64.lt _20 ([%#srust_std'1] (3: UInt64.t)) ] s4
-    | s4 = {[@expl:index in bounds] [%#srust_std'1] _21} s5
-    | s5 = Slice64Ops.get [%#srust_std'1] <Int32.t> {arr} {_20} (fun (r: Int32.t) -> [ &_19 <- r ] s6)
-    | s6 = [ &_23 <- [%#srust_std'2] (1: UInt64.t) ] s7
-    | s7 = [ &_24 <- UInt64.lt _23 ([%#srust_std'3] (3: UInt64.t)) ] s8
-    | s8 = {[@expl:index in bounds] [%#srust_std'3] _24} s9
-    | s9 = Slice64Ops.get [%#srust_std'3] <Int32.t> {arr} {_23} (fun (r: Int32.t) -> [ &_22 <- r ] s10)
-    | s10 = [ &_26 <- [%#srust_std'4] (2: UInt64.t) ] s11
-    | s11 = [ &_27 <- UInt64.lt _26 ([%#srust_std'5] (3: UInt64.t)) ] s12
-    | s12 = {[@expl:index in bounds] [%#srust_std'5] _27} s13
-    | s13 = Slice64Ops.get [%#srust_std'5] <Int32.t> {arr} {_26} (fun (r: Int32.t) -> [ &_25 <- r ] s14)
-    | s14 = [ &_ret <- { f0 = _16; f1 = _19; f2 = _22; f3 = _25 } ] s15
+    | s1 = len_i32 [%#srust_std] {arr} (fun (_x: UInt64.t) -> [ &_13 <- _x ] s2)
+    | s2 = [ &_17 <- [%#srust_std'0] (0: UInt64.t) ] s3
+    | s3 = [ &_18 <- UInt64.lt _17 ([%#srust_std'1] (3: UInt64.t)) ] s4
+    | s4 = {[@expl:index in bounds] [%#srust_std'1] _18} s5
+    | s5 = Slice64Ops.get [%#srust_std'1] <Int32.t> {arr} {_17} (fun (r: Int32.t) -> [ &_16 <- r ] s6)
+    | s6 = [ &_20 <- [%#srust_std'2] (1: UInt64.t) ] s7
+    | s7 = [ &_21 <- UInt64.lt _20 ([%#srust_std'3] (3: UInt64.t)) ] s8
+    | s8 = {[@expl:index in bounds] [%#srust_std'3] _21} s9
+    | s9 = Slice64Ops.get [%#srust_std'3] <Int32.t> {arr} {_20} (fun (r: Int32.t) -> [ &_19 <- r ] s10)
+    | s10 = [ &_23 <- [%#srust_std'4] (2: UInt64.t) ] s11
+    | s11 = [ &_24 <- UInt64.lt _23 ([%#srust_std'5] (3: UInt64.t)) ] s12
+    | s12 = {[@expl:index in bounds] [%#srust_std'5] _24} s13
+    | s13 = Slice64Ops.get [%#srust_std'5] <Int32.t> {arr} {_23} (fun (r: Int32.t) -> [ &_22 <- r ] s14)
+    | s14 = [ &_ret <- { f0 = _13; f1 = _16; f2 = _19; f3 = _22 } ] s15
     | s15 = return {_ret} ] ]
   [ & _ret: tup4_usize_i32_i32_i32 = Any.any_l ()
   | & a: Int32.t = a
   | & b: Int32.t = b
   | & c: Int32.t = c
   | & arr: Slice64.array Int32.t = Any.any_l ()
-  | & _16: UInt64.t = Any.any_l ()
+  | & _13: UInt64.t = Any.any_l ()
+  | & _16: Int32.t = Any.any_l ()
+  | & _17: UInt64.t = Any.any_l ()
+  | & _18: bool = Any.any_l ()
   | & _19: Int32.t = Any.any_l ()
   | & _20: UInt64.t = Any.any_l ()
   | & _21: bool = Any.any_l ()
   | & _22: Int32.t = Any.any_l ()
   | & _23: UInt64.t = Any.any_l ()
-  | & _24: bool = Any.any_l ()
-  | & _25: Int32.t = Any.any_l ()
-  | & _26: UInt64.t = Any.any_l ()
-  | & _27: bool = Any.any_l () ])
+  | & _24: bool = Any.any_l () ])
   [ return (result: tup4_usize_i32_i32_i32) ->
-  {[@stop_split] [@expl:verify_array_indexing_and_length ensures] ([@stop_split] [@expl:verify_array_indexing_and_length ensures #0] [%#srust_std'7] result.f0
-      = (3: UInt64.t))
-    /\ ([@stop_split] [@expl:verify_array_indexing_and_length ensures #1] [%#srust_std'8] result.f1 = a)
-    /\ ([@stop_split] [@expl:verify_array_indexing_and_length ensures #2] [%#srust_std'9] result.f2 = b)
-    /\ ([@stop_split] [@expl:verify_array_indexing_and_length ensures #3] [%#srust_std'10] result.f3 = c)}
+  {[@stop_split] [@expl:verify_array_indexing_and_length ensures] [%#srust_std'7] indexing_and_length_holds a b c result}
     (! return {result}) ]

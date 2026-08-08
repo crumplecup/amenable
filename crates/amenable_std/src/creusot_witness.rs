@@ -157,7 +157,7 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
-    NON_NUL_BYTE_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
+    INDEXING_AND_LENGTH_HOLDS_SRC, NON_NUL_BYTE_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
     VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
@@ -247,7 +247,7 @@ use amenable_creusot::{
 };
 
 use crate::{
-    ArgvIncludesProgramPath, AsciiByte, NonNulByte, NulOnlyAtTheEndValidates,
+    ArgvIncludesProgramPath, AsciiByte, IndexingAndLength, NonNulByte, NulOnlyAtTheEndValidates,
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
 };
 
@@ -1111,6 +1111,62 @@ bridge_creusot_witness!(RustStdStandard<[i32]>);
         evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
         verifier: "creusot",
         describe: || <RustStdStandard<[i32]> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// [`IndexingAndLength`] reuses the array-indexing harness rather than
+/// adding a new Creusot proof — it names the postcondition both the
+/// array and slice indexing/length proofs already share, it doesn't
+/// prove anything new.
+impl CreusotWitness for IndexingAndLength {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_array_indexing_and_length",
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(IndexingAndLength);
+
+/// Returns `amenable_creusot::INDEXING_AND_LENGTH_HOLDS_SRC` directly --
+/// the verbatim, `harness!`-captured source of the real `#[logic(open)]
+/// fn indexing_and_length_holds` both `verify_array_indexing_and_length`
+/// and `verify_slice_indexing_and_length` call, not a hand-retyped copy
+/// of its expression. There is exactly one place this postcondition's
+/// text exists in the whole codebase.
+impl Ensures<CreusotVerifier> for IndexingAndLength {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        INDEXING_AND_LENGTH_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IndexingAndLength",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <IndexingAndLength as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape both real sites now use, instead of the raw
+// expression INDEXING_AND_LENGTH_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IndexingAndLength",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "indexing_and_length_holds (a , b , c , result)",
+        harnesses: &["verify_array_indexing_and_length", "verify_slice_indexing_and_length"],
     }
 }
 
