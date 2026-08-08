@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3078 8 3080 52 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3326 8 3328 52 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3083 29 3083 39
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3084 39 3084 48
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3088 40 3088 49
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3076 19 3076 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3077 18 3077 72
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3043 16 3045 57
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3331 29 3331 39
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3332 39 3332 48
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3336 40 3336 49
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3324 19 3324 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3325 18 3325 72
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3291 16 3293 57
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 103 29 103 33
 let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 99 26 102 17
@@ -96,7 +96,7 @@ type tup2_Option_i32_Option_i32 = { f0: t_Option_i32; f1: t_Option_i32 }
 
 type tup3_Option_i32_Option_i32_Option_i32 = { f0'0: t_Option_i32; f1'0: t_Option_i32; f2'0: t_Option_i32 }
 
-predicate iter_yields_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3037 8 3041 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Option_i32) =
+predicate iter_yields_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3285 8 3289 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Option_i32) =
   [%#srust_std'4] iter_result.f0'0 = Some value /\ iter_result.f1'0 = None /\ iter_result.f2'0 = Some final_value
 
 meta "compute_max_steps" 1000000
@@ -104,7 +104,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_option_iter_yields_zero_or_one_reference
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3078 8 3080 52] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3326 8 3328 52] (value: Int32.t)
   (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &opt <- Some value ] s1

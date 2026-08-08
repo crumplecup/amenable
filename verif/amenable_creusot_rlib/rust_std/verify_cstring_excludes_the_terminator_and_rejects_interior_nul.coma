@@ -1,12 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2133 8 2135 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2316 8 2318 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2136 46 2136 49
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2136 13 2136 19
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2136 33 2136 39
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2136 52 2136 56
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2124 19 2124 43
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2125 18 2132 9
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2112 24 2112 34
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2319 46 2319 49
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2319 13 2319 19
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2319 33 2319 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2319 52 2319 56
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2314 19 2314 43
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2315 18 2315 94
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2278 24 2278 34
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2294 16 2301 17
 
 use creusot.int.UInt8
 use creusot.int.UInt64
@@ -21,15 +22,23 @@ type tup5_usize_Option_u8_usize_Option_u8_bool = {
   f3: t_Option_u8;
   f4: bool }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2111 8 2111 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2277 8 2277 47] (byte: UInt8.t) =
   [%#srust_std'5] UInt8.t'int byte <> 0
+
+predicate cstring_excludes_the_terminator_and_rejects_interior_nul_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2289 8 2292 17] (byte: UInt8.t) (cstring_result: tup5_usize_Option_u8_usize_Option_u8_bool) =
+  [%#srust_std'6] match cstring_result with
+    | {f0 = payload_len; f1 = observed_byte; f2 = payload_with_nul_len; f3 = terminator; f4 = interior_nul_rejected} -> payload_len
+      = (1: UInt64.t)
+    /\ observed_byte = Some byte
+    /\ payload_with_nul_len = (2: UInt64.t) /\ terminator = Some (0: UInt8.t) /\ interior_nul_rejected
+    end
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_cstring_excludes_the_terminator_and_rejects_interior_nul
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2133 8 2135 57] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2316 8 2318 57] (byte: UInt8.t)
   (return (x: tup5_usize_Option_u8_usize_Option_u8_bool)) =
   {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#srust_std'3] non_nul_byte_holds byte}
   (! bb0
@@ -47,10 +56,5 @@ let rec verify_cstring_excludes_the_terminator_and_rejects_interior_nul
   | & _6: t_Option_u8 = Any.any_l ()
   | & _8: t_Option_u8 = Any.any_l () ])
   [ return (result: tup5_usize_Option_u8_usize_Option_u8_bool) ->
-  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul ensures] [%#srust_std'4] match result with
-      | {f0 = payload_len; f1 = observed_byte; f2 = payload_with_nul_len; f3 = terminator; f4 = interior_nul_rejected} -> payload_len
-        = (1: UInt64.t)
-      /\ observed_byte = Some byte
-      /\ payload_with_nul_len = (2: UInt64.t) /\ terminator = Some (0: UInt8.t) /\ interior_nul_rejected
-      end}
+  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul ensures] [%#srust_std'4] cstring_excludes_the_terminator_and_rejects_interior_nul_holds byte result}
     (! return {result}) ]

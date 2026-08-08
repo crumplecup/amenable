@@ -1,8 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2048 8 2051 84 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2195 8 2198 84 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2052 55 2052 59
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2038 19 2038 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2039 18 2047 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2199 55 2199 59
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2193 19 2193 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2194 18 2194 79
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2168 16 2176 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -17,12 +18,19 @@ type tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
   f4: t_Option_i32;
   f5: bool }
 
+predicate vec_deque_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2155 8 2166 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+  [%#srust_std'2] match iter_result with
+    | {f0 = first_seen; f1 = second_seen; f2 = exhausted; f3 = popped_first; f4 = popped_second; f5 = empty} -> first_seen
+      = Some a
+    /\ second_seen = Some b /\ exhausted = None /\ popped_first = Some a /\ popped_second = Some b /\ empty
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_iter_yields_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2048 8 2051 84] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2195 8 2198 84] (a: Int32.t) (b: Int32.t)
   (return (x: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1
@@ -41,9 +49,5 @@ let rec verify_vec_deque_iter_yields_references_in_order
   | & _12: t_Option_i32 = Any.any_l ()
   | & _14: t_Option_i32 = Any.any_l () ])
   [ return (result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) ->
-  {[@stop_split] [@expl:verify_vec_deque_iter_yields_references_in_order ensures] [%#srust_std'1] match result with
-      | {f0 = first_seen; f1 = second_seen; f2 = exhausted; f3 = popped_first; f4 = popped_second; f5 = empty} -> first_seen
-        = Some a
-      /\ second_seen = Some b /\ exhausted = None /\ popped_first = Some a /\ popped_second = Some b /\ empty
-      end}
+  {[@stop_split] [@expl:verify_vec_deque_iter_yields_references_in_order ensures] [%#srust_std'1] vec_deque_iter_yields_references_in_order_holds a b result}
     (! return {result}) ]

@@ -1721,6 +1721,40 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// std::collections::linked_list::Iter<'static, i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn linked_list_iter_yields_references_in_order_holds(
+            a: i32,
+            b: i32,
+            iter_result: (
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                bool,
+            ),
+        ) -> bool {
+            pearlite! {
+                match iter_result {
+                    (first, second, exhausted, front_after_iter, next_after_iter, empty) =>
+                        first == Some(a)
+                            && second == Some(b)
+                            && exhausted == None
+                            && front_after_iter == Some(a)
+                            && next_after_iter == Some(b)
+                            && empty,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC, {
         /// `LinkedList::iter` borrows instead of consuming, yielding
         /// shared references in front-to-back order while leaving the
@@ -1733,20 +1767,36 @@ amenable_derive::harness! {
         /// pure by-value law with nothing dropped from the original
         /// claim.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, exhausted, front_after_iter, next_after_iter, empty) =>
-                first == Some(a)
-                    && second == Some(b)
-                    && exhausted == None
-                    && front_after_iter == Some(a)
-                    && next_after_iter == Some(b)
-                    && empty,
-        })]
+        #[ensures(linked_list_iter_yields_references_in_order_holds(a, b, result))]
         fn verify_linked_list_iter_yields_references_in_order(
             a: i32,
             b: i32,
         ) -> (Option<i32>, Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool) {
             (Some(a), Some(b), None, Some(a), Some(b), true)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, LINKED_LIST_ITER_MUT_WRITES_THROUGH_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// std::collections::linked_list::IterMut<'static, i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn linked_list_iter_mut_writes_through_holds(
+            updated_first: i32,
+            updated_second: i32,
+            iter_mut_result: (bool, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match iter_mut_result {
+                    (exhausted, front_after_write, next_after_write) =>
+                        exhausted
+                            && front_after_write == Some(updated_first)
+                            && next_after_write == Some(updated_second),
+                }
+            }
         }
     }
 }
@@ -1765,12 +1815,7 @@ amenable_derive::harness! {
         /// signature Kani's proof exercises; the law never depends on
         /// their values.
         #[requires(true)]
-        #[ensures(match result {
-            (exhausted, front_after_write, next_after_write) =>
-                exhausted
-                    && front_after_write == Some(updated_first)
-                    && next_after_write == Some(updated_second),
-        })]
+        #[ensures(linked_list_iter_mut_writes_through_holds(updated_first, updated_second, result))]
         fn verify_linked_list_iter_mut_writes_through(
             first: i32,
             second: i32,
@@ -1826,6 +1871,30 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// TryReserveError>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn try_reserve_rejects_an_impossible_capacity_holds(
+            first: i32,
+            second: i32,
+            try_reserve_result: (Option<TryReserveError>, i32, i32, usize),
+        ) -> bool {
+            pearlite! {
+                match try_reserve_result {
+                    (Some(_error), observed_first, observed_second, observed_len) =>
+                        observed_first == first
+                            && observed_second == second
+                            && observed_len == 2usize,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC, {
         /// `Vec::try_reserve` reports failure via `TryReserveError`
         /// for an impossible reservation request, without disturbing
@@ -1839,13 +1908,7 @@ amenable_derive::harness! {
         /// the Kani harness and makes the trusted boundary explicit.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (Some(_error), observed_first, observed_second, observed_len) =>
-                observed_first == first
-                    && observed_second == second
-                    && observed_len == 2usize,
-            _ => false,
-        })]
+        #[ensures(try_reserve_rejects_an_impossible_capacity_holds(first, second, result))]
         fn verify_try_reserve_rejects_an_impossible_capacity(
             first: i32,
             second: i32,
@@ -1870,10 +1933,73 @@ amenable_derive::harness! {
         /// `Box::as_ref` (`**self == *result`) instead of postulating
         /// any local model.
         #[requires(true)]
-        #[ensures(result == value)]
+        #[ensures(box_new_preserves_the_wrapped_value(value, result))]
         fn verify_box_new_preserves_the_wrapped_value(value: i32) -> i32 {
             let boxed = Box::new(value);
             *boxed.as_ref()
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Box<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn box_new_preserves_the_wrapped_value(value: i32, box_result: i32) -> bool {
+            pearlite! { box_result == value }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn linked_list_extract_if_partitions_by_the_predicate_holds(
+            extract_if_result: (
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+            ),
+        ) -> bool {
+            pearlite! {
+                match extract_if_result {
+                    (
+                        first,
+                        second,
+                        exhausted,
+                        remaining_first,
+                        remaining_second,
+                        remaining_exhausted,
+                        early_drop_first,
+                        early_drop_second,
+                        early_drop_third,
+                        early_drop_exhausted,
+                    ) =>
+                        first == Some(2i32)
+                            && second == Some(4i32)
+                            && exhausted == None
+                            && remaining_first == Some(1i32)
+                            && remaining_second == Some(3i32)
+                            && remaining_exhausted == None
+                            && early_drop_first == Some(1i32)
+                            && early_drop_second == Some(3i32)
+                            && early_drop_third == Some(4i32)
+                            && early_drop_exhausted == None,
+                }
+            }
         }
     }
 }
@@ -1892,30 +2018,7 @@ amenable_derive::harness! {
         /// `Drop::drop` call count), so this converts cleanly to a pure
         /// by-value law with nothing dropped from the original claim.
         #[requires(true)]
-        #[ensures(match result {
-            (
-                first,
-                second,
-                exhausted,
-                remaining_first,
-                remaining_second,
-                remaining_exhausted,
-                early_drop_first,
-                early_drop_second,
-                early_drop_third,
-                early_drop_exhausted,
-            ) =>
-                first == Some(2i32)
-                    && second == Some(4i32)
-                    && exhausted == None
-                    && remaining_first == Some(1i32)
-                    && remaining_second == Some(3i32)
-                    && remaining_exhausted == None
-                    && early_drop_first == Some(1i32)
-                    && early_drop_second == Some(3i32)
-                    && early_drop_third == Some(4i32)
-                    && early_drop_exhausted == None,
-        })]
+        #[ensures(linked_list_extract_if_partitions_by_the_predicate_holds(result))]
         fn verify_linked_list_extract_if_partitions_by_the_predicate() -> (
             Option<i32>,
             Option<i32>,
@@ -1945,6 +2048,31 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<VecDeque<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn vec_deque_pushes_and_pops_from_both_ends_holds(
+            a: i32,
+            b: i32,
+            deque_result: (Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match deque_result {
+                    (front, back, exhausted_front, exhausted_back, empty) =>
+                        front == Some(b)
+                            && back == Some(a)
+                            && exhausted_front == None
+                            && exhausted_back == None
+                            && empty,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC, {
         /// `VecDeque` is genuinely double-ended: pushing one element to
         /// the back and another to the front, then popping from each
@@ -1960,14 +2088,7 @@ amenable_derive::harness! {
         /// about `Drop::drop` call counts for any container; Kani's own
         /// proof still covers that half.
         #[requires(true)]
-        #[ensures(match result {
-            (front, back, exhausted_front, exhausted_back, empty) =>
-                front == Some(b)
-                    && back == Some(a)
-                    && exhausted_front == None
-                    && exhausted_back == None
-                    && empty,
-        })]
+        #[ensures(vec_deque_pushes_and_pops_from_both_ends_holds(a, b, result))]
         fn verify_vec_deque_pushes_and_pops_from_both_ends(
             a: i32,
             b: i32,
@@ -2025,6 +2146,40 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// std::collections::vec_deque::Iter<'static, i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn vec_deque_iter_yields_references_in_order_holds(
+            a: i32,
+            b: i32,
+            iter_result: (
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                Option<i32>,
+                bool,
+            ),
+        ) -> bool {
+            pearlite! {
+                match iter_result {
+                    (first_seen, second_seen, exhausted, popped_first, popped_second, empty) =>
+                        first_seen == Some(a)
+                            && second_seen == Some(b)
+                            && exhausted == None
+                            && popped_first == Some(a)
+                            && popped_second == Some(b)
+                            && empty,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC, {
         /// `VecDeque::iter` yields shared references in front-to-back
         /// order and leaves the deque unchanged.
@@ -2036,20 +2191,36 @@ amenable_derive::harness! {
         /// pure by-value law with nothing dropped from the original
         /// claim.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, exhausted, popped_first, popped_second, empty) =>
-                first_seen == Some(a)
-                    && second_seen == Some(b)
-                    && exhausted == None
-                    && popped_first == Some(a)
-                    && popped_second == Some(b)
-                    && empty,
-        })]
+        #[ensures(vec_deque_iter_yields_references_in_order_holds(a, b, result))]
         fn verify_vec_deque_iter_yields_references_in_order(
             a: i32,
             b: i32,
         ) -> (Option<i32>, Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool) {
             (Some(a), Some(b), None, Some(a), Some(b), true)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VEC_DEQUE_ITER_MUT_WRITES_THROUGH_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// std::collections::vec_deque::IterMut<'static, i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn vec_deque_iter_mut_writes_through_holds(
+            updated_first: i32,
+            updated_second: i32,
+            iter_mut_result: (Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match iter_mut_result {
+                    (first_after, second_after, empty) =>
+                        first_after == Some(updated_first)
+                            && second_after == Some(updated_second)
+                            && empty,
+                }
+            }
         }
     }
 }
@@ -2067,12 +2238,7 @@ amenable_derive::harness! {
         /// `updated_second`, so `first`/`second` are kept in the
         /// signature purely to match Kani's proof shape.
         #[requires(true)]
-        #[ensures(match result {
-            (first_after, second_after, empty) =>
-                first_after == Some(updated_first)
-                    && second_after == Some(updated_second)
-                    && empty,
-        })]
+        #[ensures(vec_deque_iter_mut_writes_through_holds(updated_first, updated_second, result))]
         fn verify_vec_deque_iter_mut_writes_through(
             first: i32,
             second: i32,
@@ -2115,6 +2281,30 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<CString>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn cstring_excludes_the_terminator_and_rejects_interior_nul_holds(
+            byte: u8,
+            cstring_result: (usize, Option<u8>, usize, Option<u8>, bool),
+        ) -> bool {
+            pearlite! {
+                match cstring_result {
+                    (payload_len, observed_byte, payload_with_nul_len, terminator, interior_nul_rejected) =>
+                        payload_len == 1usize
+                            && observed_byte == Some(byte)
+                            && payload_with_nul_len == 2usize
+                            && terminator == Some(0u8)
+                            && interior_nul_rejected,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC, {
         /// `CString::new` appends its own terminating nul, exposes the
         /// payload bytes without that terminator through `as_bytes`,
@@ -2122,14 +2312,7 @@ amenable_derive::harness! {
         /// byte. See this cluster's leading comment for the
         /// accommodation-model rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (payload_len, observed_byte, payload_with_nul_len, terminator, interior_nul_rejected) =>
-                payload_len == 1usize
-                    && observed_byte == Some(byte)
-                    && payload_with_nul_len == 2usize
-                    && terminator == Some(0u8)
-                    && interior_nul_rejected,
-        })]
+        #[ensures(cstring_excludes_the_terminator_and_rejects_interior_nul_holds(byte, result))]
         fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul(
             byte: u8,
         ) -> (usize, Option<u8>, usize, Option<u8>, bool) {
@@ -2170,21 +2353,56 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// IntoStringError>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn into_string_error_recovers_the_original_cstring_holds(
+            into_string_error_result: (usize, Option<u8>, Option<u8>, Option<u8>),
+        ) -> bool {
+            pearlite! {
+                match into_string_error_result {
+                    (payload_len, first, second, terminator) =>
+                        payload_len == 3usize
+                            && first == Some(0xFFu8)
+                            && second == Some(120u8)
+                            && terminator == Some(0u8),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC, {
         /// `CString::into_string` fails on non-UTF-8 payload bytes, and
         /// `IntoStringError::into_cstring` recovers exactly the
         /// original owned `CString`. See this cluster's leading comment
         /// for the accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (payload_len, first, second, terminator) =>
-                payload_len == 3usize
-                    && first == Some(0xFFu8)
-                    && second == Some(120u8)
-                    && terminator == Some(0u8),
-        })]
+        #[ensures(into_string_error_recovers_the_original_cstring_holds(result))]
         fn verify_into_string_error_recovers_the_original_cstring() -> (usize, Option<u8>, Option<u8>, Option<u8>) {
             (3usize, Some(0xFFu8), Some(120u8), Some(0u8))
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<NulError>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn nul_error_reports_the_interior_nuls_position_holds(
+            nul_error_result: (usize, usize),
+        ) -> bool {
+            pearlite! {
+                match nul_error_result {
+                    (single_nul_index, first_of_two_index) =>
+                        single_nul_index == 1usize && first_of_two_index == 1usize,
+                }
+            }
         }
     }
 }
@@ -2196,13 +2414,33 @@ amenable_derive::harness! {
         /// input. See this cluster's leading comment for the
         /// accommodation-model rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (single_nul_index, first_of_two_index) =>
-                single_nul_index == 1usize && first_of_two_index == 1usize,
-        })]
+        #[ensures(nul_error_reports_the_interior_nuls_position_holds(result))]
         fn verify_nul_error_reports_the_interior_nuls_position(byte: u8) -> (usize, usize) {
             let _ = byte;
             (1usize, 1usize)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<CStr>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn cstr_excludes_the_terminating_nul_from_to_bytes_holds(
+            byte: u8,
+            cstr_result: (usize, Option<u8>, usize, Option<u8>),
+        ) -> bool {
+            pearlite! {
+                match cstr_result {
+                    (payload_len, observed_byte, borrowed_len, terminator) =>
+                        payload_len == 1usize
+                            && observed_byte == Some(byte)
+                            && borrowed_len == 2usize
+                            && terminator == Some(0u8),
+                }
+            }
         }
     }
 }
@@ -2215,17 +2453,29 @@ amenable_derive::harness! {
         /// representation. See this cluster's leading comment for the
         /// accommodation-model rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (payload_len, observed_byte, borrowed_len, terminator) =>
-                payload_len == 1usize
-                    && observed_byte == Some(byte)
-                    && borrowed_len == 2usize
-                    && terminator == Some(0u8),
-        })]
+        #[ensures(cstr_excludes_the_terminating_nul_from_to_bytes_holds(byte, result))]
         fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(
             byte: u8,
         ) -> (usize, Option<u8>, usize, Option<u8>) {
             (1usize, Some(byte), 2usize, Some(0u8))
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// FromBytesUntilNulError>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn from_bytes_until_nul_requires_a_nul_byte_somewhere_holds(
+            from_bytes_until_nul_result: (bool, bool),
+        ) -> bool {
+            pearlite! {
+                match from_bytes_until_nul_result {
+                    (accepted, rejected) => accepted && rejected,
+                }
+            }
         }
     }
 }
@@ -2237,9 +2487,7 @@ amenable_derive::harness! {
         /// none is present at all. See this cluster's leading comment
         /// for the accommodation-model rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (accepted, rejected) => accepted && rejected,
-        })]
+        #[ensures(from_bytes_until_nul_requires_a_nul_byte_somewhere_holds(result))]
         fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere(byte: u8) -> (bool, bool) {
             let _ = byte;
             (true, true)
