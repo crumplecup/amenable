@@ -39,7 +39,11 @@ type EnumerateResult = (Option<(usize, i32)>, Option<(usize, i32)>, Option<(usiz
 /// single-element ranges `a..a+1` and `b..b+1`.
 pub fn verify_chain_model_sequences_two_iterators_end_to_end(a: i32, b: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         a < i32::MAX,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b < i32::MAX,
     ensures
         result.0 == Some(a),
@@ -54,7 +58,11 @@ pub fn verify_chain_model_sequences_two_iterators_end_to_end(a: i32, b: i32) -> 
 /// `a..a+1` and `b..b+1`.
 pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (result: ZipResult)
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         a < i32::MAX,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b < i32::MAX,
     ensures
         result.0 == Some((a, b)),

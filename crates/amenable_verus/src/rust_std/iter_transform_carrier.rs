@@ -28,6 +28,8 @@ verus! {
 /// `verify_map_applies_its_closure_to_each_item` harness uses.
 pub fn verify_map_model_applies_its_closure_to_each_item(x: i32) -> (result: (i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         x < i32::MAX,
     ensures
         result.0 == result.1,

@@ -84,6 +84,8 @@ pub fn verify_tuple_model_field_access(a: i32, b: i32) -> (result: (i32, i32))
 /// twice, standing in for "the pointer" and "the function" agreeing.
 pub fn verify_fn_pointer_model_calls_the_underlying_function(value: i32) -> (result: (i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         value < i32::MAX,
     ensures
         result.0 == result.1,

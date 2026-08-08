@@ -2459,6 +2459,42 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "a < i32 :: MAX",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "b < i32 :: MAX",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "value < i32 :: MAX",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "x < i32 :: MAX",
+    }
+}
+
 /// [`ValueUnchanged`] reuses `RefCell`'s own borrow-rules harness rather
 /// than adding a new Verus proof — the harness's own `ensures` clauses
 /// already establish this frame condition for `try_borrow`/
