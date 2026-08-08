@@ -24,6 +24,17 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The single-increment-headroom precondition `amenable_std::
+// IncrementHeadroom` names -- a real spec fn defined once in
+// `iter_sequence_carrier`, called from here directly rather than
+// restated inline. `#[cfg(verus_keep_ghost)]`-gated like every other
+// spec-only import in this crate (see `chars_carrier.rs`): plain
+// `spec fn`s carry no runtime representation, so this import only
+// resolves when Verus's own ghost content is retained, not under
+// ordinary `cargo check`.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::iter_sequence_carrier::single_increment_headroom_holds;
+
 verus! {
 
 /// `[a, b, c].len() == 3`, and each index recovers the element the
@@ -84,9 +95,7 @@ pub fn verify_tuple_model_field_access(a: i32, b: i32) -> (result: (i32, i32))
 /// twice, standing in for "the pointer" and "the function" agreeing.
 pub fn verify_fn_pointer_model_calls_the_underlying_function(value: i32) -> (result: (i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        value < i32::MAX,
+        single_increment_headroom_holds(value),
     ensures
         result.0 == result.1,
 {

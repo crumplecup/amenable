@@ -21,6 +21,17 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The single-increment-headroom precondition `amenable_std::
+// IncrementHeadroom` names -- a real spec fn defined once in
+// `iter_sequence_carrier`, called from here directly rather than
+// restated inline. `#[cfg(verus_keep_ghost)]`-gated like every other
+// spec-only import in this crate (see `chars_carrier.rs`): plain
+// `spec fn`s carry no runtime representation, so this import only
+// resolves when Verus's own ghost content is retained, not under
+// ordinary `cargo check`.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::iter_sequence_carrier::single_increment_headroom_holds;
+
 verus! {
 
 /// `Map::next` applies its closure to the underlying item — modeled
@@ -28,9 +39,7 @@ verus! {
 /// `verify_map_applies_its_closure_to_each_item` harness uses.
 pub fn verify_map_model_applies_its_closure_to_each_item(x: i32) -> (result: (i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        x < i32::MAX,
+        single_increment_headroom_holds(x),
     ensures
         result.0 == result.1,
 {

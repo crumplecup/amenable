@@ -2453,15 +2453,22 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
 
 // `Requires::requires()` still returns the tight-margin spelling as
 // IncrementHeadroom's canonical descriptive text (for cross-backend
-// enumeration), but no real site restates it raw anymore -- all four
-// (verify_enumerate_model_pairs_each_item_with_its_index,
-// verify_rev_model_reverses_iteration_order,
-// verify_cycle_model_repeats_its_sequence_forever,
-// verify_peekable_model_peek_does_not_consume) call
-// increment_headroom_holds directly, a real, shared `open spec fn` in
-// amenable_verus::rust_std::iter_sequence_carrier confirmed under real
-// verus to give every call site genuine proof credit across carrier
-// files -- see amenable_std::verus_gallery's
+// enumeration), but no real site restates it raw anymore. Four sites
+// need the tight, two-increment margin (verify_enumerate_model_pairs_
+// each_item_with_its_index, verify_rev_model_reverses_iteration_order,
+// verify_cycle_model_repeats_its_sequence_forever, verify_peekable_
+// model_peek_does_not_consume) and call increment_headroom_holds
+// directly; eight more need only the loosest, one-increment margin
+// (verify_chain_model_sequences_two_iterators_end_to_end,
+// verify_zip_model_pairs_items_from_two_iterators,
+// verify_fuse_model_keeps_returning_none_once_exhausted,
+// verify_inspect_model_calls_once_per_item_without_changing_values,
+// verify_fn_pointer_model_calls_the_underlying_function,
+// verify_map_model_applies_its_closure_to_each_item) and call
+// single_increment_headroom_holds. Both are real, shared `open spec
+// fn`s in amenable_verus::rust_std::iter_sequence_carrier confirmed
+// under real verus to give every call site genuine proof credit across
+// carrier files -- see amenable_std::verus_gallery's
 // cross_file_spec_fn_reuse_gets_real_proof_credit case.
 ::inventory::submit! {
     ::amenable_core::ContractRecord {
@@ -2532,7 +2539,7 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         evidence: "amenable_std::IncrementHeadroom",
         verifier: "verus",
         kind: "requires",
-        fragment: || "a < i32 :: MAX",
+        fragment: || "single_increment_headroom_holds (a)",
         harnesses: &[
             "verify_fuse_model_keeps_returning_none_once_exhausted",
             "verify_chain_model_sequences_two_iterators_end_to_end",
@@ -2546,7 +2553,7 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         evidence: "amenable_std::IncrementHeadroom",
         verifier: "verus",
         kind: "requires",
-        fragment: || "b < i32 :: MAX",
+        fragment: || "single_increment_headroom_holds (b)",
         harnesses: &[
             "verify_chain_model_sequences_two_iterators_end_to_end",
             "verify_zip_model_pairs_items_from_two_iterators",
@@ -2559,7 +2566,7 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         evidence: "amenable_std::IncrementHeadroom",
         verifier: "verus",
         kind: "requires",
-        fragment: || "value < i32 :: MAX",
+        fragment: || "single_increment_headroom_holds (value)",
         harnesses: &[
             "verify_fn_pointer_model_calls_the_underlying_function",
             "verify_inspect_model_calls_once_per_item_without_changing_values",
@@ -2572,7 +2579,7 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         evidence: "amenable_std::IncrementHeadroom",
         verifier: "verus",
         kind: "requires",
-        fragment: || "x < i32 :: MAX",
+        fragment: || "single_increment_headroom_holds (x)",
         harnesses: &["verify_map_model_applies_its_closure_to_each_item"],
     }
 }

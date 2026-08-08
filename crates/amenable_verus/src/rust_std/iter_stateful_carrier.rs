@@ -38,7 +38,9 @@ use vstd::prelude::*;
 // representation, so this import only resolves when Verus's own ghost
 // content is retained, not under ordinary `cargo check`.
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::iter_sequence_carrier::increment_headroom_holds;
+use crate::rust_std::iter_sequence_carrier::{
+    increment_headroom_holds, single_increment_headroom_holds,
+};
 
 verus! {
 
@@ -60,9 +62,7 @@ pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32,
 /// has, checked across two calls after exhaustion.
 pub fn verify_fuse_model_keeps_returning_none_once_exhausted(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a < i32::MAX,
+        single_increment_headroom_holds(a),
     ensures
         result.0 == Some(a),
         result.1 is None,
@@ -76,9 +76,7 @@ pub fn verify_fuse_model_keeps_returning_none_once_exhausted(a: i32) -> (result:
 /// tracked here as a plain call count.
 pub fn verify_inspect_model_calls_once_per_item_without_changing_values(value: i32) -> (result: (Option<i32>, u32, Option<i32>, u32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        value < i32::MAX,
+        single_increment_headroom_holds(value),
     ensures
         result.0 == Some(value),
         result.1 == 1,

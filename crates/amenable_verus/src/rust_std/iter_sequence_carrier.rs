@@ -39,12 +39,8 @@ type EnumerateResult = (Option<(usize, i32)>, Option<(usize, i32)>, Option<(usiz
 /// single-element ranges `a..a+1` and `b..b+1`.
 pub fn verify_chain_model_sequences_two_iterators_end_to_end(a: i32, b: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a < i32::MAX,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b < i32::MAX,
+        single_increment_headroom_holds(a),
+        single_increment_headroom_holds(b),
     ensures
         result.0 == Some(a),
         result.1 == Some(b),
@@ -58,12 +54,8 @@ pub fn verify_chain_model_sequences_two_iterators_end_to_end(a: i32, b: i32) -> 
 /// `a..a+1` and `b..b+1`.
 pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (result: ZipResult)
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a < i32::MAX,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b < i32::MAX,
+        single_increment_headroom_holds(a),
+        single_increment_headroom_holds(b),
     ensures
         result.0 == Some((a, b)),
         result.1 is None,
@@ -78,6 +70,15 @@ pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (resul
 /// proof_credit` case) rather than restated inline.
 pub open spec fn increment_headroom_holds(a: i32) -> bool {
     a < i32::MAX - 1
+}
+
+/// The single-increment-headroom precondition -- the same
+/// `amenable_std::IncrementHeadroom` bound at its loosest margin (only
+/// one more increment needs to stay in range, not two), named once here
+/// and called from every carrier file that needs exactly this margin
+/// rather than restating `x < i32::MAX` inline at each site.
+pub open spec fn single_increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX
 }
 
 /// `Enumerate::next` pairs each item with its index, starting at `0` —
