@@ -1630,3 +1630,66 @@ impl creusot_std::model::View for std::collections::BinaryHeap<i32> {
         },
     }
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::macro_invocation_inside_an_attribute_is_never_pre_expanded".to_owned(),
+            title: "a macro_rules! invocation inside #[requires(...)]'s argument position is not expanded before Creusot's own Pearlite parser sees it".to_owned(),
+            disposition: CreusotGalleryDisposition::FalseTrail,
+            expected: CreusotGalleryExpectation::TranslationError,
+            claim: r#"
+// Investigated as part of the same "single source living with the
+// contract type" effort as amenable_std::verus_gallery's
+// cross_file_spec_fn_reuse_gets_real_proof_credit case: if a bound's
+// literal expression could be written once as a macro_rules! invocation
+// and used both inside a real #[requires(...)]/#[ensures(...)] clause AND
+// wherever amenable_std::Requires/Ensures needs it, that would be a real
+// single source spanning the amenable_std/amenable_creusot crate
+// boundary -- worth checking before concluding the boundary can only ever
+// be scanner-verified.
+
+#[cfg(creusot)]
+macro_rules! probe_bound {
+    () => {
+        value@ < 10
+    };
+}
+
+#[requires(probe_bound!())]
+fn probe_macro_nesting_in_attribute_position(value: i32) -> i32 {
+    value
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot`:
+//   error: Unsupported expression: macros other than `pearlite!`,
+//   `proof_assert!` or `seq!` are unsupported in Pearlite code.
+//     --> #[requires(probe_bound!())]
+// Creusot's `#[requires]`/`#[ensures]` attribute proc-macro receives its
+// argument tokens and parses them itself, via its own Pearlite grammar --
+// it does NOT first hand the tokens to rustc's ordinary macro-expansion
+// pass the way a ordinary expression position would. A nested
+// macro_rules! invocation reaches Creusot's parser completely
+// unexpanded, as the literal tokens `probe_bound ! ( )`, which its
+// Pearlite grammar explicitly rejects (only `pearlite!`/`proof_assert!`/
+// `seq!` are recognized as legal nested macros -- an explicit allowlist,
+// not a general macro-expansion mechanism).
+//
+// This settles the whole "nest a shared macro inside their attribute"
+// family of approaches, not just the declarative-macro case tested here:
+// attribute macros process raw, unexpanded input by design (this is how
+// Rust's macro system works generally, not a Creusot-specific quirk), so
+// a proc-macro invocation nested the same way would hit the identical
+// wall -- Creusot's parser has no mechanism to recursively expand or
+// delegate to an arbitrary external macro mid-parse, only to its own
+// fixed allowlist.
+//
+// Real path forward for a genuine single source across this boundary:
+// generate the real attribute's literal tokens (and amenable_std's
+// registered fragment) from one shared spec, as a build-time text/codegen
+// step (before rustc ever parses either file), not as a macro nested
+// inside Creusot's own attribute-position parsing.
+"#,
+        },
+    }
+}
