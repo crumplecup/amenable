@@ -1,24 +1,25 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3105 8 3111 9 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3132 8 3138 9 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3113 53 3113 55
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3113 16 3113 56
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3114 53 3114 67
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3114 16 3114 68
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3115 53 3115 75
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3115 16 3115 76
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3116 53 3116 76
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3116 16 3116 77
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3117 62 3117 65
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3117 16 3117 66
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3094 19 3094 23
-let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3105 64 3111 9
-let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3095 18 3104 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3140 53 3140 55
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3140 16 3140 56
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3141 53 3141 67
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3141 16 3141 68
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3142 53 3142 75
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3142 16 3142 76
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3143 53 3143 76
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3143 16 3143 77
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3144 62 3144 65
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3144 16 3144 66
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3130 19 3130 23
+let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3132 64 3138 9
+let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3131 18 3131 72
 let%span srust_std'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3016 18 3019 9
 let%span srust_std'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3021 12 3027 13
 let%span srust_std'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3030 12 3036 13
 let%span srust_std'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3039 12 3046 13
 let%span srust_std'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3067 18 3070 9
-let%span srust_std'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2991 16 2991 36
+let%span srust_std'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3096 16 3105 17
+let%span srust_std'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2991 16 2991 36
 
 use creusot.int.Int32
 use seq.Seq
@@ -48,7 +49,7 @@ type t_IntErrorKind = Empty | InvalidDigit | PosOverflow | NegOverflow | Zero
 function parse_int_error_kind [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2981 0 2981 59] (_e: t_ParseIntError) : t_IntErrorKind
 
 predicate is_ascii_digit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2990 0 2990 34] (c: Char.t) =
-  [%#srust_std'17] Char.to_int c >= 48 /\ Char.to_int c <= 57
+  [%#srust_std'18] Char.to_int c >= 48 /\ Char.to_int c <= 57
 
 let rec from_str_i32 (s: string) (return (x: t_Result_i32_ParseIntError)) = any
   [ return (result: t_Result_i32_ParseIntError) ->
@@ -128,12 +129,20 @@ predicate inv_tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_
 
 meta "rewrite_def" predicate inv_tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_NonZero_i32_ParseIntError
 
+predicate int_error_kind_classifies_parse_failures_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3086 8 3094 17] (parse_result: tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_NonZero_i32_ParseIntError) =
+  [%#srust_std'17] match parse_result with
+    | {f0 = Err e1; f1 = Err e2; f2 = Err e3; f3 = Err e4; f4 = Err'0 e5} -> parse_int_error_kind e1 = Empty
+    /\ parse_int_error_kind e2 = InvalidDigit
+    /\ parse_int_error_kind e3 = PosOverflow /\ parse_int_error_kind e4 = NegOverflow /\ parse_int_error_kind e5 = Zero
+    | _ -> false
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_int_error_kind_classifies_parse_failures
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3105 8 3111 9]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3132 8 3138 9]
   (return (x: tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_NonZero_i32_ParseIntError)) =
   (! bb0
   [ bb0 = s0
@@ -164,11 +173,5 @@ let rec verify_int_error_kind_classifies_parse_failures
   [ return
     (result: tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_NonZero_i32_ParseIntError) ->
   {[@stop_split] [@expl:verify_int_error_kind_classifies_parse_failures ensures] ([@stop_split] [@expl:verify_int_error_kind_classifies_parse_failures result type invariant] [%#srust_std'10] inv_tup5_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_i32_ParseIntError_Result_NonZero_i32_ParseIntError result)
-    /\ ([@stop_split] [@expl:verify_int_error_kind_classifies_parse_failures ensures] [%#srust_std'11] match result with
-      | {f0 = Err e1; f1 = Err e2; f2 = Err e3; f3 = Err e4; f4 = Err'0 e5} -> parse_int_error_kind e1 = Empty
-      /\ parse_int_error_kind e2 = InvalidDigit
-      /\ parse_int_error_kind e3 = PosOverflow
-      /\ parse_int_error_kind e4 = NegOverflow /\ parse_int_error_kind e5 = Zero
-      | _ -> false
-      end)}
+    /\ ([@stop_split] [@expl:verify_int_error_kind_classifies_parse_failures ensures] [%#srust_std'11] int_error_kind_classifies_parse_failures_holds result)}
     (! return {result}) ]

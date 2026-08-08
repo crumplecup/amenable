@@ -172,9 +172,11 @@ use amenable_creusot::{
     CreusotWitness, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, DURATION_NEW_HEADROOM_HOLDS_SRC,
     DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_HOLDS_SRC,
     FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
+    FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC,
     FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_HOLDS_SRC,
     HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
     HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
+    INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC,
     INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_HOLDS_SRC,
     ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, K1_LESS_THAN_K2_HOLDS_SRC,
     LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_HOLDS_SRC,
@@ -184,12 +186,15 @@ use amenable_creusot::{
     NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
     ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_HOLDS_SRC,
     OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
-    RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC, SATURATING_I32_ADD_CLAMPS_HOLDS_SRC,
-    SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
+    PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC,
+    PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC,
+    RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC, REVERSE_INVERTS_COMPARISON_HOLDS_SRC,
+    SATURATING_I32_ADD_CLAMPS_HOLDS_SRC, SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
     SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
     SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
     SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC,
     STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC,
+    TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC,
     TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_HOLDS_SRC, TUPLE_FIELD_ACCESS_HOLDS_SRC,
     VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
     VEC_DEQUE_ITER_MUT_WRITES_THROUGH_HOLDS_SRC,
@@ -4650,6 +4655,43 @@ bridge_creusot_witness!(RustStdStandard<core::num::IntErrorKind>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic] fn int_error_kind_classifies_parse_failures_holds` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<core::num::IntErrorKind> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<core::num::IntErrorKind> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "int_error_kind_classifies_parse_failures_holds (result)",
+        harnesses: &["verify_int_error_kind_classifies_parse_failures"],
+    }
+}
+
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
 // registration exactly (`register_rust_std_standard_evidence!(...,
 // core::num::TryFromIntError, ...)`, confirmed against the checklist's own
@@ -4679,6 +4721,46 @@ bridge_creusot_witness!(RustStdStandard<core::num::TryFromIntError>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// try_from_int_error_occurs_exactly_when_out_of_range_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<core::num::TryFromIntError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<core::num::TryFromIntError> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "try_from_int_error_occurs_exactly_when_out_of_range_holds (value , result)",
+        harnesses: &["verify_try_from_int_error_occurs_exactly_when_out_of_range"],
+    }
+}
+
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
 // registration exactly (`register_rust_std_standard_evidence!(...,
 // core::num::ParseIntError, ...)`, confirmed against the checklist's own
@@ -4705,6 +4787,45 @@ bridge_creusot_witness!(RustStdStandard<core::num::ParseIntError>);
         describe: || {
             <RustStdStandard<core::num::ParseIntError> as CreusotWitness>::proof().to_string()
         },
+    }
+}
+
+/// Returns
+/// `amenable_creusot::PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic] fn parse_int_error_reports_the_kind_of_the_failure_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<core::num::ParseIntError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<core::num::ParseIntError> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "parse_int_error_reports_the_kind_of_the_failure_holds (& result)",
+        harnesses: &["verify_parse_int_error_reports_the_kind_of_the_failure"],
     }
 }
 
@@ -4744,6 +4865,43 @@ bridge_creusot_witness!(RustStdStandard<core::num::FpCategory>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn fp_category_matches_the_value_it_classifies_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<core::num::FpCategory> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<core::num::FpCategory> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "fp_category_matches_the_value_it_classifies_holds (result)",
+        harnesses: &["verify_fp_category_matches_the_value_it_classifies"],
+    }
+}
+
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
 // registration exactly (`register_rust_std_standard_evidence!(...,
 // core::num::ParseFloatError, ...)`, confirmed against the checklist's
@@ -4779,6 +4937,46 @@ bridge_creusot_witness!(RustStdStandard<core::num::ParseFloatError>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// parse_float_error_occurs_only_for_unparseable_input_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<core::num::ParseFloatError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<core::num::ParseFloatError> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "parse_float_error_occurs_only_for_unparseable_input_holds (result)",
+        harnesses: &["verify_parse_float_error_occurs_only_for_unparseable_input"],
+    }
+}
+
 // Bare `Reverse<i32>`, matching `amenable_std::rust_std::cmp`'s own
 // registration exactly (`register_rust_std_standard_evidence!(std::cmp::
 // Ordering, Reverse<i32>)`, confirmed against the checklist's own
@@ -4797,6 +4995,41 @@ impl CreusotWitness for RustStdStandard<Reverse<i32>> {
 }
 
 bridge_creusot_witness!(RustStdStandard<Reverse<i32>>);
+
+/// Returns `amenable_creusot::REVERSE_INVERTS_COMPARISON_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn reverse_inverts_comparison_holds` the real site
+/// calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Reverse<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        REVERSE_INVERTS_COMPARISON_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Reverse<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression REVERSE_INVERTS_COMPARISON_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "reverse_inverts_comparison_holds (a , b , result)",
+        harnesses: &["verify_reverse_inverts_comparison"],
+    }
+}
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {

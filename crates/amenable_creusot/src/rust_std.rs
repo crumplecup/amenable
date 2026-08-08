@@ -3073,6 +3073,42 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// core::num::IntErrorKind>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        /// Not `open`: it calls the opaque `parse_int_error_kind`, and
+        /// an `open` wrapper around an opaque callee would leak that
+        /// opacity boundary (same real `creusot-rustc` "less-visible
+        /// item" error `string_roundtrips_and_preserves_length` hit
+        /// earlier).
+        #[logic]
+        fn int_error_kind_classifies_parse_failures_holds(
+            parse_result: (
+                Result<i32, ParseIntError>,
+                Result<i32, ParseIntError>,
+                Result<i32, ParseIntError>,
+                Result<i32, ParseIntError>,
+                Result<NonZero<i32>, ParseIntError>,
+            ),
+        ) -> bool {
+            pearlite! {
+                match parse_result {
+                    (Err(ref e1), Err(ref e2), Err(ref e3), Err(ref e4), Err(ref e5)) => {
+                        parse_int_error_kind(e1) == IntErrorKind::Empty
+                            && parse_int_error_kind(e2) == IntErrorKind::InvalidDigit
+                            && parse_int_error_kind(e3) == IntErrorKind::PosOverflow
+                            && parse_int_error_kind(e4) == IntErrorKind::NegOverflow
+                            && parse_int_error_kind(e5) == IntErrorKind::Zero
+                    }
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC, {
         /// Each representative integer-parse failure mode produces the
         /// matching `IntErrorKind` variant — the same claim
@@ -3092,16 +3128,7 @@ amenable_derive::harness! {
         /// function 'parse' with no contract will yield an impossible
         /// precondition`) before switching call sites.
         #[requires(true)]
-        #[ensures(match result {
-            (Err(ref e1), Err(ref e2), Err(ref e3), Err(ref e4), Err(ref e5)) => {
-                parse_int_error_kind(e1) == IntErrorKind::Empty
-                    && parse_int_error_kind(e2) == IntErrorKind::InvalidDigit
-                    && parse_int_error_kind(e3) == IntErrorKind::PosOverflow
-                    && parse_int_error_kind(e4) == IntErrorKind::NegOverflow
-                    && parse_int_error_kind(e5) == IntErrorKind::Zero
-            }
-            _ => false,
-        })]
+        #[ensures(int_error_kind_classifies_parse_failures_holds(result))]
         fn verify_int_error_kind_classifies_parse_failures() -> (
             Result<i32, ParseIntError>,
             Result<i32, ParseIntError>,
@@ -3145,6 +3172,26 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// TryFromIntError>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn try_from_int_error_occurs_exactly_when_out_of_range_holds(
+            value: i32,
+            try_from_result: Result<u8, TryFromIntError>,
+        ) -> bool {
+            pearlite! {
+                match try_from_result {
+                    Ok(v) => value@ >= 0 && value@ <= 255 && v@ == value@,
+                    Err(_) => value@ < 0 || value@ > 255,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC, {
         /// `u8::try_from(i32)` fails with `TryFromIntError` exactly when the
         /// source value doesn't fit in `u8`, and succeeds with the same
@@ -3158,14 +3205,34 @@ amenable_derive::harness! {
         /// every non-`char`/`String` harness in this file has to a trusted
         /// axiom on the real method it exercises.
         #[requires(true)]
-        #[ensures(match result {
-            Ok(v) => value@ >= 0 && value@ <= 255 && v@ == value@,
-            Err(_) => value@ < 0 || value@ > 255,
-        })]
+        #[ensures(try_from_int_error_occurs_exactly_when_out_of_range_holds(value, result))]
         fn verify_try_from_int_error_occurs_exactly_when_out_of_range(
             value: i32,
         ) -> Result<u8, TryFromIntError> {
             u8::try_from(value)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<ParseIntError>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. Not `open`: it calls the
+        /// opaque `parse_int_error_kind`, and an `open` wrapper around
+        /// an opaque callee would leak that opacity boundary (same
+        /// real `creusot-rustc` "less-visible item" error
+        /// `string_roundtrips_and_preserves_length` hit earlier).
+        #[logic]
+        fn parse_int_error_reports_the_kind_of_the_failure_holds(
+            parse_result: &Result<i32, ParseIntError>,
+        ) -> bool {
+            pearlite! {
+                match parse_result {
+                    Err(e) => parse_int_error_kind(e) == IntErrorKind::InvalidDigit,
+                    Ok(_) => false,
+                }
+            }
         }
     }
 }
@@ -3182,13 +3249,29 @@ amenable_derive::harness! {
         /// `ParseIntError`'s own claim, at the one concrete input Kani
         /// exercises.
         #[requires(true)]
-        #[ensures(match &result {
-            Err(e) => parse_int_error_kind(e) == IntErrorKind::InvalidDigit,
-            Ok(_) => false,
-        })]
+        #[ensures(parse_int_error_reports_the_kind_of_the_failure_holds(&result))]
         fn verify_parse_int_error_reports_the_kind_of_the_failure() -> Result<i32, ParseIntError>
         {
             <i32 as std::str::FromStr>::from_str("not a number")
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<FpCategory>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn fp_category_matches_the_value_it_classifies_holds(
+            fp_category_result: (FpCategory, FpCategory, FpCategory, FpCategory, FpCategory),
+        ) -> bool {
+            pearlite! {
+                match fp_category_result {
+                    (FpCategory::Nan, FpCategory::Infinite, FpCategory::Zero, FpCategory::Normal, FpCategory::Subnormal) => true,
+                    _ => false,
+                }
+            }
         }
     }
 }
@@ -3220,10 +3303,7 @@ amenable_derive::harness! {
         /// blocker.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (FpCategory::Nan, FpCategory::Infinite, FpCategory::Zero, FpCategory::Normal, FpCategory::Subnormal) => true,
-            _ => false,
-        })]
+        #[ensures(fp_category_matches_the_value_it_classifies_holds(result))]
         fn verify_fp_category_matches_the_value_it_classifies() -> (
             FpCategory,
             FpCategory,
@@ -3239,6 +3319,25 @@ amenable_derive::harness! {
                 f64::MIN_POSITIVE.classify(),
                 subnormal.classify(),
             )
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// ParseFloatError>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn parse_float_error_occurs_only_for_unparseable_input_holds(
+            parse_result: (Result<f64, ParseFloatError>, Result<f64, ParseFloatError>),
+        ) -> bool {
+            pearlite! {
+                match parse_result {
+                    (Err(_), Ok(_)) => true,
+                    _ => false,
+                }
+            }
         }
     }
 }
@@ -3277,10 +3376,7 @@ amenable_derive::harness! {
         /// finding for the full repro.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (Err(_), Ok(_)) => true,
-            _ => false,
-        })]
+        #[ensures(parse_float_error_occurs_only_for_unparseable_input_holds(result))]
         fn verify_parse_float_error_occurs_only_for_unparseable_input()
         -> (Result<f64, ParseFloatError>, Result<f64, ParseFloatError>) {
             (
@@ -3322,6 +3418,24 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, REVERSE_INVERTS_COMPARISON_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Reverse<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn reverse_inverts_comparison_holds(a: i32, b: i32, cmp_result: (Ordering, i32)) -> bool {
+            pearlite! {
+                (match cmp_result.0 {
+                    Ordering::Less => b > a,
+                    Ordering::Equal => b == a,
+                    Ordering::Greater => b < a,
+                }) && cmp_result.1 == a
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_REVERSE_INVERTS_COMPARISON_SRC, {
         /// `Reverse<T>` inverts `T`'s comparison direction, and its `.0`
         /// field round-trips the wrapped value unchanged — the same claim
@@ -3331,12 +3445,7 @@ amenable_derive::harness! {
         /// in this file has to a trusted axiom on the real method it
         /// exercises.
         #[requires(true)]
-        #[ensures(match result.0 {
-            Ordering::Less => b > a,
-            Ordering::Equal => b == a,
-            Ordering::Greater => b < a,
-        })]
-        #[ensures(result.1 == a)]
+        #[ensures(reverse_inverts_comparison_holds(a, b, result))]
         fn verify_reverse_inverts_comparison(a: i32, b: i32) -> (Ordering, i32) {
             (Reverse(a).cmp(&Reverse(b)), Reverse(a).0)
         }

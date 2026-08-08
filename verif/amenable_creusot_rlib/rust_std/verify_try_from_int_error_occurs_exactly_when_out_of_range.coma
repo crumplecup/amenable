@@ -1,10 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3165 8 3167 40 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3209 8 3211 40 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3168 12 3168 31
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3160 19 3160 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3167 13 3167 40
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3161 18 3164 9
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3139 18 3142 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3212 12 3212 31
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3207 19 3207 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3211 13 3211 40
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3208 18 3208 90
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3166 18 3169 9
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3185 16 3188 17
 
 use creusot.int.Int32
 use creusot.int.UInt8
@@ -35,20 +36,23 @@ let rec try_from_u8 (value: Int32.t) (return (x: t_Result_u8_TryFromIntError)) =
       end)}
     (! return {result}) ]
 
+predicate try_from_int_error_occurs_exactly_when_out_of_range_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3180 8 3183 17] (value: Int32.t) (try_from_result: t_Result_u8_TryFromIntError) =
+  [%#srust_std'4] match try_from_result with
+    | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
+    | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_try_from_int_error_occurs_exactly_when_out_of_range
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3165 8 3167 40] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3209 8 3211 40] (value: Int32.t)
   (return (x: t_Result_u8_TryFromIntError)) = (! bb0
   [ bb0 = s0
     [ s0 = try_from_u8 [%#srust_std] {value} (fun (_x: t_Result_u8_TryFromIntError) -> [ &_ret <- _x ] s1)
     | s1 = return {_ret} ] ] [ & _ret: t_Result_u8_TryFromIntError = Any.any_l () | & value: Int32.t = value ])
   [ return (result: t_Result_u8_TryFromIntError) ->
   {[@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range ensures] ([@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range result type invariant] [%#srust_std'1] inv_Result_u8_TryFromIntError result)
-    /\ ([@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range ensures] [%#srust_std'2] match result with
-      | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
-      | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
-      end)}
+    /\ ([@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range ensures] [%#srust_std'2] try_from_int_error_occurs_exactly_when_out_of_range_holds value result)}
     (! return {result}) ]
