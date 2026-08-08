@@ -44,7 +44,7 @@
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 
-use amenable_core::{Ensures, Evidence, MetadataEntry, Provenance, Verifier, Witness};
+use amenable_core::{Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness};
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
 #[cfg(windows)]
@@ -52,7 +52,7 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::{RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
+use crate::{AsciiByte, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
 
 /// The Verus verifier, local to this crate: there is only one verifier
 /// Verus works with — Verus. Being local here (not imported from
@@ -4592,6 +4592,97 @@ macro_rules! impl_str_matches_verus_witness {
 
 impl_str_matches_verus_witness!(std::str::Matches<'static, char>);
 impl_str_matches_verus_witness!(std::str::RMatches<'static, char>);
+
+/// [`AsciiByte`] reuses the same harness rather than adding a new Verus
+/// proof — it names the precondition the harness already requires, it
+/// doesn't prove anything new. The precondition recurs across six carrier
+/// files under six different local variable names (`pattern`, `c`, `a`,
+/// `b`, `before`, `after`) for the identical claim; `Requires<VerusVerifier>`
+/// carries the `pattern` spelling (this harness's own), and the other five
+/// are registered directly as supplementary `ContractRecord`s.
+impl VerusWitness for AsciiByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_str_matches_model_yields_every_non_overlapping_occurrence",
+            claim: VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(AsciiByte);
+
+impl Requires<VerusVerifier> for AsciiByte {
+    fn requires() -> &'static str {
+        "(pattern as u32) < 128"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: <AsciiByte as Requires<VerusVerifier>>::requires,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "(c as u32) < 128",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "(a as u32) < 128",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "(b as u32) < 128",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "(before as u32) < 128",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "(after as u32) < 128",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "byte < 128",
+    }
+}
 
 const VERIFY_STR_MATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/str_pattern_match_carrier.rs");

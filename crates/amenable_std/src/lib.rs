@@ -13,6 +13,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod ascii_byte;
 mod cert;
 #[cfg(feature = "creusot")]
 mod creusot_gallery;
@@ -25,6 +26,7 @@ mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;
 
+pub use ascii_byte::AsciiByte;
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
 #[cfg(feature = "creusot")]
 pub use creusot_gallery::{

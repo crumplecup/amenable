@@ -813,6 +813,10 @@ amenable_derive::harness! {
         /// over the byte value instead (no real call needed, so no
         /// trusted boundary is needed either -- Creusot discharges the
         /// resulting tuple equalities on its own).
+        ///
+        /// The precondition below is the canonical home
+        /// `amenable_std::AsciiByte`'s own `Requires<CreusotVerifier>`
+        /// impl names.
         #[requires(byte < 128u8)]
         #[ensures(result.0 == 1usize)]
         #[ensures(result.1 == byte)]

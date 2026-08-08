@@ -55,6 +55,11 @@ pub fn verify_slice_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result
 /// A `str`'s `.len()` reports its UTF-8 byte length, and its bytes are
 /// exactly its content's UTF-8 encoding — checked for any single-byte
 /// (ASCII) character.
+///
+/// The precondition below is the canonical home
+/// `amenable_std::AsciiByte`'s own `Requires<VerusVerifier>` impl names
+/// (this file's own spelling, `byte < 128`, registered as one of its
+/// supplementary fragments).
 pub fn verify_str_model_byte_length_and_content(byte: u8) -> (result: (u32, u8))
     requires
         byte < 128,

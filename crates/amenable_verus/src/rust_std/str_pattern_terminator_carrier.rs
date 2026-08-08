@@ -15,6 +15,11 @@
 //! harness for that exact type (checking the real type via the bounded
 //! observation) already confirms independently, for the identical
 //! claim.
+//!
+//! Every `requires (... as u32) < 128,` clause below is the canonical
+//! home `amenable_std::AsciiByte`'s own `Requires<VerusVerifier>` impl
+//! (and its supplementary fragments, one per local variable name used
+//! across this file family) names.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]

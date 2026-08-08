@@ -154,7 +154,7 @@ use std::vec::Vec;
 
 use core::panic::{Location, PanicInfo, PanicMessage};
 
-use amenable_core::{Ensures, Evidence, Provenance, Witness};
+use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
@@ -244,7 +244,9 @@ use amenable_creusot::{
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
-use crate::{RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
+use crate::{
+    AsciiByte, RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
+};
 
 #[expect(
     deprecated,
@@ -1150,6 +1152,39 @@ bridge_creusot_witness!(RustStdStandard<str>);
         evidence: "amenable_std::rust_std::RustStdStandard<str>",
         verifier: "creusot",
         describe: || <RustStdStandard<str> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// [`AsciiByte`] reuses the same harness rather than adding a new Creusot
+/// proof — it names the precondition the harness already requires, it
+/// doesn't prove anything new.
+impl CreusotWitness for AsciiByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_str_byte_length_and_content",
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(AsciiByte);
+
+impl Requires<CreusotVerifier> for AsciiByte {
+    fn requires() -> &'static str {
+        "byte < 128u8"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: <AsciiByte as Requires<CreusotVerifier>>::requires,
     }
 }
 

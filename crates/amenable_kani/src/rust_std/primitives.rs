@@ -10,8 +10,8 @@
 //! exception, trusted alongside the scalars: it has exactly one possible
 //! value, nothing to check.
 
-use amenable_core::{Establish, Evidence, ProofToken};
-use amenable_std::RustStdStandard;
+use amenable_core::{Establish, Evidence, ProofToken, Requires};
+use amenable_std::{AsciiByte, RustStdStandard};
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -301,6 +301,12 @@ amenable_derive::harness! {
         /// value can never exist as a local, only a `&str` reference
         /// can (here, borrowed from an owned `String`), so this is the
         /// only way any code interacts with a `str` value at all.
+        ///
+        /// The `kani::assume` call is the canonical home
+        /// [`AsciiByte`]'s own `Requires<KaniVerifier>` impl (below) names
+        /// for this exact fragment — the same precondition every
+        /// symbolic single-byte-character proof in `rust_std::str`
+        /// assumes, under a different local variable name each time.
         #[kani::proof]
         fn verify_str_byte_length_and_content() {
             let byte: u8 = kani::any();
@@ -310,6 +316,39 @@ amenable_derive::harness! {
             assert_eq!(s.len(), 1, "a single ASCII char is exactly one UTF-8 byte");
             assert_eq!(s.as_bytes()[0], byte);
         }
+    }
+}
+
+/// [`AsciiByte`] reuses `verify_str_byte_length_and_content` rather than
+/// adding a new Kani harness — it names the precondition the harness
+/// already assumes, it doesn't prove anything new.
+impl KaniWitness for AsciiByte {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_str_byte_length_and_content".to_owned(),
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(AsciiByte);
+
+impl Requires<KaniVerifier> for AsciiByte {
+    fn requires() -> &'static str {
+        "byte < 128"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::AsciiByte",
+        verifier: "kani",
+        kind: "requires",
+        fragment: <AsciiByte as Requires<KaniVerifier>>::requires,
     }
 }
 

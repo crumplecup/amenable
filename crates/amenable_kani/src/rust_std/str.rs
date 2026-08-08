@@ -85,6 +85,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_bytes_yields_the_utf8_encoding() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier> impl
+            // (rust_std::primitives) names this exact fragment.
             kani::assume(byte < 128);
             let s = (byte as char).to_string();
             let mut it = s.bytes();
@@ -122,6 +124,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_char_indices_pairs_each_char_with_its_byte_offset() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier> impl
+            // (rust_std::primitives) names this exact fragment.
             kani::assume(byte < 128);
             let c = byte as char;
             let s = c.to_string();
@@ -161,6 +165,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_chars_yields_the_str_characters() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier> impl
+            // (rust_std::primitives) names this exact fragment.
             kani::assume(byte < 128);
             let c = byte as char;
             let s = c.to_string();
@@ -200,6 +206,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_encode_utf16_yields_utf16_code_units() {
             let byte: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier> impl
+            // (rust_std::primitives) names this exact fragment.
             kani::assume(byte < 128);
             let s = (byte as char).to_string();
             let mut it = s.encode_utf16();
