@@ -163,16 +163,32 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<SeekFrom>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn seek_from_round_trips_each_variants_offset(
+            start_offset: u64,
+            end_offset: i64,
+            current_offset: i64,
+            seek_result: (u64, i64, i64),
+        ) -> bool {
+            pearlite! {
+                seek_result.0 == start_offset
+                    && seek_result.1 == end_offset
+                    && seek_result.2 == current_offset
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
         /// Each `SeekFrom` variant preserves the offset it was constructed
         /// with and remains its own variant.
         #[requires(true)]
-        #[ensures(match result {
-            (start_value, end_value, current_value) =>
-                start_value == start_offset
-                    && end_value == end_offset
-                    && current_value == current_offset,
-        })]
+        #[ensures(seek_from_round_trips_each_variants_offset(start_offset, end_offset, current_offset, result))]
         fn verify_seek_from_round_trips_each_variants_offset(
             start_offset: u64,
             end_offset: i64,
@@ -248,6 +264,26 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<HashMap<i32,
+        /// i32>>` postcondition -- real, callable Pearlite content, not
+        /// just descriptive text alongside it.
+        #[logic(open)]
+        fn hash_map_insert_then_get_recovers_the_value(
+            value: i32,
+            map_result: (Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match map_result {
+                    (Some(got), Some(removed), empty) => got == value && removed == value && empty,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC, {
         /// Inserting one key/value pair into an empty `HashMap` makes a
         /// later `get` recover that value, and removing the same key hands
@@ -264,16 +300,32 @@ amenable_derive::harness! {
         /// `key` only needs to type-check the signature Kani's proof
         /// exercises; the law never depends on its value.
         #[requires(true)]
-        #[ensures(match result {
-            (Some(got), Some(removed), empty) => got == value && removed == value && empty,
-            _ => false,
-        })]
+        #[ensures(hash_map_insert_then_get_recovers_the_value(value, result))]
         fn verify_hash_map_insert_then_get_recovers_the_value(
             key: i32,
             value: i32,
         ) -> (Option<i32>, Option<i32>, bool) {
             let _ = key;
             (Some(value), Some(value), true)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<HashSet<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn hash_set_insert_then_contains_reports_membership(
+            set_result: (bool, bool, bool, bool),
+        ) -> bool {
+            pearlite! {
+                match set_result {
+                    (inserted, contains_before_remove, removed, contains_after_remove) =>
+                        inserted && contains_before_remove && removed && !contains_after_remove,
+                }
+            }
         }
     }
 }
@@ -290,10 +342,7 @@ amenable_derive::harness! {
         /// above -- see the `binary_heap_has_no_local_fix_either` gallery
         /// finding for the full accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (inserted, contains_before_remove, removed, contains_after_remove) =>
-                inserted && contains_before_remove && removed && !contains_after_remove,
-        })]
+        #[ensures(hash_set_insert_then_contains_reports_membership(result))]
         fn verify_hash_set_insert_then_contains_reports_membership(
             value: i32,
         ) -> (bool, bool, bool, bool) {
@@ -407,6 +456,25 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<VarError>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn var_error_distinguishes_not_present_from_not_unicode(
+            var_error_result: (bool, bool, usize),
+        ) -> bool {
+            pearlite! {
+                match var_error_result {
+                    (not_present_is_distinct, not_unicode_is_detected, payload_len) =>
+                        not_present_is_distinct && not_unicode_is_detected && payload_len == 2usize,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC, {
         /// `VarError`'s public variants are disjoint, and the
         /// `NotUnicode` payload is preserved by pattern matching.
@@ -420,12 +488,27 @@ amenable_derive::harness! {
         /// (the harness takes no parameters), so it's stated directly
         /// rather than recomputed through the real, uncontracted API.
         #[requires(true)]
-        #[ensures(match result {
-            (not_present_is_distinct, not_unicode_is_detected, payload_len) =>
-                not_present_is_distinct && not_unicode_is_detected && payload_len == 2usize,
-        })]
+        #[ensures(var_error_distinguishes_not_present_from_not_unicode(result))]
         fn verify_var_error_distinguishes_not_present_from_not_unicode() -> (bool, bool, usize) {
             (true, true, 2usize)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<OsStr>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn os_str_valid_utf8_content_round_trips_through_to_str(
+            os_str_result: (bool, usize),
+        ) -> bool {
+            pearlite! {
+                match os_str_result {
+                    (round_trips, byte_len) => round_trips && byte_len == 2usize,
+                }
+            }
         }
     }
 }
@@ -444,9 +527,7 @@ amenable_derive::harness! {
         /// no-parameters shape as `VarError`'s sibling harness just
         /// above.
         #[requires(true)]
-        #[ensures(match result {
-            (round_trips, byte_len) => round_trips && byte_len == 2usize,
-        })]
+        #[ensures(os_str_valid_utf8_content_round_trips_through_to_str(result))]
         fn verify_os_str_valid_utf8_content_round_trips_through_to_str() -> (bool, usize) {
             (true, 2usize)
         }
@@ -514,10 +595,22 @@ amenable_derive::harness! {
         /// for this exact fragment held as a reusable, backend-checkable
         /// claim.
         #[requires(true)]
-        #[ensures(result == c)]
+        #[ensures(char_roundtrips(c, result))]
         #[ensures(c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF))]
         fn verify_char_roundtrip(c: char) -> char {
             c
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, CHAR_ROUNDTRIPS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<char>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn char_roundtrips(c: char, char_result: char) -> bool {
+            pearlite! { char_result == c }
         }
     }
 }
@@ -551,10 +644,24 @@ amenable_derive::harness! {
         /// length claim goes through `string_len` (see above) since
         /// `.len()` itself can't appear in a postcondition directly.
         #[requires(true)]
-        #[ensures(result == s)]
-        #[ensures(string_len(&result) == string_len(&s))]
+        #[ensures(string_roundtrips_and_preserves_length(s, result))]
         fn verify_string_roundtrip(s: String) -> String {
             s
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<String>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. Not `open`: it calls the
+        /// opaque `string_len`, and an `open` wrapper around an opaque
+        /// callee would leak that opacity boundary (a real
+        /// `creusot-rustc` "less-visible item" error, not a guess).
+        #[logic]
+        fn string_roundtrips_and_preserves_length(s: String, string_result: String) -> bool {
+            pearlite! { string_result == s && string_len(&string_result) == string_len(&s) }
         }
     }
 }
@@ -758,17 +865,36 @@ amenable_derive::harness! {
 // `get_disjoint_mut` remains contractless. Those laws stay behind explicit
 // trusted boundaries instead of pretending to be checked here.
 amenable_derive::harness! {
+    creusot, SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<std::slice::
+        /// Iter<'static, i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn slice_iter_yields_shared_references_in_order(
+            a: i32,
+            b: i32,
+            c: i32,
+            slice_iter_result: (Option<i32>, Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match slice_iter_result {
+                    (first_seen, second_seen, third_seen, exhausted) =>
+                        first_seen == Some(a)
+                            && second_seen == Some(b)
+                            && third_seen == Some(c)
+                            && exhausted,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, {
         /// `slice::Iter` yields shared references to each element in
         /// order, then ends.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, third_seen, exhausted) =>
-                first_seen == Some(a)
-                    && second_seen == Some(b)
-                    && third_seen == Some(c)
-                    && exhausted,
-        })]
+        #[ensures(slice_iter_yields_shared_references_in_order(a, b, c, result))]
         fn verify_slice_iter_yields_shared_references_in_order(
             a: i32,
             b: i32,
@@ -798,18 +924,38 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<std::slice::
+        /// IterMut<'static, i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn slice_iter_mut_yields_mutable_references_that_write_through(
+            a: i32,
+            b: i32,
+            updated_a: i32,
+            updated_b: i32,
+            slice_iter_mut_result: (Option<i32>, Option<i32>, bool, i32, i32),
+        ) -> bool {
+            pearlite! {
+                match slice_iter_mut_result {
+                    (first_seen, second_seen, exhausted, final_first, final_second) =>
+                        first_seen == Some(a)
+                            && second_seen == Some(b)
+                            && exhausted
+                            && final_first == updated_a
+                            && final_second == updated_b,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC, {
         /// `slice::IterMut` yields mutable references in order, and
         /// writes through them update the underlying slice.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, exhausted, final_first, final_second) =>
-                first_seen == Some(a)
-                    && second_seen == Some(b)
-                    && exhausted
-                    && final_first == updated_a
-                    && final_second == updated_b,
-        })]
+        #[ensures(slice_iter_mut_yields_mutable_references_that_write_through(a, b, updated_a, updated_b, result))]
         fn verify_slice_iter_mut_yields_mutable_references_that_write_through(
             a: i32,
             b: i32,
@@ -863,10 +1009,21 @@ amenable_derive::harness! {
         /// `amenable_std::AsciiByte`'s own `Requires<CreusotVerifier>`
         /// impl names.
         #[requires(byte < 128u8)]
-        #[ensures(result.0 == 1usize)]
-        #[ensures(result.1 == byte)]
+        #[ensures(str_byte_length_and_content_holds(byte, result))]
         fn verify_str_byte_length_and_content(byte: u8) -> (usize, u8) {
             (1usize, byte)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<str>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn str_byte_length_and_content_holds(byte: u8, str_result: (usize, u8)) -> bool {
+            pearlite! { str_result.0 == 1usize && str_result.1 == byte }
         }
     }
 }
@@ -876,11 +1033,22 @@ amenable_derive::harness! {
         /// A tuple's fields recover the values it was constructed with,
         /// in position order.
         #[requires(true)]
-        #[ensures(result.0 == a)]
-        #[ensures(result.1 == b)]
+        #[ensures(tuple_field_access_holds(a, b, result))]
         fn verify_tuple_field_access(a: i32, b: i32) -> (i32, i32) {
             let tuple = (a, b);
             (tuple.0, tuple.1)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, TUPLE_FIELD_ACCESS_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<(i32, i32)>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn tuple_field_access_holds(a: i32, b: i32, tuple_result: (i32, i32)) -> bool {
+            pearlite! { tuple_result.0 == a && tuple_result.1 == b }
         }
     }
 }
@@ -897,9 +1065,21 @@ amenable_derive::harness! {
         /// carrier instead of falling back to provenance-only coverage.
         #[trusted]
         #[requires(true)]
-        #[ensures(result == value)]
+        #[ensures(fn_pointer_calls_the_underlying_function(value, result))]
         fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
             value
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<fn(i32) ->
+        /// i32>` postcondition -- real, callable Pearlite content, not
+        /// just descriptive text alongside it.
+        #[logic(open)]
+        fn fn_pointer_calls_the_underlying_function(value: i32, fn_pointer_result: i32) -> bool {
+            pearlite! { fn_pointer_result == value }
         }
     }
 }
@@ -936,8 +1116,7 @@ amenable_derive::harness! {
         /// carried value; Creusot can prove the wrapper-level round trip
         /// directly through its public field.
         #[requires(true)]
-        #[ensures(result.0 == value)]
-        #[ensures(result.1 == updated)]
+        #[ensures(assert_unwind_safe_derefs_transparently(value, updated, result))]
         fn verify_assert_unwind_safe_derefs_transparently(
             value: i32,
             updated: i32,
@@ -951,14 +1130,45 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// AssertUnwindSafe<i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn assert_unwind_safe_derefs_transparently(
+            value: i32,
+            updated: i32,
+            wrapper_result: (i32, i32),
+        ) -> bool {
+            pearlite! { wrapper_result.0 == value && wrapper_result.1 == updated }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
         /// Dereferencing a shared reference recovers exactly the value it
         /// borrows.
         #[requires(true)]
-        #[ensures(result == value)]
+        #[ensures(shared_reference_dereferences_to_the_referent(value, result))]
         fn verify_shared_reference_dereferences_to_the_referent(value: i32) -> i32 {
             let reference = &value;
             *reference
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<&'static i32>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn shared_reference_dereferences_to_the_referent(
+            value: i32,
+            reference_result: i32,
+        ) -> bool {
+            pearlite! { reference_result == value }
         }
     }
 }
@@ -968,8 +1178,7 @@ amenable_derive::harness! {
         /// Dereferencing a mutable reference recovers the borrowed value,
         /// and writing through it updates the referent.
         #[requires(true)]
-        #[ensures(result.0 == initial)]
-        #[ensures(result.1 == next)]
+        #[ensures(mutable_reference_dereferences_to_and_updates_the_referent(initial, next, result))]
         fn verify_mutable_reference_dereferences_to_and_updates_the_referent(
             initial: i32,
             next: i32,
@@ -979,6 +1188,22 @@ amenable_derive::harness! {
             let before = *reference;
             *reference = next;
             (before, *reference)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<&'static mut
+        /// i32>` postcondition -- real, callable Pearlite content, not
+        /// just descriptive text alongside it.
+        #[logic(open)]
+        fn mutable_reference_dereferences_to_and_updates_the_referent(
+            initial: i32,
+            next: i32,
+            reference_result: (i32, i32),
+        ) -> bool {
+            pearlite! { reference_result.0 == initial && reference_result.1 == next }
         }
     }
 }

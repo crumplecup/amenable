@@ -1,23 +1,26 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 519 8 519 49 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 600 8 600 49 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 516 19 516 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 517 18 517 29
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 518 18 518 66
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 597 19 597 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 598 18 598 44
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 599 18 599 66
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 613 24 613 40
 
 use creusot.prelude.Char
 use creusot.prelude.Any
 use int.Int
 
+predicate char_roundtrips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 612 8 612 62] (c: Char.t) (char_result: Char.t) =
+  [%#srust_std'2] char_result = c
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_char_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 519 8 519 49]
+let rec verify_char_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 600 8 600 49]
   (c: Char.t) (return (x: Char.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- c ] s1 | s1 = return {_ret} ] ] [ & _ret: Char.t = Any.any_l () | & c: Char.t = c ])
   [ return (result: Char.t) ->
-  {[@stop_split] [@expl:verify_char_roundtrip ensures] ([@stop_split] [@expl:verify_char_roundtrip ensures #0] [%#srust_std'0] result
-      = c)
+  {[@stop_split] [@expl:verify_char_roundtrip ensures] ([@stop_split] [@expl:verify_char_roundtrip ensures #0] [%#srust_std'0] char_roundtrips c result)
     /\ ([@stop_split] [@expl:verify_char_roundtrip ensures #1] [%#srust_std'1] Char.to_int c <= 55295
     \/ Char.to_int c >= 57344 /\ Char.to_int c <= 1114111)}
     (! return {result}) ]

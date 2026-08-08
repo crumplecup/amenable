@@ -1,31 +1,31 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 680 8 680 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 787 8 787 90 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 681 36 681 66
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 682 47 684 13
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 682 47 684 13
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 682 35 684 14
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 687 16 689 17
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 687 16 689 17
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 685 12 690 13
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 691 44 693 13
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 691 44 693 13
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 691 32 693 14
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 694 13 694 36
-let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 694 40 694 54
-let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 694 56 694 76
-let%span srust_std'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 694 80 694 91
-let%span srust_std'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 677 19 677 23
-let%span srust_std'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 678 18 678 26
-let%span srust_std'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 679 18 679 26
-let%span srust_std'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 683 106 683 110
-let%span srust_std'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 683 91 683 111
-let%span srust_std'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 688 119 688 123
-let%span srust_std'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 688 99 688 124
-let%span srust_std'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 692 106 692 110
-let%span srust_std'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 692 91 692 111
-let%span srust_std'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 688 20 688 98
-let%span srust_std'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 683 16 683 90
-let%span srust_std'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 692 16 692 90
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 788 36 788 66
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 789 47 791 13
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 789 47 791 13
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 789 35 791 14
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 794 16 796 17
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 794 16 796 17
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 792 12 797 13
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 798 44 800 13
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 798 44 800 13
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 798 32 800 14
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 801 13 801 36
+let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 801 40 801 54
+let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 801 56 801 76
+let%span srust_std'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 801 80 801 91
+let%span srust_std'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 784 19 784 23
+let%span srust_std'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 785 18 785 26
+let%span srust_std'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 786 18 786 26
+let%span srust_std'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 790 106 790 110
+let%span srust_std'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 790 91 790 111
+let%span srust_std'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 795 119 795 123
+let%span srust_std'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 795 99 795 124
+let%span srust_std'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 799 106 799 110
+let%span srust_std'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 799 91 799 111
+let%span srust_std'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 795 20 795 98
+let%span srust_std'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 790 16 790 90
+let%span srust_std'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 799 16 799 90
 let%span satomic_sc = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 32 12 32 87
 let%span satomic_sc'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 28 22 28 44
 let%span satomic_sc'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 29 22 29 50
@@ -113,7 +113,7 @@ let rec shoot_load_AtomicPtr_i32 (self: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst
     = val_AtomicPtr_i32 own}
     (! return {result}) ]
 
-let rec closure3 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 683 16 683 90] [@coma:extspec]
+let rec closure3 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 790 16 790 90] [@coma:extspec]
   (self: closure3) (c: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst_None) (return (x: ())) = bb0
   [ bb0 = s0
     [ s0 = deref_Ghost_Box_Perm_AtomicPtr_i32_Global [%#srust_std'16] {self.c0}
@@ -253,7 +253,7 @@ predicate hist_inv_closure4 [@inline:trivial] (self: closure4) (result_state: cl
 
 meta "rewrite_def" predicate hist_inv_closure4
 
-let rec closure4 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 688 20 688 98] [@coma:extspec]
+let rec closure4 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 795 20 795 98] [@coma:extspec]
   (self: MutBorrow.t closure4) (c: MutBorrow.t t_Committer_AtomicPtr_i32_ptr_i32_None_SeqCst) (return (x: ())) = bb0
   [ bb0 = s0
     [ s0 = MutBorrow.borrow_mut <t_Perm_AtomicPtr_i32> {self.current.c0'0.current}
@@ -393,7 +393,7 @@ meta "rewrite_def" predicate resolve_Ghost_Box_Perm_AtomicPtr_i32_Global
 
 type closure5 = { c0'1: t_Perm_AtomicPtr_i32 }
 
-let rec closure5 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 692 16 692 90] [@coma:extspec]
+let rec closure5 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 799 16 799 90] [@coma:extspec]
   (self: closure5) (c: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst_None) (return (x: ())) = bb0
   [ bb0 = s0
     [ s0 = deref_Ghost_Box_Perm_AtomicPtr_i32_Global [%#srust_std'20] {self.c0'1}
@@ -462,7 +462,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_atomic_ptr_load_store [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 680 8 680 90]
+let rec verify_atomic_ptr_load_store [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 787 8 787 90]
   (initial: Opaque.ptr) (next: Opaque.ptr) (return (x: tup2_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = new_i32 [%#srust_std] {initial}

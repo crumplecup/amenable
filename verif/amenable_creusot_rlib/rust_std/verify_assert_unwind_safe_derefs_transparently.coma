@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 941 8 944 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1120 8 1123 23 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 938 19 938 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 939 18 939 35
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 940 18 940 37
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1118 19 1118 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1119 18 1119 81
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1143 24 1143 80
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -11,12 +11,15 @@ type t_AssertUnwindSafe_i32 = { f0: Int32.t }
 
 type tup2_i32_i32 = { f0'0: Int32.t; f1'0: Int32.t }
 
+predicate assert_unwind_safe_derefs_transparently [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1138 8 1142 17] (value: Int32.t) (updated: Int32.t) (wrapper_result: tup2_i32_i32) =
+  [%#srust_std'1] wrapper_result.f0'0 = value /\ wrapper_result.f1'0 = updated
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_assert_unwind_safe_derefs_transparently
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 941 8 944 23] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1120 8 1123 23] (value: Int32.t)
   (updated: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &wrapped <- { f0 = value } ] s1
@@ -30,8 +33,5 @@ let rec verify_assert_unwind_safe_derefs_transparently
   | & wrapped: t_AssertUnwindSafe_i32 = Any.any_l ()
   | & first: Int32.t = Any.any_l () ])
   [ return (result: tup2_i32_i32) ->
-  {[@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures] ([@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures #0] [%#srust_std'0] result.f0'0
-      = value)
-    /\ ([@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures #1] [%#srust_std'1] result.f1'0
-    = updated)}
+  {[@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures] [%#srust_std'0] assert_unwind_safe_derefs_transparently value updated result}
     (! return {result}) ]

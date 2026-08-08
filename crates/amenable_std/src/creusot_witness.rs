@@ -156,10 +156,21 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
-    ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
-    DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
-    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, NON_NUL_BYTE_HOLDS_SRC,
-    NUL_ONLY_AT_THE_END_VALIDATES_SRC, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC,
+    ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, CHAR_ROUNDTRIPS_SRC, CreusotVerifier,
+    CreusotWitness, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC,
+    FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+    HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
+    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC,
+    MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, NON_NUL_BYTE_HOLDS_SRC,
+    NUL_ONLY_AT_THE_END_VALIDATES_SRC, OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+    SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
+    SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
+    SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+    SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC,
+    STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC, TUPLE_FIELD_ACCESS_HOLDS_SRC,
+    VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
+    VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
     VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
@@ -655,6 +666,41 @@ bridge_creusot_witness!(RustStdStandard<char>);
     }
 }
 
+/// Returns `amenable_creusot::CHAR_ROUNDTRIPS_SRC` directly -- the
+/// verbatim, `harness!`-captured source of the real `#[logic(open)] fn
+/// char_roundtrips` the real site calls, not a hand-retyped copy of
+/// its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<char> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        CHAR_ROUNDTRIPS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<char> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression CHAR_ROUNDTRIPS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "char_roundtrips (c , result)",
+        harnesses: &["verify_char_roundtrip"],
+    }
+}
+
 /// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
 /// rather than adding a new Creusot proof — it names the postcondition the
 /// harness already checks (`c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <=
@@ -721,6 +767,42 @@ bridge_creusot_witness!(RustStdStandard<String>);
         evidence: "amenable_std::rust_std::RustStdStandard<String>",
         verifier: "creusot",
         describe: || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn string_roundtrips_and_preserves_length` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<String> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<String>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<String> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<String>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "string_roundtrips_and_preserves_length (s , result)",
+        harnesses: &["verify_string_roundtrip"],
     }
 }
 
@@ -950,6 +1032,41 @@ bridge_creusot_witness!(RustStdStandard<SeekFrom>);
     }
 }
 
+/// Returns `amenable_creusot::SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn seek_from_round_trips_each_variants_offset` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<SeekFrom> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<SeekFrom> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "seek_from_round_trips_each_variants_offset (start_offset , end_offset , current_offset , result)",
+        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<Shutdown> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1042,6 +1159,41 @@ bridge_creusot_witness!(RustStdStandard<HashMap<i32, i32>>);
     }
 }
 
+/// Returns `amenable_creusot::HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn hash_map_insert_then_get_recovers_the_value` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<HashMap<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<HashMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "hash_map_insert_then_get_recovers_the_value (value , result)",
+        harnesses: &["verify_hash_map_insert_then_get_recovers_the_value"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<HashSet<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1062,6 +1214,43 @@ bridge_creusot_witness!(RustStdStandard<HashSet<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<HashSet<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn hash_set_insert_then_contains_reports_membership`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<HashSet<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<HashSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "hash_set_insert_then_contains_reports_membership (result)",
+        harnesses: &["verify_hash_set_insert_then_contains_reports_membership"],
     }
 }
 
@@ -1197,6 +1386,42 @@ bridge_creusot_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
     }
 }
 
+/// Returns `amenable_creusot::SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn slice_iter_yields_shared_references_in_order` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<std::slice::Iter<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::slice::Iter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "slice_iter_yields_shared_references_in_order (a , b , c , result)",
+        harnesses: &["verify_slice_iter_yields_shared_references_in_order"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1223,6 +1448,44 @@ bridge_creusot_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn slice_iter_mut_yields_mutable_references_that_
+/// write_through` the real site calls, not a hand-retyped copy of its
+/// expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<std::slice::IterMut<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::slice::IterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "slice_iter_mut_yields_mutable_references_that_write_through (a , b , updated_a , updated_b , result)",
+        harnesses: &["verify_slice_iter_mut_yields_mutable_references_that_write_through"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<str> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1243,6 +1506,41 @@ bridge_creusot_witness!(RustStdStandard<str>);
         evidence: "amenable_std::rust_std::RustStdStandard<str>",
         verifier: "creusot",
         describe: || <RustStdStandard<str> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns `amenable_creusot::STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn str_byte_length_and_content_holds` the real site
+/// calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<str> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<str> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "str_byte_length_and_content_holds (byte , result)",
+        harnesses: &["verify_str_byte_length_and_content"],
     }
 }
 
@@ -1306,6 +1604,41 @@ bridge_creusot_witness!(RustStdStandard<(i32, i32)>);
     }
 }
 
+/// Returns `amenable_creusot::TUPLE_FIELD_ACCESS_HOLDS_SRC` directly --
+/// the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn tuple_field_access_holds` the real site calls,
+/// not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<(i32, i32)> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        TUPLE_FIELD_ACCESS_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<(i32, i32)> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression TUPLE_FIELD_ACCESS_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "tuple_field_access_holds (a , b , result)",
+        harnesses: &["verify_tuple_field_access"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1326,6 +1659,41 @@ bridge_creusot_witness!(RustStdStandard<fn(i32) -> i32>);
         evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
         verifier: "creusot",
         describe: || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns `amenable_creusot::FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn fn_pointer_calls_the_underlying_function` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<fn(i32) -> i32> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<fn(i32) -> i32> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "fn_pointer_calls_the_underlying_function (value , result)",
+        harnesses: &["verify_fn_pointer_calls_the_underlying_function"],
     }
 }
 
@@ -1398,6 +1766,41 @@ bridge_creusot_witness!(RustStdStandard<AssertUnwindSafe<i32>>);
     }
 }
 
+/// Returns `amenable_creusot::ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn assert_unwind_safe_derefs_transparently` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<AssertUnwindSafe<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<AssertUnwindSafe<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "assert_unwind_safe_derefs_transparently (value , updated , result)",
+        harnesses: &["verify_assert_unwind_safe_derefs_transparently"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<&'static i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1421,6 +1824,43 @@ bridge_creusot_witness!(RustStdStandard<&'static i32>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn shared_reference_dereferences_to_the_referent`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<&'static i32> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<&'static i32> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "shared_reference_dereferences_to_the_referent (value , result)",
+        harnesses: &["verify_shared_reference_dereferences_to_the_referent"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<&'static mut i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1441,6 +1881,45 @@ bridge_creusot_witness!(RustStdStandard<&'static mut i32>);
         evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
         verifier: "creusot",
         describe: || <RustStdStandard<&'static mut i32> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// mutable_reference_dereferences_to_and_updates_the_referent` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<&'static mut i32> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<&'static mut i32> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "mutable_reference_dereferences_to_and_updates_the_referent (initial , next , result)",
+        harnesses: &["verify_mutable_reference_dereferences_to_and_updates_the_referent"],
     }
 }
 
@@ -2215,6 +2694,43 @@ bridge_creusot_witness!(RustStdStandard<VarError>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn var_error_distinguishes_not_present_from_not_unicode`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<VarError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<VarError> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "var_error_distinguishes_not_present_from_not_unicode (result)",
+        harnesses: &["verify_var_error_distinguishes_not_present_from_not_unicode"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<Vars> {
     type SupportingEvidence = Self;
     type ProofArtifact = RustStdProvenance;
@@ -2273,6 +2789,43 @@ bridge_creusot_witness!(RustStdStandard<OsStr>);
         evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
         verifier: "creusot",
         describe: || <RustStdStandard<OsStr> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn os_str_valid_utf8_content_round_trips_through_to_str`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<OsStr> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<OsStr> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "os_str_valid_utf8_content_round_trips_through_to_str (result)",
+        harnesses: &["verify_os_str_valid_utf8_content_round_trips_through_to_str"],
     }
 }
 

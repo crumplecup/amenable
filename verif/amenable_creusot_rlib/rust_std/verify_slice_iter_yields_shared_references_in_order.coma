@@ -1,14 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 772 8 776 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 898 8 902 58 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 778 25 778 36
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 779 35 779 44
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 783 36 783 45
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 787 35 787 44
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 791 34 791 43
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 792 27 792 32
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 793 24 793 28
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 764 19 764 23
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 765 18 771 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 904 25 904 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 905 35 905 44
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 909 36 909 45
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 913 35 913 44
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 917 34 917 43
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 918 27 918 32
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 919 24 919 28
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 896 19 896 23
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 897 18 897 79
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 880 16 886 17
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 348 18 348 33
 let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 491 20 491 62
@@ -113,12 +114,18 @@ predicate resolve_Iter_i32 (_1: t_Iter_i32)
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
+predicate slice_iter_yields_shared_references_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 873 8 878 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (slice_iter_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+  [%#srust_std'8] match slice_iter_result with
+    | {f0 = first_seen; f1 = second_seen; f2 = third_seen; f3 = exhausted} -> first_seen = Some'0 a
+    /\ second_seen = Some'0 b /\ third_seen = Some'0 c /\ exhausted
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_slice_iter_yields_shared_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 772 8 776 58] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 898 8 902 58] (a: Int32.t) (b: Int32.t)
   (c: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = any
@@ -192,8 +199,5 @@ let rec verify_slice_iter_yields_shared_references_in_order
   | & _35: t_Option_ref_i32 = Any.any_l ()
   | & _36: MutBorrow.t t_Iter_i32 = Any.any_l () ])
   [ return (result: tup4_Option_i32_Option_i32_Option_i32_bool) ->
-  {[@stop_split] [@expl:verify_slice_iter_yields_shared_references_in_order ensures] [%#srust_std'7] match result with
-      | {f0 = first_seen; f1 = second_seen; f2 = third_seen; f3 = exhausted} -> first_seen = Some'0 a
-      /\ second_seen = Some'0 b /\ third_seen = Some'0 c /\ exhausted
-      end}
+  {[@stop_split] [@expl:verify_slice_iter_yields_shared_references_in_order ensures] [%#srust_std'7] slice_iter_yields_shared_references_in_order a b c result}
     (! return {result}) ]

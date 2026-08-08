@@ -1,17 +1,17 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1839 8 1839 94 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2064 8 2064 94 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1841 13 1841 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1841 19 1841 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1835 19 1835 43
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1836 18 1838 9
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1708 24 1708 34
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2066 13 2066 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2066 19 2066 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2060 19 2060 43
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2061 18 2063 9
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1933 24 1933 34
 
 use creusot.prelude.Any
 use creusot.int.UInt8
 
 type tup2_bool_bool = { f0: bool; f1: bool }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1707 8 1707 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1932 8 1932 47] (byte: UInt8.t) =
   [%#srust_std'3] UInt8.t'int byte <> 0
 
 meta "compute_max_steps" 1000000
@@ -19,7 +19,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_from_bytes_until_nul_requires_a_nul_byte_somewhere
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1839 8 1839 94] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2064 8 2064 94] (byte: UInt8.t)
   (return (x: tup2_bool_bool)) =
   {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere requires] [%#srust_std'1] non_nul_byte_holds byte}
   (! bb0

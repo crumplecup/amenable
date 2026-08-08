@@ -1,27 +1,31 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 450 8 450 89 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 531 8 531 89 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 451 13 451 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 451 19 451 25
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 446 19 446 23
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 447 18 449 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 532 13 532 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 532 19 532 25
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 529 19 529 23
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 530 18 530 78
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 508 16 510 17
 
 use creusot.int.UInt64
 use creusot.prelude.Any
 
 type tup2_bool_usize = { f0: bool; f1: UInt64.t }
 
+predicate os_str_valid_utf8_content_round_trips_through_to_str [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 504 8 506 17] (os_str_result: tup2_bool_usize) =
+  [%#srust_std'3] match os_str_result with
+    | {f0 = round_trips; f1 = byte_len} -> round_trips /\ byte_len = (2: UInt64.t)
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_os_str_valid_utf8_content_round_trips_through_to_str
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 450 8 450 89] (return (x: tup2_bool_usize)) =
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 531 8 531 89] (return (x: tup2_bool_usize)) =
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] (2: UInt64.t)) } ] s1 | s1 = return {_ret} ] ]
   [ & _ret: tup2_bool_usize = Any.any_l () ])
   [ return (result: tup2_bool_usize) ->
-  {[@stop_split] [@expl:verify_os_str_valid_utf8_content_round_trips_through_to_str ensures] [%#srust_std'2] match result with
-      | {f0 = round_trips; f1 = byte_len} -> round_trips /\ byte_len = (2: UInt64.t)
-      end}
+  {[@stop_split] [@expl:verify_os_str_valid_utf8_content_round_trips_through_to_str ensures] [%#srust_std'2] os_str_valid_utf8_content_round_trips_through_to_str result}
     (! return {result}) ]

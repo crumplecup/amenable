@@ -1,19 +1,22 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 881 8 881 66 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1037 8 1037 66 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 878 19 878 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 879 18 879 31
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 880 18 880 31
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1035 19 1035 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1036 18 1036 56
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1051 24 1051 66
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
+predicate tuple_field_access_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1050 8 1050 85] (a: Int32.t) (b: Int32.t) (tuple_result: tup2_i32_i32) =
+  [%#srust_std'1] tuple_result.f0 = a /\ tuple_result.f1 = b
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_tuple_field_access [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 881 8 881 66]
+let rec verify_tuple_field_access [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1037 8 1037 66]
   (a: Int32.t) (b: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &tuple <- { f0 = a; f1 = b } ] s1
@@ -21,7 +24,5 @@ let rec verify_tuple_field_access [#"/home/erik/repos/amenable/crates/amenable_c
     | s2 = return {_ret} ] ]
   [ & _ret: tup2_i32_i32 = Any.any_l () | & a: Int32.t = a | & b: Int32.t = b | & tuple: tup2_i32_i32 = Any.any_l () ])
   [ return (result: tup2_i32_i32) ->
-  {[@stop_split] [@expl:verify_tuple_field_access ensures] ([@stop_split] [@expl:verify_tuple_field_access ensures #0] [%#srust_std'0] result.f0
-      = a)
-    /\ ([@stop_split] [@expl:verify_tuple_field_access ensures #1] [%#srust_std'1] result.f1 = b)}
+  {[@stop_split] [@expl:verify_tuple_field_access ensures] [%#srust_std'0] tuple_field_access_holds a b result}
     (! return {result}) ]
