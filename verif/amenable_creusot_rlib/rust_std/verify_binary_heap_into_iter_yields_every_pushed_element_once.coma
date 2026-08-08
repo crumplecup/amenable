@@ -1,7 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1412 8 1415 39 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1553 8 1556 39 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1408 19 1408 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1409 18 1411 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1551 19 1551 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1552 18 1552 92
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1537 16 1539 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -10,12 +11,17 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup2_Option_i32_Option_i32 = { f0: t_Option_i32; f1: t_Option_i32 }
 
+predicate binary_heap_into_iter_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1531 8 1535 17] (a: Int32.t) (b: Int32.t) (into_iter_result: tup2_Option_i32_Option_i32) =
+  [%#srust_std'1] match into_iter_result with
+    | {f0 = first; f1 = second} -> first = Some a /\ second = Some b
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_into_iter_yields_every_pushed_element_once
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1412 8 1415 39] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1553 8 1556 39] (a: Int32.t) (b: Int32.t)
   (return (x: tup2_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1
@@ -28,7 +34,5 @@ let rec verify_binary_heap_into_iter_yields_every_pushed_element_once
   | & _7: t_Option_i32 = Any.any_l ()
   | & _9: t_Option_i32 = Any.any_l () ])
   [ return (result: tup2_Option_i32_Option_i32) ->
-  {[@stop_split] [@expl:verify_binary_heap_into_iter_yields_every_pushed_element_once ensures] [%#srust_std'0] match result with
-      | {f0 = first; f1 = second} -> first = Some a /\ second = Some b
-      end}
+  {[@stop_split] [@expl:verify_binary_heap_into_iter_yields_every_pushed_element_once ensures] [%#srust_std'0] binary_heap_into_iter_yields_every_pushed_element_once_holds a b result}
     (! return {result}) ]

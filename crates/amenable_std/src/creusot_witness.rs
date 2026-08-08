@@ -156,12 +156,19 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
-    ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC,
-    ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, CHAR_ROUNDTRIPS_SRC, CreusotVerifier,
-    CreusotWitness, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC,
-    FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC, HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+    A_LESS_THAN_B_HOLDS_SRC, ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC,
+    ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
+    BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
+    BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
+    BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
+    BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_HOLDS_SRC,
+    BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_HOLDS_SRC, BTREE_MAP_ITERATES_IN_KEY_ORDER_HOLDS_SRC,
+    BTREE_SET_ITERATES_IN_SORTED_ORDER_HOLDS_SRC, CHAR_ROUNDTRIPS_SRC,
+    COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC, CreusotVerifier, CreusotWitness,
+    DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
+    HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
     HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
-    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC,
+    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, K1_LESS_THAN_K2_HOLDS_SRC,
     MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, NON_NUL_BYTE_HOLDS_SRC,
     NUL_ONLY_AT_THE_END_VALIDATES_SRC, OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
     SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
@@ -1950,6 +1957,43 @@ bridge_creusot_witness!(RustStdStandard<Cow<'static, i32>>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn cow_destructure_recovers_the_wrapped_value` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Cow<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Cow<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "cow_destructure_recovers_the_wrapped_value (value , result)",
+        harnesses: &["verify_cow_destructure_recovers_the_wrapped_value"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1970,6 +2014,73 @@ bridge_creusot_witness!(RustStdStandard<BTreeMap<i32, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BTreeMap<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns `amenable_creusot::K1_LESS_THAN_K2_HOLDS_SRC` /
+/// `BTREE_MAP_ITERATES_IN_KEY_ORDER_HOLDS_SRC` directly -- the verbatim,
+/// `harness!`-captured source of the real `#[logic(open)]` fns the real
+/// site calls, not a hand-retyped copy of their expressions.
+impl Requires<CreusotVerifier> for RustStdStandard<BTreeMap<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        K1_LESS_THAN_K2_HOLDS_SRC
+    }
+}
+
+impl Ensures<CreusotVerifier> for RustStdStandard<BTreeMap<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BTREE_MAP_ITERATES_IN_KEY_ORDER_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || <RustStdStandard<BTreeMap<i32, i32>> as Requires<CreusotVerifier>>::requires(
+            (),
+        ),
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BTreeMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shapes the real site now uses, instead of the raw
+// expressions K1_LESS_THAN_K2_HOLDS_SRC/
+// BTREE_MAP_ITERATES_IN_KEY_ORDER_HOLDS_SRC themselves capture.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || "k1_less_than_k2_holds (k1 , k2)",
+        harnesses: &["verify_btree_map_iterates_in_key_order"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "btree_map_iterates_in_key_order_holds (k1 , k2 , v1 , v2 , result)",
+        harnesses: &["verify_btree_map_iterates_in_key_order"],
     }
 }
 
@@ -1996,6 +2107,77 @@ bridge_creusot_witness!(RustStdStandard<BTreeSet<i32>>);
     }
 }
 
+/// Returns `amenable_creusot::A_LESS_THAN_B_HOLDS_SRC` /
+/// `BTREE_SET_ITERATES_IN_SORTED_ORDER_HOLDS_SRC` directly -- the
+/// verbatim, `harness!`-captured source of the real `#[logic(open)]`
+/// fns the real site calls, not a hand-retyped copy of their
+/// expressions. `A_LESS_THAN_B_HOLDS_SRC` is shared with
+/// `RustStdStandard<BinaryHeapPeekMut<'static, i32>>`'s own `Requires`
+/// impl below -- the identical precondition, named once.
+impl Requires<CreusotVerifier> for RustStdStandard<BTreeSet<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        A_LESS_THAN_B_HOLDS_SRC
+    }
+}
+
+impl Ensures<CreusotVerifier> for RustStdStandard<BTreeSet<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BTREE_SET_ITERATES_IN_SORTED_ORDER_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || <RustStdStandard<BTreeSet<i32>> as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BTreeSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shapes both real sites (BTreeSet and BinaryHeapPeekMut)
+// now use, instead of the raw expression A_LESS_THAN_B_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || "a_less_than_b_holds (a , b)",
+        harnesses: &[
+            "verify_btree_set_iterates_in_sorted_order",
+            "verify_binary_heap_peek_mut_exposes_the_maximum",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "btree_set_iterates_in_sorted_order_holds (a , b , result)",
+        harnesses: &["verify_btree_set_iterates_in_sorted_order"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<BinaryHeap<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -2016,6 +2198,43 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeap<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BinaryHeap<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn binary_heap_pop_yields_the_maximum_first_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeap<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BinaryHeap<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "binary_heap_pop_yields_the_maximum_first_holds (a , b , result)",
+        harnesses: &["verify_binary_heap_pop_yields_the_maximum_first"],
     }
 }
 
@@ -2042,6 +2261,45 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeapDrain<'static, i32>>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// binary_heap_drain_yields_every_pushed_element_once_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapDrain<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapDrain<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BinaryHeapDrain<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapDrain<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "binary_heap_drain_yields_every_pushed_element_once_holds (a , b , result)",
+        harnesses: &["verify_binary_heap_drain_yields_every_pushed_element_once"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<BinaryHeapIntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -2062,6 +2320,45 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeapIntoIter<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BinaryHeapIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// binary_heap_into_iter_yields_every_pushed_element_once_holds` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapIntoIter<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIntoIter<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BinaryHeapIntoIter<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIntoIter<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "binary_heap_into_iter_yields_every_pushed_element_once_holds (a , b , result)",
+        harnesses: &["verify_binary_heap_into_iter_yields_every_pushed_element_once"],
     }
 }
 
@@ -2088,6 +2385,45 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeapIter<'static, i32>>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// binary_heap_iter_yields_every_pushed_element_once_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapIter<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIter<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<BinaryHeapIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIter<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "binary_heap_iter_yields_every_pushed_element_once_holds (a , b , result)",
+        harnesses: &["verify_binary_heap_iter_yields_every_pushed_element_once"],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -2108,6 +2444,68 @@ bridge_creusot_witness!(RustStdStandard<BinaryHeapPeekMut<'static, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns `amenable_creusot::A_LESS_THAN_B_HOLDS_SRC` /
+/// `BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_HOLDS_SRC` directly -- the
+/// verbatim, `harness!`-captured source of the real `#[logic(open)]`
+/// fns the real site calls, not a hand-retyped copy of their
+/// expressions. `A_LESS_THAN_B_HOLDS_SRC` is the same shared
+/// precondition `RustStdStandard<BTreeSet<i32>>`'s own `Requires` impl
+/// above already names.
+impl Requires<CreusotVerifier> for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        A_LESS_THAN_B_HOLDS_SRC
+    }
+}
+
+impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: ||
+            <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_HOLDS_SRC itself
+// captures. (a_less_than_b_holds's own call-shape fragment is already
+// registered, scoped to both harnesses, on
+// RustStdStandard<BTreeSet<i32>> above.)
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "binary_heap_peek_mut_exposes_the_maximum_holds (a , b , result)",
+        harnesses: &["verify_binary_heap_peek_mut_exposes_the_maximum"],
     }
 }
 

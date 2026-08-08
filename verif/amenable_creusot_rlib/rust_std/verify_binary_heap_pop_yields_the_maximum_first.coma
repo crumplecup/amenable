@@ -1,7 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1364 8 1367 39 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1468 8 1471 39 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1358 19 1358 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1359 18 1363 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1466 19 1466 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1467 18 1467 78
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1451 16 1455 17
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -71,12 +72,18 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
+predicate binary_heap_pop_yields_the_maximum_first_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1445 8 1449 17] (a: Int32.t) (b: Int32.t) (pop_result: tup2_Option_i32_Option_i32) =
+  [%#srust_std'1] match pop_result with
+    | {f0 = first; f1 = second} -> first = Some (if Int32.ge a b then a else b)
+    /\ second = Some (if Int32.ge a b then b else a)
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_pop_yields_the_maximum_first
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1364 8 1367 39] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1468 8 1471 39] (a: Int32.t) (b: Int32.t)
   (return (x: tup2_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_9 <- Int32.ge a b ] s1 | s1 = any [ br0 -> {_9 = false} (! bb2) | br1 -> {_9} (! bb1) ] ]
   | bb1 = s0 [ s0 = [ &_8 <- a ] s1 | s1 = bb3 ]
@@ -99,8 +106,5 @@ let rec verify_binary_heap_pop_yields_the_maximum_first
   | & _13: Int32.t = Any.any_l ()
   | & _14: bool = Any.any_l () ])
   [ return (result: tup2_Option_i32_Option_i32) ->
-  {[@stop_split] [@expl:verify_binary_heap_pop_yields_the_maximum_first ensures] [%#srust_std'0] match result with
-      | {f0 = first; f1 = second} -> first = Some (if Int32.ge a b then a else b)
-      /\ second = Some (if Int32.ge a b then b else a)
-      end}
+  {[@stop_split] [@expl:verify_binary_heap_pop_yields_the_maximum_first ensures] [%#srust_std'0] binary_heap_pop_yields_the_maximum_first_holds a b result}
     (! return {result}) ]

@@ -1,8 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1436 8 1439 72 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1596 8 1599 72 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1442 33 1442 39
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1427 19 1427 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1428 18 1435 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1602 33 1602 39
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1594 19 1594 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1595 18 1595 87
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1575 16 1582 17
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -78,12 +79,21 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
+predicate binary_heap_iter_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1569 8 1573 17] (a: Int32.t) (b: Int32.t) (iter_result: tup5_Option_i32_Option_i32_usize_Option_i32_Option_i32) =
+  [%#srust_std'2] match iter_result with
+    | {f0 = first; f1 = second; f2 = len_after_iter; f3 = first_pop; f4 = second_pop} -> first
+      = Some (if Int32.ge a b then a else b)
+    /\ second = Some (if Int32.ge a b then b else a)
+    /\ len_after_iter = (2: UInt64.t)
+    /\ first_pop = Some (if Int32.ge a b then a else b) /\ second_pop = Some (if Int32.ge a b then b else a)
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_iter_yields_every_pushed_element_once
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1436 8 1439 72] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1596 8 1599 72] (a: Int32.t) (b: Int32.t)
   (return (x: tup5_Option_i32_Option_i32_usize_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_9 <- Int32.ge a b ] s1 | s1 = any [ br0 -> {_9 = false} (! bb2) | br1 -> {_9} (! bb1) ] ]
   | bb1 = s0 [ s0 = [ &_8 <- a ] s1 | s1 = bb3 ]
@@ -128,11 +138,5 @@ let rec verify_binary_heap_iter_yields_every_pushed_element_once
   | & _24: Int32.t = Any.any_l ()
   | & _25: bool = Any.any_l () ])
   [ return (result: tup5_Option_i32_Option_i32_usize_Option_i32_Option_i32) ->
-  {[@stop_split] [@expl:verify_binary_heap_iter_yields_every_pushed_element_once ensures] [%#srust_std'1] match result with
-      | {f0 = first; f1 = second; f2 = len_after_iter; f3 = first_pop; f4 = second_pop} -> first
-        = Some (if Int32.ge a b then a else b)
-      /\ second = Some (if Int32.ge a b then b else a)
-      /\ len_after_iter = (2: UInt64.t)
-      /\ first_pop = Some (if Int32.ge a b then a else b) /\ second_pop = Some (if Int32.ge a b then b else a)
-      end}
+  {[@stop_split] [@expl:verify_binary_heap_iter_yields_every_pushed_element_once ensures] [%#srust_std'1] binary_heap_iter_yields_every_pushed_element_once_holds a b result}
     (! return {result}) ]

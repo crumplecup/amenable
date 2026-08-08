@@ -1,10 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1310 8 1313 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1396 8 1399 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1316 32 1316 36
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1317 33 1317 37
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1318 24 1318 28
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1300 19 1300 24
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1301 18 1309 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1402 32 1402 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1403 33 1403 37
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1404 24 1404 28
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1394 19 1394 44
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1395 18 1395 72
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1261 24 1261 29
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1368 16 1376 17
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -74,14 +76,24 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
+predicate a_less_than_b_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1260 8 1260 54] (a: Int32.t) (b: Int32.t) =
+  [%#srust_std'4] Int32.lt a b
+
+predicate btree_set_iterates_in_sorted_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1362 8 1366 17] (a: Int32.t) (b: Int32.t) (btree_set_result: tup5_Option_i32_Option_i32_bool_bool_bool) =
+  [%#srust_std'5] match btree_set_result with
+    | {f0 = Some first; f1 = Some second; f2 = removed_first; f3 = removed_second; f4 = empty} -> first = a
+    /\ second = b /\ removed_first /\ removed_second /\ empty
+    | _ -> false
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_btree_set_iterates_in_sorted_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1310 8 1313 57] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1396 8 1399 57] (a: Int32.t) (b: Int32.t)
   (return (x: tup5_Option_i32_Option_i32_bool_bool_bool)) =
-  {[@stop_split] [@expl:verify_btree_set_iterates_in_sorted_order requires] [%#srust_std'2] Int32.lt a b}
+  {[@stop_split] [@expl:verify_btree_set_iterates_in_sorted_order requires] [%#srust_std'2] a_less_than_b_holds a b}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &first <- Some a ] s1
@@ -100,9 +112,5 @@ let rec verify_btree_set_iterates_in_sorted_order
   | & removed_second: bool = Any.any_l ()
   | & empty: bool = Any.any_l () ])
   [ return (result: tup5_Option_i32_Option_i32_bool_bool_bool) ->
-  {[@stop_split] [@expl:verify_btree_set_iterates_in_sorted_order ensures] [%#srust_std'3] match result with
-      | {f0 = Some first; f1 = Some second; f2 = removed_first; f3 = removed_second; f4 = empty} -> first = a
-      /\ second = b /\ removed_first /\ removed_second /\ empty
-      | _ -> false
-      end}
+  {[@stop_split] [@expl:verify_btree_set_iterates_in_sorted_order ensures] [%#srust_std'3] btree_set_iterates_in_sorted_order_holds a b result}
     (! return {result}) ]

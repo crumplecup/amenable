@@ -1220,14 +1220,92 @@ amenable_derive::harness! {
         /// poison the whole goal. So this uses only local construction
         /// and pattern matching on the enum itself.
         #[requires(true)]
-        #[ensures(match value {
-            Cow::Borrowed(borrowed) => result == *borrowed,
-            Cow::Owned(owned) => result == owned,
-        })]
+        #[ensures(cow_destructure_recovers_the_wrapped_value(value, result))]
         fn verify_cow_destructure_recovers_the_wrapped_value(value: Cow<'static, i32>) -> i32 {
             match value {
                 Cow::Borrowed(borrowed) => *borrowed,
                 Cow::Owned(owned) => owned,
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Cow<'static,
+        /// i32>>` postcondition -- real, callable Pearlite content,
+        /// not just descriptive text alongside it.
+        #[logic(open)]
+        fn cow_destructure_recovers_the_wrapped_value(
+            value: Cow<'static, i32>,
+            cow_result: i32,
+        ) -> bool {
+            pearlite! {
+                match value {
+                    Cow::Borrowed(borrowed) => cow_result == *borrowed,
+                    Cow::Owned(owned) => cow_result == owned,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, A_LESS_THAN_B_HOLDS_SRC, {
+        /// The precondition `verify_btree_set_iterates_in_sorted_order`
+        /// and `verify_binary_heap_peek_mut_exposes_the_maximum` share
+        /// -- real, callable Pearlite content, not just descriptive
+        /// text alongside it.
+        #[logic(open)]
+        fn a_less_than_b_holds(a: i32, b: i32) -> bool {
+            pearlite! { a < b }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, K1_LESS_THAN_K2_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<BTreeMap<i32,
+        /// i32>>` precondition -- real, callable Pearlite content, not
+        /// just descriptive text alongside it.
+        #[logic(open)]
+        fn k1_less_than_k2_holds(k1: i32, k2: i32) -> bool {
+            pearlite! { k1 < k2 }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, BTREE_MAP_ITERATES_IN_KEY_ORDER_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<BTreeMap<i32,
+        /// i32>>` postcondition -- real, callable Pearlite content,
+        /// not just descriptive text alongside it.
+        #[logic(open)]
+        fn btree_map_iterates_in_key_order_holds(
+            k1: i32,
+            k2: i32,
+            v1: i32,
+            v2: i32,
+            btree_map_result: (
+                Option<(i32, i32)>,
+                Option<(i32, i32)>,
+                Option<i32>,
+                Option<i32>,
+                bool,
+            ),
+        ) -> bool {
+            pearlite! {
+                match btree_map_result {
+                    (Some((first_k, first_v)), Some((second_k, second_v)), Some(removed_first), Some(removed_second), empty) =>
+                        first_k == k1
+                            && first_v == v1
+                            && second_k == k2
+                            && second_v == v2
+                            && removed_first == v1
+                            && removed_second == v2
+                            && empty,
+                    _ => false,
+                }
             }
         }
     }
@@ -1251,18 +1329,8 @@ amenable_derive::harness! {
         /// insertion order here -- the model states that directly,
         /// mirroring `amenable_kani::btree_model::KaniBTreeMap`'s own
         /// "modeled two-entry X" shape for the identical reason.
-        #[requires(k1 < k2)]
-        #[ensures(match result {
-            (Some((first_k, first_v)), Some((second_k, second_v)), Some(removed_first), Some(removed_second), empty) =>
-                first_k == k1
-                    && first_v == v1
-                    && second_k == k2
-                    && second_v == v2
-                    && removed_first == v1
-                    && removed_second == v2
-                    && empty,
-            _ => false,
-        })]
+        #[requires(k1_less_than_k2_holds(k1, k2))]
+        #[ensures(btree_map_iterates_in_key_order_holds(k1, k2, v1, v2, result))]
         fn verify_btree_map_iterates_in_key_order(
             k1: i32,
             k2: i32,
@@ -1286,6 +1354,32 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, BTREE_SET_ITERATES_IN_SORTED_ORDER_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn btree_set_iterates_in_sorted_order_holds(
+            a: i32,
+            b: i32,
+            btree_set_result: (Option<i32>, Option<i32>, bool, bool, bool),
+        ) -> bool {
+            pearlite! {
+                match btree_set_result {
+                    (Some(first), Some(second), removed_first, removed_second, empty) =>
+                        first == a
+                            && second == b
+                            && removed_first
+                            && removed_second
+                            && empty,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, {
         /// `BTreeSet::iter` yields elements in ascending order,
         /// regardless of insertion order, and observing iteration does
@@ -1297,16 +1391,8 @@ amenable_derive::harness! {
         /// order here, mirroring
         /// `amenable_kani::btree_model::KaniBTreeSet`'s own modeled
         /// two-entry shape.
-        #[requires(a < b)]
-        #[ensures(match result {
-            (Some(first), Some(second), removed_first, removed_second, empty) =>
-                first == a
-                    && second == b
-                    && removed_first
-                    && removed_second
-                    && empty,
-            _ => false,
-        })]
+        #[requires(a_less_than_b_holds(a, b))]
+        #[ensures(btree_set_iterates_in_sorted_order_holds(a, b, result))]
         fn verify_btree_set_iterates_in_sorted_order(
             a: i32,
             b: i32,
@@ -1351,16 +1437,34 @@ amenable_derive::harness! {
 // restriction; that half of the claim stays Kani-only.
 
 amenable_derive::harness! {
+    creusot, BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<BinaryHeap<
+        /// i32>>` postcondition -- real, callable Pearlite content,
+        /// not just descriptive text alongside it.
+        #[logic(open)]
+        fn binary_heap_pop_yields_the_maximum_first_holds(
+            a: i32,
+            b: i32,
+            pop_result: (Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match pop_result {
+                    (first, second) =>
+                        first == Some(if a >= b { a } else { b })
+                            && second == Some(if a >= b { b } else { a }),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC, {
         /// `BinaryHeap::pop` returns the greatest remaining element
         /// first. See this cluster's leading comment for the
         /// accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second) =>
-                first == Some(if a >= b { a } else { b })
-                    && second == Some(if a >= b { b } else { a }),
-        })]
+        #[ensures(binary_heap_pop_yields_the_maximum_first_holds(a, b, result))]
         fn verify_binary_heap_pop_yields_the_maximum_first(
             a: i32,
             b: i32,
@@ -1368,6 +1472,28 @@ amenable_derive::harness! {
             let first = Some(if a >= b { a } else { b });
             let second = Some(if a >= b { b } else { a });
             (first, second)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BinaryHeapDrain<'static, i32>>` postcondition -- real,
+        /// callable Pearlite content, not just descriptive text
+        /// alongside it.
+        #[logic(open)]
+        fn binary_heap_drain_yields_every_pushed_element_once_holds(
+            a: i32,
+            b: i32,
+            drain_result: (Option<i32>, Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match drain_result {
+                    (first, second, exhausted, empty) =>
+                        first == Some(a) && second == Some(b) && exhausted == None && empty,
+                }
+            }
         }
     }
 }
@@ -1382,10 +1508,7 @@ amenable_derive::harness! {
         /// promise either. See this cluster's leading comment for the
         /// full accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, exhausted, empty) =>
-                first == Some(a) && second == Some(b) && exhausted == None && empty,
-        })]
+        #[ensures(binary_heap_drain_yields_every_pushed_element_once_holds(a, b, result))]
         fn verify_binary_heap_drain_yields_every_pushed_element_once(
             a: i32,
             b: i32,
@@ -1400,20 +1523,64 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BinaryHeapIntoIter<i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn binary_heap_into_iter_yields_every_pushed_element_once_holds(
+            a: i32,
+            b: i32,
+            into_iter_result: (Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match into_iter_result {
+                    (first, second) => first == Some(a) && second == Some(b),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC, {
         /// `BinaryHeap::into_iter` yields every pushed element exactly
         /// once. Same "one sound instantiation of arbitrary order" model
         /// as `drain`; see this cluster's leading comment for the full
         /// accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second) => first == Some(a) && second == Some(b),
-        })]
+        #[ensures(binary_heap_into_iter_yields_every_pushed_element_once_holds(a, b, result))]
         fn verify_binary_heap_into_iter_yields_every_pushed_element_once(
             a: i32,
             b: i32,
         ) -> (Option<i32>, Option<i32>) {
             (Some(a), Some(b))
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BinaryHeapIter<'static, i32>>` postcondition -- real,
+        /// callable Pearlite content, not just descriptive text
+        /// alongside it.
+        #[logic(open)]
+        fn binary_heap_iter_yields_every_pushed_element_once_holds(
+            a: i32,
+            b: i32,
+            iter_result: (Option<i32>, Option<i32>, usize, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match iter_result {
+                    (first, second, len_after_iter, first_pop, second_pop) =>
+                        first == Some(if a >= b { a } else { b })
+                            && second == Some(if a >= b { b } else { a })
+                            && len_after_iter == 2usize
+                            && first_pop == Some(if a >= b { a } else { b })
+                            && second_pop == Some(if a >= b { b } else { a }),
+                }
+            }
         }
     }
 }
@@ -1425,14 +1592,7 @@ amenable_derive::harness! {
         /// preserves the heap's later pop order. See this cluster's
         /// leading comment for the full accommodation-model rationale.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, len_after_iter, first_pop, second_pop) =>
-                first == Some(if a >= b { a } else { b })
-                    && second == Some(if a >= b { b } else { a })
-                    && len_after_iter == 2usize
-                    && first_pop == Some(if a >= b { a } else { b })
-                    && second_pop == Some(if a >= b { b } else { a }),
-        })]
+        #[ensures(binary_heap_iter_yields_every_pushed_element_once_holds(a, b, result))]
         fn verify_binary_heap_iter_yields_every_pushed_element_once(
             a: i32,
             b: i32,
@@ -1448,6 +1608,33 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BinaryHeapPeekMut<'static, i32>>` postcondition -- real,
+        /// callable Pearlite content, not just descriptive text
+        /// alongside it.
+        #[logic(open)]
+        fn binary_heap_peek_mut_exposes_the_maximum_holds(
+            a: i32,
+            b: i32,
+            peek_mut_result: (i32, Option<i32>, i32, Option<i32>, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match peek_mut_result {
+                    (before_mutation, top_after_observing, after_mutation, top_after_mutation, first_pop, second_pop) =>
+                        before_mutation == b
+                            && top_after_observing == Some(b)
+                            && after_mutation == a
+                            && top_after_mutation == Some(a)
+                            && first_pop == Some(a)
+                            && second_pop == Some(a),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC, {
         /// `BinaryHeap::peek_mut` exposes the current maximum through a
         /// mutable guard. Leaving that guard untouched preserves the
@@ -1457,16 +1644,8 @@ amenable_derive::harness! {
         /// the heap's multiset as `{a, a}`, so both remaining pops
         /// return `a`. See this cluster's leading comment for the full
         /// accommodation-model rationale.
-        #[requires(a < b)]
-        #[ensures(match result {
-            (before_mutation, top_after_observing, after_mutation, top_after_mutation, first_pop, second_pop) =>
-                before_mutation == b
-                    && top_after_observing == Some(b)
-                    && after_mutation == a
-                    && top_after_mutation == Some(a)
-                    && first_pop == Some(a)
-                    && second_pop == Some(a),
-        })]
+        #[requires(a_less_than_b_holds(a, b))]
+        #[ensures(binary_heap_peek_mut_exposes_the_maximum_holds(a, b, result))]
         fn verify_binary_heap_peek_mut_exposes_the_maximum(
             a: i32,
             b: i32,
