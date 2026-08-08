@@ -1,16 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3963 8 3963 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4098 8 4098 90 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3964 26 3964 50
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3965 30 3965 38
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3966 26 3966 59
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3960 19 3960 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3961 18 3961 35
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3962 18 3962 35
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3936 18 3936 55
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3947 18 3947 22
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3946 18 3946 54
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3941 22 3941 26
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3940 18 3940 54
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4099 26 4099 50
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4100 30 4100 38
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4101 26 4101 59
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4096 19 4096 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4097 18 4097 85
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4057 18 4057 55
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4068 18 4068 22
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4067 18 4067 54
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4062 22 4062 26
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4061 18 4061 54
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4082 24 4082 90
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 
 use creusot.int.Int32
@@ -20,12 +20,12 @@ type t_ManuallyDrop_i32
 
 predicate inv_ManuallyDrop_i32 (_1: t_ManuallyDrop_i32)
 
-function manually_drop_value_i32 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3928 0 3928 52] (_m: t_ManuallyDrop_i32) : Int32.t
+function manually_drop_value_i32 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4049 0 4049 52] (_m: t_ManuallyDrop_i32) : Int32.t
 
 let rec new_i32 (value: Int32.t) (return (x: t_ManuallyDrop_i32)) = any
   [ return (result: t_ManuallyDrop_i32) ->
   {[@stop_split] [@expl:new_i32 ensures] ([@stop_split] [@expl:new result type invariant] inv_ManuallyDrop_i32 result)
-    /\ ([@stop_split] [@expl:new ensures] [%#srust_std'5] manually_drop_value_i32 result = value)}
+    /\ ([@stop_split] [@expl:new ensures] [%#srust_std'4] manually_drop_value_i32 result = value)}
     (! return {result}) ]
 
 predicate invariant_ref_ManuallyDrop_i32 [@inline:trivial] (self: t_ManuallyDrop_i32) =
@@ -38,44 +38,44 @@ predicate inv_ref_ManuallyDrop_i32 [@inline:trivial] (_1: t_ManuallyDrop_i32) = 
 meta "rewrite_def" predicate inv_ref_ManuallyDrop_i32
 
 let rec deref_ManuallyDrop_i32 (self_: t_ManuallyDrop_i32) (return (x: Int32.t)) =
-  {[@stop_split] [@expl:deref 'self_' type invariant] [%#srust_std'6] inv_ref_ManuallyDrop_i32 self_}
+  {[@stop_split] [@expl:deref 'self_' type invariant] [%#srust_std'5] inv_ref_ManuallyDrop_i32 self_}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:deref ensures] [%#srust_std'7] result
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:deref ensures] [%#srust_std'6] result
     = manually_drop_value_i32 self_}
     (! return {result}) ]
 
 let rec into_inner_i32 (slot: t_ManuallyDrop_i32) (return (x: Int32.t)) =
-  {[@stop_split] [@expl:into_inner 'slot' type invariant] [%#srust_std'8] inv_ManuallyDrop_i32 slot}
+  {[@stop_split] [@expl:into_inner 'slot' type invariant] [%#srust_std'7] inv_ManuallyDrop_i32 slot}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:into_inner ensures] [%#srust_std'9] result
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:into_inner ensures] [%#srust_std'8] result
     = manually_drop_value_i32 slot}
     (! return {result}) ]
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
+
+predicate manually_drop_derefs_and_into_inner_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4078 8 4081 17] (value: Int32.t) (manually_drop_result: tup2_i32_i32) =
+  [%#srust_std'9] manually_drop_result.f0 = value /\ manually_drop_result.f1 = value
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_manually_drop_derefs_and_into_inner_round_trip
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3963 8 3963 90] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4098 8 4098 90] (value: Int32.t)
   (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = new_i32 [%#srust_std] {value} (fun (_x: t_ManuallyDrop_i32) -> [ &wrapped <- _x ] s1)
-    | s1 = deref_ManuallyDrop_i32 [%#srust_std'0] {wrapped} (fun (_x: Int32.t) -> [ &_10 <- _x ] s2)
-    | s2 = [ &deref_value <- _10 ] s3
-    | s3 = into_inner_i32 [%#srust_std'1] {wrapped} (fun (_x: Int32.t) -> [ &_13 <- _x ] s4)
-    | s4 = [ &_ret <- { f0 = deref_value; f1 = _13 } ] s5
+    | s1 = deref_ManuallyDrop_i32 [%#srust_std'0] {wrapped} (fun (_x: Int32.t) -> [ &_8 <- _x ] s2)
+    | s2 = [ &deref_value <- _8 ] s3
+    | s3 = into_inner_i32 [%#srust_std'1] {wrapped} (fun (_x: Int32.t) -> [ &_11 <- _x ] s4)
+    | s4 = [ &_ret <- { f0 = deref_value; f1 = _11 } ] s5
     | s5 = return {_ret} ] ]
   [ & _ret: tup2_i32_i32 = Any.any_l ()
   | & value: Int32.t = value
   | & wrapped: t_ManuallyDrop_i32 = Any.any_l ()
   | & deref_value: Int32.t = Any.any_l ()
-  | & _10: Int32.t = Any.any_l ()
-  | & _13: Int32.t = Any.any_l () ])
+  | & _8: Int32.t = Any.any_l ()
+  | & _11: Int32.t = Any.any_l () ])
   [ return (result: tup2_i32_i32) ->
-  {[@stop_split] [@expl:verify_manually_drop_derefs_and_into_inner_round_trip ensures] ([@stop_split] [@expl:verify_manually_drop_derefs_and_into_inner_round_trip ensures #0] [%#srust_std'3] result.f0
-      = value)
-    /\ ([@stop_split] [@expl:verify_manually_drop_derefs_and_into_inner_round_trip ensures #1] [%#srust_std'4] result.f1
-    = value)}
+  {[@stop_split] [@expl:verify_manually_drop_derefs_and_into_inner_round_trip ensures] [%#srust_std'3] manually_drop_derefs_and_into_inner_round_trip_holds value result}
     (! return {result}) ]

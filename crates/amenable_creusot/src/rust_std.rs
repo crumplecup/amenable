@@ -3463,6 +3463,26 @@ amenable_derive::harness! {
 // and the postcondition states the same facts via plain equality on the
 // results instead of re-calling them).
 amenable_derive::harness! {
+    creusot, OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Option<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn option_some_and_none_are_disjoint_holds(
+            value: i32,
+            option_result: (Option<i32>, i32, Option<i32>, i32),
+        ) -> bool {
+            pearlite! {
+                option_result.0 != None
+                    && option_result.1 == value
+                    && option_result.2 == None
+                    && option_result.3 == 0i32
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC, {
         /// `Some` round-trips its value through `unwrap`, and `None`
         /// falls back to `unwrap_or`'s default — the same claim
@@ -3471,10 +3491,7 @@ amenable_derive::harness! {
         /// postcondition against `creusot-std`'s own shipped `Option<T>`
         /// contracts (not a local `extern_spec!`, and not `#[trusted]`).
         #[requires(true)]
-        #[ensures(result.0 != None)]
-        #[ensures(result.1 == value)]
-        #[ensures(result.2 == None)]
-        #[ensures(result.3 == 0i32)]
+        #[ensures(option_some_and_none_are_disjoint_holds(value, result))]
         fn verify_option_some_and_none_are_disjoint(value: i32) -> (Option<i32>, i32, Option<i32>, i32) {
             let some: Option<i32> = Some(value);
             let none: Option<i32> = None;
@@ -3490,6 +3507,22 @@ amenable_derive::harness! {
 // directly in `#[ensures]` as native Pearlite equality — no local
 // `extern_spec!` needed.
 amenable_derive::harness! {
+    creusot, RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Result<i32,
+        /// i32>>` postcondition -- real, callable Pearlite content, not
+        /// just descriptive text alongside it.
+        #[logic(open)]
+        fn result_ok_and_err_are_disjoint_holds(
+            value: i32,
+            err_value: i32,
+            result_result: (i32, i32),
+        ) -> bool {
+            pearlite! { result_result.0 == value && result_result.1 == err_value }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, {
         /// `Ok` round-trips its value through `unwrap`, and `Err`
         /// round-trips its value through `unwrap_err` — the same claim
@@ -3498,8 +3531,7 @@ amenable_derive::harness! {
         /// postcondition against `creusot-std`'s own shipped `Result<T, E>`
         /// contracts (not a local `extern_spec!`, and not `#[trusted]`).
         #[requires(true)]
-        #[ensures(result.0 == value)]
-        #[ensures(result.1 == err_value)]
+        #[ensures(result_ok_and_err_are_disjoint_holds(value, err_value, result))]
         fn verify_result_ok_and_err_are_disjoint(value: i32, err_value: i32) -> (i32, i32) {
             let ok: Result<i32, i32> = Ok(value);
             let err: Result<i32, i32> = Err(err_value);
@@ -3677,18 +3709,35 @@ amenable_derive::harness! {
 // the surrounding task ecosystem stays outside its current std-contract
 // surface.
 amenable_derive::harness! {
+    creusot, POLL_READY_AND_PENDING_ARE_DISJOINT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Poll<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn poll_ready_and_pending_are_disjoint_holds(
+            value: i32,
+            poll_result: (bool, bool, i32, bool, bool),
+        ) -> bool {
+            pearlite! {
+                match poll_result {
+                    (ready_is_ready, ready_is_pending, ready_value, pending_is_pending, pending_is_ready) =>
+                        ready_is_ready
+                            && !ready_is_pending
+                            && ready_value == value
+                            && pending_is_pending
+                            && !pending_is_ready,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC, {
         /// `Poll::Ready` and `Poll::Pending` are disjoint, and `Ready`
         /// round-trips its payload.
         #[requires(true)]
-        #[ensures(match result {
-            (ready_is_ready, ready_is_pending, ready_value, pending_is_pending, pending_is_ready) =>
-                ready_is_ready
-                    && !ready_is_pending
-                    && ready_value == value
-                    && pending_is_pending
-                    && !pending_is_ready,
-        })]
+        #[ensures(poll_ready_and_pending_are_disjoint_holds(value, result))]
         fn verify_poll_ready_and_pending_are_disjoint(
             value: i32,
         ) -> (bool, bool, i32, bool, bool) {
@@ -3751,16 +3800,29 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, PENDING_NEVER_RESOLVES_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Pending<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn pending_never_resolves_holds(pending_result: (Poll<i32>, Poll<i32>)) -> bool {
+            pearlite! {
+                match pending_result {
+                    (first_poll, second_poll) =>
+                        first_poll == Poll::Pending && second_poll == Poll::Pending,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_PENDING_NEVER_RESOLVES_SRC, {
         /// `Pending` always reports `Poll::Pending` when polled,
         /// including repeated polls.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (first_poll, second_poll) =>
-                first_poll == Poll::Pending
-                    && second_poll == Poll::Pending,
-        })]
+        #[ensures(pending_never_resolves_holds(result))]
         fn verify_pending_never_resolves() -> (Poll<i32>, Poll<i32>) {
             use std::pin::pin;
             use std::sync::Arc;
@@ -3783,12 +3845,27 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Ready<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn ready_resolves_immediately_with_its_value_holds(
+            value: i32,
+            poll_result: Poll<i32>,
+        ) -> bool {
+            pearlite! { poll_result == Poll::Ready(value) }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC, {
         /// `Ready` resolves immediately with the value it was
         /// constructed from.
         #[trusted]
         #[requires(true)]
-        #[ensures(result == Poll::Ready(value))]
+        #[ensures(ready_resolves_immediately_with_its_value_holds(value, result))]
         fn verify_ready_resolves_immediately_with_its_value(value: i32) -> Poll<i32> {
             use std::pin::pin;
             use std::sync::Arc;
@@ -3809,12 +3886,24 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Waker>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn waker_wake_by_ref_invokes_the_wake_impl_holds(wake_count_result: usize) -> bool {
+            pearlite! { wake_count_result == 1usize }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC, {
         /// `Waker::wake_by_ref` dispatches through to the wrapped
         /// `Wake` implementation exactly once.
         #[trusted]
         #[requires(true)]
-        #[ensures(result == 1usize)]
+        #[ensures(waker_wake_by_ref_invokes_the_wake_impl_holds(result))]
         fn verify_waker_wake_by_ref_invokes_the_wake_impl() -> usize {
             use std::sync::Arc;
             use std::task::Wake;
@@ -3839,14 +3928,31 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<AtomicOrdering>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn relaxed_ordering_still_makes_a_store_observable_holds(
+            value: i32,
+            load_result: (i32, i32),
+        ) -> bool {
+            pearlite! {
+                match load_result {
+                    (before, after) => before == 0i32 && after == value,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC, {
         /// A `Relaxed` store is still observable through a later
         /// `Relaxed` load on the same atomic in the same thread.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (before, after) => before == 0i32 && after == value,
-        })]
+        #[ensures(relaxed_ordering_still_makes_a_store_observable_holds(value, result))]
         fn verify_relaxed_ordering_still_makes_a_store_observable(
             value: i32,
         ) -> (i32, i32) {
@@ -3860,17 +3966,32 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut
+        /// Context<'_>) -> Poll<i32>>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn poll_fn_dispatches_through_to_its_closure_holds(
+            value: i32,
+            poll_fn_result: (Poll<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                match poll_fn_result {
+                    (poll_result, called) => poll_result == Poll::Ready(value) && called,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC, {
         /// `poll_fn` turns a poll-shaped function into a `Future`, and
         /// polling that future dispatches straight through to the
         /// wrapped function result.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            (poll_result, called) =>
-                poll_result == Poll::Ready(value)
-                    && called,
-        })]
+        #[ensures(poll_fn_dispatches_through_to_its_closure_holds(value, result))]
         fn verify_poll_fn_dispatches_through_to_its_closure(
             value: i32,
         ) -> (Poll<i32>, bool) {
@@ -3949,6 +4070,21 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// ManuallyDrop<i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn manually_drop_derefs_and_into_inner_round_trip_holds(
+            value: i32,
+            manually_drop_result: (i32, i32),
+        ) -> bool {
+            pearlite! { manually_drop_result.0 == value && manually_drop_result.1 == value }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC, {
         /// `ManuallyDrop` is transparent to its wrapped value through
         /// both `Deref` and `into_inner` — the same claim
@@ -3958,8 +4094,7 @@ amenable_derive::harness! {
         /// in this file has to a trusted axiom on the real method it
         /// exercises.
         #[requires(true)]
-        #[ensures(result.0 == value)]
-        #[ensures(result.1 == value)]
+        #[ensures(manually_drop_derefs_and_into_inner_round_trip_holds(value, result))]
         fn verify_manually_drop_derefs_and_into_inner_round_trip(value: i32) -> (i32, i32) {
             let wrapped = ManuallyDrop::new(value);
             let deref_value = *wrapped;
@@ -4003,6 +4138,25 @@ amenable_derive::harness! {
 // value instead, with no wrapper type needed at all.
 
 amenable_derive::harness! {
+    creusot, WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BorrowedHandle<'static>>`/`RustStdStandard<OwnedHandle>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. Both real Windows carriers
+        /// share the identical claim (see this cluster's leading
+        /// comment for why they aren't real Rust types on this
+        /// platform).
+        #[logic(open)]
+        fn windows_handle_as_raw_handle_recovers_the_wrapped_value_holds(
+            value: isize,
+            handle_result: isize,
+        ) -> bool {
+            pearlite! { handle_result == value }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC, {
         /// `BorrowedHandle`/`OwnedHandle` both expose exactly the raw
         /// handle value they were constructed with, unchanged -- the same
@@ -4010,9 +4164,27 @@ amenable_derive::harness! {
         /// verify_windows_handle_as_raw_handle_recovers_the_wrapped_value`
         /// checks by symbolic execution.
         #[requires(true)]
-        #[ensures(result == value)]
+        #[ensures(windows_handle_as_raw_handle_recovers_the_wrapped_value_holds(value, result))]
         fn verify_windows_handle_as_raw_handle_recovers_the_wrapped_value(value: isize) -> isize {
             value
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// HandleOrInvalid>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn windows_handle_or_invalid_rejects_only_the_sentinel_holds(
+            value: isize,
+            conversion_result: (bool, isize),
+        ) -> bool {
+            pearlite! {
+                (value@ == -1 ==> conversion_result.0)
+                    && (value@ != -1 ==> !conversion_result.0 && conversion_result.1 == value)
+            }
         }
     }
 }
@@ -4029,14 +4201,32 @@ amenable_derive::harness! {
         /// recovered_value)`: `recovered_value` is meaningless when
         /// `conversion_failed` is true.
         #[requires(true)]
-        #[ensures(value@ == -1 ==> result.0)]
-        #[ensures(value@ != -1 ==> !result.0 && result.1 == value)]
+        #[ensures(windows_handle_or_invalid_rejects_only_the_sentinel_holds(value, result))]
         fn verify_windows_handle_or_invalid_rejects_only_the_sentinel(value: isize) -> (bool, isize) {
             if value == -1 {
                 (true, 0)
             } else {
                 (false, value)
             }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// BorrowedSocket<'static>>`/`RustStdStandard<OwnedSocket>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. Both real Windows carriers
+        /// share the identical claim (see this cluster's leading
+        /// comment for why they aren't real Rust types on this
+        /// platform).
+        #[logic(open)]
+        fn windows_socket_as_raw_socket_recovers_the_wrapped_value_holds(
+            value: u64,
+            socket_result: u64,
+        ) -> bool {
+            pearlite! { socket_result == value }
         }
     }
 }
@@ -4049,9 +4239,36 @@ amenable_derive::harness! {
         /// verify_windows_socket_as_raw_socket_recovers_the_wrapped_value`
         /// checks by symbolic execution.
         #[requires(true)]
-        #[ensures(result == value)]
+        #[ensures(windows_socket_as_raw_socket_recovers_the_wrapped_value_holds(value, result))]
         fn verify_windows_socket_as_raw_socket_recovers_the_wrapped_value(value: u64) -> u64 {
             value
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, ENCODE_WIDE_HEADROOM_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// EncodeWide<'static>>` precondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn encode_wide_headroom_holds(code_point: u32) -> bool {
+            pearlite! { code_point@ < 0x10000 }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// EncodeWide<'static>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds(
+            code_point: u32,
+            encode_result: u16,
+        ) -> bool {
+            pearlite! { encode_result == code_point as u16 }
         }
     }
 }
@@ -4066,8 +4283,8 @@ amenable_derive::harness! {
         /// by symbolic execution, restated over the code point as a plain
         /// `u32` rather than a `char` (see this cluster's own leading
         /// comment for why).
-        #[requires(code_point@ < 0x10000)]
-        #[ensures(result == code_point as u16)]
+        #[requires(encode_wide_headroom_holds(code_point))]
+        #[ensures(encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds(code_point, result))]
         fn verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit(code_point: u32) -> u16 {
             code_point as u16
         }

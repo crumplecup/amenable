@@ -171,7 +171,8 @@ use amenable_creusot::{
     CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_HOLDS_SRC, CreusotVerifier,
     CreusotWitness, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, DURATION_NEW_HEADROOM_HOLDS_SRC,
     DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_HOLDS_SRC,
-    FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
+    ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_HOLDS_SRC,
+    ENCODE_WIDE_HEADROOM_HOLDS_SRC, FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
     FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_HOLDS_SRC,
     FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_HOLDS_SRC,
     HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
@@ -182,13 +183,18 @@ use amenable_creusot::{
     LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_HOLDS_SRC,
     LINKED_LIST_ITER_MUT_WRITES_THROUGH_HOLDS_SRC,
     LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC,
+    MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC,
     MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, NON_NUL_BYTE_HOLDS_SRC,
     NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
-    ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_HOLDS_SRC,
+    OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC, ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_HOLDS_SRC,
     OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
     PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_HOLDS_SRC,
-    PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC,
-    RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC, REVERSE_INVERTS_COMPARISON_HOLDS_SRC,
+    PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_HOLDS_SRC, PENDING_NEVER_RESOLVES_HOLDS_SRC,
+    POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_HOLDS_SRC,
+    POLL_READY_AND_PENDING_ARE_DISJOINT_HOLDS_SRC, RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC,
+    READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_HOLDS_SRC,
+    RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_HOLDS_SRC,
+    RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC, REVERSE_INVERTS_COMPARISON_HOLDS_SRC,
     SATURATING_I32_ADD_CLAMPS_HOLDS_SRC, SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
     SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
     SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
@@ -285,8 +291,12 @@ use amenable_creusot::{
     VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC,
     VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
-    VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC, WRAPPING_I32_ADD_WRAPS_HOLDS_SRC,
-    YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC,
+    VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
+    WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_HOLDS_SRC,
+    WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC,
+    WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    WRAPPING_I32_ADD_WRAPS_HOLDS_SRC, YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC,
 };
 
 use crate::{
@@ -942,6 +952,45 @@ bridge_creusot_witness!(RustStdStandard<AtomicOrdering>);
         evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
         verifier: "creusot",
         describe: || <RustStdStandard<AtomicOrdering> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// relaxed_ordering_still_makes_a_store_observable_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<AtomicOrdering> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<AtomicOrdering> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "relaxed_ordering_still_makes_a_store_observable_holds (value , result)",
+        harnesses: &["verify_relaxed_ordering_still_makes_a_store_observable"],
     }
 }
 
@@ -5065,6 +5114,43 @@ bridge_creusot_witness!(RustStdStandard<Option<i32>>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn option_some_and_none_are_disjoint_holds` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Option<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Option<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "option_some_and_none_are_disjoint_holds (value , result)",
+        harnesses: &["verify_option_some_and_none_are_disjoint"],
+    }
+}
+
 // Bare `Result<i32, i32>`, matching `amenable_std::rust_std::option_result`'s
 // own registration exactly (confirmed against the checklist's own
 // `evidence_name` column: `RustStdStandard<Result<i32, i32>>`).
@@ -5088,6 +5174,41 @@ bridge_creusot_witness!(RustStdStandard<Result<i32, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns `amenable_creusot::RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn result_ok_and_err_are_disjoint_holds` the real
+/// site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Result<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Result<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "result_ok_and_err_are_disjoint_holds (value , err_value , result)",
+        harnesses: &["verify_result_ok_and_err_are_disjoint"],
     }
 }
 
@@ -5310,6 +5431,41 @@ bridge_creusot_witness!(RustStdStandard<Pending<i32>>);
     }
 }
 
+/// Returns `amenable_creusot::PENDING_NEVER_RESOLVES_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn pending_never_resolves_holds` the real site
+/// calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Pending<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        PENDING_NEVER_RESOLVES_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Pending<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression PENDING_NEVER_RESOLVES_HOLDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "pending_never_resolves_holds (result)",
+        harnesses: &["verify_pending_never_resolves"],
+    }
+}
+
 // Bare `PollFn<fn(&mut Context<'_>) -> Poll<i32>>`, matching
 // `amenable_std::rust_std::future`'s own registration exactly.
 impl CreusotWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> {
@@ -5336,6 +5492,44 @@ bridge_creusot_witness!(RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>
     }
 }
 
+/// Returns
+/// `amenable_creusot::POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn poll_fn_dispatches_through_to_its_closure_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_HOLDS_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "poll_fn_dispatches_through_to_its_closure_holds (value , result)",
+        harnesses: &["verify_poll_fn_dispatches_through_to_its_closure"],
+    }
+}
+
 // Bare `Ready<i32>`, matching `amenable_std::rust_std::future`'s own
 // registration exactly (confirmed against the checklist's own
 // `evidence_name` column: `RustStdStandard<Ready<i32>>`).
@@ -5359,6 +5553,43 @@ bridge_creusot_witness!(RustStdStandard<Ready<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<Ready<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// Returns
+/// `amenable_creusot::READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn ready_resolves_immediately_with_its_value_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Ready<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Ready<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_HOLDS_SRC
+// itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "ready_resolves_immediately_with_its_value_holds (value , result)",
+        harnesses: &["verify_ready_resolves_immediately_with_its_value"],
     }
 }
 
@@ -5404,6 +5635,42 @@ impl CreusotWitness for RustStdStandard<Poll<i32>> {
 
 bridge_creusot_witness!(RustStdStandard<Poll<i32>>);
 
+/// Returns `amenable_creusot::POLL_READY_AND_PENDING_ARE_DISJOINT_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn poll_ready_and_pending_are_disjoint_holds` the
+/// real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Poll<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        POLL_READY_AND_PENDING_ARE_DISJOINT_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Poll<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression POLL_READY_AND_PENDING_ARE_DISJOINT_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "poll_ready_and_pending_are_disjoint_holds (value , result)",
+        harnesses: &["verify_poll_ready_and_pending_are_disjoint"],
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
@@ -5441,6 +5708,43 @@ bridge_creusot_witness!(RustStdStandard<Waker>);
     }
 }
 
+/// Returns
+/// `amenable_creusot::WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn waker_wake_by_ref_invokes_the_wake_impl_holds`
+/// the real site calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<Waker> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Waker> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "waker_wake_by_ref_invokes_the_wake_impl_holds (result)",
+        harnesses: &["verify_waker_wake_by_ref_invokes_the_wake_impl"],
+    }
+}
+
 // Bare `ManuallyDrop<i32>`, matching `amenable_std::rust_std::mem`'s own
 // registration exactly (confirmed against the checklist's own
 // `evidence_name` column: `RustStdStandard<ManuallyDrop<i32>>`).
@@ -5458,6 +5762,46 @@ impl CreusotWitness for RustStdStandard<ManuallyDrop<i32>> {
 }
 
 bridge_creusot_witness!(RustStdStandard<ManuallyDrop<i32>>);
+
+/// Returns
+/// `amenable_creusot::MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn
+/// manually_drop_derefs_and_into_inner_round_trip_holds` the real site
+/// calls, not a hand-retyped copy of its expression.
+impl Ensures<CreusotVerifier> for RustStdStandard<ManuallyDrop<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: ||
+            <RustStdStandard<ManuallyDrop<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape the real site now uses, instead of the raw
+// expression
+// MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC itself
+// captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "manually_drop_derefs_and_into_inner_round_trip_holds (value , result)",
+        harnesses: &["verify_manually_drop_derefs_and_into_inner_round_trip"],
+    }
+}
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -5611,5 +5955,153 @@ fn windows_provenance(
             ),
         }
         .to_string(),
+    }
+}
+
+// None of these five types can carry a real `Ensures<CreusotVerifier>`
+// impl the way every other harness in this file does: they don't exist
+// as real Rust types on this platform at all (see this module's own
+// bypass above), so there's no `Self` to hang a trait impl on. The
+// captured `_SRC` consts below are still the real, `harness!`-captured
+// single source of each bound's text, though -- these `ContractRecord`s
+// just point straight at them, the same bypass this module's
+// `ProofRecord` entries above already use for the same reason.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "windows_handle_as_raw_handle_recovers_the_wrapped_value_holds (value , result)",
+        harnesses: &["verify_windows_handle_as_raw_handle_recovers_the_wrapped_value"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "windows_handle_as_raw_handle_recovers_the_wrapped_value_holds (value , result)",
+        harnesses: &["verify_windows_handle_as_raw_handle_recovers_the_wrapped_value"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "windows_handle_or_invalid_rejects_only_the_sentinel_holds (value , result)",
+        harnesses: &["verify_windows_handle_or_invalid_rejects_only_the_sentinel"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "windows_socket_as_raw_socket_recovers_the_wrapped_value_holds (value , result)",
+        harnesses: &["verify_windows_socket_as_raw_socket_recovers_the_wrapped_value"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "windows_socket_as_raw_socket_recovers_the_wrapped_value_holds (value , result)",
+        harnesses: &["verify_windows_socket_as_raw_socket_recovers_the_wrapped_value"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || ENCODE_WIDE_HEADROOM_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || "encode_wide_headroom_holds (code_point)",
+        harnesses: &["verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_HOLDS_SRC,
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds (code_point , result)",
+        harnesses: &["verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit"],
     }
 }
