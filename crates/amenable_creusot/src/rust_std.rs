@@ -1265,6 +1265,29 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, {
+        /// The `amenable_std::DrainsTwoValuesInOrderAndEmpties`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. A draining operation yields
+        /// its first item, then its second, then ends, leaving the
+        /// container reporting empty.
+        #[logic(open)]
+        fn drains_two_values_in_order_and_empties(
+            a: i32,
+            b: i32,
+            drain_result: (Option<i32>, Option<i32>, Option<i32>, bool),
+        ) -> bool {
+            pearlite! {
+                drain_result.0 == Some(a)
+                    && drain_result.1 == Some(b)
+                    && drain_result.2 == None
+                    && drain_result.3
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
         /// `LinkedList::push_back` followed by `pop_front` behaves as a
         /// FIFO queue.
@@ -1283,10 +1306,7 @@ amenable_derive::harness! {
         /// own drop-count fields; Kani's proof for this cluster still
         /// covers that half.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, third, empty) =>
-                first == Some(a) && second == Some(b) && third == None && empty,
-        })]
+        #[ensures(drains_two_values_in_order_and_empties(a, b, result))]
         fn verify_linked_list_is_fifo_through_back_and_front(
             a: i32,
             b: i32,
@@ -1360,6 +1380,23 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC, {
+        /// The `amenable_std::YieldsTwoValuesInOrderThenEnds`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. A consuming iterator yields
+        /// its first item, then its second, then ends.
+        #[logic(open)]
+        fn yields_two_values_in_order_then_ends(
+            a: i32,
+            b: i32,
+            iter_result: (Option<i32>, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! { iter_result.0 == Some(a) && iter_result.1 == Some(b) && iter_result.2 == None }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `LinkedList::into_iter` consumes the list and yields its
         /// owned values in front-to-back order.
@@ -1374,9 +1411,7 @@ amenable_derive::harness! {
         /// possible for the model any more than for the real type;
         /// Kani's own proof still covers that half.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, third) => first == Some(a) && second == Some(b) && third == None,
-        })]
+        #[ensures(yields_two_values_in_order_then_ends(a, b, result))]
         fn verify_linked_list_into_iter_yields_owned_values_in_order(
             a: i32,
             b: i32,
@@ -1551,9 +1586,7 @@ amenable_derive::harness! {
         /// cannot reason about `Drop::drop` call counts for any
         /// container; Kani's own proof still covers that half.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, third) => first == Some(a) && second == Some(b) && third == None,
-        })]
+        #[ensures(yields_two_values_in_order_then_ends(a, b, result))]
         fn verify_vec_deque_into_iter_yields_owned_values_in_order(
             a: i32,
             b: i32,
@@ -1577,10 +1610,7 @@ amenable_derive::harness! {
         /// `Drop::drop` call counts for any container; Kani's own proof
         /// still covers that half.
         #[requires(true)]
-        #[ensures(match result {
-            (first, second, third, empty) =>
-                first == Some(a) && second == Some(b) && third == None && empty,
-        })]
+        #[ensures(drains_two_values_in_order_and_empties(a, b, result))]
         fn verify_vec_deque_drain_removes_and_yields_in_order(
             a: i32,
             b: i32,

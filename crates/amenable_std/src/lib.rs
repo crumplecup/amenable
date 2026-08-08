@@ -20,6 +20,7 @@ mod cert;
 mod creusot_gallery;
 #[cfg(feature = "creusot")]
 mod creusot_witness;
+mod drains_two_values_in_order_and_empties;
 mod increment_headroom;
 mod indexing_and_length;
 mod iter_yields_value_once_then_ends;
@@ -32,6 +33,7 @@ mod value_unchanged;
 mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;
+mod yields_two_values_in_order_then_ends;
 
 pub use argv_includes_program_path::ArgvIncludesProgramPath;
 pub use ascii_byte::AsciiByte;
@@ -43,6 +45,7 @@ pub use creusot_gallery::{
 };
 #[cfg(feature = "creusot")]
 pub use creusot_witness::CheckedProof;
+pub use drains_two_values_in_order_and_empties::DrainsTwoValuesInOrderAndEmpties;
 pub use increment_headroom::IncrementHeadroom;
 pub use indexing_and_length::IndexingAndLength;
 pub use iter_yields_value_once_then_ends::IterYieldsValueOnceThenEnds;
@@ -60,3 +63,4 @@ pub use verus_gallery::{
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+pub use yields_two_values_in_order_then_ends::YieldsTwoValuesInOrderThenEnds;

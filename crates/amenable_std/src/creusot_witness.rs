@@ -157,7 +157,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
-    INDEXING_AND_LENGTH_HOLDS_SRC, ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, NON_NUL_BYTE_HOLDS_SRC,
+    DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
+    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, NON_NUL_BYTE_HOLDS_SRC,
     NUL_ONLY_AT_THE_END_VALIDATES_SRC, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
@@ -244,12 +245,13 @@ use amenable_creusot::{
     VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC,
     VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
+    YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC,
 };
 
 use crate::{
-    ArgvIncludesProgramPath, AsciiByte, IndexingAndLength, IterYieldsValueOnceThenEnds, NonNulByte,
-    NulOnlyAtTheEndValidates, RustLanguageProvenance, RustStdProvenance, RustStdStandard,
-    ValidUnicodeScalar,
+    ArgvIncludesProgramPath, AsciiByte, DrainsTwoValuesInOrderAndEmpties, IndexingAndLength,
+    IterYieldsValueOnceThenEnds, NonNulByte, NulOnlyAtTheEndValidates, RustLanguageProvenance,
+    RustStdProvenance, RustStdStandard, ValidUnicodeScalar, YieldsTwoValuesInOrderThenEnds,
 };
 
 #[expect(
@@ -1653,6 +1655,65 @@ bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
     }
 }
 
+/// [`DrainsTwoValuesInOrderAndEmpties`] reuses the `LinkedList` FIFO
+/// harness rather than adding a new Creusot proof — it names the
+/// postcondition both the `LinkedList` FIFO and `VecDeque::drain`
+/// proofs already share, it doesn't prove anything new.
+impl CreusotWitness for DrainsTwoValuesInOrderAndEmpties {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_is_fifo_through_back_and_front",
+            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(DrainsTwoValuesInOrderAndEmpties);
+
+/// Returns `amenable_creusot::DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn drains_two_values_in_order_and_empties` both real
+/// sites call, not a hand-retyped copy of its expression. There is
+/// exactly one place this postcondition's text exists in the whole
+/// codebase.
+impl Ensures<CreusotVerifier> for DrainsTwoValuesInOrderAndEmpties {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::DrainsTwoValuesInOrderAndEmpties",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <DrainsTwoValuesInOrderAndEmpties as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape both real sites now use, instead of the raw
+// expression DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::DrainsTwoValuesInOrderAndEmpties",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "drains_two_values_in_order_and_empties (a , b , result)",
+        harnesses: &[
+            "verify_linked_list_is_fifo_through_back_and_front",
+            "verify_vec_deque_drain_removes_and_yields_in_order",
+        ],
+    }
+}
+
 impl CreusotWitness for RustStdStandard<LinkedListIter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1719,6 +1780,65 @@ bridge_creusot_witness!(RustStdStandard<LinkedListIntoIter<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
         verifier: "creusot",
         describe: || <RustStdStandard<LinkedListIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// [`YieldsTwoValuesInOrderThenEnds`] reuses the `LinkedList::into_iter`
+/// harness rather than adding a new Creusot proof — it names the
+/// postcondition both the `LinkedList` and `VecDeque` `into_iter`
+/// proofs already share, it doesn't prove anything new.
+impl CreusotWitness for YieldsTwoValuesInOrderThenEnds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_into_iter_yields_owned_values_in_order",
+            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(YieldsTwoValuesInOrderThenEnds);
+
+/// Returns `amenable_creusot::YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn yields_two_values_in_order_then_ends` both real
+/// sites call, not a hand-retyped copy of its expression. There is
+/// exactly one place this postcondition's text exists in the whole
+/// codebase.
+impl Ensures<CreusotVerifier> for YieldsTwoValuesInOrderThenEnds {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::YieldsTwoValuesInOrderThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <YieldsTwoValuesInOrderThenEnds as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape both real sites now use, instead of the raw
+// expression YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::YieldsTwoValuesInOrderThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "yields_two_values_in_order_then_ends (a , b , result)",
+        harnesses: &[
+            "verify_linked_list_into_iter_yields_owned_values_in_order",
+            "verify_vec_deque_into_iter_yields_owned_values_in_order",
+        ],
     }
 }
 

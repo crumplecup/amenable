@@ -1,8 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1584 8 1587 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1614 8 1617 58 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1588 37 1588 41
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1579 19 1579 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1580 18 1583 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1618 37 1618 41
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1612 19 1612 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1613 18 1613 70
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1281 16 1284 37
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -11,12 +12,15 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
+predicate drains_two_values_in_order_and_empties [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1275 8 1279 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+  [%#srust_std'2] drain_result.f0 = Some a /\ drain_result.f1 = Some b /\ drain_result.f2 = None /\ drain_result.f3
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_drain_removes_and_yields_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1584 8 1587 58] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1614 8 1617 58] (a: Int32.t) (b: Int32.t)
   (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1
@@ -31,7 +35,5 @@ let rec verify_vec_deque_drain_removes_and_yields_in_order
   | & _9: t_Option_i32 = Any.any_l ()
   | & _11: t_Option_i32 = Any.any_l () ])
   [ return (result: tup4_Option_i32_Option_i32_Option_i32_bool) ->
-  {[@stop_split] [@expl:verify_vec_deque_drain_removes_and_yields_in_order ensures] [%#srust_std'1] match result with
-      | {f0 = first; f1 = second; f2 = third; f3 = empty} -> first = Some a /\ second = Some b /\ third = None /\ empty
-      end}
+  {[@stop_split] [@expl:verify_vec_deque_drain_removes_and_yields_in_order ensures] [%#srust_std'1] drains_two_values_in_order_and_empties a b result}
     (! return {result}) ]
