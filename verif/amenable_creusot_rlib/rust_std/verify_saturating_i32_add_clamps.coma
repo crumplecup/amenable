@@ -1,13 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2839 8 2839 102 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2967 8 2967 102 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2840 12 2840 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2832 19 2832 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2834 12 2835 42
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2837 18 2837 70
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2838 18 2838 70
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2814 12 2815 47
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2817 18 2817 75
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2818 18 2818 75
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2968 12 2968 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2965 19 2965 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2966 18 2966 63
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2926 12 2927 47
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2929 18 2929 75
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2930 18 2930 75
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2947 16 2950 81
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -21,38 +20,37 @@ constant const_MAX: Int32.t = (2147483647: Int32.t)
 
 let rec add_Saturating_i32 (self_: t_Saturating_i32) (rhs: t_Saturating_i32) (return (x: t_Saturating_i32)) = any
   [ return (result: t_Saturating_i32) ->
-  {[@stop_split] [@expl:add_Saturating_i32 ensures] ([@stop_split] [@expl:add ensures #0] [%#srust_std'4] Int32.to_int self_.f0
+  {[@stop_split] [@expl:add_Saturating_i32 ensures] ([@stop_split] [@expl:add ensures #0] [%#srust_std'2] Int32.to_int self_.f0
             + Int32.to_int rhs.f0
           >= Int32.to_int const_MIN
         /\ Int32.to_int self_.f0 + Int32.to_int rhs.f0 <= Int32.to_int const_MAX
       -> Int32.to_int result.f0 = Int32.to_int self_.f0 + Int32.to_int rhs.f0)
-    /\ ([@stop_split] [@expl:add ensures #1] [%#srust_std'5] Int32.to_int self_.f0 + Int32.to_int rhs.f0
+    /\ ([@stop_split] [@expl:add ensures #1] [%#srust_std'3] Int32.to_int self_.f0 + Int32.to_int rhs.f0
         < Int32.to_int const_MIN -> Int32.to_int result.f0 = Int32.to_int const_MIN)
-    /\ ([@stop_split] [@expl:add ensures #2] [%#srust_std'6] Int32.to_int self_.f0 + Int32.to_int rhs.f0
+    /\ ([@stop_split] [@expl:add ensures #2] [%#srust_std'4] Int32.to_int self_.f0 + Int32.to_int rhs.f0
       > Int32.to_int const_MAX -> Int32.to_int result.f0 = Int32.to_int const_MAX)}
     (! return {result}) ]
+
+predicate saturating_i32_add_clamps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2941 8 2945 17] (a: t_Saturating_i32) (b: t_Saturating_i32) (add_result: t_Saturating_i32) =
+  [%#srust_std'5] (Int32.to_int a.f0 + Int32.to_int b.f0 >= Int32.to_int const_MIN
+      /\ Int32.to_int a.f0 + Int32.to_int b.f0 <= Int32.to_int const_MAX
+    -> Int32.to_int add_result.f0 = Int32.to_int a.f0 + Int32.to_int b.f0)
+  /\ (Int32.to_int a.f0 + Int32.to_int b.f0 < Int32.to_int const_MIN
+    -> Int32.to_int add_result.f0 = Int32.to_int const_MIN)
+  /\ (Int32.to_int a.f0 + Int32.to_int b.f0 > Int32.to_int const_MAX
+  -> Int32.to_int add_result.f0 = Int32.to_int const_MAX)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_saturating_i32_add_clamps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2839 8 2839 102] (a: t_Saturating_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2967 8 2967 102] (a: t_Saturating_i32)
   (b: t_Saturating_i32) (return (x: t_Saturating_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Saturating_i32 [%#srust_std] {a} {b} (fun (_x: t_Saturating_i32) -> [ &_ret <- _x ] s1)
     | s1 = return {_ret} ] ]
   [ & _ret: t_Saturating_i32 = Any.any_l () | & a: t_Saturating_i32 = a | & b: t_Saturating_i32 = b ])
   [ return (result: t_Saturating_i32) ->
-  {[@stop_split] [@expl:verify_saturating_i32_add_clamps ensures] ([@stop_split] [@expl:verify_saturating_i32_add_clamps ensures #0] [%#srust_std'1] Int32.to_int a.f0
-            + Int32.to_int b.f0
-          >= Int32.to_int const_MIN
-        /\ Int32.to_int a.f0 + Int32.to_int b.f0 <= Int32.to_int const_MAX
-      -> Int32.to_int result.f0 = Int32.to_int a.f0 + Int32.to_int b.f0)
-    /\ ([@stop_split] [@expl:verify_saturating_i32_add_clamps ensures #1] [%#srust_std'2] Int32.to_int a.f0
-          + Int32.to_int b.f0
-        < Int32.to_int const_MIN -> Int32.to_int result.f0 = Int32.to_int const_MIN)
-    /\ ([@stop_split] [@expl:verify_saturating_i32_add_clamps ensures #2] [%#srust_std'3] Int32.to_int a.f0
-        + Int32.to_int b.f0
-      > Int32.to_int const_MAX -> Int32.to_int result.f0 = Int32.to_int const_MAX)}
+  {[@stop_split] [@expl:verify_saturating_i32_add_clamps ensures] [%#srust_std'1] saturating_i32_add_clamps_holds a b result}
     (! return {result}) ]

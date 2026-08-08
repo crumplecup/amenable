@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3422 8 3425 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3550 8 3553 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3420 19 3420 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3421 18 3421 77
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3311 16 3313 55
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3548 19 3548 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3549 18 3549 77
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3439 16 3441 55
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -13,7 +13,7 @@ type t_Result_i32_i32 = Ok Int32.t | Err Int32.t
 
 type tup3_Option_i32_Option_i32_Result_i32_i32 = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Result_i32_i32 }
 
-predicate iter_yields_ok_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3305 8 3309 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Result_i32_i32) =
+predicate iter_yields_ok_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3433 8 3437 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Result_i32_i32) =
   [%#srust_std'1] iter_result.f0 = Some value /\ iter_result.f1 = None /\ iter_result.f2 = Ok final_value
 
 meta "compute_max_steps" 1000000
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_result_iter_mut_writes_through_to_the_result
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3422 8 3425 57] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3550 8 3553 57] (value: Int32.t)
   (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some value ] s1

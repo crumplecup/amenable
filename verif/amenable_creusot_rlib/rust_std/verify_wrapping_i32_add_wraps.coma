@@ -1,9 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2794 8 2794 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2906 8 2906 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2795 12 2795 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2792 19 2792 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2793 18 2793 39
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2777 18 2777 44
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2907 12 2907 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2904 19 2904 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2905 18 2905 60
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2873 18 2873 44
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2889 24 2889 49
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -15,17 +16,20 @@ let rec add_Wrapping_i32 (self_: t_Wrapping_i32) (rhs: t_Wrapping_i32) (return (
     = Int32.add self_.f0 rhs.f0}
     (! return {result}) ]
 
+predicate wrapping_i32_add_wraps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2884 8 2888 17] (a: t_Wrapping_i32) (b: t_Wrapping_i32) (add_result: t_Wrapping_i32) =
+  [%#srust_std'3] add_result.f0 = Int32.add a.f0 b.f0
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_wrapping_i32_add_wraps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2794 8 2794 93] (a: t_Wrapping_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2906 8 2906 93] (a: t_Wrapping_i32)
   (b: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Wrapping_i32 [%#srust_std] {a} {b} (fun (_x: t_Wrapping_i32) -> [ &_ret <- _x ] s1)
     | s1 = return {_ret} ] ]
   [ & _ret: t_Wrapping_i32 = Any.any_l () | & a: t_Wrapping_i32 = a | & b: t_Wrapping_i32 = b ])
   [ return (result: t_Wrapping_i32) ->
-  {[@stop_split] [@expl:verify_wrapping_i32_add_wraps ensures] [%#srust_std'1] result.f0 = Int32.add a.f0 b.f0}
+  {[@stop_split] [@expl:verify_wrapping_i32_add_wraps ensures] [%#srust_std'1] wrapping_i32_add_wraps_holds a b result}
     (! return {result}) ]

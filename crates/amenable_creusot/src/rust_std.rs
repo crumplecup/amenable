@@ -2513,6 +2513,41 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, DURATION_NEW_HEADROOM_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Duration>`
+        /// precondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn duration_new_headroom_holds(secs: u64, nanos: u32) -> bool {
+            pearlite! { secs@ + (nanos@ / 1_000_000_000) <= u64::MAX@ }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Duration>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it. Not `open`: it calls the
+        /// opaque `creusot_std` logic fn `nanos_to_secs`, and an `open`
+        /// wrapper around an opaque callee would leak that opacity
+        /// boundary (same real `creusot-rustc` "less-visible item"
+        /// error `string_roundtrips_and_preserves_length` hit above).
+        #[logic]
+        fn duration_new_normalizes_nanos_and_carries_into_secs_holds(
+            secs: u64,
+            nanos: u32,
+            duration_result: Duration,
+        ) -> bool {
+            pearlite! {
+                nanos_to_secs(duration_result@) == secs@ + (nanos@ / 1_000_000_000)
+                    && duration_result@ % 1_000_000_000 == nanos@ % 1_000_000_000
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, {
         /// `Duration::new` does not require `nanos < 1_000_000_000` — it
         /// normalizes: any whole-second carry in `nanos` is added to
@@ -2548,14 +2583,25 @@ amenable_derive::harness! {
         /// the way `as_secs`/`subsec_nanos`'s OWN trusted axioms claim it
         /// should — internal consistency between two independently-trusted
         /// specifications, not agreement with the real implementation.
-        #[requires(secs@ + (nanos@ / 1_000_000_000) <= u64::MAX@)]
-        #[ensures(nanos_to_secs(result@) == secs@ + (nanos@ / 1_000_000_000))]
-        #[ensures(result@ % 1_000_000_000 == nanos@ % 1_000_000_000)]
+        #[requires(duration_new_headroom_holds(secs, nanos))]
+        #[ensures(duration_new_normalizes_nanos_and_carries_into_secs_holds(secs, nanos, result))]
         fn verify_duration_new_normalizes_nanos_and_carries_into_secs(
             secs: u64,
             nanos: u32,
         ) -> Duration {
             Duration::new(secs, nanos)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// std::ops::RangeTo<i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn range_to_contains_matches_bound_holds(end: i32, x: i32, range_to_result: bool) -> bool {
+            pearlite! { range_to_result == (x < end) }
         }
     }
 }
@@ -2572,7 +2618,7 @@ amenable_derive::harness! {
         /// coverage.
         #[trusted]
         #[requires(true)]
-        #[ensures(result == (x < end))]
+        #[ensures(range_to_contains_matches_bound_holds(end, x, result))]
         fn verify_range_to_contains_matches_bound(end: i32, x: i32) -> bool {
             std::ops::RangeBounds::contains(&(..end), &x)
         }
@@ -2599,15 +2645,32 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, BOUND_ROUND_TRIPS_ITS_ENDPOINT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Bound<i32>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn bound_round_trips_its_endpoint_holds(
+            value: Bound<i32>,
+            bound_result: (bool, bool, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match value {
+                    Bound::Included(inner) => bound_result == (true, false, Some(inner)),
+                    Bound::Excluded(inner) => bound_result == (false, true, Some(inner)),
+                    Bound::Unbounded => bound_result == (false, false, None),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC, {
         /// `Bound` has exactly three inhabitants; the endpoint variants
         /// round-trip their payload and `Unbounded` carries no endpoint.
         #[requires(true)]
-        #[ensures(match value {
-            Bound::Included(inner) => result == (true, false, Some(inner)),
-            Bound::Excluded(inner) => result == (false, true, Some(inner)),
-            Bound::Unbounded => result == (false, false, None),
-        })]
+        #[ensures(bound_round_trips_its_endpoint_holds(value, result))]
         fn verify_bound_round_trips_its_endpoint(
             value: Bound<i32>,
         ) -> (bool, bool, Option<i32>) {
@@ -2621,14 +2684,33 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// ControlFlow<i32, i32>>` postcondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn control_flow_continue_and_break_are_disjoint_holds(
+            value: ControlFlow<i32, i32>,
+            control_flow_result: (bool, bool, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                match value {
+                    ControlFlow::Continue(inner) =>
+                        control_flow_result == (true, false, Some(inner), None),
+                    ControlFlow::Break(inner) =>
+                        control_flow_result == (false, true, None, Some(inner)),
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC, {
         /// `Continue` and `Break` are mutually exclusive, and each
         /// variant carries exactly the payload the other lacks.
         #[requires(true)]
-        #[ensures(match value {
-            ControlFlow::Continue(inner) => result == (true, false, Some(inner), None),
-            ControlFlow::Break(inner) => result == (false, true, None, Some(inner)),
-        })]
+        #[ensures(control_flow_continue_and_break_are_disjoint_holds(value, result))]
         fn verify_control_flow_continue_and_break_are_disjoint(
             value: ControlFlow<i32, i32>,
         ) -> (bool, bool, Option<i32>, Option<i32>) {
@@ -2727,6 +2809,25 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<Ordering>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn ordering_reverse_swaps_less_and_greater_holds(o: Ordering, reverse_result: Ordering) -> bool {
+            pearlite! {
+                match (o, reverse_result) {
+                    (Ordering::Less, Ordering::Greater) => true,
+                    (Ordering::Equal, Ordering::Equal) => true,
+                    (Ordering::Greater, Ordering::Less) => true,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC, {
         /// `Ordering` has exactly three inhabitants, and `.reverse()`
         /// swaps `Less`/`Greater` while fixing `Equal` — the same claim
@@ -2745,12 +2846,7 @@ amenable_derive::harness! {
         /// Kani checks explicitly (applying the same swap twice is the
         /// identity), so no separate reverse-twice clause is needed.
         #[requires(true)]
-        #[ensures(match (o, result) {
-            (Ordering::Less, Ordering::Greater) => true,
-            (Ordering::Equal, Ordering::Equal) => true,
-            (Ordering::Greater, Ordering::Less) => true,
-            _ => false,
-        })]
+        #[ensures(ordering_reverse_swaps_less_and_greater_holds(o, result))]
         fn verify_ordering_reverse_swaps_less_and_greater(o: Ordering) -> Ordering {
             o.reverse()
         }
@@ -2780,6 +2876,22 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, WRAPPING_I32_ADD_WRAPS_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// Wrapping<i32>>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn wrapping_i32_add_wraps_holds(
+            a: Wrapping<i32>,
+            b: Wrapping<i32>,
+            add_result: Wrapping<i32>,
+        ) -> bool {
+            pearlite! { add_result.0 == a.0 + b.0 }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC, {
         /// `Wrapping<T>`'s `+` operator wraps on overflow exactly like the
         /// inner type's `wrapping_add` — the same claim
@@ -2790,7 +2902,7 @@ amenable_derive::harness! {
         /// harness in this file has to a trusted axiom on the real method
         /// it exercises.
         #[requires(true)]
-        #[ensures(result.0 == a.0 + b.0)]
+        #[ensures(wrapping_i32_add_wraps_holds(a, b, result))]
         fn verify_wrapping_i32_add_wraps(a: Wrapping<i32>, b: Wrapping<i32>) -> Wrapping<i32> {
             a + b
         }
@@ -2821,6 +2933,27 @@ extern_spec! {
 }
 
 amenable_derive::harness! {
+    creusot, SATURATING_I32_ADD_CLAMPS_HOLDS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<
+        /// Saturating<i32>>` postcondition -- real, callable Pearlite
+        /// content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn saturating_i32_add_clamps_holds(
+            a: Saturating<i32>,
+            b: Saturating<i32>,
+            add_result: Saturating<i32>,
+        ) -> bool {
+            pearlite! {
+                ((a.0@ + b.0@) >= i32::MIN@ && (a.0@ + b.0@) <= i32::MAX@
+                    ==> add_result.0@ == (a.0@ + b.0@))
+                    && ((a.0@ + b.0@) < i32::MIN@ ==> add_result.0@ == i32::MIN@)
+                    && ((a.0@ + b.0@) > i32::MAX@ ==> add_result.0@ == i32::MAX@)
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC, {
         /// `Saturating<T>`'s `+` operator saturates at the numeric bounds
         /// exactly like the inner type's `saturating_add` — the same
@@ -2830,12 +2963,7 @@ amenable_derive::harness! {
         /// `i32::saturating_add` in terms of `Saturating<i32>`'s wrapper
         /// field.
         #[requires(true)]
-        #[ensures(
-            (a.0@ + b.0@) >= i32::MIN@ && (a.0@ + b.0@) <= i32::MAX@
-            ==> result.0@ == (a.0@ + b.0@)
-        )]
-        #[ensures((a.0@ + b.0@) < i32::MIN@ ==> result.0@ == i32::MIN@)]
-        #[ensures((a.0@ + b.0@) > i32::MAX@ ==> result.0@ == i32::MAX@)]
+        #[ensures(saturating_i32_add_clamps_holds(a, b, result))]
         fn verify_saturating_i32_add_clamps(a: Saturating<i32>, b: Saturating<i32>) -> Saturating<i32> {
             a + b
         }

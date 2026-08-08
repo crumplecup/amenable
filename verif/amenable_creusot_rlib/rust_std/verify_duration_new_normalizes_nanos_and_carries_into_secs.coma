@@ -1,10 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2554 8 2557 21 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2588 8 2591 21 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2558 12 2558 38
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2551 19 2551 64
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2557 13 2557 21
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2552 18 2552 76
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2553 18 2553 67
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2592 12 2592 38
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2586 19 2586 59
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2591 13 2591 21
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2587 18 2587 96
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2522 24 2522 69
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2543 16 2544 81
 let%span stime = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 72 19 72 61
 let%span stime'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 73 18 73 58
 let%span stime'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 39 4 39 25
@@ -42,24 +43,28 @@ let rec new (secs: UInt64.t) (nanos: UInt32.t) (return (x: t_Duration)) =
     = secs_to_nanos (UInt64.t'int secs) + UInt32.t'int nanos)}
     (! return {result}) ]
 
+predicate duration_new_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2521 8 2521 69] (secs: UInt64.t) (nanos: UInt32.t) =
+  [%#srust_std'3] UInt64.t'int secs + ComputerDivision.div (UInt32.t'int nanos) 1000000000 <= UInt64.t'int const_MAX
+
+predicate duration_new_normalizes_nanos_and_carries_into_secs_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2537 8 2541 17] (secs: UInt64.t) (nanos: UInt32.t) (duration_result: t_Duration) =
+  [%#srust_std'4] nanos_to_secs (view_Duration duration_result)
+    = UInt64.t'int secs + ComputerDivision.div (UInt32.t'int nanos) 1000000000
+  /\ ComputerDivision.mod (view_Duration duration_result) 1000000000
+  = ComputerDivision.mod (UInt32.t'int nanos) 1000000000
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_duration_new_normalizes_nanos_and_carries_into_secs
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2554 8 2557 21] (secs: UInt64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2588 8 2591 21] (secs: UInt64.t)
   (nanos: UInt32.t) (return (x: t_Duration)) =
-  {[@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs requires] [%#srust_std'0] UInt64.t'int secs
-    + ComputerDivision.div (UInt32.t'int nanos) 1000000000
-  <= UInt64.t'int const_MAX}
+  {[@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs requires] [%#srust_std'0] duration_new_headroom_holds secs nanos}
   (! bb0
   [ bb0 = s0
     [ s0 = new [%#srust_std] {secs} {nanos} (fun (_x: t_Duration) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]
   [ & _ret: t_Duration = Any.any_l () | & secs: UInt64.t = secs | & nanos: UInt32.t = nanos ])
   [ return (result: t_Duration) ->
   {[@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs ensures] ([@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs result type invariant] [%#srust_std'1] inv_Duration result)
-    /\ ([@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs ensures #0] [%#srust_std'2] nanos_to_secs (view_Duration result)
-      = UInt64.t'int secs + ComputerDivision.div (UInt32.t'int nanos) 1000000000)
-    /\ ([@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs ensures #1] [%#srust_std'3] ComputerDivision.mod (view_Duration result) 1000000000
-    = ComputerDivision.mod (UInt32.t'int nanos) 1000000000)}
+    /\ ([@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs ensures] [%#srust_std'2] duration_new_normalizes_nanos_and_carries_into_secs_holds secs nanos result)}
     (! return {result}) ]
