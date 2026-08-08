@@ -384,8 +384,160 @@ where
     }
 }
 
+// Registered unconditionally (not inside `#[cfg(kani)] mod proofs` below)
+// so `amenable dump-registry`'s ordinary, non-Kani build still sees these
+// `ContractRecord`s -- the self-test proof bodies that call them are
+// Kani-only (the whole module is `#[cfg(kani)]`-gated, since the derived
+// `KaniCompose` impls it exercises call `kani::any()`/`kani::assume`
+// directly, and this crate has no unconditional `kani` dependency), but
+// the named claim they call into is not. Each carries the "trusted"
+// disposition (chain-derived provenance only, no dedicated harness of its
+// own) rather than pointing at one of the three self-test harnesses that
+// use it, since those harnesses aren't nameable from unconditional code.
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+macro_rules! impl_compose_claim_witness {
+    ($ty:ty) => {
+        impl crate::KaniWitness for $ty {
+            type SupportingEvidence = Self;
+            type ProofArtifact = amenable_std::RustStdProvenance;
+
+            fn proof() -> Self::ProofArtifact {
+                amenable_core::Evidence::audit(
+                    &<Self::SupportingEvidence as amenable_core::Evidence>::basis(),
+                )
+            }
+        }
+
+        bridge_kani_witness!($ty);
+    };
+}
+
+impl_compose_claim_witness!(amenable_std::ComposeDepthZeroIsEmpty);
+impl_compose_claim_witness!(amenable_std::ComposeFieldPresenceTracksDepth);
+impl_compose_claim_witness!(amenable_std::ComposeAnyLengthIsBounded);
+
+kani_ensures!(
+    amenable_std::ComposeDepthZeroIsEmpty,
+    "amenable_std::ComposeDepthZeroIsEmpty",
+    usize,
+    |len| len == 0
+);
+
+kani_ensures!(
+    amenable_std::ComposeFieldPresenceTracksDepth,
+    "amenable_std::ComposeFieldPresenceTracksDepth",
+    (bool, usize),
+    |(is_some, depth)| is_some == (depth > 0)
+);
+
+kani_ensures!(
+    amenable_std::ComposeAnyLengthIsBounded,
+    "amenable_std::ComposeAnyLengthIsBounded",
+    (usize, usize),
+    |(actual, bound)| actual <= bound
+);
+
+// The real call shapes the three self-test harnesses below actually use,
+// instead of the raw predicate body each `kani_ensures!` above already
+// captures canonically.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeDepthZeroIsEmpty",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeDepthZeroIsEmpty::ensures(String::kani_depth0().len())",
+        harnesses: &["verify_kani_compose_string_depths"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeDepthZeroIsEmpty",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeDepthZeroIsEmpty::ensures(Vec::<u8>::kani_depth0().len())",
+        harnesses: &["verify_kani_compose_vec_depths"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeDepthZeroIsEmpty",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeDepthZeroIsEmpty::ensures(depth0.name.len())",
+        harnesses: &["verify_derive_kani_compose_struct_shapes"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeDepthZeroIsEmpty",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeDepthZeroIsEmpty::ensures(depth0.flags.len())",
+        harnesses: &["verify_derive_kani_compose_struct_shapes"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeFieldPresenceTracksDepth",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeFieldPresenceTracksDepth::ensures((depth0.maybe_child.is_some(), 0))",
+        harnesses: &["verify_derive_kani_compose_struct_shapes"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeFieldPresenceTracksDepth",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeFieldPresenceTracksDepth::ensures((depth1.maybe_child.is_some(), 1))",
+        harnesses: &["verify_derive_kani_compose_struct_shapes"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeAnyLengthIsBounded",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeAnyLengthIsBounded::ensures((name.len(), 4))",
+        harnesses: &["verify_derive_kani_compose_enum_is_bounded"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeAnyLengthIsBounded",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeAnyLengthIsBounded::ensures((values.len(), 3))",
+        harnesses: &["verify_derive_kani_compose_enum_is_bounded"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ComposeAnyLengthIsBounded",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "ComposeAnyLengthIsBounded::ensures((text.len(), 4))",
+        harnesses: &["verify_derive_kani_compose_enum_is_bounded"],
+    }
+}
+
 #[cfg(kani)]
 mod proofs {
+    use amenable_core::Ensures;
+    use amenable_std::{
+        ComposeAnyLengthIsBounded, ComposeDepthZeroIsEmpty, ComposeFieldPresenceTracksDepth,
+    };
+
     use super::KaniCompose;
 
     #[derive(amenable_derive::KaniCompose, Debug, Clone, PartialEq, Eq)]
@@ -409,7 +561,7 @@ mod proofs {
         kani, VERIFY_KANI_COMPOSE_STRING_DEPTHS_SRC, {
             #[kani::proof]
             fn verify_kani_compose_string_depths() {
-                assert!(String::kani_depth0().is_empty());
+                assert!(ComposeDepthZeroIsEmpty::ensures(String::kani_depth0().len()));
                 assert_eq!(String::kani_depth1().len(), 1);
                 assert_eq!(String::kani_depth2().len(), 2);
             }
@@ -420,7 +572,7 @@ mod proofs {
         kani, VERIFY_KANI_COMPOSE_VEC_DEPTHS_SRC, {
             #[kani::proof]
             fn verify_kani_compose_vec_depths() {
-                assert!(Vec::<u8>::kani_depth0().is_empty());
+                assert!(ComposeDepthZeroIsEmpty::ensures(Vec::<u8>::kani_depth0().len()));
                 assert_eq!(Vec::<u8>::kani_depth1().len(), 1);
                 assert_eq!(Vec::<u8>::kani_depth2().len(), 2);
             }
@@ -447,13 +599,19 @@ mod proofs {
             #[kani::proof]
             fn verify_derive_kani_compose_struct_shapes() {
                 let depth0 = DerivedNode::kani_depth0();
-                assert!(depth0.name.is_empty());
-                assert!(depth0.maybe_child.is_none());
-                assert!(depth0.flags.is_empty());
+                assert!(ComposeDepthZeroIsEmpty::ensures(depth0.name.len()));
+                assert!(ComposeFieldPresenceTracksDepth::ensures((
+                    depth0.maybe_child.is_some(),
+                    0
+                )));
+                assert!(ComposeDepthZeroIsEmpty::ensures(depth0.flags.len()));
 
                 let depth1 = DerivedNode::kani_depth1();
                 assert_eq!(depth1.name.len(), 1);
-                assert!(depth1.maybe_child.is_some());
+                assert!(ComposeFieldPresenceTracksDepth::ensures((
+                    depth1.maybe_child.is_some(),
+                    1
+                )));
                 assert_eq!(depth1.flags.len(), 1);
             }
         }
@@ -467,14 +625,14 @@ mod proofs {
                 match choice {
                     DerivedChoice::Empty => {}
                     DerivedChoice::Pair(name, values) => {
-                        assert!(name.len() <= 4);
-                        assert!(values.len() <= 3);
+                        assert!(ComposeAnyLengthIsBounded::ensures((name.len(), 4)));
+                        assert!(ComposeAnyLengthIsBounded::ensures((values.len(), 3)));
                     }
                     DerivedChoice::Boxed { inner } => {
                         let DerivedLeaf(value, maybe_text) = *inner;
                         let _ = value;
                         if let Some(text) = maybe_text {
-                            assert!(text.len() <= 4);
+                            assert!(ComposeAnyLengthIsBounded::ensures((text.len(), 4)));
                         }
                     }
                 }

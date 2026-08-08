@@ -36,7 +36,7 @@ mod future;
 mod hash;
 mod io;
 mod iter;
-mod macros;
+pub(crate) mod macros;
 mod marker;
 mod mem;
 mod net;
