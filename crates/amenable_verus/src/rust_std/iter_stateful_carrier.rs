@@ -100,9 +100,7 @@ pub fn verify_inspect_model_calls_once_per_item_without_changing_values(value: i
 /// doesn't skip the item after it.
 pub fn verify_peekable_model_peek_does_not_consume(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness) names this exact fragment.
-        a < i32::MAX - 1,
+        increment_headroom_holds(a),
     ensures
         result.0 == Some(a),
         result.1 == Some(a),
