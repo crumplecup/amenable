@@ -54,7 +54,7 @@ use std::os::windows::io::{
 
 use crate::{
     AsciiByte, IncrementHeadroom, NonNulByte, RustStdProvenance, RustStdStandard,
-    ValidUnicodeScalar,
+    ValidUnicodeScalar, ValueUnchanged,
 };
 
 /// The Verus verifier, local to this crate: there is only one verifier
@@ -2456,6 +2456,42 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         verifier: "verus",
         kind: "requires",
         fragment: || "c <= i32 :: MAX - 10",
+    }
+}
+
+/// [`ValueUnchanged`] reuses `RefCell`'s own borrow-rules harness rather
+/// than adding a new Verus proof — the harness's own `ensures` clauses
+/// already establish this frame condition for `try_borrow`/
+/// `try_borrow_mut`/`release_shared`; `Weak::drop_strong` states the
+/// identical claim, covered by the same fragment text (no variable-name
+/// variance this time — all four sites use `self`/`value` verbatim).
+impl VerusWitness for ValueUnchanged {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_ref_cell_model_dynamic_borrow_rules",
+            claim: VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ValueUnchanged);
+
+impl Ensures<VerusVerifier> for ValueUnchanged {
+    fn ensures() -> &'static str {
+        "final (self) . value == old (self) . value"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ValueUnchanged",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: <ValueUnchanged as Ensures<VerusVerifier>>::ensures,
     }
 }
 

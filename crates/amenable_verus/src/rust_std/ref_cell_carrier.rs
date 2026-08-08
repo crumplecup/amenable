@@ -55,6 +55,8 @@ impl VerusRefCellModel {
             ).borrow_state + 1,
             old(self).borrow_state < 0 ==> !result && final(self).borrow_state
                 == old(self).borrow_state,
+            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == old(self).value,
     {
         if self.borrow_state >= 0 {
@@ -72,6 +74,8 @@ impl VerusRefCellModel {
             old(self).borrow_state == 0 ==> result && final(self).borrow_state == -1,
             old(self).borrow_state != 0 ==> !result && final(self).borrow_state
                 == old(self).borrow_state,
+            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == old(self).value,
     {
         if self.borrow_state == 0 {
@@ -88,6 +92,8 @@ impl VerusRefCellModel {
             old(self).borrow_state > 0,
         ensures
             final(self).borrow_state == old(self).borrow_state - 1,
+            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == old(self).value,
     {
         self.borrow_state -= 1;

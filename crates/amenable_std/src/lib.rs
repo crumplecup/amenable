@@ -23,6 +23,7 @@ mod increment_headroom;
 mod non_nul_byte;
 mod rust_std;
 mod valid_unicode_scalar;
+mod value_unchanged;
 #[cfg(feature = "verus")]
 mod verus_gallery;
 #[cfg(feature = "verus")]
@@ -44,6 +45,7 @@ pub use rust_std::{
     write_rust_std_certificate_artifacts,
 };
 pub use valid_unicode_scalar::ValidUnicodeScalar;
+pub use value_unchanged::ValueUnchanged;
 #[cfg(feature = "verus")]
 pub use verus_gallery::{
     VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,

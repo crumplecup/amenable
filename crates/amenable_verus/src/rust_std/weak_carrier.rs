@@ -65,6 +65,8 @@ impl VerusWeakModel {
             old(self).strong_count > 0,
         ensures
             final(self).strong_count == old(self).strong_count - 1,
+            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == old(self).value,
     {
         self.strong_count -= 1;
