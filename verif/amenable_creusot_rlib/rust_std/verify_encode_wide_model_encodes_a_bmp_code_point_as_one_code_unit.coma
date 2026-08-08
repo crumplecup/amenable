@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3048 8 3048 101 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3076 8 3076 101 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3046 19 3046 40
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3047 18 3047 45
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3074 19 3074 40
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3075 18 3075 45
 
 use creusot.int.UInt32
 use creusot.int.UInt16
@@ -13,7 +13,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3048 8 3048 101] (code_point: UInt32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3076 8 3076 101] (code_point: UInt32.t)
   (return (x: UInt16.t)) =
   {[@stop_split] [@expl:verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit requires] [%#srust_std] UInt32.t'int code_point
   < 65536}

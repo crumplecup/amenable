@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 269 8 272 45 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 271 8 274 45 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 274 39 274 43
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 264 19 264 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 265 18 268 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 276 39 276 43
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 266 19 266 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 267 18 270 9
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -16,7 +16,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_hash_map_insert_then_get_recovers_the_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 269 8 272 45] (key: Int32.t) (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 271 8 274 45] (key: Int32.t) (value: Int32.t)
   (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some value ] s1

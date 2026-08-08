@@ -71,13 +71,20 @@ pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (resul
     (Some((a, b)), None)
 }
 
+/// The increment-headroom precondition `amenable_std::IncrementHeadroom`
+/// names — called directly from `requires` clauses (in this file and,
+/// confirmed under real `verus`, from other carrier files too — see
+/// `amenable_std::verus_gallery`'s `cross_file_spec_fn_reuse_gets_real_
+/// proof_credit` case) rather than restated inline.
+pub open spec fn increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX - 1
+}
+
 /// `Enumerate::next` pairs each item with its index, starting at `0` —
 /// modeled here over the two-element range `a..a+2`.
 pub fn verify_enumerate_model_pairs_each_item_with_its_index(a: i32) -> (result: EnumerateResult)
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness) names this exact fragment.
-        a < i32::MAX - 1,
+        increment_headroom_holds(a),
     ensures
         result.0 == Some((0usize, a)),
         result.1 == Some((1usize, (a + 1) as i32)),

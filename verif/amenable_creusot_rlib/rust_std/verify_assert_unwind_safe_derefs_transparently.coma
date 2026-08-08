@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 886 8 889 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 898 8 901 23 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 883 19 883 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 884 18 884 35
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 885 18 885 37
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 895 19 895 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 896 18 896 35
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 897 18 897 37
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -16,7 +16,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_assert_unwind_safe_derefs_transparently
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 886 8 889 23] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 898 8 901 23] (value: Int32.t)
   (updated: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &wrapped <- { f0 = value } ] s1

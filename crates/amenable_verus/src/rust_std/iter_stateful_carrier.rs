@@ -26,15 +26,27 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The increment-headroom precondition `amenable_std::IncrementHeadroom`
+// names — a real spec fn defined once in `iter_sequence_carrier`, called
+// from here directly rather than restated inline. Confirmed under real
+// `verus` that a spec fn defined in one carrier file gets full proof
+// credit when called from a sibling file (see `amenable_std::
+// verus_gallery`'s `cross_file_spec_fn_reuse_gets_real_proof_credit`
+// case) — unlike Creusot's cross-module `#[logic]` opacity.
+// `#[cfg(verus_keep_ghost)]`-gated like every other spec-only import in
+// this crate (see `chars_carrier.rs`): plain `spec fn`s carry no runtime
+// representation, so this import only resolves when Verus's own ghost
+// content is retained, not under ordinary `cargo check`.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::iter_sequence_carrier::increment_headroom_holds;
+
 verus! {
 
 /// `Cycle::next` restarts its sequence once exhausted — modeled over
 /// the two-element range `a..a+2`, observed across four calls.
 pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32, i32, i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness) names this exact fragment.
-        a < i32::MAX - 1,
+        increment_headroom_holds(a),
     ensures
         result.0 == a,
         result.1 == (a + 1) as i32,

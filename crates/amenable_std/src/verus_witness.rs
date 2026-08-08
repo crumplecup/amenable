@@ -2458,10 +2458,29 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         kind: "requires",
         fragment: || <IncrementHeadroom as Requires<VerusVerifier>>::requires(()),
         harnesses: &[
-            "verify_enumerate_model_pairs_each_item_with_its_index",
             "verify_rev_model_reverses_iteration_order",
-            "verify_cycle_model_repeats_its_sequence_forever",
             "verify_peekable_model_peek_does_not_consume",
+        ],
+    }
+}
+
+// Two of IncrementHeadroom's four "a < i32 :: MAX - 1" sites now call
+// increment_headroom_holds directly (a real, shared `open spec fn` in
+// amenable_verus::rust_std::iter_sequence_carrier, confirmed under real
+// verus to give both call sites genuine proof credit -- see
+// amenable_std::verus_gallery's cross_file_spec_fn_reuse_gets_real_
+// proof_credit case) rather than restating the expression. This
+// fragment names that call shape so the two converted sites don't
+// falsely register as still-raw.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "increment_headroom_holds (a)",
+        harnesses: &[
+            "verify_enumerate_model_pairs_each_item_with_its_index",
+            "verify_cycle_model_repeats_its_sequence_forever",
         ],
     }
 }

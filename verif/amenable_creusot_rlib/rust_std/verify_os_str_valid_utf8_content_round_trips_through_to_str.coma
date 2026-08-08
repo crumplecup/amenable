@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 423 8 423 89 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 425 8 425 89 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 424 13 424 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 424 19 424 25
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 419 19 419 23
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 420 18 422 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 426 13 426 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 426 19 426 25
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 421 19 421 23
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 422 18 424 9
 
 use creusot.int.UInt64
 use creusot.prelude.Any
@@ -15,7 +15,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_os_str_valid_utf8_content_round_trips_through_to_str
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 423 8 423 89] (return (x: tup2_bool_usize)) =
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 425 8 425 89] (return (x: tup2_bool_usize)) =
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] (2: UInt64.t)) } ] s1 | s1 = return {_ret} ] ]

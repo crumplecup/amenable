@@ -735,3 +735,80 @@ pub assume_specification<'a, B: ToOwned + ?Sized> [<Cow<'a, B> as core::ops::Der
         },
     }
 }
+
+::inventory::submit! {
+    VerusGalleryRegistration {
+        case: || VerusGalleryCase {
+            id: "amenable_std::verus_gallery::cross_file_spec_fn_reuse_gets_real_proof_credit".to_owned(),
+            title: "a pub open spec fn defined in one carrier file, called from a requires clause in a sibling carrier file, verifies for real -- not opaque the way Creusot's cross-module #[logic] calls are".to_owned(),
+            disposition: VerusGalleryDisposition::BestPractice,
+            expected: VerusGalleryExpectation::Proved,
+            claim: r#"
+// Investigated while designing a "single source living with the
+// contract type" mechanism for amenable_core::Requires<VerusVerifier>/
+// Ensures<VerusVerifier> (Kani already reached this: its Bound = bool,
+// so Requires::requires() IS the real check, called directly at the
+// proof site instead of restating the expression -- see
+// amenable_kani::rust_std::primitives's AsciiByte::requires). Verus
+// spec content isn't executable Rust, so it can never be `Bound`
+// itself, but the question was whether the DUPLICATION across many
+// carrier files' own requires/ensures clauses could still collapse to
+// one real, verified definition, the way `amenable_creusot::rust_std`'s
+// existing `is_ascii_digit` #[logic(open)] fn already does for Creusot
+// (five real call sites, same file, genuinely proven -- see
+// amenable_std::creusot_gallery's view_operator_needs_pearlite_macro_
+// outside_attributes case for that fn's own history).
+//
+// elicitation_verus's gallery::level12 imports lemmas/spec fns from
+// gallery::level11 (a DIFFERENT file) and its header claims this
+// proves -- unlike elicitation_creusot's gallery::level12, which
+// documents the identical cross-MODULE #[logic] call going opaque
+// under Creusot. Confirmed for real against this repo's own
+// IncrementHeadroom precondition (recurs across iter_sequence_carrier,
+// iter_stateful_carrier, iter_transform_carrier, primitive_shapes_
+// carrier, slice_chunks_carrier -- eight sites needing supplementary
+// ContractRecord fragments today because each restates the expression
+// under a different local variable name):
+pub open spec fn increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX - 1
+}
+// ... in iter_sequence_carrier.rs, called from a requires clause in
+// THAT same file, AND (via `use crate::rust_std::iter_sequence_carrier
+// ::increment_headroom_holds;`) from iter_stateful_carrier.rs, a
+// different file:
+pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32, i32, i32, i32))
+    requires
+        increment_headroom_holds(a),
+    ...
+
+// Observed under `verus --crate-type=lib crates/amenable_verus/src/
+// lib.rs`: verification results:: 332 verified, 0 errors -- no
+// regression, both call sites get real credit for the shared
+// definition, exactly like Creusot's is_ascii_digit.
+//
+// The real remaining gap, on both backends, isn't "can the proof sites
+// share a real definition" (yes, within one crate) -- it's that
+// amenable_std (where Requires<VerusVerifier>::requires()'s &'static
+// str fragment is registered, for cross-backend enumeration) can never
+// see amenable_verus at all: verus is invoked as a bare compiler over
+// a single file tree, never reads Cargo.toml, so it cannot resolve
+// amenable_core/amenable_std/inventory/any proc-macro crate (see
+// amenable_verus::lib's own doc comment, confirmed empirically there
+// already). Creusot's version of the same gap is a real Cargo
+// dependency cycle: amenable_std optionally depends on
+// amenable_creusot (to include_str! its real proof source), so
+// amenable_creusot structurally cannot depend back on amenable_std.
+// Neither gap is a macro-expansion-order problem -- nesting either
+// side's macro inside the other's attribute/DSL position wouldn't
+// route around a Cargo dependency cycle or a file-based, Cargo-blind
+// invocation model. The fragment text registered in amenable_std stays
+// a manually-kept-in-sync transcription of the shared spec fn/logic
+// fn's real body, verified only by elicit_doc's contract-bound
+// scanner -- which is the correct layer for this specific boundary,
+// not a fallback: this boundary structurally cannot carry an
+// executable, provable connection across it, unlike the boundary
+// between a Kani contract type and its own crate's proof sites.
+"#,
+        },
+    }
+}
