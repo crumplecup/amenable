@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1687 8 1687 114 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1698 8 1698 114 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 26 1688 32
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 40 1688 45
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 53 1688 56
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1688 13 1688 19
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1679 19 1679 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1680 18 1686 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1699 26 1699 32
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1699 40 1699 45
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1699 53 1699 56
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1699 13 1699 19
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1690 19 1690 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1691 18 1697 9
 
 use creusot.int.UInt8
 use creusot.int.UInt64
@@ -20,7 +20,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_into_string_error_recovers_the_original_cstring
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1687 8 1687 114]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1698 8 1698 114]
   (return (x: tup4_usize_Option_u8_Option_u8_Option_u8)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_3 <- Some ([%#srust_std] (255: UInt8.t)) ] s1

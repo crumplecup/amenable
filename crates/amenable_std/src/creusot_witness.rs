@@ -156,7 +156,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    CreusotVerifier, CreusotWitness, NON_NUL_BYTE_HOLDS_SRC,
+    VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
     VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
@@ -2182,12 +2183,17 @@ impl CreusotWitness for NonNulByte {
 
 bridge_creusot_witness!(NonNulByte);
 
+/// Returns `amenable_creusot::NON_NUL_BYTE_HOLDS_SRC` directly — the
+/// verbatim, `harness!`-captured source of the real `#[logic(open)] fn
+/// non_nul_byte_holds` every site in that cluster now calls, not a
+/// hand-retyped copy of its expression. There is exactly one place this
+/// precondition's text exists in the whole codebase.
 impl Requires<CreusotVerifier> for NonNulByte {
     type Input = ();
     type Bound = &'static str;
 
     fn requires(_: ()) -> &'static str {
-        "byte@ != 0"
+        NON_NUL_BYTE_HOLDS_SRC
     }
 }
 
@@ -2197,6 +2203,18 @@ impl Requires<CreusotVerifier> for NonNulByte {
         verifier: "creusot",
         kind: "requires",
         fragment: || <NonNulByte as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape every site in the CStr/CString cluster now uses,
+// instead of the raw expression `NON_NUL_BYTE_HOLDS_SRC` itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NonNulByte",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || "non_nul_byte_holds (byte)",
         harnesses: &[
             "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
             "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",

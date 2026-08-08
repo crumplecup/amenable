@@ -1,25 +1,28 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1664 8 1666 31 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1675 8 1677 31 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1668 13 1668 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1668 19 1668 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1668 25 1668 29
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 19 1659 29
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1660 18 1663 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1679 13 1679 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1679 19 1679 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1679 25 1679 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1670 19 1670 43
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1671 18 1674 9
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1635 24 1635 34
 
 use creusot.prelude.Any
 use creusot.int.UInt8
 
 type tup3_bool_bool_bool = { f0: bool; f1: bool; f2: bool }
 
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1634 8 1634 47] (byte: UInt8.t) =
+  [%#srust_std'4] UInt8.t'int byte <> 0
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_from_vec_with_nul_requires_the_nul_only_at_the_end
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1664 8 1666 31] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1675 8 1677 31] (byte: UInt8.t)
   (return (x: tup3_bool_bool_bool)) =
-  {[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end requires] [%#srust_std'2] UInt8.t'int byte
-  <> 0}
+  {[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end requires] [%#srust_std'2] non_nul_byte_holds byte}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] true); f2 = ([%#srust_std'1] true) } ] s1

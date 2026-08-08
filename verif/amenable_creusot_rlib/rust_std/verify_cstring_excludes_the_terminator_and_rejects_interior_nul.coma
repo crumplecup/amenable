@@ -1,11 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1643 8 1645 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1656 8 1658 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1646 46 1646 49
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1646 13 1646 19
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1646 33 1646 39
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1646 52 1646 56
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1634 19 1634 29
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1635 18 1642 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 46 1659 49
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 13 1659 19
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 33 1659 39
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 52 1659 56
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1647 19 1647 43
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1648 18 1655 9
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1635 24 1635 34
 
 use creusot.int.UInt8
 use creusot.int.UInt64
@@ -20,15 +21,17 @@ type tup5_usize_Option_u8_usize_Option_u8_bool = {
   f3: t_Option_u8;
   f4: bool }
 
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1634 8 1634 47] (byte: UInt8.t) =
+  [%#srust_std'5] UInt8.t'int byte <> 0
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_cstring_excludes_the_terminator_and_rejects_interior_nul
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1643 8 1645 57] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1656 8 1658 57] (byte: UInt8.t)
   (return (x: tup5_usize_Option_u8_usize_Option_u8_bool)) =
-  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#srust_std'3] UInt8.t'int byte
-  <> 0}
+  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#srust_std'3] non_nul_byte_holds byte}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some byte ] s1
