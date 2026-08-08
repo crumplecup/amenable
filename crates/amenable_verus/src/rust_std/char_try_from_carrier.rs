@@ -37,6 +37,12 @@ pub assume_specification [<u8 as core::convert::TryFrom<char>>::try_from] (value
 /// values (at most `U+10FFFF`, excluding the surrogate range) and
 /// preserves the value, failing with `CharTryFromError` otherwise — the
 /// same claim the Kani harness checks, for every possible `u32`.
+///
+/// `is_valid_scalar` below is the canonical home
+/// `amenable_std::ValidUnicodeScalar` names — see that type for the same
+/// bound stated once, and its `Ensures<VerusVerifier>` impl (sourced from
+/// `verify_char_roundtrip` in `char_carrier.rs`, the same fragment this
+/// function's `is_valid_scalar` restates).
 pub fn verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range(value: u32) -> (result: bool)
     ensures
         result,

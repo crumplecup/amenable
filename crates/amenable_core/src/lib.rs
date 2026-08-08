@@ -23,6 +23,7 @@
 mod calculation;
 mod cert;
 mod chain;
+mod contract;
 mod evidence;
 mod exchange;
 mod link;
@@ -37,6 +38,7 @@ pub use cert::{Certificate, Registry, RegistryReport};
 pub use chain::{
     ChainError, ChainGap, ChainNode, ProofChainReport, proof_chain, proof_chain_for_verifiers,
 };
+pub use contract::{Ensures, Requires};
 pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
 pub use link::{EvidenceLink, ProofRecord};

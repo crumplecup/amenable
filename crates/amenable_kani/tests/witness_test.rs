@@ -1,6 +1,6 @@
-use amenable_core::Witness;
+use amenable_core::{Ensures, Witness};
 use amenable_kani::KaniVerifier;
-use amenable_std::{RustStdStandard, RustStdType};
+use amenable_std::{RustStdStandard, RustStdType, ValidUnicodeScalar};
 
 #[test]
 fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
@@ -16,6 +16,21 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     assert_eq!(proof.harness, "verify_char_unicode_scalar");
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+}
+
+#[test]
+fn valid_unicode_scalar_reuses_the_char_try_from_harness_and_names_its_bound() {
+    let proof = <ValidUnicodeScalar as Witness<KaniVerifier>>::proof();
+
+    assert_eq!(
+        proof.harness,
+        "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
+    );
+    assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(
+        <ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(),
+        "value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value)"
+    );
 }
 
 #[test]

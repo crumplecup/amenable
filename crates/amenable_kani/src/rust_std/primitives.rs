@@ -64,6 +64,12 @@ amenable_derive::harness! {
     kani, VERIFY_CHAR_UNICODE_SCALAR_SRC, {
         /// `char` is constrained to Unicode scalar values (excludes the
         /// surrogate range `0xD800..=0xDFFF`) and round-trips through `u32`.
+        ///
+        /// The first assertion is the canonical home
+        /// `amenable_std::ValidUnicodeScalar` names — see that type for the
+        /// same bound stated once (currently sourced from
+        /// `rust_std::char`'s `verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range`,
+        /// a different but equivalent restatement of this exact claim).
         #[kani::proof]
         fn verify_char_unicode_scalar() {
             let c: char = kani::any();

@@ -16,6 +16,11 @@ verus! {
 /// reports `verification results:: 1 verified, 0 errors`), unlike
 /// `String`'s content, which needs the `@` View operator instead (see
 /// `string_carrier.rs`).
+///
+/// The second `ensures` clause is the canonical home
+/// `amenable_std::ValidUnicodeScalar` names — see that type for the same
+/// bound stated once, and its `Ensures<VerusVerifier>` impl for this exact
+/// fragment held as a reusable, backend-checkable claim.
 pub fn verify_char_roundtrip(c: char) -> (result: char)
     ensures
         result == c,

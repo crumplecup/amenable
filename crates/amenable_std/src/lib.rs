@@ -19,6 +19,7 @@ mod creusot_gallery;
 #[cfg(feature = "creusot")]
 mod creusot_witness;
 mod rust_std;
+mod valid_unicode_scalar;
 #[cfg(feature = "verus")]
 mod verus_gallery;
 #[cfg(feature = "verus")]
@@ -36,6 +37,7 @@ pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,
 };
+pub use valid_unicode_scalar::ValidUnicodeScalar;
 #[cfg(feature = "verus")]
 pub use verus_gallery::{
     VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,

@@ -154,7 +154,7 @@ use std::vec::Vec;
 
 use core::panic::{Location, PanicInfo, PanicMessage};
 
-use amenable_core::{Evidence, Provenance, Witness};
+use amenable_core::{Ensures, Evidence, Provenance, Witness};
 use amenable_creusot::{
     CreusotVerifier, CreusotWitness, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
@@ -244,7 +244,7 @@ use amenable_creusot::{
     VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
 };
 
-use crate::{RustLanguageProvenance, RustStdProvenance, RustStdStandard};
+use crate::{RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
 
 #[expect(
     deprecated,
@@ -644,6 +644,39 @@ bridge_creusot_witness!(RustStdStandard<char>);
         evidence: "amenable_std::rust_std::RustStdStandard<char>",
         verifier: "creusot",
         describe: || <RustStdStandard<char> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
+/// rather than adding a new Creusot proof — it names the postcondition the
+/// harness already checks (`c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <=
+/// 0x10FFFF)`), it doesn't prove anything new.
+impl CreusotWitness for ValidUnicodeScalar {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_char_roundtrip",
+            claim: VERIFY_CHAR_ROUNDTRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(ValidUnicodeScalar);
+
+impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
+    fn ensures() -> &'static str {
+        "c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF)"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::ValidUnicodeScalar",
+        verifier: "creusot",
+        describe: || <ValidUnicodeScalar as CreusotWitness>::proof().to_string(),
     }
 }
 

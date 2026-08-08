@@ -480,6 +480,12 @@ amenable_derive::harness! {
         /// impl in `creusot-std` maps to `Int` via a builtin
         /// (`creusot.prelude.Char.to_int`), which is exactly what `@` is
         /// for per the Creusot guide's own Pearlite reference.
+        ///
+        /// The range check below is the canonical home
+        /// `amenable_std::ValidUnicodeScalar` names — see that type for the
+        /// same bound stated once, and its `Ensures<CreusotVerifier>` impl
+        /// for this exact fragment held as a reusable, backend-checkable
+        /// claim.
         #[requires(true)]
         #[ensures(result == c)]
         #[ensures(c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF))]

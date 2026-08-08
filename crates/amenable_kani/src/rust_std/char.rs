@@ -19,8 +19,8 @@ use std::char::{
     TryFromCharError,
 };
 
-use amenable_core::Evidence;
-use amenable_std::RustStdStandard;
+use amenable_core::{Ensures, Evidence};
+use amenable_std::{RustStdStandard, ValidUnicodeScalar};
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -56,6 +56,11 @@ amenable_derive::harness! {
         /// `char::try_from(u32)` succeeds exactly for valid Unicode scalar
         /// values (at most `U+10FFFF`, excluding the surrogate range), and
         /// preserves the value; it fails with `CharTryFromError` otherwise.
+        ///
+        /// The `is_valid_scalar` check below is the canonical home
+        /// `amenable_std::ValidUnicodeScalar` names — see that type for the
+        /// same bound stated once, and its `Ensures<KaniVerifier>` impl for
+        /// this exact fragment held as a reusable, backend-checkable claim.
         #[kani::proof]
         fn verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range() {
             let value: u32 = kani::any();
@@ -74,6 +79,41 @@ amenable_derive::harness! {
                 );
             }
         }
+    }
+}
+
+/// The [`ValidUnicodeScalar`] contract type reuses
+/// `verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range`
+/// rather than adding a new Kani harness — it names the bound the harness
+/// already checks, it doesn't prove anything new.
+impl KaniWitness for ValidUnicodeScalar {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
+                .to_owned(),
+            claim: VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC
+                .to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(ValidUnicodeScalar);
+
+impl Ensures<crate::KaniVerifier> for ValidUnicodeScalar {
+    fn ensures() -> &'static str {
+        "value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value)"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::ValidUnicodeScalar",
+        verifier: "kani",
+        describe: || <ValidUnicodeScalar as KaniWitness>::proof().to_string(),
     }
 }
 

@@ -44,7 +44,7 @@
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 
-use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier, Witness};
+use amenable_core::{Ensures, Evidence, MetadataEntry, Provenance, Verifier, Witness};
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
 #[cfg(windows)]
@@ -52,7 +52,7 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::{RustStdProvenance, RustStdStandard};
+use crate::{RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
 
 /// The Verus verifier, local to this crate: there is only one verifier
 /// Verus works with — Verus. Being local here (not imported from
@@ -249,6 +249,38 @@ bridge_verus_witness!(RustStdStandard<char>);
         evidence: "amenable_std::rust_std::RustStdStandard<char>",
         verifier: "verus",
         describe: || <RustStdStandard<char> as VerusWitness>::proof().to_string(),
+    }
+}
+
+/// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
+/// rather than adding a new Verus proof — it names the postcondition the
+/// spec already checks, it doesn't prove anything new.
+impl VerusWitness for ValidUnicodeScalar {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_char_roundtrip",
+            claim: VERIFY_CHAR_ROUNDTRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ValidUnicodeScalar);
+
+impl Ensures<VerusVerifier> for ValidUnicodeScalar {
+    fn ensures() -> &'static str {
+        "(c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32)"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_std::ValidUnicodeScalar",
+        verifier: "verus",
+        describe: || <ValidUnicodeScalar as VerusWitness>::proof().to_string(),
     }
 }
 

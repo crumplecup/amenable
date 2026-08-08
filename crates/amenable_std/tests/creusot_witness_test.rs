@@ -105,9 +105,9 @@ use std::vec::{
 
 use core::panic::{Location, PanicInfo, PanicMessage};
 
-use amenable_core::Witness;
+use amenable_core::{Ensures, Witness};
 use amenable_creusot::CreusotVerifier;
-use amenable_std::{RustStdStandard, RustStdType};
+use amenable_std::{RustStdStandard, RustStdType, ValidUnicodeScalar};
 
 #[expect(
     deprecated,
@@ -147,6 +147,18 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     assert_eq!(proof.harness, "verify_char_roundtrip");
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+}
+
+#[test]
+fn valid_unicode_scalar_reuses_the_char_roundtrip_harness_and_names_its_bound() {
+    let proof = <ValidUnicodeScalar as Witness<CreusotVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_char_roundtrip");
+    assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(
+        <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures(),
+        "c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF)"
+    );
 }
 
 macro_rules! assert_checked_atomic_creusot_witness {

@@ -1,7 +1,7 @@
 #![cfg(feature = "verus")]
 
-use amenable_core::Witness;
-use amenable_std::{RustStdStandard, RustStdType, VerusVerifier};
+use amenable_core::{Ensures, Witness};
+use amenable_std::{RustStdStandard, RustStdType, ValidUnicodeScalar, VerusVerifier};
 
 #[expect(
     deprecated,
@@ -23,6 +23,18 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     assert_eq!(proof.harness, "verify_char_roundtrip");
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+}
+
+#[test]
+fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
+    let proof = <ValidUnicodeScalar as Witness<VerusVerifier>>::proof();
+
+    assert_eq!(proof.harness, "verify_char_roundtrip");
+    assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(
+        <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(),
+        "(c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32)"
+    );
 }
 
 #[test]
