@@ -157,8 +157,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
-    INDEXING_AND_LENGTH_HOLDS_SRC, NON_NUL_BYTE_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
-    VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    INDEXING_AND_LENGTH_HOLDS_SRC, ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, NON_NUL_BYTE_HOLDS_SRC,
+    NUL_ONLY_AT_THE_END_VALIDATES_SRC, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
     VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
@@ -247,8 +247,9 @@ use amenable_creusot::{
 };
 
 use crate::{
-    ArgvIncludesProgramPath, AsciiByte, IndexingAndLength, NonNulByte, NulOnlyAtTheEndValidates,
-    RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
+    ArgvIncludesProgramPath, AsciiByte, IndexingAndLength, IterYieldsValueOnceThenEnds, NonNulByte,
+    NulOnlyAtTheEndValidates, RustLanguageProvenance, RustStdProvenance, RustStdStandard,
+    ValidUnicodeScalar,
 };
 
 #[expect(
@@ -3096,6 +3097,95 @@ bridge_creusot_witness!(RustStdStandard<core::result::IterMut<'static, i32>>);
         verifier: "creusot",
         describe: || <RustStdStandard<core::result::IterMut<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
+    }
+}
+
+/// [`IterYieldsValueOnceThenEnds`] reuses the `Option::iter` harness
+/// rather than adding a new Creusot proof — it names the postcondition
+/// all four `Option`/`Result` value-iterator proofs already share, it
+/// doesn't prove anything new.
+impl CreusotWitness for IterYieldsValueOnceThenEnds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_option_iter_yields_zero_or_one_reference",
+            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(IterYieldsValueOnceThenEnds);
+
+/// Returns `amenable_creusot::ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn iter_yields_value_once_then_ends` both
+/// `Option`-shaped sites call, not a hand-retyped copy of its
+/// expression. There is exactly one place each shape's text exists in
+/// the whole codebase (the `Result`-shaped sibling
+/// `ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC` is registered as a
+/// supplementary fragment below, alongside its own two call sites).
+impl Ensures<CreusotVerifier> for IterYieldsValueOnceThenEnds {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <IterYieldsValueOnceThenEnds as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shapes all four sites now use, instead of the raw
+// expressions ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC/
+// ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC themselves capture.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "iter_yields_value_once_then_ends (value , value , result)",
+        harnesses: &["verify_option_iter_yields_zero_or_one_reference"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "iter_yields_value_once_then_ends (value , updated , result)",
+        harnesses: &["verify_option_iter_mut_writes_through_to_the_option"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "iter_yields_ok_value_once_then_ends (value , value , result)",
+        harnesses: &["verify_result_iter_yields_a_reference_to_the_ok_value"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "iter_yields_ok_value_once_then_ends (value , updated , result)",
+        harnesses: &["verify_result_iter_mut_writes_through_to_the_result"],
     }
 }
 

@@ -2593,17 +2593,54 @@ amenable_derive::harness! {
 // `Option::iter_mut`, plus `Iterator::next` over the resulting carriers, so
 // these borrowed-iterator laws can stay fully checked rather than trusted.
 amenable_derive::harness! {
+    creusot, ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, {
+        /// The `amenable_std::IterYieldsValueOnceThenEnds` postcondition
+        /// -- real, callable Pearlite content, not just descriptive
+        /// text alongside it. A borrowed value-iterator yields its
+        /// contained value once, then ends, and any write through the
+        /// first reference is reflected in the final value afterward.
+        #[logic(open)]
+        fn iter_yields_value_once_then_ends(
+            value: i32,
+            final_value: i32,
+            iter_result: (Option<i32>, Option<i32>, Option<i32>),
+        ) -> bool {
+            pearlite! {
+                iter_result.0 == Some(value)
+                    && iter_result.1 == None
+                    && iter_result.2 == Some(final_value)
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC, {
+        /// The `Result`-shaped sibling of
+        /// `amenable_std::IterYieldsValueOnceThenEnds` -- same claim,
+        /// over `Result<i32, i32>`'s `Ok` variant instead of `Option`.
+        #[logic(open)]
+        fn iter_yields_ok_value_once_then_ends(
+            value: i32,
+            final_value: i32,
+            iter_result: (Option<i32>, Option<i32>, Result<i32, i32>),
+        ) -> bool {
+            pearlite! {
+                iter_result.0 == Some(value)
+                    && iter_result.1 == None
+                    && iter_result.2 == Ok(final_value)
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC, {
         /// `Option::iter` yields a shared reference to the contained
         /// value once, then ends, and leaves the underlying `Option`
         /// unchanged.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, final_opt) =>
-                first_seen == Some(value)
-                    && second_seen == None
-                    && final_opt == Some(value),
-        })]
+        #[ensures(iter_yields_value_once_then_ends(value, value, result))]
         fn verify_option_iter_yields_zero_or_one_reference(
             value: i32,
         ) -> (Option<i32>, Option<i32>, Option<i32>) {
@@ -2631,12 +2668,7 @@ amenable_derive::harness! {
         /// contained value once, and a write through that reference is
         /// visible in the `Option` afterward.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, final_opt) =>
-                first_seen == Some(value)
-                    && second_seen == None
-                    && final_opt == Some(updated),
-        })]
+        #[ensures(iter_yields_value_once_then_ends(value, updated, result))]
         fn verify_option_iter_mut_writes_through_to_the_option(
             value: i32,
             updated: i32,
@@ -2684,12 +2716,7 @@ amenable_derive::harness! {
         /// yield-once law doesn't depend on `Iter`'s own machinery, so
         /// it's stated directly over the value.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, final_res) =>
-                first_seen == Some(value)
-                    && second_seen == None
-                    && final_res == Ok(value),
-        })]
+        #[ensures(iter_yields_ok_value_once_then_ends(value, value, result))]
         fn verify_result_iter_yields_a_reference_to_the_ok_value(
             value: i32,
         ) -> (Option<i32>, Option<i32>, Result<i32, i32>) {
@@ -2709,12 +2736,7 @@ amenable_derive::harness! {
         /// write-through law only depends on `value`/`updated`, so it's
         /// stated directly over the values.
         #[requires(true)]
-        #[ensures(match result {
-            (first_seen, second_seen, final_res) =>
-                first_seen == Some(value)
-                    && second_seen == None
-                    && final_res == Ok(updated),
-        })]
+        #[ensures(iter_yields_ok_value_once_then_ends(value, updated, result))]
         fn verify_result_iter_mut_writes_through_to_the_result(
             value: i32,
             updated: i32,

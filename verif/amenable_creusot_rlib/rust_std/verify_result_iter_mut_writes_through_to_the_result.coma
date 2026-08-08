@@ -1,7 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2718 8 2721 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2740 8 2743 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2711 19 2711 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2712 18 2717 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2738 19 2738 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2739 18 2739 77
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2629 16 2631 55
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,12 +13,15 @@ type t_Result_i32_i32 = Ok Int32.t | Err Int32.t
 
 type tup3_Option_i32_Option_i32_Result_i32_i32 = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Result_i32_i32 }
 
+predicate iter_yields_ok_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2623 8 2627 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Result_i32_i32) =
+  [%#srust_std'1] iter_result.f0 = Some value /\ iter_result.f1 = None /\ iter_result.f2 = Ok final_value
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_result_iter_mut_writes_through_to_the_result
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2718 8 2721 57] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2740 8 2743 57] (value: Int32.t)
   (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some value ] s1
@@ -32,8 +36,5 @@ let rec verify_result_iter_mut_writes_through_to_the_result
   | & _9: t_Option_i32 = Any.any_l ()
   | & _10: t_Result_i32_i32 = Any.any_l () ])
   [ return (result: tup3_Option_i32_Option_i32_Result_i32_i32) ->
-  {[@stop_split] [@expl:verify_result_iter_mut_writes_through_to_the_result ensures] [%#srust_std'0] match result with
-      | {f0 = first_seen; f1 = second_seen; f2 = final_res} -> first_seen = Some value
-      /\ second_seen = None /\ final_res = Ok updated
-      end}
+  {[@stop_split] [@expl:verify_result_iter_mut_writes_through_to_the_result ensures] [%#srust_std'0] iter_yields_ok_value_once_then_ends value updated result}
     (! return {result}) ]

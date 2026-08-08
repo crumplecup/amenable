@@ -1,10 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2607 8 2609 52 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2644 8 2646 52 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2612 29 2612 39
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2613 39 2613 48
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2617 40 2617 49
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2600 19 2600 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2601 18 2606 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2649 29 2649 39
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2650 39 2650 48
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2654 40 2654 49
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2642 19 2642 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2643 18 2643 72
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2609 16 2611 57
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 103 29 103 33
 let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 99 26 102 17
@@ -95,12 +96,15 @@ type tup2_Option_i32_Option_i32 = { f0: t_Option_i32; f1: t_Option_i32 }
 
 type tup3_Option_i32_Option_i32_Option_i32 = { f0'0: t_Option_i32; f1'0: t_Option_i32; f2'0: t_Option_i32 }
 
+predicate iter_yields_value_once_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2603 8 2607 17] (value: Int32.t) (final_value: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Option_i32) =
+  [%#srust_std'4] iter_result.f0'0 = Some value /\ iter_result.f1'0 = None /\ iter_result.f2'0 = Some final_value
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_option_iter_yields_zero_or_one_reference
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2607 8 2609 52] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2644 8 2646 52] (value: Int32.t)
   (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &opt <- Some value ] s1
@@ -148,8 +152,5 @@ let rec verify_option_iter_yields_zero_or_one_reference
   | & _20: MutBorrow.t t_Iter_i32 = Any.any_l ()
   | & r'0: Int32.t = Any.any_l () ])
   [ return (result: tup3_Option_i32_Option_i32_Option_i32) ->
-  {[@stop_split] [@expl:verify_option_iter_yields_zero_or_one_reference ensures] [%#srust_std'3] match result with
-      | {f0'0 = first_seen; f1'0 = second_seen; f2'0 = final_opt} -> first_seen = Some value
-      /\ second_seen = None /\ final_opt = Some value
-      end}
+  {[@stop_split] [@expl:verify_option_iter_yields_zero_or_one_reference ensures] [%#srust_std'3] iter_yields_value_once_then_ends value value result}
     (! return {result}) ]
