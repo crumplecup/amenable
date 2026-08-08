@@ -673,6 +673,15 @@ impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
 }
 
 ::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ValidUnicodeScalar",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures,
+    }
+}
+
+::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::ValidUnicodeScalar",
         verifier: "creusot",

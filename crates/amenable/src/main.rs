@@ -162,11 +162,24 @@ struct ProofRecordDump {
     verifier: String,
 }
 
+/// One [`amenable::ContractRecord`], owned for JSON serialization. Unlike
+/// [`ProofRecordDump`], this carries the fragment text itself: external
+/// tooling comparing real proof-site expressions against registered
+/// contracts needs the literal bound, not just a presence/absence flag.
+#[derive(serde::Serialize)]
+struct ContractRecordDump {
+    evidence: String,
+    verifier: String,
+    kind: String,
+    fragment: String,
+}
+
 /// The full registry dump written by `dump-registry`.
 #[derive(serde::Serialize)]
 struct RegistryDump {
     evidence_links: Vec<EvidenceLinkDump>,
     proof_records: Vec<ProofRecordDump>,
+    contract_records: Vec<ContractRecordDump>,
     kani_proofs: Vec<KaniProofDump>,
 }
 
@@ -191,6 +204,14 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
             .map(|record| ProofRecordDump {
                 evidence: record.evidence.to_owned(),
                 verifier: record.verifier.to_owned(),
+            })
+            .collect(),
+        contract_records: inventory::iter::<amenable::ContractRecord>()
+            .map(|record| ContractRecordDump {
+                evidence: record.evidence.to_owned(),
+                verifier: record.verifier.to_owned(),
+                kind: record.kind.to_owned(),
+                fragment: (record.fragment)().to_owned(),
             })
             .collect(),
         kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()

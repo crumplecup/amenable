@@ -69,3 +69,29 @@ pub struct ProofRecord {
 }
 
 inventory::collect!(ProofRecord);
+
+/// A statically-registered fact: a verifier backend checks a named
+/// requires/ensures bound, in its own native syntax, for a given evidence
+/// type. Registered once per `(evidence, verifier, kind)` triple by each
+/// `Ensures`/`Requires` impl, alongside its own definition.
+///
+/// Unlike [`ProofRecord::describe`], `fragment` is not merely a
+/// presence/absence signal — external tooling (e.g. a scanner that flags
+/// proof sites still writing a bound's expression inline instead of
+/// pointing at a named contract type) needs the literal fragment text to
+/// compare against real source, not just the fact that some contract
+/// exists. It is still a plain function pointer, not a captured closure,
+/// for the same `const`-evaluable reason `describe` is.
+pub struct ContractRecord {
+    /// The evidence type this contract names, in the same naming
+    /// convention as [`EvidenceLink::name`].
+    pub evidence: &'static str,
+    /// The verifier backend this fragment is written for (e.g. `"kani"`).
+    pub verifier: &'static str,
+    /// Which half of the contract this is: `"ensures"` or `"requires"`.
+    pub kind: &'static str,
+    /// The bound's fragment, in the verifier's own native syntax.
+    pub fragment: fn() -> &'static str,
+}
+
+inventory::collect!(ContractRecord);

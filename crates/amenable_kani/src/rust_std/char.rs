@@ -110,6 +110,15 @@ impl Ensures<crate::KaniVerifier> for ValidUnicodeScalar {
 }
 
 ::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ValidUnicodeScalar",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures,
+    }
+}
+
+::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::ValidUnicodeScalar",
         verifier: "kani",

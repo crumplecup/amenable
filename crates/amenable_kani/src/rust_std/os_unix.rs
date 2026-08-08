@@ -92,6 +92,15 @@ impl Ensures<crate::KaniVerifier> for NonNegativeFd {
 }
 
 ::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::NonNegativeFd",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: <NonNegativeFd as Ensures<crate::KaniVerifier>>::ensures,
+    }
+}
+
+::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_kani::NonNegativeFd",
         verifier: "kani",

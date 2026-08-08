@@ -36,10 +36,10 @@ pub use error::{
 
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
-    Establish, Evidence, EvidenceLink, Exchange, MetadataEntry, OwnedProvenanceReport,
-    ProofChainReport, ProofRecord, ProofToken, Provenance, ProvenanceReport, Registry,
-    RegistryReport, Sidecar, Standard, StateMachine, Verifier, Witness, proof_chain,
-    proof_chain_for_verifiers,
+    ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange, MetadataEntry,
+    OwnedProvenanceReport, ProofChainReport, ProofRecord, ProofToken, Provenance, ProvenanceReport,
+    Registry, RegistryReport, Requires, Sidecar, Standard, StateMachine, Verifier, Witness,
+    proof_chain, proof_chain_for_verifiers,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};
@@ -47,14 +47,14 @@ pub use amenable_kani::{
     AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Color, Credit,
     Debit, Green, GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition,
     KaniGalleryExpectation, KaniGalleryRegistration, KaniProof, KaniProofRegistration,
-    KaniVerifier, KaniVerifierMetadata, KaniWitness, Red, RedToken, SequentialCycle, Stoplight,
-    Sum, Yellow, YellowToken, add,
+    KaniVerifier, KaniVerifierMetadata, KaniWitness, NonNegativeFd, Red, RedToken, SequentialCycle,
+    Stoplight, Sum, Yellow, YellowToken, add,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_std::CheckedProof as CreusotCheckedProof;
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
-    RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,
+    RustStdStandard, RustStdType, ValidUnicodeScalar, write_rust_std_certificate_artifacts,
 };
 #[cfg(feature = "verus")]
 pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
