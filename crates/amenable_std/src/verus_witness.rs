@@ -3238,6 +3238,14 @@ bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
     }
 }
 
+/// `RustStdStandard<NonZero<T>>`'s Verus proof states its claim as two
+/// separate `ensures` clauses (`value != 0 ==> result`, `value == 0 ==>
+/// !result`) — an iff split into its two implications, not one expression.
+/// `Ensures<VerusVerifier>` names the first (the "positive" direction);
+/// the second is registered directly as a supplementary
+/// [`amenable_core::ContractRecord`], via a plain non-capturing closure
+/// coerced to a `fn` pointer (legal in a const context, and needs no
+/// per-`$ty` unique name the way a real fn item would).
 macro_rules! impl_non_zero_verus_witness {
     ($($ty:ty => $harness:literal),* $(,)?) => {
         $(
@@ -3261,6 +3269,30 @@ macro_rules! impl_non_zero_verus_witness {
                     evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
                     verifier: "verus",
                     describe: || <RustStdStandard<std::num::NonZero<$ty>> as VerusWitness>::proof().to_string(),
+                }
+            }
+
+            impl Ensures<VerusVerifier> for RustStdStandard<std::num::NonZero<$ty>> {
+                fn ensures() -> &'static str {
+                    "value != 0 ==> result"
+                }
+            }
+
+            ::inventory::submit! {
+                ::amenable_core::ContractRecord {
+                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                    verifier: "verus",
+                    kind: "ensures",
+                    fragment: <RustStdStandard<std::num::NonZero<$ty>> as Ensures<VerusVerifier>>::ensures,
+                }
+            }
+
+            ::inventory::submit! {
+                ::amenable_core::ContractRecord {
+                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                    verifier: "verus",
+                    kind: "ensures",
+                    fragment: || "value == 0 ==> !result",
                 }
             }
         )*

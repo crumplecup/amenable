@@ -1924,6 +1924,10 @@ amenable_derive::harness! {
         /// every `NonZero{I,U}*` type alias back to the same evidence,
         /// `RustStdStandard<NonZero<i16>>`, so one representative case is
         /// what actually closes the gap there.
+        ///
+        /// Both `#[ensures]` clauses below are the canonical home
+        /// `RustStdStandard<NonZero<i16>>`'s own `Ensures<CreusotVerifier>`
+        /// impl (`amenable_std::creusot_witness`) names.
         #[trusted]
         #[requires(true)]
         #[ensures(match result {

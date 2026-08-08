@@ -2306,6 +2306,39 @@ bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
     }
 }
 
+/// `#[trusted]`'s two `#[ensures]` clauses each get their own
+/// `ContractRecord` here — the same bound `Ensures<KaniVerifier>`
+/// (`amenable_kani::rust_std::num`, `value != 0`) and
+/// `Ensures<VerusVerifier>` (`amenable_std::verus_witness`, split into
+/// `value != 0 ==> result`/`value == 0 ==> !result`) already name, restated
+/// once more in Creusot's own `match`-expression form. Fragment text is
+/// the literal normalized (tokenize, don't parse-as-`syn::Expr`) form
+/// `elicit_doc`'s scanner computes, not hand-formatted — Pearlite content
+/// like this isn't valid plain-Rust expression grammar to begin with.
+impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
+    fn ensures() -> &'static str {
+        "match result { Some (_) => value != 0i16 , None => value == 0i16 , }"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: <RustStdStandard<NonZero<i16>> as Ensures<CreusotVerifier>>::ensures,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "match result { Some (nz) => nonzero_i16_get (& nz) == value , None => true , }",
+    }
+}
+
 // Fully qualified, matching `amenable_kani::rust_std::cmp` and
 // `amenable_std::rust_std::cmp`'s own registration exactly: there's also
 // a `core::sync::atomic::Ordering`, so the evidence string must say

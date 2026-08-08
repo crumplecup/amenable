@@ -13,6 +13,14 @@
 //! law, which `amenable_kani`'s own harness for that exact width
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
+//!
+//! The two `ensures` clauses in every function below are the canonical
+//! home `RustStdStandard<NonZero<T>>`'s own `Ensures<VerusVerifier>` impl
+//! (`amenable_std::verus_witness`) names, for this exact width — see that
+//! type for the same bound stated once, and its `Ensures<KaniVerifier>`
+//! (`amenable_kani::rust_std::num`) and `Ensures<CreusotVerifier>`
+//! (`amenable_creusot::rust_std`) counterparts for the same claim in the
+//! other two backends' own syntax.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
