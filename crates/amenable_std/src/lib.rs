@@ -19,6 +19,7 @@ mod cert;
 mod creusot_gallery;
 #[cfg(feature = "creusot")]
 mod creusot_witness;
+mod increment_headroom;
 mod non_nul_byte;
 mod rust_std;
 mod valid_unicode_scalar;
@@ -36,6 +37,7 @@ pub use creusot_gallery::{
 };
 #[cfg(feature = "creusot")]
 pub use creusot_witness::CheckedProof;
+pub use increment_headroom::IncrementHeadroom;
 pub use non_nul_byte::NonNulByte;
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,

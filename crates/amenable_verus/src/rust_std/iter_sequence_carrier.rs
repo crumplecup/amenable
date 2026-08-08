@@ -67,6 +67,8 @@ pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (resul
 /// modeled here over the two-element range `a..a+2`.
 pub fn verify_enumerate_model_pairs_each_item_with_its_index(a: i32) -> (result: EnumerateResult)
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness) names this exact fragment.
         a < i32::MAX - 1,
     ensures
         result.0 == Some((0usize, a)),
@@ -80,6 +82,8 @@ pub fn verify_enumerate_model_pairs_each_item_with_its_index(a: i32) -> (result:
 /// two-element range `a..a+2`.
 pub fn verify_rev_model_reverses_iteration_order(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness) names this exact fragment.
         a < i32::MAX - 1,
     ensures
         result.0 == Some((a + 1) as i32),

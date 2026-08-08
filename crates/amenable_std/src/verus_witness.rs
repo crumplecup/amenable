@@ -52,7 +52,10 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
-use crate::{AsciiByte, NonNulByte, RustStdProvenance, RustStdStandard, ValidUnicodeScalar};
+use crate::{
+    AsciiByte, IncrementHeadroom, NonNulByte, RustStdProvenance, RustStdStandard,
+    ValidUnicodeScalar,
+};
 
 /// The Verus verifier, local to this crate: there is only one verifier
 /// Verus works with — Verus. Being local here (not imported from
@@ -2390,6 +2393,69 @@ bridge_verus_witness!(RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>
             <RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+/// [`IncrementHeadroom`] reuses the same harness rather than adding a new
+/// Verus proof — it names the precondition the harness already requires,
+/// it doesn't prove anything new. Three supplementary fragments cover the
+/// wider margin `slice_chunks_carrier`'s own models need (`a`/`b`/`c <=
+/// i32::MAX - 10`, not registered through the `Requires` trait itself
+/// since only one fragment can be the "canonical" one per type).
+impl VerusWitness for IncrementHeadroom {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_enumerate_model_pairs_each_item_with_its_index",
+            claim: VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(IncrementHeadroom);
+
+impl Requires<VerusVerifier> for IncrementHeadroom {
+    fn requires() -> &'static str {
+        "a < i32 :: MAX - 1"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: <IncrementHeadroom as Requires<VerusVerifier>>::requires,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "a <= i32 :: MAX - 10",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "b <= i32 :: MAX - 10",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || "c <= i32 :: MAX - 10",
     }
 }
 

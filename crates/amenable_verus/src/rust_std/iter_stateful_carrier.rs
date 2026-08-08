@@ -32,6 +32,8 @@ verus! {
 /// the two-element range `a..a+2`, observed across four calls.
 pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32, i32, i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness) names this exact fragment.
         a < i32::MAX - 1,
     ensures
         result.0 == a,
@@ -82,6 +84,8 @@ pub fn verify_inspect_model_calls_once_per_item_without_changing_values(value: i
 /// doesn't skip the item after it.
 pub fn verify_peekable_model_peek_does_not_consume(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness) names this exact fragment.
         a < i32::MAX - 1,
     ensures
         result.0 == Some(a),

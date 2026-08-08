@@ -47,7 +47,11 @@ pub fn verify_chunks_exact_model_discards_a_short_remainder(a: i32, b: i32, c: i
 /// `[a, b].chunks_mut(2)` writes `+10` through the single full chunk.
 pub fn verify_chunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (result: (i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         a <= i32::MAX - 10,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b <= i32::MAX - 10,
     ensures
         result.0 == a + 10,
@@ -60,7 +64,11 @@ pub fn verify_chunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (re
 /// `(a, b)`; the short remainder `c` is never visited.
 pub fn verify_chunks_exact_mut_model_leaves_the_remainder_untouched(a: i32, b: i32, c: i32) -> (result: (i32, i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         a <= i32::MAX - 10,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b <= i32::MAX - 10,
     ensures
         result.0 == a + 10,
@@ -95,7 +103,13 @@ pub fn verify_rchunks_exact_model_discards_a_short_remainder_at_the_front(a: i32
 /// `(b, c)`; the front remainder `a` is never visited.
 pub fn verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched(a: i32, b: i32, c: i32) -> (result: (i32, i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b <= i32::MAX - 10,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         c <= i32::MAX - 10,
     ensures
         result.0 == a,
@@ -109,7 +123,11 @@ pub fn verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched(a: i3
 /// (grouped from the back).
 pub fn verify_rchunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (result: (i32, i32))
     requires
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         a <= i32::MAX - 10,
+        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
+        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
         b <= i32::MAX - 10,
     ensures
         result.0 == a + 10,
