@@ -11,6 +11,9 @@
 //! - if the real std/libc path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+use amenable_derive::Standard;
+use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
+
 use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
 
@@ -34,8 +37,50 @@ pub struct KaniBorrowedFd(i32, bool, u64);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct KaniFile(KaniFd);
 
+/// A raw Unix file descriptor known to be non-negative while live.
+///
+/// "A live raw fd is never negative" is independently hand-written at four
+/// real sites in this crate — [`KaniFd::live`]'s own defensive assertion,
+/// `rust_std::os_unix::verify_borrowed_fd_reports_the_same_raw_value_as_the_owner`,
+/// and two gallery diagnostics in `gallery::replace_recommendations` — with
+/// nothing tying them together. Unlike [`ValidUnicodeScalar`]
+/// (`amenable_std`), this bound has no Creusot or Verus coverage yet, so
+/// only `Ensures<KaniVerifier>` is implemented (in `rust_std::os_unix`,
+/// alongside the harness it reuses) — it stays local to this crate rather
+/// than moving to `amenable_std` until a second backend actually needs it.
+///
+/// [`ValidUnicodeScalar`]: amenable_std::ValidUnicodeScalar
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as RustStdType>::provenance()",
+    provenance_type = "RustStdProvenance"
+)]
+pub struct NonNegativeFd {
+    value: i32,
+}
+
+impl NonNegativeFd {
+    /// Wrap an `i32` already known to be a non-negative, live raw fd value.
+    pub const fn new(value: i32) -> Self {
+        Self { value }
+    }
+
+    /// The wrapped raw fd value.
+    pub const fn value(&self) -> i32 {
+        self.value
+    }
+}
+
 impl KaniFd {
     /// Construct a live modeled descriptor.
+    ///
+    /// The assertion below is the canonical home
+    /// [`NonNegativeFd`] names — see that type for the same bound stated
+    /// once, and its `Ensures<KaniVerifier>` impl (in
+    /// `rust_std::os_unix`) for this exact fragment held as a reusable,
+    /// backend-checkable claim.
     pub fn live(raw_fd: i32, resource_id: u64) -> Self {
         assert!(raw_fd >= 0, "live modeled fds must be non-negative");
         Self(raw_fd, true, resource_id)

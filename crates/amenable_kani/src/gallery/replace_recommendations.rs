@@ -211,6 +211,9 @@ amenable_derive::harness! {
         /// but seeding it from a live descriptor clone reaches `fcntl`
         /// through `BorrowedFd::try_clone_to_owned` before the property can
         /// be established.
+        ///
+        /// The final assertion restates the bound `NonNegativeFd`
+        /// (`fd_model.rs`) names once, canonically.
         #[kani::proof]
         fn borrowed_fd_clone_reaches_unsupported_fcntl_boundary() {
             use std::os::unix::io::{AsFd, AsRawFd};
@@ -242,6 +245,9 @@ amenable_derive::harness! {
         /// `PipeWriter` replacement review: the delivery claim is reasonable,
         /// but the direct `std::io::pipe()` setup already reaches `pipe2`
         /// before any read/write property can be established.
+        ///
+        /// Both assertions restate the bound `NonNegativeFd` (`fd_model.rs`)
+        /// names once, canonically.
         #[kani::proof]
         fn anonymous_pipe_creation_reaches_unsupported_pipe2_boundary() {
             use std::os::fd::AsRawFd;

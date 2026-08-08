@@ -57,7 +57,7 @@ pub use env_model::KaniArgv;
 pub use env_path_model::{
     KaniEnvPath, KaniEnvPathList, KaniEnvPaths, KaniJoinPathsError, KaniJoinedEnvPaths,
 };
-pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile};
+pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile, NonNegativeFd};
 pub use fmt_model::{KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRendered, KaniRenderedKind};
 pub use fs_model::{
     KaniAlreadyExists, KaniAlreadyLocked, KaniCreateNewObservation, KaniDirEntryObservation,
