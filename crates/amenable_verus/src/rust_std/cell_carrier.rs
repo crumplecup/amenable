@@ -49,6 +49,8 @@ impl VerusCellModel {
     /// `set` overwrites the stored value.
     pub fn set(&mut self, new_value: i32)
         ensures
+            // Canonical home: RustStdStandard<Cell<i32>>'s Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == new_value,
     {
         self.value = new_value;
@@ -58,6 +60,8 @@ impl VerusCellModel {
     pub fn replace(&mut self, new_value: i32) -> (result: i32)
         ensures
             result == old(self).value,
+            // Canonical home: RustStdStandard<Cell<i32>>'s Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == new_value,
     {
         let old_value = self.value;

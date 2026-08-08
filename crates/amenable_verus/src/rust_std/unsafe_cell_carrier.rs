@@ -50,6 +50,8 @@ impl VerusUnsafeCellModel {
     /// Writes the stored value, mirroring `*cell.get_mut() = new_value`.
     pub fn write_through(&mut self, new_value: i32)
         ensures
+            // Canonical home: RustStdStandard<UnsafeCell<i32>>'s Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == new_value,
     {
         self.value = new_value;

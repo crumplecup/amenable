@@ -1508,6 +1508,26 @@ bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
     }
 }
 
+/// The interior-mutability postcondition every `Cell`-family carrier in
+/// this file states after a write (`set`/`replace`) — "the stored value
+/// is now exactly what was written" — recurs identically across `Cell`,
+/// `RefCell`, and `UnsafeCell`'s own accommodation models. Named once
+/// here rather than at each site.
+impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
+    fn ensures() -> &'static str {
+        "final (self) . value == new_value"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures,
+    }
+}
+
 const VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/array_into_iter_carrier.rs");
 
@@ -1564,6 +1584,21 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
     }
 }
 
+impl Ensures<VerusVerifier> for RustStdStandard<std::cell::RefCell<i32>> {
+    fn ensures() -> &'static str {
+        "final (self) . value == new_value"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: <RustStdStandard<std::cell::RefCell<i32>> as Ensures<VerusVerifier>>::ensures,
+    }
+}
+
 const VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/once_cell_carrier.rs");
 
@@ -1617,6 +1652,21 @@ bridge_verus_witness!(RustStdStandard<std::cell::UnsafeCell<i32>>);
         describe: || {
             <RustStdStandard<std::cell::UnsafeCell<i32>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+impl Ensures<VerusVerifier> for RustStdStandard<std::cell::UnsafeCell<i32>> {
+    fn ensures() -> &'static str {
+        "final (self) . value == new_value"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::UnsafeCell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: <RustStdStandard<std::cell::UnsafeCell<i32>> as Ensures<VerusVerifier>>::ensures,
     }
 }
 

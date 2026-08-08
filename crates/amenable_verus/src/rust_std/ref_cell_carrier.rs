@@ -101,6 +101,8 @@ impl VerusRefCellModel {
             old(self).borrow_state == -1,
         ensures
             final(self).borrow_state == 0,
+            // Canonical home: RustStdStandard<RefCell<i32>>'s Ensures<VerusVerifier>
+            // impl (amenable_std::verus_witness) names this exact fragment.
             final(self).value == new_value,
     {
         self.value = new_value;
