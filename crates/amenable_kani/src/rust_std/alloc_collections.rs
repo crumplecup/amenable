@@ -11,6 +11,8 @@
 
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -215,11 +217,20 @@ amenable_derive::harness! {
             witness_heap.push(OrderedDropWitness { id: 1, drop_count: drop_count.clone() });
             witness_heap.push(OrderedDropWitness { id: 2, drop_count: drop_count.clone() });
             let popped = witness_heap.pop().unwrap();
-            assert_eq!(drop_count.get(), 0, "pop does not drop the returned value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "pop does not drop the returned value"
+            );
             drop(popped);
-            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the popped value drops once its owner drops it"
+            );
             drop(witness_heap);
-            assert_eq!(drop_count.get(), 2, "dropping the heap drops the remaining element");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                "dropping the heap drops the remaining element"
+            );
         }
     }
 }
@@ -282,11 +293,20 @@ amenable_derive::harness! {
             witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
             witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
             let popped = witness_list.pop_front().unwrap();
-            assert_eq!(drop_count.get(), 0, "pop_front does not drop the returned value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "pop_front does not drop the returned value"
+            );
             drop(popped);
-            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the popped value drops once its owner drops it"
+            );
             drop(witness_list);
-            assert_eq!(drop_count.get(), 2, "dropping the list drops the remaining element");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                "dropping the list drops the remaining element"
+            );
         }
     }
 }
@@ -352,11 +372,20 @@ amenable_derive::harness! {
             witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
             witness_dq.push_back(DropWitness { drop_count: drop_count.clone() });
             let popped = witness_dq.pop_front().unwrap();
-            assert_eq!(drop_count.get(), 0, "pop_front does not drop the returned value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "pop_front does not drop the returned value"
+            );
             drop(popped);
-            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the popped value drops once its owner drops it"
+            );
             drop(witness_dq);
-            assert_eq!(drop_count.get(), 2, "dropping the deque drops the remaining element");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                "dropping the deque drops the remaining element"
+            );
         }
     }
 }
@@ -492,21 +521,18 @@ amenable_derive::harness! {
             });
             let mut drain = witness_heap.drain();
             let first = drain.next().unwrap();
-            assert_eq!(
-                drop_count.get(),
-                0,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
                 "drain transfers a yielded value without dropping it"
             );
             drop(first);
-            assert_eq!(
-                drop_count.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the caller drops the yielded value exactly once"
             );
             drop(drain);
-            assert_eq!(
-                drop_count.get(),
-                3,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping an unfinished drain drops every remaining element"
             );
             assert!(
@@ -606,21 +632,18 @@ amenable_derive::harness! {
             });
             let mut iterator = witness_heap.into_iter();
             let first = iterator.next().unwrap();
-            assert_eq!(
-                drop_count.get(),
-                0,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
                 "into_iter transfers a yielded value without dropping it"
             );
             drop(first);
-            assert_eq!(
-                drop_count.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the caller drops the yielded value exactly once"
             );
             drop(iterator);
-            assert_eq!(
-                drop_count.get(),
-                3,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping an unfinished iterator drops every remaining value"
             );
         }
@@ -890,11 +913,20 @@ amenable_derive::harness! {
             witness_list.push_back(DropWitness { drop_count: drop_count.clone() });
             let mut iterator = witness_list.into_iter();
             let first = iterator.next().unwrap();
-            assert_eq!(drop_count.get(), 0, "into_iter transfers a yielded value without dropping it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "into_iter transfers a yielded value without dropping it"
+            );
             drop(first);
-            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the caller drops the yielded value exactly once"
+            );
             drop(iterator);
-            assert_eq!(drop_count.get(), 3, "dropping an unfinished iterator drops every remaining value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                "dropping an unfinished iterator drops every remaining value"
+            );
         }
     }
 }
@@ -1039,11 +1071,20 @@ amenable_derive::harness! {
             witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
             let mut drain = witness_deque.drain(..);
             let first = drain.next().unwrap();
-            assert_eq!(drop_count.get(), 0, "drain transfers a yielded value without dropping it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "drain transfers a yielded value without dropping it"
+            );
             drop(first);
-            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the caller drops the yielded value exactly once"
+            );
             drop(drain);
-            assert_eq!(drop_count.get(), 3, "dropping an unfinished drain drops every remaining value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                "dropping an unfinished drain drops every remaining value"
+            );
             assert!(witness_deque.is_empty(), "dropping an unfinished drain leaves the deque empty");
         }
     }
@@ -1205,11 +1246,20 @@ amenable_derive::harness! {
             witness_deque.push_back(DropWitness { drop_count: drop_count.clone() });
             let mut iterator = witness_deque.into_iter();
             let first = iterator.next().unwrap();
-            assert_eq!(drop_count.get(), 0, "into_iter transfers a yielded value without dropping it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "into_iter transfers a yielded value without dropping it"
+            );
             drop(first);
-            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the caller drops the yielded value exactly once"
+            );
             drop(iterator);
-            assert_eq!(drop_count.get(), 3, "dropping an unfinished iterator drops every remaining value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                "dropping an unfinished iterator drops every remaining value"
+            );
         }
     }
 }

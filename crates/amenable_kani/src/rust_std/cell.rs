@@ -7,12 +7,14 @@
 
 use std::cell::{BorrowError, BorrowMutError, Cell, LazyCell, OnceCell, RefCell, UnsafeCell};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Cell<i32>> {
     type SupportingEvidence = Self;
@@ -37,26 +39,44 @@ bridge_kani_witness!(RustStdStandard<Cell<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Cell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC, {
         /// `Cell`'s whole interface is get/set-by-value: `new` stores the
         /// initial value, `set` overwrites it, `replace` overwrites it and
         /// hands back the old value, and `take` (needs `T: Default`) does
-        /// the same against `T::default()`.
+        /// the same against `T::default()`. The first, second, and last
+        /// assertions call `RustStdStandard::<Cell<i32>>::ensures`
+        /// directly rather than restating the comparison.
         #[kani::proof]
         fn verify_cell_get_set_replace_take_round_trip() {
             let initial: i32 = kani::any();
             let cell = Cell::new(initial);
-            assert_eq!(cell.get(), initial, "new stores the initial value");
+            assert!(
+                RustStdStandard::<Cell<i32>>::ensures((cell.get(), initial)),
+                "new stores the initial value"
+            );
 
             let updated: i32 = kani::any();
             cell.set(updated);
-            assert_eq!(cell.get(), updated, "set overwrites the stored value");
+            assert!(
+                RustStdStandard::<Cell<i32>>::ensures((cell.get(), updated)),
+                "set overwrites the stored value"
+            );
 
             let replacement: i32 = kani::any();
             let old = cell.replace(replacement);
             assert_eq!(old, updated, "replace returns the previous value");
-            assert_eq!(cell.get(), replacement, "replace stores the new value");
+            assert!(
+                RustStdStandard::<Cell<i32>>::ensures((cell.get(), replacement)),
+                "replace stores the new value"
+            );
 
             let taken = cell.take();
             assert_eq!(taken, replacement, "take returns the stored value");
@@ -66,6 +86,194 @@ amenable_derive::harness! {
                 "take leaves the default value behind"
             );
         }
+    }
+}
+
+/// [`RustStdStandard<Cell<u32>>`] reuses [`RustStdStandard<Cell<i32>>`]'s
+/// harness rather than adding a new Kani proof — every proof across this
+/// crate that counts drops via a `Cell<u32>` witness relies on exactly
+/// the get/set round-trip `verify_cell_get_set_replace_take_round_trip`
+/// already checks for `i32`, just at a different scalar width.
+impl KaniWitness for RustStdStandard<Cell<u32>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Cell<u32>>);
+
+kani_ensures!(
+    RustStdStandard<Cell<u32>>,
+    "amenable_std::rust_std::RustStdStandard<Cell<u32>>",
+    (u32, u32),
+    |(actual, expected)| actual == expected
+);
+
+/// [`RustStdStandard<Cell<usize>>`] reuses the same harness for the same
+/// reason [`RustStdStandard<Cell<u32>>`] does — a call-counter witness
+/// relies on the identical get/set round-trip, at `usize` width.
+impl KaniWitness for RustStdStandard<Cell<usize>> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RustStdStandard<Cell<usize>>);
+
+kani_ensures!(
+    RustStdStandard<Cell<usize>>,
+    "amenable_std::rust_std::RustStdStandard<Cell<usize>>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
+// The real call shapes this harness's own three sites use, instead of
+// the raw predicate body `kani_ensures!` above already captures
+// canonically.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Cell<i32>>::ensures((cell.get(), initial))",
+        harnesses: &["verify_cell_get_set_replace_take_round_trip"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Cell<i32>>::ensures((cell.get(), updated))",
+        harnesses: &["verify_cell_get_set_replace_take_round_trip"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Cell<i32>>::ensures((cell.get(), replacement))",
+        harnesses: &["verify_cell_get_set_replace_take_round_trip"],
+    }
+}
+
+// Every real call shape the crate's `Cell<u32>` drop-counter idiom
+// actually uses, across every proof that relies on it -- `drop_count` is
+// always the local variable name, so only the expected count varies
+// (0, 1, 2, or 3), and each exact shape recurs across many otherwise
+// unrelated harnesses. Grouping by shape here (four registrations, not
+// one per site) mirrors exactly the duplicate-cluster grouping
+// elicit_doc's own checklist now surfaces for this rule.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<u32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0))",
+        harnesses: &[
+            "verify_box_derefs_and_writes_through",
+            "verify_rc_strong_count_tracks_clones",
+            "verify_arc_strong_count_tracks_clones",
+            "verify_binary_heap_pop_yields_the_maximum_first",
+            "verify_linked_list_is_fifo_through_back_and_front",
+            "verify_vec_deque_pushes_and_pops_from_both_ends",
+            "verify_binary_heap_drain_yields_every_pushed_element_once",
+            "verify_binary_heap_into_iter_yields_every_pushed_element_once",
+            "verify_linked_list_into_iter_yields_owned_values_in_order",
+            "verify_vec_deque_drain_removes_and_yields_in_order",
+            "verify_vec_deque_into_iter_yields_owned_values_in_order",
+            "verify_vec_push_pop_round_trips",
+            "verify_vec_drain_removes_and_yields_in_order",
+            "verify_vec_into_iter_yields_owned_values_in_order",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<u32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1))",
+        harnesses: &[
+            "verify_box_derefs_and_writes_through",
+            "verify_rc_strong_count_tracks_clones",
+            "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero",
+            "verify_arc_strong_count_tracks_clones",
+            "verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero",
+            "verify_binary_heap_pop_yields_the_maximum_first",
+            "verify_linked_list_is_fifo_through_back_and_front",
+            "verify_vec_deque_pushes_and_pops_from_both_ends",
+            "verify_binary_heap_drain_yields_every_pushed_element_once",
+            "verify_binary_heap_into_iter_yields_every_pushed_element_once",
+            "verify_linked_list_into_iter_yields_owned_values_in_order",
+            "verify_vec_deque_drain_removes_and_yields_in_order",
+            "verify_vec_deque_into_iter_yields_owned_values_in_order",
+            "verify_vec_push_pop_round_trips",
+            "verify_vec_drain_removes_and_yields_in_order",
+            "verify_vec_into_iter_yields_owned_values_in_order",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<u32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2))",
+        harnesses: &[
+            "verify_box_derefs_and_writes_through",
+            "verify_binary_heap_pop_yields_the_maximum_first",
+            "verify_linked_list_is_fifo_through_back_and_front",
+            "verify_vec_deque_pushes_and_pops_from_both_ends",
+            "verify_vec_push_pop_round_trips",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<u32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3))",
+        harnesses: &[
+            "verify_binary_heap_drain_yields_every_pushed_element_once",
+            "verify_binary_heap_into_iter_yields_every_pushed_element_once",
+            "verify_linked_list_into_iter_yields_owned_values_in_order",
+            "verify_vec_deque_drain_removes_and_yields_in_order",
+            "verify_vec_deque_into_iter_yields_owned_values_in_order",
+            "verify_vec_drain_removes_and_yields_in_order",
+            "verify_vec_into_iter_yields_owned_values_in_order",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<usize>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::cell::Cell<usize>>::ensures((calls.get(), 1))",
+        harnesses: &["verify_inspect_calls_once_per_item_without_changing_values"],
     }
 }
 

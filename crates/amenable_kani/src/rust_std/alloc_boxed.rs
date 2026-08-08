@@ -2,6 +2,8 @@
 
 use std::boxed::Box;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -65,23 +67,20 @@ amenable_derive::harness! {
             let mut witness = Box::new(DropWitness {
                 drop_count: drop_count.clone(),
             });
-            assert_eq!(
-                drop_count.get(),
-                0,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
                 "the value is not dropped while it remains boxed"
             );
             *witness = DropWitness {
                 drop_count: drop_count.clone(),
             };
-            assert_eq!(
-                drop_count.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
                 "assigning through deref_mut drops the displaced value exactly once"
             );
             drop(witness);
-            assert_eq!(
-                drop_count.get(),
-                2,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
                 "dropping the box drops the replacement exactly once"
             );
         }

@@ -2,6 +2,8 @@
 
 use std::sync::Arc;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -71,9 +73,15 @@ amenable_derive::harness! {
             let witness = Arc::new(DropWitness { drop_count: drop_count.clone() });
             let witness2 = Arc::clone(&witness);
             drop(witness2);
-            assert_eq!(drop_count.get(), 0, "the value survives dropping one of two strong refs");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "the value survives dropping one of two strong refs"
+            );
             drop(witness);
-            assert_eq!(drop_count.get(), 1, "the value drops exactly once, when the last strong ref drops");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the value drops exactly once, when the last strong ref drops"
+            );
         }
     }
 }
@@ -151,9 +159,8 @@ amenable_derive::harness! {
             let witness = Arc::new(DropWitness { drop_count: drop_count.clone() });
             let weak_witness = Arc::downgrade(&witness);
             drop(witness);
-            assert_eq!(
-                drop_count.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the value drops once the last strong ref drops, though a Weak to it still exists"
             );
             assert!(weak_witness.upgrade().is_none());

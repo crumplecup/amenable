@@ -32,6 +32,8 @@ use std::ops::Range;
 use std::slice::Iter;
 use std::vec::IntoIter;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -758,15 +760,13 @@ amenable_derive::harness! {
             let mut inspected = (value..value + 1).inspect(|_| calls.set(calls.get() + 1));
 
             assert_eq!(inspected.next(), Some(value), "inspect does not change the yielded value");
-            assert_eq!(
-                calls.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect calls its closure exactly once per item"
             );
             assert_eq!(inspected.next(), None, "the one-item inspected iterator then exhausts");
-            assert_eq!(
-                calls.get(),
-                1,
+            assert!(
+                RustStdStandard::<std::cell::Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect does not re-invoke its closure after exhaustion"
             );
         }

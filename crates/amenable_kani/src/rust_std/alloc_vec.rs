@@ -2,6 +2,8 @@
 
 use std::vec::Vec;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -66,11 +68,20 @@ amenable_derive::harness! {
             witnesses.push(DropWitness { drop_count: drop_count.clone() });
             witnesses.push(DropWitness { drop_count: drop_count.clone() });
             let popped = witnesses.pop().unwrap();
-            assert_eq!(drop_count.get(), 0, "pop does not drop the returned value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "pop does not drop the returned value"
+            );
             drop(popped);
-            assert_eq!(drop_count.get(), 1, "the popped value drops once its owner drops it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the popped value drops once its owner drops it"
+            );
             drop(witnesses);
-            assert_eq!(drop_count.get(), 2, "dropping the Vec drops the remaining element");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                "dropping the Vec drops the remaining element"
+            );
         }
     }
 }
@@ -127,11 +138,20 @@ amenable_derive::harness! {
             ];
             let mut drain = witnesses.drain(..);
             let first = drain.next().unwrap();
-            assert_eq!(drop_count.get(), 0, "drain transfers a yielded value without dropping it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "drain transfers a yielded value without dropping it"
+            );
             drop(first);
-            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the caller drops the yielded value exactly once"
+            );
             drop(drain);
-            assert_eq!(drop_count.get(), 3, "dropping an unfinished drain drops every remaining value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                "dropping an unfinished drain drops every remaining value"
+            );
             assert!(witnesses.is_empty(), "dropping an unfinished drain leaves the Vec empty");
         }
     }
@@ -189,11 +209,20 @@ amenable_derive::harness! {
             ]
             .into_iter();
             let first = witness_iter.next().unwrap();
-            assert_eq!(drop_count.get(), 0, "IntoIter transfers a yielded value without dropping it");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                "IntoIter transfers a yielded value without dropping it"
+            );
             drop(first);
-            assert_eq!(drop_count.get(), 1, "the caller drops the yielded value exactly once");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                "the caller drops the yielded value exactly once"
+            );
             drop(witness_iter);
-            assert_eq!(drop_count.get(), 3, "dropping IntoIter drops every remaining value");
+            assert!(
+                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                "dropping IntoIter drops every remaining value"
+            );
         }
     }
 }
