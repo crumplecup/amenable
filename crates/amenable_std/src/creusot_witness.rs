@@ -157,7 +157,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
-    NON_NUL_BYTE_HOLDS_SRC, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    NON_NUL_BYTE_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
+    VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
     VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
@@ -246,8 +247,8 @@ use amenable_creusot::{
 };
 
 use crate::{
-    ArgvIncludesProgramPath, AsciiByte, NonNulByte, RustLanguageProvenance, RustStdProvenance,
-    RustStdStandard, ValidUnicodeScalar,
+    ArgvIncludesProgramPath, AsciiByte, NonNulByte, NulOnlyAtTheEndValidates,
+    RustLanguageProvenance, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
 };
 
 #[expect(
@@ -2315,6 +2316,66 @@ impl Requires<CreusotVerifier> for NonNulByte {
             "verify_nul_error_reports_the_interior_nuls_position",
             "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
             "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere",
+            "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
+        ],
+    }
+}
+
+/// [`NulOnlyAtTheEndValidates`] reuses the `FromVecWithNulError` harness
+/// rather than adding a new Creusot proof — it names the postcondition
+/// both `from_vec_with_nul`/`from_bytes_with_nul` proofs already share,
+/// it doesn't prove anything new.
+impl CreusotWitness for NulOnlyAtTheEndValidates {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
+            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(NulOnlyAtTheEndValidates);
+
+/// Returns `amenable_creusot::NUL_ONLY_AT_THE_END_VALIDATES_SRC`
+/// directly -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn nul_only_at_the_end_validates` both
+/// `verify_from_vec_with_nul_requires_the_nul_only_at_the_end` and
+/// `verify_from_bytes_with_nul_requires_the_nul_only_at_the_end` call,
+/// not a hand-retyped copy of its expression. There is exactly one
+/// place this postcondition's text exists in the whole codebase.
+impl Ensures<CreusotVerifier> for NulOnlyAtTheEndValidates {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        NUL_ONLY_AT_THE_END_VALIDATES_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NulOnlyAtTheEndValidates",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <NulOnlyAtTheEndValidates as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shape both real sites now use, instead of the raw
+// expression NUL_ONLY_AT_THE_END_VALIDATES_SRC itself captures.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NulOnlyAtTheEndValidates",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "nul_only_at_the_end_validates (result)",
+        harnesses: &[
+            "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
             "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
         ],
     }

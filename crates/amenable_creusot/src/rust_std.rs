@@ -1687,16 +1687,27 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, NUL_ONLY_AT_THE_END_VALIDATES_SRC, {
+        /// The `amenable_std::NulOnlyAtTheEndValidates` postcondition --
+        /// real, callable Pearlite content, not just descriptive text
+        /// alongside it. The three-flag validation disposition
+        /// (accepted, missing-nul-rejected, interior-nul-rejected) all
+        /// hold together.
+        #[logic(open)]
+        fn nul_only_at_the_end_validates(disposition: (bool, bool, bool)) -> bool {
+            pearlite! { disposition.0 && disposition.1 && disposition.2 }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC, {
         /// `CString::from_vec_with_nul` accepts a nul-terminated byte
         /// vector only when the sole nul byte is the final one. See
         /// this cluster's leading comment for the accommodation-model
         /// rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (accepted, missing_nul_rejected, interior_nul_rejected) =>
-                accepted && missing_nul_rejected && interior_nul_rejected,
-        })]
+        #[ensures(nul_only_at_the_end_validates(result))]
         fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(
             byte: u8,
         ) -> (bool, bool, bool) {
@@ -1791,10 +1802,7 @@ amenable_derive::harness! {
         /// cluster's leading comment for the accommodation-model
         /// rationale.
         #[requires(non_nul_byte_holds(byte))]
-        #[ensures(match result {
-            (accepted, missing_nul_rejected, interior_nul_rejected) =>
-                accepted && missing_nul_rejected && interior_nul_rejected,
-        })]
+        #[ensures(nul_only_at_the_end_validates(result))]
         fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(
             byte: u8,
         ) -> (bool, bool, bool) {

@@ -22,6 +22,7 @@ mod creusot_gallery;
 mod creusot_witness;
 mod increment_headroom;
 mod non_nul_byte;
+mod nul_only_at_the_end_validates;
 mod rust_std;
 mod valid_unicode_scalar;
 mod value_unchanged;
@@ -42,6 +43,7 @@ pub use creusot_gallery::{
 pub use creusot_witness::CheckedProof;
 pub use increment_headroom::IncrementHeadroom;
 pub use non_nul_byte::NonNulByte;
+pub use nul_only_at_the_end_validates::NulOnlyAtTheEndValidates;
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,

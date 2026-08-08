@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2046 8 2046 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2054 8 2054 82 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2047 12 2047 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2039 19 2039 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2040 18 2045 9
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2011 18 2016 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2055 12 2055 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2047 19 2047 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2048 18 2053 9
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2019 18 2024 9
 
 use creusot.prelude.Any
 
@@ -26,7 +26,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_ordering_reverse_swaps_less_and_greater
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2046 8 2046 82] (o: t_Ordering)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2054 8 2054 82] (o: t_Ordering)
   (return (x: t_Ordering)) = (! bb0
   [ bb0 = s0 [ s0 = reverse [%#srust_std] {o} (fun (_x: t_Ordering) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]
   [ & _ret: t_Ordering = Any.any_l () | & o: t_Ordering = o ])
