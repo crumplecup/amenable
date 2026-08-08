@@ -5277,6 +5277,13 @@ bridge_verus_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
     }
 }
 
+/// Every width's Verus accommodation model states the identical claim
+/// (`result == (initial, next)`) since the model function is a plain
+/// echo of its own two parameters — trivially true by construction, but
+/// still a real, named round-trip claim about the atomic-model type, not
+/// scanner-level noise (unlike a bare `result`, whose *content* is
+/// invisible to the clause): `Ensures<VerusVerifier>` names it once here
+/// rather than at each of the eleven widths' own `ensures` clauses.
 macro_rules! impl_sync_atomic_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
@@ -5302,6 +5309,21 @@ macro_rules! impl_sync_atomic_verus_witness {
                 evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
                 verifier: "verus",
                 describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+
+        impl Ensures<VerusVerifier> for RustStdStandard<$ty> {
+            fn ensures() -> &'static str {
+                "result == (initial, next)"
+            }
+        }
+
+        ::inventory::submit! {
+            ::amenable_core::ContractRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                kind: "ensures",
+                fragment: <RustStdStandard<$ty> as Ensures<VerusVerifier>>::ensures,
             }
         }
     };

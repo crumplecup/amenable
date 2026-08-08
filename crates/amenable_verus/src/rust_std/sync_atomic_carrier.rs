@@ -18,6 +18,11 @@
 //! real type refines this law, which `amenable_kani`'s own harness for
 //! that exact width (checking the real type directly) already confirms
 //! independently, for the identical claim.
+//!
+//! Every `ensures result == (initial, next),` clause below is the
+//! canonical home each width's own `RustStdStandard<Atomic*>`'s
+//! `Ensures<VerusVerifier>` impl (`amenable_std::verus_witness`,
+//! `impl_sync_atomic_verus_witness!`) names.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
