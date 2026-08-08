@@ -60,9 +60,16 @@
 //!   already uses elsewhere in this crate: encoding is exactly the code
 //!   point cast to `u16`.
 
-use amenable_std::{RustLanguageProvenance, RustStdProvenance};
+#[cfg(kani)]
+use amenable_core::Ensures;
+use amenable_core::Evidence;
+use amenable_std::{
+    RustLanguageProvenance, RustStdProvenance, WindowsHandleOrInvalidRejectsOnlyTheSentinel,
+};
 
 use super::CheckedProof;
+use crate::KaniWitness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 /// Modeled raw HANDLE value -- see the module doc for why this is a plain
 /// `isize`, not a real pointer.
@@ -211,19 +218,65 @@ amenable_derive::harness! {
     }
 }
 
+/// [`WindowsHandleOrInvalidRejectsOnlyTheSentinel`] reuses the same
+/// harness rather than adding a new Kani proof — it names the
+/// postcondition this model's one real proof already checks, it doesn't
+/// prove anything new.
+impl KaniWitness for WindowsHandleOrInvalidRejectsOnlyTheSentinel {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
+            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(WindowsHandleOrInvalidRejectsOnlyTheSentinel);
+
+kani_ensures!(
+    WindowsHandleOrInvalidRejectsOnlyTheSentinel,
+    "amenable_std::WindowsHandleOrInvalidRejectsOnlyTheSentinel",
+    isize,
+    |value| crate::KaniWindowsHandleOrInvalid::new(value)
+        .try_into_owned()
+        .is_err()
+);
+
+// The real call shape the one harness below actually uses, instead of
+// the raw predicate body `kani_ensures!` above already captures
+// canonically.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::WindowsHandleOrInvalidRejectsOnlyTheSentinel",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "WindowsHandleOrInvalidRejectsOnlyTheSentinel::ensures(value)",
+        harnesses: &["verify_windows_handle_or_invalid_rejects_only_the_sentinel"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC, {
         /// `HandleOrInvalid` converts to an owned handle, preserving the
         /// wrapped value, unless that value is exactly the
         /// `INVALID_HANDLE_VALUE` sentinel (`-1`), in which case
-        /// conversion fails.
+        /// conversion fails. The assertion calls
+        /// `WindowsHandleOrInvalidRejectsOnlyTheSentinel::ensures`
+        /// directly rather than restating the comparison.
         #[kani::proof]
         fn verify_windows_handle_or_invalid_rejects_only_the_sentinel() {
             let value: isize = kani::any();
             let wrapped = crate::KaniWindowsHandleOrInvalid::new(value);
             let result = wrapped.try_into_owned();
             if value == crate::KANI_INVALID_HANDLE_VALUE {
-                assert!(result.is_err(), "the sentinel value is rejected");
+                assert!(
+                    WindowsHandleOrInvalidRejectsOnlyTheSentinel::ensures(value),
+                    "the sentinel value is rejected"
+                );
             } else {
                 assert_eq!(
                     result,

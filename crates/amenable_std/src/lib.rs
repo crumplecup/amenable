@@ -36,6 +36,7 @@ mod value_unchanged;
 mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;
+mod windows_handle_or_invalid_rejects_only_the_sentinel;
 mod yields_two_values_in_order_then_ends;
 
 pub use argv_includes_program_path::ArgvIncludesProgramPath;
@@ -69,4 +70,5 @@ pub use verus_gallery::{
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
 pub use yields_two_values_in_order_then_ends::YieldsTwoValuesInOrderThenEnds;
