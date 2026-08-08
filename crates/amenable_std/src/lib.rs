@@ -13,6 +13,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod argv_includes_program_path;
 mod ascii_byte;
 mod cert;
 #[cfg(feature = "creusot")]
@@ -29,6 +30,7 @@ mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;
 
+pub use argv_includes_program_path::ArgvIncludesProgramPath;
 pub use ascii_byte::AsciiByte;
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
 #[cfg(feature = "creusot")]

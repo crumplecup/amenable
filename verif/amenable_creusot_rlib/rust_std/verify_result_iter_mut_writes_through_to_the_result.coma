@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2667 8 2670 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2692 8 2695 57 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2660 19 2660 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2661 18 2666 9
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2685 19 2685 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2686 18 2691 9
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -17,7 +17,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_result_iter_mut_writes_through_to_the_result
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2667 8 2670 57] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2692 8 2695 57] (value: Int32.t)
   (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some value ] s1

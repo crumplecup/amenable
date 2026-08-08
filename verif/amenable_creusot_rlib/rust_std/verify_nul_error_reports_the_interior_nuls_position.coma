@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1715 8 1715 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1740 8 1740 90 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1717 13 1717 19
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1717 21 1717 27
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1710 19 1710 43
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1711 18 1714 9
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1635 24 1635 34
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1742 13 1742 19
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1742 21 1742 27
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1735 19 1735 43
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1736 18 1739 9
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1660 24 1660 34
 
 use creusot.int.UInt64
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ use creusot.int.UInt8
 
 type tup2_usize_usize = { f0: UInt64.t; f1: UInt64.t }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1634 8 1634 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1659 8 1659 47] (byte: UInt8.t) =
   [%#srust_std'3] UInt8.t'int byte <> 0
 
 meta "compute_max_steps" 1000000
@@ -20,7 +20,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_nul_error_reports_the_interior_nuls_position
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1715 8 1715 90] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1740 8 1740 90] (byte: UInt8.t)
   (return (x: tup2_usize_usize)) =
   {[@stop_split] [@expl:verify_nul_error_reports_the_interior_nuls_position requires] [%#srust_std'1] non_nul_byte_holds byte}
   (! bb0

@@ -304,6 +304,33 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, ARGV_EXTRA_HEADROOM_HOLDS_SRC, {
+        /// The `amenable_std::ArgvIncludesProgramPath` precondition --
+        /// real, callable Pearlite content, not just descriptive text
+        /// alongside it. Enough headroom below `usize::MAX` for `1 +
+        /// extra` to compute without overflow.
+        #[logic(open)]
+        fn argv_extra_headroom_holds(extra: usize) -> bool {
+            pearlite! { extra@ < usize::MAX@ }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, ARGV_INCLUDES_PROGRAM_PATH_SRC, {
+        /// The `amenable_std::ArgvIncludesProgramPath` postcondition --
+        /// real, callable Pearlite content, not just descriptive text
+        /// alongside it. The reported count always includes at least the
+        /// program's own slot, and equals exactly one more than the
+        /// extra arguments supplied.
+        #[logic(open)]
+        fn argv_includes_program_path(extra: usize, args_result: (usize, usize)) -> bool {
+            pearlite! { args_result.0@ >= 1 && args_result.0@ == 1 + extra@ }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, {
         /// The process's own argv always has at least one element -- the
         /// program's own slot -- so `.args()` never yields an empty
@@ -320,9 +347,8 @@ amenable_derive::harness! {
         /// exact accommodation-model shape as "acceptable executable
         /// evidence for the scoped Args count law, with the real-process
         /// correspondence made explicit by the accommodation model."
-        #[requires(extra@ < usize::MAX@)]
-        #[ensures(result.0@ >= 1)]
-        #[ensures(result.0@ == 1 + extra@)]
+        #[requires(argv_extra_headroom_holds(extra))]
+        #[ensures(argv_includes_program_path(extra, result))]
         fn verify_args_reports_at_least_the_program_path(extra: usize) -> (usize, usize) {
             let args_count = 1 + extra;
             (args_count, extra)
@@ -334,9 +360,8 @@ amenable_derive::harness! {
     creusot, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, {
         /// Same guarantee as `Args`, in the raw `OsString` form -- same
         /// accommodation model, same rationale.
-        #[requires(extra@ < usize::MAX@)]
-        #[ensures(result.0@ >= 1)]
-        #[ensures(result.0@ == 1 + extra@)]
+        #[requires(argv_extra_headroom_holds(extra))]
+        #[ensures(argv_includes_program_path(extra, result))]
         fn verify_args_os_reports_at_least_the_program_path(extra: usize) -> (usize, usize) {
             let args_count = 1 + extra;
             (args_count, extra)

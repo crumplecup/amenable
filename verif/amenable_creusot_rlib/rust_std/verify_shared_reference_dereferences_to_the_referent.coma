@@ -1,7 +1,7 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 916 8 916 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 941 8 941 82 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 914 19 914 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 915 18 915 33
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 939 19 939 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 940 18 940 33
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -11,7 +11,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_shared_reference_dereferences_to_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 916 8 916 82] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 941 8 941 82] (value: Int32.t)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &reference <- value ] s1 | s1 = [ &_ret <- reference ] s2 | s2 = return {_ret} ] ]
   [ & _ret: Int32.t = Any.any_l () | & value: Int32.t = value | & reference: Int32.t = Any.any_l () ])

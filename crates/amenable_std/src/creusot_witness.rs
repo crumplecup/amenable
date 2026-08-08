@@ -156,8 +156,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
-    CreusotVerifier, CreusotWitness, NON_NUL_BYTE_HOLDS_SRC,
-    VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+    ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC, CreusotVerifier, CreusotWitness,
+    NON_NUL_BYTE_HOLDS_SRC, VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
     VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
     VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC, VERIFY_ATOMIC_BOOL_LOAD_STORE_SRC,
     VERIFY_ATOMIC_I8_LOAD_STORE_SRC, VERIFY_ATOMIC_I16_LOAD_STORE_SRC,
@@ -246,8 +246,8 @@ use amenable_creusot::{
 };
 
 use crate::{
-    AsciiByte, NonNulByte, RustLanguageProvenance, RustStdProvenance, RustStdStandard,
-    ValidUnicodeScalar,
+    ArgvIncludesProgramPath, AsciiByte, NonNulByte, RustLanguageProvenance, RustStdProvenance,
+    RustStdStandard, ValidUnicodeScalar,
 };
 
 #[expect(
@@ -1871,6 +1871,100 @@ bridge_creusot_witness!(RustStdStandard<ArgsOs>);
         evidence: "amenable_std::rust_std::RustStdStandard<ArgsOs>",
         verifier: "creusot",
         describe: || <RustStdStandard<ArgsOs> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// [`ArgvIncludesProgramPath`] reuses the `Args` harness rather than
+/// adding a new Creusot proof — it names the precondition/postcondition
+/// pair both `Args` and `ArgsOs` proofs already share, it doesn't prove
+/// anything new.
+impl CreusotWitness for ArgvIncludesProgramPath {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_args_reports_at_least_the_program_path",
+            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_creusot_witness!(ArgvIncludesProgramPath);
+
+/// Returns `amenable_creusot::ARGV_EXTRA_HEADROOM_HOLDS_SRC` /
+/// `ARGV_INCLUDES_PROGRAM_PATH_SRC` directly -- the verbatim,
+/// `harness!`-captured source of the real `#[logic(open)]` fns both
+/// `verify_args_reports_at_least_the_program_path` and
+/// `verify_args_os_reports_at_least_the_program_path` call, not a
+/// hand-retyped copy of their expressions. There is exactly one place
+/// each of this precondition/postcondition pair's text exists in the
+/// whole codebase.
+impl Requires<CreusotVerifier> for ArgvIncludesProgramPath {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        ARGV_EXTRA_HEADROOM_HOLDS_SRC
+    }
+}
+
+impl Ensures<CreusotVerifier> for ArgvIncludesProgramPath {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        ARGV_INCLUDES_PROGRAM_PATH_SRC
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArgvIncludesProgramPath",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || <ArgvIncludesProgramPath as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &[],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArgvIncludesProgramPath",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <ArgvIncludesProgramPath as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &[],
+    }
+}
+
+// The real call shapes both real sites now use, instead of the raw
+// expressions ARGV_EXTRA_HEADROOM_HOLDS_SRC/ARGV_INCLUDES_PROGRAM_PATH_SRC
+// themselves capture.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArgvIncludesProgramPath",
+        verifier: "creusot",
+        kind: "requires",
+        fragment: || "argv_extra_headroom_holds (extra)",
+        harnesses: &[
+            "verify_args_reports_at_least_the_program_path",
+            "verify_args_os_reports_at_least_the_program_path",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArgvIncludesProgramPath",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || "argv_includes_program_path (extra , result)",
+        harnesses: &[
+            "verify_args_reports_at_least_the_program_path",
+            "verify_args_os_reports_at_least_the_program_path",
+        ],
     }
 }
 
