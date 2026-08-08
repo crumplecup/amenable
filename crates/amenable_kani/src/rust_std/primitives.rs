@@ -10,12 +10,14 @@
 //! exception, trusted alongside the scalars: it has exactly one possible
 //! value, nothing to check.
 
-use amenable_core::{Establish, Evidence, ProofToken, Requires};
+#[cfg(kani)]
+use amenable_core::Requires;
+use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::{AsciiByte, RustStdStandard};
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
 use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl_kani_witness_trusted!(
@@ -302,15 +304,14 @@ amenable_derive::harness! {
         /// can (here, borrowed from an owned `String`), so this is the
         /// only way any code interacts with a `str` value at all.
         ///
-        /// The `kani::assume` call is the canonical home
-        /// [`AsciiByte`]'s own `Requires<KaniVerifier>` impl (below) names
-        /// for this exact fragment — the same precondition every
-        /// symbolic single-byte-character proof in `rust_std::str`
-        /// assumes, under a different local variable name each time.
+        /// The `kani::assume` call below calls
+        /// `AsciiByte::requires` directly rather than restating its
+        /// expression — the same precondition every symbolic
+        /// single-byte-character proof in `rust_std::str` assumes.
         #[kani::proof]
         fn verify_str_byte_length_and_content() {
             let byte: u8 = kani::any();
-            kani::assume(byte < 128);
+            kani::assume(AsciiByte::requires(byte));
             let owned = (byte as char).to_string();
             let s: &str = &owned;
             assert_eq!(s.len(), 1, "a single ASCII char is exactly one UTF-8 byte");
@@ -337,20 +338,7 @@ impl KaniWitness for AsciiByte {
 
 bridge_kani_witness!(AsciiByte);
 
-impl Requires<KaniVerifier> for AsciiByte {
-    fn requires() -> &'static str {
-        "byte < 128"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "kani",
-        kind: "requires",
-        fragment: <AsciiByte as Requires<KaniVerifier>>::requires,
-    }
-}
+kani_requires!(AsciiByte, "amenable_std::AsciiByte", u8, |byte| byte < 128);
 
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;

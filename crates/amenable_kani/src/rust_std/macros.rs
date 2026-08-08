@@ -66,7 +66,63 @@ macro_rules! impl_kani_witness_trusted {
     };
 }
 
-pub(crate) use {bridge_kani_witness, impl_kani_witness_trusted};
+/// Defines a contract type's `Requires<KaniVerifier>` impl as the real,
+/// callable check — `Bound = bool`, `Input` the value being checked. The
+/// proof site calls `$ty::requires(x)` directly; that call *is* the bound,
+/// not a restatement of it living somewhere else. A `ContractRecord` is
+/// still registered (via `stringify!` on the identical expression) purely
+/// as a derived audit artifact for `dump-registry` enumeration — it does
+/// not compete with `requires()` as a second definition, since nothing
+/// reads it back to check anything.
+macro_rules! kani_requires {
+    ($ty:ty, $evidence:literal, $param_ty:ty, |$param:pat_param| $expr:expr) => {
+        impl amenable_core::Requires<crate::KaniVerifier> for $ty {
+            type Input = $param_ty;
+            type Bound = bool;
+
+            fn requires($param: $param_ty) -> bool {
+                $expr
+            }
+        }
+
+        ::inventory::submit! {
+            ::amenable_core::ContractRecord {
+                evidence: $evidence,
+                verifier: "kani",
+                kind: "requires",
+                fragment: || stringify!($expr),
+                harnesses: &[],
+            }
+        }
+    };
+}
+
+/// The `Ensures` counterpart of [`kani_requires`] — same one-source
+/// guarantee, for a postcondition instead of a precondition.
+macro_rules! kani_ensures {
+    ($ty:ty, $evidence:literal, $param_ty:ty, |$param:pat_param| $expr:expr) => {
+        impl amenable_core::Ensures<crate::KaniVerifier> for $ty {
+            type Input = $param_ty;
+            type Bound = bool;
+
+            fn ensures($param: $param_ty) -> bool {
+                $expr
+            }
+        }
+
+        ::inventory::submit! {
+            ::amenable_core::ContractRecord {
+                evidence: $evidence,
+                verifier: "kani",
+                kind: "ensures",
+                fragment: || stringify!($expr),
+                harnesses: &[],
+            }
+        }
+    };
+}
+
+pub(crate) use {bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires};
 
 /// Proof artifact for a carrier with a real, machine-checked Kani harness:
 /// names the harness, carries its verbatim source as `claim`, and still

@@ -19,12 +19,14 @@ use std::char::{
     TryFromCharError,
 };
 
-use amenable_core::{Ensures, Evidence};
+#[cfg(kani)]
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::{RustStdStandard, ValidUnicodeScalar};
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<CharTryFromError> {
     type SupportingEvidence = Self;
@@ -56,16 +58,13 @@ amenable_derive::harness! {
         /// `char::try_from(u32)` succeeds exactly for valid Unicode scalar
         /// values (at most `U+10FFFF`, excluding the surrogate range), and
         /// preserves the value; it fails with `CharTryFromError` otherwise.
-        ///
-        /// The `is_valid_scalar` check below is the canonical home
-        /// `amenable_std::ValidUnicodeScalar` names — see that type for the
-        /// same bound stated once, and its `Ensures<KaniVerifier>` impl for
-        /// this exact fragment held as a reusable, backend-checkable claim.
+        /// `is_valid_scalar` calls `ValidUnicodeScalar::ensures` directly
+        /// rather than restating its expression.
         #[kani::proof]
         fn verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range() {
             let value: u32 = kani::any();
             let result = char::try_from(value);
-            let is_valid_scalar = value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value);
+            let is_valid_scalar = ValidUnicodeScalar::ensures(value);
             if is_valid_scalar {
                 let parsed = result.expect("a valid Unicode scalar value must convert");
                 assert_eq!(
@@ -103,20 +102,12 @@ impl KaniWitness for ValidUnicodeScalar {
 
 bridge_kani_witness!(ValidUnicodeScalar);
 
-impl Ensures<crate::KaniVerifier> for ValidUnicodeScalar {
-    fn ensures() -> &'static str {
-        "value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value)"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures,
-    }
-}
+kani_ensures!(
+    ValidUnicodeScalar,
+    "amenable_std::ValidUnicodeScalar",
+    u32,
+    |value| value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value)
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {

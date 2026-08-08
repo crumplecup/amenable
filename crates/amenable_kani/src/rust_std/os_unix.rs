@@ -12,13 +12,15 @@
 
 use std::os::unix::io::{BorrowedFd, OwnedFd};
 
-use amenable_core::{Ensures, Evidence};
+#[cfg(kani)]
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
 use crate::NonNegativeFd;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<BorrowedFd<'static>> {
     type SupportingEvidence = Self;
@@ -47,13 +49,9 @@ amenable_derive::harness! {
     kani, VERIFY_BORROWED_FD_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC, {
         /// Borrowing an already-open Unix stream's descriptor reports
         /// exactly the same raw value the owner itself reports, and a
-        /// live descriptor is always non-negative.
-        ///
-        /// The second assertion is the canonical home
-        /// `NonNegativeFd` names — see that type (`fd_model.rs`) for the
-        /// same bound stated once, and its `Ensures<KaniVerifier>` impl
-        /// below for this exact fragment held as a reusable,
-        /// backend-checkable claim.
+        /// live descriptor is always non-negative. The second assertion
+        /// calls `NonNegativeFd::ensures` directly rather than restating
+        /// the comparison.
         #[kani::proof]
         fn verify_borrowed_fd_reports_the_same_raw_value_as_the_owner() {
             use std::os::unix::io::{AsFd, AsRawFd};
@@ -61,7 +59,10 @@ amenable_derive::harness! {
             let stdout = std::io::stdout();
             let borrowed = stdout.as_fd();
             assert_eq!(borrowed.as_raw_fd(), stdout.as_raw_fd());
-            assert!(stdout.as_raw_fd() >= 0, "a live fd is never negative");
+            assert!(
+                NonNegativeFd::ensures(stdout.as_raw_fd()),
+                "a live fd is never negative"
+            );
         }
     }
 }
@@ -85,20 +86,12 @@ impl KaniWitness for NonNegativeFd {
 
 bridge_kani_witness!(NonNegativeFd);
 
-impl Ensures<crate::KaniVerifier> for NonNegativeFd {
-    fn ensures() -> &'static str {
-        "value >= 0"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::NonNegativeFd",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: <NonNegativeFd as Ensures<crate::KaniVerifier>>::ensures,
-    }
-}
+kani_ensures!(
+    NonNegativeFd,
+    "amenable_kani::NonNegativeFd",
+    i32,
+    |value| value >= 0
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {

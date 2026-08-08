@@ -73,7 +73,8 @@ inventory::collect!(ProofRecord);
 /// A statically-registered fact: a verifier backend checks a named
 /// requires/ensures bound, in its own native syntax, for a given evidence
 /// type. Registered once per `(evidence, verifier, kind)` triple by each
-/// `Ensures`/`Requires` impl, alongside its own definition.
+/// `Ensures`/`Requires` impl, alongside its own definition — plus once more
+/// per supplementary spelling/margin the same bound recurs under.
 ///
 /// Unlike [`ProofRecord::describe`], `fragment` is not merely a
 /// presence/absence signal — external tooling (e.g. a scanner that flags
@@ -82,6 +83,16 @@ inventory::collect!(ProofRecord);
 /// compare against real source, not just the fact that some contract
 /// exists. It is still a plain function pointer, not a captured closure,
 /// for the same `const`-evaluable reason `describe` is.
+///
+/// `harnesses` scopes where this fragment text is a valid match: the exact
+/// proof-site function name(s) it was transcribed from. Two unrelated
+/// types can independently state claims that normalize to the same literal
+/// text (e.g. `"result == value"` for a round-trip claim about completely
+/// different types) — without this scope, a scanner matching on
+/// `(verifier, kind, text)` alone would treat one type's registration as
+/// clearing every other type's coincidentally-identical, still-unnamed
+/// site. Empty only for records pre-dating this field; never leave it
+/// empty in a new registration.
 pub struct ContractRecord {
     /// The evidence type this contract names, in the same naming
     /// convention as [`EvidenceLink::name`].
@@ -92,6 +103,10 @@ pub struct ContractRecord {
     pub kind: &'static str,
     /// The bound's fragment, in the verifier's own native syntax.
     pub fragment: fn() -> &'static str,
+    /// The proof-site function name(s) this fragment text was transcribed
+    /// from — scopes matching so coincidentally-identical text elsewhere
+    /// isn't treated as the same claim.
+    pub harnesses: &'static [&'static str],
 }
 
 inventory::collect!(ContractRecord);

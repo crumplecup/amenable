@@ -29,10 +29,13 @@ fn valid_unicode_scalar_reuses_the_char_try_from_harness_and_names_its_bound() {
         "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
     );
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
-    assert_eq!(
-        <ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(),
-        "value <= 0x0010_FFFF && !(0xD800..=0xDFFF).contains(&value)"
-    );
+    assert!(<ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(0x41));
+    assert!(!<ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(
+        0xD800
+    ));
+    assert!(!<ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(
+        0x0011_0000
+    ));
 }
 
 #[test]
@@ -53,8 +56,6 @@ fn non_negative_fd_reuses_the_borrowed_fd_harness_and_names_its_bound() {
         "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner"
     );
     assert_eq!(proof.provenance, <i32 as RustStdType>::provenance());
-    assert_eq!(
-        <NonNegativeFd as Ensures<KaniVerifier>>::ensures(),
-        "value >= 0"
-    );
+    assert!(<NonNegativeFd as Ensures<KaniVerifier>>::ensures(0));
+    assert!(!<NonNegativeFd as Ensures<KaniVerifier>>::ensures(-1));
 }

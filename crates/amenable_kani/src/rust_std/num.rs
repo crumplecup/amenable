@@ -13,6 +13,8 @@ use std::num::{
     Wrapping,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -46,18 +48,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<i8>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_I8_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_i8() {
             let value: i8 = kani::any();
             match NonZero::<i8>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<i8>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -94,18 +97,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<i16>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_I16_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_i16() {
             let value: i16 = kani::any();
             match NonZero::<i16>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<i16>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -142,18 +146,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<i32>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_I32_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_i32() {
             let value: i32 = kani::any();
             match NonZero::<i32>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<i32>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -190,18 +195,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<i64>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_I64_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_i64() {
             let value: i64 = kani::any();
             match NonZero::<i64>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<i64>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -238,18 +244,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<i128>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_I128_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_i128() {
             let value: i128 = kani::any();
             match NonZero::<i128>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<i128>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -286,18 +293,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<isize>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_ISIZE_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_isize() {
             let value: isize = kani::any();
             match NonZero::<isize>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<isize>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -334,18 +342,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<u8>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_U8_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_u8() {
             let value: u8 = kani::any();
             match NonZero::<u8>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<u8>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -382,18 +391,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<u16>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_U16_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_u16() {
             let value: u16 = kani::any();
             match NonZero::<u16>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<u16>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -430,18 +440,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<u32>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_U32_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_u32() {
             let value: u32 = kani::any();
             match NonZero::<u32>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<u32>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -478,18 +489,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<u64>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_U64_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_u64() {
             let value: u64 = kani::any();
             match NonZero::<u64>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<u64>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -526,18 +538,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<u128>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_U128_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_u128() {
             let value: u128 = kani::any();
             match NonZero::<u128>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<u128>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -574,18 +587,19 @@ bridge_kani_witness!(RustStdStandard<NonZero<usize>>);
 amenable_derive::harness! {
     kani, VERIFY_NONZERO_USIZE_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
-        /// round-trips the wrapped value unchanged.
-        ///
-        /// The first assertion is the canonical home
-        /// `RustStdStandard<NonZero<T>>`'s own `Ensures<KaniVerifier>` impl
-        /// names (below, in `impl_nonzero_ensures_kani!`) for this exact
-        /// fragment held as a reusable, backend-checkable claim.
+        /// round-trips the wrapped value unchanged. The first assertion
+        /// calls `RustStdStandard::<NonZero<T>>::ensures` directly
+        /// (defined below, in `impl_nonzero_ensures_kani!`) rather than
+        /// restating `value != 0`.
         #[kani::proof]
         fn verify_nonzero_usize() {
             let value: usize = kani::any();
             match NonZero::<usize>::new(value) {
                 Some(nz) => {
-                    assert!(value != 0, "NonZero::new succeeds only for nonzero values");
+                    assert!(
+                        RustStdStandard::<NonZero<usize>>::ensures(value),
+                        "NonZero::new succeeds only for nonzero values"
+                    );
                     assert_eq!(nz.get(), value, "NonZero round-trips its wrapped value");
                 }
                 None => {
@@ -597,19 +611,23 @@ amenable_derive::harness! {
 }
 
 /// The [`RustStdStandard<NonZero<T>>`] witnesses above all reuse their own
-/// harness for [`amenable_core::Ensures<crate::KaniVerifier>`] — the
-/// `value != 0` assertion in each is the canonical bound `Ensures` names,
-/// identical across every width for the same reason the witnesses
-/// themselves are literal per-width blocks (see this module's own doc
-/// comment): a generator macro's captured span would resolve back to
-/// unsubstituted placeholders, not the real per-width text. Nothing here
-/// needs `harness!`'s span capture, though, so this half is a plain macro.
+/// harness for [`amenable_core::Ensures<crate::KaniVerifier>`] — each
+/// harness calls `RustStdStandard::<NonZero<T>>::ensures(value)` directly
+/// rather than restating `value != 0`, identical across every width for
+/// the same reason the witnesses themselves are literal per-width blocks
+/// (see this module's own doc comment): a generator macro's captured span
+/// would resolve back to unsubstituted placeholders, not the real
+/// per-width text. Nothing here needs `harness!`'s span capture, though,
+/// so this half is a plain macro.
 macro_rules! impl_nonzero_ensures_kani {
     ($($ty:ty),* $(,)?) => {
         $(
             impl amenable_core::Ensures<crate::KaniVerifier> for RustStdStandard<NonZero<$ty>> {
-                fn ensures() -> &'static str {
-                    "value != 0"
+                type Input = $ty;
+                type Bound = bool;
+
+                fn ensures(value: $ty) -> bool {
+                    value != 0
                 }
             }
 
@@ -622,7 +640,8 @@ macro_rules! impl_nonzero_ensures_kani {
                     ),
                     verifier: "kani",
                     kind: "ensures",
-                    fragment: <RustStdStandard<NonZero<$ty>> as amenable_core::Ensures<crate::KaniVerifier>>::ensures,
+                    fragment: || "value != 0",
+                    harnesses: &[],
                 }
             }
         )*

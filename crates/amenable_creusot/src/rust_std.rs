@@ -89,6 +89,8 @@ amenable_derive::harness! {
         /// the allocator hooks stay behind ordinary Rust library code.
         #[trusted]
         #[requires(true)]
+        // Canonical home: RustStdStandard<System>'s Ensures<CreusotVerifier>
+        // impl (amenable_std::creusot_witness) names this exact fragment.
         #[ensures(result == value)]
         fn verify_system_allocates_and_deallocates_a_layout(value: i32) -> i32 {
             let _allocator = System;

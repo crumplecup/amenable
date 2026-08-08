@@ -212,8 +212,8 @@ amenable_derive::harness! {
         /// through `BorrowedFd::try_clone_to_owned` before the property can
         /// be established.
         ///
-        /// The final assertion restates the bound `NonNegativeFd`
-        /// (`fd_model.rs`) names once, canonically.
+        /// The final assertion calls `NonNegativeFd::ensures` directly
+        /// (`fd_model.rs`) rather than restating the comparison.
         #[kani::proof]
         fn borrowed_fd_clone_reaches_unsupported_fcntl_boundary() {
             use std::os::unix::io::{AsFd, AsRawFd};
@@ -221,7 +221,12 @@ amenable_derive::harness! {
             let stdout = std::io::stdout();
             let owned = stdout.as_fd().try_clone_to_owned().unwrap();
 
-            assert!(owned.as_raw_fd() >= 0, "cloned owned fd should stay live");
+            assert!(
+                <crate::NonNegativeFd as amenable_core::Ensures<crate::KaniVerifier>>::ensures(
+                    owned.as_raw_fd()
+                ),
+                "cloned owned fd should stay live"
+            );
         }
     }
 }
@@ -246,16 +251,26 @@ amenable_derive::harness! {
         /// but the direct `std::io::pipe()` setup already reaches `pipe2`
         /// before any read/write property can be established.
         ///
-        /// Both assertions restate the bound `NonNegativeFd` (`fd_model.rs`)
-        /// names once, canonically.
+        /// Both assertions call `NonNegativeFd::ensures` directly
+        /// (`fd_model.rs`) rather than restating the comparison.
         #[kani::proof]
         fn anonymous_pipe_creation_reaches_unsupported_pipe2_boundary() {
             use std::os::fd::AsRawFd;
 
             let (reader, writer) = std::io::pipe().unwrap();
 
-            assert!(reader.as_raw_fd() >= 0, "reader end should stay live");
-            assert!(writer.as_raw_fd() >= 0, "writer end should stay live");
+            assert!(
+                <crate::NonNegativeFd as amenable_core::Ensures<crate::KaniVerifier>>::ensures(
+                    reader.as_raw_fd()
+                ),
+                "reader end should stay live"
+            );
+            assert!(
+                <crate::NonNegativeFd as amenable_core::Ensures<crate::KaniVerifier>>::ensures(
+                    writer.as_raw_fd()
+                ),
+                "writer end should stay live"
+            );
         }
     }
 }

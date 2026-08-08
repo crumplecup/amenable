@@ -670,7 +670,10 @@ impl CreusotWitness for ValidUnicodeScalar {
 bridge_creusot_witness!(ValidUnicodeScalar);
 
 impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
-    fn ensures() -> &'static str {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
         "c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF)"
     }
 }
@@ -680,7 +683,8 @@ impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
         evidence: "amenable_std::ValidUnicodeScalar",
         verifier: "creusot",
         kind: "ensures",
-        fragment: <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures,
+        fragment: || <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &["verify_char_roundtrip"],
     }
 }
 
@@ -844,6 +848,31 @@ bridge_creusot_witness!(RustStdStandard<System>);
         evidence: "amenable_std::rust_std::RustStdStandard<System>",
         verifier: "creusot",
         describe: || <RustStdStandard<System> as CreusotWitness>::proof().to_string(),
+    }
+}
+
+/// A `Box` allocation serviced by the default `System` allocator
+/// round-trips its value — the same claim Kani's own
+/// `verify_system_allocates_and_deallocates_a_layout` harness checks via
+/// `assert_eq!` (out of the contract-bound scanner's reach, since
+/// `assert_eq!`'s comparands aren't parsed as a clause), named here once
+/// for the Creusot side that does state it as an explicit `#[ensures]`.
+impl Ensures<CreusotVerifier> for RustStdStandard<System> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result == value"
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<System>",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || <RustStdStandard<System> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &["verify_system_allocates_and_deallocates_a_layout"],
     }
 }
 
@@ -1175,7 +1204,10 @@ impl CreusotWitness for AsciiByte {
 bridge_creusot_witness!(AsciiByte);
 
 impl Requires<CreusotVerifier> for AsciiByte {
-    fn requires() -> &'static str {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
         "byte < 128u8"
     }
 }
@@ -1185,7 +1217,8 @@ impl Requires<CreusotVerifier> for AsciiByte {
         evidence: "amenable_std::AsciiByte",
         verifier: "creusot",
         kind: "requires",
-        fragment: <AsciiByte as Requires<CreusotVerifier>>::requires,
+        fragment: || <AsciiByte as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &["verify_str_byte_length_and_content"],
     }
 }
 
@@ -2150,7 +2183,10 @@ impl CreusotWitness for NonNulByte {
 bridge_creusot_witness!(NonNulByte);
 
 impl Requires<CreusotVerifier> for NonNulByte {
-    fn requires() -> &'static str {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
         "byte@ != 0"
     }
 }
@@ -2160,7 +2196,15 @@ impl Requires<CreusotVerifier> for NonNulByte {
         evidence: "amenable_std::NonNulByte",
         verifier: "creusot",
         kind: "requires",
-        fragment: <NonNulByte as Requires<CreusotVerifier>>::requires,
+        fragment: || <NonNulByte as Requires<CreusotVerifier>>::requires(()),
+        harnesses: &[
+            "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
+            "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
+            "verify_nul_error_reports_the_interior_nuls_position",
+            "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
+            "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere",
+            "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
+        ],
     }
 }
 
@@ -2385,7 +2429,10 @@ bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
 /// `elicit_doc`'s scanner computes, not hand-formatted — Pearlite content
 /// like this isn't valid plain-Rust expression grammar to begin with.
 impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
-    fn ensures() -> &'static str {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
         "match result { Some (_) => value != 0i16 , None => value == 0i16 , }"
     }
 }
@@ -2395,7 +2442,8 @@ impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
         evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
         verifier: "creusot",
         kind: "ensures",
-        fragment: <RustStdStandard<NonZero<i16>> as Ensures<CreusotVerifier>>::ensures,
+        fragment: || <RustStdStandard<NonZero<i16>> as Ensures<CreusotVerifier>>::ensures(()),
+        harnesses: &["verify_nonzero_i16_roundtrips"],
     }
 }
 
@@ -2405,6 +2453,7 @@ impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
         verifier: "creusot",
         kind: "ensures",
         fragment: || "match result { Some (nz) => nonzero_i16_get (& nz) == value , None => true , }",
+        harnesses: &["verify_nonzero_i16_roundtrips"],
     }
 }
 

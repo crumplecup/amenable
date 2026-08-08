@@ -172,6 +172,7 @@ struct ContractRecordDump {
     verifier: String,
     kind: String,
     fragment: String,
+    harnesses: Vec<String>,
 }
 
 /// The full registry dump written by `dump-registry`.
@@ -212,6 +213,7 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
                 verifier: record.verifier.to_owned(),
                 kind: record.kind.to_owned(),
                 fragment: (record.fragment)().to_owned(),
+                harnesses: record.harnesses.iter().map(|&h| h.to_owned()).collect(),
             })
             .collect(),
         kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()

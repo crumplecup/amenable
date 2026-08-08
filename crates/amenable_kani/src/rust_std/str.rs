@@ -775,6 +775,8 @@ amenable_derive::harness! {
             let before: u8 = kani::any();
             let pattern: u8 = kani::any();
             let after: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(before < 128 && pattern < 128 && after < 128);
             kani::assume(before != pattern && after != pattern);
             let observation =
@@ -828,6 +830,8 @@ amenable_derive::harness! {
             let pattern: u8 = kani::any();
             let b: u8 = kani::any();
             let c: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(a < 128 && pattern < 128 && b < 128 && c < 128);
             kani::assume(a != pattern && b != pattern && c != pattern);
             let observation =
@@ -885,6 +889,8 @@ amenable_derive::harness! {
             let a: u8 = kani::any();
             let pattern: u8 = kani::any();
             let b: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(a < 128 && pattern < 128 && b < 128);
             kani::assume(a != pattern && b != pattern);
             let observation =
@@ -935,6 +941,8 @@ amenable_derive::harness! {
             let a: u8 = kani::any();
             let pattern: u8 = kani::any();
             let b: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(a < 128 && pattern < 128 && b < 128);
             kani::assume(a != pattern && b != pattern);
             let observation =
@@ -989,6 +997,8 @@ amenable_derive::harness! {
             let pattern: u8 = kani::any();
             let f1: u8 = kani::any();
             let f2: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
             kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
             let observation =
@@ -1038,6 +1048,8 @@ amenable_derive::harness! {
             let pattern: u8 = kani::any();
             let f1: u8 = kani::any();
             let f2: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
             kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
             let observation =
@@ -1088,6 +1100,8 @@ amenable_derive::harness! {
             let pattern: u8 = kani::any();
             let f1: u8 = kani::any();
             let f2: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
             kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
             let observation =
@@ -1142,6 +1156,8 @@ amenable_derive::harness! {
             let pattern: u8 = kani::any();
             let f1: u8 = kani::any();
             let f2: u8 = kani::any();
+            // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
+            // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
             kani::assume(f0 != pattern && f1 != pattern && f2 != pattern);
             let observation =
