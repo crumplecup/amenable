@@ -23,11 +23,13 @@ use std::io::{
     PipeWriter, SeekFrom, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, WriterPanicked,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 use crate::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniVerifier, KaniWitness,
@@ -856,10 +858,53 @@ bridge_kani_witness!(RustStdStandard<SeekFrom>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<SeekFrom>,
+    "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+    (i64, i64),
+    |(actual, expected)| actual == expected
+);
+
+// The real call shape each of this harness's three match arms uses.
+// `Start`'s payload is `u64`; casting both sides to `i64` (a lossless,
+// bit-preserving reinterpretation for equality purposes -- `(a as i64)
+// == (b as i64)` iff `a == b` for any two `u64`s) lets all three
+// variants share the one `(i64, i64)` contract above instead of adding
+// a second type just for `Start`'s width.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<SeekFrom>::ensures((value as i64, start_offset as i64))",
+        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
+    }
+}
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<SeekFrom>::ensures((value, end_offset))",
+        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
+    }
+}
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<SeekFrom>::ensures((value, current_offset))",
+        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
         /// Each `SeekFrom` variant preserves the offset it was
-        /// constructed with, and stays its own variant.
+        /// constructed with, and stays its own variant. The assertions
+        /// call `RustStdStandard::<SeekFrom>::ensures` directly rather
+        /// than restating the comparison.
         #[kani::proof]
         fn verify_seek_from_round_trips_each_variants_offset() {
             let start_offset: u64 = kani::any();
@@ -868,19 +913,28 @@ amenable_derive::harness! {
 
             match SeekFrom::Start(start_offset) {
                 SeekFrom::Start(value) => {
-                    assert_eq!(value, start_offset, "SeekFrom::Start preserves its offset");
+                    assert!(
+                        RustStdStandard::<SeekFrom>::ensures((value as i64, start_offset as i64)),
+                        "SeekFrom::Start preserves its offset"
+                    );
                 }
                 _ => panic!("SeekFrom::Start must construct the Start variant"),
             }
             match SeekFrom::End(end_offset) {
                 SeekFrom::End(value) => {
-                    assert_eq!(value, end_offset, "SeekFrom::End preserves its offset");
+                    assert!(
+                        RustStdStandard::<SeekFrom>::ensures((value, end_offset)),
+                        "SeekFrom::End preserves its offset"
+                    );
                 }
                 _ => panic!("SeekFrom::End must construct the End variant"),
             }
             match SeekFrom::Current(current_offset) {
                 SeekFrom::Current(value) => {
-                    assert_eq!(value, current_offset, "SeekFrom::Current preserves its offset");
+                    assert!(
+                        RustStdStandard::<SeekFrom>::ensures((value, current_offset)),
+                        "SeekFrom::Current preserves its offset"
+                    );
                 }
                 _ => panic!("SeekFrom::Current must construct the Current variant"),
             }

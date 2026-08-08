@@ -4,12 +4,14 @@ use std::net::{
     AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Ipv4Addr> {
     type SupportingEvidence = Self;
@@ -123,6 +125,41 @@ bridge_kani_witness!(RustStdStandard<IpAddr>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Ipv4Addr>,
+    "amenable_std::rust_std::RustStdStandard<Ipv4Addr>",
+    (Ipv4Addr, Ipv4Addr),
+    |(actual, expected)| actual == expected
+);
+
+kani_ensures!(
+    RustStdStandard<Ipv6Addr>,
+    "amenable_std::rust_std::RustStdStandard<Ipv6Addr>",
+    (Ipv6Addr, Ipv6Addr),
+    |(actual, expected)| actual == expected
+);
+
+// The real call shape this harness's two match arms actually use.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ipv4Addr>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Ipv4Addr>::ensures((inner, v4))",
+        harnesses: &["verify_ip_addr_variant_matches_its_kind"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Ipv6Addr>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Ipv6Addr>::ensures((inner, v6))",
+        harnesses: &["verify_ip_addr_variant_matches_its_kind"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC, {
         /// `IpAddr::is_ipv4`/`is_ipv6` agree with the constructing variant,
@@ -145,7 +182,10 @@ amenable_derive::harness! {
             assert!(ip.is_ipv4(), "V4 reports is_ipv4");
             assert!(!ip.is_ipv6(), "V4 reports !is_ipv6");
             match ip {
-                IpAddr::V4(inner) => assert_eq!(inner, v4, "V4 round-trips its address"),
+                IpAddr::V4(inner) => assert!(
+                    RustStdStandard::<Ipv4Addr>::ensures((inner, v4)),
+                    "V4 round-trips its address"
+                ),
                 IpAddr::V6(_) => unreachable!("constructed as V4"),
             }
 
@@ -154,7 +194,10 @@ amenable_derive::harness! {
             assert!(ip.is_ipv6(), "V6 reports is_ipv6");
             assert!(!ip.is_ipv4(), "V6 reports !is_ipv4");
             match ip {
-                IpAddr::V6(inner) => assert_eq!(inner, v6, "V6 round-trips its address"),
+                IpAddr::V6(inner) => assert!(
+                    RustStdStandard::<Ipv6Addr>::ensures((inner, v6)),
+                    "V6 round-trips its address"
+                ),
                 IpAddr::V4(_) => unreachable!("constructed as V6"),
             }
         }

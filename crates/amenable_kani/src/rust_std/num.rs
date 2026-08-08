@@ -67,7 +67,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<i8>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -119,7 +122,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<i16>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -171,7 +177,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<i32>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -223,7 +232,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<i64>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -275,7 +287,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<i128>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -327,7 +342,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<isize>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -379,7 +397,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<u8>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -431,7 +452,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<u16>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -483,7 +507,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<u32>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -535,7 +562,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<u64>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -587,7 +617,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<u128>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -639,7 +672,10 @@ amenable_derive::harness! {
                     );
                 }
                 None => {
-                    assert_eq!(value, 0, "NonZero::new fails only for zero");
+                    assert!(
+                        !RustStdStandard::<NonZero<usize>>::ensures(value),
+                        "NonZero::new fails only for zero"
+                    );
                 }
             }
         }
@@ -687,6 +723,45 @@ macro_rules! impl_nonzero_ensures_kani {
 impl_nonzero_ensures_kani!(
     i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
 );
+
+/// The `None`-branch real call shape each width's harness actually uses
+/// (`!RustStdStandard::<NonZero<T>>::ensures(value)` — the exact
+/// contrapositive of the construction precondition above) instead of
+/// restating `value == 0` a second time.
+macro_rules! nonzero_new_fails_only_for_zero_contract_records {
+    ($($ty:ty, $harness:literal, $fragment:literal);* $(;)?) => {
+        $(
+            ::inventory::submit! {
+                ::amenable_core::ContractRecord {
+                    evidence: concat!(
+                        "amenable_std::rust_std::RustStdStandard<NonZero<",
+                        stringify!($ty),
+                        ">>"
+                    ),
+                    verifier: "kani",
+                    kind: "ensures",
+                    fragment: || $fragment,
+                    harnesses: &[$harness],
+                }
+            }
+        )*
+    };
+}
+
+nonzero_new_fails_only_for_zero_contract_records! {
+    i8, "verify_nonzero_i8", "!RustStdStandard::<NonZero<i8>>::ensures(value)";
+    i16, "verify_nonzero_i16", "!RustStdStandard::<NonZero<i16>>::ensures(value)";
+    i32, "verify_nonzero_i32", "!RustStdStandard::<NonZero<i32>>::ensures(value)";
+    i64, "verify_nonzero_i64", "!RustStdStandard::<NonZero<i64>>::ensures(value)";
+    i128, "verify_nonzero_i128", "!RustStdStandard::<NonZero<i128>>::ensures(value)";
+    isize, "verify_nonzero_isize", "!RustStdStandard::<NonZero<isize>>::ensures(value)";
+    u8, "verify_nonzero_u8", "!RustStdStandard::<NonZero<u8>>::ensures(value)";
+    u16, "verify_nonzero_u16", "!RustStdStandard::<NonZero<u16>>::ensures(value)";
+    u32, "verify_nonzero_u32", "!RustStdStandard::<NonZero<u32>>::ensures(value)";
+    u64, "verify_nonzero_u64", "!RustStdStandard::<NonZero<u64>>::ensures(value)";
+    u128, "verify_nonzero_u128", "!RustStdStandard::<NonZero<u128>>::ensures(value)";
+    usize, "verify_nonzero_usize", "!RustStdStandard::<NonZero<usize>>::ensures(value)";
+}
 
 /// `NonZero<T>::get()` round-trips its wrapped value — a distinct claim
 /// from [`impl_nonzero_ensures_kani`]'s `RustStdStandard<NonZero<T>>`

@@ -2,12 +2,14 @@
 
 use std::ops::{Bound, ControlFlow, RangeTo};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::ops::Range<i32>> {
     type SupportingEvidence = Self;
@@ -297,26 +299,54 @@ bridge_kani_witness!(RustStdStandard<Bound<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Bound<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
+// The real call shape both match arms below use -- identical text for
+// Included and Excluded, since both bind their endpoint to `inner` and
+// compare against `v`.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Bound<i32>>::ensures((inner, v))",
+        harnesses: &["verify_bound_round_trips_its_endpoint"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC, {
         /// `Bound` has exactly three inhabitants, two of which carry an
         /// endpoint. Kani has no `Arbitrary` impl for `Bound`, so each
         /// variant is constructed explicitly rather than sampled
-        /// symbolically, matching the `Ordering` harness's approach.
+        /// symbolically, matching the `Ordering` harness's approach. The
+        /// assertions call `RustStdStandard::<Bound<i32>>::ensures`
+        /// directly rather than restating the comparison.
         #[kani::proof]
         fn verify_bound_round_trips_its_endpoint() {
             let v: i32 = kani::any();
 
             match Bound::Included(v) {
                 Bound::Included(inner) => {
-                    assert_eq!(inner, v, "Included round-trips its endpoint")
+                    assert!(
+                        RustStdStandard::<Bound<i32>>::ensures((inner, v)),
+                        "Included round-trips its endpoint"
+                    )
                 }
                 _ => unreachable!("Bound::Included never matches another variant"),
             }
 
             match Bound::Excluded(v) {
                 Bound::Excluded(inner) => {
-                    assert_eq!(inner, v, "Excluded round-trips its endpoint")
+                    assert!(
+                        RustStdStandard::<Bound<i32>>::ensures((inner, v)),
+                        "Excluded round-trips its endpoint"
+                    )
                 }
                 _ => unreachable!("Bound::Excluded never matches another variant"),
             }

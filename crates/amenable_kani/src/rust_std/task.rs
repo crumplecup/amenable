@@ -10,12 +10,14 @@
 
 use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Context<'static>> {
     type SupportingEvidence = Self;
@@ -86,6 +88,23 @@ bridge_kani_witness!(RustStdStandard<Poll<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Poll<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Poll<i32>>::ensures((inner, value))",
+        harnesses: &["verify_poll_ready_and_pending_are_disjoint"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC, {
         /// `Ready` and `Pending` are mutually exclusive, and `Ready`
@@ -97,7 +116,10 @@ amenable_derive::harness! {
             assert!(poll.is_ready(), "Ready reports is_ready");
             assert!(!poll.is_pending(), "Ready reports !is_pending");
             match poll {
-                Poll::Ready(inner) => assert_eq!(inner, value, "Ready round-trips its value"),
+                Poll::Ready(inner) => assert!(
+                    RustStdStandard::<Poll<i32>>::ensures((inner, value)),
+                    "Ready round-trips its value"
+                ),
                 Poll::Pending => unreachable!("constructed as Ready"),
             }
 
