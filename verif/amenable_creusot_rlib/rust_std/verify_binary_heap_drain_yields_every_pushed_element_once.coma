@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1512 8 1515 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1524 8 1527 58 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1519 24 1519 28
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1510 19 1510 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1511 18 1511 88
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1492 16 1495 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1531 24 1531 28
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1522 19 1522 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1523 18 1523 88
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1504 16 1507 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
-predicate binary_heap_drain_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1486 8 1490 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+predicate binary_heap_drain_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1498 8 1502 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'2] match drain_result with
     | {f0 = first; f1 = second; f2 = exhausted; f3 = empty} -> first = Some a
     /\ second = Some b /\ exhausted = None /\ empty
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_drain_yields_every_pushed_element_once
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1512 8 1515 58] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1524 8 1527 58] (a: Int32.t) (b: Int32.t)
   (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &first <- Some a ] s1

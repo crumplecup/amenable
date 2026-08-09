@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 648 8 648 55 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 660 8 660 55 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 648 35 648 36
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 646 19 646 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 648 49 648 55
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 647 18 647 67
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 664 24 664 90
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 660 35 660 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 658 19 658 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 660 49 660 55
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 659 18 659 67
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 676 24 676 90
 
 use creusot.prelude.Any
 use creusot.int.UInt64
@@ -13,16 +13,16 @@ type t_String
 
 predicate inv_String (_1: t_String)
 
-function string_len [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 629 0 629 35] (_s: t_String) : UInt64.t
+function string_len [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 641 0 641 35] (_s: t_String) : UInt64.t
 
-predicate string_roundtrips_and_preserves_length [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 663 8 663 91] (s: t_String) (string_result: t_String) =
+predicate string_roundtrips_and_preserves_length [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 675 8 675 91] (s: t_String) (string_result: t_String) =
   [%#srust_std'3] string_result = s /\ string_len string_result = string_len s
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 648 8 648 55]
+let rec verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 660 8 660 55]
   (s: t_String) (return (x: t_String)) =
   {[@stop_split] [@expl:verify_string_roundtrip 's' type invariant] [%#srust_std] inv_String s}
   (! bb0

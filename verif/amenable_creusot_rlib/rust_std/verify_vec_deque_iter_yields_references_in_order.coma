@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2195 8 2198 84 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2207 8 2210 84 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2199 55 2199 59
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2193 19 2193 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2194 18 2194 79
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2168 16 2176 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2211 55 2211 59
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2205 19 2205 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2206 18 2206 79
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2180 16 2188 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -18,7 +18,7 @@ type tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
   f4: t_Option_i32;
   f5: bool }
 
-predicate vec_deque_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2155 8 2166 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+predicate vec_deque_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2167 8 2178 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'2] match iter_result with
     | {f0 = first_seen; f1 = second_seen; f2 = exhausted; f3 = popped_first; f4 = popped_second; f5 = empty} -> first_seen
       = Some a
@@ -30,7 +30,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_iter_yields_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2195 8 2198 84] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2207 8 2210 84] (a: Int32.t) (b: Int32.t)
   (return (x: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1

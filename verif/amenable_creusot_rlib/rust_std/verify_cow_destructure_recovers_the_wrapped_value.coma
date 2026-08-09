@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1224 8 1224 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1236 8 1236 93 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1222 19 1222 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1223 18 1223 75
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1244 16 1247 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1234 19 1234 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1235 18 1235 75
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1256 16 1259 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -25,7 +25,7 @@ let rec elim_Borrowed (_x: t_Cow_i32) (return (f0: Int32.t)) = any
       end}
     any) ]
 
-predicate cow_destructure_recovers_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1239 8 1242 17] (value: t_Cow_i32) (cow_result: Int32.t) =
+predicate cow_destructure_recovers_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1251 8 1254 17] (value: t_Cow_i32) (cow_result: Int32.t) =
   [%#srust_std'1] match value with
     | Borrowed borrowed -> cow_result = borrowed
     | Owned owned -> cow_result = owned
@@ -36,7 +36,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_cow_destructure_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1224 8 1224 93] (value: t_Cow_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1236 8 1236 93] (value: t_Cow_i32)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = any [ br0 (x0: Int32.t) -> {value = Borrowed x0} (! bb4) | br1 (x0: Int32.t) -> {value = Owned x0} (! bb3) ]
   | bb3 = s0

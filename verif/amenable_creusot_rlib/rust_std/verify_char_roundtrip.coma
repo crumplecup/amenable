@@ -2,8 +2,9 @@
 
 let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 597 19 597 23
 let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 598 18 598 44
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 599 18 599 66
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 599 18 599 52
 let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 613 24 613 40
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 625 24 625 72
 
 use creusot.prelude.Char
 use creusot.prelude.Any
@@ -11,6 +12,9 @@ use int.Int
 
 predicate char_roundtrips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 612 8 612 62] (c: Char.t) (char_result: Char.t) =
   [%#srust_std'2] char_result = c
+
+predicate valid_unicode_scalar_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 624 8 624 54] (c: Char.t) =
+  [%#srust_std'3] Char.to_int c <= 55295 \/ Char.to_int c >= 57344 /\ Char.to_int c <= 1114111
 
 meta "compute_max_steps" 1000000
 
@@ -21,6 +25,5 @@ let rec verify_char_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creus
   [ bb0 = s0 [ s0 = [ &_ret <- c ] s1 | s1 = return {_ret} ] ] [ & _ret: Char.t = Any.any_l () | & c: Char.t = c ])
   [ return (result: Char.t) ->
   {[@stop_split] [@expl:verify_char_roundtrip ensures] ([@stop_split] [@expl:verify_char_roundtrip ensures #0] [%#srust_std'0] char_roundtrips c result)
-    /\ ([@stop_split] [@expl:verify_char_roundtrip ensures #1] [%#srust_std'1] Char.to_int c <= 55295
-    \/ Char.to_int c >= 57344 /\ Char.to_int c <= 1114111)}
+    /\ ([@stop_split] [@expl:verify_char_roundtrip ensures #1] [%#srust_std'1] valid_unicode_scalar_holds result)}
     (! return {result}) ]

@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1771 8 1774 84 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1783 8 1786 84 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1775 55 1775 59
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1769 19 1769 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1770 18 1770 81
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1743 16 1751 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1787 55 1787 59
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1781 19 1781 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1782 18 1782 81
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1755 16 1763 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -18,7 +18,7 @@ type tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
   f4: t_Option_i32;
   f5: bool }
 
-predicate linked_list_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1730 8 1741 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+predicate linked_list_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1742 8 1753 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'2] match iter_result with
     | {f0 = first; f1 = second; f2 = exhausted; f3 = front_after_iter; f4 = next_after_iter; f5 = empty} -> first
       = Some a
@@ -30,7 +30,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_linked_list_iter_yields_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1771 8 1774 84] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1783 8 1786 84] (a: Int32.t) (b: Int32.t)
   (return (x: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1

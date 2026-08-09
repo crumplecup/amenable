@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2850 8 2850 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2862 8 2862 82 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2851 12 2851 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2848 19 2848 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2849 18 2849 74
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2801 18 2806 9
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2819 16 2824 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2863 12 2863 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2860 19 2860 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2861 18 2861 74
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2813 18 2818 9
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2831 16 2836 17
 
 use creusot.prelude.Any
 
@@ -22,7 +22,7 @@ let rec reverse (self_: t_Ordering) (return (x: t_Ordering)) = any
       end}
     (! return {result}) ]
 
-predicate ordering_reverse_swaps_less_and_greater_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2817 8 2817 103] (o: t_Ordering) (reverse_result: t_Ordering) =
+predicate ordering_reverse_swaps_less_and_greater_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2829 8 2829 103] (o: t_Ordering) (reverse_result: t_Ordering) =
   [%#srust_std'3] match { f0 = o; f1 = reverse_result } with
     | {f0 = Less; f1 = Greater} -> true
     | {f0 = Equal; f1 = Equal} -> true
@@ -35,7 +35,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_ordering_reverse_swaps_less_and_greater
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2850 8 2850 82] (o: t_Ordering)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2862 8 2862 82] (o: t_Ordering)
   (return (x: t_Ordering)) = (! bb0
   [ bb0 = s0 [ s0 = reverse [%#srust_std] {o} (fun (_x: t_Ordering) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]
   [ & _ret: t_Ordering = Any.any_l () | & o: t_Ordering = o ])

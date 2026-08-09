@@ -1,13 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4243 8 4243 92 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4255 8 4255 92 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4241 19 4241 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4242 18 4242 94
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4229 24 4229 46
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4253 19 4253 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4254 18 4254 94
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4241 24 4241 46
 
 use creusot.int.UInt64
 use creusot.prelude.Any
 
-predicate windows_socket_as_raw_socket_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4225 8 4228 17] (value: UInt64.t) (socket_result: UInt64.t) =
+predicate windows_socket_as_raw_socket_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4237 8 4240 17] (value: UInt64.t) (socket_result: UInt64.t) =
   [%#srust_std'1] socket_result = value
 
 meta "compute_max_steps" 1000000
@@ -15,7 +15,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_socket_as_raw_socket_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4243 8 4243 92] (value: UInt64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4255 8 4255 92] (value: UInt64.t)
   (return (x: UInt64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
   [ & _ret: UInt64.t = Any.any_l () | & value: UInt64.t = value ])

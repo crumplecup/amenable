@@ -1,13 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1154 8 1154 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1166 8 1166 82 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1152 19 1152 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1153 18 1153 78
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1171 24 1171 49
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1164 19 1164 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1165 18 1165 78
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1183 24 1183 49
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
-predicate shared_reference_dereferences_to_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1167 8 1170 17] (value: Int32.t) (reference_result: Int32.t) =
+predicate shared_reference_dereferences_to_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1179 8 1182 17] (value: Int32.t) (reference_result: Int32.t) =
   [%#srust_std'1] reference_result = value
 
 meta "compute_max_steps" 1000000
@@ -15,7 +15,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_shared_reference_dereferences_to_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1154 8 1154 82] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1166 8 1166 82] (value: Int32.t)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &reference <- value ] s1 | s1 = [ &_ret <- reference ] s2 | s2 = return {_ret} ] ]
   [ & _ret: Int32.t = Any.any_l () | & value: Int32.t = value | & reference: Int32.t = Any.any_l () ])

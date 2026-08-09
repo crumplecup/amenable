@@ -202,6 +202,7 @@ use amenable_creusot::{
     STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC,
     TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC,
     TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_HOLDS_SRC, TUPLE_FIELD_ACCESS_HOLDS_SRC,
+    VALID_UNICODE_SCALAR_HOLDS_SRC,
     VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
     VEC_DEQUE_ITER_MUT_WRITES_THROUGH_HOLDS_SRC,
     VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC,
@@ -731,7 +732,8 @@ impl Ensures<CreusotVerifier> for RustStdStandard<char> {
 /// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
 /// rather than adding a new Creusot proof — it names the postcondition the
 /// harness already checks (`c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <=
-/// 0x10FFFF)`), it doesn't prove anything new.
+/// 0x10FFFF)`, via the named `valid_unicode_scalar_holds` predicate), it
+/// doesn't prove anything new.
 impl CreusotWitness for ValidUnicodeScalar {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -747,12 +749,16 @@ impl CreusotWitness for ValidUnicodeScalar {
 
 bridge_creusot_witness!(ValidUnicodeScalar);
 
+/// Returns `amenable_creusot::VALID_UNICODE_SCALAR_HOLDS_SRC` directly --
+/// the verbatim, `harness!`-captured source of the real `#[logic(open)] fn
+/// valid_unicode_scalar_holds` the real site calls, not a hand-retyped
+/// copy of its expression.
 impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
     type Input = ();
     type Bound = &'static str;
 
     fn ensures(_: ()) -> &'static str {
-        "c@ <= 0xD7FF || (c@ >= 0xE000 && c@ <= 0x10FFFF)"
+        VALID_UNICODE_SCALAR_HOLDS_SRC
     }
 }
 

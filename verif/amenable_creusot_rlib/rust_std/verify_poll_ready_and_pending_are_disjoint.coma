@@ -1,16 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3741 8 3743 42 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3753 8 3755 42 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3747 33 3747 38
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3746 34 3746 38
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3751 33 3751 37
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3750 34 3750 39
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3761 33 3761 37
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3760 34 3760 39
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3765 33 3765 38
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3764 34 3764 38
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3739 19 3739 23
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3740 18 3740 74
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3722 16 3729 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3759 33 3759 38
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3758 34 3758 38
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3763 33 3763 37
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3762 34 3762 39
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3773 33 3773 37
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3772 34 3772 39
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3777 33 3777 38
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3776 34 3776 38
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3751 19 3751 23
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3752 18 3752 74
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3734 16 3741 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -27,7 +27,7 @@ let rec elim_Ready (_x: t_Poll_i32) (return (f0: Int32.t)) = any
 
 type tup5_bool_bool_i32_bool_bool = { f0: bool; f1: bool; f2: Int32.t; f3: bool; f4: bool }
 
-predicate poll_ready_and_pending_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3717 8 3720 17] (value: Int32.t) (poll_result: tup5_bool_bool_i32_bool_bool) =
+predicate poll_ready_and_pending_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3729 8 3732 17] (value: Int32.t) (poll_result: tup5_bool_bool_i32_bool_bool) =
   [%#srust_std'9] match poll_result with
     | {f0 = ready_is_ready; f1 = ready_is_pending; f2 = ready_value; f3 = pending_is_pending; f4 = pending_is_ready} -> ready_is_ready
     /\ not ready_is_pending /\ ready_value = value /\ pending_is_pending /\ not pending_is_ready
@@ -38,7 +38,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_poll_ready_and_pending_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3741 8 3743 42] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3753 8 3755 42] (value: Int32.t)
   (return (x: tup5_bool_bool_i32_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &ready <- Ready value ] s1
