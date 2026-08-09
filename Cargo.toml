@@ -27,3 +27,17 @@ amenable_std = { path = "crates/amenable_std", version = "0.1.0" }
 amenable_kani = { path = "crates/amenable_kani", version = "0.1.0" }
 amenable_creusot = { path = "crates/amenable_creusot", version = "0.1.0" }
 amenable_verus = { path = "crates/amenable_verus", version = "0.1.0" }
+
+clap = { version = "4", features = ["derive"] }
+creusot-std = { version = "0.11.0", features = ["sc-drf"] }
+derive_more = { version = "2", features = ["display", "error", "from"] }
+inventory = "0.3"
+miette = { version = "7", features = ["fancy"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+syn = { version = "3", features = ["full"] }
+time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
+verus_builtin_macros = "0.0.0-2026-05-31-0205"
+vstd = "0.0.0-2026-05-31-0205"

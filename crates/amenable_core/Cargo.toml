@@ -14,7 +14,7 @@ keywords = ["formal-verification", "proof", "provenance", "constitutional", "aud
 categories = ["development-tools", "rust-patterns"]
 
 [dependencies]
-inventory = "0.3"
+inventory = { workspace = true }
 
 [dev-dependencies]
 amenable_derive = { workspace = true }

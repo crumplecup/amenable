@@ -14,8 +14,8 @@ keywords = ["formal-verification", "verus", "proof"]
 categories = ["development-tools"]
 
 [dependencies]
-verus_builtin_macros = "0.0.0-2026-05-31-0205"
-vstd = "0.0.0-2026-05-31-0205"
+verus_builtin_macros = { workspace = true }
+vstd = { workspace = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [

@@ -17,7 +17,7 @@ categories = ["development-tools"]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 amenable_std = { workspace = true }
-inventory = "0.3"
+inventory = { workspace = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }
