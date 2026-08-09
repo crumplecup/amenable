@@ -1,8 +1,9 @@
 # Naming Raw Requires/Ensures Bounds: Design Pattern and Workflow
 
-**Status:** 🔲 Ongoing — mechanism and tooling complete; `amenable_creusot`
-fully cleared; `amenable_kani` partially cleared (largest duplicate
-clusters resolved, long tail remains); `amenable_verus` not yet started.
+**Status:** 🔲 Ongoing — mechanism redesigned and fully verified this
+session (call-shape recognition replaced text matching); `amenable_creusot`
+fully cleared (twice — see "History" below); `amenable_kani` and
+`amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
 person) can pick this work back up without re-deriving the mechanism,
@@ -72,49 +73,61 @@ until a second backend needs it.
   Requires<KaniVerifier>`/`Ensures<KaniVerifier>` with `Bound = bool` —
   the proof site calls `Type::requires(x)`/`Type::ensures(x)` directly;
   that call *is* the check, not a restatement of it. The macro also
-  submits a canonical `ContractRecord` (`fragment: || stringify!($expr)`,
-  unscoped).
-- **Creusot**: a shared `#[logic(open)]` fn (or plain `#[logic]` — see
+  submits the type's `ContractRecord` automatically.
+- **Creusot**: a shared `#[logic(open)]` fn (or `#[logic(opaque)]` — see
   Gotchas) wrapped in `amenable_derive::harness!`, called directly from
-  every real site; `amenable_std`'s `Requires<CreusotVerifier>` impl
-  returns the harness-captured `_SRC` const verbatim.
+  every real site; `amenable_std`'s `Ensures`/`Requires<CreusotVerifier>`
+  impl returns the harness-captured `_SRC` const verbatim.
 - **Verus**: a shared cross-file `spec fn`, same idea.
 
-### `ContractRecord`: two-tier registration
+### `ContractRecord`: call-shape recognition, not text matching
 
-`amenable_core::ContractRecord` (`{ evidence, verifier, kind, fragment,
-harnesses }`) is what makes a named bound *discoverable* outside the Rust
-binary that defines it — `amenable dump-registry` dumps every registered
-record to JSON, which `elicit_doc` reads to check real proof-site text
-against.
+`amenable_core::ContractRecord` (`{ evidence, verifier, kind, fragment }`)
+is what makes a named bound *discoverable* outside the Rust binary that
+defines it — `amenable dump-registry` dumps every registered record to
+JSON, which `elicit_doc` reads to check real proof-site clauses against.
 
-Every contract type needs **two kinds** of registration:
+A real proof site is recognized as using a registered contract **only
+when its clause is a real call to it** — never by comparing the clause's
+text against the registered `fragment`'s text. This replaced an earlier
+"two-tier" design (a canonical registration plus hand-typed
+"supplementary" registrations, one per distinct call-site spelling,
+`harnesses`-scoped to avoid coincidental cross-matches) that existed
+purely to keep the old text-matching scanner quiet — ceremony that
+caught nothing a real call-shape check doesn't already catch, and that
+was actively **hiding** real debt (a Verus `NonNulByte` registration
+turned out to be coincidentally text-matching real call sites that never
+actually named it — see "History" below).
 
-1. **Canonical** (`harnesses: &[]`, unscoped): the predicate's own body
-   text (`stringify!($expr)` for Kani, the harness-captured source for
-   Creusot/Verus). Establishes the bound's own definition; matches
-   nowhere on its own once real sites stop restating the raw expression.
-2. **Supplementary** (`harnesses: &["fn_name", ...]`, scoped): the
-   *exact* literal text of the real call site(s) — e.g.
-   `"RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0))"`. This
-   is what actually silences the scanner, since the scanner compares
-   against literal source text, not against the predicate's semantic
-   body.
+Two recognized shapes, one per family of verifier:
 
-   **Grouping insight**: if the exact same call-site text recurs
-   verbatim across multiple harnesses (same local variable names, same
-   literal), register it **once** with all those harness names in the
-   `harnesses` list, rather than one registration per site. This mirrors
-   exactly the duplicate-cluster leverage the checklist itself surfaces
-   (see below) — e.g. `amenable_kani`'s `Cell<u32>` drop-counter idiom
-   needed only 4 registrations (one per literal count: 0, 1, 2, 3) to
-   cover 42 real sites across a dozen otherwise-unrelated harnesses,
-   because every site uses the identical variable name `drop_count`.
+- **Kani** — `<TypePath>::ensures(...)` / `<TypePath>::requires(...)`:
+  the call's last path segment must equal `"ensures"`/`"requires"`. The
+  type prefix (everything before that segment, turbofish-stripped) is
+  compared by **suffix** against every registered `evidence` string for
+  that `(verifier, kind)` — a suffix match, not exact equality, because a
+  real call site's type name is usually abbreviated by a `use` import
+  (`RustStdStandard::<i32>::ensures(...)`) while `evidence` is always
+  fully qualified (`amenable_std::rust_std::RustStdStandard<i32>`).
+- **Creusot/Verus** — a bare `name(...)` call (no receiver, exactly one
+  path segment): `name` is compared against a function name **scanned
+  out of the registered `fragment`'s own source text** — a literal `fn`
+  token immediately followed by an identifier, not a full `syn::ItemFn`
+  parse (Verus's real syntax, `pub open spec fn foo(...) -> bool { ... }`,
+  has real keywords `syn::ItemFn` would reject as invalid Rust, but `fn`
+  is still just a plain token to scan for). **`evidence` is not consulted
+  at all for this match** — only the fragment's own extracted name
+  matters, so one evidence value can legitimately carry more than one
+  real fragment (see the `IterYieldsValueOnceThenEnds` example under
+  "Gotchas": it names two distinct real predicates, one per shape of
+  value it's proven over).
 
-   `ContractIndex::matches` (in elicit_doc) only checks `(verifier, kind,
-   fragment_text)` plus harness scope — it never looks at the `evidence`
-   field, so which type's name appears in `evidence` is purely
-   descriptive.
+A fragment that isn't a real `fn`/`spec fn` definition — still a raw
+restated expression under the hood, or a hand-typed string mimicking a
+call site's text — **can never match**, under any circumstances, no
+matter how its text compares to anything. That's not a bug to route
+around; a fragment like that was never really naming a bound, it was
+only passing the old text-equality check by coincidence.
 
 ## The elicit_doc tooling
 
@@ -125,15 +138,13 @@ Scans `amenable_creusot`/`amenable_verus`/`amenable_kani` only (the only
 crates with a verifier-native raw-bound shape), skips any directory
 literally named `gallery/` (verifier experiments and documented dead
 ends, not production proofs — pruned via `WalkDir::filter_entry`, not
-hand-excepted per site), and flags any `requires`/`ensures` clause whose
-normalized text matches **no** registered `ContractRecord` fragment for
-its verifier.
+hand-excepted per site), and flags any `requires`/`ensures` clause that
+[`ContractIndex::matches_named_call`] doesn't recognize as a real call to
+some registered contract (see previous section) for its verifier.
 
 Per-verifier clause shapes it recognizes:
 
-- **Creusot**: `#[requires(...)]`/`#[ensures(...)]` attribute contents,
-  compared at the token level (not parsed as `syn::Expr`, since Pearlite
-  isn't valid plain Rust).
+- **Creusot**: `#[requires(...)]`/`#[ensures(...)]` attribute contents.
 - **Verus**: `requires`/`ensures` clauses inside a `verus! { ... }`
   macro body, walked as a raw `proc_macro2::TokenStream` (the clauses are
   invisible to `syn::visit::Visit` — a macro body is opaque to `syn`).
@@ -141,14 +152,21 @@ Per-verifier clause shapes it recognizes:
   the clause `A == B` — a direct transcription of the two comparands,
   not a guess) inside a `#[kani::proof]` fn body. **`kani::assume(EXPR)`
   is a plain function call, not a macro invocation** (`assume` has no
-  `!`) — it needs its own `syn::ExprCall` visitor, separate from the
-  `assert!`/`assert_eq!` macro-node visitor. Getting this wrong (as the
-  scanner originally did) means every Kani `requires`-shaped bound is
-  silently never checked, regardless of content.
+  `!`) — it has its own `syn::ExprCall` visitor, separate from the
+  `assert!`/`assert_eq!` macro-node visitor.
 
-A bare `true`/`false`/`result`/`result.N` clause is treated as trivial
-and never flagged — see `is_trivial`'s doc comment in `contract_bounds.rs`
-for the full reasoning per shape.
+  **`assert_eq!` can never be recognized as compliant, structurally, no
+  matter what's registered.** It always synthesizes a binary comparison
+  (`A == B`, a `syn::Expr::Binary`), never a call — even when one side of
+  the comparison is itself a call to a real registered contract's
+  `ensures`. A Kani postcondition that needs to be nameable has to use
+  `assert!(Type::ensures(...), "message")`, never `assert_eq!`. This is a
+  real, intentional, regression-tested behavior of the new mechanism, not
+  a gap to work around.
+
+A bare `true`/`false`/`result`/`result.N`/`result.N is None` clause is
+treated as trivial and never flagged — see `is_trivial`'s doc comment in
+`contract_bounds.rs` for the full reasoning per shape.
 
 ### The leverage tool: duplicate-cluster grouping
 
@@ -158,7 +176,9 @@ non-call identifier and every literal blinded to a placeholder token
 (`X`), so `map.is_empty()` and `dq.is_empty()` both collapse to
 `X.is_empty()`. The checklist prints a `**Possible duplicate clusters**`
 block, sorted by cluster size descending, **before** the flat per-site
-list, for each crate's `UnnamedContractBound001` section.
+list, for each crate's `UnnamedContractBound001` section. Unaffected by
+the call-shape redesign — clustering operates on the raw clause shapes
+regardless of how compliance is later checked.
 
 This is the actual point of the whole exercise: naming a bound once only
 pays off if you can see which raw sites share it. A cluster of size N
@@ -168,10 +188,8 @@ sites at once — that's the leverage worth pulling on first.
 **Caveat, printed in the checklist itself and worth repeating**: a
 coincidentally-identical shape is not guaranteed to be the same real
 claim. `X == X` is the maximally generic shape — some sub-clusters
-within it really were the same claim restated (NonZero's `value == 0`
-across twelve widths, five different `RustStdStandard<T>::ensures`
-round-trip checks all comparing `first == second`), but a good chunk
-were genuinely unrelated (`Cell::replace`'s previous-value check vs.
+within it really were the same claim restated, but a good chunk were
+genuinely unrelated (`Cell::replace`'s previous-value check vs.
 `LazyCell`'s cache-once check vs. a raw pointer-cast reproducibility
 check) that only look alike because `assert_eq!(a, b)` is a common
 idiom. **Always read the actual site before assuming a shared claim** —
@@ -212,19 +230,27 @@ shape-clustering is a hint to investigate, not an automatic merge.
      registers a `KaniWitness`/`ProofRecord` for its own carrier.
    - Check whether that type's `Ensures`/`Requires` slot for this
      verifier is already taken by a *different* bound. If so, you need a
-     new type (see Gotchas: associated-type uniqueness).
-   - Write the `kani_ensures!`/`kani_requires!` (or Creusot/Verus
-     equivalent) call, plus the canonical `ContractRecord` it generates
-     automatically.
-   - Add supplementary `ContractRecord`s for the *exact* real call-site
-     text, one per distinct literal text, each `harnesses`-scoped to
-     every harness that uses that exact text (see the grouping insight
-     above — check for recurring identical text before writing N
-     separate registrations for N sites).
+     new type (see Gotchas: associated-type uniqueness) — or, if the two
+     bounds are genuinely two shapes of the *same* claim on the *same*
+     evidence (e.g. an `Option`-shaped and `Result`-shaped sibling
+     predicate), register the second real fragment under the *same*
+     evidence instead (see "Gotchas": one evidence, multiple fragments).
+   - For Kani: write the `kani_ensures!`/`kani_requires!` call — the
+     canonical `ContractRecord` comes for free.
+   - For Creusot/Verus: write a named `#[logic(open)]` fn / `spec fn`
+     whose body **is** the bound (via `amenable_derive::harness!`, so its
+     source is capturable verbatim), and point the contract type's
+     `Ensures`/`Requires` impl at that harness's `_SRC` constant directly
+     — never at a hand-typed string. A fragment that isn't real `fn`
+     source can never be recognized (see "`ContractRecord`: call-shape
+     recognition" above).
 
-5. **Rewrite the real call sites** to call the named type's
-   `::ensures(...)`/`::requires(...)` directly, replacing the raw
-   expression. Preserve the original assertion message where one existed.
+5. **Rewrite the real call sites** to call the named predicate/type
+   directly, replacing the raw expression:
+   - Kani: `Type::ensures(...)`/`Type::requires(...)`.
+   - Creusot/Verus: the bare predicate name, e.g. `#[ensures(bound_holds(value, result))]`.
+
+   Preserve the original assertion message where one existed.
 
 6. **Verify, in this order:**
 
@@ -236,6 +262,14 @@ shape-clustering is a hint to investigate, not an automatic merge.
    just test-package amenable_kani
    ```
 
+   For Creusot, additionally run the real translator, not just `cargo
+   check` — a Pearlite-only failure (visibility rules, unsupported
+   syntax) won't show up under plain `rustc`:
+
+   ```bash
+   cargo creusot -- -p amenable_creusot
+   ```
+
    `just verify-kani` needs the harness's fully-qualified path as it
    appears in the module tree (e.g. `rust_std::cell::verify_cell_get_set_replace_take_round_trip`,
    or `compose::proofs::verify_kani_compose_string_depths` if it's nested
@@ -244,11 +278,11 @@ shape-clustering is a hint to investigate, not an automatic merge.
 
 7. **Rebuild the registry dump and rescan** (step 1 again) to confirm the
    specific sites you touched actually drop out of the checklist. Don't
-   trust the rewrite until the real rescan confirms it — a text mismatch
-   between the supplementary `ContractRecord` fragment and the real
-   call-site text (e.g. forgetting a `amenable_std::` prefix, or writing
-   `Cell<u32>` when the site actually spells it `std::cell::Cell<u32>`)
-   silently leaves the site flagged with no compile error.
+   trust the rewrite until the real rescan confirms it — a clause that
+   *looks* right can still fail to match: the registered `fragment` has
+   to be real `fn`/`spec fn` source (not a hand-typed string), and the
+   call site has to be a genuine call (not, e.g., buried inside an
+   `assert_eq!` comparand).
 
 8. **Commit** the batch with a message describing the sub-claims resolved
    and citing the real verification (harnesses passed, rescan counts
@@ -256,6 +290,48 @@ shape-clustering is a hint to investigate, not an automatic merge.
 
 ## Gotchas, found the hard way
 
+- **A registered `fragment` must be real predicate source, not
+  descriptive text.** `fragment_fn_name` only extracts a name when the
+  fragment's own text contains a literal `fn` token followed by an
+  identifier. A `fragment: || "some_predicate (value , result)"` closure
+  — text that merely *reads like* a call — extracts no name and can
+  never match anything, Kani-style call-shape aside. Always point
+  `fragment` at a `harness!`-captured `_SRC` constant (or, for Kani, let
+  `kani_ensures!`/`kani_requires!` generate it via `stringify!`).
+- **One `evidence` can carry more than one real fragment.** Creusot/Verus
+  matching ignores `evidence` entirely — it only cares whether *some*
+  registered fragment's extracted name matches the call site. This means
+  a single contract type can legitimately register two (or more) real,
+  independent predicates under its own evidence string when it's proven
+  over more than one real shape (`amenable_std::IterYieldsValueOnceThenEnds`
+  registers both `iter_yields_value_once_then_ends`, for `Option`-typed
+  proofs, and `iter_yields_ok_value_once_then_ends`, for `Result`-typed
+  ones — two `ContractRecord` submissions, same evidence, each with its
+  own real `fn`). Don't mistake this for redundancy when auditing.
+- **`#[logic(open)]` can't call a less-visible item.** An `open`
+  (transparent) Creusot logic fn is inlined wherever it's referenced, so
+  Creusot requires everything it calls to be at least as visible as
+  itself. If the predicate needs to call a module-private helper (most
+  commonly a `#[trusted] #[logic(opaque)]` wrapper around an uncontracted
+  std method, e.g. `nonzero_i16_get`), mark the *calling* predicate
+  `#[logic(opaque)]` too rather than `open` — real error, not a guess:
+  `Cannot make "..." transparent in "..." as it would call a
+  less-visible item`. Since the harness it backs is usually already
+  `#[trusted]` in this situation anyway, nothing is lost by not being
+  transparent.
+- **When auditing many `ContractRecord` sites at once, trust
+  `cargo-expand`, not a source grep.** A canonical registration is often
+  emitted by a macro (`kani_ensures!`, or a locally-defined
+  `macro_rules!` that stamps out one `ContractRecord` per
+  monomorphization) — invisible to a plain text search for
+  `evidence: "..."` across the raw source. When retiring the old
+  "supplementary" registrations this session, classifying by raw-source
+  triples alone would have deleted a registration whose only sibling
+  canonical source was generated through *nested* macro expansion
+  (`impl_nonzero_get_round_trips_kani!` calling `kani_ensures!` inside
+  itself). `cargo expand -p <crate> --lib` (plus `--features` for
+  Creusot/Verus) gives the real, fully-expanded ground truth for exactly
+  this kind of audit.
 - **`#[cfg(kani)]` import gating.** A real proof's fn body only exists
   under `cfg(kani)` (the `harness!` macro gates `#[cfg(#cfg_name)]` on
   the item, not the module) — so any `use amenable_core::Ensures;` (or
@@ -301,26 +377,87 @@ shape-clustering is a hint to investigate, not an automatic merge.
   Windows accommodation model respectively) — don't assume everything
   outside `rust_std/` is gallery-equivalent; read the module doc comment.
 
+## History: the two-tier design and why it was replaced
+
+The original design (see git history on this file for the full writeup)
+matched a real proof-site clause against a registered `ContractRecord`
+by comparing **normalized text**, not recognizing a real call. That
+needed a "canonical" registration (the predicate's own body text) plus a
+hand-typed "supplementary" registration per distinct real call-site
+spelling — the exact literal text of each real site, `harnesses`-scoped
+to avoid one type's registration coincidentally silencing an unrelated
+site with matching text.
+
+This was retired mid-session (not a gradual deprecation) after directly
+investigating real Creusot vs. Verus call sites and finding the
+asymmetry that motivated the whole redesign: Creusot's real sites were
+genuinely wired to real named `#[logic]` calls, but at least one Verus
+registration (`amenable_std::NonNulByte`'s `requires`) was not — its
+`Requires<VerusVerifier>::requires()` impl returned the raw text `"byte
+!= 0"`, which happened to text-match four real call sites that never
+actually called anything, only restated the same literal comparison.
+The old scanner reported those four sites as compliant; they were not.
+That's a real correctness bug in the old mechanism, not just ceremony —
+worth remembering if any future design temptation reaches for text
+matching again.
+
+The redesign itself was mechanical but large: `amenable_core::ContractRecord`
+lost its `harnesses` field, and all 253 existing `ContractRecord`
+submissions across `amenable_kani`/`amenable_std` were swept — 152
+turned out to be pure duplicates of an already-canonical registration
+(deleted), 96 were each the sole registration for their bound (kept,
+`harnesses` field dropped). The sweep was classified against
+`cargo-expand` ground truth, not raw source text (see "Gotchas" above
+for why that mattered). `amenable_creusot` briefly went from "fully
+cleared" to 7 real findings the moment the redesign landed — not a
+regression, real debt the old mechanism had been silently hiding — and
+was brought back to zero in three focused follow-up commits.
+
 ## Current state (last updated during this session)
 
-- `amenable_creusot`: **fully cleared** — zero raw sites remain.
-- `amenable_kani`: two largest duplicate clusters cleared this session
-  (`X.get() == X`, 59 sites; `X == X`, 30 sites — the latter after
-  splitting into ~10 genuinely distinct sub-claims), plus the earlier
-  `compose.rs` self-test cluster (9 sites) and the `os_windows_model.rs`
-  sentinel-rejection singleton (1 site), plus 20 sites from a
-  `NonZero`/enum-round-trip sweep. Total resolved this session: 119
-  sites. **~700 sites remain** — next up by cluster size:
-  `X.next() == X` (42), `X.next() == Some(X)` (40),
-  `X.load(X::X::X::X::X) == X` (29), `*X == X` (28), and onward down the
-  ranked list.
-- `amenable_verus`: **not yet started.** Almost certainly has its own
-  version of the `kani::assume`-style scanner gap worth checking before
-  trusting its raw count (Verus's `requires`/`ensures` are real spec
-  clauses inside a macro body, not runtime asserts, so the specific gap
-  won't recur verbatim, but don't assume the Verus-side scanner has been
-  exercised against real duplicate volume the way Kani's has).
+- **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
+  real rescan after the redesign (not carried over from before it).
+- **`amenable_kani`: not yet started under the new mechanism.** The
+  ~700-sites-remaining figure and specific cluster list from before the
+  redesign are **stale** — the new mechanism is stricter in some ways
+  (`assert_eq!` can never comply) and looser in others (no more
+  `harnesses`-scoping ceremony), so cluster sizes have shifted. Total is
+  now **771** sites. Current top clusters, by size (re-run the scan
+  before trusting these — this list will drift as work lands):
+  - `X::<X::X::X<X>>::ensures((X.get(), X))` — 44 sites
+  - `X.next() == X` — 42 sites
+  - `X.next() == Some(X)` — 40 sites
+  - `X.load(X::X::X::X::X) == X` — 29 sites
+  - `*X == X` — 28 sites
+  - `X.len() == X` — 16 sites
+  - `X.next() == X.next()` — 16 sites
+  - `X.is_empty()` — 13 sites
+  - `!X::<X<X>>::ensures(X)` — 12 sites
+  - `X::<X<X>>::ensures(X)` — 12 sites
+  - and onward down the ranked list in the checklist itself.
+- **`amenable_verus`: not yet started under the new mechanism.** Total is
+  now **663** sites, including the confirmed `NonNulByte` case from
+  "History" above (register a real `spec fn` for it first — it's a
+  concrete, already-understood fix, not exploratory). Current top
+  clusters:
+  - `X.X == X` — 145 sites
+  - `X.X@ =~= X@` — 39 sites
+  - `X.X == Some(X)` — 36 sites
+  - `X == X` — 30 sites
+  - `X != X` — 29 sites
+  - `X == (X, X)` — 23 sites
+  - and onward down the ranked list in the checklist itself.
+
+  Also still worth checking before trusting the raw count: whether the
+  Verus-side scanner's `verus! { ... }` token walk has been exercised
+  against real duplicate volume the way Kani's `assert!`/`assert_eq!`
+  visitor has — a scanner-completeness gap (missed clause shapes, not a
+  naming-mechanism issue) would under-report here the same way the
+  original `kani::assume` gap did for Kani before it was found and fixed.
 
 To resume: run the workflow above starting from step 1, and continue
 pulling from the top of whichever crate's duplicate-cluster list you're
-working.
+working. `amenable_kani` and `amenable_verus` are both untouched under
+the new mechanism — either is a reasonable place to start; `amenable_verus`
+has the added wrinkle of the already-diagnosed `NonNulByte` fix as a
+concrete first task.
