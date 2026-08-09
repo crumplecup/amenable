@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1194 8 1197 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1217 8 1220 23 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1192 19 1192 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1193 18 1193 99
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1218 24 1218 83
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1215 19 1215 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1216 18 1216 99
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1241 24 1241 83
 
 use creusot.prelude.MutBorrow
 use creusot.int.Int32
@@ -14,7 +14,7 @@ meta "rewrite_def" predicate resolve_refmut_i32
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
-predicate mutable_reference_dereferences_to_and_updates_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1213 8 1217 17] (initial: Int32.t) (next: Int32.t) (reference_result: tup2_i32_i32) =
+predicate mutable_reference_dereferences_to_and_updates_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1236 8 1240 17] (initial: Int32.t) (next: Int32.t) (reference_result: tup2_i32_i32) =
   [%#srust_std'1] reference_result.f0 = initial /\ reference_result.f1 = next
 
 meta "compute_max_steps" 1000000
@@ -22,7 +22,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_mutable_reference_dereferences_to_and_updates_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1194 8 1197 23] (initial: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1217 8 1220 23] (initial: Int32.t)
   (next: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &value <- initial ] s1

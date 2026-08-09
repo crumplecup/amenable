@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3461 8 3461 79 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3520 8 3520 79 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3462 13 3462 40
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3459 19 3459 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3460 18 3460 64
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3423 18 3427 9
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3440 16 3444 39
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3521 13 3521 40
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3518 19 3518 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3519 18 3519 64
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3482 18 3486 9
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3499 16 3503 39
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -82,7 +82,7 @@ let rec cmp_Reverse_i32 (self_: t_Reverse_i32) (other: t_Reverse_i32) (return (x
 
 type tup2_Ordering_i32 = { f0'0: t_Ordering; f1'0: Int32.t }
 
-predicate reverse_inverts_comparison_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3438 8 3438 96] (a: Int32.t) (b: Int32.t) (cmp_result: tup2_Ordering_i32) =
+predicate reverse_inverts_comparison_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3497 8 3497 96] (a: Int32.t) (b: Int32.t) (cmp_result: tup2_Ordering_i32) =
   [%#srust_std'3] match cmp_result.f0'0 with
       | Less -> Int32.gt b a
       | Equal -> b = a
@@ -95,7 +95,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_reverse_inverts_comparison
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3461 8 3461 79] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3520 8 3520 79] (a: Int32.t) (b: Int32.t)
   (return (x: tup2_Ordering_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_9 <- { f0 = a } ] s1

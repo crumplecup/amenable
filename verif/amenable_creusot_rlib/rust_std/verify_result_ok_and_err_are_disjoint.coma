@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3547 8 3547 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3606 8 3606 90 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3550 13 3550 24
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3550 26 3550 42
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3545 19 3545 23
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3546 18 3546 80
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3532 24 3532 80
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3609 13 3609 24
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3609 26 3609 42
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3604 19 3604 23
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3605 18 3605 80
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3591 24 3591 80
 let%span sresult = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 50 19 50 45
 let%span sresult'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 51 18 51 36
 let%span sresult'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 64 19 64 46
@@ -29,7 +29,7 @@ let rec unwrap_err_i32 (self_: t_Result_i32_i32) (return (x: Int32.t)) =
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
-predicate result_ok_and_err_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3527 8 3531 17] (value: Int32.t) (err_value: Int32.t) (result_result: tup2_i32_i32) =
+predicate result_ok_and_err_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3586 8 3590 17] (value: Int32.t) (err_value: Int32.t) (result_result: tup2_i32_i32) =
   [%#srust_std'3] result_result.f0 = value /\ result_result.f1 = err_value
 
 meta "compute_max_steps" 1000000
@@ -37,7 +37,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_result_ok_and_err_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3547 8 3547 90] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3606 8 3606 90] (value: Int32.t)
   (err_value: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &ok <- Ok value ] s1

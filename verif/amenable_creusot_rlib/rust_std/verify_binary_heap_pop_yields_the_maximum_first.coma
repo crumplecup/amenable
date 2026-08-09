@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1480 8 1483 39 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1503 8 1506 39 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1478 19 1478 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1479 18 1479 78
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1463 16 1467 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1501 19 1501 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1502 18 1502 78
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1486 16 1490 17
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -72,7 +72,7 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
-predicate binary_heap_pop_yields_the_maximum_first_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1457 8 1461 17] (a: Int32.t) (b: Int32.t) (pop_result: tup2_Option_i32_Option_i32) =
+predicate binary_heap_pop_yields_the_maximum_first_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1480 8 1484 17] (a: Int32.t) (b: Int32.t) (pop_result: tup2_Option_i32_Option_i32) =
   [%#srust_std'1] match pop_result with
     | {f0 = first; f1 = second} -> first = Some (if Int32.ge a b then a else b)
     /\ second = Some (if Int32.ge a b then b else a)
@@ -83,7 +83,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_pop_yields_the_maximum_first
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1480 8 1483 39] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1503 8 1506 39] (a: Int32.t) (b: Int32.t)
   (return (x: tup2_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_9 <- Int32.ge a b ] s1 | s1 = any [ br0 -> {_9 = false} (! bb2) | br1 -> {_9} (! bb1) ] ]
   | bb1 = s0 [ s0 = [ &_8 <- a ] s1 | s1 = bb3 ]

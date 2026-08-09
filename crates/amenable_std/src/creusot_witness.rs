@@ -157,7 +157,7 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_creusot::{
     A_LESS_THAN_B_HOLDS_SRC, ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC,
-    ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
+    ASCII_BYTE_HOLDS_SRC, ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
     BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
     BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
     BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
@@ -185,7 +185,9 @@ use amenable_creusot::{
     LINKED_LIST_ITER_MUT_WRITES_THROUGH_HOLDS_SRC,
     LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC,
     MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_HOLDS_SRC,
-    MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC, NON_NUL_BYTE_HOLDS_SRC,
+    MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC,
+    NONZERO_I16_GET_ROUND_TRIPS_SRC, NONZERO_I16_NEW_SUCCEEDS_EXACTLY_WHEN_NONZERO_SRC,
+    NON_NUL_BYTE_HOLDS_SRC,
     NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_HOLDS_SRC, NUL_ONLY_AT_THE_END_VALIDATES_SRC,
     OPTION_SOME_AND_NONE_ARE_DISJOINT_HOLDS_SRC, ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_HOLDS_SRC,
     OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
@@ -200,7 +202,7 @@ use amenable_creusot::{
     SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
     SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
     SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC, STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC,
-    STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC,
+    STRING_ROUNDTRIPS_AND_PRESERVES_LENGTH_SRC, SYSTEM_ALLOCATION_ROUND_TRIPS_SRC,
     TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_HOLDS_SRC,
     TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_HOLDS_SRC, TUPLE_FIELD_ACCESS_HOLDS_SRC,
     VALID_UNICODE_SCALAR_HOLDS_SRC,
@@ -982,18 +984,19 @@ bridge_creusot_witness!(RustStdStandard<System>);
     }
 }
 
-/// A `Box` allocation serviced by the default `System` allocator
-/// round-trips its value — the same claim Kani's own
+/// Returns `amenable_creusot::SYSTEM_ALLOCATION_ROUND_TRIPS_SRC` directly
+/// -- the verbatim, `harness!`-captured source of the real
+/// `#[logic(open)] fn system_allocation_round_trips` the real site calls,
+/// not a hand-retyped copy of its expression. The same claim Kani's own
 /// `verify_system_allocates_and_deallocates_a_layout` harness checks via
 /// `assert_eq!` (out of the contract-bound scanner's reach, since
-/// `assert_eq!`'s comparands aren't parsed as a clause), named here once
-/// for the Creusot side that does state it as an explicit `#[ensures]`.
+/// `assert_eq!`'s comparands aren't parsed as a clause).
 impl Ensures<CreusotVerifier> for RustStdStandard<System> {
     type Input = ();
     type Bound = &'static str;
 
     fn ensures(_: ()) -> &'static str {
-        "result == value"
+        SYSTEM_ALLOCATION_ROUND_TRIPS_SRC
     }
 }
 
@@ -1511,12 +1514,16 @@ impl CreusotWitness for AsciiByte {
 
 bridge_creusot_witness!(AsciiByte);
 
+/// Returns `amenable_creusot::ASCII_BYTE_HOLDS_SRC` directly -- the
+/// verbatim, `harness!`-captured source of the real `#[logic(open)] fn
+/// ascii_byte_holds` the real site calls, not a hand-retyped copy of its
+/// expression.
 impl Requires<CreusotVerifier> for AsciiByte {
     type Input = ();
     type Bound = &'static str;
 
     fn requires(_: ()) -> &'static str {
-        "byte < 128u8"
+        ASCII_BYTE_HOLDS_SRC
     }
 }
 
@@ -3743,16 +3750,15 @@ bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
 /// (`amenable_kani::rust_std::num`, `value != 0`) and
 /// `Ensures<VerusVerifier>` (`amenable_std::verus_witness`, split into
 /// `value != 0 ==> result`/`value == 0 ==> !result`) already name, restated
-/// once more in Creusot's own `match`-expression form. Fragment text is
-/// the literal normalized (tokenize, don't parse-as-`syn::Expr`) form
-/// `elicit_doc`'s scanner computes, not hand-formatted — Pearlite content
-/// like this isn't valid plain-Rust expression grammar to begin with.
+/// once more in Creusot's own `match`-expression form -- each returns its
+/// own named predicate's `harness!`-captured source directly, not a
+/// hand-retyped copy of its expression.
 impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
     type Input = ();
     type Bound = &'static str;
 
     fn ensures(_: ()) -> &'static str {
-        "match result { Some (_) => value != 0i16 , None => value == 0i16 , }"
+        NONZERO_I16_NEW_SUCCEEDS_EXACTLY_WHEN_NONZERO_SRC
     }
 }
 
@@ -3770,7 +3776,7 @@ impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
         evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
         verifier: "creusot",
         kind: "ensures",
-        fragment: || "match result { Some (nz) => nonzero_i16_get (& nz) == value , None => true , }",
+        fragment: || NONZERO_I16_GET_ROUND_TRIPS_SRC,
     }
 }
 

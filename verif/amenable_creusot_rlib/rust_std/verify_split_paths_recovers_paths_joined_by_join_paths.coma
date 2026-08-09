@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 452 8 452 75 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 464 8 464 75 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 453 12 453 16
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 450 19 450 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 451 18 451 24
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 465 12 465 16
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 462 19 462 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 463 18 463 24
 
 use creusot.prelude.Any
 
@@ -11,7 +11,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_split_paths_recovers_paths_joined_by_join_paths
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 452 8 452 75] (return (x: bool)) = (! bb0
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 464 8 464 75] (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#srust_std] true ] s1 | s1 = return {_ret} ] ] [ & _ret: bool = Any.any_l () ])
   [ return (result: bool) ->
   {[@stop_split] [@expl:verify_split_paths_recovers_paths_joined_by_join_paths ensures] [%#srust_std'1] result}

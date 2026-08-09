@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2397 8 2397 114 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2420 8 2420 114 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2398 26 2398 32
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2398 40 2398 45
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2398 53 2398 56
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2398 13 2398 19
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2395 19 2395 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2396 18 2396 79
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2377 16 2383 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2421 26 2421 32
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2421 40 2421 45
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2421 53 2421 56
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2421 13 2421 19
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2418 19 2418 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2419 18 2419 79
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2400 16 2406 17
 
 use creusot.int.UInt8
 use creusot.int.UInt64
@@ -16,7 +16,7 @@ type t_Option_u8 = None | Some UInt8.t
 
 type tup4_usize_Option_u8_Option_u8_Option_u8 = { f0: UInt64.t; f1: t_Option_u8; f2: t_Option_u8; f3: t_Option_u8 }
 
-predicate into_string_error_recovers_the_original_cstring_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2373 8 2375 17] (into_string_error_result: tup4_usize_Option_u8_Option_u8_Option_u8) =
+predicate into_string_error_recovers_the_original_cstring_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2396 8 2398 17] (into_string_error_result: tup4_usize_Option_u8_Option_u8_Option_u8) =
   [%#srust_std'5] match into_string_error_result with
     | {f0 = payload_len; f1 = first; f2 = second; f3 = terminator} -> payload_len = (3: UInt64.t)
     /\ first = Some (255: UInt8.t) /\ second = Some (120: UInt8.t) /\ terminator = Some (0: UInt8.t)
@@ -27,7 +27,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_into_string_error_recovers_the_original_cstring
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2397 8 2397 114]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2420 8 2420 114]
   (return (x: tup4_usize_Option_u8_Option_u8_Option_u8)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_3 <- Some ([%#srust_std] (255: UInt8.t)) ] s1

@@ -1,22 +1,22 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1049 8 1049 66 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1072 8 1072 66 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1047 19 1047 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1048 18 1048 56
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1063 24 1063 66
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1070 19 1070 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1071 18 1071 56
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1086 24 1086 66
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
-predicate tuple_field_access_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1062 8 1062 85] (a: Int32.t) (b: Int32.t) (tuple_result: tup2_i32_i32) =
+predicate tuple_field_access_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1085 8 1085 85] (a: Int32.t) (b: Int32.t) (tuple_result: tup2_i32_i32) =
   [%#srust_std'1] tuple_result.f0 = a /\ tuple_result.f1 = b
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_tuple_field_access [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1049 8 1049 66]
+let rec verify_tuple_field_access [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1072 8 1072 66]
   (a: Int32.t) (b: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &tuple <- { f0 = a; f1 = b } ] s1

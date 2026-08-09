@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 304 8 307 45 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 316 8 319 45 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 309 39 309 43
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 302 19 302 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 303 18 303 76
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 277 16 280 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 321 39 321 43
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 314 19 314 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 315 18 315 76
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 289 16 292 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: bool }
 
-predicate hash_map_insert_then_get_recovers_the_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 272 8 275 17] (value: Int32.t) (map_result: tup3_Option_i32_Option_i32_bool) =
+predicate hash_map_insert_then_get_recovers_the_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 284 8 287 17] (value: Int32.t) (map_result: tup3_Option_i32_Option_i32_bool) =
   [%#srust_std'2] match map_result with
     | {f0 = Some got; f1 = Some removed; f2 = empty} -> got = value /\ removed = value /\ empty
     | _ -> false
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_hash_map_insert_then_get_recovers_the_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 304 8 307 45] (key: Int32.t) (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 316 8 319 45] (key: Int32.t) (value: Int32.t)
   (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some value ] s1

@@ -83,6 +83,18 @@ use std::task::{Context, Poll};
 use std::time::Duration;
 
 amenable_derive::harness! {
+    creusot, SYSTEM_ALLOCATION_ROUND_TRIPS_SRC, {
+        /// The `amenable_std::rust_std::RustStdStandard<System>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn system_allocation_round_trips(value: i32, alloc_result: i32) -> bool {
+            pearlite! { alloc_result == value }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC, {
         /// `System` is the process's default global allocator in this crate,
         /// so a `Box` allocation and drop is serviced by `System` even though
@@ -91,7 +103,7 @@ amenable_derive::harness! {
         #[requires(true)]
         // Canonical home: RustStdStandard<System>'s Ensures<CreusotVerifier>
         // impl (amenable_std::creusot_witness) names this exact fragment.
-        #[ensures(result == value)]
+        #[ensures(system_allocation_round_trips(value, result))]
         fn verify_system_allocates_and_deallocates_a_layout(value: i32) -> i32 {
             let _allocator = System;
             let boxed = Box::new(value);
@@ -1005,6 +1017,17 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, ASCII_BYTE_HOLDS_SRC, {
+        /// The `amenable_std::AsciiByte` precondition -- real, callable
+        /// Pearlite content, not just descriptive text alongside it.
+        #[logic(open)]
+        fn ascii_byte_holds(byte: u8) -> bool {
+            pearlite! { byte < 128u8 }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, {
         /// A one-byte ASCII `str` reports a byte length of one, and its
         /// first byte is exactly the byte it was constructed from.
@@ -1017,10 +1040,10 @@ amenable_derive::harness! {
         /// trusted boundary is needed either -- Creusot discharges the
         /// resulting tuple equalities on its own).
         ///
-        /// The precondition below is the canonical home
+        /// `ascii_byte_holds` is the canonical home
         /// `amenable_std::AsciiByte`'s own `Requires<CreusotVerifier>`
         /// impl names.
-        #[requires(byte < 128u8)]
+        #[requires(ascii_byte_holds(byte))]
         #[ensures(str_byte_length_and_content_holds(byte, result))]
         fn verify_str_byte_length_and_content(byte: u8) -> (usize, u8) {
             (1usize, byte)
@@ -2746,6 +2769,48 @@ fn nonzero_i16_get(_nz: &NonZero<i16>) -> i16 {
 }
 
 amenable_derive::harness! {
+    creusot, NONZERO_I16_NEW_SUCCEEDS_EXACTLY_WHEN_NONZERO_SRC, {
+        /// The first `amenable_std::rust_std::RustStdStandard<NonZero<i16>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        #[logic(open)]
+        fn nonzero_i16_new_succeeds_exactly_when_nonzero(
+            value: i16,
+            new_result: Option<NonZero<i16>>,
+        ) -> bool {
+            pearlite! {
+                match new_result {
+                    Some(_) => value != 0i16,
+                    None => value == 0i16,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, NONZERO_I16_GET_ROUND_TRIPS_SRC, {
+        /// The second `amenable_std::rust_std::RustStdStandard<NonZero<i16>>`
+        /// postcondition -- real, callable Pearlite content, not just
+        /// descriptive text alongside it.
+        ///
+        /// `opaque`, not `open`: it calls the module-private
+        /// `nonzero_i16_get` (itself `#[trusted] #[logic(opaque)]`), and
+        /// Creusot rejects an `open` (transparent) definition that would
+        /// expose a less-visible item to its own callers.
+        #[logic(opaque)]
+        fn nonzero_i16_get_round_trips(value: i16, new_result: Option<NonZero<i16>>) -> bool {
+            pearlite! {
+                match new_result {
+                    Some(nz) => nonzero_i16_get(&nz) == value,
+                    None => true,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_NONZERO_I16_ROUNDTRIPS_SRC, {
         /// `NonZero::new` succeeds iff the input is nonzero, and `.get()`
         /// round-trips the wrapped value unchanged — the same claim
@@ -2778,14 +2843,8 @@ amenable_derive::harness! {
         /// impl (`amenable_std::creusot_witness`) names.
         #[trusted]
         #[requires(true)]
-        #[ensures(match result {
-            Some(_) => value != 0i16,
-            None => value == 0i16,
-        })]
-        #[ensures(match result {
-            Some(nz) => nonzero_i16_get(&nz) == value,
-            None => true,
-        })]
+        #[ensures(nonzero_i16_new_succeeds_exactly_when_nonzero(value, result))]
+        #[ensures(nonzero_i16_get_round_trips(value, result))]
         fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
             NonZero::new(value)
         }

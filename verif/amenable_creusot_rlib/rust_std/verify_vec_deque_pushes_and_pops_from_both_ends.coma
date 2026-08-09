@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2104 8 2107 71 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2127 8 2130 71 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2108 43 2108 47
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2102 19 2102 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2103 18 2103 78
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2074 16 2081 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2131 43 2131 47
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2125 19 2125 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2126 18 2126 78
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2097 16 2104 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -17,7 +17,7 @@ type tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
   f3: t_Option_i32;
   f4: bool }
 
-predicate vec_deque_pushes_and_pops_from_both_ends_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2068 8 2072 17] (a: Int32.t) (b: Int32.t) (deque_result: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+predicate vec_deque_pushes_and_pops_from_both_ends_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2091 8 2095 17] (a: Int32.t) (b: Int32.t) (deque_result: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'2] match deque_result with
     | {f0 = front; f1 = back; f2 = exhausted_front; f3 = exhausted_back; f4 = empty} -> front = Some b
     /\ back = Some a /\ exhausted_front = None /\ exhausted_back = None /\ empty
@@ -28,7 +28,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_pushes_and_pops_from_both_ends
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2104 8 2107 71] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2127 8 2130 71] (a: Int32.t) (b: Int32.t)
   (return (x: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some b ] s1

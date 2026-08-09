@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1346 8 1357 9 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1369 8 1380 9 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1362 24 1362 28
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1344 19 1344 48
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1345 18 1345 79
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1285 24 1285 31
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1310 16 1320 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1385 24 1385 28
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1367 19 1367 48
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1368 18 1368 79
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1308 24 1308 31
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1333 16 1343 17
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -83,10 +83,10 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
-predicate k1_less_than_k2_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1284 8 1284 58] (k1: Int32.t) (k2: Int32.t) =
+predicate k1_less_than_k2_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1307 8 1307 58] (k1: Int32.t) (k2: Int32.t) =
   [%#srust_std'2] Int32.lt k1 k2
 
-predicate btree_map_iterates_in_key_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1296 8 1308 17] (k1: Int32.t) (k2: Int32.t) (v1: Int32.t) (v2: Int32.t) (btree_map_result: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool) =
+predicate btree_map_iterates_in_key_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1319 8 1331 17] (k1: Int32.t) (k2: Int32.t) (v1: Int32.t) (v2: Int32.t) (btree_map_result: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'3] match btree_map_result with
     | {f0'0 = Some {f0 = first_k; f1 = first_v}; f1'0 = Some {f0 = second_k; f1 = second_v}; f2'0 = Some'0 removed_first; f3'0 = Some'0 removed_second; f4'0 = empty} -> first_k
       = k1
@@ -99,7 +99,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_btree_map_iterates_in_key_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1346 8 1357 9] (k1: Int32.t) (k2: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1369 8 1380 9] (k1: Int32.t) (k2: Int32.t)
   (v1: Int32.t) (v2: Int32.t) (return (x: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool)) =
   {[@stop_split] [@expl:verify_btree_map_iterates_in_key_order requires] [%#srust_std'0] k1_less_than_k2_holds k1 k2}
   (! bb0

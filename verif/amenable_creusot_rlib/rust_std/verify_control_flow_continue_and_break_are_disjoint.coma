@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2726 8 2728 51 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2749 8 2751 51 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2731 46 2731 51
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2731 53 2731 57
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2730 49 2730 53
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2730 55 2730 60
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2724 19 2724 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2725 18 2725 83
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2709 16 2714 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2754 46 2754 51
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2754 53 2754 57
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2753 49 2753 53
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2753 55 2753 60
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2747 19 2747 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2748 18 2748 83
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2732 16 2737 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -33,7 +33,7 @@ let rec elim_Continue (_x: t_ControlFlow_i32_i32) (return (f0'0: Int32.t)) = any
       end}
     any) ]
 
-predicate control_flow_continue_and_break_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2704 8 2707 17] (value: t_ControlFlow_i32_i32) (control_flow_result: tup4_bool_bool_Option_i32_Option_i32) =
+predicate control_flow_continue_and_break_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2727 8 2730 17] (value: t_ControlFlow_i32_i32) (control_flow_result: tup4_bool_bool_Option_i32_Option_i32) =
   [%#srust_std'5] match value with
     | Continue inner -> control_flow_result = { f0 = true; f1 = false; f2 = Some inner; f3 = None }
     | Break inner -> control_flow_result = { f0 = false; f1 = true; f2 = None; f3 = Some inner }
@@ -44,7 +44,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_control_flow_continue_and_break_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2726 8 2728 51] (value: t_ControlFlow_i32_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2749 8 2751 51] (value: t_ControlFlow_i32_i32)
   (return (x: tup4_bool_bool_Option_i32_Option_i32)) = (! bb0
   [ bb0 = any [ br0 (x0: Int32.t) -> {value = Continue x0} (! bb4) | br1 (x0: Int32.t) -> {value = Break x0} (! bb3) ]
   | bb3 = s0

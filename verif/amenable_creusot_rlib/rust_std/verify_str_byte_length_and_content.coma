@@ -1,9 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1025 8 1025 70 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1048 8 1048 70 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1026 13 1026 19
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1023 19 1023 31
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1024 18 1024 65
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1038 24 1038 70
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1049 13 1049 19
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1046 19 1046 41
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1047 18 1047 65
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1025 24 1025 36
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1061 24 1061 70
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -72,17 +73,20 @@ function cmp_le_log_u8 (x: UInt8.t) (y: UInt8.t) : ()
 
 axiom cmp_le_log_u8_spec: forall x: UInt8.t, y: UInt8.t. [%#sord] UInt8.le x y = (cmp_log_u8 x y <> Greater)
 
-predicate str_byte_length_and_content_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1037 8 1037 87] (byte: UInt8.t) (str_result: tup2_usize_u8) =
-  [%#srust_std'2] str_result.f0 = (1: UInt64.t) /\ str_result.f1 = byte
+predicate ascii_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1024 8 1024 45] (byte: UInt8.t) =
+  [%#srust_std'2] UInt8.lt byte (128: UInt8.t)
+
+predicate str_byte_length_and_content_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1060 8 1060 87] (byte: UInt8.t) (str_result: tup2_usize_u8) =
+  [%#srust_std'3] str_result.f0 = (1: UInt64.t) /\ str_result.f1 = byte
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
 let rec verify_str_byte_length_and_content
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1025 8 1025 70] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1048 8 1048 70] (byte: UInt8.t)
   (return (x: tup2_usize_u8)) =
-  {[@stop_split] [@expl:verify_str_byte_length_and_content requires] [%#srust_std'0] UInt8.lt byte (128: UInt8.t)}
+  {[@stop_split] [@expl:verify_str_byte_length_and_content requires] [%#srust_std'0] ascii_byte_holds byte}
   (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- { f0 = ([%#srust_std] (1: UInt64.t)); f1 = byte } ] s1 | s1 = return {_ret} ] ]
   [ & _ret: tup2_usize_u8 = Any.any_l () | & byte: UInt8.t = byte ])

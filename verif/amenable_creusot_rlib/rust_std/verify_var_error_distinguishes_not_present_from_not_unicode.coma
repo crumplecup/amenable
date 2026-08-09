@@ -1,18 +1,18 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 492 8 492 95 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 504 8 504 95 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 493 13 493 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 493 19 493 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 493 25 493 31
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 490 19 490 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 491 18 491 78
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 468 16 471 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 505 13 505 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 505 19 505 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 505 25 505 31
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 502 19 502 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 503 18 503 78
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 480 16 483 17
 
 use creusot.int.UInt64
 use creusot.prelude.Any
 
 type tup3_bool_bool_usize = { f0: bool; f1: bool; f2: UInt64.t }
 
-predicate var_error_distinguishes_not_present_from_not_unicode [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 464 8 466 17] (var_error_result: tup3_bool_bool_usize) =
+predicate var_error_distinguishes_not_present_from_not_unicode [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 476 8 478 17] (var_error_result: tup3_bool_bool_usize) =
   [%#srust_std'4] match var_error_result with
     | {f0 = not_present_is_distinct; f1 = not_unicode_is_detected; f2 = payload_len} -> not_present_is_distinct
     /\ not_unicode_is_detected /\ payload_len = (2: UInt64.t)
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_var_error_distinguishes_not_present_from_not_unicode
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 492 8 492 95]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 504 8 504 95]
   (return (x: tup3_bool_bool_usize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#srust_std] true); f1 = ([%#srust_std'0] true); f2 = ([%#srust_std'1] (2: UInt64.t)) } ]

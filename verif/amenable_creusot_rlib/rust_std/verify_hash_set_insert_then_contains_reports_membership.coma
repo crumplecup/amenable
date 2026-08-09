@@ -1,19 +1,19 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 346 8 348 37 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 358 8 360 37 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 350 13 350 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 350 19 350 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 350 25 350 29
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 350 31 350 36
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 344 19 344 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 345 18 345 74
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 324 16 327 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 362 13 362 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 362 19 362 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 362 25 362 29
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 362 31 362 36
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 356 19 356 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 357 18 357 74
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 336 16 339 17
 
 use creusot.prelude.Any
 use creusot.int.Int32
 
 type tup4_bool_bool_bool_bool = { f0: bool; f1: bool; f2: bool; f3: bool }
 
-predicate hash_set_insert_then_contains_reports_membership [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 320 8 322 17] (set_result: tup4_bool_bool_bool_bool) =
+predicate hash_set_insert_then_contains_reports_membership [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 332 8 334 17] (set_result: tup4_bool_bool_bool_bool) =
   [%#srust_std'5] match set_result with
     | {f0 = inserted; f1 = contains_before_remove; f2 = removed; f3 = contains_after_remove} -> inserted
     /\ contains_before_remove /\ removed /\ not contains_after_remove
@@ -24,7 +24,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_hash_set_insert_then_contains_reports_membership
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 346 8 348 37] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 358 8 360 37] (value: Int32.t)
   (return (x: tup4_bool_bool_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#srust_std] true);

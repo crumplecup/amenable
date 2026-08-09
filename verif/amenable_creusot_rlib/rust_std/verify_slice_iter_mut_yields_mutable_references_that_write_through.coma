@@ -1,18 +1,18 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 971 8 976 55 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 983 8 988 55 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 979 29 979 44
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 980 39 980 48
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 988 40 988 49
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 996 38 996 47
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 997 31 997 36
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 998 28 998 32
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1002 54 1002 55
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1002 49 1002 56
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1002 63 1002 64
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1002 58 1002 65
-let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 969 19 969 23
-let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 970 18 970 113
-let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 952 16 959 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 991 29 991 44
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 992 39 992 48
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1000 40 1000 49
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1008 38 1008 47
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1009 31 1009 36
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1010 28 1010 32
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1014 54 1014 55
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1014 49 1014 56
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1014 63 1014 64
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1014 58 1014 65
+let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 981 19 981 23
+let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 982 18 982 113
+let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 964 16 971 17
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 352 18 352 33
 let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 517 14 517 50
@@ -169,7 +169,7 @@ type tup5_Option_i32_Option_i32_bool_i32_i32 = {
   f3'0: Int32.t;
   f4'0: Int32.t }
 
-predicate slice_iter_mut_yields_mutable_references_that_write_through [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 944 8 950 17] (a: Int32.t) (b: Int32.t) (updated_a: Int32.t) (updated_b: Int32.t) (slice_iter_mut_result: tup5_Option_i32_Option_i32_bool_i32_i32) =
+predicate slice_iter_mut_yields_mutable_references_that_write_through [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 956 8 962 17] (a: Int32.t) (b: Int32.t) (updated_a: Int32.t) (updated_b: Int32.t) (slice_iter_mut_result: tup5_Option_i32_Option_i32_bool_i32_i32) =
   [%#srust_std'11] match slice_iter_mut_result with
     | {f0'0 = first_seen; f1'0 = second_seen; f2'0 = exhausted; f3'0 = final_first; f4'0 = final_second} -> first_seen
       = Some'0 a
@@ -181,7 +181,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_slice_iter_mut_yields_mutable_references_that_write_through
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 971 8 976 55] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 983 8 988 55] (a: Int32.t) (b: Int32.t)
   (updated_a: Int32.t) (updated_b: Int32.t) (return (x: tup5_Option_i32_Option_i32_bool_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = any

@@ -1,13 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4180 8 4180 96 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4239 8 4239 96 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4178 19 4178 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4179 18 4179 94
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4166 24 4166 46
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4237 19 4237 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4238 18 4238 94
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4225 24 4225 46
 
 use creusot.int.Int64
 use creusot.prelude.Any
 
-predicate windows_handle_as_raw_handle_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4162 8 4165 17] (value: Int64.t) (handle_result: Int64.t) =
+predicate windows_handle_as_raw_handle_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4221 8 4224 17] (value: Int64.t) (handle_result: Int64.t) =
   [%#srust_std'1] handle_result = value
 
 meta "compute_max_steps" 1000000
@@ -15,7 +15,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_as_raw_handle_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4180 8 4180 96] (value: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4239 8 4239 96] (value: Int64.t)
   (return (x: Int64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
   [ & _ret: Int64.t = Any.any_l () | & value: Int64.t = value ])

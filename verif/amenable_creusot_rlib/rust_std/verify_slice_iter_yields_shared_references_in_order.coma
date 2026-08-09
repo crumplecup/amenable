@@ -1,15 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 910 8 914 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 922 8 926 58 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 916 25 916 36
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 917 35 917 44
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 921 36 921 45
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 925 35 925 44
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 929 34 929 43
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 930 27 930 32
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 931 24 931 28
-let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 908 19 908 23
-let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 909 18 909 79
-let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 892 16 898 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 928 25 928 36
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 929 35 929 44
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 933 36 933 45
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 937 35 937 44
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 941 34 941 43
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 942 27 942 32
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 943 24 943 28
+let%span srust_std'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 920 19 920 23
+let%span srust_std'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 921 18 921 79
+let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 904 16 910 17
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 348 18 348 33
 let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 491 20 491 62
@@ -114,7 +114,7 @@ predicate resolve_Iter_i32 (_1: t_Iter_i32)
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
-predicate slice_iter_yields_shared_references_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 885 8 890 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (slice_iter_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+predicate slice_iter_yields_shared_references_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 897 8 902 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (slice_iter_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
   [%#srust_std'8] match slice_iter_result with
     | {f0 = first_seen; f1 = second_seen; f2 = third_seen; f3 = exhausted} -> first_seen = Some'0 a
     /\ second_seen = Some'0 b /\ third_seen = Some'0 c /\ exhausted
@@ -125,7 +125,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_slice_iter_yields_shared_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 910 8 914 58] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 922 8 926 58] (a: Int32.t) (b: Int32.t)
   (c: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = any

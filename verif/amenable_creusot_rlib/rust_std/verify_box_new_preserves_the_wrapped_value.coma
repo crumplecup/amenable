@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1949 8 1949 72 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1972 8 1972 72 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1951 13 1951 27
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1947 19 1947 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1948 18 1948 68
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1963 24 1963 43
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1974 13 1974 27
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1970 19 1970 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1971 18 1971 68
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1986 24 1986 43
 let%span sboxed = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/boxed.rs" 77 18 77 35
 
 use creusot.int.Int32
@@ -12,7 +12,7 @@ use creusot.prelude.Any
 let rec as_ref_Box_i32_Global (self_: Int32.t) (return (x: Int32.t)) = any
   [ return (result: Int32.t) -> {[@stop_split] [@expl:as_ref ensures] [%#sboxed] self_ = result} (! return {result}) ]
 
-predicate box_new_preserves_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1962 8 1962 83] (value: Int32.t) (box_result: Int32.t) =
+predicate box_new_preserves_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1985 8 1985 83] (value: Int32.t) (box_result: Int32.t) =
   [%#srust_std'2] box_result = value
 
 meta "compute_max_steps" 1000000
@@ -20,7 +20,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_box_new_preserves_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1949 8 1949 72] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1972 8 1972 72] (value: Int32.t)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &boxed <- value ] s1
