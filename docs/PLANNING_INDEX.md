@@ -4,6 +4,30 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Naming Raw Requires/Ensures Bounds (elicit_doc-driven)
+
+**Document:** [CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)
+
+**Status:** 🔲 Ongoing — mechanism and tooling complete;
+`amenable_creusot` fully cleared; `amenable_kani` partially cleared
+(largest duplicate clusters resolved, long tail remains);
+`amenable_verus` not yet started.
+
+**Description:** Every `requires`/`ensures` bound should be a named
+`amenable_core::{Ensures, Requires}` contract type with one real,
+callable predicate, not a raw expression restated per site.
+`elicit_doc`'s `ANTIPATTERN-UNNAMED-CONTRACT-BOUND-001` rule scans all
+three verifier backends for raw bounds and groups them into duplicate
+clusters by clause shape, ranked by size, so the highest-leverage
+(most-repeated) bound gets named first. The linked document is a
+full handoff: the contract-type design pattern, the `ContractRecord`
+two-tier registration mechanism, the elicit_doc tooling internals, a
+step-by-step workflow, and every gotcha hit along the way (associated-
+type uniqueness, `#[cfg(kani)]` import gating, macro/attribute literal
+limitations, the `kani::assume`-is-a-plain-fn-call scanner gap). Written
+so another agent can resume the sweep from the top of the ranked list
+without re-deriving any of this.
+
 ### Fixing `Establish` to Actually Gate Obligations
 
 **Document:** [PROVABLE_FROM_PLAN.md](PROVABLE_FROM_PLAN.md)
