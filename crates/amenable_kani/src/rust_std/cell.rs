@@ -72,14 +72,20 @@ amenable_derive::harness! {
 
             let replacement: i32 = kani::any();
             let old = cell.replace(replacement);
-            assert_eq!(old, updated, "replace returns the previous value");
+            assert!(
+                RustStdStandard::<Cell<i32>>::ensures((old, updated)),
+                "replace returns the previous value"
+            );
             assert!(
                 RustStdStandard::<Cell<i32>>::ensures((cell.get(), replacement)),
                 "replace stores the new value"
             );
 
             let taken = cell.take();
-            assert_eq!(taken, replacement, "take returns the stored value");
+            assert!(
+                RustStdStandard::<Cell<i32>>::ensures((taken, replacement)),
+                "take returns the stored value"
+            );
             assert_eq!(
                 cell.get(),
                 i32::default(),
@@ -170,6 +176,26 @@ kani_ensures!(
         verifier: "kani",
         kind: "ensures",
         fragment: || "RustStdStandard::<Cell<i32>>::ensures((cell.get(), replacement))",
+        harnesses: &["verify_cell_get_set_replace_take_round_trip"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Cell<i32>>::ensures((old, updated))",
+        harnesses: &["verify_cell_get_set_replace_take_round_trip"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Cell<i32>>::ensures((taken, replacement))",
         harnesses: &["verify_cell_get_set_replace_take_round_trip"],
     }
 }
@@ -555,6 +581,23 @@ bridge_kani_witness!(RustStdStandard<LazyCell<i32, fn() -> i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<LazyCell<i32, fn() -> i32>>,
+    "amenable_std::rust_std::RustStdStandard<LazyCell<i32, fn() -> i32>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LazyCell<i32, fn() -> i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<LazyCell<i32, fn() -> i32>>::ensures((first, second))",
+        harnesses: &["verify_lazy_cell_caches_its_initializer_result"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LAZY_CELL_CACHES_ITS_INITIALIZER_RESULT_SRC, {
         /// `LazyCell` runs its initializer at most once. Rather than an
@@ -573,8 +616,8 @@ amenable_derive::harness! {
             let lazy: LazyCell<i32, fn() -> i32> = LazyCell::new(init);
             let first = *lazy;
             let second = *lazy;
-            assert_eq!(
-                first, second,
+            assert!(
+                RustStdStandard::<LazyCell<i32, fn() -> i32>>::ensures((first, second)),
                 "LazyCell caches its initializer's result across derefs"
             );
         }

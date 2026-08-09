@@ -13,11 +13,13 @@ use std::sync::{
     WaitTimeoutResult,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
     KaniVerifier, KaniWaitTimeoutObservation, KaniWitness,
@@ -448,6 +450,23 @@ bridge_kani_witness!(RustStdStandard<LazyLock<i32, fn() -> i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<LazyLock<i32, fn() -> i32>>,
+    "amenable_std::rust_std::RustStdStandard<LazyLock<i32, fn() -> i32>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<LazyLock<i32, fn() -> i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<LazyLock<i32, fn() -> i32>>::ensures((first, second))",
+        harnesses: &["verify_lazy_lock_caches_its_initializer_result"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LAZY_LOCK_CACHES_ITS_INITIALIZER_RESULT_SRC, {
         /// Same caching proof technique as `core::cell::LazyCell`:
@@ -463,8 +482,8 @@ amenable_derive::harness! {
             let lazy: LazyLock<i32, fn() -> i32> = LazyLock::new(init);
             let first = *lazy;
             let second = *lazy;
-            assert_eq!(
-                first, second,
+            assert!(
+                RustStdStandard::<LazyLock<i32, fn() -> i32>>::ensures((first, second)),
                 "LazyLock caches its initializer's result across derefs"
             );
         }

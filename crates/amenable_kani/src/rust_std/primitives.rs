@@ -11,13 +11,17 @@
 //! value, nothing to check.
 
 #[cfg(kani)]
+use amenable_core::Ensures;
+#[cfg(kani)]
 use amenable_core::Requires;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::{AsciiByte, RustStdStandard};
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
+use crate::rust_std::macros::{
+    bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
+};
 use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl_kani_witness_trusted!(
@@ -62,6 +66,23 @@ bridge_kani_witness!(RustStdStandard<char>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<char>,
+    "amenable_std::rust_std::RustStdStandard<char>",
+    (char, char),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<char>::ensures((c, c2))",
+        harnesses: &["verify_char_unicode_scalar"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_UNICODE_SCALAR_SRC, {
         /// `char` is constrained to Unicode scalar values (excludes the
@@ -83,7 +104,10 @@ amenable_derive::harness! {
             );
 
             let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
-            assert!(c == c2, "char round-trips through u32");
+            assert!(
+                RustStdStandard::<char>::ensures((c, c2)),
+                "char round-trips through u32"
+            );
         }
     }
 }
@@ -440,6 +464,23 @@ bridge_kani_witness!(RustStdStandard<*const i32>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<*const i32>,
+    "amenable_std::rust_std::RustStdStandard<*const i32>",
+    (*const i32, *const i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<*const i32>::ensures((first, second))",
+        harnesses: &["verify_const_pointer_cast_is_reproducible"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC, {
         /// Casting the same reference to a raw pointer twice gives the
@@ -451,7 +492,10 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let first: *const i32 = &value;
             let second: *const i32 = &value;
-            assert_eq!(first, second, "casting the same reference twice gives the same address");
+            assert!(
+                RustStdStandard::<*const i32>::ensures((first, second)),
+                "casting the same reference twice gives the same address"
+            );
         }
     }
 }
@@ -479,6 +523,23 @@ bridge_kani_witness!(RustStdStandard<*mut i32>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<*mut i32>,
+    "amenable_std::rust_std::RustStdStandard<*mut i32>",
+    (*mut i32, *mut i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<*mut i32>::ensures((first, second))",
+        harnesses: &["verify_mut_pointer_cast_is_reproducible"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC, {
         /// Same as the `*const i32` proof, for a mutable raw pointer:
@@ -489,7 +550,10 @@ amenable_derive::harness! {
             let mut value: i32 = kani::any();
             let first: *mut i32 = &mut value;
             let second: *mut i32 = &mut value;
-            assert_eq!(first, second, "casting the same reference twice gives the same address");
+            assert!(
+                RustStdStandard::<*mut i32>::ensures((first, second)),
+                "casting the same reference twice gives the same address"
+            );
         }
     }
 }

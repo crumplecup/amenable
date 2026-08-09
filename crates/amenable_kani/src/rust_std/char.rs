@@ -326,6 +326,23 @@ bridge_kani_witness!(RustStdStandard<ToLowercase>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<ToLowercase>,
+    "amenable_std::rust_std::RustStdStandard<ToLowercase>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ToLowercase>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<ToLowercase>::ensures((out, \"a\"))",
+        harnesses: &["verify_to_lowercase_maps_an_uppercase_ascii_letter"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TO_LOWERCASE_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC, {
         /// `.to_lowercase()` yields the lowercase mapping of an uppercase
@@ -333,7 +350,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_to_lowercase_maps_an_uppercase_ascii_letter() {
             let out: String = 'A'.to_lowercase().collect();
-            assert_eq!(out, "a", "to_lowercase maps 'A' to \"a\"");
+            assert!(
+                RustStdStandard::<ToLowercase>::ensures((out, "a")),
+                "to_lowercase maps 'A' to \"a\""
+            );
         }
     }
 }
@@ -361,6 +381,23 @@ bridge_kani_witness!(RustStdStandard<ToUppercase>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<ToUppercase>,
+    "amenable_std::rust_std::RustStdStandard<ToUppercase>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<ToUppercase>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<ToUppercase>::ensures((out, \"A\"))",
+        harnesses: &["verify_to_uppercase_maps_a_lowercase_ascii_letter"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_TO_UPPERCASE_MAPS_A_LOWERCASE_ASCII_LETTER_SRC, {
         /// `.to_uppercase()` yields the uppercase mapping of a lowercase
@@ -368,7 +405,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_to_uppercase_maps_a_lowercase_ascii_letter() {
             let out: String = 'a'.to_uppercase().collect();
-            assert_eq!(out, "A", "to_uppercase maps 'a' to \"A\"");
+            assert!(
+                RustStdStandard::<ToUppercase>::ensures((out, "A")),
+                "to_uppercase maps 'a' to \"A\""
+            );
         }
     }
 }
@@ -396,6 +436,23 @@ bridge_kani_witness!(RustStdStandard<core::char::EscapeDebug>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<core::char::EscapeDebug>,
+    "amenable_std::rust_std::RustStdStandard<core::char::EscapeDebug>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDebug>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<core::char::EscapeDebug>::ensures((out, \"\\\\n\"))",
+        harnesses: &["verify_char_escape_debug_escapes_a_newline"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_DEBUG_ESCAPES_A_NEWLINE_SRC, {
         /// `.escape_debug()` renders a newline as the two-character escape
@@ -403,7 +460,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_char_escape_debug_escapes_a_newline() {
             let out: String = '\n'.escape_debug().collect();
-            assert_eq!(out, "\\n", "escape_debug renders \\n as a two-character escape");
+            assert!(
+                RustStdStandard::<core::char::EscapeDebug>::ensures((out, "\\n")),
+                "escape_debug renders \\n as a two-character escape"
+            );
         }
     }
 }
@@ -432,6 +492,23 @@ bridge_kani_witness!(RustStdStandard<core::char::EscapeDefault>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<core::char::EscapeDefault>,
+    "amenable_std::rust_std::RustStdStandard<core::char::EscapeDefault>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDefault>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<core::char::EscapeDefault>::ensures((out, \"\\\\n\"))",
+        harnesses: &["verify_char_escape_default_escapes_a_newline"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_DEFAULT_ESCAPES_A_NEWLINE_SRC, {
         /// `.escape_default()` renders a newline the same way a Rust
@@ -439,7 +516,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_char_escape_default_escapes_a_newline() {
             let out: String = '\n'.escape_default().collect();
-            assert_eq!(out, "\\n", "escape_default renders \\n as a two-character escape");
+            assert!(
+                RustStdStandard::<core::char::EscapeDefault>::ensures((out, "\\n")),
+                "escape_default renders \\n as a two-character escape"
+            );
         }
     }
 }
@@ -468,6 +548,23 @@ bridge_kani_witness!(RustStdStandard<core::char::EscapeUnicode>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<core::char::EscapeUnicode>,
+    "amenable_std::rust_std::RustStdStandard<core::char::EscapeUnicode>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeUnicode>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<core::char::EscapeUnicode>::ensures((out, \"\\\\u{61}\"))",
+        harnesses: &["verify_char_escape_unicode_renders_the_codepoint_escape"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC, {
         /// `.escape_unicode()` renders a char as a `\u{...}` codepoint
@@ -475,7 +572,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_char_escape_unicode_renders_the_codepoint_escape() {
             let out: String = 'a'.escape_unicode().collect();
-            assert_eq!(out, "\\u{61}", "escape_unicode renders a char as \\u{...}");
+            assert!(
+                RustStdStandard::<core::char::EscapeUnicode>::ensures((out, "\\u{61}")),
+                "escape_unicode renders a char as \\u{...}"
+            );
         }
     }
 }

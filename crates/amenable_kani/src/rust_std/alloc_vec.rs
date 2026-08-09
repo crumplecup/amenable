@@ -9,7 +9,7 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Vec<i32>> {
     type SupportingEvidence = Self;
@@ -31,6 +31,44 @@ bridge_kani_witness!(RustStdStandard<Vec<i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
         verifier: "kani",
         describe: || <RustStdStandard<Vec<i32>> as KaniWitness>::proof().to_string(),
+    }
+}
+
+kani_ensures!(
+    RustStdStandard<Vec<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+    (Vec<i32>, Vec<i32>),
+    |(actual, expected)| actual == expected
+);
+
+// The real call shapes recurring across every proof that collects a
+// `Vec<i32>` and checks it against an expected one -- `drained`/
+// `expected` and `collected`/`expected` are each reused verbatim across
+// multiple otherwise-unrelated harnesses (BinaryHeap's drain/into_iter/
+// iter proofs in alloc_collections.rs, and this file's own drain proof).
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Vec<i32>>::ensures((drained, expected))",
+        harnesses: &[
+            "verify_binary_heap_drain_yields_every_pushed_element_once",
+            "verify_vec_drain_removes_and_yields_in_order",
+        ],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<Vec<i32>>::ensures((collected, expected))",
+        harnesses: &[
+            "verify_binary_heap_into_iter_yields_every_pushed_element_once",
+            "verify_binary_heap_iter_yields_every_pushed_element_once",
+        ],
     }
 }
 
@@ -118,7 +156,10 @@ amenable_derive::harness! {
             let mut v = <Vec<i32> as crate::KaniCompose>::kani_depth2();
             let expected = v.clone();
             let drained: Vec<i32> = v.drain(..).collect();
-            assert_eq!(drained, expected, "drain yields every element in order");
+            assert!(
+                RustStdStandard::<Vec<i32>>::ensures((drained, expected)),
+                "drain yields every element in order"
+            );
             assert!(v.is_empty(), "drain leaves the Vec empty");
 
             struct DropWitness {

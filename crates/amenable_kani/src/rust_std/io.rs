@@ -496,6 +496,23 @@ bridge_kani_witness!(RustStdStandard<PipeReader>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<PipeReader>,
+    "amenable_std::rust_std::RustStdStandard<PipeReader>",
+    (Vec<u8>, Vec<u8>),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PipeReader>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<PipeReader>::ensures((collected, expected))",
+        harnesses: &["verify_pipe_reader_reads_what_the_paired_writer_wrote"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC, {
         /// Bytes written to a pipe's writer half arrive, unaltered, on
@@ -514,7 +531,7 @@ amenable_derive::harness! {
             pipe.close_writer(writer);
 
             let collected = pipe.read_to_end(reader.clone());
-            assert_eq!(collected, expected);
+            assert!(RustStdStandard::<PipeReader>::ensures((collected, expected)));
             assert_eq!(reader.resource_id(), pipe.resource_id());
         }
     }
@@ -543,6 +560,23 @@ bridge_kani_witness!(RustStdStandard<PipeWriter>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<PipeWriter>,
+    "amenable_std::rust_std::RustStdStandard<PipeWriter>",
+    (Vec<u8>, Vec<u8>),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<PipeWriter>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<PipeWriter>::ensures((collected, expected))",
+        harnesses: &["verify_pipe_writer_writes_arrive_at_the_paired_reader"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC, {
         /// The same delivery contract as `PipeReader`, checked from the
@@ -563,7 +597,7 @@ amenable_derive::harness! {
             pipe.close_writer(writer);
 
             let collected = pipe.read_to_end(reader.clone());
-            assert_eq!(collected, expected);
+            assert!(RustStdStandard::<PipeWriter>::ensures((collected, expected)));
             assert_eq!(writer_resource, reader.resource_id());
         }
     }
@@ -776,6 +810,23 @@ bridge_kani_witness!(RustStdStandard<std::io::Empty>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::io::Empty>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
+    usize,
+    |read| read == 0
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::io::Empty>::ensures(read)",
+        harnesses: &["verify_empty_read_reports_end_of_file"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC, {
         /// `std::io::empty()`'s reader always reports zero bytes read,
@@ -787,7 +838,10 @@ amenable_derive::harness! {
             let mut buffer: [u8; 4] = kani::any();
             let mut reader = std::io::empty();
             let read = reader.read(&mut buffer).expect("Empty::read never errors");
-            assert_eq!(read, 0, "Empty::read always reports zero bytes read");
+            assert!(
+                RustStdStandard::<std::io::Empty>::ensures(read),
+                "Empty::read always reports zero bytes read"
+            );
         }
     }
 }
@@ -815,6 +869,23 @@ bridge_kani_witness!(RustStdStandard<std::io::Repeat>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::io::Repeat>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
+    (u8, u8),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::io::Repeat>::ensures((filled, byte))",
+        harnesses: &["verify_repeat_fills_the_buffer_with_the_given_byte"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC, {
         /// `std::io::repeat(byte)`'s reader always fills the whole
@@ -829,7 +900,10 @@ amenable_derive::harness! {
             let read = reader.read(&mut buffer).expect("Repeat::read never errors");
             assert_eq!(read, buffer.len(), "Repeat::read always fills the whole buffer");
             for filled in buffer {
-                assert_eq!(filled, byte, "Repeat::read fills every slot with the given byte");
+                assert!(
+                    RustStdStandard::<std::io::Repeat>::ensures((filled, byte)),
+                    "Repeat::read fills every slot with the given byte"
+                );
             }
         }
     }
@@ -1007,6 +1081,39 @@ bridge_kani_witness!(RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+    ([u8; 2], [u8; 2]),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence:
+            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || {
+            "RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((buffer, first))"
+        },
+        harnesses: &["verify_chain_reads_the_first_source_then_the_second"],
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence:
+            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || {
+            "RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((buffer, second))"
+        },
+        harnesses: &["verify_chain_reads_the_first_source_then_the_second"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC, {
         /// `.chain()` reads its first source to exhaustion before it
@@ -1028,7 +1135,12 @@ amenable_derive::harness! {
                 buffer.len(),
                 "Chain::read drains the first source fully before touching the second"
             );
-            assert_eq!(buffer, first, "Chain::read yields the first source's bytes first");
+            assert!(
+                RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((
+                    buffer, first
+                )),
+                "Chain::read yields the first source's bytes first"
+            );
 
             let read_second = chain
                 .read(&mut buffer)
@@ -1038,8 +1150,10 @@ amenable_derive::harness! {
                 buffer.len(),
                 "Chain::read continues into the second source once the first is exhausted"
             );
-            assert_eq!(
-                buffer, second,
+            assert!(
+                RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((
+                    buffer, second
+                )),
                 "Chain::read yields the second source's bytes once the first is drained"
             );
         }

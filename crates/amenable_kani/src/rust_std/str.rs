@@ -48,12 +48,14 @@ use std::str::{
     SplitN, SplitTerminator, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type SupportingEvidence = Self;
@@ -243,6 +245,23 @@ bridge_kani_witness!(RustStdStandard<std::str::EscapeDebug<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::str::EscapeDebug<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::EscapeDebug<'static>>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDebug<'static>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::str::EscapeDebug<'static>>::ensures((out, \"\\\\n\"))",
+        harnesses: &["verify_escape_debug_escapes_control_characters"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC, {
         /// `.escape_debug()` renders a newline as the two-character
@@ -251,7 +270,10 @@ amenable_derive::harness! {
         fn verify_escape_debug_escapes_control_characters() {
             let s = "\n";
             let out: String = s.escape_debug().collect();
-            assert_eq!(out, "\\n", "escape_debug renders \\n as a two-character escape");
+            assert!(
+                RustStdStandard::<std::str::EscapeDebug<'static>>::ensures((out, "\\n")),
+                "escape_debug renders \\n as a two-character escape"
+            );
         }
     }
 }
@@ -279,6 +301,23 @@ bridge_kani_witness!(RustStdStandard<std::str::EscapeDefault<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::str::EscapeDefault<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::EscapeDefault<'static>>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDefault<'static>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::str::EscapeDefault<'static>>::ensures((out, \"\\\\n\"))",
+        harnesses: &["verify_escape_default_escapes_control_characters"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC, {
         /// `.escape_default()` renders a newline the same way a Rust
@@ -287,7 +326,10 @@ amenable_derive::harness! {
         fn verify_escape_default_escapes_control_characters() {
             let s = "\n";
             let out: String = s.escape_default().collect();
-            assert_eq!(out, "\\n", "escape_default renders \\n as a two-character escape");
+            assert!(
+                RustStdStandard::<std::str::EscapeDefault<'static>>::ensures((out, "\\n")),
+                "escape_default renders \\n as a two-character escape"
+            );
         }
     }
 }
@@ -315,6 +357,23 @@ bridge_kani_witness!(RustStdStandard<std::str::EscapeUnicode<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::str::EscapeUnicode<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::EscapeUnicode<'static>>",
+    (String, &'static str),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeUnicode<'static>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<std::str::EscapeUnicode<'static>>::ensures((out, \"\\\\u{61}\"))",
+        harnesses: &["verify_escape_unicode_renders_the_codepoint_escape"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC, {
         /// `.escape_unicode()` renders every character as a
@@ -323,7 +382,10 @@ amenable_derive::harness! {
         fn verify_escape_unicode_renders_the_codepoint_escape() {
             let s = "a";
             let out: String = s.escape_unicode().collect();
-            assert_eq!(out, "\\u{61}", "escape_unicode renders every char as \\u{...}");
+            assert!(
+                RustStdStandard::<std::str::EscapeUnicode<'static>>::ensures((out, "\\u{61}")),
+                "escape_unicode renders every char as \\u{...}"
+            );
         }
     }
 }

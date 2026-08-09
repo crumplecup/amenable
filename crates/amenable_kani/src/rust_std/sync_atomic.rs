@@ -13,12 +13,14 @@ use std::sync::atomic::{
     AtomicU16, AtomicU32, AtomicU64, AtomicUsize,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<AtomicBool> {
     type SupportingEvidence = Self;
@@ -571,6 +573,23 @@ bridge_kani_witness!(RustStdStandard<AtomicPtr<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<AtomicPtr<i32>>,
+    "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
+    (*mut i32, *mut i32),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || "RustStdStandard::<AtomicPtr<i32>>::ensures((previous, stored))",
+        harnesses: &["verify_atomic_ptr_load_store_swap_and_compare_exchange"],
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC, {
         /// `AtomicPtr::new` sets the pointer value observable via `load`;
@@ -618,8 +637,8 @@ amenable_derive::harness! {
 
             let swapped_in: *mut i32 = &mut swapped_in_slot;
             let previous = atomic.swap(swapped_in, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                previous, stored,
+            assert!(
+                RustStdStandard::<AtomicPtr<i32>>::ensures((previous, stored)),
                 "AtomicPtr::swap returns the value that was there before"
             );
             assert_eq!(

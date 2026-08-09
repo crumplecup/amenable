@@ -476,7 +476,10 @@ amenable_derive::harness! {
             drained.sort_unstable();
             let mut expected = vec![a, b];
             expected.sort_unstable();
-            assert_eq!(drained, expected, "drain yields every pushed element exactly once");
+            assert!(
+                RustStdStandard::<Vec<i32>>::ensures((drained, expected)),
+                "drain yields every pushed element exactly once"
+            );
             assert!(heap.is_empty(), "drain leaves the heap empty");
 
             struct OrderedDropWitness {
@@ -588,7 +591,10 @@ amenable_derive::harness! {
             collected.sort_unstable();
             let mut expected = vec![a, b];
             expected.sort_unstable();
-            assert_eq!(collected, expected, "into_iter yields every pushed element exactly once");
+            assert!(
+                RustStdStandard::<Vec<i32>>::ensures((collected, expected)),
+                "into_iter yields every pushed element exactly once"
+            );
 
             struct OrderedDropWitness {
                 id: i32,
@@ -692,7 +698,10 @@ amenable_derive::harness! {
             collected.sort_unstable();
             let mut expected = vec![a, b];
             expected.sort_unstable();
-            assert_eq!(collected, expected, "iter yields every pushed element exactly once");
+            assert!(
+                RustStdStandard::<Vec<i32>>::ensures((collected, expected)),
+                "iter yields every pushed element exactly once"
+            );
             assert_eq!(heap.len(), 2, "iteration leaves every heap element in place");
             assert_eq!(heap.pop(), Some(a.max(b)), "iteration preserves the heap maximum");
             assert_eq!(heap.pop(), Some(a.min(b)), "iteration preserves the remaining element");
