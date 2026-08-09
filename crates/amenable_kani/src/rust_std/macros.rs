@@ -91,7 +91,6 @@ macro_rules! kani_requires {
                 verifier: "kani",
                 kind: "requires",
                 fragment: || stringify!($expr),
-                harnesses: &[],
             }
         }
     };
@@ -116,7 +115,6 @@ macro_rules! kani_ensures {
                 verifier: "kani",
                 kind: "ensures",
                 fragment: || stringify!($expr),
-                harnesses: &[],
             }
         }
     };

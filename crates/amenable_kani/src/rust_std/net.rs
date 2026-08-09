@@ -139,27 +139,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-// The real call shape this harness's two match arms actually use.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ipv4Addr>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Ipv4Addr>::ensures((inner, v4))",
-        harnesses: &["verify_ip_addr_variant_matches_its_kind"],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ipv6Addr>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Ipv6Addr>::ensures((inner, v6))",
-        harnesses: &["verify_ip_addr_variant_matches_its_kind"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC, {
         /// `IpAddr::is_ipv4`/`is_ipv6` agree with the constructing variant,

@@ -252,16 +252,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDebug<'static>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<std::str::EscapeDebug<'static>>::ensures((out, \"\\\\n\"))",
-        harnesses: &["verify_escape_debug_escapes_control_characters"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC, {
         /// `.escape_debug()` renders a newline as the two-character
@@ -308,16 +298,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeDefault<'static>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<std::str::EscapeDefault<'static>>::ensures((out, \"\\\\n\"))",
-        harnesses: &["verify_escape_default_escapes_control_characters"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC, {
         /// `.escape_default()` renders a newline the same way a Rust
@@ -363,16 +343,6 @@ kani_ensures!(
     (String, &'static str),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::EscapeUnicode<'static>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<std::str::EscapeUnicode<'static>>::ensures((out, \"\\\\u{61}\"))",
-        harnesses: &["verify_escape_unicode_renders_the_codepoint_escape"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC, {

@@ -580,16 +580,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<AtomicPtr<i32>>::ensures((previous, stored))",
-        harnesses: &["verify_atomic_ptr_load_store_swap_and_compare_exchange"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC, {
         /// `AtomicPtr::new` sets the pointer value observable via `load`;

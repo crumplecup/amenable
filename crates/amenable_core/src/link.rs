@@ -73,8 +73,7 @@ inventory::collect!(ProofRecord);
 /// A statically-registered fact: a verifier backend checks a named
 /// requires/ensures bound, in its own native syntax, for a given evidence
 /// type. Registered once per `(evidence, verifier, kind)` triple by each
-/// `Ensures`/`Requires` impl, alongside its own definition — plus once more
-/// per supplementary spelling/margin the same bound recurs under.
+/// `Ensures`/`Requires` impl, alongside its own definition.
 ///
 /// Unlike [`ProofRecord::describe`], `fragment` is not merely a
 /// presence/absence signal — external tooling (e.g. a scanner that flags
@@ -84,15 +83,14 @@ inventory::collect!(ProofRecord);
 /// exists. It is still a plain function pointer, not a captured closure,
 /// for the same `const`-evaluable reason `describe` is.
 ///
-/// `harnesses` scopes where this fragment text is a valid match: the exact
-/// proof-site function name(s) it was transcribed from. Two unrelated
-/// types can independently state claims that normalize to the same literal
-/// text (e.g. `"result == value"` for a round-trip claim about completely
-/// different types) — without this scope, a scanner matching on
-/// `(verifier, kind, text)` alone would treat one type's registration as
-/// clearing every other type's coincidentally-identical, still-unnamed
-/// site. Empty only for records pre-dating this field; never leave it
-/// empty in a new registration.
+/// A proof site is only recognized as using this contract when it names it
+/// by a real call (`Type::ensures(...)`/`Type::requires(...)` for Kani, a
+/// bare `name(...)` call for Creusot/Verus) — never by its clause merely
+/// normalizing to the same text as `fragment`. Two unrelated types can
+/// independently state claims that normalize to identical text (e.g.
+/// `"result == value"` for a round-trip claim about completely different
+/// types); call-shape recognition means that coincidence can never silence
+/// an unnamed site, so no per-site scoping field is needed here.
 pub struct ContractRecord {
     /// The evidence type this contract names, in the same naming
     /// convention as [`EvidenceLink::name`].
@@ -103,10 +101,6 @@ pub struct ContractRecord {
     pub kind: &'static str,
     /// The bound's fragment, in the verifier's own native syntax.
     pub fragment: fn() -> &'static str,
-    /// The proof-site function name(s) this fragment text was transcribed
-    /// from — scopes matching so coincidentally-identical text elsewhere
-    /// isn't treated as the same claim.
-    pub harnesses: &'static [&'static str],
 }
 
 inventory::collect!(ContractRecord);

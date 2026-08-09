@@ -246,19 +246,6 @@ kani_ensures!(
         .is_err()
 );
 
-// The real call shape the one harness below actually uses, instead of
-// the raw predicate body `kani_ensures!` above already captures
-// canonically.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::WindowsHandleOrInvalidRejectsOnlyTheSentinel",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "WindowsHandleOrInvalidRejectsOnlyTheSentinel::ensures(value)",
-        harnesses: &["verify_windows_handle_or_invalid_rejects_only_the_sentinel"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC, {
         /// `HandleOrInvalid` converts to an owned handle, preserving the

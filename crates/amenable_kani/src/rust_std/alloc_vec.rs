@@ -41,37 +41,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-// The real call shapes recurring across every proof that collects a
-// `Vec<i32>` and checks it against an expected one -- `drained`/
-// `expected` and `collected`/`expected` are each reused verbatim across
-// multiple otherwise-unrelated harnesses (BinaryHeap's drain/into_iter/
-// iter proofs in alloc_collections.rs, and this file's own drain proof).
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Vec<i32>>::ensures((drained, expected))",
-        harnesses: &[
-            "verify_binary_heap_drain_yields_every_pushed_element_once",
-            "verify_vec_drain_removes_and_yields_in_order",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Vec<i32>>::ensures((collected, expected))",
-        harnesses: &[
-            "verify_binary_heap_into_iter_yields_every_pushed_element_once",
-            "verify_binary_heap_iter_yields_every_pushed_element_once",
-        ],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC, {
         /// `push` appends and is indexable, and `pop` removes and

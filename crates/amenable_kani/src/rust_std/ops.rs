@@ -306,19 +306,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-// The real call shape both match arms below use -- identical text for
-// Included and Excluded, since both bind their endpoint to `inner` and
-// compare against `v`.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Bound<i32>>::ensures((inner, v))",
-        harnesses: &["verify_bound_round_trips_its_endpoint"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC, {
         /// `Bound` has exactly three inhabitants, two of which carry an

@@ -95,16 +95,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<Poll<i32>>::ensures((inner, value))",
-        harnesses: &["verify_poll_ready_and_pending_are_disjoint"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC, {
         /// `Ready` and `Pending` are mutually exclusive, and `Ready`

@@ -503,16 +503,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PipeReader>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<PipeReader>::ensures((collected, expected))",
-        harnesses: &["verify_pipe_reader_reads_what_the_paired_writer_wrote"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC, {
         /// Bytes written to a pipe's writer half arrive, unaltered, on
@@ -566,16 +556,6 @@ kani_ensures!(
     (Vec<u8>, Vec<u8>),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PipeWriter>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<PipeWriter>::ensures((collected, expected))",
-        harnesses: &["verify_pipe_writer_writes_arrive_at_the_paired_reader"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC, {
@@ -817,16 +797,6 @@ kani_ensures!(
     |read| read == 0
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<std::io::Empty>::ensures(read)",
-        harnesses: &["verify_empty_read_reports_end_of_file"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC, {
         /// `std::io::empty()`'s reader always reports zero bytes read,
@@ -875,16 +845,6 @@ kani_ensures!(
     (u8, u8),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<std::io::Repeat>::ensures((filled, byte))",
-        harnesses: &["verify_repeat_fills_the_buffer_with_the_given_byte"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC, {
@@ -938,40 +898,6 @@ kani_ensures!(
     (i64, i64),
     |(actual, expected)| actual == expected
 );
-
-// The real call shape each of this harness's three match arms uses.
-// `Start`'s payload is `u64`; casting both sides to `i64` (a lossless,
-// bit-preserving reinterpretation for equality purposes -- `(a as i64)
-// == (b as i64)` iff `a == b` for any two `u64`s) lets all three
-// variants share the one `(i64, i64)` contract above instead of adding
-// a second type just for `Start`'s width.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<SeekFrom>::ensures((value as i64, start_offset as i64))",
-        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
-    }
-}
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<SeekFrom>::ensures((value, end_offset))",
-        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
-    }
-}
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<SeekFrom>::ensures((value, current_offset))",
-        harnesses: &["verify_seek_from_round_trips_each_variants_offset"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC, {
@@ -1087,32 +1013,6 @@ kani_ensures!(
     ([u8; 2], [u8; 2]),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || {
-            "RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((buffer, first))"
-        },
-        harnesses: &["verify_chain_reads_the_first_source_then_the_second"],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || {
-            "RustStdStandard::<std::io::Chain<&'static [u8], &'static [u8]>>::ensures((buffer, second))"
-        },
-        harnesses: &["verify_chain_reads_the_first_source_then_the_second"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC, {

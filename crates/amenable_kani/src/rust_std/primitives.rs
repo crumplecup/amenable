@@ -73,16 +73,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<char>::ensures((c, c2))",
-        harnesses: &["verify_char_unicode_scalar"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_CHAR_UNICODE_SCALAR_SRC, {
         /// `char` is constrained to Unicode scalar values (excludes the
@@ -471,16 +461,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<*const i32>::ensures((first, second))",
-        harnesses: &["verify_const_pointer_cast_is_reproducible"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC, {
         /// Casting the same reference to a raw pointer twice gives the
@@ -529,16 +509,6 @@ kani_ensures!(
     (*mut i32, *mut i32),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<*mut i32>::ensures((first, second))",
-        harnesses: &["verify_mut_pointer_cast_is_reproducible"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC, {

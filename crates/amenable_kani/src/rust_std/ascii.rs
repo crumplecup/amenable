@@ -40,43 +40,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::ascii::EscapeDefault>::ensures((newline, b\"\\\\n\".to_vec()))",
-        harnesses: &["verify_escape_default_escapes_a_control_byte"],
-    }
-}
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::ascii::EscapeDefault>::ensures((tab, b\"\\\\t\".to_vec()))",
-        harnesses: &["verify_escape_default_escapes_a_control_byte"],
-    }
-}
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::ascii::EscapeDefault>::ensures((carriage_return, b\"\\\\r\".to_vec()))",
-        harnesses: &["verify_escape_default_escapes_a_control_byte"],
-    }
-}
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::ascii::EscapeDefault>::ensures((bell, b\"\\\\x07\".to_vec()))",
-        harnesses: &["verify_escape_default_escapes_a_control_byte"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_ESCAPE_DEFAULT_ESCAPES_A_CONTROL_BYTE_SRC, {
         /// `u8::escape_ascii()` renders the three named C-style control

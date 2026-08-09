@@ -288,7 +288,6 @@ impl Ensures<VerusVerifier> for ValidUnicodeScalar {
         verifier: "verus",
         kind: "ensures",
         fragment: || <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(()),
-        harnesses: &["verify_char_roundtrip"],
     }
 }
 
@@ -1535,7 +1534,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
         verifier: "verus",
         kind: "ensures",
         fragment: || <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures(()),
-        harnesses: &["set", "replace"],
     }
 }
 
@@ -1610,7 +1608,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::RefCell<i32>> {
         verifier: "verus",
         kind: "ensures",
         fragment: || <RustStdStandard<std::cell::RefCell<i32>> as Ensures<VerusVerifier>>::ensures(()),
-        harnesses: &["release_exclusive"],
     }
 }
 
@@ -1685,7 +1682,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::UnsafeCell<i32>> {
         verifier: "verus",
         kind: "ensures",
         fragment: || <RustStdStandard<std::cell::UnsafeCell<i32>> as Ensures<VerusVerifier>>::ensures(()),
-        harnesses: &["write_through"],
     }
 }
 
@@ -1914,12 +1910,6 @@ impl Requires<VerusVerifier> for NonNulByte {
         verifier: "verus",
         kind: "requires",
         fragment: || <NonNulByte as Requires<VerusVerifier>>::requires(()),
-        harnesses: &[
-            "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
-            "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
-            "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
-            "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
-        ],
     }
 }
 
@@ -2476,111 +2466,6 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         verifier: "verus",
         kind: "requires",
         fragment: || <IncrementHeadroom as Requires<VerusVerifier>>::requires(()),
-        harnesses: &[],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "increment_headroom_holds (a)",
-        harnesses: &[
-            "verify_enumerate_model_pairs_each_item_with_its_index",
-            "verify_rev_model_reverses_iteration_order",
-            "verify_cycle_model_repeats_its_sequence_forever",
-            "verify_peekable_model_peek_does_not_consume",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "a <= i32 :: MAX - 10",
-        harnesses: &[
-            "verify_chunks_mut_model_writes_through_every_chunk",
-            "verify_chunks_exact_mut_model_leaves_the_remainder_untouched",
-            "verify_rchunks_mut_model_writes_through_every_chunk",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "b <= i32 :: MAX - 10",
-        harnesses: &[
-            "verify_chunks_mut_model_writes_through_every_chunk",
-            "verify_chunks_exact_mut_model_leaves_the_remainder_untouched",
-            "verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched",
-            "verify_rchunks_mut_model_writes_through_every_chunk",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "c <= i32 :: MAX - 10",
-        harnesses: &["verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched"],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "single_increment_headroom_holds (a)",
-        harnesses: &[
-            "verify_fuse_model_keeps_returning_none_once_exhausted",
-            "verify_chain_model_sequences_two_iterators_end_to_end",
-            "verify_zip_model_pairs_items_from_two_iterators",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "single_increment_headroom_holds (b)",
-        harnesses: &[
-            "verify_chain_model_sequences_two_iterators_end_to_end",
-            "verify_zip_model_pairs_items_from_two_iterators",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "single_increment_headroom_holds (value)",
-        harnesses: &[
-            "verify_fn_pointer_model_calls_the_underlying_function",
-            "verify_inspect_model_calls_once_per_item_without_changing_values",
-        ],
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "single_increment_headroom_holds (x)",
-        harnesses: &["verify_map_model_applies_its_closure_to_each_item"],
     }
 }
 
@@ -2620,7 +2505,6 @@ impl Ensures<VerusVerifier> for ValueUnchanged {
         verifier: "verus",
         kind: "ensures",
         fragment: || <ValueUnchanged as Ensures<VerusVerifier>>::ensures(()),
-        harnesses: &["try_borrow", "try_borrow_mut", "release_shared", "drop_strong"],
     }
 }
 
@@ -3601,7 +3485,6 @@ macro_rules! impl_non_zero_verus_witness {
                     verifier: "verus",
                     kind: "ensures",
                     fragment: || <RustStdStandard<std::num::NonZero<$ty>> as Ensures<VerusVerifier>>::ensures(()),
-                    harnesses: &[$harness],
                 }
             }
 
@@ -3611,7 +3494,6 @@ macro_rules! impl_non_zero_verus_witness {
                     verifier: "verus",
                     kind: "ensures",
                     fragment: || "value == 0 ==> !result",
-                    harnesses: &[$harness],
                 }
             }
         )*
@@ -4949,15 +4831,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || <AsciiByte as Requires<VerusVerifier>>::requires(()),
-        harnesses: &[
-            "verify_str_rsplit_model_yields_substrings_from_the_back",
-            "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back",
-            "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring",
-            "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back",
-            "verify_str_matches_model_yields_every_non_overlapping_occurrence",
-            "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset",
-            "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back",
-        ],
     }
 }
 
@@ -4967,12 +4840,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "(c as u32) < 128",
-        harnesses: &[
-            "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back",
-            "verify_bytes_model_yields_the_utf8_encoding",
-            "verify_char_indices_model_pairs_each_char_with_its_byte_offset",
-            "verify_encode_utf16_model_yields_utf16_code_units",
-        ],
     }
 }
 
@@ -4982,11 +4849,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "(a as u32) < 128",
-        harnesses: &[
-            "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back",
-            "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring",
-            "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back",
-        ],
     }
 }
 
@@ -4996,11 +4858,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "(b as u32) < 128",
-        harnesses: &[
-            "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back",
-            "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring",
-            "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back",
-        ],
     }
 }
 
@@ -5010,7 +4867,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "(before as u32) < 128",
-        harnesses: &["verify_str_rsplit_model_yields_substrings_from_the_back"],
     }
 }
 
@@ -5020,7 +4876,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "(after as u32) < 128",
-        harnesses: &["verify_str_rsplit_model_yields_substrings_from_the_back"],
     }
 }
 
@@ -5030,7 +4885,6 @@ impl Requires<VerusVerifier> for AsciiByte {
         verifier: "verus",
         kind: "requires",
         fragment: || "byte < 128",
-        harnesses: &["verify_str_model_byte_length_and_content"],
     }
 }
 
@@ -5644,7 +5498,6 @@ macro_rules! impl_sync_atomic_verus_witness {
                 verifier: "verus",
                 kind: "ensures",
                 fragment: || <RustStdStandard<$ty> as Ensures<VerusVerifier>>::ensures(()),
-                harnesses: &[$harness],
             }
         }
     };

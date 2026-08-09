@@ -457,16 +457,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LazyLock<i32, fn() -> i32>>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<LazyLock<i32, fn() -> i32>>::ensures((first, second))",
-        harnesses: &["verify_lazy_lock_caches_its_initializer_result"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_LAZY_LOCK_CACHES_ITS_INITIALIZER_RESULT_SRC, {
         /// Same caching proof technique as `core::cell::LazyCell`:

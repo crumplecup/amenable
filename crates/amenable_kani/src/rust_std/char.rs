@@ -333,16 +333,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ToLowercase>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<ToLowercase>::ensures((out, \"a\"))",
-        harnesses: &["verify_to_lowercase_maps_an_uppercase_ascii_letter"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_TO_LOWERCASE_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC, {
         /// `.to_lowercase()` yields the lowercase mapping of an uppercase
@@ -388,16 +378,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ToUppercase>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<ToUppercase>::ensures((out, \"A\"))",
-        harnesses: &["verify_to_uppercase_maps_a_lowercase_ascii_letter"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_TO_UPPERCASE_MAPS_A_LOWERCASE_ASCII_LETTER_SRC, {
         /// `.to_uppercase()` yields the uppercase mapping of a lowercase
@@ -442,16 +422,6 @@ kani_ensures!(
     (String, &'static str),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDebug>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::char::EscapeDebug>::ensures((out, \"\\\\n\"))",
-        harnesses: &["verify_char_escape_debug_escapes_a_newline"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_DEBUG_ESCAPES_A_NEWLINE_SRC, {
@@ -499,16 +469,6 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDefault>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::char::EscapeDefault>::ensures((out, \"\\\\n\"))",
-        harnesses: &["verify_char_escape_default_escapes_a_newline"],
-    }
-}
-
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_DEFAULT_ESCAPES_A_NEWLINE_SRC, {
         /// `.escape_default()` renders a newline the same way a Rust
@@ -554,16 +514,6 @@ kani_ensures!(
     (String, &'static str),
     |(actual, expected)| actual == expected
 );
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeUnicode>",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || "RustStdStandard::<core::char::EscapeUnicode>::ensures((out, \"\\\\u{61}\"))",
-        harnesses: &["verify_char_escape_unicode_renders_the_codepoint_escape"],
-    }
-}
 
 amenable_derive::harness! {
     kani, VERIFY_CHAR_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC, {
