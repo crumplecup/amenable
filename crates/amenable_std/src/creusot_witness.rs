@@ -179,7 +179,8 @@ use amenable_creusot::{
     HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, INDEXING_AND_LENGTH_HOLDS_SRC,
     INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_HOLDS_SRC,
     INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_HOLDS_SRC,
-    ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC, K1_LESS_THAN_K2_HOLDS_SRC,
+    ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC, ITER_YIELDS_VALUE_ONCE_THEN_ENDS_SRC,
+    K1_LESS_THAN_K2_HOLDS_SRC,
     LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_HOLDS_SRC,
     LINKED_LIST_ITER_MUT_WRITES_THROUGH_HOLDS_SRC,
     LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_HOLDS_SRC,
@@ -4463,10 +4464,11 @@ bridge_creusot_witness!(IterYieldsValueOnceThenEnds);
 /// directly -- the verbatim, `harness!`-captured source of the real
 /// `#[logic(open)] fn iter_yields_value_once_then_ends` both
 /// `Option`-shaped sites call, not a hand-retyped copy of its
-/// expression. There is exactly one place each shape's text exists in
-/// the whole codebase (the `Result`-shaped sibling
-/// `ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC` is registered as a
-/// supplementary fragment below, alongside its own two call sites).
+/// expression. The `Result`-shaped sibling
+/// `ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC` is registered as a second
+/// `ContractRecord` just below, under the same evidence -- Creusot
+/// matching is by predicate name, not evidence, so one contract type
+/// can name more than one real call shape.
 impl Ensures<CreusotVerifier> for IterYieldsValueOnceThenEnds {
     type Input = ();
     type Bound = &'static str;
@@ -4482,6 +4484,19 @@ impl Ensures<CreusotVerifier> for IterYieldsValueOnceThenEnds {
         verifier: "creusot",
         kind: "ensures",
         fragment: || <IterYieldsValueOnceThenEnds as Ensures<CreusotVerifier>>::ensures(()),
+    }
+}
+
+// The `Result`-shaped sibling of the registration above -- both real
+// `#[logic(open)]` predicates `IterYieldsValueOnceThenEnds` names
+// (`iter_yields_value_once_then_ends` for `Option`, this one for
+// `Result`), not a second, competing definition of the same claim.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
+        verifier: "creusot",
+        kind: "ensures",
+        fragment: || ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC,
     }
 }
 
