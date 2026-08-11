@@ -8,11 +8,13 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)
 
-**Status:** 🔲 Ongoing — matching mechanism redesigned this session
-(call-shape recognition replaced text matching, closing a real
+**Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
+session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` and `amenable_verus` not yet started under it
-(their prior progress predates the redesign and no longer applies as-is).
+mechanism; `amenable_kani` now in progress (771 → 660 sites: a real
+`elicit_doc` matcher bug fixed plus one cluster named via a new generic
+contract type, `IteratorYieldsNoneWhenExhausted<T>`); `amenable_verus`
+not yet started under it.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,

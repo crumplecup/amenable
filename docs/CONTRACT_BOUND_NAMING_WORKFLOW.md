@@ -1,9 +1,11 @@
 # Naming Raw Requires/Ensures Bounds: Design Pattern and Workflow
 
-**Status:** 🔲 Ongoing — mechanism redesigned and fully verified this
-session (call-shape recognition replaced text matching); `amenable_creusot`
-fully cleared (twice — see "History" below); `amenable_kani` and
-`amenable_verus` not yet started under the new mechanism.
+**Status:** 🔲 Ongoing — mechanism redesigned and fully verified in an
+earlier session (call-shape recognition replaced text matching);
+`amenable_creusot` fully cleared (twice — see "History" below);
+`amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
+one cluster named — see "Current state"); `amenable_verus` not yet
+started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
 person) can pick this work back up without re-deriving the mechanism,
@@ -417,15 +419,10 @@ was brought back to zero in three focused follow-up commits.
 
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
-- **`amenable_kani`: not yet started under the new mechanism.** The
-  ~700-sites-remaining figure and specific cluster list from before the
-  redesign are **stale** — the new mechanism is stricter in some ways
-  (`assert_eq!` can never comply) and looser in others (no more
-  `harnesses`-scoping ceremony), so cluster sizes have shifted. Total is
-  now **771** sites. Current top clusters, by size (re-run the scan
+- **`amenable_kani`: in progress under the new mechanism.** Started this
+  session; total is now **660** sites (was 771; two intervening fixes
+  landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X::<X::X::X<X>>::ensures((X.get(), X))` — 44 sites
-  - `X.next() == X` — 42 sites
   - `X.next() == Some(X)` — 40 sites
   - `X.load(X::X::X::X::X) == X` — 29 sites
   - `*X == X` — 28 sites
@@ -433,8 +430,38 @@ was brought back to zero in three focused follow-up commits.
   - `X.next() == X.next()` — 16 sites
   - `X.is_empty()` — 13 sites
   - `!X::<X<X>>::ensures(X)` — 12 sites
-  - `X::<X<X>>::ensures(X)` — 12 sites
+  - `X.pop_front() == Some(X)` — 11 sites
+  - `X.next() == Some(X + X)` — 10 sites
   - and onward down the ranked list in the checklist itself.
+
+  Two things resolved the first 111 sites of the drop from 771:
+  1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
+     `amenable`** (69 sites, no `amenable` source changes beyond a small
+     `Cell` import cleanup): `ContractIndex::matches_named_call` compared
+     a call site's type prefix against a registered `evidence` string
+     after independently re-tokenizing both, and Rust's tokenizer
+     collapses a bare `>>` in raw text into one `Shr` punct (no space)
+     while `syn`'s real `Path` AST always emits nested closing generics
+     as separate `Gt` tokens (with a space) — so *any* contract type with
+     a nested generic parameter (`Cell<i32>`, `Box<i32>`, `Vec<i32>`,
+     `NonZero<i32>`, ...) failed the suffix match even at its own
+     canonical call site. Fixed in `elicit_doc` by
+     `split_adjacent_gt` (see that repo's `contract_bounds.rs`), with a
+     regression test. This is why the `X::<X::X::X<X>>::ensures((X.get(),
+     X))` cluster (44 sites) from the original list above no longer
+     exists at all — it wasn't a real naming gap, it was this bug.
+  2. **`X.next() == X` (42 sites)**: the exhaustion postcondition
+     (`assert_eq!(iter.next(), None, ...)`), independently restated
+     across ~30 distinct concrete iterator adapter types. Named once as
+     `amenable_kani::IteratorYieldsNoneWhenExhausted<T>`, generic over
+     the item type with a single blanket `impl<T> Ensures<KaniVerifier>`
+     — the first genuinely generic (not per-concrete-type) contract type
+     in this codebase, since every real site's item type differs and the
+     existing "fixed representative type" pattern
+     (`IndexingAndLength`/`IterYieldsValueOnceThenEnds`) only works when
+     real sites happen to already share one type. See that type's own
+     doc comment in `rust_std/iter.rs` for the full mechanism (why the
+     macros couldn't be reused, why call sites write no turbofish).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
