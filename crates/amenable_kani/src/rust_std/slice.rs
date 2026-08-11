@@ -798,6 +798,98 @@ impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
     }
 }
 
+/// The three-operand sibling of [`SplitOperandsAreDistinctFromThePattern`]:
+/// an `(a, b, c, pattern)` quadruple known to satisfy the precondition
+/// every `*n`-capped or match-counting split-family harness assumes about
+/// its three symbolic pieces -- each is itself distinct from the split
+/// pattern.
+///
+/// Independently hand-written as `kani::assume(a != pattern && b !=
+/// pattern && c != pattern)` at 9 real sites, same slice/str split (fixed
+/// vs. symbolic pattern) as its two-operand sibling. A separate type
+/// rather than a re-run of the two-operand one since Rust generics have
+/// no variadic tuple, and merging the two into one `Vec`-shaped `Input`
+/// would trade a real fixed-arity check for a weaker runtime-length one.
+pub struct ThreeSplitOperandsAreDistinctFromThePattern<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ThreeSplitOperandsAreDistinctFromThePattern<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ThreeSplitOperandsAreDistinctFromThePattern<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ThreeSplitOperandsAreDistinctFromThePattern<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_n_caps_the_number_of_pieces".to_owned(),
+            claim: VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier>
+    for ThreeSplitOperandsAreDistinctFromThePattern<T>
+{
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
+    for ThreeSplitOperandsAreDistinctFromThePattern<T>
+{
+    type Input = (T, T, T, T);
+    type Bound = bool;
+
+    fn requires((a, b, c, pattern): (T, T, T, T)) -> bool {
+        a != pattern && b != pattern && c != pattern
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
+        verifier: "kani",
+        kind: "requires",
+        fragment: || stringify!(a != pattern && b != pattern && c != pattern),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
+        verifier: "kani",
+        describe: || <ThreeSplitOperandsAreDistinctFromThePattern<i32> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -1292,7 +1384,7 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(a != 0 && b != 0 && c != 0);
+            kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
             let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
@@ -1363,7 +1455,7 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(a != 0 && b != 0 && c != 0);
+            kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
             let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
@@ -1669,7 +1761,7 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(a != 0 && b != 0 && c != 0);
+            kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
             let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
@@ -1740,7 +1832,7 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(a != 0 && b != 0 && c != 0);
+            kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
             let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
             let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
