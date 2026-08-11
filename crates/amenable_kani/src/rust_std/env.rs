@@ -8,12 +8,14 @@
 
 use std::env::{Args, ArgsOs, JoinPathsError, SplitPaths, VarError, Vars, VarsOs};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Args> {
     type SupportingEvidence = Self;
@@ -151,6 +153,13 @@ bridge_kani_witness!(RustStdStandard<SplitPaths<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<SplitPaths<'static>>,
+    "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC, {
         /// Amenable models a bounded separator-free PATH-style subset
@@ -169,7 +178,7 @@ amenable_derive::harness! {
             let joined = crate::KaniEnvPaths::join_semantic(paths);
             let split = crate::KaniEnvPaths::split_semantic(joined);
 
-            assert_eq!(split.len(), 3);
+            assert!(RustStdStandard::<SplitPaths<'static>>::ensures((split.len(), 3)));
             assert_eq!(split.paths()[0].as_str(), "one");
             assert_eq!(split.paths()[1].as_str(), "two");
             assert_eq!(split.paths()[2].as_str(), "three");

@@ -12,11 +12,14 @@
 //! - if the real owned UTF-8 conversion path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::Standard;
 
 use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
+use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
 
 const MAX_KANI_UTF8_BYTES: usize = 4;
@@ -473,6 +476,13 @@ impl Witness<KaniVerifier> for KaniUtf8Buffer<2> {
     }
 }
 
+kani_ensures!(
+    KaniUtf8Buffer<2>,
+    "amenable_kani::utf8_model::KaniUtf8Buffer<2>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC, {
         /// `KaniUtf8Buffer`'s own invariant, proven once here rather than
@@ -488,10 +498,13 @@ amenable_derive::harness! {
             kani::assume(len <= 2);
 
             if let Ok(buffer) = KaniUtf8Buffer::<2>::new(bytes, len) {
-                assert_eq!(buffer.len(), len, "length tracks the stored bytes");
+                assert!(
+                    KaniUtf8Buffer::<2>::ensures((buffer.len(), len)),
+                    "length tracks the stored bytes"
+                );
                 assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
                 let recovered = buffer.as_bytes();
-                assert_eq!(recovered.len(), len);
+                assert!(KaniUtf8Buffer::<2>::ensures((recovered.len(), len)));
                 if len >= 1 {
                     assert_eq!(recovered[0], bytes[0]);
                 }

@@ -179,9 +179,12 @@ amenable_derive::harness! {
                 Ok(buffer) => {
                     let _token = RustStdStandard::<String>::establish(buffer);
 
-                    assert_eq!(buffer.len(), len, "length tracks the stored bytes");
+                    assert!(
+                        KaniUtf8Buffer::<2>::ensures((buffer.len(), len)),
+                        "length tracks the stored bytes"
+                    );
                     assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
-                    assert_eq!(buffer.as_bytes().len(), len);
+                    assert!(KaniUtf8Buffer::<2>::ensures((buffer.as_bytes().len(), len)));
                 }
                 Err(KaniUtf8BufferError::InvalidUtf8) => {
                     // Bytes can be assumed invalid under Kani's
@@ -219,6 +222,13 @@ bridge_kani_witness!(RustStdStandard<[i32; 3]>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<[i32; 3]>,
+    "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC, {
         /// A fixed-size array's `.len()` is the compile-time-known
@@ -230,7 +240,10 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             let arr = [a, b, c];
-            assert_eq!(arr.len(), 3, "the array's length is its fixed compile-time size");
+            assert!(
+                RustStdStandard::<[i32; 3]>::ensures((arr.len(), 3)),
+                "the array's length is its fixed compile-time size"
+            );
             assert_eq!(arr[0], a);
             assert_eq!(arr[1], b);
             assert_eq!(arr[2], c);
@@ -261,6 +274,13 @@ bridge_kani_witness!(RustStdStandard<[i32]>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<[i32]>,
+    "amenable_std::rust_std::RustStdStandard<[i32]>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SLICE_INDEXING_AND_LENGTH_SRC, {
         /// A slice's `.len()` reports the number of elements it views,
@@ -277,7 +297,10 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             let arr = [a, b, c];
             let s: &[i32] = &arr;
-            assert_eq!(s.len(), 3, "the slice's length is the number of elements it views");
+            assert!(
+                RustStdStandard::<[i32]>::ensures((s.len(), 3)),
+                "the slice's length is the number of elements it views"
+            );
             assert_eq!(s[0], a);
             assert_eq!(s[1], b);
             assert_eq!(s[2], c);
@@ -308,6 +331,13 @@ bridge_kani_witness!(RustStdStandard<str>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<str>,
+    "amenable_std::rust_std::RustStdStandard<str>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC, {
         /// A `str`'s `.len()` reports its UTF-8 byte length, and its
@@ -328,7 +358,10 @@ amenable_derive::harness! {
             kani::assume(AsciiByte::requires(byte));
             let owned = (byte as char).to_string();
             let s: &str = &owned;
-            assert_eq!(s.len(), 1, "a single ASCII char is exactly one UTF-8 byte");
+            assert!(
+                RustStdStandard::<str>::ensures((s.len(), 1)),
+                "a single ASCII char is exactly one UTF-8 byte"
+            );
             assert_eq!(s.as_bytes()[0], byte);
         }
     }

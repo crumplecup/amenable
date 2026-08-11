@@ -2,6 +2,8 @@
 
 use std::ffi::{OsStr, OsString};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
@@ -94,7 +96,10 @@ amenable_derive::harness! {
                     // `Iterator::position` call (see
                     // `gallery::slice_split_position`).
                     let recovered = buffer.as_bytes();
-                    assert_eq!(recovered.len(), len, "len() reports the byte length");
+                    assert!(
+                        KaniUtf8Buffer::<2>::ensures((recovered.len(), len)),
+                        "len() reports the byte length"
+                    );
                     if len >= 1 {
                         assert_eq!(
                             recovered[0], bytes[0],

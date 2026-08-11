@@ -5,7 +5,8 @@ use std::vec::Vec;
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
-use amenable_std::RustStdStandard;
+use amenable_derive::Standard;
+use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
 #[cfg(kani)]
 use std::cell::Cell;
 
@@ -47,6 +48,60 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+/// A `Vec`'s length known to match the count of pushes and pops applied
+/// to it -- `RustStdStandard<Vec<i32>>`'s own `Ensures<KaniVerifier>`
+/// slot is already occupied by content-equality (just above), so this
+/// distinct claim (element count, not content) needs its own type per
+/// the associated-type-uniqueness rule.
+///
+/// A derived claim about `usize`, not a fresh root authority — its
+/// evidence chain rests on `usize`'s own already-registered standard-
+/// library provenance ([`RustStdStandard<usize>`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<usize>",
+    basis_ctor = "RustStdStandard::<usize>::new()",
+    provenance = "<usize as RustStdType>::provenance()",
+    provenance_type = "RustStdProvenance"
+)]
+pub struct VecLengthTracksPushesAndPops {
+    value: usize,
+}
+
+impl VecLengthTracksPushesAndPops {
+    /// Wrap a length already known to match the count of pushes and pops.
+    pub const fn new(value: usize) -> Self {
+        Self { value }
+    }
+
+    /// The wrapped length.
+    pub const fn value(&self) -> usize {
+        self.value
+    }
+}
+
+impl KaniWitness for VecLengthTracksPushesAndPops {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_vec_push_pop_round_trips".to_owned(),
+            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(VecLengthTracksPushesAndPops);
+
+kani_ensures!(
+    VecLengthTracksPushesAndPops,
+    "amenable_kani::rust_std::alloc_vec::VecLengthTracksPushesAndPops",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC, {
         /// `push` appends and is indexable, and `pop` removes and
@@ -61,7 +116,7 @@ amenable_derive::harness! {
             let value = <i32 as crate::KaniCompose>::kani_any();
             let mut v = <Vec<i32> as crate::KaniCompose>::kani_depth0();
             v.push(value);
-            assert_eq!(v.len(), 1);
+            assert!(VecLengthTracksPushesAndPops::ensures((v.len(), 1)));
             assert_eq!(v[0], value, "the pushed value is indexable");
             assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
             assert!(

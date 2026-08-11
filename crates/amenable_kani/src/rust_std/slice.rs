@@ -26,7 +26,7 @@ use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniChunkByObservation, KaniEscapeAsciiObservation, KaniSplitNObservation,
     KaniSplitObservation, KaniVerifier,
@@ -663,6 +663,13 @@ bridge_kani_witness!(RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> 
     }
 }
 
+kani_ensures!(
+    RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CHUNK_BY_MUT_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC, {
         /// Same grouping rule as `ChunkBy`, checked on the mutable
@@ -679,9 +686,21 @@ amenable_derive::harness! {
             let mut it = data.chunk_by_mut(same_parity as fn(&i32, &i32) -> bool);
             let first = it.next().unwrap();
             if grouped_together {
-                assert_eq!(first.len(), 2, "matching adjacent elements are grouped together");
+                assert!(
+                    RustStdStandard::<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>::ensures((
+                        first.len(),
+                        2
+                    )),
+                    "matching adjacent elements are grouped together"
+                );
             } else {
-                assert_eq!(first.len(), 1, "a non-matching pair starts a new chunk");
+                assert!(
+                    RustStdStandard::<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>::ensures((
+                        first.len(),
+                        1
+                    )),
+                    "a non-matching pair starts a new chunk"
+                );
             }
         }
     }

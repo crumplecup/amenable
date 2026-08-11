@@ -20,7 +20,7 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniPathDisplayObservation, KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
 
 impl KaniWitness for RustStdStandard<Ancestors<'static>> {
@@ -268,6 +268,13 @@ bridge_kani_witness!(RustStdStandard<std::path::Iter<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::path::Iter<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::path::Iter<'static>>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ITER_YIELDS_THE_NAMED_SEGMENTS_SRC, {
         /// `.iter()` yields the path's raw `OsStr` segments in order,
@@ -276,7 +283,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_iter_yields_the_named_segments() {
             let segments: Vec<&std::ffi::OsStr> = Path::new("/a/b").iter().collect();
-            assert_eq!(segments.len(), 3, "root, then two named segments");
+            assert!(
+                RustStdStandard::<std::path::Iter<'static>>::ensures((segments.len(), 3)),
+                "root, then two named segments"
+            );
             assert_eq!(segments[1], std::ffi::OsStr::new("a"));
             assert_eq!(segments[2], std::ffi::OsStr::new("b"));
         }

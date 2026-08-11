@@ -228,6 +228,13 @@ bridge_kani_witness!(RustStdStandard<BinaryHeap<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<BinaryHeap<i32>>,
+    "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC, {
         /// `.pop()` is the one operation `BinaryHeap` actually
@@ -776,7 +783,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Vec<i32>>::ensures((collected, expected)),
                 "iter yields every pushed element exactly once"
             );
-            assert_eq!(heap.len(), 2, "iteration leaves every heap element in place");
+            assert!(
+                RustStdStandard::<BinaryHeap<i32>>::ensures((heap.len(), 2)),
+                "iteration leaves every heap element in place"
+            );
             assert_eq!(heap.pop(), Some(a.max(b)), "iteration preserves the heap maximum");
             assert_eq!(heap.pop(), Some(a.min(b)), "iteration preserves the remaining element");
         }

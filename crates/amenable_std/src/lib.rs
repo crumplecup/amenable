@@ -17,6 +17,7 @@ mod argv_includes_program_path;
 mod ascii_byte;
 mod cert;
 mod compose_any_length_is_bounded;
+mod compose_array_length_is_fixed;
 mod compose_depth_zero_is_empty;
 mod compose_field_presence_tracks_depth;
 #[cfg(feature = "creusot")]
@@ -44,6 +45,7 @@ pub use argv_includes_program_path::ArgvIncludesProgramPath;
 pub use ascii_byte::AsciiByte;
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
 pub use compose_any_length_is_bounded::ComposeAnyLengthIsBounded;
+pub use compose_array_length_is_fixed::ComposeArrayLengthIsFixed;
 pub use compose_depth_zero_is_empty::ComposeDepthZeroIsEmpty;
 pub use compose_field_presence_tracks_depth::ComposeFieldPresenceTracksDepth;
 #[cfg(feature = "creusot")]

@@ -416,6 +416,7 @@ macro_rules! impl_compose_claim_witness {
 impl_compose_claim_witness!(amenable_std::ComposeDepthZeroIsEmpty);
 impl_compose_claim_witness!(amenable_std::ComposeFieldPresenceTracksDepth);
 impl_compose_claim_witness!(amenable_std::ComposeAnyLengthIsBounded);
+impl_compose_claim_witness!(amenable_std::ComposeArrayLengthIsFixed);
 
 kani_ensures!(
     amenable_std::ComposeDepthZeroIsEmpty,
@@ -438,11 +439,19 @@ kani_ensures!(
     |(actual, bound)| actual <= bound
 );
 
+kani_ensures!(
+    amenable_std::ComposeArrayLengthIsFixed,
+    "amenable_std::ComposeArrayLengthIsFixed",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 #[cfg(kani)]
 mod proofs {
     use amenable_core::Ensures;
     use amenable_std::{
-        ComposeAnyLengthIsBounded, ComposeDepthZeroIsEmpty, ComposeFieldPresenceTracksDepth,
+        ComposeAnyLengthIsBounded, ComposeArrayLengthIsFixed, ComposeDepthZeroIsEmpty,
+        ComposeFieldPresenceTracksDepth,
     };
 
     use super::KaniCompose;
@@ -494,9 +503,9 @@ mod proofs {
                 let depth1 = <[u8; 3]>::kani_depth1();
                 let depth2 = <[u8; 3]>::kani_depth2();
 
-                assert_eq!(depth0.len(), 3);
-                assert_eq!(depth1.len(), 3);
-                assert_eq!(depth2.len(), 3);
+                assert!(ComposeArrayLengthIsFixed::ensures((depth0.len(), 3)));
+                assert!(ComposeArrayLengthIsFixed::ensures((depth1.len(), 3)));
+                assert!(ComposeArrayLengthIsFixed::ensures((depth2.len(), 3)));
             }
         }
     }
