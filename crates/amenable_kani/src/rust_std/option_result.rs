@@ -1,9 +1,13 @@
 //! `KaniWitness` impls for `core::option` and `core::result`.
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -122,10 +126,13 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let mut it = Some(value).into_iter();
             assert_eq!(it.next(), Some(value));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             let mut empty_it = None::<i32>.into_iter();
-            assert_eq!(empty_it.next(), None, "None's into_iter yields nothing");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(empty_it.next()),
+                "None's into_iter yields nothing"
+            );
         }
     }
 }
@@ -164,7 +171,7 @@ amenable_derive::harness! {
             let opt = Some(value);
             let mut it = opt.iter();
             assert_eq!(it.next(), Some(&value));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
 }
@@ -208,7 +215,7 @@ amenable_derive::harness! {
                 let first = it.next().unwrap();
                 assert_eq!(*first, value);
                 *first = updated;
-                assert_eq!(it.next(), None);
+                assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }
             assert_eq!(opt, Some(updated), "the write through iter_mut is visible");
         }
@@ -248,11 +255,14 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let mut it = Ok::<i32, i32>(value).into_iter();
             assert_eq!(it.next(), Some(value));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             let err_value: i32 = kani::any();
             let mut empty_it = Err::<i32, i32>(err_value).into_iter();
-            assert_eq!(empty_it.next(), None, "Err's into_iter yields nothing");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(empty_it.next()),
+                "Err's into_iter yields nothing"
+            );
         }
     }
 }
@@ -291,7 +301,7 @@ amenable_derive::harness! {
             let res: Result<i32, i32> = Ok(value);
             let mut it = res.iter();
             assert_eq!(it.next(), Some(&value));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
 }
@@ -334,7 +344,7 @@ amenable_derive::harness! {
                 let first = it.next().unwrap();
                 assert_eq!(*first, value);
                 *first = updated;
-                assert_eq!(it.next(), None);
+                assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }
             assert_eq!(res, Ok(updated), "the write through iter_mut is visible");
         }

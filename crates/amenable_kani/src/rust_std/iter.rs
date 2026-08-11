@@ -418,7 +418,10 @@ amenable_derive::harness! {
                 Some(b),
                 "chain yields the second iterator's items once the first is exhausted"
             );
-            assert_eq!(c.next(), None, "chain is exhausted once both inputs are");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(c.next()),
+                "chain is exhausted once both inputs are"
+            );
         }
     }
 }
@@ -458,7 +461,10 @@ amenable_derive::harness! {
             kani::assume(a < i32::MAX && b < i32::MAX);
             let mut z = (a..a + 1).zip(b..b + 1);
             assert_eq!(z.next(), Some((a, b)), "zip pairs the two iterators' items");
-            assert_eq!(z.next(), None, "zip stops once either input is exhausted");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(z.next()),
+                "zip stops once either input is exhausted"
+            );
         }
     }
 }
@@ -501,9 +507,8 @@ amenable_derive::harness! {
                 Some((1, a + 1)),
                 "enumerate increments the index alongside the item"
             );
-            assert_eq!(
-                e.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(e.next()),
                 "enumerate is exhausted once the underlying iterator is exhausted"
             );
         }
@@ -543,7 +548,10 @@ amenable_derive::harness! {
             let mut r = (a..a + 2).rev();
             assert_eq!(r.next(), Some(a + 1), "rev yields the last item first");
             assert_eq!(r.next(), Some(a), "rev yields items in reverse order");
-            assert_eq!(r.next(), None, "rev is exhausted once every item has been yielded");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(r.next()),
+                "rev is exhausted once every item has been yielded"
+            );
         }
     }
 }
@@ -587,9 +595,8 @@ amenable_derive::harness! {
                 Some(value),
                 "cloned yields an owned clone of each referenced item"
             );
-            assert_eq!(
-                c.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(c.next()),
                 "cloned is exhausted after yielding the only referenced item"
             );
         }
@@ -634,9 +641,8 @@ amenable_derive::harness! {
                 Some(value),
                 "copied yields an owned copy of each referenced item"
             );
-            assert_eq!(
-                c.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(c.next()),
                 "copied is exhausted after yielding the only referenced item"
             );
         }
@@ -716,10 +722,9 @@ amenable_derive::harness! {
             kani::assume(a < i32::MAX);
             let mut f = (a..a + 1).fuse();
             assert_eq!(f.next(), Some(a));
-            assert_eq!(f.next(), None);
-            assert_eq!(
-                f.next(),
-                None,
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(f.next()));
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(f.next()),
                 "fuse keeps returning None once the underlying iterator has"
             );
         }
@@ -766,7 +771,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect calls its closure exactly once per item"
             );
-            assert_eq!(inspected.next(), None, "the one-item inspected iterator then exhausts");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(inspected.next()),
+                "the one-item inspected iterator then exhausts"
+            );
             assert!(
                 RustStdStandard::<Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect does not re-invoke its closure after exhaustion"
@@ -1020,9 +1028,8 @@ amenable_derive::harness! {
             let mut t = (a..a + 5).take(2);
             assert_eq!(t.next(), Some(a));
             assert_eq!(t.next(), Some(a + 1));
-            assert_eq!(
-                t.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(t.next()),
                 "take yields no more than n items even though the source has more"
             );
         }
@@ -1066,7 +1073,10 @@ amenable_derive::harness! {
             let a: i32 = 4;
             let mut t = (a..a + 2).take_while(is_even);
             assert_eq!(t.next(), Some(a), "take_while yields items while the predicate holds");
-            assert_eq!(t.next(), None, "take_while stops as soon as the predicate first fails");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(t.next()),
+                "take_while stops as soon as the predicate first fails"
+            );
         }
     }
 }
@@ -1149,7 +1159,10 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let mut o = std::iter::once(value);
             assert_eq!(o.next(), Some(value), "once yields its value");
-            assert_eq!(o.next(), None, "once yields nothing after its one value");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(o.next()),
+                "once yields nothing after its one value"
+            );
         }
     }
 }
@@ -1188,7 +1201,10 @@ amenable_derive::harness! {
             }
             let mut o = std::iter::once_with(produce as fn() -> i32);
             assert!(o.next().is_some(), "once_with yields one value");
-            assert_eq!(o.next(), None, "once_with yields nothing after its one value");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(o.next()),
+                "once_with yields nothing after its one value"
+            );
         }
     }
 }
@@ -1313,7 +1329,10 @@ amenable_derive::harness! {
             let mut r = std::iter::repeat_n(value, 2);
             assert_eq!(r.next(), Some(value));
             assert_eq!(r.next(), Some(value));
-            assert_eq!(r.next(), None, "repeat_n stops after exactly n items");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(r.next()),
+                "repeat_n stops after exactly n items"
+            );
         }
     }
 }
@@ -1343,17 +1362,119 @@ bridge_kani_witness!(RustStdStandard<std::iter::Empty<i32>>);
 
 amenable_derive::harness! {
     kani, VERIFY_EMPTY_YIELDS_NOTHING_SRC, {
-        /// `empty` never yields a value.
+        /// `empty` never yields a value. Both assertions call
+        /// `IteratorYieldsNoneWhenExhausted::ensures` directly rather than
+        /// restating the comparison -- see that type for why this is the
+        /// one harness its registration reuses as a witness.
         #[kani::proof]
         fn verify_empty_yields_nothing() {
             let mut e: std::iter::Empty<i32> = std::iter::empty();
-            assert_eq!(e.next(), None, "empty never yields a value");
-            assert_eq!(
-                e.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(e.next()),
+                "empty never yields a value"
+            );
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(e.next()),
                 "empty continues yielding nothing on repeated next calls"
             );
         }
+    }
+}
+
+/// An `Option<T>` known to be the `None` an exhausted iterator adapter
+/// keeps returning on every subsequent `.next()` call.
+///
+/// Independently hand-written as `assert_eq!(iter.next(), None, ...)` at
+/// dozens of real proof sites across nearly every iterator adapter this
+/// crate proves, spanning this file plus `alloc_collections`, `alloc_vec`,
+/// `array`, `option_result`, `path`, `slice`, and `str` -- the identical
+/// claim regardless of the adapter's item type. A single contract type
+/// generic over the item, rather than one registration per concrete
+/// adapter, resolves every site at once.
+///
+/// Unlike every other named bound in this crate, this one needs a
+/// hand-written `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros: both macros emit a
+/// non-generic `impl Trait for $ty`, which can't carry the `impl<T>`
+/// generic parameter list this type's single, item-type-agnostic
+/// registration depends on. Call sites never construct an instance --
+/// `ensures` is a static associated function, resolved by unifying
+/// `Self::Input = Option<T>` against the argument's type -- so this type
+/// carries no fields beyond the `PhantomData<T>` Rust requires to use `T`
+/// at all, and every call site writes the bare type name with no
+/// turbofish, letting inference pick `T`.
+pub struct IteratorYieldsNoneWhenExhausted<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for IteratorYieldsNoneWhenExhausted<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for IteratorYieldsNoneWhenExhausted<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for IteratorYieldsNoneWhenExhausted<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_empty_yields_nothing".to_owned(),
+            claim: VERIFY_EMPTY_YIELDS_NOTHING_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for IteratorYieldsNoneWhenExhausted<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T> amenable_core::Ensures<crate::KaniVerifier> for IteratorYieldsNoneWhenExhausted<T> {
+    type Input = Option<T>;
+    type Bound = bool;
+
+    fn ensures(input: Option<T>) -> bool {
+        input.is_none()
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::IteratorYieldsNoneWhenExhausted",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(input.is_none()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::IteratorYieldsNoneWhenExhausted",
+        verifier: "kani",
+        describe: || <IteratorYieldsNoneWhenExhausted<i32> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -1444,9 +1565,8 @@ amenable_derive::harness! {
             let mut f = std::iter::from_fn(produce as fn() -> Option<i32>);
             assert_eq!(f.next(), Some(0));
             assert_eq!(f.next(), Some(1));
-            assert_eq!(
-                f.next(),
-                None,
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(f.next()),
                 "from_fn stops once its closure returns None"
             );
         }

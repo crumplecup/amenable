@@ -10,6 +10,8 @@ use amenable_std::RustStdStandard;
 use std::cell::Cell;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -202,7 +204,7 @@ amenable_derive::harness! {
             let mut it = expected.clone().into_iter();
             assert_eq!(it.next(), Some(expected[0]));
             assert_eq!(it.next(), Some(expected[1]));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,

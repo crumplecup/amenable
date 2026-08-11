@@ -12,10 +12,14 @@ use std::path::{
     Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniPathDisplayObservation, KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
 
@@ -99,7 +103,7 @@ amenable_derive::harness! {
                 components.next(),
                 Some(Component::Normal(std::ffi::OsStr::new("a")))
             );
-            assert_eq!(components.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(components.next()));
         }
     }
 }
@@ -148,7 +152,7 @@ amenable_derive::harness! {
                 components.next(),
                 Some(Component::Normal(std::ffi::OsStr::new("b")))
             );
-            assert_eq!(components.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(components.next()));
         }
     }
 }

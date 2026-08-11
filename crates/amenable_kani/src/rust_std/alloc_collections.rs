@@ -19,6 +19,8 @@ use amenable_std::RustStdStandard;
 use std::cell::Cell;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -806,7 +808,7 @@ amenable_derive::harness! {
             let mut it = list.iter();
             assert_eq!(it.next(), Some(&a));
             assert_eq!(it.next(), Some(&b));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
             assert_eq!(list.pop_front(), Some(a), "iteration leaves the first value in place");
             assert_eq!(list.pop_front(), Some(b), "iteration leaves the second value in place");
@@ -857,7 +859,10 @@ amenable_derive::harness! {
                 let mut iterator = list.iter_mut();
                 *iterator.next().unwrap() = updated_first;
                 *iterator.next().unwrap() = updated_second;
-                assert_eq!(iterator.next(), None, "iter_mut visits every list element exactly once");
+                assert!(
+                    IteratorYieldsNoneWhenExhausted::ensures(iterator.next()),
+                    "iter_mut visits every list element exactly once"
+                );
             }
             assert_eq!(list.pop_front(), Some(updated_first), "the first write is visible at the front");
             assert_eq!(list.pop_front(), Some(updated_second), "the second write preserves list order");
@@ -906,7 +911,7 @@ amenable_derive::harness! {
             let mut it = list.into_iter();
             assert_eq!(it.next(), Some(a));
             assert_eq!(it.next(), Some(b));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,
@@ -1140,7 +1145,7 @@ amenable_derive::harness! {
             let mut it = dq.iter();
             assert_eq!(it.next(), Some(&a));
             assert_eq!(it.next(), Some(&b));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
             assert_eq!(dq.pop_front(), Some(a), "iteration leaves the first value in place");
             assert_eq!(dq.pop_front(), Some(b), "iteration leaves the second value in place");
@@ -1191,7 +1196,10 @@ amenable_derive::harness! {
                 let mut iterator = dq.iter_mut();
                 *iterator.next().unwrap() = updated_first;
                 *iterator.next().unwrap() = updated_second;
-                assert_eq!(iterator.next(), None, "iter_mut visits every deque element exactly once");
+                assert!(
+                    IteratorYieldsNoneWhenExhausted::ensures(iterator.next()),
+                    "iter_mut visits every deque element exactly once"
+                );
             }
             assert_eq!(dq.pop_front(), Some(updated_first), "the first write is visible at the front");
             assert_eq!(dq.pop_front(), Some(updated_second), "the second write preserves deque order");
@@ -1239,7 +1247,7 @@ amenable_derive::harness! {
             let mut it = dq.into_iter();
             assert_eq!(it.next(), Some(a));
             assert_eq!(it.next(), Some(b));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,

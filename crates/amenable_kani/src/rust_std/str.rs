@@ -54,6 +54,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -393,7 +395,7 @@ amenable_derive::harness! {
             let mut it = s.lines();
             assert_eq!(it.next(), Some("a"));
             assert_eq!(it.next(), Some("b"));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
 }
@@ -657,7 +659,7 @@ amenable_derive::harness! {
             let mut it = s.lines_any();
             assert_eq!(it.next(), Some("a"));
             assert_eq!(it.next(), Some("b"));
-            assert_eq!(it.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
 }

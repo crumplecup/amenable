@@ -2,10 +2,14 @@
 
 use std::array::TryFromSliceError;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -96,7 +100,10 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(a));
             assert_eq!(it.next(), Some(b));
             assert_eq!(it.next(), Some(c));
-            assert_eq!(it.next(), None, "into_iter yields exactly N elements");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(it.next()),
+                "into_iter yields exactly N elements"
+            );
         }
     }
 }

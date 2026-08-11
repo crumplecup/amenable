@@ -67,4 +67,5 @@ mod task;
 mod thread;
 mod time;
 
+pub use iter::IteratorYieldsNoneWhenExhausted;
 pub use macros::CheckedProof;

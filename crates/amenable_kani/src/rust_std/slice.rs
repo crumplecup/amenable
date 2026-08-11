@@ -15,10 +15,14 @@ use std::slice::{
     SplitInclusiveMut, SplitMut, SplitNMut, Windows,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{
@@ -143,7 +147,7 @@ amenable_derive::harness! {
             let mut ch = data.chunks(2);
             assert_eq!(ch.next(), Some(&[a, b][..]));
             assert_eq!(ch.next(), Some(&[c][..]), "the final chunk is short rather than dropped");
-            assert_eq!(ch.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
         }
     }
 }
@@ -185,7 +189,10 @@ amenable_derive::harness! {
             let data = [a, b, c];
             let mut ch = data.chunks_exact(2);
             assert_eq!(ch.next(), Some(&[a, b][..]));
-            assert_eq!(ch.next(), None, "the short remainder is not yielded as a chunk");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(ch.next()),
+                "the short remainder is not yielded as a chunk"
+            );
             assert_eq!(ch.remainder(), &[c], "the short remainder is still reachable directly");
         }
     }
@@ -321,7 +328,7 @@ amenable_derive::harness! {
             let mut ch = data.rchunks(2);
             assert_eq!(ch.next(), Some(&[b, c][..]));
             assert_eq!(ch.next(), Some(&[a][..]), "the short chunk is at the front, not the back");
-            assert_eq!(ch.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
         }
     }
 }
@@ -363,7 +370,7 @@ amenable_derive::harness! {
             let data = [a, b, c];
             let mut ch = data.rchunks_exact(2);
             assert_eq!(ch.next(), Some(&[b, c][..]));
-            assert_eq!(ch.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
             assert_eq!(ch.remainder(), &[a], "the short remainder sits at the front");
         }
     }
@@ -500,7 +507,7 @@ amenable_derive::harness! {
             let mut w = data.windows(2);
             assert_eq!(w.next(), Some(&[a, b][..]));
             assert_eq!(w.next(), Some(&[b, c][..]), "consecutive windows overlap on b");
-            assert_eq!(w.next(), None);
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(w.next()));
         }
     }
 }
