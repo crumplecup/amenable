@@ -48,16 +48,16 @@ use std::str::{
     SplitN, SplitTerminator, SplitWhitespace, Utf8Chunk, Utf8Chunks, Utf8Error,
 };
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
+#[cfg(kani)]
+use crate::{IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern};
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type SupportingEvidence = Self;
@@ -846,7 +846,9 @@ amenable_derive::harness! {
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(before < 128 && pattern < 128 && after < 128);
-            kani::assume(before != pattern && after != pattern);
+            kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
+                before, pattern, after,
+            )));
             let observation =
                 crate::KaniStrRSplitObservation::new(before as char, pattern as char, after as char);
             assert_eq!(
@@ -960,7 +962,9 @@ amenable_derive::harness! {
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(a < 128 && pattern < 128 && b < 128);
-            kani::assume(a != pattern && b != pattern);
+            kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
+                a, pattern, b,
+            )));
             let observation =
                 crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
             assert_eq!(
@@ -1012,7 +1016,9 @@ amenable_derive::harness! {
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
             kani::assume(a < 128 && pattern < 128 && b < 128);
-            kani::assume(a != pattern && b != pattern);
+            kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
+                a, pattern, b,
+            )));
             let observation =
                 crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
             assert_eq!(

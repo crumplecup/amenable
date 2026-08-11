@@ -72,4 +72,5 @@ pub use alloc_vec::VecLengthTracksPushesAndPops;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use primitives::DerefReflectsTheStoredValue;
+pub use slice::SplitOperandsAreDistinctFromThePattern;
 pub use sync_atomic::AtomicLoadReflectsTheLastWrite;
