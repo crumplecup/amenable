@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, seven clusters named, 771 → 505 sites — see "Current state");
+fixed, eight clusters named, 771 → 490 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,15 +420,15 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **505** sites (was 771; nine intervening fixes
+  session; total is now **490** sites (was 771; ten intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X.pop_front() == Some(X)` — 11 sites
   - `X != X && X != X` — 9 sites
   - `X != X && X != X && X != X` — 9 sites
   - `X.checked_add(X).is_some()` — 9 sites
   - `X[X] == X` — 9 sites
   - `X.is_err()` — 8 sites
+  - `X::strong_count(&X) == X` — 8 sites
   - and onward down the ranked list in the checklist itself.
 
   **Both clusters caught by the mid-session correction (above) are now
@@ -588,6 +588,15 @@ was brought back to zero in three focused follow-up commits.
      file) — invisible to plain `cargo check`/clippy, caught only by
      running `cargo kani` itself, confirming why this project's workflow
      requires real verification, not just compile checks.
+  10. **`X.pop_front() == Some(X)` (11 sites landed, 15 total)**: same
+      heterogeneous-but-still-named treatment — `LinkedList<i32>`'s and
+      `VecDeque<i32>`'s own `Ensures<KaniVerifier>` slots were both
+      free, registered directly on them. Landed 4 more sites than the
+      cluster's own count: while already inside the two harnesses this
+      cluster touched, also converted their mechanically-identical
+      `X.pop_front() == X` (exhaustion-to-`None`) and
+      `X.pop_back() == Some(X)`/`X.pop_back() == X` (`VecDeque`'s
+      back-end equivalents) sites with the same registration.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
