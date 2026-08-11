@@ -40,6 +40,8 @@ use amenable_std::RustStdStandard;
 use std::cell::Cell;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AtomicLoadReflectsTheLastWrite;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -1287,9 +1289,11 @@ amenable_derive::harness! {
             r.next();
             r.next();
             r.next();
-            assert_eq!(
-                CALLS.load(std::sync::atomic::Ordering::SeqCst),
-                3,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    CALLS.load(std::sync::atomic::Ordering::SeqCst),
+                    3
+                )),
                 "repeat_with calls its closure once per item, never caching"
             );
         }

@@ -69,3 +69,4 @@ mod time;
 
 pub use iter::IteratorYieldsNoneWhenExhausted;
 pub use macros::CheckedProof;
+pub use sync_atomic::AtomicLoadReflectsTheLastWrite;

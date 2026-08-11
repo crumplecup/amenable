@@ -19,6 +19,8 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AtomicLoadReflectsTheLastWrite;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
@@ -331,9 +333,11 @@ amenable_derive::harness! {
             once.call_once(|| {
                 CALLS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
             });
-            assert_eq!(
-                CALLS.load(std::sync::atomic::Ordering::SeqCst),
-                1,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    CALLS.load(std::sync::atomic::Ordering::SeqCst),
+                    1
+                )),
                 "call_once runs its closure exactly once"
             );
         }

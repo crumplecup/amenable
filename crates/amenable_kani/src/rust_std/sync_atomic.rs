@@ -48,25 +48,133 @@ bridge_kani_witness!(RustStdStandard<AtomicBool>);
 amenable_derive::harness! {
     kani, VERIFY_ATOMIC_BOOL_SRC, {
         /// `AtomicBool::new` sets the value observable via `load`, and
-        /// `store` overwrites it, both under `SeqCst` ordering.
+        /// `store` overwrites it, both under `SeqCst` ordering. Both
+        /// assertions call `AtomicLoadReflectsTheLastWrite::ensures`
+        /// directly rather than restating the comparison -- see that
+        /// type for why this is the one harness its registration reuses
+        /// as a witness.
         #[kani::proof]
         fn verify_atomic_bool() {
             let initial: bool = kani::any();
             let atomic = AtomicBool::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicBool::new sets the value observable via load"
             );
 
             let next: bool = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicBool::store overwrites the value observable via load"
             );
         }
+    }
+}
+
+/// A `(loaded, expected)` pair known to agree: an atomic's `.load()`
+/// reflects the value most recently established for it, by `new`,
+/// `store`, `swap`, `compare_exchange`, or `fetch_add`.
+///
+/// Independently hand-written as `assert_eq!(atomic.load(Ordering::SeqCst),
+/// expected, ...)` at 29 real sites across every `Atomic*` integer/bool
+/// type in this file plus two call-counter sites elsewhere
+/// (`rust_std::iter::verify_repeat_with_calls_its_closure_once_per_item`,
+/// `rust_std::sync_lock::verify_once_runs_its_closure_exactly_once`) --
+/// the identical claim regardless of the atomic's value type. Generic
+/// over that value type rather than one registration per `Atomic*` type,
+/// the same reasoning (and the same reason it needs a hand-written
+/// `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros) as
+/// `IteratorYieldsNoneWhenExhausted` in `rust_std::iter`.
+///
+/// `AtomicPtr<i32>`'s own `RustStdStandard<AtomicPtr<i32>>` carrier
+/// already has a *different* `Ensures<KaniVerifier>` bound occupying its
+/// slot (`.swap()` returning the previous value, just below) -- a second,
+/// distinct claim about the same type needs its own type regardless, per
+/// the associated-type-uniqueness rule, so `AtomicPtr`'s four `.load()`
+/// sites could never have used a per-carrier registration even if every
+/// other `Atomic*` type had.
+pub struct AtomicLoadReflectsTheLastWrite<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for AtomicLoadReflectsTheLastWrite<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for AtomicLoadReflectsTheLastWrite<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for AtomicLoadReflectsTheLastWrite<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_atomic_bool".to_owned(),
+            claim: VERIFY_ATOMIC_BOOL_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for AtomicLoadReflectsTheLastWrite<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for AtomicLoadReflectsTheLastWrite<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((loaded, expected): (T, T)) -> bool {
+        loaded == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::AtomicLoadReflectsTheLastWrite",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(loaded == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::AtomicLoadReflectsTheLastWrite",
+        verifier: "kani",
+        describe: || <AtomicLoadReflectsTheLastWrite<i32> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -101,17 +209,21 @@ amenable_derive::harness! {
         fn verify_atomic_i8() {
             let initial: i8 = kani::any();
             let atomic = AtomicI8::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicI8::new sets the value observable via load"
             );
 
             let next: i8 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicI8::store overwrites the value observable via load"
             );
         }
@@ -149,17 +261,21 @@ amenable_derive::harness! {
         fn verify_atomic_i16() {
             let initial: i16 = kani::any();
             let atomic = AtomicI16::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicI16::new sets the value observable via load"
             );
 
             let next: i16 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicI16::store overwrites the value observable via load"
             );
         }
@@ -197,17 +313,21 @@ amenable_derive::harness! {
         fn verify_atomic_i32() {
             let initial: i32 = kani::any();
             let atomic = AtomicI32::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicI32::new sets the value observable via load"
             );
 
             let next: i32 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicI32::store overwrites the value observable via load"
             );
         }
@@ -245,17 +365,21 @@ amenable_derive::harness! {
         fn verify_atomic_i64() {
             let initial: i64 = kani::any();
             let atomic = AtomicI64::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicI64::new sets the value observable via load"
             );
 
             let next: i64 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicI64::store overwrites the value observable via load"
             );
         }
@@ -293,17 +417,21 @@ amenable_derive::harness! {
         fn verify_atomic_isize() {
             let initial: isize = kani::any();
             let atomic = AtomicIsize::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicIsize::new sets the value observable via load"
             );
 
             let next: isize = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicIsize::store overwrites the value observable via load"
             );
         }
@@ -341,17 +469,21 @@ amenable_derive::harness! {
         fn verify_atomic_u8() {
             let initial: u8 = kani::any();
             let atomic = AtomicU8::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicU8::new sets the value observable via load"
             );
 
             let next: u8 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicU8::store overwrites the value observable via load"
             );
         }
@@ -389,17 +521,21 @@ amenable_derive::harness! {
         fn verify_atomic_u16() {
             let initial: u16 = kani::any();
             let atomic = AtomicU16::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicU16::new sets the value observable via load"
             );
 
             let next: u16 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicU16::store overwrites the value observable via load"
             );
         }
@@ -437,17 +573,21 @@ amenable_derive::harness! {
         fn verify_atomic_u32() {
             let initial: u32 = kani::any();
             let atomic = AtomicU32::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicU32::new sets the value observable via load"
             );
 
             let next: u32 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicU32::store overwrites the value observable via load"
             );
         }
@@ -485,17 +625,21 @@ amenable_derive::harness! {
         fn verify_atomic_u64() {
             let initial: u64 = kani::any();
             let atomic = AtomicU64::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicU64::new sets the value observable via load"
             );
 
             let next: u64 = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicU64::store overwrites the value observable via load"
             );
         }
@@ -533,17 +677,21 @@ amenable_derive::harness! {
         fn verify_atomic_usize() {
             let initial: usize = kani::any();
             let atomic = AtomicUsize::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicUsize::new sets the value observable via load"
             );
 
             let next: usize = kani::any();
             atomic.store(next, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                next,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    next
+                )),
                 "AtomicUsize::store overwrites the value observable via load"
             );
         }
@@ -611,17 +759,21 @@ amenable_derive::harness! {
 
             let initial: *mut i32 = &mut initial_slot;
             let atomic = AtomicPtr::new(initial);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                initial,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    initial
+                )),
                 "AtomicPtr::new sets the value observable via load"
             );
 
             let stored: *mut i32 = &mut stored_slot;
             atomic.store(stored, std::sync::atomic::Ordering::SeqCst);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                stored,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    stored
+                )),
                 "AtomicPtr::store overwrites the value observable via load"
             );
 
@@ -631,9 +783,11 @@ amenable_derive::harness! {
                 RustStdStandard::<AtomicPtr<i32>>::ensures((previous, stored)),
                 "AtomicPtr::swap returns the value that was there before"
             );
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                swapped_in,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    swapped_in
+                )),
                 "AtomicPtr::swap installs the new value observable via load"
             );
 
@@ -649,9 +803,11 @@ amenable_derive::harness! {
                 Ok(swapped_in),
                 "compare_exchange succeeds and returns the previous value when current matches"
             );
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::SeqCst),
-                exchange_target,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::SeqCst),
+                    exchange_target
+                )),
                 "compare_exchange installs the new value on success"
             );
         }
@@ -694,9 +850,11 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let atomic = AtomicI32::new(0);
             atomic.store(value, std::sync::atomic::Ordering::Relaxed);
-            assert_eq!(
-                atomic.load(std::sync::atomic::Ordering::Relaxed),
-                value,
+            assert!(
+                AtomicLoadReflectsTheLastWrite::ensures((
+                    atomic.load(std::sync::atomic::Ordering::Relaxed),
+                    value
+                )),
                 "a Relaxed store is observable via a Relaxed load on the same atomic"
             );
         }
