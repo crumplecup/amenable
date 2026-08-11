@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
-three clusters named, 771 → 603 sites — see "Current state"); `amenable_verus`
+four clusters named, 771 → 587 sites — see "Current state"); `amenable_verus`
 not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,33 +420,41 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **603** sites (was 771; four intervening fixes
+  session; total is now **587** sites (was 771; five intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
   - `X.next() == Some(X)` — 40 sites (intentionally skipped, see below)
-  - `X.len() == X` — 16 sites
-  - `X.next() == X.next()` — 16 sites
+  - `X.len() == X` — 16 sites (intentionally skipped, see below)
   - `X.is_empty()` — 13 sites
   - `!X::<X<X>>::ensures(X)` — 12 sites
   - `X.pop_front() == Some(X)` — 11 sites
   - `X.next() == Some(X + X)` — 10 sites
   - `X != X && X != X` — 9 sites
+  - `X != X && X != X && X != X` — 9 sites
   - and onward down the ranked list in the checklist itself.
 
-  **`X.next() == Some(X)` (40 sites) is not a shared-claim candidate**,
-  confirmed by reading a sample before starting on it (`str.rs`'s
-  `Some(byte)`, `alloc_vec.rs`'s `Some(2)`, `iter.rs`'s cycle-restart
-  `Some(a)`/`Some(a + 1)`, ...): every site asserts a different real value
-  computed by that adapter's own logic, only coincidentally sharing the
-  clause shape — exactly the "shape-clustering is a hint to investigate,
-  not an automatic merge" caveat this doc already warns about. Each site
-  still needs naming eventually (every `requires`/`ensures` should be
-  named, not just duplicated ones), but as ~35 individual per-carrier
-  `kani_ensures!` registrations, not one shared type — lower leverage
-  than the clusters below it, so it's an intentionally-skipped top entry
-  right now, not a forgotten one.
+  **Two top clusters are not shared-claim candidates**, confirmed by
+  reading a sample before starting on either:
+  - `X.next() == Some(X)` (40 sites): `str.rs`'s `Some(byte)`,
+    `alloc_vec.rs`'s `Some(2)`, `iter.rs`'s cycle-restart
+    `Some(a)`/`Some(a + 1)`, ... — every site asserts a different real
+    value computed by that adapter's own logic, only coincidentally
+    sharing the clause shape.
+  - `X.len() == X` (16 sites): `compose.rs`'s fixed array depth (`3`),
+    `alloc_vec.rs`'s length after one push (`1`), `primitives.rs`'s
+    buffer-length-tracks-stored-bytes claim, `primitives.rs`'s array
+    length as a fixed compile-time size (`3`) — again, every site
+    checks a different specific value.
 
-  Four things resolved the first 168 sites of the drop from 771:
+  Both are exactly the "shape-clustering is a hint to investigate, not
+  an automatic merge" caveat this doc already warns about. Each site
+  still needs naming eventually (every `requires`/`ensures` should be
+  named, not just duplicated ones), but as individual per-carrier
+  `kani_ensures!` registrations, not one shared type — lower leverage
+  than the clusters below them, so they're intentionally-skipped top
+  entries right now, not forgotten ones.
+
+  Five things resolved the first 184 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -500,6 +508,17 @@ was brought back to zero in three focused follow-up commits.
      `X.next() == Some(X)` below, which failed that same check) — every
      comparison really is a plain value-equality check regardless of
      which wrapper type derefs.
+  5. **`X.next() == X.next()` (16 sites)**: an iterator adapter's
+     sequence matches a directly-constructed reference iterator's
+     sequence, step by step, independently restated across
+     `verify_flat_map_flattens_each_generated_iterator` (`FlatMap` vs.
+     calling its closure directly) and
+     `verify_flatten_concatenates_the_inner_iterators` (`Flatten` vs. a
+     direct `.chain()` concatenation). Named once as
+     `amenable_kani::IteratorMatchesReferenceStepByStep<T>`, the fourth
+     generic contract type. Both harnesses use identical
+     receiver/comparand pairs throughout (only the assertion messages
+     differ), confirmed before starting.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a

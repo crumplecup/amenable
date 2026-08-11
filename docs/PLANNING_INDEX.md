@@ -11,11 +11,12 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 603 sites: a real
-`elicit_doc` matcher bug fixed plus three clusters named via generic
+mechanism; `amenable_kani` now in progress (771 → 587 sites: a real
+`elicit_doc` matcher bug fixed plus four clusters named via generic
 contract types, `IteratorYieldsNoneWhenExhausted<T>`,
-`AtomicLoadReflectsTheLastWrite<T>`, and `DerefReflectsTheStoredValue<T>`);
-`amenable_verus` not yet started under it.
+`AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
+and `IteratorMatchesReferenceStepByStep<T>`); `amenable_verus` not yet
+started under it.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
