@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, nine clusters named, 771 → 481 sites — see "Current state");
+fixed, ten clusters named, 771 → 472 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,10 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **481** sites (was 771; eleven intervening fixes
+  session; total is now **472** sites (was 771; twelve intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X != X && X != X && X != X` — 9 sites
   - `X.checked_add(X).is_some()` — 9 sites
   - `X[X] == X` — 9 sites
   - `X.is_err()` — 8 sites
@@ -614,6 +613,17 @@ was brought back to zero in three focused follow-up commits.
       in `rust_std::slice.rs` (majority owner, 6 of 9 sites) and is
       re-exported at the crate boundary for `str.rs`'s 3 sites to reach
       it.
+  12. **`X != X && X != X && X != X` (9 sites)**: the three-operand
+      sibling of item 11's claim, same split-family split (4 sites in
+      `rust_std::slice`'s `*n`-capped family, fixed-literal pattern; 5 in
+      `rust_std::str`'s `matches`/`rmatches`/`match_indices` family,
+      symbolic pattern). Named as a separate type,
+      `amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern<T>`
+      (the sixth generic contract type this session), rather than
+      reusing item 11's two-operand type — Rust generics have no
+      variadic tuple, and a `Vec`-shaped `Input` would trade the real
+      fixed-arity check for a weaker runtime-length one. Lives next to
+      its two-operand sibling in `rust_std::slice.rs`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
