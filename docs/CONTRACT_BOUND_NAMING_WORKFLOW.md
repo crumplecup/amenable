@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, five clusters named, 771 → 562 sites — see "Current state");
+fixed, six clusters named, 771 → 520 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,39 +420,37 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **562** sites (was 771; seven intervening fixes
+  session; total is now **520** sites (was 771; eight intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X.next() == Some(X)` — 40 sites (intentionally skipped, see below)
-  - `X.len() == X` — 16 sites (intentionally skipped, see below)
   - `X.pop_front() == Some(X)` — 11 sites
-  - `X.next() == Some(X + X)` — 10 sites
   - `X != X && X != X` — 9 sites
   - `X != X && X != X && X != X` — 9 sites
+  - `X.checked_add(X).is_some()` — 9 sites
+  - `X[X] == X` — 9 sites
   - and onward down the ranked list in the checklist itself.
 
-  **Two top clusters are not shared-claim candidates**, confirmed by
-  reading a sample before starting on either:
-  - `X.next() == Some(X)` (40 sites): `str.rs`'s `Some(byte)`,
-    `alloc_vec.rs`'s `Some(2)`, `iter.rs`'s cycle-restart
-    `Some(a)`/`Some(a + 1)`, ... — every site asserts a different real
-    value computed by that adapter's own logic, only coincidentally
-    sharing the clause shape.
-  - `X.len() == X` (16 sites): `compose.rs`'s fixed array depth (`3`),
-    `alloc_vec.rs`'s length after one push (`1`), `primitives.rs`'s
-    buffer-length-tracks-stored-bytes claim, `primitives.rs`'s array
-    length as a fixed compile-time size (`3`) — again, every site
-    checks a different specific value.
+  **A correction mid-session, worth recording so it isn't repeated:**
+  the first pass through this list checked each top cluster for a real
+  shared claim (reading a sample of sites — correct, per this doc's own
+  "shape-clustering is a hint to investigate, not an automatic merge"
+  caveat) but then *skipped* every cluster that came back heterogeneous
+  (`X.next() == Some(X)`, `X.len() == X`, `X.pop_front() == Some(X)`) to
+  keep chasing clusters that resolved with one shared type — leaving 60+
+  real sites unnamed while reporting clean incremental progress. That
+  contradicts this doc's actual goal: every `requires`/`ensures` bound
+  gets named, not just the duplicated ones. **Whether a cluster is a
+  shared claim decides *how* to name it (one generic type vs. N
+  per-carrier `kani_ensures!` registrations), never *whether* to.**
+  `X.next() == Some(X)` (40 sites, confirmed heterogeneous —
+  `str.rs`'s `Some(byte)`, `alloc_vec.rs`'s `Some(2)`, `iter.rs`'s
+  cycle-restart `Some(a)`/`Some(a + 1)`, each a different real value
+  from that adapter's own logic) was gone back to and named per-carrier
+  (item 8 below) once this was caught. `X.len() == X` and
+  `X.pop_front() == Some(X)` are next in line for the same treatment,
+  not skips.
 
-  Both are exactly the "shape-clustering is a hint to investigate, not
-  an automatic merge" caveat this doc already warns about. Each site
-  still needs naming eventually (every `requires`/`ensures` should be
-  named, not just duplicated ones), but as individual per-carrier
-  `kani_ensures!` registrations, not one shared type — lower leverage
-  than the clusters below them, so they're intentionally-skipped top
-  entries right now, not forgotten ones.
-
-  Seven things resolved the first 209 sites of the drop from 771:
+  Eight things resolved the first 251 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -537,6 +535,28 @@ was brought back to zero in three focused follow-up commits.
      (strip a single leading `!` before matching either the Kani or
      Creusot/Verus shape; `!!x` stays unmatched). Confirmed the fix
      resolves exactly this cluster and nothing else.
+  8. **`X.next() == Some(X)` (42 sites landed, of 40 originally
+     flagged)**: the cluster wrongly skipped earlier this session (see
+     the correction note above). Genuinely heterogeneous — every real
+     site's expected value comes from that adapter's own domain logic,
+     not a shared abstraction — so each of the ~25 distinct carrier
+     types (`LinkedList`/`VecDeque`'s `IntoIter`, `Vec`'s `ExtractIf`/
+     `Splice`, `array::IntoIter`, most of `iter.rs`'s adapters —
+     `Chain`, `Rev`, `Cloned`, `Copied`, `Cycle`, `Fuse`, `Inspect`,
+     `Peekable`, `Scan`, `StepBy`, `Take`, `TakeWhile`, `Once`, `Repeat`,
+     `RepeatN`, `Successors`, `FromFn` — `option`/`result`'s `IntoIter`,
+     and `str`'s `Bytes`/`Chars`/`Lines`/`LinesAny`) got its own
+     `kani_ensures!(RustStdStandard<AdapterType>, ..., (actual,
+     expected), |(actual, expected)| actual == expected)` registration
+     — the same "trivial equality, real per-carrier registration"
+     pattern `cell.rs` already used for
+     `Cell<i32>`/`Cell<u32>`/`Cell<usize>`. Landed 2 more sites than the
+     cluster's original 40: while already inside a harness for this
+     cluster, also converted its mechanically-identical
+     `X.next() == Some(X + X)` sites with the same registration (`Rev`,
+     `Cycle`, `Peekable`, `Scan`) — matching this doc's own
+     top-to-bottom-order exception for later items that are mechanically
+     identical to the one just finished.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
