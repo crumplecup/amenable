@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, ten clusters named, 771 → 472 sites — see "Current state");
+fixed, eleven clusters named, 771 → 463 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,10 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **472** sites (was 771; twelve intervening fixes
-  landed, see below). Current top clusters, by size (re-run the scan
-  before trusting these — this list will drift as work lands):
-  - `X.checked_add(X).is_some()` — 9 sites
+  session; total is now **463** sites (was 771; thirteen intervening
+  fixes landed, see below). Current top clusters, by size (re-run the
+  scan before trusting these — this list will drift as work lands):
   - `X[X] == X` — 9 sites
   - `X.is_err()` — 8 sites
   - `X::strong_count(&X) == X` — 8 sites
@@ -624,6 +623,20 @@ was brought back to zero in three focused follow-up commits.
       variadic tuple, and a `Vec`-shaped `Input` would trade the real
       fixed-arity check for a weaker runtime-length one. Lives next to
       its two-operand sibling in `rust_std::slice.rs`.
+  13. **`X.checked_add(X).is_some()` (9 sites)**: "adding these two
+      values doesn't overflow the fixed-width integer type" -- 8 sites
+      in `rust_std::slice`'s chunk-family harnesses (`i32`, fixed-
+      literal addend `10`) and 1 in
+      `rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs`
+      (`u64`, symbolic addend). Registered directly on
+      `RustStdStandard<i32>`/`RustStdStandard<u64>` via
+      `kani_requires!`, one per concrete width rather than a new generic
+      contract type: `checked_add` is inherent per fixed-width integer
+      type, not a trait method available generically without pulling in
+      an external crate (`num_traits`). Both carriers' `Requires<KaniVerifier>`
+      slots were free -- lives in `rust_std::primitives.rs`, the
+      existing home for other cross-cutting primitive-type
+      `Requires`/`Ensures` registrations (`AsciiByte`).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
