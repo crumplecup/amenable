@@ -24,6 +24,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -109,7 +111,10 @@ amenable_derive::harness! {
                 );
                 *first = updated;
             }
-            assert_eq!(data[0], updated, "a write through iter_mut's reference is visible");
+            assert!(
+                IndexRecoversTheStoredElement::ensures((data[0], updated)),
+                "a write through iter_mut's reference is visible"
+            );
         }
     }
 }

@@ -14,6 +14,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::EmptiedContainerReportsEmpty;
 #[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -117,7 +119,10 @@ amenable_derive::harness! {
             let mut v = <Vec<i32> as crate::KaniCompose>::kani_depth0();
             v.push(value);
             assert!(VecLengthTracksPushesAndPops::ensures((v.len(), 1)));
-            assert_eq!(v[0], value, "the pushed value is indexable");
+            assert!(
+                IndexRecoversTheStoredElement::ensures((v[0], value)),
+                "the pushed value is indexable"
+            );
             assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
             assert!(
                 EmptiedContainerReportsEmpty::ensures(v.is_empty()),

@@ -266,9 +266,9 @@ amenable_derive::harness! {
                 RustStdStandard::<[i32; 3]>::ensures((arr.len(), 3)),
                 "the array's length is its fixed compile-time size"
             );
-            assert_eq!(arr[0], a);
-            assert_eq!(arr[1], b);
-            assert_eq!(arr[2], c);
+            assert!(IndexRecoversTheStoredElement::ensures((arr[0], a)));
+            assert!(IndexRecoversTheStoredElement::ensures((arr[1], b)));
+            assert!(IndexRecoversTheStoredElement::ensures((arr[2], c)));
         }
     }
 }
@@ -323,9 +323,9 @@ amenable_derive::harness! {
                 RustStdStandard::<[i32]>::ensures((s.len(), 3)),
                 "the slice's length is the number of elements it views"
             );
-            assert_eq!(s[0], a);
-            assert_eq!(s[1], b);
-            assert_eq!(s[2], c);
+            assert!(IndexRecoversTheStoredElement::ensures((s[0], a)));
+            assert!(IndexRecoversTheStoredElement::ensures((s[1], b)));
+            assert!(IndexRecoversTheStoredElement::ensures((s[2], c)));
         }
     }
 }
@@ -716,6 +716,102 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for DerefReflects
         evidence: "amenable_kani::DerefReflectsTheStoredValue",
         verifier: "kani",
         describe: || <DerefReflectsTheStoredValue<i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+/// An `(actual, expected)` pair known to agree: indexing a fixed-length
+/// container at a position recovers exactly the element known to be
+/// stored there.
+///
+/// Independently hand-written as `assert_eq!(container[i], expected,
+/// ...)` at 9 real sites spanning `Vec<i32>`, a `[u8; 4]` array indexed
+/// through `IoSliceMut`, `[i32; 3]`/`[i32; 1]` arrays, and a `&[i32]`
+/// slice -- the identical claim regardless of container kind or element
+/// type. This is the Kani-side sibling of
+/// `amenable_std::IndexingAndLength`'s Creusot postcondition, not a
+/// reuse of that type directly: `IndexingAndLength` is a fixed,
+/// non-generic wrapper bundling a length check together with three
+/// specific indices in one Pearlite predicate, which cannot vary its
+/// `Input` type per real site's element type the way a Kani `Ensures`
+/// impl needs to (`i32` here, `u8` for the `IoSliceMut` site). Generic
+/// over the element type instead, same reasoning (and the same reason
+/// it needs a hand-written `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros) as
+/// `DerefReflectsTheStoredValue` just above.
+pub struct IndexRecoversTheStoredElement<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for IndexRecoversTheStoredElement<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for IndexRecoversTheStoredElement<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for IndexRecoversTheStoredElement<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_array_indexing_and_length".to_owned(),
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for IndexRecoversTheStoredElement<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for IndexRecoversTheStoredElement<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::IndexRecoversTheStoredElement",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::IndexRecoversTheStoredElement",
+        verifier: "kani",
+        describe: || <IndexRecoversTheStoredElement<i32> as KaniWitness>::proof().to_string(),
     }
 }
 

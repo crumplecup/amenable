@@ -29,6 +29,8 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 use crate::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
@@ -1252,8 +1254,8 @@ amenable_derive::harness! {
             assert_eq!(&*slice, &original, "IoSliceMut derefs to exactly the wrapped bytes");
             slice[0] = new_value;
             drop(slice);
-            assert_eq!(
-                bytes[0], new_value,
+            assert!(
+                IndexRecoversTheStoredElement::ensures((bytes[0], new_value)),
                 "mutating through IoSliceMut mutates the wrapped bytes"
             );
         }
