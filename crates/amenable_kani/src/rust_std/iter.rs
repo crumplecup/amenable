@@ -43,7 +43,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::AtomicLoadReflectsTheLastWrite;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
     type SupportingEvidence = Self;
@@ -481,6 +481,13 @@ bridge_kani_witness!(RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CHAIN_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC, {
         /// `Chain` yields the first iterator's items, then the second's,
@@ -491,10 +498,18 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a < i32::MAX && b < i32::MAX);
             let mut c = (a..a + 1).chain(b..b + 1);
-            assert_eq!(c.next(), Some(a), "chain yields the first iterator's items first");
-            assert_eq!(
-                c.next(),
-                Some(b),
+            assert!(
+                RustStdStandard::<std::iter::Chain<Range<i32>, Range<i32>>>::ensures((
+                    c.next(),
+                    Some(a)
+                )),
+                "chain yields the first iterator's items first"
+            );
+            assert!(
+                RustStdStandard::<std::iter::Chain<Range<i32>, Range<i32>>>::ensures((
+                    c.next(),
+                    Some(b)
+                )),
                 "chain yields the second iterator's items once the first is exhausted"
             );
             assert!(
@@ -617,6 +632,13 @@ bridge_kani_witness!(RustStdStandard<Rev<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Rev<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Rev<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_REV_REVERSES_ITERATION_ORDER_SRC, {
         /// `Rev` yields a double-ended iterator's items back to front.
@@ -625,8 +647,14 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(a < i32::MAX - 1);
             let mut r = (a..a + 2).rev();
-            assert_eq!(r.next(), Some(a + 1), "rev yields the last item first");
-            assert_eq!(r.next(), Some(a), "rev yields items in reverse order");
+            assert!(
+                RustStdStandard::<Rev<Range<i32>>>::ensures((r.next(), Some(a + 1))),
+                "rev yields the last item first"
+            );
+            assert!(
+                RustStdStandard::<Rev<Range<i32>>>::ensures((r.next(), Some(a))),
+                "rev yields items in reverse order"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(r.next()),
                 "rev is exhausted once every item has been yielded"
@@ -659,6 +687,13 @@ bridge_kani_witness!(RustStdStandard<Cloned<Iter<'static, i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Cloned<Iter<'static, i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Cloned<Iter<'static, i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CLONED_CLONES_EACH_REFERENCED_ITEM_SRC, {
         /// `Cloned` yields an owned clone of each referenced item. The
@@ -669,9 +704,8 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let data = [value];
             let mut c = data.iter().cloned();
-            assert_eq!(
-                c.next(),
-                Some(value),
+            assert!(
+                RustStdStandard::<Cloned<Iter<'static, i32>>>::ensures((c.next(), Some(value))),
                 "cloned yields an owned clone of each referenced item"
             );
             assert!(
@@ -706,6 +740,13 @@ bridge_kani_witness!(RustStdStandard<Copied<Iter<'static, i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Copied<Iter<'static, i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Copied<Iter<'static, i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_COPIED_COPIES_EACH_REFERENCED_ITEM_SRC, {
         /// `Copied` yields an owned copy of each referenced item. Same
@@ -715,9 +756,8 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let data = [value];
             let mut c = data.iter().copied();
-            assert_eq!(
-                c.next(),
-                Some(value),
+            assert!(
+                RustStdStandard::<Copied<Iter<'static, i32>>>::ensures((c.next(), Some(value))),
                 "copied yields an owned copy of each referenced item"
             );
             assert!(
@@ -751,6 +791,13 @@ bridge_kani_witness!(RustStdStandard<Cycle<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Cycle<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Cycle<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CYCLE_REPEATS_ITS_SEQUENCE_FOREVER_SRC, {
         /// `Cycle` restarts its underlying sequence once exhausted,
@@ -760,10 +807,13 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(a < i32::MAX - 1);
             let mut c = (a..a + 2).cycle();
-            assert_eq!(c.next(), Some(a));
-            assert_eq!(c.next(), Some(a + 1));
-            assert_eq!(c.next(), Some(a), "cycle restarts its sequence once exhausted");
-            assert_eq!(c.next(), Some(a + 1));
+            assert!(RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a))));
+            assert!(RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a + 1))));
+            assert!(
+                RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a))),
+                "cycle restarts its sequence once exhausted"
+            );
+            assert!(RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a + 1))));
         }
     }
 }
@@ -791,6 +841,13 @@ bridge_kani_witness!(RustStdStandard<Fuse<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Fuse<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Fuse<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_FUSE_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC, {
         /// `Fuse` keeps returning `None` once the underlying iterator
@@ -800,7 +857,7 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(a < i32::MAX);
             let mut f = (a..a + 1).fuse();
-            assert_eq!(f.next(), Some(a));
+            assert!(RustStdStandard::<Fuse<Range<i32>>>::ensures((f.next(), Some(a))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(f.next()));
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(f.next()),
@@ -834,6 +891,13 @@ bridge_kani_witness!(RustStdStandard<Inspect<Range<i32>, fn(&i32)>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Inspect<Range<i32>, fn(&i32)>>,
+    "amenable_std::rust_std::RustStdStandard<Inspect<Range<i32>, fn(&i32)>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_INSPECT_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC, {
         /// `Inspect` leaves values unchanged and calls its closure
@@ -845,7 +909,13 @@ amenable_derive::harness! {
             let calls = Cell::new(0usize);
             let mut inspected = (value..value + 1).inspect(|_| calls.set(calls.get() + 1));
 
-            assert_eq!(inspected.next(), Some(value), "inspect does not change the yielded value");
+            assert!(
+                RustStdStandard::<Inspect<Range<i32>, fn(&i32)>>::ensures((
+                    inspected.next(),
+                    Some(value)
+                )),
+                "inspect does not change the yielded value"
+            );
             assert!(
                 RustStdStandard::<Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect calls its closure exactly once per item"
@@ -885,6 +955,13 @@ bridge_kani_witness!(RustStdStandard<Peekable<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Peekable<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Peekable<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_PEEKABLE_PEEK_DOES_NOT_CONSUME_SRC, {
         /// `Peekable::peek` previews the next item without consuming it:
@@ -895,8 +972,14 @@ amenable_derive::harness! {
             kani::assume(a < i32::MAX - 1);
             let mut p = (a..a + 2).peekable();
             assert_eq!(p.peek(), Some(&a), "peek previews the next item");
-            assert_eq!(p.next(), Some(a), "next still returns the peeked item");
-            assert_eq!(p.next(), Some(a + 1), "peek did not consume an item");
+            assert!(
+                RustStdStandard::<Peekable<Range<i32>>>::ensures((p.next(), Some(a))),
+                "next still returns the peeked item"
+            );
+            assert!(
+                RustStdStandard::<Peekable<Range<i32>>>::ensures((p.next(), Some(a + 1))),
+                "peek did not consume an item"
+            );
         }
     }
 }
@@ -925,6 +1008,13 @@ bridge_kani_witness!(RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> 
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SCAN_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC, {
         /// `Scan` threads its mutable state from one call into the next:
@@ -940,14 +1030,18 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume((-1000..=1000).contains(&a));
             let mut s = (a..a + 2).scan(0i32, running_sum);
-            assert_eq!(
-                s.next(),
-                Some(a),
+            assert!(
+                RustStdStandard::<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>::ensures((
+                    s.next(),
+                    Some(a)
+                )),
                 "scan's first item is the closure applied to the initial state and first item"
             );
-            assert_eq!(
-                s.next(),
-                Some(a + (a + 1)),
+            assert!(
+                RustStdStandard::<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>::ensures((
+                    s.next(),
+                    Some(a + (a + 1))
+                )),
                 "scan threads its updated state into the next call"
             );
         }
@@ -1058,6 +1152,13 @@ bridge_kani_witness!(RustStdStandard<StepBy<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<StepBy<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<StepBy<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_STEP_BY_YIELDS_EVERY_NTH_ITEM_SRC, {
         /// `StepBy(n)` yields every nth item starting from the first.
@@ -1066,9 +1167,12 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(a < i32::MAX - 4);
             let mut s = (a..a + 5).step_by(2);
-            assert_eq!(s.next(), Some(a));
-            assert_eq!(s.next(), Some(a + 2));
-            assert_eq!(s.next(), Some(a + 4), "step_by yields every nth item from the start");
+            assert!(RustStdStandard::<StepBy<Range<i32>>>::ensures((s.next(), Some(a))));
+            assert!(RustStdStandard::<StepBy<Range<i32>>>::ensures((s.next(), Some(a + 2))));
+            assert!(
+                RustStdStandard::<StepBy<Range<i32>>>::ensures((s.next(), Some(a + 4))),
+                "step_by yields every nth item from the start"
+            );
         }
     }
 }
@@ -1096,6 +1200,13 @@ bridge_kani_witness!(RustStdStandard<std::iter::Take<Range<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::iter::Take<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Take<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_TAKE_YIELDS_AT_MOST_N_ITEMS_SRC, {
         /// `Take(n)` yields no more than `n` items even when the source
@@ -1105,8 +1216,11 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(a < i32::MAX - 4);
             let mut t = (a..a + 5).take(2);
-            assert_eq!(t.next(), Some(a));
-            assert_eq!(t.next(), Some(a + 1));
+            assert!(RustStdStandard::<std::iter::Take<Range<i32>>>::ensures((t.next(), Some(a))));
+            assert!(RustStdStandard::<std::iter::Take<Range<i32>>>::ensures((
+                t.next(),
+                Some(a + 1)
+            )));
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(t.next()),
                 "take yields no more than n items even though the source has more"
@@ -1139,6 +1253,13 @@ bridge_kani_witness!(RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_TAKE_WHILE_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC, {
         /// `TakeWhile` yields items while the predicate holds and stops
@@ -1151,7 +1272,13 @@ amenable_derive::harness! {
             }
             let a: i32 = 4;
             let mut t = (a..a + 2).take_while(is_even);
-            assert_eq!(t.next(), Some(a), "take_while yields items while the predicate holds");
+            assert!(
+                RustStdStandard::<TakeWhile<Range<i32>, fn(&i32) -> bool>>::ensures((
+                    t.next(),
+                    Some(a)
+                )),
+                "take_while yields items while the predicate holds"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(t.next()),
                 "take_while stops as soon as the predicate first fails"
@@ -1230,6 +1357,13 @@ bridge_kani_witness!(RustStdStandard<std::iter::Once<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::iter::Once<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Once<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ONCE_YIELDS_EXACTLY_ONE_VALUE_SRC, {
         /// `once` yields its value once, then stops.
@@ -1237,7 +1371,10 @@ amenable_derive::harness! {
         fn verify_once_yields_exactly_one_value() {
             let value: i32 = kani::any();
             let mut o = std::iter::once(value);
-            assert_eq!(o.next(), Some(value), "once yields its value");
+            assert!(
+                RustStdStandard::<std::iter::Once<i32>>::ensures((o.next(), Some(value))),
+                "once yields its value"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(o.next()),
                 "once yields nothing after its one value"
@@ -1311,6 +1448,13 @@ bridge_kani_witness!(RustStdStandard<std::iter::Repeat<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::iter::Repeat<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Repeat<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_REPEAT_YIELDS_THE_SAME_VALUE_FOREVER_SRC, {
         /// `repeat` yields the same value on every call, checked across
@@ -1319,9 +1463,12 @@ amenable_derive::harness! {
         fn verify_repeat_yields_the_same_value_forever() {
             let value: i32 = kani::any();
             let mut r = std::iter::repeat(value);
-            assert_eq!(r.next(), Some(value));
-            assert_eq!(r.next(), Some(value));
-            assert_eq!(r.next(), Some(value), "repeat yields the same value on every call");
+            assert!(RustStdStandard::<std::iter::Repeat<i32>>::ensures((r.next(), Some(value))));
+            assert!(RustStdStandard::<std::iter::Repeat<i32>>::ensures((r.next(), Some(value))));
+            assert!(
+                RustStdStandard::<std::iter::Repeat<i32>>::ensures((r.next(), Some(value))),
+                "repeat yields the same value on every call"
+            );
         }
     }
 }
@@ -1400,6 +1547,13 @@ bridge_kani_witness!(RustStdStandard<RepeatN<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<RepeatN<i32>>,
+    "amenable_std::rust_std::RustStdStandard<RepeatN<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_REPEAT_N_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC, {
         /// `repeat_n(value, n)` yields `value` exactly `n` times, then
@@ -1408,8 +1562,8 @@ amenable_derive::harness! {
         fn verify_repeat_n_yields_the_value_exactly_n_times() {
             let value: i32 = kani::any();
             let mut r = std::iter::repeat_n(value, 2);
-            assert_eq!(r.next(), Some(value));
-            assert_eq!(r.next(), Some(value));
+            assert!(RustStdStandard::<RepeatN<i32>>::ensures((r.next(), Some(value))));
+            assert!(RustStdStandard::<RepeatN<i32>>::ensures((r.next(), Some(value))));
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(r.next()),
                 "repeat_n stops after exactly n items"
@@ -1583,6 +1737,13 @@ bridge_kani_witness!(RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SUCCESSORS_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC, {
         /// `successors` yields the seed first, then computes each next
@@ -1595,10 +1756,18 @@ amenable_derive::harness! {
             let seed: i32 = kani::any();
             kani::assume(seed < 100);
             let mut s = std::iter::successors(Some(seed), next_step);
-            assert_eq!(s.next(), Some(seed), "successors yields the seed first");
-            assert_eq!(
-                s.next(),
-                Some(seed + 1),
+            assert!(
+                RustStdStandard::<Successors<i32, fn(&i32) -> Option<i32>>>::ensures((
+                    s.next(),
+                    Some(seed)
+                )),
+                "successors yields the seed first"
+            );
+            assert!(
+                RustStdStandard::<Successors<i32, fn(&i32) -> Option<i32>>>::ensures((
+                    s.next(),
+                    Some(seed + 1)
+                )),
                 "successors computes the next item from the previous one"
             );
         }
@@ -1629,6 +1798,13 @@ bridge_kani_witness!(RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_FROM_FN_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC, {
         /// `from_fn` yields whatever its closure produces, and stops the
@@ -1644,8 +1820,14 @@ amenable_derive::harness! {
             }
 
             let mut f = std::iter::from_fn(produce as fn() -> Option<i32>);
-            assert_eq!(f.next(), Some(0));
-            assert_eq!(f.next(), Some(1));
+            assert!(RustStdStandard::<std::iter::FromFn<fn() -> Option<i32>>>::ensures((
+                f.next(),
+                Some(0)
+            )));
+            assert!(RustStdStandard::<std::iter::FromFn<fn() -> Option<i32>>>::ensures((
+                f.next(),
+                Some(1)
+            )));
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(f.next()),
                 "from_fn stops once its closure returns None"

@@ -11,7 +11,7 @@ use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Option<i32>> {
     type SupportingEvidence = Self;
@@ -119,6 +119,13 @@ bridge_kani_witness!(RustStdStandard<core::option::IntoIter<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<core::option::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<core::option::IntoIter<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_OPTION_INTO_ITER_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC, {
         /// `Some(value).into_iter()` yields the owned value once, then
@@ -127,7 +134,7 @@ amenable_derive::harness! {
         fn verify_option_into_iter_yields_zero_or_one_owned_value() {
             let value: i32 = kani::any();
             let mut it = Some(value).into_iter();
-            assert_eq!(it.next(), Some(value));
+            assert!(RustStdStandard::<core::option::IntoIter<i32>>::ensures((it.next(), Some(value))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             let mut empty_it = None::<i32>.into_iter();
@@ -247,6 +254,13 @@ bridge_kani_witness!(RustStdStandard<core::result::IntoIter<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<core::result::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<core::result::IntoIter<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RESULT_INTO_ITER_YIELDS_THE_OK_VALUE_ONLY_SRC, {
         /// `Ok(value).into_iter()` yields the owned value once, then
@@ -256,7 +270,7 @@ amenable_derive::harness! {
         fn verify_result_into_iter_yields_the_ok_value_only() {
             let value: i32 = kani::any();
             let mut it = Ok::<i32, i32>(value).into_iter();
-            assert_eq!(it.next(), Some(value));
+            assert!(RustStdStandard::<core::result::IntoIter<i32>>::ensures((it.next(), Some(value))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             let err_value: i32 = kani::any();

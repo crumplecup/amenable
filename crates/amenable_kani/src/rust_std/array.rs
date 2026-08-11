@@ -11,7 +11,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<TryFromSliceError> {
     type SupportingEvidence = Self;
@@ -87,6 +87,13 @@ bridge_kani_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::array::IntoIter<i32, 3>>,
+    "amenable_std::rust_std::RustStdStandard<std::array::IntoIter<i32, 3>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ARRAY_INTO_ITER_YIELDS_ELEMENTS_IN_ORDER_SRC, {
         /// `[T; N]::into_iter()` yields the array's elements by value, in
@@ -97,9 +104,9 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             let mut it = [a, b, c].into_iter();
-            assert_eq!(it.next(), Some(a));
-            assert_eq!(it.next(), Some(b));
-            assert_eq!(it.next(), Some(c));
+            assert!(RustStdStandard::<std::array::IntoIter<i32, 3>>::ensures((it.next(), Some(a))));
+            assert!(RustStdStandard::<std::array::IntoIter<i32, 3>>::ensures((it.next(), Some(b))));
+            assert!(RustStdStandard::<std::array::IntoIter<i32, 3>>::ensures((it.next(), Some(c))));
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(it.next()),
                 "into_iter yields exactly N elements"

@@ -82,6 +82,13 @@ bridge_kani_witness!(RustStdStandard<std::str::Bytes<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::str::Bytes<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Bytes<'static>>",
+    (Option<u8>, Option<u8>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC, {
         /// `.bytes()` yields the UTF-8 encoding of the str, checked for
@@ -94,7 +101,10 @@ amenable_derive::harness! {
             kani::assume(byte < 128);
             let s = (byte as char).to_string();
             let mut it = s.bytes();
-            assert_eq!(it.next(), Some(byte), "bytes yields the str's UTF-8 encoding");
+            assert!(
+                RustStdStandard::<std::str::Bytes<'static>>::ensures((it.next(), Some(byte))),
+                "bytes yields the str's UTF-8 encoding"
+            );
         }
     }
 }
@@ -162,6 +172,13 @@ bridge_kani_witness!(RustStdStandard<Chars<'static>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<Chars<'static>>,
+    "amenable_std::rust_std::RustStdStandard<Chars<'static>>",
+    (Option<char>, Option<char>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC, {
         /// `.chars()` yields the str's characters, for any (symbolic)
@@ -175,7 +192,10 @@ amenable_derive::harness! {
             let c = byte as char;
             let s = c.to_string();
             let mut it = s.chars();
-            assert_eq!(it.next(), Some(c), "chars yields the str's characters");
+            assert!(
+                RustStdStandard::<Chars<'static>>::ensures((it.next(), Some(c))),
+                "chars yields the str's characters"
+            );
         }
     }
 }
@@ -377,6 +397,13 @@ impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
 
 bridge_kani_witness!(RustStdStandard<std::str::Lines<'static>>);
 
+kani_ensures!(
+    RustStdStandard<std::str::Lines<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Lines<'static>>",
+    (Option<&'static str>, Option<&'static str>),
+    |(actual, expected)| actual == expected
+);
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::str::Lines<'static>>",
@@ -393,8 +420,8 @@ amenable_derive::harness! {
         fn verify_lines_splits_on_line_endings() {
             let s = "a\nb";
             let mut it = s.lines();
-            assert_eq!(it.next(), Some("a"));
-            assert_eq!(it.next(), Some("b"));
+            assert!(RustStdStandard::<std::str::Lines<'static>>::ensures((it.next(), Some("a"))));
+            assert!(RustStdStandard::<std::str::Lines<'static>>::ensures((it.next(), Some("b"))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
@@ -632,6 +659,13 @@ impl KaniWitness for RustStdStandard<LinesAnyStatic> {
 
 bridge_kani_witness!(RustStdStandard<LinesAnyStatic>);
 
+kani_ensures!(
+    RustStdStandard<LinesAnyStatic>,
+    "amenable_std::rust_std::RustStdStandard<LinesAnyStatic>",
+    (Option<&'static str>, Option<&'static str>),
+    |(actual, expected)| actual == expected
+);
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<LinesAny<'static>>",
@@ -657,8 +691,8 @@ amenable_derive::harness! {
         fn verify_lines_any_splits_on_any_line_ending() {
             let s = "a\r\nb";
             let mut it = s.lines_any();
-            assert_eq!(it.next(), Some("a"));
-            assert_eq!(it.next(), Some("b"));
+            assert!(RustStdStandard::<LinesAnyStatic>::ensures((it.next(), Some("a"))));
+            assert!(RustStdStandard::<LinesAnyStatic>::ensures((it.next(), Some("b"))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }

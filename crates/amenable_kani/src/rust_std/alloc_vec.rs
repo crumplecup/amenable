@@ -276,6 +276,13 @@ bridge_kani_witness!(RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC, {
         /// `.extract_if(.., predicate)` removes and yields exactly the
@@ -293,7 +300,13 @@ amenable_derive::harness! {
 
             let mut early_drop = vec![1, 2, 3, 4];
             let mut extractor = early_drop.extract_if(.., is_even as fn(&mut i32) -> bool);
-            assert_eq!(extractor.next(), Some(2), "extract_if yields the first matching element");
+            assert!(
+                RustStdStandard::<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>::ensures((
+                    extractor.next(),
+                    Some(2)
+                )),
+                "extract_if yields the first matching element"
+            );
             drop(extractor);
             assert_eq!(
                 early_drop,
@@ -328,6 +341,13 @@ bridge_kani_witness!(RustStdStandard<std::vec::Splice<'static, std::vec::IntoIte
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SPLICE_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC, {
         /// `.splice(range, replacement)` replaces the given range with
@@ -345,7 +365,13 @@ amenable_derive::harness! {
 
             let mut early_drop = vec![a, b, c];
             let mut splice = early_drop.splice(1..2, vec![9, 8]);
-            assert_eq!(splice.next(), Some(b), "splice first yields the removed element");
+            assert!(
+                RustStdStandard::<std::vec::Splice<'static, std::vec::IntoIter<i32>>>::ensures((
+                    splice.next(),
+                    Some(b)
+                )),
+                "splice first yields the removed element"
+            );
             drop(splice);
             assert_eq!(
                 early_drop,

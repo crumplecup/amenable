@@ -973,6 +973,13 @@ bridge_kani_witness!(RustStdStandard<std::collections::linked_list::IntoIter<i32
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::collections::linked_list::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `.into_iter()` consumes the list, yielding its owned
@@ -988,8 +995,14 @@ amenable_derive::harness! {
             list.push_back(a);
             list.push_back(b);
             let mut it = list.into_iter();
-            assert_eq!(it.next(), Some(a));
-            assert_eq!(it.next(), Some(b));
+            assert!(RustStdStandard::<std::collections::linked_list::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(a)
+            )));
+            assert!(RustStdStandard::<std::collections::linked_list::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(b)
+            )));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {
@@ -1319,6 +1332,13 @@ bridge_kani_witness!(RustStdStandard<std::collections::vec_deque::IntoIter<i32>>
     }
 }
 
+kani_ensures!(
+    RustStdStandard<std::collections::vec_deque::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `.into_iter()` consumes the deque, yielding its owned
@@ -1333,8 +1353,14 @@ amenable_derive::harness! {
             dq.push_back(a);
             dq.push_back(b);
             let mut it = dq.into_iter();
-            assert_eq!(it.next(), Some(a));
-            assert_eq!(it.next(), Some(b));
+            assert!(RustStdStandard::<std::collections::vec_deque::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(a)
+            )));
+            assert!(RustStdStandard::<std::collections::vec_deque::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(b)
+            )));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {
