@@ -11,10 +11,14 @@ use std::os::windows::io::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -188,7 +192,7 @@ amenable_derive::harness! {
 
             let sentinel = unsafe { HandleOrInvalid::from_raw_handle(-1isize as RawHandle) };
             let converted_sentinel: Result<OwnedHandle, _> = sentinel.try_into();
-            assert!(converted_sentinel.is_err());
+            assert!(FallibleOperationReportsFailure::ensures(converted_sentinel.is_err()));
 
             drop(file);
             std::fs::remove_dir_all(&base).unwrap();

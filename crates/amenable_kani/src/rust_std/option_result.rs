@@ -3,6 +3,7 @@
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
+use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
@@ -54,6 +55,60 @@ amenable_derive::harness! {
     }
 }
 
+/// A fallible operation's outcome, once computed, known to report
+/// failure: whatever real reason (a length mismatch, an out-of-range
+/// conversion, a rejected alignment, ...) the operation's own body
+/// decided on, `.is_err()` reflects it.
+///
+/// Independently hand-written as `assert!(result.is_err(), ...)` at 8
+/// real sites across `TryFromSliceError`, `char::try_from`'s surrogate
+/// rejection, `TryFromCharError`, `Layout::from_size_align`'s alignment
+/// rejection, `TryFromIntError`, a `Result<i32, i32>` freshly
+/// constructed as `Err`, and `HandleOrInvalid`'s sentinel-conversion
+/// rejection -- the identical claim shape regardless of which fallible
+/// operation or real rejection reason produced the `Err`. Same "trust
+/// the body, name the flag" reasoning as `EmptiedContainerReportsEmpty`
+/// (`rust_std::alloc_collections`): needs no type parameter, since
+/// every real site already computes the `bool` before asserting it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct FallibleOperationReportsFailure;
+
+impl KaniWitness for FallibleOperationReportsFailure {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_result_ok_and_err_are_disjoint".to_owned(),
+            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(FallibleOperationReportsFailure);
+
+kani_ensures!(
+    FallibleOperationReportsFailure,
+    "amenable_kani::FallibleOperationReportsFailure",
+    bool,
+    |is_err| is_err
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::FallibleOperationReportsFailure",
+        verifier: "kani",
+        describe: || <FallibleOperationReportsFailure as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<Result<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -90,7 +145,7 @@ amenable_derive::harness! {
 
             let err_value: i32 = kani::any();
             let err: Result<i32, i32> = Err(err_value);
-            assert!(err.is_err());
+            assert!(FallibleOperationReportsFailure::ensures(err.is_err()));
             assert_eq!(err.unwrap_err(), err_value, "Err round-trips its value");
         }
     }

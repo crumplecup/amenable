@@ -25,6 +25,8 @@ use amenable_core::Evidence;
 use amenable_std::{RustStdStandard, ValidUnicodeScalar};
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -73,7 +75,7 @@ amenable_derive::harness! {
                 );
             } else {
                 assert!(
-                    result.is_err(),
+                    FallibleOperationReportsFailure::ensures(result.is_err()),
                     "char::try_from fails for surrogate or out-of-range values"
                 );
             }
@@ -157,7 +159,7 @@ amenable_derive::harness! {
                 );
             } else {
                 assert!(
-                    result.is_err(),
+                    FallibleOperationReportsFailure::ensures(result.is_err()),
                     "try_from fails with TryFromCharError when the char doesn't fit u8"
                 );
             }

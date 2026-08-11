@@ -2,10 +2,14 @@
 
 use std::alloc::{Layout, LayoutError};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -76,7 +80,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_layout_from_size_align_rejects_a_non_power_of_two_alignment() {
             let result = Layout::from_size_align(4, 3);
-            assert!(result.is_err(), "a non-power-of-two alignment is rejected");
+            assert!(
+                FallibleOperationReportsFailure::ensures(result.is_err()),
+                "a non-power-of-two alignment is rejected"
+            );
         }
     }
 }

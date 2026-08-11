@@ -19,6 +19,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -895,7 +897,7 @@ amenable_derive::harness! {
                 );
             } else {
                 assert!(
-                    result.is_err(),
+                    FallibleOperationReportsFailure::ensures(result.is_err()),
                     "try_from fails with TryFromIntError when the value doesn't fit the target type"
                 );
             }

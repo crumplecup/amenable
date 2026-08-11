@@ -94,7 +94,7 @@ pub use registry::{
 pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::{
     AtomicLoadReflectsTheLastWrite, CheckedProof, DerefReflectsTheStoredValue,
-    EmptiedContainerReportsEmpty, IndexRecoversTheStoredElement,
+    EmptiedContainerReportsEmpty, FallibleOperationReportsFailure, IndexRecoversTheStoredElement,
     IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted,
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,
     VecLengthTracksPushesAndPops,

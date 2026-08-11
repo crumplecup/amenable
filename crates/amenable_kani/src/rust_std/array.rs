@@ -9,6 +9,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -54,11 +56,17 @@ amenable_derive::harness! {
 
             let mismatched: &[i32] = &[a, b, a];
             let bad: Result<[i32; 2], TryFromSliceError> = mismatched.try_into();
-            assert!(bad.is_err(), "a mismatched-length slice is rejected");
+            assert!(
+                FallibleOperationReportsFailure::ensures(bad.is_err()),
+                "a mismatched-length slice is rejected"
+            );
 
             let too_short: &[i32] = &[a];
             let short: Result<[i32; 2], TryFromSliceError> = too_short.try_into();
-            assert!(short.is_err(), "a shorter slice is rejected");
+            assert!(
+                FallibleOperationReportsFailure::ensures(short.is_err()),
+                "a shorter slice is rejected"
+            );
         }
     }
 }

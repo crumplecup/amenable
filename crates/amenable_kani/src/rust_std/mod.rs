@@ -71,6 +71,7 @@ pub use alloc_collections::EmptiedContainerReportsEmpty;
 pub use alloc_vec::VecLengthTracksPushesAndPops;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
+pub use option_result::FallibleOperationReportsFailure;
 pub use primitives::{DerefReflectsTheStoredValue, IndexRecoversTheStoredElement};
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,
