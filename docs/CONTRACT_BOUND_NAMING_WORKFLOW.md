@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, thirteen clusters named, 771 → 446 sites — see "Current state");
+fixed, fourteen clusters named, 771 → 438 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,10 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **446** sites (was 771; fifteen intervening
+  session; total is now **438** sites (was 771; sixteen intervening
   fixes landed, see below). Current top clusters, by size (re-run the
   scan before trusting these — this list will drift as work lands):
-  - `X::strong_count(&X) == X` — 8 sites
   - `X < X` — 8 sites
   - and onward down the ranked list in the checklist itself.
 
@@ -671,6 +670,15 @@ was brought back to zero in three focused follow-up commits.
       is `#![cfg(windows)]`-gated and can't run through `cargo kani` on
       a Linux host -- verified instead via `just check-windows-package`,
       the project's existing cross-compile check for that file.
+  16. **`X::strong_count(&X) == X` (8 sites)**: `strong_count()` starts
+      at 1, increments on `clone`, and decrements again once a clone
+      drops -- identical between `Rc` (`rust_std::alloc_rc`, 4 sites)
+      and `Arc` (`rust_std::alloc_sync`, 4 sites). Named as
+      `amenable_kani::StrongCountTracksLiveReferences`, another unit
+      struct needing no type parameter (`strong_count()` always returns
+      a plain `usize`) -- same shape as items 6 and 15. Lives in
+      `rust_std::alloc_rc.rs`. Every touched `assert_eq!` rewritten to
+      `assert!(Type::ensures(...), ..)`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
