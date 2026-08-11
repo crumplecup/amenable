@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twelve clusters named, 771 → 454 sites — see "Current state");
+fixed, thirteen clusters named, 771 → 446 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,10 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **454** sites (was 771; fourteen intervening
+  session; total is now **446** sites (was 771; fifteen intervening
   fixes landed, see below). Current top clusters, by size (re-run the
   scan before trusting these — this list will drift as work lands):
-  - `X.is_err()` — 8 sites
   - `X::strong_count(&X) == X` — 8 sites
   - `X < X` — 8 sites
   - and onward down the ranked list in the checklist itself.
@@ -652,6 +651,26 @@ was brought back to zero in three focused follow-up commits.
       `assert!(Type::ensures(...), ..)` per this doc's own "`assert_eq!`
       can never be recognized as compliant" rule (see "The elicit_doc
       tooling" above).
+  15. **`X.is_err()` (8 sites)**: "a fallible operation's outcome, once
+      computed, reports failure" -- spans `TryFromSliceError`,
+      `char::try_from`'s surrogate rejection, `TryFromCharError`,
+      `Layout::from_size_align`'s alignment rejection, `TryFromIntError`,
+      a `Result<i32, i32>` freshly constructed as `Err`, and
+      `HandleOrInvalid`'s sentinel-conversion rejection. Named as
+      `amenable_kani::FallibleOperationReportsFailure`, the same "trust
+      the body, name the flag" shape as `EmptiedContainerReportsEmpty`
+      (item 6) -- **not** a scanner gap, even though `result.is_err()`
+      is semantically as tautological in spirit as the `is_trivial`-
+      excluded `result.N is None` shape: `is_trivial` only recognizes a
+      bare `result`/`result.N` *identifier* (Creusot's implicit-binding
+      convention -- see that function's own doc comment), never a real
+      method *call* like `.is_err()`, so this genuinely needed a name
+      rather than a matcher fix. 7 of 8 harnesses re-verified with real
+      `cargo kani`; the 8th
+      (`rust_std::os_windows::verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel`)
+      is `#![cfg(windows)]`-gated and can't run through `cargo kani` on
+      a Linux host -- verified instead via `just check-windows-package`,
+      the project's existing cross-compile check for that file.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
