@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
-four clusters named, 771 → 587 sites — see "Current state"); `amenable_verus`
+five clusters named, 771 → 574 sites — see "Current state"); `amenable_verus`
 not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,12 +420,11 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **587** sites (was 771; five intervening fixes
+  session; total is now **574** sites (was 771; six intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
   - `X.next() == Some(X)` — 40 sites (intentionally skipped, see below)
   - `X.len() == X` — 16 sites (intentionally skipped, see below)
-  - `X.is_empty()` — 13 sites
   - `!X::<X<X>>::ensures(X)` — 12 sites
   - `X.pop_front() == Some(X)` — 11 sites
   - `X.next() == Some(X + X)` — 10 sites
@@ -454,7 +453,7 @@ was brought back to zero in three focused follow-up commits.
   than the clusters below them, so they're intentionally-skipped top
   entries right now, not forgotten ones.
 
-  Five things resolved the first 184 sites of the drop from 771:
+  Six things resolved the first 197 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -519,6 +518,16 @@ was brought back to zero in three focused follow-up commits.
      generic contract type. Both harnesses use identical
      receiver/comparand pairs throughout (only the assertion messages
      differ), confirmed before starting.
+  6. **`X.is_empty()` (13 sites)**: a container that's had every element
+     removed (via `drain`, repeated `pop`/`remove`, or iteration)
+     reports itself empty afterward, independently restated across
+     `BTreeMap`, `BTreeSet`, `LinkedList`, `VecDeque`, `BinaryHeap`, and
+     `Vec`. Named once as `amenable_kani::EmptiedContainerReportsEmpty`
+     — unlike the four generic types above, this one needs **no** type
+     parameter: every real site already computes the `bool` before
+     asserting it, so the ordinary `kani_ensures!`/`bridge_kani_witness!`
+     macros work unmodified, same shape as `NonNegativeFd`/
+     `IndexingAndLength`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
