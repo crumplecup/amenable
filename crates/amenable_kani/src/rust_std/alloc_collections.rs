@@ -330,6 +330,13 @@ bridge_kani_witness!(RustStdStandard<LinkedList<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<LinkedList<i32>>,
+    "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC, {
         /// `push_back` followed by `pop_front` behaves as a FIFO
@@ -346,9 +353,15 @@ amenable_derive::harness! {
             let mut list = LinkedList::new();
             list.push_back(a);
             list.push_back(b);
-            assert_eq!(list.pop_front(), Some(a), "the first-pushed element comes out first");
-            assert_eq!(list.pop_front(), Some(b));
-            assert_eq!(list.pop_front(), None, "popping an exhausted FIFO returns None");
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(a))),
+                "the first-pushed element comes out first"
+            );
+            assert!(RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(b))));
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), None)),
+                "popping an exhausted FIFO returns None"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(list.is_empty()),
                 "popping both queued elements empties the list"
@@ -409,6 +422,13 @@ bridge_kani_witness!(RustStdStandard<VecDeque<i32>>);
     }
 }
 
+kani_ensures!(
+    RustStdStandard<VecDeque<i32>>,
+    "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC, {
         /// Unlike `LinkedList` (back-only push), `VecDeque` is
@@ -427,10 +447,22 @@ amenable_derive::harness! {
             let mut dq = VecDeque::new();
             dq.push_back(a);
             dq.push_front(b);
-            assert_eq!(dq.pop_front(), Some(b), "pop_front returns the front-pushed element");
-            assert_eq!(dq.pop_back(), Some(a), "pop_back returns the back-pushed element");
-            assert_eq!(dq.pop_front(), None, "popping the exhausted front returns None");
-            assert_eq!(dq.pop_back(), None, "popping the exhausted back returns None");
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), Some(b))),
+                "pop_front returns the front-pushed element"
+            );
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_back(), Some(a))),
+                "pop_back returns the back-pushed element"
+            );
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), None)),
+                "popping the exhausted front returns None"
+            );
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_back(), None)),
+                "popping the exhausted back returns None"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
                 "popping both end-specific values empties the deque"
@@ -896,8 +928,14 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(&b));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
-            assert_eq!(list.pop_front(), Some(a), "iteration leaves the first value in place");
-            assert_eq!(list.pop_front(), Some(b), "iteration leaves the second value in place");
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(a))),
+                "iteration leaves the first value in place"
+            );
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(b))),
+                "iteration leaves the second value in place"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(list.is_empty()),
                 "removing values after iteration empties the list"
@@ -953,8 +991,14 @@ amenable_derive::harness! {
                     "iter_mut visits every list element exactly once"
                 );
             }
-            assert_eq!(list.pop_front(), Some(updated_first), "the first write is visible at the front");
-            assert_eq!(list.pop_front(), Some(updated_second), "the second write preserves list order");
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(updated_first))),
+                "the first write is visible at the front"
+            );
+            assert!(
+                RustStdStandard::<LinkedList<i32>>::ensures((list.pop_front(), Some(updated_second))),
+                "the second write preserves list order"
+            );
         }
     }
 }
@@ -1255,8 +1299,14 @@ amenable_derive::harness! {
             assert_eq!(it.next(), Some(&b));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
-            assert_eq!(dq.pop_front(), Some(a), "iteration leaves the first value in place");
-            assert_eq!(dq.pop_front(), Some(b), "iteration leaves the second value in place");
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), Some(a))),
+                "iteration leaves the first value in place"
+            );
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), Some(b))),
+                "iteration leaves the second value in place"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
                 "removing values after iteration empties the deque"
@@ -1312,8 +1362,14 @@ amenable_derive::harness! {
                     "iter_mut visits every deque element exactly once"
                 );
             }
-            assert_eq!(dq.pop_front(), Some(updated_first), "the first write is visible at the front");
-            assert_eq!(dq.pop_front(), Some(updated_second), "the second write preserves deque order");
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), Some(updated_first))),
+                "the first write is visible at the front"
+            );
+            assert!(
+                RustStdStandard::<VecDeque<i32>>::ensures((dq.pop_front(), Some(updated_second))),
+                "the second write preserves deque order"
+            );
         }
     }
 }
