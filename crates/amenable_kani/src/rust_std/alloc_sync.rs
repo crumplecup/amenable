@@ -13,6 +13,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::StrongCountTracksLiveReferences;
 use crate::rust_std::macros::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<Arc<i32>> {
@@ -56,14 +58,19 @@ amenable_derive::harness! {
                 DerefReflectsTheStoredValue::ensures((*arc, value)),
                 "deref exposes the wrapped value"
             );
-            assert_eq!(Arc::strong_count(&arc), 1, "a fresh Arc has strong_count 1");
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Arc::strong_count(&arc), 1)),
+                "a fresh Arc has strong_count 1"
+            );
 
             let arc2 = Arc::clone(&arc);
-            assert_eq!(Arc::strong_count(&arc), 2, "clone increments strong_count");
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Arc::strong_count(&arc), 2)),
+                "clone increments strong_count"
+            );
             drop(arc2);
-            assert_eq!(
-                Arc::strong_count(&arc),
-                1,
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Arc::strong_count(&arc), 1)),
                 "dropping the clone decrements strong_count back"
             );
 
@@ -144,9 +151,8 @@ amenable_derive::harness! {
                 "an upgraded Weak exposes the original value"
             );
             drop(upgraded);
-            assert_eq!(
-                Arc::strong_count(&arc),
-                1,
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Arc::strong_count(&arc), 1)),
                 "dropping the upgraded Arc restores the original strong count"
             );
 

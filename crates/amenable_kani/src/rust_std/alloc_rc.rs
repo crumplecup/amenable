@@ -13,7 +13,59 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// A live-strong-reference count known to match `strong_count()`'s
+/// report: `Rc`/`Arc` start at 1, increment on `clone`, and decrement
+/// again once a clone drops.
+///
+/// Independently hand-written as `assert_eq!(Rc::strong_count(&rc),
+/// N, ...)` / `assert_eq!(Arc::strong_count(&arc), N, ...)` at 8 real
+/// sites split between `rust_std::alloc_rc` and `rust_std::alloc_sync`
+/// -- the identical claim regardless of which single-/multi-threaded
+/// reference-counted pointer. Needs no type parameter, same "trust the
+/// body, name the flag" shape as `EmptiedContainerReportsEmpty`
+/// (`rust_std::alloc_collections`): `strong_count()` always returns a
+/// plain `usize`, so there's nothing container-type-specific left to
+/// be generic over.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<usize>",
+    basis_ctor = "RustStdStandard::<usize>::new()",
+    provenance = "<usize as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct StrongCountTracksLiveReferences;
+
+impl KaniWitness for StrongCountTracksLiveReferences {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rc_strong_count_tracks_clones".to_owned(),
+            claim: VERIFY_RC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(StrongCountTracksLiveReferences);
+
+kani_ensures!(
+    StrongCountTracksLiveReferences,
+    "amenable_kani::StrongCountTracksLiveReferences",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::StrongCountTracksLiveReferences",
+        verifier: "kani",
+        describe: || <StrongCountTracksLiveReferences as KaniWitness>::proof().to_string(),
+    }
+}
 
 impl KaniWitness for RustStdStandard<Rc<i32>> {
     type SupportingEvidence = Self;
@@ -56,14 +108,19 @@ amenable_derive::harness! {
                 DerefReflectsTheStoredValue::ensures((*rc, value)),
                 "deref exposes the wrapped value"
             );
-            assert_eq!(Rc::strong_count(&rc), 1, "a fresh Rc has strong_count 1");
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Rc::strong_count(&rc), 1)),
+                "a fresh Rc has strong_count 1"
+            );
 
             let rc2 = Rc::clone(&rc);
-            assert_eq!(Rc::strong_count(&rc), 2, "clone increments strong_count");
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Rc::strong_count(&rc), 2)),
+                "clone increments strong_count"
+            );
             drop(rc2);
-            assert_eq!(
-                Rc::strong_count(&rc),
-                1,
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Rc::strong_count(&rc), 1)),
                 "dropping the clone decrements strong_count back"
             );
 
@@ -145,9 +202,8 @@ amenable_derive::harness! {
                 "an upgraded Weak exposes the original value"
             );
             drop(upgraded);
-            assert_eq!(
-                Rc::strong_count(&rc),
-                1,
+            assert!(
+                StrongCountTracksLiveReferences::ensures((Rc::strong_count(&rc), 1)),
                 "dropping the upgraded Rc restores the original strong count"
             );
 
