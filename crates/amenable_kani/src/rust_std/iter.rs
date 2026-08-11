@@ -245,37 +245,124 @@ amenable_derive::harness! {
             kani::assume((0..=4).contains(&x));
             let mut flattened = [x].into_iter().flat_map(flat_map_fn);
             let mut direct = flat_map_fn(x);
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map's first item matches the direct inner iterator"
             );
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map's second item matches the direct inner iterator"
             );
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map's third item matches the direct inner iterator"
             );
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map's fourth item matches the direct inner iterator"
             );
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map and the direct inner iterator exhaust together"
             );
-            assert_eq!(
-                flattened.next(),
-                direct.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), direct.next())),
                 "flat_map over one item matches calling its closure directly"
             );
         }
+    }
+}
+
+/// An `(actual, expected)` pair of `.next()` results known to agree: an
+/// iterator adapter's sequence matches a directly-constructed reference
+/// iterator's sequence, step by step.
+///
+/// Independently hand-written as `assert_eq!(adapter.next(),
+/// reference.next(), ...)` at 16 real sites split between
+/// `verify_flat_map_flattens_each_generated_iterator` (comparing
+/// `FlatMap` against calling its closure directly) and
+/// `verify_flatten_concatenates_the_inner_iterators` (comparing
+/// `Flatten` against a direct `.chain()` concatenation) -- the identical
+/// claim regardless of which adapter or reference construction is being
+/// checked. Generic over the item type rather than one registration per
+/// adapter, the same reasoning (and the same reason it needs a hand-
+/// written `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros) as
+/// `IteratorYieldsNoneWhenExhausted` just above.
+pub struct IteratorMatchesReferenceStepByStep<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for IteratorMatchesReferenceStepByStep<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for IteratorMatchesReferenceStepByStep<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for IteratorMatchesReferenceStepByStep<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_flat_map_flattens_each_generated_iterator".to_owned(),
+            claim: VERIFY_FLAT_MAP_FLATTENS_EACH_GENERATED_ITERATOR_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for IteratorMatchesReferenceStepByStep<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for IteratorMatchesReferenceStepByStep<T>
+{
+    type Input = (Option<T>, Option<T>);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (Option<T>, Option<T>)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::IteratorMatchesReferenceStepByStep",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::IteratorMatchesReferenceStepByStep",
+        verifier: "kani",
+        describe: || <IteratorMatchesReferenceStepByStep<i32> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -326,54 +413,44 @@ amenable_derive::harness! {
             let nested: Vec<Range<i32>> = vec![0..a, 0..b];
             let mut flattened = nested.into_iter().flatten();
             let mut expected = (0..a).chain(0..b);
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's first item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's second item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's third item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's fourth item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's fifth item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's sixth item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's seventh item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten's eighth item matches the direct concatenation"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten concatenates its inner iterators in order"
             );
-            assert_eq!(
-                flattened.next(),
-                expected.next(),
+            assert!(
+                IteratorMatchesReferenceStepByStep::ensures((flattened.next(), expected.next())),
                 "flatten and the direct concatenation exhaust together"
             );
         }
