@@ -7,11 +7,15 @@
 
 use std::panic::AssertUnwindSafe;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 use core::panic::{Location, PanicInfo, PanicMessage};
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 use crate::{KaniCallerLocationObservation, KaniVerifier, KaniWitness};
 
@@ -46,7 +50,10 @@ amenable_derive::harness! {
         fn verify_assert_unwind_safe_derefs_transparently() {
             let value: i32 = kani::any();
             let mut wrapped = AssertUnwindSafe(value);
-            assert_eq!(*wrapped, value, "deref exposes the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*wrapped, value)),
+                "deref exposes the wrapped value"
+            );
 
             let updated: i32 = kani::any();
             *wrapped = updated;

@@ -10,6 +10,8 @@ use amenable_std::RustStdStandard;
 use std::cell::Cell;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -50,7 +52,10 @@ amenable_derive::harness! {
         fn verify_arc_strong_count_tracks_clones() {
             let value: i32 = kani::any();
             let arc = Arc::new(value);
-            assert_eq!(*arc, value, "deref exposes the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*arc, value)),
+                "deref exposes the wrapped value"
+            );
             assert_eq!(Arc::strong_count(&arc), 1, "a fresh Arc has strong_count 1");
 
             let arc2 = Arc::clone(&arc);
@@ -134,7 +139,10 @@ amenable_derive::harness! {
             let upgraded = weak
                 .upgrade()
                 .expect("upgrade succeeds while a strong reference is alive");
-            assert_eq!(*upgraded, value, "an upgraded Weak exposes the original value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*upgraded, value)),
+                "an upgraded Weak exposes the original value"
+            );
             drop(upgraded);
             assert_eq!(
                 Arc::strong_count(&arc),

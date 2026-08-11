@@ -10,6 +10,8 @@ use amenable_std::RustStdStandard;
 use std::cell::Cell;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -50,11 +52,17 @@ amenable_derive::harness! {
         fn verify_box_derefs_and_writes_through() {
             let mut boxed = <Box<i32> as crate::KaniCompose>::kani_any();
             let value = *boxed;
-            assert_eq!(*boxed, value, "deref exposes the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*boxed, value)),
+                "deref exposes the wrapped value"
+            );
 
             let updated = <i32 as crate::KaniCompose>::kani_any();
             *boxed = updated;
-            assert_eq!(*boxed, updated, "a write through deref_mut is visible");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*boxed, updated)),
+                "a write through deref_mut is visible"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,

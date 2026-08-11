@@ -13,6 +13,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -185,7 +187,10 @@ amenable_derive::harness! {
 
             {
                 let borrow = cell.borrow();
-                assert_eq!(*borrow, initial, "borrow reads the stored value");
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*borrow, initial)),
+                    "borrow reads the stored value"
+                );
                 assert!(
                     cell.try_borrow_mut().is_err(),
                     "mutable borrow rejected while a shared borrow is live"
@@ -252,7 +257,10 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let cell = RefCell::new(value);
             let borrow = cell.borrow();
-            assert_eq!(*borrow, value, "Ref derefs to the RefCell's stored value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*borrow, value)),
+                "Ref derefs to the RefCell's stored value"
+            );
         }
     }
 }
@@ -293,7 +301,10 @@ amenable_derive::harness! {
             let updated: i32 = kani::any();
             {
                 let mut borrow = cell.borrow_mut();
-                assert_eq!(*borrow, initial, "RefMut derefs to the RefCell's stored value");
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*borrow, initial)),
+                    "RefMut derefs to the RefCell's stored value"
+                );
                 *borrow = updated;
             }
             assert_eq!(

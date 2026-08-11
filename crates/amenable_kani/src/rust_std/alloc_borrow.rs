@@ -2,10 +2,14 @@
 
 use std::borrow::Cow;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -41,14 +45,20 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
 
             let borrowed: Cow<'_, i32> = Cow::Borrowed(&value);
-            assert_eq!(*borrowed, value, "Cow::Borrowed derefs to the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*borrowed, value)),
+                "Cow::Borrowed derefs to the wrapped value"
+            );
             assert!(
                 matches!(borrowed, Cow::Borrowed(_)),
                 "Cow::Borrowed constructs the Borrowed variant"
             );
 
             let owned: Cow<'_, i32> = Cow::Owned(value);
-            assert_eq!(*owned, value, "Cow::Owned derefs to the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*owned, value)),
+                "Cow::Owned derefs to the wrapped value"
+            );
             assert!(
                 matches!(owned, Cow::Owned(_)),
                 "Cow::Owned constructs the Owned variant"

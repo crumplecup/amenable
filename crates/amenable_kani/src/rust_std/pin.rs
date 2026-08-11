@@ -2,10 +2,14 @@
 
 use std::pin::Pin;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -42,12 +46,15 @@ amenable_derive::harness! {
         fn verify_pin_derefs_and_get_mut_round_trip() {
             let value: i32 = kani::any();
             let mut pinned: Pin<Box<i32>> = Box::pin(value);
-            assert_eq!(*pinned, value, "deref exposes the pointee");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*pinned, value)),
+                "deref exposes the pointee"
+            );
 
             let updated: i32 = kani::any();
             *pinned.as_mut().get_mut() = updated;
-            assert_eq!(
-                *pinned, updated,
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*pinned, updated)),
                 "a write through get_mut is visible through deref"
             );
         }

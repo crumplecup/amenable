@@ -22,6 +22,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -101,7 +103,10 @@ amenable_derive::harness! {
             let mut data = [value];
             {
                 let first = data.iter_mut().next().unwrap();
-                assert_eq!(*first, value, "iter_mut yields a reference to the element");
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*first, value)),
+                    "iter_mut yields a reference to the element"
+                );
                 *first = updated;
             }
             assert_eq!(data[0], updated, "a write through iter_mut's reference is visible");

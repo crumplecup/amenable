@@ -2,10 +2,14 @@
 
 use std::mem::{Discriminant, ManuallyDrop};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -43,7 +47,10 @@ amenable_derive::harness! {
         fn verify_manually_drop_derefs_and_into_inner_round_trip() {
             let value: i32 = kani::any();
             let wrapped = ManuallyDrop::new(value);
-            assert_eq!(*wrapped, value, "deref exposes the wrapped value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*wrapped, value)),
+                "deref exposes the wrapped value"
+            );
             assert_eq!(
                 ManuallyDrop::into_inner(wrapped),
                 value,

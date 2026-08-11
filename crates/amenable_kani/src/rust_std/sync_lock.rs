@@ -21,6 +21,8 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AtomicLoadReflectsTheLastWrite;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
@@ -154,7 +156,7 @@ amenable_derive::harness! {
             let mutex = std::sync::Mutex::new(value);
             {
                 let mut guard = mutex.lock().unwrap();
-                assert_eq!(*guard, value);
+                assert!(DerefReflectsTheStoredValue::ensures((*guard, value)));
                 *guard = updated;
             }
             assert_eq!(
@@ -201,8 +203,11 @@ amenable_derive::harness! {
             {
                 let r1 = lock.read().unwrap();
                 let r2 = lock.read().unwrap();
-                assert_eq!(*r1, value);
-                assert_eq!(*r2, value, "two read guards can be held concurrently");
+                assert!(DerefReflectsTheStoredValue::ensures((*r1, value)));
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*r2, value)),
+                    "two read guards can be held concurrently"
+                );
                 assert!(
                     lock.try_write().is_err(),
                     "a write is rejected while readers are held"
@@ -248,7 +253,7 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let lock = std::sync::RwLock::new(value);
             let guard = lock.read().unwrap();
-            assert_eq!(*guard, value);
+            assert!(DerefReflectsTheStoredValue::ensures((*guard, value)));
         }
     }
 }
@@ -288,7 +293,7 @@ amenable_derive::harness! {
             let lock = std::sync::RwLock::new(value);
             {
                 let mut guard = lock.write().unwrap();
-                assert_eq!(*guard, value);
+                assert!(DerefReflectsTheStoredValue::ensures((*guard, value)));
                 *guard = updated;
             }
             assert_eq!(*lock.read().unwrap(), updated);

@@ -557,13 +557,110 @@ amenable_derive::harness! {
         /// it borrows. `Box::leak` gives a genuinely `'static` reference
         /// to symbolic heap data without needing a `const`/`static` item
         /// (which can't hold a `kani::any()` value) -- ordinary safe
-        /// Rust, not a workaround for anything unsafe.
+        /// Rust, not a workaround for anything unsafe. Calls
+        /// `DerefReflectsTheStoredValue::ensures` directly rather than
+        /// restating the comparison -- see that type for why this is the
+        /// one harness its registration reuses as a witness.
         #[kani::proof]
         fn verify_shared_reference_dereferences_to_the_referent() {
             let value: i32 = kani::any();
             let leaked: &'static i32 = Box::leak(Box::new(value));
-            assert_eq!(*leaked, value, "dereferencing recovers the referent");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*leaked, value)),
+                "dereferencing recovers the referent"
+            );
         }
+    }
+}
+
+/// A `(dereferenced, expected)` pair known to agree: dereferencing a
+/// smart pointer, guard, or reference recovers exactly the value stored
+/// in (or borrowed by) it.
+///
+/// Independently hand-written as `assert_eq!(*wrapper, expected, ...)` at
+/// 28 real sites spanning `Cow`, `Box`, `BinaryHeap::PeekMut`, `Rc`,
+/// `Arc`, `RefCell`'s `Ref`/`RefMut`, `ManuallyDrop`, `Option`/`Result`'s
+/// `IterMut`, `AssertUnwindSafe`, `Pin<Box<_>>`, shared/mutable
+/// references, `slice::IterMut`, and `Mutex`/`RwLock`'s guards -- the
+/// identical claim regardless of which wrapper type derefs. Generic over
+/// the pointee type rather than one registration per wrapper type, the
+/// same reasoning (and the same reason it needs a hand-written
+/// `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros) as
+/// `IteratorYieldsNoneWhenExhausted` in `rust_std::iter` and
+/// `AtomicLoadReflectsTheLastWrite` in `rust_std::sync_atomic`.
+pub struct DerefReflectsTheStoredValue<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for DerefReflectsTheStoredValue<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for DerefReflectsTheStoredValue<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for DerefReflectsTheStoredValue<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_shared_reference_dereferences_to_the_referent".to_owned(),
+            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for DerefReflectsTheStoredValue<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for DerefReflectsTheStoredValue<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((dereferenced, expected): (T, T)) -> bool {
+        dereferenced == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::DerefReflectsTheStoredValue",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(dereferenced == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::DerefReflectsTheStoredValue",
+        verifier: "kani",
+        describe: || <DerefReflectsTheStoredValue<i32> as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -600,9 +697,15 @@ amenable_derive::harness! {
             let initial: i32 = kani::any();
             let next: i32 = kani::any();
             let leaked: &'static mut i32 = Box::leak(Box::new(initial));
-            assert_eq!(*leaked, initial, "dereferencing recovers the referent");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*leaked, initial)),
+                "dereferencing recovers the referent"
+            );
             *leaked = next;
-            assert_eq!(*leaked, next, "writing through the reference updates the referent");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*leaked, next)),
+                "writing through the reference updates the referent"
+            );
         }
     }
 }

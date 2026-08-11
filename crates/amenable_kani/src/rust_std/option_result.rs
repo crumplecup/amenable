@@ -7,6 +7,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -213,7 +215,7 @@ amenable_derive::harness! {
             {
                 let mut it = opt.iter_mut();
                 let first = it.next().unwrap();
-                assert_eq!(*first, value);
+                assert!(DerefReflectsTheStoredValue::ensures((*first, value)));
                 *first = updated;
                 assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }
@@ -342,7 +344,7 @@ amenable_derive::harness! {
             {
                 let mut it = res.iter_mut();
                 let first = it.next().unwrap();
-                assert_eq!(*first, value);
+                assert!(DerefReflectsTheStoredValue::ensures((*first, value)));
                 *first = updated;
                 assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }

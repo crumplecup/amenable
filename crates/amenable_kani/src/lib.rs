@@ -92,7 +92,10 @@ pub use registry::{
     KaniProof, KaniProofRegistration,
 };
 pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
-pub use rust_std::{AtomicLoadReflectsTheLastWrite, CheckedProof, IteratorYieldsNoneWhenExhausted};
+pub use rust_std::{
+    AtomicLoadReflectsTheLastWrite, CheckedProof, DerefReflectsTheStoredValue,
+    IteratorYieldsNoneWhenExhausted,
+};
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{

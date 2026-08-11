@@ -20,6 +20,8 @@ use std::cell::Cell;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -754,13 +756,19 @@ amenable_derive::harness! {
             heap.push(b);
             {
                 let peek = heap.peek_mut().unwrap();
-                assert_eq!(*peek, b, "peek_mut derefs to the greatest element");
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*peek, b)),
+                    "peek_mut derefs to the greatest element"
+                );
             }
             assert_eq!(heap.peek(), Some(&b), "the maximum is still on top afterward");
             {
                 let mut peek = heap.peek_mut().unwrap();
                 *peek = a;
-                assert_eq!(*peek, a, "peek_mut writes through to the guarded maximum");
+                assert!(
+                    DerefReflectsTheStoredValue::ensures((*peek, a)),
+                    "peek_mut writes through to the guarded maximum"
+                );
             }
             assert_eq!(heap.peek(), Some(&a), "releasing a modified guard re-establishes the heap maximum");
             assert_eq!(heap.pop(), Some(a), "the re-heapified first value is available");
