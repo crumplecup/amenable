@@ -4,8 +4,8 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
-one cluster named — see "Current state"); `amenable_verus` not yet
-started under the new mechanism.
+two clusters named, 771 → 631 sites — see "Current state"); `amenable_verus`
+not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
 person) can pick this work back up without re-deriving the mechanism,
@@ -420,11 +420,10 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **660** sites (was 771; two intervening fixes
+  session; total is now **631** sites (was 771; three intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
   - `X.next() == Some(X)` — 40 sites
-  - `X.load(X::X::X::X::X) == X` — 29 sites
   - `*X == X` — 28 sites
   - `X.len() == X` — 16 sites
   - `X.next() == X.next()` — 16 sites
@@ -434,7 +433,20 @@ was brought back to zero in three focused follow-up commits.
   - `X.next() == Some(X + X)` — 10 sites
   - and onward down the ranked list in the checklist itself.
 
-  Two things resolved the first 111 sites of the drop from 771:
+  **`X.next() == Some(X)` (40 sites) is not a shared-claim candidate**,
+  confirmed by reading a sample before starting on it (`str.rs`'s
+  `Some(byte)`, `alloc_vec.rs`'s `Some(2)`, `iter.rs`'s cycle-restart
+  `Some(a)`/`Some(a + 1)`, ...): every site asserts a different real value
+  computed by that adapter's own logic, only coincidentally sharing the
+  clause shape — exactly the "shape-clustering is a hint to investigate,
+  not an automatic merge" caveat this doc already warns about. Each site
+  still needs naming eventually (every `requires`/`ensures` should be
+  named, not just duplicated ones), but as ~35 individual per-carrier
+  `kani_ensures!` registrations, not one shared type — lower leverage
+  than the clusters below it, so it's an intentionally-skipped top entry
+  right now, not a forgotten one.
+
+  Three things resolved the first 140 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -462,6 +474,20 @@ was brought back to zero in three focused follow-up commits.
      real sites happen to already share one type. See that type's own
      doc comment in `rust_std/iter.rs` for the full mechanism (why the
      macros couldn't be reused, why call sites write no turbofish).
+  3. **`X.load(X::X::X::X::X) == X` (29 sites)**: an atomic's `.load()`
+     reflects the value most recently established by
+     `new`/`store`/`swap`/`compare_exchange`/`fetch_add`, independently
+     restated across all 11 `Atomic*` integer/bool types in
+     `sync_atomic.rs` plus two unrelated-file call-counter sites. Named
+     once as `amenable_kani::AtomicLoadReflectsTheLastWrite<T>`, the
+     second genuinely generic contract type, same design as
+     `IteratorYieldsNoneWhenExhausted`. Notably, `AtomicPtr<i32>`'s own
+     `RustStdStandard<AtomicPtr<i32>>` carrier already had a *different*
+     `Ensures<KaniVerifier>` bound occupying its slot (`.swap()`
+     returning the previous value) — its four `.load()` sites could never
+     have used a per-carrier registration even if every other `Atomic*`
+     type had, confirming the generic-type approach isn't just
+     convenient here, it's necessary.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
