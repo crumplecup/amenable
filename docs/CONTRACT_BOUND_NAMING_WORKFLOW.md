@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, six clusters named, 771 → 520 sites — see "Current state");
+fixed, seven clusters named, 771 → 505 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **520** sites (was 771; eight intervening fixes
+  session; total is now **505** sites (was 771; nine intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
   - `X.pop_front() == Some(X)` — 11 sites
@@ -428,7 +428,14 @@ was brought back to zero in three focused follow-up commits.
   - `X != X && X != X && X != X` — 9 sites
   - `X.checked_add(X).is_some()` — 9 sites
   - `X[X] == X` — 9 sites
+  - `X.is_err()` — 8 sites
   - and onward down the ranked list in the checklist itself.
+
+  **Both clusters caught by the mid-session correction (above) are now
+  resolved.** `X.next() == Some(X)` (item 8 below) and `X.len() == X`
+  (item 9 below) — no cluster on this list should be treated as a skip
+  candidate going forward; heterogeneity only changes the naming
+  mechanism (shared type vs. per-carrier), never whether to name it.
 
   **A correction mid-session, worth recording so it isn't repeated:**
   the first pass through this list checked each top cluster for a real
@@ -557,6 +564,30 @@ was brought back to zero in three focused follow-up commits.
      `Cycle`, `Peekable`, `Scan`) — matching this doc's own
      top-to-bottom-order exception for later items that are mechanically
      identical to the one just finished.
+  9. **`X.len() == X` (16 sites)**: also heterogeneous (`compose.rs`'s
+     fixed array depth, `alloc_vec.rs`'s post-push length,
+     `primitives.rs`'s array/slice/str length claims, `path.rs`'s
+     segment count, `env.rs`'s split-paths count, `slice.rs`'s
+     chunk-by-mut group size, `std_ffi.rs`'s `OsStr` byte length,
+     `utf8_model.rs`'s buffer bookkeeping) — named per real carrier.
+     Where the natural carrier's `Ensures<KaniVerifier>` slot was free,
+     registered directly on it; where occupied (`Vec<i32>`'s slot holds
+     content equality), added a small new local wrapper type
+     (`VecLengthTracksPushesAndPops`) per the associated-type-uniqueness
+     rule. Two sites turned out to already be reusing
+     `utf8_model.rs`'s own `KaniUtf8Buffer<2>` bookkeeping claim (its own
+     doc comment says so) — registered once there and reused rather than
+     duplicated. `compose.rs`'s array-depth check needed a genuinely new
+     `amenable_std` type, `ComposeArrayLengthIsFixed`: the existing
+     `ComposeAnyLengthIsBounded` checks `actual <= bound`, not exact
+     equality, and reusing it would have weakened the real claim (arrays
+     always report their fixed compile-time length, not just "no more
+     than"). This sweep also exposed a real `#[cfg(kani)]` import-gating
+     gap (`env.rs`/`utf8_model.rs` called the newly-registered
+     `.ensures()` without importing `amenable_core::Ensures` in that
+     file) — invisible to plain `cargo check`/clippy, caught only by
+     running `cargo kani` itself, confirming why this project's workflow
+     requires real verification, not just compile checks.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
