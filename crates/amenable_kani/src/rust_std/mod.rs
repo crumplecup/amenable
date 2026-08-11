@@ -67,6 +67,7 @@ mod task;
 mod thread;
 mod time;
 
+pub use alloc_collections::EmptiedContainerReportsEmpty;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use primitives::DerefReflectsTheStoredValue;

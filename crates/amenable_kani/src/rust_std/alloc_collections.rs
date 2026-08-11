@@ -14,6 +14,7 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveErr
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
+use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use std::cell::Cell;
@@ -24,7 +25,7 @@ use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
@@ -86,8 +87,63 @@ amenable_derive::harness! {
                 Some(v2),
                 "iteration leaves the higher key and its value in the map"
             );
-            assert!(map.is_empty(), "removing both entries after iteration empties the map");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(map.is_empty()),
+                "removing both entries after iteration empties the map"
+            );
         }
+    }
+}
+
+/// An emptied container's `.is_empty()` known to report `true`: whatever
+/// sequence of removals (`drain`, repeated `pop`/`remove`, iteration)
+/// took every element out, `.is_empty()` reflects it afterward.
+///
+/// Independently hand-written as `assert!(container.is_empty(), ...)` at
+/// 13 real sites across `BTreeMap`, `BTreeSet`, `LinkedList`,
+/// `VecDeque`, `BinaryHeap`, and `Vec` -- the identical claim regardless
+/// of container type. Unlike `IteratorYieldsNoneWhenExhausted`,
+/// `AtomicLoadReflectsTheLastWrite`, and `DerefReflectsTheStoredValue`,
+/// this bound needs no type parameter at all: every real site already
+/// computes the `bool` before asserting it, so the predicate has nothing
+/// container-type-specific left to be generic over, and the ordinary
+/// `kani_ensures!`/`bridge_kani_witness!` macros work unmodified.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct EmptiedContainerReportsEmpty;
+
+impl KaniWitness for EmptiedContainerReportsEmpty {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
+            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(EmptiedContainerReportsEmpty);
+
+kani_ensures!(
+    EmptiedContainerReportsEmpty,
+    "amenable_kani::EmptiedContainerReportsEmpty",
+    bool,
+    |is_empty| is_empty
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::EmptiedContainerReportsEmpty",
+        verifier: "kani",
+        describe: || <EmptiedContainerReportsEmpty as KaniWitness>::proof().to_string(),
     }
 }
 
@@ -141,7 +197,10 @@ amenable_derive::harness! {
             );
             assert!(set.remove(&a), "iteration leaves the lower element in the set");
             assert!(set.remove(&b), "iteration leaves the higher element in the set");
-            assert!(set.is_empty(), "removing both elements after iteration empties the set");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(set.is_empty()),
+                "removing both elements after iteration empties the set"
+            );
         }
     }
 }
@@ -283,7 +342,10 @@ amenable_derive::harness! {
             assert_eq!(list.pop_front(), Some(a), "the first-pushed element comes out first");
             assert_eq!(list.pop_front(), Some(b));
             assert_eq!(list.pop_front(), None, "popping an exhausted FIFO returns None");
-            assert!(list.is_empty(), "popping both queued elements empties the list");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(list.is_empty()),
+                "popping both queued elements empties the list"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,
@@ -362,7 +424,10 @@ amenable_derive::harness! {
             assert_eq!(dq.pop_back(), Some(a), "pop_back returns the back-pushed element");
             assert_eq!(dq.pop_front(), None, "popping the exhausted front returns None");
             assert_eq!(dq.pop_back(), None, "popping the exhausted back returns None");
-            assert!(dq.is_empty(), "popping both end-specific values empties the deque");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
+                "popping both end-specific values empties the deque"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,
@@ -486,7 +551,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Vec<i32>>::ensures((drained, expected)),
                 "drain yields every pushed element exactly once"
             );
-            assert!(heap.is_empty(), "drain leaves the heap empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(heap.is_empty()),
+                "drain leaves the heap empty"
+            );
 
             struct OrderedDropWitness {
                 id: i32,
@@ -545,7 +613,7 @@ amenable_derive::harness! {
                 "dropping an unfinished drain drops every remaining element"
             );
             assert!(
-                witness_heap.is_empty(),
+                EmptiedContainerReportsEmpty::ensures(witness_heap.is_empty()),
                 "dropping an unfinished drain leaves the heap empty"
             );
         }
@@ -820,7 +888,10 @@ amenable_derive::harness! {
             drop(it);
             assert_eq!(list.pop_front(), Some(a), "iteration leaves the first value in place");
             assert_eq!(list.pop_front(), Some(b), "iteration leaves the second value in place");
-            assert!(list.is_empty(), "removing values after iteration empties the list");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(list.is_empty()),
+                "removing values after iteration empties the list"
+            );
         }
     }
 }
@@ -1077,7 +1148,10 @@ amenable_derive::harness! {
             dq.push_back(b);
             let drained: Vec<i32> = dq.drain(..).collect();
             assert_eq!(drained, vec![a, b], "drain yields every element in order");
-            assert!(dq.is_empty(), "drain leaves the deque empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
+                "drain leaves the deque empty"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,
@@ -1109,7 +1183,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping an unfinished drain drops every remaining value"
             );
-            assert!(witness_deque.is_empty(), "dropping an unfinished drain leaves the deque empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(witness_deque.is_empty()),
+                "dropping an unfinished drain leaves the deque empty"
+            );
         }
     }
 }
@@ -1157,7 +1234,10 @@ amenable_derive::harness! {
             drop(it);
             assert_eq!(dq.pop_front(), Some(a), "iteration leaves the first value in place");
             assert_eq!(dq.pop_front(), Some(b), "iteration leaves the second value in place");
-            assert!(dq.is_empty(), "removing values after iteration empties the deque");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
+                "removing values after iteration empties the deque"
+            );
         }
     }
 }

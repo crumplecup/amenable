@@ -11,6 +11,8 @@ use std::cell::Cell;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::EmptiedContainerReportsEmpty;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -62,7 +64,10 @@ amenable_derive::harness! {
             assert_eq!(v.len(), 1);
             assert_eq!(v[0], value, "the pushed value is indexable");
             assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
-            assert!(v.is_empty(), "pop leaves the Vec empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(v.is_empty()),
+                "pop leaves the Vec empty"
+            );
             assert_eq!(v.pop(), None, "popping an exhausted Vec returns None");
 
             struct DropWitness {
@@ -133,7 +138,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Vec<i32>>::ensures((drained, expected)),
                 "drain yields every element in order"
             );
-            assert!(v.is_empty(), "drain leaves the Vec empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(v.is_empty()),
+                "drain leaves the Vec empty"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,
@@ -166,7 +174,10 @@ amenable_derive::harness! {
                 RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping an unfinished drain drops every remaining value"
             );
-            assert!(witnesses.is_empty(), "dropping an unfinished drain leaves the Vec empty");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(witnesses.is_empty()),
+                "dropping an unfinished drain leaves the Vec empty"
+            );
         }
     }
 }
