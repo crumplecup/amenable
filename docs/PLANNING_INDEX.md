@@ -11,23 +11,23 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 463 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 454 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus eleven clusters named -- six generic
+missing negated-call shape) plus twelve clusters named -- seven generic
 contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`,
 `SplitOperandsAreDistinctFromThePattern<T>`,
-`ThreeSplitOperandsAreDistinctFromThePattern<T>` -- the last two
-`Requires`-shaped, not `Ensures`), one non-generic
-(`EmptiedContainerReportsEmpty`), a per-width pair
-(`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own `Requires` slots,
-for `checked_add` not overflowing), and three heterogeneous clusters
-(`X.next() == Some(X)` 42 sites, `X.len() == X` 16 sites,
-`X.pop_front() == Some(X)` 15 sites) named per-carrier since none is a
-shared claim -- see the naming-workflow doc's mid-session correction
-note before skipping any future heterogeneous cluster); `amenable_verus`
-not yet started under it.
+`ThreeSplitOperandsAreDistinctFromThePattern<T>`,
+`IndexRecoversTheStoredElement<T>` -- two of these `Requires`-shaped,
+not `Ensures`), one non-generic (`EmptiedContainerReportsEmpty`), a
+per-width pair (`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own
+`Requires` slots, for `checked_add` not overflowing), and three
+heterogeneous clusters (`X.next() == Some(X)` 42 sites, `X.len() == X`
+16 sites, `X.pop_front() == Some(X)` 15 sites) named per-carrier since
+none is a shared claim -- see the naming-workflow doc's mid-session
+correction note before skipping any future heterogeneous cluster);
+`amenable_verus` not yet started under it.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,

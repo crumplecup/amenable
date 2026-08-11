@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, eleven clusters named, 771 → 463 sites — see "Current state");
+fixed, twelve clusters named, 771 → 454 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,10 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **463** sites (was 771; thirteen intervening
+  session; total is now **454** sites (was 771; fourteen intervening
   fixes landed, see below). Current top clusters, by size (re-run the
   scan before trusting these — this list will drift as work lands):
-  - `X[X] == X` — 9 sites
   - `X.is_err()` — 8 sites
   - `X::strong_count(&X) == X` — 8 sites
   - `X < X` — 8 sites
@@ -637,6 +636,22 @@ was brought back to zero in three focused follow-up commits.
       slots were free -- lives in `rust_std::primitives.rs`, the
       existing home for other cross-cutting primitive-type
       `Requires`/`Ensures` registrations (`AsciiByte`).
+  14. **`X[X] == X` (9 sites)**: "indexing a fixed-length container at a
+      position recovers exactly the element known to be stored there" --
+      spans `Vec<i32>`, a `[u8; 4]` array indexed through `IoSliceMut`,
+      `[i32; 3]`/`[i32; 1]` arrays, and a `&[i32]` slice. Named as
+      `amenable_kani::IndexRecoversTheStoredElement<T>`, the seventh
+      generic contract type this session -- deliberately **not** a reuse
+      of the already-existing `amenable_std::IndexingAndLength`
+      (Creusot-side only, see that type's own doc comment): it's a
+      fixed, non-generic wrapper bundling a length check together with
+      three specific indices into one Pearlite predicate, and can't vary
+      its `Input` type per real site's element type (`i32` here, `u8`
+      for the `IoSliceMut` site) the way a Kani `Ensures` impl needs to.
+      Every touched `assert_eq!` was rewritten to
+      `assert!(Type::ensures(...), ..)` per this doc's own "`assert_eq!`
+      can never be recognized as compliant" rule (see "The elicit_doc
+      tooling" above).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
