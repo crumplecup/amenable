@@ -6,6 +6,8 @@ use std::vec::Vec;
 use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
+#[cfg(kani)]
+use std::cell::Cell;
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -62,7 +64,7 @@ amenable_derive::harness! {
             assert_eq!(v.pop(), None, "popping an exhausted Vec returns None");
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -70,23 +72,23 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let mut witnesses = Vec::new();
             witnesses.push(DropWitness { drop_count: drop_count.clone() });
             witnesses.push(DropWitness { drop_count: drop_count.clone() });
             let popped = witnesses.pop().unwrap();
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0)),
                 "pop does not drop the returned value"
             );
             drop(popped);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the popped value drops once its owner drops it"
             );
             drop(witnesses);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 2)),
                 "dropping the Vec drops the remaining element"
             );
         }
@@ -132,7 +134,7 @@ amenable_derive::harness! {
             assert!(v.is_empty(), "drain leaves the Vec empty");
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -140,7 +142,7 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let mut witnesses = vec![
                 DropWitness { drop_count: drop_count.clone() },
                 DropWitness { drop_count: drop_count.clone() },
@@ -149,17 +151,17 @@ amenable_derive::harness! {
             let mut drain = witnesses.drain(..);
             let first = drain.next().unwrap();
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0)),
                 "drain transfers a yielded value without dropping it"
             );
             drop(first);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the caller drops the yielded value exactly once"
             );
             drop(drain);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping an unfinished drain drops every remaining value"
             );
             assert!(witnesses.is_empty(), "dropping an unfinished drain leaves the Vec empty");
@@ -203,7 +205,7 @@ amenable_derive::harness! {
             assert_eq!(it.next(), None);
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -211,7 +213,7 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let mut witness_iter = vec![
                 DropWitness { drop_count: drop_count.clone() },
                 DropWitness { drop_count: drop_count.clone() },
@@ -220,17 +222,17 @@ amenable_derive::harness! {
             .into_iter();
             let first = witness_iter.next().unwrap();
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0)),
                 "IntoIter transfers a yielded value without dropping it"
             );
             drop(first);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the caller drops the yielded value exactly once"
             );
             drop(witness_iter);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 3)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 3)),
                 "dropping IntoIter drops every remaining value"
             );
         }

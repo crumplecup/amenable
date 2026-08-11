@@ -36,6 +36,8 @@ use std::vec::IntoIter;
 use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
+#[cfg(kani)]
+use std::cell::Cell;
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -756,17 +758,17 @@ amenable_derive::harness! {
         fn verify_inspect_calls_once_per_item_without_changing_values() {
             let value: i32 = kani::any();
             kani::assume(value < i32::MAX);
-            let calls = std::cell::Cell::new(0usize);
+            let calls = Cell::new(0usize);
             let mut inspected = (value..value + 1).inspect(|_| calls.set(calls.get() + 1));
 
             assert_eq!(inspected.next(), Some(value), "inspect does not change the yielded value");
             assert!(
-                RustStdStandard::<std::cell::Cell<usize>>::ensures((calls.get(), 1)),
+                RustStdStandard::<Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect calls its closure exactly once per item"
             );
             assert_eq!(inspected.next(), None, "the one-item inspected iterator then exhausts");
             assert!(
-                RustStdStandard::<std::cell::Cell<usize>>::ensures((calls.get(), 1)),
+                RustStdStandard::<Cell<usize>>::ensures((calls.get(), 1)),
                 "inspect does not re-invoke its closure after exhaustion"
             );
         }

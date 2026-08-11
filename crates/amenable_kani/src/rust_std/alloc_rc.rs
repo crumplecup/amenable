@@ -6,6 +6,8 @@ use std::rc::Rc;
 use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
+#[cfg(kani)]
+use std::cell::Cell;
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -61,7 +63,7 @@ amenable_derive::harness! {
             );
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -69,17 +71,17 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let witness = Rc::new(DropWitness { drop_count: drop_count.clone() });
             let witness2 = Rc::clone(&witness);
             drop(witness2);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0)),
                 "the value survives dropping one of two strong refs"
             );
             drop(witness);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the value drops exactly once, when the last strong ref drops"
             );
         }
@@ -148,7 +150,7 @@ amenable_derive::harness! {
             );
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -156,12 +158,12 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let witness = Rc::new(DropWitness { drop_count: drop_count.clone() });
             let weak_witness = Rc::downgrade(&witness);
             drop(witness);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the value drops once the last strong ref drops, though a Weak to it still exists"
             );
             assert!(weak_witness.upgrade().is_none());

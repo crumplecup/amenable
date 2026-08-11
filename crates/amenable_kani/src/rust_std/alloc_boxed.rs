@@ -6,6 +6,8 @@ use std::boxed::Box;
 use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
+#[cfg(kani)]
+use std::cell::Cell;
 
 use super::CheckedProof;
 use crate::KaniWitness;
@@ -55,7 +57,7 @@ amenable_derive::harness! {
             assert_eq!(*boxed, updated, "a write through deref_mut is visible");
 
             struct DropWitness {
-                drop_count: std::rc::Rc<std::cell::Cell<u32>>,
+                drop_count: std::rc::Rc<Cell<u32>>,
             }
             impl Drop for DropWitness {
                 fn drop(&mut self) {
@@ -63,24 +65,24 @@ amenable_derive::harness! {
                 }
             }
 
-            let drop_count = std::rc::Rc::new(std::cell::Cell::new(0));
+            let drop_count = std::rc::Rc::new(Cell::new(0));
             let mut witness = Box::new(DropWitness {
                 drop_count: drop_count.clone(),
             });
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 0)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 0)),
                 "the value is not dropped while it remains boxed"
             );
             *witness = DropWitness {
                 drop_count: drop_count.clone(),
             };
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 1)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "assigning through deref_mut drops the displaced value exactly once"
             );
             drop(witness);
             assert!(
-                RustStdStandard::<std::cell::Cell<u32>>::ensures((drop_count.get(), 2)),
+                RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 2)),
                 "dropping the box drops the replacement exactly once"
             );
         }
