@@ -11,15 +11,17 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 505 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 481 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus seven clusters named -- four generic
+missing negated-call shape) plus nine clusters named -- five generic
 contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
-`IteratorMatchesReferenceStepByStep<T>`), one non-generic
-(`EmptiedContainerReportsEmpty`), and two heterogeneous clusters
-(`X.next() == Some(X)` 42 sites, `X.len() == X` 16 sites) named
-per-carrier since neither is a shared claim -- see the naming-workflow
+`IteratorMatchesReferenceStepByStep<T>`,
+`SplitOperandsAreDistinctFromThePattern<T>` -- the last one `Requires`-
+shaped, not `Ensures`), one non-generic (`EmptiedContainerReportsEmpty`),
+and three heterogeneous clusters (`X.next() == Some(X)` 42 sites,
+`X.len() == X` 16 sites, `X.pop_front() == Some(X)` 15 sites) named
+per-carrier since none is a shared claim -- see the naming-workflow
 doc's mid-session correction note before skipping any future
 heterogeneous cluster); `amenable_verus` not yet started under it.
 

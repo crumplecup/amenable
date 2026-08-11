@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, eight clusters named, 771 → 490 sites — see "Current state");
+fixed, nine clusters named, 771 → 481 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,15 +420,15 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **490** sites (was 771; ten intervening fixes
+  session; total is now **481** sites (was 771; eleven intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X != X && X != X` — 9 sites
   - `X != X && X != X && X != X` — 9 sites
   - `X.checked_add(X).is_some()` — 9 sites
   - `X[X] == X` — 9 sites
   - `X.is_err()` — 8 sites
   - `X::strong_count(&X) == X` — 8 sites
+  - `X < X` — 8 sites
   - and onward down the ranked list in the checklist itself.
 
   **Both clusters caught by the mid-session correction (above) are now
@@ -597,6 +597,23 @@ was brought back to zero in three focused follow-up commits.
       `X.pop_front() == X` (exhaustion-to-`None`) and
       `X.pop_back() == Some(X)`/`X.pop_back() == X` (`VecDeque`'s
       back-end equivalents) sites with the same registration.
+  11. **`X != X && X != X` (9 sites)**: the first genuinely `Requires`-
+      shaped (precondition) bound named this session — every prior
+      cluster was `Ensures`-shaped. All 9 sites are a
+      `kani::assume(a != pattern && b != pattern)` guarding a split
+      family's symbolic inputs: 6 in `rust_std::slice` (pattern is the
+      fixed literal `0`) and 3 in `rust_std::str` (pattern is itself a
+      symbolic `kani::any()` byte) — one real shared claim ("the two
+      operands surrounding a match are distinct from the split
+      pattern"), confirmed by reading every site before naming it, not
+      just the first. Named as
+      `amenable_kani::SplitOperandsAreDistinctFromThePattern<T>`, the
+      fifth generic contract type this session, for the same reason as
+      the other four (`kani_requires!` can't emit `impl<T>`, and the
+      real element type differs — `i32` for slice, `u8` for str). Lives
+      in `rust_std::slice.rs` (majority owner, 6 of 9 sites) and is
+      re-exported at the crate boundary for `str.rs`'s 3 sites to reach
+      it.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
