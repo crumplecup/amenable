@@ -43,6 +43,28 @@ impl_kani_witness_trusted!(
     ()
 );
 
+// `checked_add` not overflowing is a real precondition independently
+// restated at 9 real sites across `rust_std::slice`'s `chunks_mut`/
+// `chunks_exact_mut`/`rchunks_mut`/`rchunks_exact_mut` families (`i32`,
+// a fixed literal addend) and `rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs`
+// (`u64`, a symbolic addend). `checked_add` is inherent per fixed-width
+// integer type, not a shared trait method available without pulling in
+// an external crate (`num_traits`), so this is registered per concrete
+// width rather than as one generic contract type.
+kani_requires!(
+    RustStdStandard<i32>,
+    "amenable_std::rust_std::RustStdStandard<i32>",
+    (i32, i32),
+    |(a, b)| a.checked_add(b).is_some()
+);
+
+kani_requires!(
+    RustStdStandard<u64>,
+    "amenable_std::rust_std::RustStdStandard<u64>",
+    (u64, u64),
+    |(a, b)| a.checked_add(b).is_some()
+);
+
 impl KaniWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

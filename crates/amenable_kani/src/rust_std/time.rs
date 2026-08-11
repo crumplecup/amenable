@@ -3,6 +3,8 @@
 use std::time::{Duration, TryFromFloatSecsError};
 
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::Requires;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
@@ -46,7 +48,7 @@ amenable_derive::harness! {
             let secs: u64 = kani::any();
             let nanos: u32 = kani::any();
             let carry = (nanos / 1_000_000_000) as u64;
-            kani::assume(secs.checked_add(carry).is_some());
+            kani::assume(RustStdStandard::<u64>::requires((secs, carry)));
 
             let d = Duration::new(secs, nanos);
             assert_eq!(

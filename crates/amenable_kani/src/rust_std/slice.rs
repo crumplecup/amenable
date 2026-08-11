@@ -235,8 +235,8 @@ amenable_derive::harness! {
         fn verify_chunks_mut_writes_through_every_chunk() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a.checked_add(10).is_some());
-            kani::assume(b.checked_add(10).is_some());
+            kani::assume(RustStdStandard::<i32>::requires((a, 10)));
+            kani::assume(RustStdStandard::<i32>::requires((b, 10)));
             let mut data = [a, b];
             for chunk in data.chunks_mut(2) {
                 for x in chunk {
@@ -281,8 +281,8 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(a.checked_add(10).is_some());
-            kani::assume(b.checked_add(10).is_some());
+            kani::assume(RustStdStandard::<i32>::requires((a, 10)));
+            kani::assume(RustStdStandard::<i32>::requires((b, 10)));
             let mut data = [a, b, c];
             {
                 let mut ch = data.chunks_exact_mut(2);
@@ -415,8 +415,8 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let c: i32 = kani::any();
-            kani::assume(b.checked_add(10).is_some());
-            kani::assume(c.checked_add(10).is_some());
+            kani::assume(RustStdStandard::<i32>::requires((b, 10)));
+            kani::assume(RustStdStandard::<i32>::requires((c, 10)));
             let mut data = [a, b, c];
             {
                 let mut ch = data.rchunks_exact_mut(2);
@@ -462,8 +462,8 @@ amenable_derive::harness! {
         fn verify_rchunks_mut_writes_through_every_chunk() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a.checked_add(10).is_some());
-            kani::assume(b.checked_add(10).is_some());
+            kani::assume(RustStdStandard::<i32>::requires((a, 10)));
+            kani::assume(RustStdStandard::<i32>::requires((b, 10)));
             let mut data = [a, b];
             for chunk in data.rchunks_mut(2) {
                 for x in chunk {
