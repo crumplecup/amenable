@@ -3,9 +3,9 @@
 **Status:** 🔲 Ongoing — mechanism redesigned and fully verified in an
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
-`amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
-five clusters named, 771 → 574 sites — see "Current state"); `amenable_verus`
-not yet started under the new mechanism.
+`amenable_kani` now in progress (two real `elicit_doc` matcher bugs
+fixed, five clusters named, 771 → 562 sites — see "Current state");
+`amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
 person) can pick this work back up without re-deriving the mechanism,
@@ -420,12 +420,11 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **574** sites (was 771; six intervening fixes
+  session; total is now **562** sites (was 771; seven intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
   - `X.next() == Some(X)` — 40 sites (intentionally skipped, see below)
   - `X.len() == X` — 16 sites (intentionally skipped, see below)
-  - `!X::<X<X>>::ensures(X)` — 12 sites
   - `X.pop_front() == Some(X)` — 11 sites
   - `X.next() == Some(X + X)` — 10 sites
   - `X != X && X != X` — 9 sites
@@ -453,7 +452,7 @@ was brought back to zero in three focused follow-up commits.
   than the clusters below them, so they're intentionally-skipped top
   entries right now, not forgotten ones.
 
-  Six things resolved the first 197 sites of the drop from 771:
+  Seven things resolved the first 209 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -528,6 +527,16 @@ was brought back to zero in three focused follow-up commits.
      asserting it, so the ordinary `kani_ensures!`/`bridge_kani_witness!`
      macros work unmodified, same shape as `NonNegativeFd`/
      `IndexingAndLength`.
+  7. **`!X::<X<X>>::ensures(X)` (12 sites)**: a real `elicit_doc`
+     scanner completeness gap, not a naming gap — `matches_named_call`
+     only recognized a bare `syn::Expr::Call`, never one wrapped in `!`,
+     so every `NonZero::new`'s "fails only for zero" rejection check
+     (already calling its own registered `Ensures<KaniVerifier>`
+     directly, negated) was flagged despite naming a real contract. No
+     `amenable` source changes at all this time — pure `elicit_doc` fix
+     (strip a single leading `!` before matching either the Kani or
+     Creusot/Verus shape; `!!x` stays unmatched). Confirmed the fix
+     resolves exactly this cluster and nothing else.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a

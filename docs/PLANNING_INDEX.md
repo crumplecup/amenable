@@ -11,8 +11,9 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 574 sites: a real
-`elicit_doc` matcher bug fixed plus five clusters named -- four generic
+mechanism; `amenable_kani` now in progress (771 → 562 sites: two real
+`elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
+missing negated-call shape) plus five clusters named -- four generic
 contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`) and one non-generic
