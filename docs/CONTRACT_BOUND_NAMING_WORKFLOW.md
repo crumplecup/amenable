@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (a real `elicit_doc` matcher bug fixed,
-two clusters named, 771 → 631 sites — see "Current state"); `amenable_verus`
+three clusters named, 771 → 603 sites — see "Current state"); `amenable_verus`
 not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,17 +420,17 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **631** sites (was 771; three intervening fixes
+  session; total is now **603** sites (was 771; four intervening fixes
   landed, see below). Current top clusters, by size (re-run the scan
   before trusting these — this list will drift as work lands):
-  - `X.next() == Some(X)` — 40 sites
-  - `*X == X` — 28 sites
+  - `X.next() == Some(X)` — 40 sites (intentionally skipped, see below)
   - `X.len() == X` — 16 sites
   - `X.next() == X.next()` — 16 sites
   - `X.is_empty()` — 13 sites
   - `!X::<X<X>>::ensures(X)` — 12 sites
   - `X.pop_front() == Some(X)` — 11 sites
   - `X.next() == Some(X + X)` — 10 sites
+  - `X != X && X != X` — 9 sites
   - and onward down the ranked list in the checklist itself.
 
   **`X.next() == Some(X)` (40 sites) is not a shared-claim candidate**,
@@ -446,7 +446,7 @@ was brought back to zero in three focused follow-up commits.
   than the clusters below it, so it's an intentionally-skipped top entry
   right now, not a forgotten one.
 
-  Three things resolved the first 140 sites of the drop from 771:
+  Four things resolved the first 168 sites of the drop from 771:
   1. **A real bug in `elicit_doc`'s matcher, not a naming gap in
      `amenable`** (69 sites, no `amenable` source changes beyond a small
      `Cell` import cleanup): `ContractIndex::matches_named_call` compared
@@ -488,6 +488,18 @@ was brought back to zero in three focused follow-up commits.
      have used a per-carrier registration even if every other `Atomic*`
      type had, confirming the generic-type approach isn't just
      convenient here, it's necessary.
+  4. **`*X == X` (28 sites)**: dereferencing a smart pointer, guard, or
+     reference recovers the value stored in (or borrowed by) it,
+     independently restated across `Cow`, `Box`, `BinaryHeap::PeekMut`,
+     `Rc`, `Arc`, `RefCell`'s `Ref`/`RefMut`, `ManuallyDrop`,
+     `Option`/`Result`'s `IterMut`, `AssertUnwindSafe`, `Pin<Box<_>>`,
+     shared/mutable references, `slice::IterMut`, and `Mutex`/`RwLock`'s
+     guards. Named once as `amenable_kani::DerefReflectsTheStoredValue<T>`,
+     the third generic contract type, same design as the two above.
+     Checked a sample of real sites before starting (unlike
+     `X.next() == Some(X)` below, which failed that same check) — every
+     comparison really is a plain value-equality check regardless of
+     which wrapper type derefs.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
