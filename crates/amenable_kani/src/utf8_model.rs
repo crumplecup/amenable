@@ -17,6 +17,8 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::Standard;
 
+#[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
 use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
 use crate::rust_std::macros::{kani_ensures, kani_requires};
@@ -517,10 +519,10 @@ amenable_derive::harness! {
                 let recovered = buffer.as_bytes();
                 assert!(KaniUtf8Buffer::<2>::ensures((recovered.len(), len)));
                 if len >= 1 {
-                    assert_eq!(recovered[0], bytes[0]);
+                    assert!(IndexRecoversTheStoredElement::ensures((recovered[0], bytes[0])));
                 }
                 if len >= 2 {
-                    assert_eq!(recovered[1], bytes[1]);
+                    assert!(IndexRecoversTheStoredElement::ensures((recovered[1], bytes[1])));
                 }
             }
         }

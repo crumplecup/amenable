@@ -8,6 +8,8 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniUtf8Buffer, KaniVerifier};
@@ -101,14 +103,14 @@ amenable_derive::harness! {
                         "len() reports the byte length"
                     );
                     if len >= 1 {
-                        assert_eq!(
-                            recovered[0], bytes[0],
+                        assert!(
+                            IndexRecoversTheStoredElement::ensures((recovered[0], bytes[0])),
                             "to_str's content is exactly the OsStr's own bytes"
                         );
                     }
                     if len >= 2 {
-                        assert_eq!(
-                            recovered[1], bytes[1],
+                        assert!(
+                            IndexRecoversTheStoredElement::ensures((recovered[1], bytes[1])),
                             "to_str's content is exactly the OsStr's own bytes"
                         );
                     }
