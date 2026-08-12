@@ -595,7 +595,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_enumerate_pairs_each_item_with_its_index() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 1);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut e = (a..a + 2).enumerate();
             assert_eq!(e.next(), Some((0, a)), "enumerate starts indexing at 0");
             assert_eq!(
@@ -647,7 +647,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_rev_reverses_iteration_order() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 1);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut r = (a..a + 2).rev();
             assert!(
                 RustStdStandard::<Rev<Range<i32>>>::ensures((r.next(), Some(a + 1))),
@@ -807,7 +807,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_cycle_repeats_its_sequence_forever() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 1);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut c = (a..a + 2).cycle();
             assert!(RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a))));
             assert!(RustStdStandard::<Cycle<Range<i32>>>::ensures((c.next(), Some(a + 1))));
@@ -971,7 +971,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_peekable_peek_does_not_consume() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 1);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut p = (a..a + 2).peekable();
             assert_eq!(p.peek(), Some(&a), "peek previews the next item");
             assert!(
@@ -1079,7 +1079,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_skip_discards_the_first_n_items() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 2);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 2)));
             let mut s = (a..a + 3).skip(2);
             assert_eq!(s.next(), Some(a + 2), "skip discards exactly the first n items");
         }
@@ -1167,7 +1167,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_step_by_yields_every_nth_item() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 4);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 4)));
             let mut s = (a..a + 5).step_by(2);
             assert!(RustStdStandard::<StepBy<Range<i32>>>::ensures((s.next(), Some(a))));
             assert!(RustStdStandard::<StepBy<Range<i32>>>::ensures((s.next(), Some(a + 2))));
@@ -1216,7 +1216,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_take_yields_at_most_n_items() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX - 4);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 4)));
             let mut t = (a..a + 5).take(2);
             assert!(RustStdStandard::<std::iter::Take<Range<i32>>>::ensures((t.next(), Some(a))));
             assert!(RustStdStandard::<std::iter::Take<Range<i32>>>::ensures((
