@@ -25,10 +25,27 @@ verus! {
 #[verifier::external_type_specification]
 pub struct ExFpCategory(FpCategory);
 
+pub open spec fn fp_category_classify_result_matches_special_value_categories(
+    value: f64,
+    result: FpCategory,
+) -> bool {
+    (value.is_nan_spec() ==> result == FpCategory::Nan)
+        && (value.is_infinite_spec() ==> result == FpCategory::Infinite)
+}
+
+pub open spec fn fp_category_inputs_cover_nan_and_infinite_cases(nan: f64, infinite: f64) -> bool {
+    nan.is_nan_spec() && infinite.is_infinite_spec()
+}
+
+pub open spec fn fp_category_results_match_nan_and_infinite_cases(
+    result: (FpCategory, FpCategory),
+) -> bool {
+    result.0 == FpCategory::Nan && result.1 == FpCategory::Infinite
+}
+
 pub assume_specification [f64::classify] (value: f64) -> (result: FpCategory)
     ensures
-        value.is_nan_spec() ==> result == FpCategory::Nan,
-        value.is_infinite_spec() ==> result == FpCategory::Infinite,
+        fp_category_classify_result_matches_special_value_categories(value, result),
 ;
 
 /// A NaN value classifies as `FpCategory::Nan`, and an infinite value
@@ -36,11 +53,9 @@ pub assume_specification [f64::classify] (value: f64) -> (result: FpCategory)
 /// the five-way claim the Kani/Creusot harnesses check exhaustively.
 pub fn verify_fp_category_matches_the_value_it_classifies(nan: f64, infinite: f64) -> (result: (FpCategory, FpCategory))
     requires
-        nan.is_nan_spec(),
-        infinite.is_infinite_spec(),
+        fp_category_inputs_cover_nan_and_infinite_cases(nan, infinite),
     ensures
-        result.0 == FpCategory::Nan,
-        result.1 == FpCategory::Infinite,
+        fp_category_results_match_nan_and_infinite_cases(result),
 {
     (nan.classify(), infinite.classify())
 }

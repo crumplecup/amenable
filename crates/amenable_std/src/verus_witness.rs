@@ -567,6 +567,21 @@ bridge_verus_witness!(RustStdStandard<std::mem::ManuallyDrop<i32>>);
 
 const VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fp_category_carrier.rs");
+const FP_CATEGORY_CLASSIFY_RESULT_MATCHES_SPECIAL_VALUE_CATEGORIES_VERUS_FRAGMENT: &str = r#"pub open spec fn fp_category_classify_result_matches_special_value_categories(
+    value: f64,
+    result: FpCategory,
+) -> bool {
+    (value.is_nan_spec() ==> result == FpCategory::Nan)
+        && (value.is_infinite_spec() ==> result == FpCategory::Infinite)
+}"#;
+const FP_CATEGORY_INPUTS_COVER_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn fp_category_inputs_cover_nan_and_infinite_cases(nan: f64, infinite: f64) -> bool {
+    nan.is_nan_spec() && infinite.is_infinite_spec()
+}"#;
+const FP_CATEGORY_RESULTS_MATCH_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn fp_category_results_match_nan_and_infinite_cases(
+    result: (FpCategory, FpCategory),
+) -> bool {
+    result.0 == FpCategory::Nan && result.1 == FpCategory::Infinite
+}"#;
 
 impl VerusWitness for RustStdStandard<core::num::FpCategory> {
     type SupportingEvidence = Self;
@@ -590,6 +605,33 @@ bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
         describe: || {
             <RustStdStandard<core::num::FpCategory> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FP_CATEGORY_CLASSIFY_RESULT_MATCHES_SPECIAL_VALUE_CATEGORIES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || FP_CATEGORY_INPUTS_COVER_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FP_CATEGORY_RESULTS_MATCH_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
     }
 }
 
