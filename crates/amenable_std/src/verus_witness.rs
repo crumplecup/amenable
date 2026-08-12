@@ -1260,6 +1260,21 @@ bridge_verus_witness!(RustStdStandard<std::ffi::IntoStringError>);
 const VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
 
+const CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_from_bytes_until_nul_result_matches_nul_presence<'a>(
+    bytes: &'a [u8],
+    result: Result<&'a CStr, std::ffi::FromBytesUntilNulError>,
+) -> bool {
+    (cstr_bytes_contain_a_nul(bytes) ==> result is Ok)
+        && (cstr_bytes_contain_no_nul(bytes) ==> result is Err)
+}"#;
+
+const CSTR_UNTIL_NUL_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_until_nul_test_inputs_cover_both_cases(
+    with_nul: &[u8],
+    without_nul: &[u8],
+) -> bool {
+    cstr_bytes_contain_a_nul(with_nul) && cstr_bytes_contain_no_nul(without_nul)
+}"#;
+
 impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1275,6 +1290,15 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
 
 bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesUntilNulError>);
 
+impl Requires<VerusVerifier> for RustStdStandard<core::ffi::FromBytesUntilNulError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "exists|i: int| 0 <= i < with_nul@.len() && with_nul@[i] == 0 && !exists|i: int| 0 <= i < without_nul@.len() && without_nul@[i] == 0"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
@@ -1285,8 +1309,46 @@ bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesUntilNulError>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<core::ffi::FromBytesUntilNulError> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || CSTR_UNTIL_NUL_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
+
+const CSTR_FROM_BYTES_WITH_NUL_RESULT_MATCHES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_from_bytes_with_nul_result_matches_bytes<'a>(
+    bytes: &'a [u8],
+    result: Result<&'a CStr, std::ffi::FromBytesWithNulError>,
+) -> bool {
+    (cstr_bytes_have_only_a_trailing_nul(bytes) ==> {
+        &&& result is Ok
+        &&& cstr_bytes_spec(result->Ok_0) == bytes@.subrange(0, bytes@.len() - 1)
+    }) && (cstr_bytes_contain_no_nul(bytes) ==> result is Err)
+        && (cstr_bytes_have_an_interior_nul(bytes) ==> result is Err)
+}"#;
 
 impl VerusWitness for RustStdStandard<core::ffi::FromBytesWithNulError> {
     type SupportingEvidence = Self;
@@ -1310,6 +1372,15 @@ bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
         describe: || {
             <RustStdStandard<core::ffi::FromBytesWithNulError> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CSTR_FROM_BYTES_WITH_NUL_RESULT_MATCHES_BYTES_VERUS_FRAGMENT,
     }
 }
 
@@ -2552,6 +2623,10 @@ bridge_verus_witness!(RustStdStandard<core::ascii::EscapeDefault>);
 const VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
 
+const CSTR_TO_BYTES_MATCHES_MODEL_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_to_bytes_matches_model(cstr: &CStr, result: &[u8]) -> bool {
+    result@ == cstr_bytes_spec(cstr)
+}"#;
+
 impl VerusWitness for RustStdStandard<core::ffi::CStr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2577,6 +2652,15 @@ bridge_verus_witness!(RustStdStandard<core::ffi::CStr>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CSTR_TO_BYTES_MATCHES_MODEL_VERUS_FRAGMENT,
+    }
+}
+
 /// [`NonNulByte`] reuses the same harness rather than adding a new Verus
 /// proof — it names the precondition every `CStr`/`CString`-family proof
 /// in this crate already requires, it doesn't prove anything new.
@@ -2595,6 +2679,10 @@ impl VerusWitness for NonNulByte {
 
 bridge_verus_witness!(NonNulByte);
 
+const NON_NUL_BYTE_VALUE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_nul_byte_value_is_nonzero(byte: u8) -> bool {
+    byte != 0
+}"#;
+
 impl Requires<VerusVerifier> for NonNulByte {
     type Input = ();
     type Bound = &'static str;
@@ -2610,6 +2698,15 @@ impl Requires<VerusVerifier> for NonNulByte {
         verifier: "verus",
         kind: "requires",
         fragment: || <NonNulByte as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::NonNulByte",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || NON_NUL_BYTE_VALUE_IS_NONZERO_VERUS_FRAGMENT,
     }
 }
 

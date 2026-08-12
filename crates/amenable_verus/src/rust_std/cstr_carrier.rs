@@ -24,10 +24,35 @@ pub struct ExFromBytesUntilNulError(std::ffi::FromBytesUntilNulError);
 #[verifier::external_body]
 pub struct ExFromBytesWithNulError(std::ffi::FromBytesWithNulError);
 
+pub open spec fn cstr_bytes_contain_a_nul(bytes: &[u8]) -> bool {
+    exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0
+}
+
+pub open spec fn cstr_bytes_contain_no_nul(bytes: &[u8]) -> bool {
+    !exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0
+}
+
+pub open spec fn cstr_bytes_have_an_interior_nul(bytes: &[u8]) -> bool {
+    exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0
+}
+
+pub open spec fn cstr_bytes_have_only_a_trailing_nul(bytes: &[u8]) -> bool {
+    bytes@.len() > 0
+        && bytes@[bytes@.len() - 1] == 0
+        && !cstr_bytes_have_an_interior_nul(bytes)
+}
+
+pub open spec fn cstr_from_bytes_until_nul_result_matches_nul_presence<'a>(
+    bytes: &'a [u8],
+    result: Result<&'a CStr, std::ffi::FromBytesUntilNulError>,
+) -> bool {
+    (cstr_bytes_contain_a_nul(bytes) ==> result is Ok)
+        && (cstr_bytes_contain_no_nul(bytes) ==> result is Err)
+}
+
 pub assume_specification<'a> [CStr::from_bytes_until_nul] (bytes: &'a [u8]) -> (result: Result<&'a CStr, std::ffi::FromBytesUntilNulError>)
     ensures
-        (exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Ok,
-        (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Err,
+        cstr_from_bytes_until_nul_result_matches_nul_presence(bytes, result),
 ;
 
 /// `to_bytes`'s abstract content for a `&CStr` — opaque (uninterpreted),
@@ -36,21 +61,41 @@ pub assume_specification<'a> [CStr::from_bytes_until_nul] (bytes: &'a [u8]) -> (
 /// below, mirroring `cstring_carrier.rs`'s `cstring_bytes_spec` pattern.
 pub uninterp spec fn cstr_bytes_spec(cstr: &CStr) -> Seq<u8>;
 
+pub open spec fn cstr_from_bytes_with_nul_result_matches_bytes<'a>(
+    bytes: &'a [u8],
+    result: Result<&'a CStr, std::ffi::FromBytesWithNulError>,
+) -> bool {
+    (cstr_bytes_have_only_a_trailing_nul(bytes) ==> {
+        &&& result is Ok
+        &&& cstr_bytes_spec(result->Ok_0) == bytes@.subrange(0, bytes@.len() - 1)
+    }) && (cstr_bytes_contain_no_nul(bytes) ==> result is Err)
+        && (cstr_bytes_have_an_interior_nul(bytes) ==> result is Err)
+}
+
 pub assume_specification<'a> [CStr::from_bytes_with_nul] (bytes: &'a [u8]) -> (result: Result<&'a CStr, std::ffi::FromBytesWithNulError>)
     ensures
-        (bytes@.len() > 0 && bytes@[bytes@.len() - 1] == 0
-            && !exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> {
-            &&& result is Ok
-            &&& cstr_bytes_spec(result->Ok_0) == bytes@.subrange(0, bytes@.len() - 1)
-        },
-        (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Err,
-        (exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err,
+        cstr_from_bytes_with_nul_result_matches_bytes(bytes, result),
 ;
+
+pub open spec fn cstr_to_bytes_matches_model(cstr: &CStr, result: &[u8]) -> bool {
+    result@ == cstr_bytes_spec(cstr)
+}
 
 pub assume_specification<'a> [CStr::to_bytes] (cstr: &'a CStr) -> (result: &'a [u8])
     ensures
-        result@ == cstr_bytes_spec(cstr),
+        cstr_to_bytes_matches_model(cstr, result),
 ;
+
+pub open spec fn cstr_until_nul_test_inputs_cover_both_cases(
+    with_nul: &[u8],
+    without_nul: &[u8],
+) -> bool {
+    cstr_bytes_contain_a_nul(with_nul) && cstr_bytes_contain_no_nul(without_nul)
+}
+
+pub open spec fn non_nul_byte_value_is_nonzero(byte: u8) -> bool {
+    byte != 0
+}
 
 /// `CStr::from_bytes_until_nul` succeeds whenever a nul byte appears
 /// anywhere in the input, and fails only when none is present at all —
@@ -60,8 +105,7 @@ pub assume_specification<'a> [CStr::to_bytes] (cstr: &'a CStr) -> (result: &'a [
 /// literals Kani constructs inline.
 pub fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere(with_nul: &[u8], without_nul: &[u8]) -> (result: (bool, bool))
     requires
-        exists|i: int| 0 <= i < with_nul@.len() && with_nul@[i] == 0,
-        !exists|i: int| 0 <= i < without_nul@.len() && without_nul@[i] == 0,
+        cstr_until_nul_test_inputs_cover_both_cases(with_nul, without_nul),
     ensures
         result.0,
         result.1,
@@ -82,9 +126,7 @@ pub fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere(with_nul: &[u8]
 /// trailing data after it — the same claim the Kani harness checks.
 pub fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (result: (bool, bool, bool))
     requires
-        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
-        // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
-        byte != 0,
+        non_nul_byte_value_is_nonzero(byte),
     ensures
         result.0,
         result.1,
@@ -116,9 +158,7 @@ pub fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> 
 /// — the same claim the Kani harness checks.
 pub fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(byte: u8) -> (result: bool)
     requires
-        // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
-        // impl (this file's own verify_cstr_excludes_the_terminating_nul_from_to_bytes) names this exact fragment.
-        byte != 0,
+        non_nul_byte_value_is_nonzero(byte),
     ensures
         result,
 {
