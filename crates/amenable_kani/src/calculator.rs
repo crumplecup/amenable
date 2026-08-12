@@ -12,10 +12,14 @@
 //! not product surface: real users compose their own calculations the
 //! same way, on their own domain types.
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::{Standard, calculation};
 use amenable_std::RustStdStandard;
 
+#[cfg(kani)]
+use crate::FieldAccessRecoversTheStoredValue;
 use crate::KaniVerifier;
 
 /// A debit amount: a domain wrapper around `i64`, resting on `i64`'s own
@@ -86,7 +90,7 @@ amenable_derive::harness! {
             let x: i64 = kani::any();
             let debit = Debit::new(x);
 
-            assert_eq!(debit.value, x);
+            assert!(FieldAccessRecoversTheStoredValue::ensures((debit.value, x)));
         }
     }
 }
@@ -154,7 +158,7 @@ amenable_derive::harness! {
             let x: i64 = kani::any();
             let credit = Credit::new(x);
 
-            assert_eq!(credit.value, x);
+            assert!(FieldAccessRecoversTheStoredValue::ensures((credit.value, x)));
         }
     }
 }

@@ -77,7 +77,9 @@ pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use option_result::FallibleOperationReportsFailure;
-pub use primitives::{DerefReflectsTheStoredValue, IndexRecoversTheStoredElement};
+pub use primitives::{
+    DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, IndexRecoversTheStoredElement,
+};
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,
 };

@@ -16,6 +16,8 @@ use core::panic::{Location, PanicInfo, PanicMessage};
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
+use crate::FieldAccessRecoversTheStoredValue;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 use crate::{KaniCallerLocationObservation, KaniVerifier, KaniWitness};
 
@@ -57,8 +59,8 @@ amenable_derive::harness! {
 
             let updated: i32 = kani::any();
             *wrapped = updated;
-            assert_eq!(
-                wrapped.0, updated,
+            assert!(
+                FieldAccessRecoversTheStoredValue::ensures((wrapped.0, updated)),
                 "deref_mut writes through to the wrapped value"
             );
         }

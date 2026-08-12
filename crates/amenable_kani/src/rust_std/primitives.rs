@@ -441,8 +441,8 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let t = (a, b);
-            assert_eq!(t.0, a);
-            assert_eq!(t.1, b);
+            assert!(FieldAccessRecoversTheStoredValue::ensures((t.0, a)));
+            assert!(FieldAccessRecoversTheStoredValue::ensures((t.1, b)));
         }
     }
 }
@@ -812,6 +812,99 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
         evidence: "amenable_kani::IndexRecoversTheStoredElement",
         verifier: "kani",
         describe: || <IndexRecoversTheStoredElement<i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
+/// An `(actual, expected)` pair known to agree: a struct or tuple
+/// field access recovers exactly the value known to be stored there.
+///
+/// Independently hand-written as `assert_eq!(value.field, expected,
+/// ...)` at 5 real sites: `verify_tuple_field_access` (`(a, b)`'s `.0`/
+/// `.1` projections, 2 sites), `calculator::Debit`/`Credit`'s own
+/// `.value` field access constructors (2 sites), and
+/// `verify_assert_unwind_safe_derefs_transparently`'s `.0` projection
+/// after a `DerefMut` write-through (1 site) -- the identical claim
+/// regardless of whether the access is a named field or a tuple index.
+/// A distinct access pattern from `IndexRecoversTheStoredElement`
+/// (`[i]`) and `DerefReflectsTheStoredValue` (`*x`) even though the
+/// `Ensures` impl body is identical trivial equality either way --
+/// same reasoning as keeping `CollectedSequenceMatchesExpected`
+/// separate from `DerefReflectsTheStoredValue` despite type-level
+/// overlap.
+pub struct FieldAccessRecoversTheStoredValue<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for FieldAccessRecoversTheStoredValue<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for FieldAccessRecoversTheStoredValue<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for FieldAccessRecoversTheStoredValue<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_tuple_field_access".to_owned(),
+            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for FieldAccessRecoversTheStoredValue<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for FieldAccessRecoversTheStoredValue<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::FieldAccessRecoversTheStoredValue",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::FieldAccessRecoversTheStoredValue",
+        verifier: "kani",
+        describe: || <FieldAccessRecoversTheStoredValue<i32> as KaniWitness>::proof().to_string(),
     }
 }
 
