@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, eighteen clusters named, 771 → 406 sites — see "Current state");
+fixed, nineteen clusters named, 771 → 399 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **406** sites (was 771; twenty intervening
+  session; total is now **399** sites (was 771; twenty-one intervening
   fixes landed, see below). Re-run the scan before picking the next
   cluster — this list will drift as work lands.
 
@@ -740,6 +740,15 @@ was brought back to zero in three focused follow-up commits.
       than varying a plain element type -- a non-generic type has no
       way to name an unconstrained lifetime. Lives in
       `rust_std::alloc_collections.rs` (majority owner, 4 of 7 sites).
+  21. **`X < X::X - X` (7 sites)**: `kani::assume(a < i32::MAX - N)`
+      across `rust_std::iter`'s
+      `enumerate`/`rev`/`cycle`/`peekable`/`skip`/`step_by`/`take`
+      harnesses (an overflow-avoidance bound on the symbolic seed, N
+      varying 1/2/4 per harness's own arithmetic). Reused the
+      already-named `FirstValueIsLessThanTheSecond` from item 17 --
+      the identical `<` relation regardless of whether the right side
+      is a symbolic value or a computed bound like `i32::MAX - N`. No
+      new type needed.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
