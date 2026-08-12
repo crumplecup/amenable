@@ -37,6 +37,55 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn fmt_arguments_result_matches_display_token(display_token: i32, result: i32) -> bool {
+    result == display_token
+}
+
+pub open spec fn fmt_from_fn_result_matches_display_token(display_token: i32, result: i32) -> bool {
+    result == display_token
+}
+
+pub open spec fn fmt_debug_struct_result_matches_named_fields(
+    type_label: u8,
+    field_label: u8,
+    value_token: i32,
+    result: (u8, u8, i32),
+) -> bool {
+    result == (type_label, field_label, value_token)
+}
+
+pub open spec fn fmt_debug_tuple_result_matches_positional_fields(
+    type_label: u8,
+    value_token: i32,
+    result: (u8, i32),
+) -> bool {
+    result == (type_label, value_token)
+}
+
+pub open spec fn fmt_debug_list_result_matches_entries_in_brackets(
+    first_token: i32,
+    second_token: i32,
+    result: (i32, i32),
+) -> bool {
+    result == (first_token, second_token)
+}
+
+pub open spec fn fmt_debug_set_result_matches_entries_in_braces(
+    first_token: i32,
+    second_token: i32,
+    result: (i32, i32),
+) -> bool {
+    result == (first_token, second_token)
+}
+
+pub open spec fn fmt_debug_map_result_matches_key_value_pair(
+    key_label: u8,
+    value_token: i32,
+    result: (u8, i32),
+) -> bool {
+    result == (key_label, value_token)
+}
+
 /// A `{:<5}`-style spec's `Left` alignment reaches the `Formatter` —
 /// modeled as the parsed alignment tag (`0` standing in for `Left`)
 /// coming back out of a formatter built from that spec.
@@ -64,7 +113,7 @@ pub fn verify_formatter_model_exposes_the_parsed_width_and_precision() -> (resul
 /// through unchanged, the same law `FromFn` (below) shares.
 pub fn verify_arguments_model_renders_the_same_as_the_value_itself(display_token: i32) -> (result: i32)
     ensures
-        result == display_token,
+        fmt_arguments_result_matches_display_token(display_token, result),
 {
     display_token
 }
@@ -74,7 +123,7 @@ pub fn verify_arguments_model_renders_the_same_as_the_value_itself(display_token
 /// law `Arguments` (above) checks.
 pub fn verify_from_fn_model_forwards_display_to_the_supplied_closure(display_token: i32) -> (result: i32)
     ensures
-        result == display_token,
+        fmt_from_fn_result_matches_display_token(display_token, result),
 {
     display_token
 }
@@ -85,7 +134,7 @@ pub fn verify_from_fn_model_forwards_display_to_the_supplied_closure(display_tok
 /// `DebugTuple`'s positional shape.
 pub fn verify_debug_struct_model_renders_named_fields(type_label: u8, field_label: u8, value_token: i32) -> (result: (u8, u8, i32))
     ensures
-        result == (type_label, field_label, value_token),
+        fmt_debug_struct_result_matches_named_fields(type_label, field_label, value_token, result),
 {
     (type_label, field_label, value_token)
 }
@@ -96,7 +145,7 @@ pub fn verify_debug_struct_model_renders_named_fields(type_label: u8, field_labe
 /// named-field shape.
 pub fn verify_debug_tuple_model_renders_positional_fields(type_label: u8, value_token: i32) -> (result: (u8, i32))
     ensures
-        result == (type_label, value_token),
+        fmt_debug_tuple_result_matches_positional_fields(type_label, value_token, result),
 {
     (type_label, value_token)
 }
@@ -106,7 +155,7 @@ pub fn verify_debug_tuple_model_renders_positional_fields(type_label: u8, value_
 /// it from `DebugSet`'s braced shape for the identical two entries.
 pub fn verify_debug_list_model_renders_entries_in_brackets(first_token: i32, second_token: i32) -> (result: (i32, i32))
     ensures
-        result == (first_token, second_token),
+        fmt_debug_list_result_matches_entries_in_brackets(first_token, second_token, result),
 {
     (first_token, second_token)
 }
@@ -116,7 +165,7 @@ pub fn verify_debug_list_model_renders_entries_in_brackets(first_token: i32, sec
 /// `DebugList`'s bracketed shape for the identical two entries.
 pub fn verify_debug_set_model_renders_entries_in_braces(first_token: i32, second_token: i32) -> (result: (i32, i32))
     ensures
-        result == (first_token, second_token),
+        fmt_debug_set_result_matches_entries_in_braces(first_token, second_token, result),
 {
     (first_token, second_token)
 }
@@ -125,7 +174,7 @@ pub fn verify_debug_set_model_renders_entries_in_braces(first_token: i32, second
 /// label and value debug token as a key/value pair.
 pub fn verify_debug_map_model_renders_key_value_pairs(key_label: u8, value_token: i32) -> (result: (u8, i32))
     ensures
-        result == (key_label, value_token),
+        fmt_debug_map_result_matches_key_value_pair(key_label, value_token, result),
 {
     (key_label, value_token)
 }

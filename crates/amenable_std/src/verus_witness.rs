@@ -4198,6 +4198,48 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Formatter<'static>>);
 
 const VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
+const FMT_ARGUMENTS_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_arguments_result_matches_display_token(display_token: i32, result: i32) -> bool {
+    result == display_token
+}"#;
+const FMT_FROM_FN_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_from_fn_result_matches_display_token(display_token: i32, result: i32) -> bool {
+    result == display_token
+}"#;
+const FMT_DEBUG_STRUCT_RESULT_MATCHES_NAMED_FIELDS_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_debug_struct_result_matches_named_fields(
+    type_label: u8,
+    field_label: u8,
+    value_token: i32,
+    result: (u8, u8, i32),
+) -> bool {
+    result == (type_label, field_label, value_token)
+}"#;
+const FMT_DEBUG_TUPLE_RESULT_MATCHES_POSITIONAL_FIELDS_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_debug_tuple_result_matches_positional_fields(
+    type_label: u8,
+    value_token: i32,
+    result: (u8, i32),
+) -> bool {
+    result == (type_label, value_token)
+}"#;
+const FMT_DEBUG_LIST_RESULT_MATCHES_ENTRIES_IN_BRACKETS_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_debug_list_result_matches_entries_in_brackets(
+    first_token: i32,
+    second_token: i32,
+    result: (i32, i32),
+) -> bool {
+    result == (first_token, second_token)
+}"#;
+const FMT_DEBUG_SET_RESULT_MATCHES_ENTRIES_IN_BRACES_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_debug_set_result_matches_entries_in_braces(
+    first_token: i32,
+    second_token: i32,
+    result: (i32, i32),
+) -> bool {
+    result == (first_token, second_token)
+}"#;
+const FMT_DEBUG_MAP_RESULT_MATCHES_KEY_VALUE_PAIR_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_debug_map_result_matches_key_value_pair(
+    key_label: u8,
+    value_token: i32,
+    result: (u8, i32),
+) -> bool {
+    result == (key_label, value_token)
+}"#;
 
 impl VerusWitness for RustStdStandard<std::fmt::Arguments<'static>> {
     type SupportingEvidence = Self;
@@ -4221,6 +4263,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Arguments<'static>>);
         describe: || {
             <RustStdStandard<std::fmt::Arguments<'static>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_ARGUMENTS_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
     }
 }
 
@@ -4257,6 +4308,15 @@ bridge_verus_witness!(
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_FROM_FN_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
 
@@ -4283,6 +4343,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugStruct<'static, 'static>>);
             <RustStdStandard<std::fmt::DebugStruct<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_DEBUG_STRUCT_RESULT_MATCHES_NAMED_FIELDS_VERUS_FRAGMENT,
     }
 }
 
@@ -4315,6 +4384,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugTuple<'static, 'static>>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_DEBUG_TUPLE_RESULT_MATCHES_POSITIONAL_FIELDS_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
 
@@ -4341,6 +4419,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugList<'static, 'static>>);
             <RustStdStandard<std::fmt::DebugList<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_DEBUG_LIST_RESULT_MATCHES_ENTRIES_IN_BRACKETS_VERUS_FRAGMENT,
     }
 }
 
@@ -4373,6 +4460,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugSet<'static, 'static>>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_DEBUG_SET_RESULT_MATCHES_ENTRIES_IN_BRACES_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fmt_carrier.rs");
 
@@ -4399,6 +4495,15 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
             <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FMT_DEBUG_MAP_RESULT_MATCHES_KEY_VALUE_PAIR_VERUS_FRAGMENT,
     }
 }
 
