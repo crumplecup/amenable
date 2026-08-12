@@ -1687,6 +1687,15 @@ bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
 const VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cell_carrier.rs");
 
+const CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_get_set_replace_round_trip_holds(
+    stores_initial: bool,
+    set_overwrites: bool,
+    replace_returns_old: bool,
+    replace_stores_new: bool,
+) -> bool {
+    stores_initial && set_overwrites && replace_returns_old && replace_stores_new
+}"#;
+
 impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1702,6 +1711,15 @@ impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 && result.1 && result.2 && result.3"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
@@ -1709,6 +1727,24 @@ bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
         describe: || {
             <RustStdStandard<std::cell::Cell<i32>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
     }
 }
 

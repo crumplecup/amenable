@@ -30,6 +30,32 @@ pub open spec fn write_stores_new_value(new_value: int, observed: int) -> bool {
     observed == new_value
 }
 
+/// `Cell::new` stores the initial value in the model.
+pub open spec fn cell_model_new_stores_initial_value(observed: int, initial: int) -> bool {
+    observed == initial
+}
+
+/// `Cell::get` reads back the current modeled value.
+pub open spec fn cell_model_get_reads_current_value(observed: int, current: int) -> bool {
+    observed == current
+}
+
+/// `Cell::replace` returns the previous modeled value.
+pub open spec fn cell_model_replace_returns_previous_value(observed: int, previous: int) -> bool {
+    observed == previous
+}
+
+/// The get/set/replace round-trip law the `Cell` accommodation model
+/// establishes.
+pub open spec fn cell_model_get_set_replace_round_trip_holds(
+    stores_initial: bool,
+    set_overwrites: bool,
+    replace_returns_old: bool,
+    replace_stores_new: bool,
+) -> bool {
+    stores_initial && set_overwrites && replace_returns_old && replace_stores_new
+}
+
 /// Models `Cell`'s whole interface — get/set-by-value, nothing more —
 /// not `Cell` itself.
 pub struct VerusCellModel {
@@ -40,7 +66,7 @@ impl VerusCellModel {
     /// `new` stores the initial value.
     pub fn new(initial: i32) -> (result: Self)
         ensures
-            result.value == initial,
+            cell_model_new_stores_initial_value(result.value as int, initial as int),
     {
         Self { value: initial }
     }
@@ -48,7 +74,7 @@ impl VerusCellModel {
     /// `get` reads back the currently stored value.
     pub fn get(&self) -> (result: i32)
         ensures
-            result == self.value,
+            cell_model_get_reads_current_value(result as int, self.value as int),
     {
         self.value
     }
@@ -64,7 +90,7 @@ impl VerusCellModel {
     /// `replace` overwrites the stored value and hands back the old one.
     pub fn replace(&mut self, new_value: i32) -> (result: i32)
         ensures
-            result == old(self).value,
+            cell_model_replace_returns_previous_value(result as int, old(self).value as int),
             write_stores_new_value(new_value as int, final(self).value as int),
     {
         let old_value = self.value;
@@ -79,10 +105,7 @@ impl VerusCellModel {
 /// refine.
 pub fn verify_cell_model_get_set_replace_round_trip(initial: i32, updated: i32, replacement: i32) -> (result: (bool, bool, bool, bool))
     ensures
-        result.0,
-        result.1,
-        result.2,
-        result.3,
+        cell_model_get_set_replace_round_trip_holds(result.0, result.1, result.2, result.3),
 {
     let mut cell = VerusCellModel::new(initial);
     let stores_initial = cell.get() == initial;
