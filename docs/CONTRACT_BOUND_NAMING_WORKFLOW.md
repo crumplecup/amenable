@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-six clusters named, 771 → 363 sites — see "Current state");
+fixed, twenty-seven clusters named, 771 → 359 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **363** sites (was 771; twenty-eight
+  session; total is now **359** sites (was 771; twenty-nine
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -838,6 +838,15 @@ was brought back to zero in three focused follow-up commits.
       `SocketAddrV4`/`SocketAddrV6`/`SocketAddr`. Registered directly
       on `RustStdStandard<u16>` via `kani_ensures!` -- its
       `Ensures<KaniVerifier>` slot was free, no new type needed.
+  29. **`X.upgrade().is_none()` (4 sites)**: "once every strong
+      reference has dropped, upgrading a `Weak` to it can no longer
+      succeed" -- split evenly between `Rc`'s and `Arc`'s `Weak`.
+      Named as `amenable_kani::WeakUpgradeReturnsNone`, same "trust
+      the body, name the flag" shape as
+      `EmptiedContainerReportsEmpty`/`FallibleOperationReportsFailure`,
+      but a distinct type from the latter: `Option::is_none()` and
+      `Result::is_err()` are different outcome shapes, not the same
+      claim restated. Lives in `rust_std::alloc_rc.rs`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
