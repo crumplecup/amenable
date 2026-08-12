@@ -1434,6 +1434,16 @@ bridge_verus_witness!(RustStdStandard<std::str::Chars<'static>>);
 const VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/binary_heap_carrier.rs");
 
+const BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_pop_yields_the_maximum_first(
+    first: int,
+    second: int,
+    a: int,
+    b: int,
+) -> bool {
+    first == if a >= b { a } else { b }
+        && second == if a >= b { b } else { a }
+}"#;
+
 impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1449,6 +1459,15 @@ impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BinaryHeap<i32>>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BinaryHeap<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 == if a >= b { a } else { b } && result.1 == if a >= b { b } else { a }"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
@@ -1456,6 +1475,24 @@ bridge_verus_witness!(RustStdStandard<std::collections::BinaryHeap<i32>>);
         describe: || {
             <RustStdStandard<std::collections::BinaryHeap<i32>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::collections::BinaryHeap<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT,
     }
 }
 

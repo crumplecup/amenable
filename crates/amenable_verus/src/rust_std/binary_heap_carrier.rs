@@ -56,13 +56,50 @@ pub struct VerusMaxHeapPair {
     pub min: i32,
 }
 
+/// The two-push law for the binary-heap accommodation model.
+pub open spec fn binary_heap_model_records_values_in_heap_order(
+    observed_max: i32,
+    observed_min: i32,
+    a: i32,
+    b: i32,
+) -> bool {
+    observed_max == if a >= b { a } else { b }
+        && observed_min == if a >= b { b } else { a }
+}
+
+/// The pop law for the binary-heap accommodation model.
+pub open spec fn binary_heap_model_pop_returns_recorded_order(
+    first: i32,
+    second: i32,
+    max: i32,
+    min: i32,
+) -> bool {
+    first == max && second == min
+}
+
+/// The public max-first pop-order law the modeled two-element heap
+/// establishes.
+pub open spec fn binary_heap_pop_yields_the_maximum_first(
+    first: i32,
+    second: i32,
+    a: i32,
+    b: i32,
+) -> bool {
+    first == if a >= b { a } else { b }
+        && second == if a >= b { b } else { a }
+}
+
 impl VerusMaxHeapPair {
     /// Push two values in either order; the model records which is the
     /// greater, matching a max-heap's ordering law.
     pub fn from_two_pushes(a: i32, b: i32) -> (result: Self)
         ensures
-            result.max == if a >= b { a } else { b },
-            result.min == if a >= b { b } else { a },
+            binary_heap_model_records_values_in_heap_order(
+                result.max,
+                result.min,
+                a,
+                b,
+            ),
     {
         if a >= b {
             Self { max: a, min: b }
@@ -75,8 +112,12 @@ impl VerusMaxHeapPair {
     /// real `BinaryHeap` is expected to refine.
     pub fn pop_max_then_remaining(self) -> (result: (i32, i32))
         ensures
-            result.0 == self.max,
-            result.1 == self.min,
+            binary_heap_model_pop_returns_recorded_order(
+                result.0,
+                result.1,
+                self.max,
+                self.min,
+            ),
     {
         (self.max, self.min)
     }
@@ -87,8 +128,12 @@ impl VerusMaxHeapPair {
 /// law `BinaryHeap<i32>::push`/`pop` are expected to refine.
 pub fn verify_max_heap_pair_pops_the_maximum_first(a: i32, b: i32) -> (result: (i32, i32))
     ensures
-        result.0 == if a >= b { a } else { b },
-        result.1 == if a >= b { b } else { a },
+        binary_heap_pop_yields_the_maximum_first(
+            result.0,
+            result.1,
+            a,
+            b,
+        ),
 {
     let heap = VerusMaxHeapPair::from_two_pushes(a, b);
     heap.pop_max_then_remaining()
