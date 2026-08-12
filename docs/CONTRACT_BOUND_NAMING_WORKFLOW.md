@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, sixteen clusters named, 771 → 420 sites — see "Current state");
+fixed, seventeen clusters named, 771 → 413 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **420** sites (was 771; eighteen intervening
+  session; total is now **413** sites (was 771; nineteen intervening
   fixes landed, see below). Re-run the scan before picking the next
   cluster — this list will drift as work lands.
 
@@ -718,6 +718,14 @@ was brought back to zero in three focused follow-up commits.
       and `verify_vec_extract_if_partitions_by_the_predicate`'s
       3-element `vec![1, 3, 4]` comparison (the sibling
       `X == X![X, X, X]` cluster, otherwise still open).
+  19. **`X.kind() == X::X::X` (7 sites)**: "a rendered value's
+      `.kind()` matches the formatting operation that actually built
+      it" -- one site per `KaniFmt` builder (`arguments`, the five
+      `Debug*` builders, and `from_fn`), each comparing against a
+      different variant of the local `KaniRenderedKind` enum. Named as
+      `amenable_kani::RenderedKindMatchesTheBuildingOperation`, needing
+      no type parameter since every real site already compares the
+      same fixed enum type. Lives in `rust_std::fmt.rs`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
