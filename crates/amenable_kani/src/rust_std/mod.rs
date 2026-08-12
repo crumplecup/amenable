@@ -73,6 +73,7 @@ pub use alloc_collections::{
 };
 pub use alloc_rc::StrongCountTracksLiveReferences;
 pub use alloc_vec::VecLengthTracksPushesAndPops;
+pub use cell::GetterRecoversTheStoredReference;
 pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;

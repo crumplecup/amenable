@@ -23,6 +23,8 @@ use super::CheckedProof;
 use crate::AtomicLoadReflectsTheLastWrite;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
+use crate::GetterRecoversTheStoredReference;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
@@ -422,13 +424,12 @@ amenable_derive::harness! {
 
             let value: i32 = kani::any();
             assert!(cell.set(value).is_ok(), "the first set succeeds");
-            assert_eq!(cell.get(), Some(&value));
+            assert!(GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))));
 
             let other: i32 = kani::any();
             assert!(cell.set(other).is_err(), "a second set is rejected");
-            assert_eq!(
-                cell.get(),
-                Some(&value),
+            assert!(
+                GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
                 "the original value survives a rejected second set"
             );
         }

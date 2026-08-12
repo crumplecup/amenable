@@ -316,6 +316,97 @@ amenable_derive::harness! {
     }
 }
 
+/// An `(actual, expected)` pair of `.get()` results known to agree: a
+/// once-initialized cell's getter yields a reference to the exact
+/// value it was set with.
+///
+/// Independently hand-written as `assert_eq!(cell.get(), Some(&value),
+/// ...)` at 4 real sites split between `OnceCell` and `OnceLock` --
+/// the identical claim regardless of the single-/multi-threaded
+/// carrier. A distinct access pattern from
+/// `IteratorYieldsAReferenceToTheStoredValue` even though the
+/// `Ensures` impl body and the lifetime-generic design are identical:
+/// that type's own name and doc comment are specifically about
+/// iteration (`.next()`), not a plain getter -- same reasoning as
+/// keeping `FieldAccessRecoversTheStoredValue` separate from
+/// `IndexRecoversTheStoredElement` despite type-level overlap.
+pub struct GetterRecoversTheStoredReference<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for GetterRecoversTheStoredReference<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for GetterRecoversTheStoredReference<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for GetterRecoversTheStoredReference<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_once_cell_initializes_exactly_once".to_owned(),
+            claim: VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for GetterRecoversTheStoredReference<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for GetterRecoversTheStoredReference<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::GetterRecoversTheStoredReference",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::GetterRecoversTheStoredReference",
+        verifier: "kani",
+        describe: || <GetterRecoversTheStoredReference<i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<OnceCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -352,13 +443,15 @@ amenable_derive::harness! {
 
             let value: i32 = kani::any();
             assert!(cell.set(value).is_ok(), "the first set succeeds");
-            assert_eq!(cell.get(), Some(&value), "get returns the set value");
+            assert!(
+                GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
+                "get returns the set value"
+            );
 
             let other: i32 = kani::any();
             assert!(cell.set(other).is_err(), "a second set is rejected");
-            assert_eq!(
-                cell.get(),
-                Some(&value),
+            assert!(
+                GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
                 "the original value survives a rejected second set"
             );
         }
