@@ -16,13 +16,22 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The `Box` deref/write-through law this carrier establishes.
+pub open spec fn box_derefs_and_writes_through(
+    deref_value: int,
+    observed_after_write: int,
+    initial: int,
+    updated: int,
+) -> bool {
+    deref_value == initial && observed_after_write == updated
+}
+
 /// `Box::new` derefs to the value it wraps, and a write through
 /// `DerefMut` is visible on the next read — the deref/write-through half
 /// of the claim the Kani harness checks.
 pub fn verify_box_derefs_and_writes_through(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        result.0 == value,
-        result.1 == updated,
+        box_derefs_and_writes_through(result.0, result.1, value, updated),
 {
     let mut boxed = Box::new(value);
     let deref_value = *boxed;

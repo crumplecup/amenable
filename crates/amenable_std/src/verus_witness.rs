@@ -663,6 +663,15 @@ bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
 const VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/box_carrier.rs");
 
+const BOX_DEREFS_AND_WRITES_THROUGH_VERUS_FRAGMENT: &str = r#"pub open spec fn box_derefs_and_writes_through(
+    deref_value: int,
+    observed_after_write: int,
+    initial: int,
+    updated: int,
+) -> bool {
+    deref_value == initial && observed_after_write == updated
+}"#;
+
 impl VerusWitness for RustStdStandard<Box<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -678,11 +687,38 @@ impl VerusWitness for RustStdStandard<Box<i32>> {
 
 bridge_verus_witness!(RustStdStandard<Box<i32>>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<Box<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 == value && result.1 == updated"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
         verifier: "verus",
         describe: || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<Box<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || BOX_DEREFS_AND_WRITES_THROUGH_VERUS_FRAGMENT,
     }
 }
 
