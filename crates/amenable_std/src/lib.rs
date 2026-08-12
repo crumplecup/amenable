@@ -14,6 +14,8 @@
 #![warn(missing_docs)]
 
 mod argv_includes_program_path;
+mod array_into_iter_advance_matches_position;
+mod array_into_iter_starts_at_first_position;
 mod ascii_byte;
 mod cert;
 mod compose_any_length_is_bounded;
@@ -41,9 +43,12 @@ mod verus_gallery;
 mod verus_witness;
 mod windows_handle_or_invalid_rejects_only_the_sentinel;
 mod write_stores_new_value;
+mod yields_three_values_in_order_then_ends;
 mod yields_two_values_in_order_then_ends;
 
 pub use argv_includes_program_path::ArgvIncludesProgramPath;
+pub use array_into_iter_advance_matches_position::ArrayIntoIterAdvanceMatchesPosition;
+pub use array_into_iter_starts_at_first_position::ArrayIntoIterStartsAtFirstPosition;
 pub use ascii_byte::AsciiByte;
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
 pub use compose_any_length_is_bounded::ComposeAnyLengthIsBounded;
@@ -84,4 +89,5 @@ pub use verus_gallery::{
 pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
 pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
 pub use write_stores_new_value::WriteStoresNewValue;
+pub use yields_three_values_in_order_then_ends::YieldsThreeValuesInOrderThenEnds;
 pub use yields_two_values_in_order_then_ends::YieldsTwoValuesInOrderThenEnds;

@@ -53,8 +53,9 @@ use std::os::windows::io::{
 };
 
 use crate::{
-    AsciiByte, IncrementHeadroom, NonNulByte, ObservedValueMatchesInput, RustStdProvenance,
-    RustStdStandard, ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue,
+    ArrayIntoIterAdvanceMatchesPosition, ArrayIntoIterStartsAtFirstPosition, AsciiByte,
+    IncrementHeadroom, NonNulByte, ObservedValueMatchesInput, RustStdProvenance, RustStdStandard,
+    ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue, YieldsThreeValuesInOrderThenEnds,
 };
 
 /// The Verus verifier, local to this crate: there is only one verifier
@@ -1571,6 +1572,191 @@ const WRITE_STORES_NEW_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn write_st
 
 const VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/array_into_iter_carrier.rs");
+
+/// [`ArrayIntoIterStartsAtFirstPosition`] reuses the array `IntoIter`
+/// harness rather than adding a new Verus proof: it names the model's
+/// initial-state law.
+impl VerusWitness for ArrayIntoIterStartsAtFirstPosition {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_array_into_iter_model_yields_elements_in_order",
+            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ArrayIntoIterStartsAtFirstPosition);
+
+impl Ensures<VerusVerifier> for ArrayIntoIterStartsAtFirstPosition {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.first == first && result.second == second && result.third == third && result.position == 0"
+    }
+}
+
+const ARRAY_INTO_ITER_STARTS_AT_FIRST_POSITION_VERUS_FRAGMENT: &str = r#"pub open spec fn array_into_iter_model_starts_at_first_position(
+    observed_first: i32,
+    observed_second: i32,
+    observed_third: i32,
+    observed_position: u8,
+    first: i32,
+    second: i32,
+    third: i32,
+) -> bool {
+    observed_first == first
+        && observed_second == second
+        && observed_third == third
+        && observed_position == 0
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArrayIntoIterStartsAtFirstPosition",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ArrayIntoIterStartsAtFirstPosition as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArrayIntoIterStartsAtFirstPosition",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || ARRAY_INTO_ITER_STARTS_AT_FIRST_POSITION_VERUS_FRAGMENT,
+    }
+}
+
+/// [`ArrayIntoIterAdvanceMatchesPosition`] reuses the array `IntoIter`
+/// harness rather than adding a new Verus proof: it names the model's
+/// one-step transition law.
+impl VerusWitness for ArrayIntoIterAdvanceMatchesPosition {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_array_into_iter_model_yields_elements_in_order",
+            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ArrayIntoIterAdvanceMatchesPosition);
+
+impl Ensures<VerusVerifier> for ArrayIntoIterAdvanceMatchesPosition {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "old(self).position drives the yielded value, final position, and element preservation"
+    }
+}
+
+const ARRAY_INTO_ITER_ADVANCE_MATCHES_POSITION_VERUS_FRAGMENT: &str = r#"pub open spec fn array_into_iter_advance_matches_position(
+    old_position: u8,
+    yielded: Option<i32>,
+    final_position: u8,
+    old_first: i32,
+    old_second: i32,
+    old_third: i32,
+    final_first: i32,
+    final_second: i32,
+    final_third: i32,
+) -> bool {
+    (old_position == 0 ==> yielded == Some(old_first) && final_position == 1)
+        && (old_position == 1 ==> yielded == Some(old_second) && final_position == 2)
+        && (old_position == 2 ==> yielded == Some(old_third) && final_position == 3)
+        && (old_position >= 3 ==> yielded is None && final_position == old_position)
+        && final_first == old_first
+        && final_second == old_second
+        && final_third == old_third
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArrayIntoIterAdvanceMatchesPosition",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ArrayIntoIterAdvanceMatchesPosition as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ArrayIntoIterAdvanceMatchesPosition",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || ARRAY_INTO_ITER_ADVANCE_MATCHES_POSITION_VERUS_FRAGMENT,
+    }
+}
+
+/// [`YieldsThreeValuesInOrderThenEnds`] reuses the array `IntoIter`
+/// harness rather than adding a new Verus proof: it names the
+/// fixed-length consuming-iterator law the carrier already establishes.
+impl VerusWitness for YieldsThreeValuesInOrderThenEnds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_array_into_iter_model_yields_elements_in_order",
+            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(YieldsThreeValuesInOrderThenEnds);
+
+impl Ensures<VerusVerifier> for YieldsThreeValuesInOrderThenEnds {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 == Some(first) && result.1 == Some(second) && result.2 == Some(third) && result.3 is None"
+    }
+}
+
+const YIELDS_THREE_VALUES_IN_ORDER_THEN_ENDS_VERUS_FRAGMENT: &str = r#"pub open spec fn yields_three_values_in_order_then_ends(
+    observed_first: Option<i32>,
+    observed_second: Option<i32>,
+    observed_third: Option<i32>,
+    exhausted: Option<i32>,
+    first: i32,
+    second: i32,
+    third: i32,
+) -> bool {
+    observed_first == Some(first)
+        && observed_second == Some(second)
+        && observed_third == Some(third)
+        && exhausted is None
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::YieldsThreeValuesInOrderThenEnds",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <YieldsThreeValuesInOrderThenEnds as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::YieldsThreeValuesInOrderThenEnds",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || YIELDS_THREE_VALUES_IN_ORDER_THEN_ENDS_VERUS_FRAGMENT,
+    }
+}
 
 impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type SupportingEvidence = Self;
