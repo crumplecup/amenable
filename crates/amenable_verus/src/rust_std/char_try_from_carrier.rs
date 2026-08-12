@@ -11,6 +11,42 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn u32_is_valid_unicode_scalar(value: u32) -> bool {
+    value <= 0x0010_FFFF && !(0xD800 <= value && value <= 0xDFFF)
+}
+
+pub open spec fn char_try_from_u32_succeeds_with_same_scalar(
+    value: u32,
+    result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
+) -> bool {
+    u32_is_valid_unicode_scalar(value) ==> (result is Ok && (result->Ok_0 as u32) == value)
+}
+
+pub open spec fn char_try_from_u32_rejects_invalid_scalar(
+    value: u32,
+    result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
+) -> bool {
+    !u32_is_valid_unicode_scalar(value) ==> result is Err
+}
+
+pub open spec fn char_fits_in_u8(value: char) -> bool {
+    (value as u32) <= 0xFF
+}
+
+pub open spec fn u8_try_from_char_succeeds_with_same_scalar(
+    value: char,
+    result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
+) -> bool {
+    char_fits_in_u8(value) ==> (result is Ok && (result->Ok_0 as u32) == (value as u32))
+}
+
+pub open spec fn u8_try_from_char_rejects_out_of_range_scalar(
+    value: char,
+    result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
+) -> bool {
+    !char_fits_in_u8(value) ==> result is Err
+}
+
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
@@ -23,14 +59,14 @@ pub struct ExTryFromCharError(core::char::TryFromCharError);
 
 pub assume_specification [<char as core::convert::TryFrom<u32>>::try_from] (value: u32) -> (result: Result<char, <char as core::convert::TryFrom<u32>>::Error>)
     ensures
-        (value <= 0x0010_FFFF && !(0xD800 <= value && value <= 0xDFFF)) ==> (result is Ok && (result->Ok_0 as u32) == value),
-        (value > 0x0010_FFFF || (0xD800 <= value && value <= 0xDFFF)) ==> result is Err,
+        char_try_from_u32_succeeds_with_same_scalar(value, result),
+        char_try_from_u32_rejects_invalid_scalar(value, result),
 ;
 
 pub assume_specification [<u8 as core::convert::TryFrom<char>>::try_from] (value: char) -> (result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>)
     ensures
-        (value as u32) <= 0xFF ==> (result is Ok && (result->Ok_0 as u32) == (value as u32)),
-        (value as u32) > 0xFF ==> result is Err,
+        u8_try_from_char_succeeds_with_same_scalar(value, result),
+        u8_try_from_char_rejects_out_of_range_scalar(value, result),
 ;
 
 /// `char::try_from(u32)` succeeds exactly for valid Unicode scalar

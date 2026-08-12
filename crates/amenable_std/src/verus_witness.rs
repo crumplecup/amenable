@@ -847,6 +847,24 @@ bridge_verus_witness!(RustStdStandard<Vec<i32>>);
 const VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
 
+const U32_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn u32_is_valid_unicode_scalar(value: u32) -> bool {
+    value <= 0x0010_FFFF && !(0xD800 <= value && value <= 0xDFFF)
+}"#;
+
+const CHAR_TRY_FROM_U32_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn char_try_from_u32_succeeds_with_same_scalar(
+    value: u32,
+    result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
+) -> bool {
+    u32_is_valid_unicode_scalar(value) ==> (result is Ok && (result->Ok_0 as u32) == value)
+}"#;
+
+const CHAR_TRY_FROM_U32_REJECTS_INVALID_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn char_try_from_u32_rejects_invalid_scalar(
+    value: u32,
+    result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
+) -> bool {
+    !u32_is_valid_unicode_scalar(value) ==> result is Err
+}"#;
+
 impl VerusWitness for RustStdStandard<core::char::CharTryFromError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -872,8 +890,53 @@ bridge_verus_witness!(RustStdStandard<core::char::CharTryFromError>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || U32_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHAR_TRY_FROM_U32_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHAR_TRY_FROM_U32_REJECTS_INVALID_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
+
+const CHAR_FITS_IN_U8_VERUS_FRAGMENT: &str = r#"pub open spec fn char_fits_in_u8(value: char) -> bool {
+    (value as u32) <= 0xFF
+}"#;
+
+const U8_TRY_FROM_CHAR_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn u8_try_from_char_succeeds_with_same_scalar(
+    value: char,
+    result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
+) -> bool {
+    char_fits_in_u8(value) ==> (result is Ok && (result->Ok_0 as u32) == (value as u32))
+}"#;
+
+const U8_TRY_FROM_CHAR_REJECTS_OUT_OF_RANGE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn u8_try_from_char_rejects_out_of_range_scalar(
+    value: char,
+    result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
+) -> bool {
+    !char_fits_in_u8(value) ==> result is Err
+}"#;
 
 impl VerusWitness for RustStdStandard<core::char::TryFromCharError> {
     type SupportingEvidence = Self;
@@ -897,6 +960,33 @@ bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
         describe: || {
             <RustStdStandard<core::char::TryFromCharError> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHAR_FITS_IN_U8_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || U8_TRY_FROM_CHAR_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || U8_TRY_FROM_CHAR_REJECTS_OUT_OF_RANGE_SCALAR_VERUS_FRAGMENT,
     }
 }
 
