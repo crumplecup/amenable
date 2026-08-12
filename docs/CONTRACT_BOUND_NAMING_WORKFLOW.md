@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, seventeen clusters named, 771 → 413 sites — see "Current state");
+fixed, eighteen clusters named, 771 → 406 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **413** sites (was 771; nineteen intervening
+  session; total is now **406** sites (was 771; twenty intervening
   fixes landed, see below). Re-run the scan before picking the next
   cluster — this list will drift as work lands.
 
@@ -726,6 +726,20 @@ was brought back to zero in three focused follow-up commits.
       `amenable_kani::RenderedKindMatchesTheBuildingOperation`, needing
       no type parameter since every real site already compares the
       same fixed enum type. Lives in `rust_std::fmt.rs`.
+  20. **`X.next() == Some(&X)` (7 sites)**: "an iterator over shared
+      references yields a reference to the exact value known to be
+      there" -- spans `LinkedList::iter`, `VecDeque::iter`,
+      `Option::iter`, `Result::iter`, and `slice::iter`. Named as
+      `amenable_kani::IteratorYieldsAReferenceToTheStoredValue<T>`, the
+      ninth generic contract type this session -- but unlike every
+      other generic type so far (which varies over the *element* type
+      across real sites), this one is generic to accommodate the
+      *borrow's lifetime* instead: every real site already uses `i32`,
+      but each borrows from its own local container, so `T` is
+      inferred as the full `Option<&'a i32>` at each call site rather
+      than varying a plain element type -- a non-generic type has no
+      way to name an unconstrained lifetime. Lives in
+      `rust_std::alloc_collections.rs` (majority owner, 4 of 7 sites).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a

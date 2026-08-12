@@ -11,16 +11,18 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 413 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 406 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus seventeen clusters named -- eight
+missing negated-call shape) plus eighteen clusters named -- nine
 generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`,
 `SplitOperandsAreDistinctFromThePattern<T>`,
 `ThreeSplitOperandsAreDistinctFromThePattern<T>`,
-`IndexRecoversTheStoredElement<T>`, `CollectedSequenceMatchesExpected<T>`
--- two of these `Requires`-shaped, not `Ensures`), five non-generic
+`IndexRecoversTheStoredElement<T>`, `CollectedSequenceMatchesExpected<T>`,
+`IteratorYieldsAReferenceToTheStoredValue<T>` -- two of these
+`Requires`-shaped, not `Ensures`, and the last one generic over a
+borrow's lifetime rather than an element type), five non-generic
 (`EmptiedContainerReportsEmpty`, `FallibleOperationReportsFailure`,
 `StrongCountTracksLiveReferences`, `FirstValueIsLessThanTheSecond`,
 `RenderedKindMatchesTheBuildingOperation`), a per-width pair
