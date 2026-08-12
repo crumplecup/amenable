@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, thirty-one clusters named, 771 → 345 sites — see "Current state");
+fixed, thirty-two clusters named, 771 → 342 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **345** sites (was 771; thirty-three
+  session; total is now **342** sites (was 771; thirty-four
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -869,6 +869,14 @@ was brought back to zero in three focused follow-up commits.
       "a produced sequence matches exactly the expected content" claim,
       no new type needed despite the accessor being `.as_bytes()`
       rather than `.collect()`.
+  34. **`X.finish() == X.finish()` (3 sites)**: "two hashers over
+      identical input produce matching digests" across
+      `rust_std::hash`'s `BuildHasherDefault`/`SipHasher` harnesses and
+      `rust_std::std_hash`'s `DefaultHasher` harness. Registered
+      directly on `RustStdStandard<u64>` via `kani_ensures!` -- its
+      `Ensures<KaniVerifier>` slot was free (only `Requires` was
+      previously registered there, for `checked_add`), no new type
+      needed.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
