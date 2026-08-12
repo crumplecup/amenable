@@ -11,16 +11,20 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 381 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 376 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus twenty-two clusters named (two of
+missing negated-call shape) plus twenty-three clusters named (two of
 which reused already-named types instead of minting new ones --
 `FirstValueIsLessThanTheSecond` for `rust_std::iter`'s
 overflow-avoidance bounds, `IteratorYieldsAReferenceToTheStoredValue`
 for `rust_std::slice`'s chunk/window groupings, plus new
-`ByteIsDistinctFromTheMarker` and `FieldAccessRecoversTheStoredValue<T>`
-types for `rust_std::io`'s single-pair distinctness checks and the
-tuple/struct field-access equality bound respectively) -- ten
+`ByteIsDistinctFromTheMarker`, `FieldAccessRecoversTheStoredValue<T>`,
+and `FourBytesAreEachAscii` types for `rust_std::io`'s single-pair
+distinctness checks, the tuple/struct field-access equality bound, and
+a combined 4-way ASCII-range precondition respectively -- the last one
+a re-do after a first attempt compiled clean but didn't move the
+rescan count, since the naming-workflow doc's `&&`-combined-clause
+Gotcha wasn't followed the first time) -- eleven
 generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`,
@@ -30,10 +34,10 @@ generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `IteratorYieldsAReferenceToTheStoredValue<T>`,
 `FieldAccessRecoversTheStoredValue<T>` -- two of these `Requires`-shaped,
 not `Ensures`, and one generic over a borrow's lifetime rather than an
-element type), six non-generic (`EmptiedContainerReportsEmpty`,
+element type), seven non-generic (`EmptiedContainerReportsEmpty`,
 `FallibleOperationReportsFailure`, `StrongCountTracksLiveReferences`,
 `FirstValueIsLessThanTheSecond`, `RenderedKindMatchesTheBuildingOperation`,
-`ByteIsDistinctFromTheMarker`), a per-width pair
+`ByteIsDistinctFromTheMarker`, `FourBytesAreEachAscii`), a per-width pair
 (`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own `Requires` slots,
 for `checked_add` not overflowing), a reuse of an already-existing type
 (`amenable_std::AsciiByte`'s `Requires` impl, whose 4 real call sites

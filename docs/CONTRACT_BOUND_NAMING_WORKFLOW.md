@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-two clusters named, 771 → 381 sites — see "Current state");
+fixed, twenty-three clusters named, 771 → 376 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -345,6 +345,26 @@ shape-clustering is a hint to investigate, not an automatic merge.
   original gate from its intended item and the import becomes
   unconditional (caught once via a stray `warning: unused import` on a
   plain `cargo check`).
+- **A `kani::assume(EXPR)` clause is only recognized when `EXPR` is
+  itself a single call — never a `&&`-combined expression of several
+  real calls, even when every operand individually calls something
+  registered.** `matches_named_call`'s Kani shape requires a bare
+  `syn::Expr::Call` (or one negated `!`); `a != b && c != d` combining
+  two calls to a real registered predicate is `syn::Expr::Binary`, not
+  a call, and can never match — no matter how compliant each half
+  looks. This bit twice this session in the same way: once designing
+  `SplitOperandsAreDistinctFromThePattern`/`ThreeSplitOperandsAreDistinctFromThePattern`
+  (correctly avoided the trap by writing one combined predicate from
+  the start), and once *not* avoiding it — rewriting a 4-way `< 128`
+  clause as `AsciiByte::requires(a) && AsciiByte::requires(pattern) &&
+  ...` compiled clean and looked right, but the rescan count didn't
+  move, because the call site was still one `&&` expression, not one
+  call. The fix each time is the same: write **one** contract type
+  whose own predicate body contains the `&&`, so the real call site
+  becomes `kani::assume(Type::requires((a, b, c, d)))` — a single
+  call. **Always rescan after any multi-operand rewrite before trusting
+  it**, not just after single-operand ones — this is exactly the kind
+  of case where the code looks obviously correct and isn't recognized.
 - **Associated-type uniqueness.** `impl Ensures<KaniVerifier> for
   RustStdStandard<NonZero<i8>>` can exist exactly once per concrete
   type. If the natural carrier already carries a *different* bound
@@ -420,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **381** sites (was 771; twenty-four
+  session; total is now **376** sites (was 771; twenty-five
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -783,6 +803,21 @@ was brought back to zero in three focused follow-up commits.
       from `DerefReflectsTheStoredValue` (item 18) despite type-level
       overlap. Lives in `rust_std::primitives.rs`, alongside its
       sibling access-pattern types.
+  25. **`X < X && X < X && X < X && X < X` (5 sites)**: 5 real sites in
+      `rust_std::str`'s `*n`/`matches`/`match_indices` family already
+      carried a canonical-home comment pointing at `AsciiByte`'s
+      existing single-byte `< 128` precondition. First attempt
+      rewrote each site to `AsciiByte::requires(a) &&
+      AsciiByte::requires(pattern) && ...` -- compiled clean, but the
+      rescan count didn't move: the call-shape scanner only accepts a
+      `kani::assume(EXPR)` clause when `EXPR` itself is a single call,
+      never a `&&`-combined expression of several real calls, even
+      when every operand individually calls something registered (see
+      the new Gotchas entry below). Named
+      `amenable_kani::FourBytesAreEachAscii` instead, a single combined
+      predicate over all four bytes at once -- fixed the count on
+      re-rescan. Lives in `rust_std::primitives.rs`, next to
+      `AsciiByte`'s own registration.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
