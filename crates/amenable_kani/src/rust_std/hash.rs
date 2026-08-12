@@ -3,6 +3,8 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::BuildHasherDefault;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
@@ -58,9 +60,8 @@ amenable_derive::harness! {
             let mut h2 = builder.build_hasher();
             h1.write_u8(value);
             h2.write_u8(value);
-            assert_eq!(
-                h1.finish(),
-                h2.finish(),
+            assert!(
+                RustStdStandard::<u64>::ensures((h1.finish(), h2.finish())),
                 "BuildHasherDefault produces hashers with consistent, deterministic output"
             );
         }
@@ -127,9 +128,8 @@ amenable_derive::harness! {
             let mut h2 = std::hash::SipHasher::new();
             h1.write_u8(value);
             h2.write_u8(value);
-            assert_eq!(
-                h1.finish(),
-                h2.finish(),
+            assert!(
+                RustStdStandard::<u64>::ensures((h1.finish(), h2.finish())),
                 "SipHasher produces consistent, deterministic output"
             );
         }

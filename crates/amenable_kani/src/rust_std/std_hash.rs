@@ -2,6 +2,8 @@
 
 use std::hash::{DefaultHasher, RandomState};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
@@ -47,7 +49,7 @@ amenable_derive::harness! {
             let mut second = DefaultHasher::new();
             "some value".hash(&mut second);
 
-            assert_eq!(first.finish(), second.finish());
+            assert!(RustStdStandard::<u64>::ensures((first.finish(), second.finish())));
         }
     }
 }

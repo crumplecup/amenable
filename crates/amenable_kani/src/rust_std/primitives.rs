@@ -88,6 +88,20 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+// Two hashers over identical input producing matching digests is
+// independently restated at 3 real sites (`assert_eq!(h1.finish(),
+// h2.finish(), ...)`) across `rust_std::hash`'s `BuildHasherDefault`/
+// `SipHasher` harnesses and `rust_std::std_hash`'s `DefaultHasher`
+// harness. `RustStdStandard<u64>`'s `Ensures<KaniVerifier>` slot was
+// free (only `Requires` was previously registered there, for
+// `checked_add`).
+kani_ensures!(
+    RustStdStandard<u64>,
+    "amenable_std::rust_std::RustStdStandard<u64>",
+    (u64, u64),
+    |(actual, expected)| actual == expected
+);
+
 impl KaniWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
