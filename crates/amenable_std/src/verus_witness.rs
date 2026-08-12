@@ -1379,6 +1379,20 @@ bridge_verus_witness!(RustStdStandard<std::hash::SipHasher>);
 const VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cow_carrier.rs");
 
+const I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT: &str = r#"pub open spec fn i32_to_owned_spec_is_identity(value: i32) -> bool {
+    to_owned_spec(&value) == value
+}"#;
+
+const COW_INTO_OWNED_PRESERVES_VARIANT_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cow_into_owned_preserves_variant_value<'a, B: ToOwned + ?Sized>(
+    cow: Cow<'a, B>,
+    result: <B as ToOwned>::Owned,
+) -> bool {
+    match cow {
+        Cow::Borrowed(b) => result == to_owned_spec(b),
+        Cow::Owned(o) => result == o,
+    }
+}"#;
+
 impl VerusWitness for RustStdStandard<std::borrow::Cow<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1401,6 +1415,42 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
         describe: || {
             <RustStdStandard<std::borrow::Cow<'static, i32>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || "#[trigger] to_owned_spec(&value) == value",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || "match cow { Cow::Borrowed(b) => result == to_owned_spec(b), Cow::Owned(o) => result == o, }",
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || COW_INTO_OWNED_PRESERVES_VARIANT_VALUE_VERUS_FRAGMENT,
     }
 }
 

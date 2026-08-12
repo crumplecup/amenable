@@ -30,6 +30,20 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn i32_to_owned_spec_is_identity(value: i32) -> bool {
+    to_owned_spec(&value) == value
+}
+
+pub open spec fn cow_into_owned_preserves_variant_value<'a, B: ToOwned + ?Sized>(
+    cow: Cow<'a, B>,
+    result: <B as ToOwned>::Owned,
+) -> bool {
+    match cow {
+        Cow::Borrowed(b) => result == to_owned_spec(b),
+        Cow::Owned(o) => result == o,
+    }
+}
+
 /// `ToOwned::to_owned`'s abstract result for a bare generic `B` —
 /// opaque (uninterpreted), connected to the concrete `i32` case (where
 /// `to_owned` is exactly `Clone::clone`, an identity-preserving
@@ -39,16 +53,13 @@ pub uninterp spec fn to_owned_spec<B: ToOwned + ?Sized>(b: &B) -> <B as ToOwned>
 #[verifier::external_body]
 pub broadcast proof fn axiom_i32_to_owned_is_identity(value: i32)
     ensures
-        #[trigger] to_owned_spec(&value) == value,
+        i32_to_owned_spec_is_identity(value),
 {
 }
 
 pub assume_specification<'a, B: ToOwned + ?Sized> [Cow::<'a, B>::into_owned] (cow: Cow<'a, B>) -> (result: <B as ToOwned>::Owned)
     ensures
-        match cow {
-            Cow::Borrowed(b) => result == to_owned_spec(b),
-            Cow::Owned(o) => result == o,
-        },
+        cow_into_owned_preserves_variant_value(cow, result),
 ;
 
 /// `Cow::Borrowed`/`Cow::Owned` construct their respective variants, and
