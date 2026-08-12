@@ -15,12 +15,20 @@ verus! {
 #[verifier::external_body]
 pub struct ExFromVecWithNulError(FromVecWithNulError);
 
+pub open spec fn from_vec_with_nul_result_matches_nul_placement(
+    bytes: Vec<u8>,
+    result: Result<CString, FromVecWithNulError>,
+) -> bool {
+    (bytes@.len() > 0 && bytes@[bytes@.len() - 1] == 0
+        && !(exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0)
+        ==> result is Ok)
+        && (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0 ==> result is Err)
+        && ((exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err)
+}
+
 pub assume_specification [CString::from_vec_with_nul] (bytes: Vec<u8>) -> (result: Result<CString, FromVecWithNulError>)
     ensures
-        (bytes@.len() > 0 && bytes@[bytes@.len() - 1] == 0
-            && !(exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0)) ==> result is Ok,
-        (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0) ==> result is Err,
-        (exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err,
+        from_vec_with_nul_result_matches_nul_placement(bytes, result),
 ;
 
 /// `CString::from_vec_with_nul` requires the nul to be exactly the last
@@ -32,7 +40,7 @@ pub fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (r
     requires
         // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
         // impl (rust_std::cstr_carrier) names this exact fragment.
-        byte != 0,
+        from_vec_with_nul_test_byte_is_nonzero(byte),
     ensures
         result.0,
         result.1,
@@ -57,6 +65,10 @@ pub fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (r
     let rejected_early_nul = nul_before_end_result.is_err();
 
     (accepted, rejected_no_nul, rejected_early_nul)
+}
+
+pub open spec fn from_vec_with_nul_test_byte_is_nonzero(byte: u8) -> bool {
+    byte != 0
 }
 
 } // verus!

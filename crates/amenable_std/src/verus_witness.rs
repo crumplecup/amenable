@@ -1323,6 +1323,21 @@ impl Requires<VerusVerifier> for RustStdStandard<std::ffi::NulError> {
 const VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/from_vec_with_nul_carrier.rs");
 
+const FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT: &str = r#"pub open spec fn from_vec_with_nul_result_matches_nul_placement(
+    bytes: Vec<u8>,
+    result: Result<CString, FromVecWithNulError>,
+) -> bool {
+    (bytes@.len() > 0 && bytes@[bytes@.len() - 1] == 0
+        && !(exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0)
+        ==> result is Ok)
+        && (!exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0 ==> result is Err)
+        && ((exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err)
+}"#;
+
+const FROM_VEC_WITH_NUL_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn from_vec_with_nul_test_byte_is_nonzero(byte: u8) -> bool {
+    byte != 0
+}"#;
+
 impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1338,6 +1353,15 @@ impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::FromVecWithNulError>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::ffi::FromVecWithNulError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "byte != 0"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
@@ -1345,6 +1369,33 @@ bridge_verus_witness!(RustStdStandard<std::ffi::FromVecWithNulError>);
         describe: || {
             <RustStdStandard<std::ffi::FromVecWithNulError> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::ffi::FromVecWithNulError> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || FROM_VEC_WITH_NUL_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT,
     }
 }
 
