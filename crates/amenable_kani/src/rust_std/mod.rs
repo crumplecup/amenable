@@ -70,6 +70,7 @@ mod time;
 pub use alloc_collections::{EmptiedContainerReportsEmpty, FirstValueIsLessThanTheSecond};
 pub use alloc_rc::StrongCountTracksLiveReferences;
 pub use alloc_vec::VecLengthTracksPushesAndPops;
+pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use option_result::FallibleOperationReportsFailure;

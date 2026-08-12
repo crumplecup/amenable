@@ -97,8 +97,9 @@ pub use rust_std::{
     DerefReflectsTheStoredValue, EmptiedContainerReportsEmpty, FallibleOperationReportsFailure,
     FirstValueIsLessThanTheSecond, IndexRecoversTheStoredElement,
     IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
-    ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
+    RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,
+    StrongCountTracksLiveReferences, ThreeSplitOperandsAreDistinctFromThePattern,
+    VecLengthTracksPushesAndPops,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};

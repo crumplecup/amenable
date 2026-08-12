@@ -13,12 +13,15 @@
 
 use core::fmt::{Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
+use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::fmt::Alignment> {
     type SupportingEvidence = Self;
@@ -64,6 +67,58 @@ amenable_derive::harness! {
     }
 }
 
+/// A rendered value's `.kind()` known to match the formatting operation
+/// that actually built it.
+///
+/// Independently hand-written as `assert_eq!(rendered.kind(),
+/// crate::KaniRenderedKind::Variant)` at 7 real sites, one per
+/// `KaniFmt` builder (`arguments`, the five `Debug*` builders, and
+/// `from_fn`) -- the identical equality check regardless of which
+/// variant the real site expects, since `rendered.kind()` and every
+/// expected value share the one local `KaniRenderedKind` enum. Needs no
+/// type parameter: unlike the generic contract types in
+/// `rust_std::iter`/`rust_std::primitives`, every real site already
+/// compares the same fixed type, so there's nothing left to be generic
+/// over.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct RenderedKindMatchesTheBuildingOperation;
+
+impl KaniWitness for RenderedKindMatchesTheBuildingOperation {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
+            claim: VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(RenderedKindMatchesTheBuildingOperation);
+
+kani_ensures!(
+    RenderedKindMatchesTheBuildingOperation,
+    "amenable_kani::RenderedKindMatchesTheBuildingOperation",
+    (crate::KaniRenderedKind, crate::KaniRenderedKind),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::RenderedKindMatchesTheBuildingOperation",
+        verifier: "kani",
+        describe: || <RenderedKindMatchesTheBuildingOperation as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<Arguments<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -99,7 +154,10 @@ amenable_derive::harness! {
         fn verify_arguments_renders_the_same_as_the_value_itself() {
             let atom = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let rendered = crate::KaniFmt::arguments(&atom);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::Arguments);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::Arguments
+            )));
             assert_eq!(rendered.display_token(), Some(atom.display_token()));
         }
     }
@@ -189,7 +247,10 @@ amenable_derive::harness! {
             let type_label = crate::KaniFormatLabel::new('P');
             let field_label = crate::KaniFormatLabel::new('x');
             let rendered = crate::KaniFmt::debug_struct_one_field(type_label, field_label, &atom);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugStructOneField);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::DebugStructOneField
+            )));
             assert_eq!(rendered.type_label(), Some(type_label));
             assert_eq!(rendered.field_label(), Some(field_label));
             assert_eq!(rendered.value_debug_token(), Some(atom.debug_token()));
@@ -230,7 +291,10 @@ amenable_derive::harness! {
             let atom = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let type_label = crate::KaniFormatLabel::new('P');
             let rendered = crate::KaniFmt::debug_tuple_one_field(type_label, &atom);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugTupleOneField);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::DebugTupleOneField
+            )));
             assert_eq!(rendered.type_label(), Some(type_label));
             assert_eq!(rendered.value_debug_token(), Some(atom.debug_token()));
         }
@@ -270,7 +334,10 @@ amenable_derive::harness! {
             let first = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let second = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let rendered = crate::KaniFmt::debug_list_two_entries(&first, &second);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugListTwoEntries);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::DebugListTwoEntries
+            )));
             assert_eq!(rendered.first_debug_token(), Some(first.debug_token()));
             assert_eq!(rendered.second_debug_token(), Some(second.debug_token()));
         }
@@ -311,7 +378,10 @@ amenable_derive::harness! {
             let first = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let second = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let rendered = crate::KaniFmt::debug_set_two_entries(&first, &second);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugSetTwoEntries);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::DebugSetTwoEntries
+            )));
             assert_eq!(rendered.first_debug_token(), Some(first.debug_token()));
             assert_eq!(rendered.second_debug_token(), Some(second.debug_token()));
         }
@@ -352,7 +422,10 @@ amenable_derive::harness! {
             let value = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let key_label = crate::KaniFormatLabel::new('k');
             let rendered = crate::KaniFmt::debug_map_one_entry(key_label, &value);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::DebugMapOneEntry);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::DebugMapOneEntry
+            )));
             assert_eq!(rendered.key_debug_label(), Some(key_label));
             assert_eq!(rendered.value_debug_token(), Some(value.debug_token()));
         }
@@ -401,7 +474,10 @@ amenable_derive::harness! {
         fn verify_from_fn_forwards_display_to_the_supplied_closure() {
             let atom = <crate::KaniFormatAtom as crate::KaniCompose>::kani_any();
             let rendered = crate::KaniFmt::arguments(&atom);
-            assert_eq!(rendered.kind(), crate::KaniRenderedKind::Arguments);
+            assert!(RenderedKindMatchesTheBuildingOperation::ensures((
+                rendered.kind(),
+                crate::KaniRenderedKind::Arguments
+            )));
             assert_eq!(rendered.display_token(), Some(atom.display_token()));
         }
     }
