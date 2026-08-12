@@ -9,6 +9,8 @@
 
 use std::sync::Arc;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -19,7 +21,7 @@ verus! {
 /// claim the Kani harness checks.
 pub fn verify_arc_derefs_to_the_wrapped_value(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     let arc = Arc::new(value);
     *arc

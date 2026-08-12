@@ -23,6 +23,13 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The shared write-through law for plain value-box models: after a
+/// write, the observed stored slot is exactly the value that was
+/// written.
+pub open spec fn write_stores_new_value(new_value: int, observed: int) -> bool {
+    observed == new_value
+}
+
 /// Models `Cell`'s whole interface — get/set-by-value, nothing more —
 /// not `Cell` itself.
 pub struct VerusCellModel {
@@ -49,9 +56,7 @@ impl VerusCellModel {
     /// `set` overwrites the stored value.
     pub fn set(&mut self, new_value: i32)
         ensures
-            // Canonical home: RustStdStandard<Cell<i32>>'s Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == new_value,
+            write_stores_new_value(new_value as int, final(self).value as int),
     {
         self.value = new_value;
     }
@@ -60,9 +65,7 @@ impl VerusCellModel {
     pub fn replace(&mut self, new_value: i32) -> (result: i32)
         ensures
             result == old(self).value,
-            // Canonical home: RustStdStandard<Cell<i32>>'s Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == new_value,
+            write_stores_new_value(new_value as int, final(self).value as int),
     {
         let old_value = self.value;
         self.value = new_value;

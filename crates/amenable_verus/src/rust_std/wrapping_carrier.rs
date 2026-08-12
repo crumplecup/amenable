@@ -13,6 +13,8 @@
 
 use std::num::Wrapping;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -27,7 +29,7 @@ pub struct ExWrapping<T>(Wrapping<T>);
 /// constructor/field access, not a claim about the `Add` impl.
 pub fn verify_wrapping_field_roundtrips_the_constructed_value(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     Wrapping(value).0
 }

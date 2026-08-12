@@ -14,6 +14,8 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -24,7 +26,7 @@ verus! {
 /// the same atomic.
 pub fn verify_atomic_ordering_model_relaxed_store_is_observable(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

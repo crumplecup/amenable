@@ -15,6 +15,8 @@
 //! type directly) already confirms independently, for the identical
 //! claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -24,7 +26,7 @@ verus! {
 /// `[value].iter().next()` yields a reference to the one element.
 pub fn verify_iter_model_yields_shared_references_in_order(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

@@ -22,6 +22,12 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The shared write-through postcondition `amenable_std::verus_witness`
+// registers for several plain value-box models. Imported only when
+// Verus keeps ghost/spec items.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::cell_carrier::write_stores_new_value;
+
 verus! {
 
 /// Models `UnsafeCell`'s safe-accessor interface — a plain value box —
@@ -50,9 +56,7 @@ impl VerusUnsafeCellModel {
     /// Writes the stored value, mirroring `*cell.get_mut() = new_value`.
     pub fn write_through(&mut self, new_value: i32)
         ensures
-            // Canonical home: RustStdStandard<UnsafeCell<i32>>'s Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == new_value,
+            write_stores_new_value(new_value as int, final(self).value as int),
     {
         self.value = new_value;
     }

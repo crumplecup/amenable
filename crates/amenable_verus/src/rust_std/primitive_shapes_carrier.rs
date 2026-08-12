@@ -37,6 +37,12 @@ use crate::rust_std::iter_sequence_carrier::single_increment_headroom_holds;
 
 verus! {
 
+/// A shared scalar-observation identity predicate for accommodation
+/// models whose observed `i32` should match their input exactly.
+pub open spec fn observed_value_matches_input(observed: int, input: int) -> bool {
+    observed == input
+}
+
 /// A shared text-view equality predicate for Verus accommodation models
 /// that need to compare observed `str` content without relying on
 /// `str`'s unsupported exec `PartialEq`.
@@ -134,7 +140,7 @@ pub fn verify_mut_pointer_model_cast_is_reproducible() -> (result: bool)
 /// borrows.
 pub fn verify_shared_reference_model_dereferences_to_the_referent(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

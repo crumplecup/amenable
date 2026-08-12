@@ -16,6 +16,8 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -37,7 +39,7 @@ pub fn verify_into_iter_model_yields_zero_or_one_owned_value(value: i32, present
 /// to the contained value, not the value itself.
 pub fn verify_iter_model_yields_zero_or_one_reference(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

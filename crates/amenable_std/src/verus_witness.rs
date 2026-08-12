@@ -53,8 +53,8 @@ use std::os::windows::io::{
 };
 
 use crate::{
-    AsciiByte, IncrementHeadroom, NonNulByte, RustStdProvenance, RustStdStandard,
-    ValidUnicodeScalar, ValueUnchanged,
+    AsciiByte, IncrementHeadroom, NonNulByte, ObservedValueMatchesInput, RustStdProvenance,
+    RustStdStandard, ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue,
 };
 
 /// The Verus verifier, local to this crate: there is only one verifier
@@ -1514,12 +1514,25 @@ bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
     }
 }
 
-/// The interior-mutability postcondition every `Cell`-family carrier in
-/// this file states after a write (`set`/`replace`) — "the stored value
-/// is now exactly what was written" — recurs identically across `Cell`,
-/// `RefCell`, and `UnsafeCell`'s own accommodation models. Named once
-/// here rather than at each site.
-impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
+/// [`WriteStoresNewValue`] reuses `Cell`'s own round-trip harness rather
+/// than adding a new Verus proof: it names the shared write-through law
+/// the harness already establishes.
+impl VerusWitness for WriteStoresNewValue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_cell_model_get_set_replace_round_trip",
+            claim: VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(WriteStoresNewValue);
+
+impl Ensures<VerusVerifier> for WriteStoresNewValue {
     type Input = ();
     type Bound = &'static str;
 
@@ -1528,12 +1541,31 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
     }
 }
 
+const WRITE_STORES_NEW_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn write_stores_new_value(new_value: int, observed: int) -> bool {
+    observed == new_value
+}"#;
+
+// `Ensures::ensures()` keeps the descriptive `final(self).value ==
+// new_value` spelling as WriteStoresNewValue's canonical text, while the
+// real Verus proof sites in `cell_carrier`, `ref_cell_carrier`,
+// `unsafe_cell_carrier`, and `ordered_pair_iter_mut_carrier` call the
+// shared `write_stores_new_value` spec fn defined in
+// `amenable_verus::rust_std::cell_carrier`.
 ::inventory::submit! {
     ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        evidence: "amenable_std::WriteStoresNewValue",
         verifier: "verus",
         kind: "ensures",
-        fragment: || <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures(()),
+        fragment: || <WriteStoresNewValue as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::WriteStoresNewValue",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || WRITE_STORES_NEW_VALUE_VERUS_FRAGMENT,
     }
 }
 
@@ -2441,6 +2473,18 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
     }
 }
 
+const INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX - 1
+}"#;
+
+const SINGLE_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn single_increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX
+}"#;
+
+const TEN_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn ten_increment_headroom_holds(a: i32) -> bool {
+    a <= i32::MAX - 10
+}"#;
+
 // `Requires::requires()` still returns the tight-margin spelling as
 // IncrementHeadroom's canonical descriptive text (for cross-backend
 // enumeration), but no real site restates it raw anymore. Four sites
@@ -2455,8 +2499,10 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
 // verify_inspect_model_calls_once_per_item_without_changing_values,
 // verify_fn_pointer_model_calls_the_underlying_function,
 // verify_map_model_applies_its_closure_to_each_item) and call
-// single_increment_headroom_holds. Both are real, shared `open spec
-// fn`s in amenable_verus::rust_std::iter_sequence_carrier confirmed
+// single_increment_headroom_holds. The slice-chunk write-through models
+// need a wider margin still and call ten_increment_headroom_holds. All
+// three are real, shared `open spec fn`s in
+// amenable_verus::rust_std::iter_sequence_carrier confirmed
 // under real verus to give every call site genuine proof credit across
 // carrier files -- see amenable_std::verus_gallery's
 // cross_file_spec_fn_reuse_gets_real_proof_credit case.
@@ -2466,6 +2512,33 @@ impl Requires<VerusVerifier> for IncrementHeadroom {
         verifier: "verus",
         kind: "requires",
         fragment: || <IncrementHeadroom as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || SINGLE_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::IncrementHeadroom",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || TEN_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
     }
 }
 
@@ -2505,6 +2578,56 @@ impl Ensures<VerusVerifier> for ValueUnchanged {
         verifier: "verus",
         kind: "ensures",
         fragment: || <ValueUnchanged as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+/// [`ObservedValueMatchesInput`] reuses the shared-reference harness
+/// rather than adding a new Verus proof — it names the direct identity
+/// postcondition that many simple scalar-observation carriers now state
+/// through one shared Verus `spec fn`.
+impl VerusWitness for ObservedValueMatchesInput {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_shared_reference_model_dereferences_to_the_referent",
+            claim: VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ObservedValueMatchesInput);
+
+impl Ensures<VerusVerifier> for ObservedValueMatchesInput {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result == value"
+    }
+}
+
+const OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_value_matches_input(observed: int, input: int) -> bool {
+    observed == input
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedValueMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ObservedValueMatchesInput as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedValueMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
     }
 }
 
@@ -3439,11 +3562,19 @@ bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
 /// `RustStdStandard<NonZero<T>>`'s Verus proof states its claim as two
 /// separate `ensures` clauses (`value != 0 ==> result`, `value == 0 ==>
 /// !result`) — an iff split into its two implications, not one expression.
-/// `Ensures<VerusVerifier>` names the first (the "positive" direction);
-/// the second is registered directly as a supplementary
-/// [`amenable_core::ContractRecord`], via a plain non-capturing closure
-/// coerced to a `fn` pointer (legal in a const context, and needs no
-/// per-`$ty` unique name the way a real fn item would).
+/// `Ensures<VerusVerifier>` still returns the first direction as the
+/// canonical descriptive text for cross-backend enumeration, while the
+/// real Verus proof sites call shared `non_zero_new_accepts_nonzero` and
+/// `non_zero_new_rejects_zero` spec fns defined in
+/// `amenable_verus::rust_std::non_zero_carrier`.
+const NON_ZERO_NEW_ACCEPTS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_zero_new_accepts_nonzero(value: int, result: bool) -> bool {
+    value != 0 ==> result
+}"#;
+
+const NON_ZERO_NEW_REJECTS_ZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_zero_new_rejects_zero(value: int, result: bool) -> bool {
+    value == 0 ==> !result
+}"#;
+
 macro_rules! impl_non_zero_verus_witness {
     ($($ty:ty => $harness:literal),* $(,)?) => {
         $(
@@ -3493,7 +3624,16 @@ macro_rules! impl_non_zero_verus_witness {
                     evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
                     verifier: "verus",
                     kind: "ensures",
-                    fragment: || "value == 0 ==> !result",
+                    fragment: || NON_ZERO_NEW_ACCEPTS_NONZERO_VERUS_FRAGMENT,
+                }
+            }
+
+            ::inventory::submit! {
+                ::amenable_core::ContractRecord {
+                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                    verifier: "verus",
+                    kind: "ensures",
+                    fragment: || NON_ZERO_NEW_REJECTS_ZERO_VERUS_FRAGMENT,
                 }
             }
         )*
@@ -4182,6 +4322,27 @@ macro_rules! impl_slice_chunks_verus_witness {
     };
 }
 
+const TEN_INCREMENT_WRITE_THROUGH_VERUS_FRAGMENT: &str = r#"pub open spec fn ten_increment_write_through(before: int, after: int) -> bool {
+    after == before + 10
+}"#;
+
+macro_rules! register_slice_chunks_increment_fragment {
+    ($ty:ty) => {
+        ::inventory::submit! {
+            ::amenable_core::ContractRecord {
+                evidence: concat!(
+                    "amenable_std::rust_std::RustStdStandard<",
+                    stringify!($ty),
+                    ">"
+                ),
+                verifier: "verus",
+                kind: "ensures",
+                fragment: || TEN_INCREMENT_WRITE_THROUGH_VERUS_FRAGMENT,
+            }
+        }
+    };
+}
+
 impl_slice_chunks_verus_witness!(
     std::slice::Chunks<'static, i32>,
     "verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk",
@@ -4227,6 +4388,11 @@ impl_slice_chunks_verus_witness!(
     "verify_windows_model_yields_overlapping_slices",
     VERIFY_WINDOWS_MODEL_YIELDS_OVERLAPPING_SLICES_SRC
 );
+
+register_slice_chunks_increment_fragment!(std::slice::ChunksMut<'static, i32>);
+register_slice_chunks_increment_fragment!(std::slice::ChunksExactMut<'static, i32>);
+register_slice_chunks_increment_fragment!(std::slice::RChunksExactMut<'static, i32>);
+register_slice_chunks_increment_fragment!(std::slice::RChunksMut<'static, i32>);
 
 const VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/slice_chunk_by_carrier.rs");
@@ -7618,6 +7784,9 @@ bridge_verus_witness!(
 const VERIFY_ARRAY_MODEL_INDEXING_AND_LENGTH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
 
+const VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC: &str =
+    include_str!("../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+
 impl VerusWitness for RustStdStandard<[i32; 3]> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -7831,9 +8000,6 @@ bridge_verus_witness!(RustStdStandard<*mut i32>);
         describe: || { <RustStdStandard<*mut i32> as VerusWitness>::proof().to_string() },
     }
 }
-
-const VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC: &str =
-    include_str!("../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<&'static i32> {
     type SupportingEvidence = Self;

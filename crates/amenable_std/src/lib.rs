@@ -31,6 +31,7 @@ mod iter_yields_value_once_then_ends;
 mod non_nul_byte;
 mod nonzero_get_round_trips;
 mod nul_only_at_the_end_validates;
+mod observed_value_matches_input;
 mod rust_std;
 mod valid_unicode_scalar;
 mod value_unchanged;
@@ -39,6 +40,7 @@ mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;
 mod windows_handle_or_invalid_rejects_only_the_sentinel;
+mod write_stores_new_value;
 mod yields_two_values_in_order_then_ends;
 
 pub use argv_includes_program_path::ArgvIncludesProgramPath;
@@ -67,6 +69,7 @@ pub use nonzero_get_round_trips::{
     NonZeroU64GetRoundTrips, NonZeroU128GetRoundTrips, NonZeroUsizeGetRoundTrips,
 };
 pub use nul_only_at_the_end_validates::NulOnlyAtTheEndValidates;
+pub use observed_value_matches_input::ObservedValueMatchesInput;
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,
@@ -80,4 +83,5 @@ pub use verus_gallery::{
 #[cfg(feature = "verus")]
 pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
 pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
+pub use write_stores_new_value::WriteStoresNewValue;
 pub use yields_two_values_in_order_then_ends::YieldsTwoValuesInOrderThenEnds;

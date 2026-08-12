@@ -19,6 +19,8 @@
 //! the real type via the bounded channel model) already confirms
 //! independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -30,7 +32,7 @@ verus! {
 /// bounded `SyncSender` with spare capacity.
 pub fn verify_channel_model_delivers_to_the_paired_receiver(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

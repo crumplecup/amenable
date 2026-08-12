@@ -21,6 +21,12 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The shared write-through postcondition `amenable_std::verus_witness`
+// registers for several plain interior-mutability models. Imported only
+// when Verus keeps ghost/spec items.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::cell_carrier::write_stores_new_value;
+
 verus! {
 
 /// Models `RefCell`'s dynamically checked borrow rule — a shared-borrow
@@ -107,9 +113,7 @@ impl VerusRefCellModel {
             old(self).borrow_state == -1,
         ensures
             final(self).borrow_state == 0,
-            // Canonical home: RustStdStandard<RefCell<i32>>'s Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == new_value,
+            write_stores_new_value(new_value as int, final(self).value as int),
     {
         self.value = new_value;
         self.borrow_state = 0;

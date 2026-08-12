@@ -28,98 +28,112 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The "success implies nonzero input" half of the shared
+/// `NonZero::<T>::new` accommodation law, factored once and called from
+/// every width-specific model via `value as int`.
+pub open spec fn non_zero_new_accepts_nonzero(value: int, result: bool) -> bool {
+    value != 0 ==> result
+}
+
+/// The "zero input implies failure" half of the shared
+/// `NonZero::<T>::new` accommodation law, factored once and called from
+/// every width-specific model via `value as int`.
+pub open spec fn non_zero_new_rejects_zero(value: int, result: bool) -> bool {
+    value == 0 ==> !result
+}
+
 pub fn verify_non_zero_i8_model_round_trips_iff_nonzero(value: i8) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_i16_model_round_trips_iff_nonzero(value: i16) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_i32_model_round_trips_iff_nonzero(value: i32) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_i64_model_round_trips_iff_nonzero(value: i64) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_i128_model_round_trips_iff_nonzero(value: i128) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_isize_model_round_trips_iff_nonzero(value: isize) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_u8_model_round_trips_iff_nonzero(value: u8) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_u16_model_round_trips_iff_nonzero(value: u16) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_u32_model_round_trips_iff_nonzero(value: u32) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_u64_model_round_trips_iff_nonzero(value: u64) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_u128_model_round_trips_iff_nonzero(value: u128) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }
 
 pub fn verify_non_zero_usize_model_round_trips_iff_nonzero(value: usize) -> (result: bool)
     ensures
-        value != 0 ==> result,
-        value == 0 ==> !result,
+        non_zero_new_accepts_nonzero(value as int, result),
+        non_zero_new_rejects_zero(value as int, result),
 {
     value != 0
 }

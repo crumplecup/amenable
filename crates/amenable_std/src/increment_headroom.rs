@@ -9,10 +9,10 @@
 //! model actually needs (bare `i32::MAX` for a single-step transform that
 //! reads the value without re-deriving a next one, `i32::MAX - 1` for a
 //! single increment, `i32::MAX - 10` for a chunk of a few), but it's the
-//! identical *kind* of precondition each time, restated across
+//! identical *kind* of precondition each time, now named through shared
+//! Verus `spec fn`s reused across
 //! `iter_sequence_carrier`, `iter_stateful_carrier`, `iter_transform_carrier`,
-//! `primitive_shapes_carrier`, and `slice_chunks_carrier` with no name
-//! tying them together.
+//! `primitive_shapes_carrier`, and `slice_chunks_carrier`.
 //! `IncrementHeadroom` is the eighth contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist — Verus-only, since this
 //! precondition exists specifically because Verus checks overflow by

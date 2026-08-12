@@ -23,6 +23,8 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 
 verus! {
@@ -57,7 +59,7 @@ pub fn verify_non_null_model_rejects_the_null_pointer() -> (result: NonNullResul
 /// allocation serviced by it round-trips its value.
 pub fn verify_system_model_allocates_and_deallocates_a_layout(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

@@ -14,6 +14,8 @@
 //! (checking the real type via the bounded model) already confirms
 //! independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -23,7 +25,7 @@ verus! {
 /// Inserting a key then getting it back recovers the same value.
 pub fn verify_hash_map_model_insert_then_get_recovers_the_value(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

@@ -12,6 +12,8 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -32,7 +34,7 @@ pub fn verify_pending_model_never_resolves() -> (result: (bool, bool))
 /// constructed from.
 pub fn verify_ready_model_resolves_immediately_with_its_value(value: i32) -> (result: i32)
     ensures
-        result == value,
+        observed_value_matches_input(result as int, value as int),
 {
     value
 }

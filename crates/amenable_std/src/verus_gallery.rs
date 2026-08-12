@@ -766,9 +766,8 @@ pub assume_specification<'a, B: ToOwned + ?Sized> [<Cow<'a, B> as core::ops::Der
 // under Creusot. Confirmed for real against this repo's own
 // IncrementHeadroom precondition (recurs across iter_sequence_carrier,
 // iter_stateful_carrier, iter_transform_carrier, primitive_shapes_
-// carrier, slice_chunks_carrier -- eight sites needing supplementary
-// ContractRecord fragments today because each restates the expression
-// under a different local variable name):
+// carrier, slice_chunks_carrier -- with the real proof sites now
+// calling shared named spec fns rather than restating raw arithmetic):
 pub open spec fn increment_headroom_holds(a: i32) -> bool {
     a < i32::MAX - 1
 }

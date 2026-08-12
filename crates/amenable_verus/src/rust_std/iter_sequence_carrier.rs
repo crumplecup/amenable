@@ -81,6 +81,13 @@ pub open spec fn single_increment_headroom_holds(a: i32) -> bool {
     a < i32::MAX
 }
 
+/// The ten-increment-headroom precondition -- still the same
+/// `amenable_std::IncrementHeadroom` bound, but at the wider margin the
+/// `slice_chunks` write-through models need before they add `10`.
+pub open spec fn ten_increment_headroom_holds(a: i32) -> bool {
+    a <= i32::MAX - 10
+}
+
 /// `Enumerate::next` pairs each item with its index, starting at `0` —
 /// modeled here over the two-element range `a..a+2`.
 pub fn verify_enumerate_model_pairs_each_item_with_its_index(a: i32) -> (result: EnumerateResult)

@@ -22,7 +22,25 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+// The wider increment-headroom precondition `amenable_std::
+// IncrementHeadroom` names -- a real spec fn defined once in
+// `iter_sequence_carrier`, called from here directly rather than
+// restated inline. `#[cfg(verus_keep_ghost)]`-gated like every other
+// spec-only import in this crate (see `chars_carrier.rs`): plain
+// `spec fn`s carry no runtime representation, so this import only
+// resolves when Verus's own ghost content is retained, not under
+// ordinary `cargo check`.
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::iter_sequence_carrier::ten_increment_headroom_holds;
+
 verus! {
+
+/// The shared write-through law for the mutable slice-chunk models: the
+/// observed post-state element is exactly the pre-state element plus the
+/// fixed `+10` update the model applies.
+pub open spec fn ten_increment_write_through(before: int, after: int) -> bool {
+    after == before + 10
+}
 
 /// `[a, b, c].chunks(2)` yields `(a, b)` then the short last chunk `c`.
 pub fn verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk(a: i32, b: i32, c: i32) -> (result: ((i32, i32), i32))
@@ -47,15 +65,11 @@ pub fn verify_chunks_exact_model_discards_a_short_remainder(a: i32, b: i32, c: i
 /// `[a, b].chunks_mut(2)` writes `+10` through the single full chunk.
 pub fn verify_chunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (result: (i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a <= i32::MAX - 10,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b <= i32::MAX - 10,
+        ten_increment_headroom_holds(a),
+        ten_increment_headroom_holds(b),
     ensures
-        result.0 == a + 10,
-        result.1 == b + 10,
+        ten_increment_write_through(a as int, result.0 as int),
+        ten_increment_write_through(b as int, result.1 as int),
 {
     (a + 10, b + 10)
 }
@@ -64,15 +78,11 @@ pub fn verify_chunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (re
 /// `(a, b)`; the short remainder `c` is never visited.
 pub fn verify_chunks_exact_mut_model_leaves_the_remainder_untouched(a: i32, b: i32, c: i32) -> (result: (i32, i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a <= i32::MAX - 10,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b <= i32::MAX - 10,
+        ten_increment_headroom_holds(a),
+        ten_increment_headroom_holds(b),
     ensures
-        result.0 == a + 10,
-        result.1 == b + 10,
+        ten_increment_write_through(a as int, result.0 as int),
+        ten_increment_write_through(b as int, result.1 as int),
         result.2 == c,
 {
     (a + 10, b + 10, c)
@@ -103,18 +113,12 @@ pub fn verify_rchunks_exact_model_discards_a_short_remainder_at_the_front(a: i32
 /// `(b, c)`; the front remainder `a` is never visited.
 pub fn verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched(a: i32, b: i32, c: i32) -> (result: (i32, i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b <= i32::MAX - 10,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        c <= i32::MAX - 10,
+        ten_increment_headroom_holds(b),
+        ten_increment_headroom_holds(c),
     ensures
         result.0 == a,
-        result.1 == b + 10,
-        result.2 == c + 10,
+        ten_increment_write_through(b as int, result.1 as int),
+        ten_increment_write_through(c as int, result.2 as int),
 {
     (a, b + 10, c + 10)
 }
@@ -123,15 +127,11 @@ pub fn verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched(a: i3
 /// (grouped from the back).
 pub fn verify_rchunks_mut_model_writes_through_every_chunk(a: i32, b: i32) -> (result: (i32, i32))
     requires
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        a <= i32::MAX - 10,
-        // Canonical home: amenable_std::IncrementHeadroom's Requires<VerusVerifier>
-        // impl (amenable_std::verus_witness, supplementary fragment) names this exact fragment.
-        b <= i32::MAX - 10,
+        ten_increment_headroom_holds(a),
+        ten_increment_headroom_holds(b),
     ensures
-        result.0 == a + 10,
-        result.1 == b + 10,
+        ten_increment_write_through(a as int, result.0 as int),
+        ten_increment_write_through(b as int, result.1 as int),
 {
     (a + 10, b + 10)
 }
