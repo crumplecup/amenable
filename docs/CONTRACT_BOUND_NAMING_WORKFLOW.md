@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-one clusters named, 771 → 386 sites — see "Current state");
+fixed, twenty-two clusters named, 771 → 381 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **386** sites (was 771; twenty-three
+  session; total is now **381** sites (was 771; twenty-four
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -769,6 +769,20 @@ was brought back to zero in three focused follow-up commits.
       into a single call: every real site here asserts exactly one
       pair at a time, no combined `&&`. Lives in `rust_std::io.rs`
       (total owner, 5 of 5 sites).
+  24. **`X.X == X` (5 sites)**: "a struct or tuple field access
+      recovers exactly the value known to be stored there" -- spans a
+      plain tuple's `.0`/`.1` projections, `calculator::Debit`/`Credit`'s
+      own `.value` field access constructors, and `AssertUnwindSafe`'s
+      `.0` projection after a `DerefMut` write-through. Named as
+      `amenable_kani::FieldAccessRecoversTheStoredValue<T>`, the tenth
+      generic contract type this session -- a distinct access pattern
+      from `IndexRecoversTheStoredElement` (`[i]`) and
+      `DerefReflectsTheStoredValue` (`*x`) even though the `Ensures`
+      impl body is identical trivial equality either way, same
+      reasoning as keeping `CollectedSequenceMatchesExpected` separate
+      from `DerefReflectsTheStoredValue` (item 18) despite type-level
+      overlap. Lives in `rust_std::primitives.rs`, alongside its
+      sibling access-pattern types.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
