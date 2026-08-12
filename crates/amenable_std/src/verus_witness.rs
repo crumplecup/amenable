@@ -7904,6 +7904,16 @@ bridge_verus_witness!(RustStdStandard<std::fs::ReadDir>);
 const VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
 
+const FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn file_model_write_then_read_round_trips_the_bytes(
+    a: u8,
+    b: u8,
+    c: u8,
+    d: u8,
+    result: (u8, u8, u8, u8),
+) -> bool {
+    result == (a, b, c, d)
+}"#;
+
 impl VerusWitness for RustStdStandard<std::fs::File> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -7927,8 +7937,24 @@ bridge_verus_witness!(RustStdStandard<std::fs::File>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::File>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
+
+const FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_VERUS_FRAGMENT: &str = r#"pub open spec fn file_times_model_sets_the_recorded_modification_time(
+    target_unix_seconds: u64,
+    result: u64,
+) -> bool {
+    result == target_unix_seconds
+}"#;
 
 impl VerusWitness for RustStdStandard<std::fs::FileTimes> {
     type SupportingEvidence = Self;
@@ -7955,8 +7981,25 @@ bridge_verus_witness!(RustStdStandard<std::fs::FileTimes>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_content_carrier.rs");
+
+const METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_VERUS_FRAGMENT: &str = r#"pub open spec fn metadata_model_reports_the_written_length(
+    byte_count: u8,
+    result: (u64, bool),
+) -> bool {
+    &&& result.0 == byte_count as u64
+    &&& result.1 == (byte_count == 0)
+}"#;
 
 impl VerusWitness for RustStdStandard<std::fs::Metadata> {
     type SupportingEvidence = Self;
@@ -7980,6 +8023,15 @@ bridge_verus_witness!(RustStdStandard<std::fs::Metadata>);
         describe: || {
             <RustStdStandard<std::fs::Metadata> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_VERUS_FRAGMENT,
     }
 }
 

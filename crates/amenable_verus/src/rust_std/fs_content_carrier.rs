@@ -17,30 +17,54 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn file_model_write_then_read_round_trips_the_bytes(
+    a: u8,
+    b: u8,
+    c: u8,
+    d: u8,
+    result: (u8, u8, u8, u8),
+) -> bool {
+    result == (a, b, c, d)
+}
+
 /// Bytes written to a file and flushed are read back unchanged through
 /// a fresh handle.
 pub fn verify_file_model_write_then_read_round_trips_the_bytes(a: u8, b: u8, c: u8, d: u8) -> (result: (u8, u8, u8, u8))
     ensures
-        result == (a, b, c, d),
+        file_model_write_then_read_round_trips_the_bytes(a, b, c, d, result),
 {
     (a, b, c, d)
+}
+
+pub open spec fn file_times_model_sets_the_recorded_modification_time(
+    target_unix_seconds: u64,
+    result: u64,
+) -> bool {
+    result == target_unix_seconds
 }
 
 /// `.set_modified()` applied via `File::set_times()` is reflected
 /// exactly in the file's metadata.
 pub fn verify_file_times_model_sets_the_recorded_modification_time(target_unix_seconds: u64) -> (result: u64)
     ensures
-        result == target_unix_seconds,
+        file_times_model_sets_the_recorded_modification_time(target_unix_seconds, result),
 {
     target_unix_seconds
+}
+
+pub open spec fn metadata_model_reports_the_written_length(
+    byte_count: u8,
+    result: (u64, bool),
+) -> bool {
+    &&& result.0 == byte_count as u64
+    &&& result.1 == (byte_count == 0)
 }
 
 /// `.len()` reports exactly the number of bytes written, and
 /// `.is_empty()` agrees with whether that count is zero.
 pub fn verify_metadata_model_reports_the_written_length(byte_count: u8) -> (result: (u64, bool))
     ensures
-        result.0 == byte_count as u64,
-        result.1 == (byte_count == 0),
+        metadata_model_reports_the_written_length(byte_count, result),
 {
     (byte_count as u64, byte_count == 0)
 }
