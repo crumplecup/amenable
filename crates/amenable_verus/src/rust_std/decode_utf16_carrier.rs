@@ -32,14 +32,36 @@ verus! {
 /// a single code unit — not `DecodeUtf16`/`DecodeUtf16Error` themselves.
 pub struct VerusDecodeUtf16Model;
 
+pub open spec fn decode_utf16_unit_is_non_surrogate(unit: u16) -> bool {
+    unit < 0xD800 || unit > 0xDFFF
+}
+
+pub open spec fn decode_utf16_bmp_unit_decodes_to_same_scalar(
+    unit: u16,
+    result: Option<u32>,
+) -> bool {
+    result == Some(unit as u32)
+}
+
+pub open spec fn decode_utf16_unit_is_surrogate(unit: u16) -> bool {
+    0xD800 <= unit <= 0xDFFF
+}
+
+pub open spec fn decode_utf16_lone_surrogate_reports_same_unit(
+    unit: u16,
+    result: Result<u32, u16>,
+) -> bool {
+    result == Err(unit)
+}
+
 impl VerusDecodeUtf16Model {
     /// A non-surrogate BMP code unit always decodes successfully, to
     /// the scalar value equal to the code unit itself.
     pub fn decode_bmp_unit(unit: u16) -> (result: Option<u32>)
         requires
-            unit < 0xD800 || unit > 0xDFFF,
+            decode_utf16_unit_is_non_surrogate(unit),
         ensures
-            result == Some(unit as u32),
+            decode_utf16_bmp_unit_decodes_to_same_scalar(unit, result),
     {
         Some(unit as u32)
     }
@@ -48,12 +70,20 @@ impl VerusDecodeUtf16Model {
     /// unpaired code unit.
     pub fn decode_lone_surrogate(unit: u16) -> (result: Result<u32, u16>)
         requires
-            0xD800 <= unit <= 0xDFFF,
+            decode_utf16_unit_is_surrogate(unit),
         ensures
-            result == Err(unit),
+            decode_utf16_lone_surrogate_reports_same_unit(unit, result),
     {
         Err(unit)
     }
+}
+
+pub open spec fn decode_utf16_test_inputs_cover_both_cases(
+    bmp_unit: u16,
+    lone_surrogate: u16,
+) -> bool {
+    decode_utf16_unit_is_non_surrogate(bmp_unit)
+        && decode_utf16_unit_is_surrogate(lone_surrogate)
 }
 
 /// A non-surrogate BMP code unit decodes to the scalar value equal to
@@ -62,8 +92,7 @@ impl VerusDecodeUtf16Model {
 /// to refine.
 pub fn verify_decode_utf16_model_round_trips_and_reports_lone_surrogates(bmp_unit: u16, lone_surrogate: u16) -> (result: (bool, bool))
     requires
-        bmp_unit < 0xD800 || bmp_unit > 0xDFFF,
-        0xD800 <= lone_surrogate <= 0xDFFF,
+        decode_utf16_test_inputs_cover_both_cases(bmp_unit, lone_surrogate),
     ensures
         result.0,
         result.1,

@@ -4973,6 +4973,28 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
 const VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/decode_utf16_carrier.rs");
 
+const DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_bmp_unit_decodes_to_same_scalar(
+    unit: u16,
+    result: Option<u32>,
+) -> bool {
+    result == Some(unit as u32)
+}"#;
+
+const DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_lone_surrogate_reports_same_unit(
+    unit: u16,
+    result: Result<u32, u16>,
+) -> bool {
+    result == Err(unit)
+}"#;
+
+const DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_test_inputs_cover_both_cases(
+    bmp_unit: u16,
+    lone_surrogate: u16,
+) -> bool {
+    decode_utf16_unit_is_non_surrogate(bmp_unit)
+        && decode_utf16_unit_is_surrogate(lone_surrogate)
+}"#;
+
 impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -4988,6 +5010,17 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIte
 
 bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>);
 
+impl Requires<VerusVerifier>
+    for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>
+{
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "(bmp_unit < 0xD800 || bmp_unit > 0xDFFF) && 0xD800 <= lone_surrogate <= 0xDFFF"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
@@ -4996,6 +5029,42 @@ bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16<std::array::IntoIte
             <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
     }
 }
 
@@ -5014,6 +5083,15 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
 
 bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16Error>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::char::DecodeUtf16Error> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "(bmp_unit < 0xD800 || bmp_unit > 0xDFFF) && 0xD800 <= lone_surrogate <= 0xDFFF"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
@@ -5021,6 +5099,42 @@ bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16Error>);
         describe: || {
             <RustStdStandard<std::char::DecodeUtf16Error> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::char::DecodeUtf16Error> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
     }
 }
 
