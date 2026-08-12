@@ -5914,6 +5914,26 @@ impl_sync_atomic_verus_witness!(
 const VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/atomic_ptr_carrier.rs");
 
+const ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT: &str = r#"pub open spec fn atomic_ptr_model_load_store_swap_and_compare_exchange(
+    load_after_new: int,
+    load_after_store: int,
+    swap_returned_previous: int,
+    load_after_swap: int,
+    compare_exchange_returned_previous: int,
+    load_after_compare_exchange: int,
+    initial: int,
+    stored: int,
+    swapped_in: int,
+    exchange_target: int,
+) -> bool {
+    load_after_new == initial
+        && load_after_store == stored
+        && swap_returned_previous == stored
+        && load_after_swap == swapped_in
+        && compare_exchange_returned_previous == swapped_in
+        && load_after_compare_exchange == exchange_target
+}"#;
+
 impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -5929,6 +5949,15 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::sync::atomic::AtomicPtr<i32>>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 == initial && result.1 == stored && result.2 == stored && result.3 == swapped_in && result.4 == swapped_in && result.5 == exchange_target"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
@@ -5937,6 +5966,24 @@ bridge_verus_witness!(RustStdStandard<std::sync::atomic::AtomicPtr<i32>>);
             <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as VerusWitness>::proof()
                 .to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT,
     }
 }
 
