@@ -5241,6 +5241,12 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
 const VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/decode_utf16_carrier.rs");
 
+const DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_unit_is_non_surrogate(unit: u16) -> bool {
+    unit < 0xD800 || unit > 0xDFFF
+}"#;
+const DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_unit_is_surrogate(unit: u16) -> bool {
+    0xD800 <= unit <= 0xDFFF
+}"#;
 const DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_bmp_unit_decodes_to_same_scalar(
     unit: u16,
     result: Option<u32>,
@@ -5314,6 +5320,24 @@ impl Requires<VerusVerifier>
         evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
         verifier: "verus",
         kind: "requires",
+        fragment: || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        verifier: "verus",
+        kind: "requires",
         fragment: || DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
     }
 }
@@ -5376,6 +5400,24 @@ impl Requires<VerusVerifier> for RustStdStandard<std::char::DecodeUtf16Error> {
         verifier: "verus",
         kind: "requires",
         fragment: || <RustStdStandard<std::char::DecodeUtf16Error> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
     }
 }
 
