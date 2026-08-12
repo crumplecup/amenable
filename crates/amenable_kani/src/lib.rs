@@ -95,7 +95,7 @@ pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::{
     AtomicLoadReflectsTheLastWrite, CheckedProof, CollectedSequenceMatchesExpected,
     DerefReflectsTheStoredValue, EmptiedContainerReportsEmpty, FallibleOperationReportsFailure,
-    FieldAccessRecoversTheStoredValue, FirstValueIsLessThanTheSecond,
+    FieldAccessRecoversTheStoredValue, FirstValueIsLessThanTheSecond, FourBytesAreEachAscii,
     IndexRecoversTheStoredElement, IteratorMatchesReferenceStepByStep,
     IteratorYieldsAReferenceToTheStoredValue, IteratorYieldsNoneWhenExhausted,
     RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,

@@ -409,6 +409,59 @@ bridge_kani_witness!(AsciiByte);
 
 kani_requires!(AsciiByte, "amenable_std::AsciiByte", u8, |byte| byte < 128);
 
+/// Four bytes each known to satisfy [`AsciiByte`]'s own precondition
+/// (`< 128`), combined into a single callable predicate.
+///
+/// Independently hand-written as `kani::assume(a < 128 && pattern < 128
+/// && b < 128 && c < 128)` at 5 real sites in `rust_std::str`'s
+/// `*n`/`matches`/`match_indices` family -- the same four-way ASCII
+/// bound `AsciiByte` already names for a single byte, just applied to
+/// all four symbolic bytes a real site needs at once. A separate type
+/// rather than four individual `AsciiByte::requires(...)` calls joined
+/// by `&&` at the call site: the call-shape scanner only recognizes a
+/// `kani::assume(EXPR)` clause as compliant when `EXPR` itself is a
+/// single call, not a `&&`-combined expression of several real calls
+/// (confirmed the hard way -- see `ThreeSplitOperandsAreDistinctFromThePattern`
+/// for the same lesson applied to a `!=` combination).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<u8>",
+    basis_ctor = "RustStdStandard::<u8>::new()",
+    provenance = "<u8 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct FourBytesAreEachAscii;
+
+impl KaniWitness for FourBytesAreEachAscii {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_str_byte_length_and_content".to_owned(),
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(FourBytesAreEachAscii);
+
+kani_requires!(
+    FourBytesAreEachAscii,
+    "amenable_kani::FourBytesAreEachAscii",
+    (u8, u8, u8, u8),
+    |(a, pattern, b, c)| a < 128 && pattern < 128 && b < 128 && c < 128
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::FourBytesAreEachAscii",
+        verifier: "kani",
+        describe: || <FourBytesAreEachAscii as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

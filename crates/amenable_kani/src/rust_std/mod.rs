@@ -78,7 +78,8 @@ pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhaust
 pub use macros::CheckedProof;
 pub use option_result::FallibleOperationReportsFailure;
 pub use primitives::{
-    DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, IndexRecoversTheStoredElement,
+    DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, FourBytesAreEachAscii,
+    IndexRecoversTheStoredElement,
 };
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,

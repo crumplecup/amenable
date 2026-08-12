@@ -60,7 +60,7 @@ use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 #[cfg(kani)]
 use crate::{
-    IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
+    FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
     ThreeSplitOperandsAreDistinctFromThePattern,
 };
 
@@ -1008,7 +1008,7 @@ amenable_derive::harness! {
             let c: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(a < 128 && pattern < 128 && b < 128 && c < 128);
+            kani::assume(FourBytesAreEachAscii::requires((a, pattern, b, c)));
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((
                 a, b, c, pattern,
             )));
@@ -1181,7 +1181,7 @@ amenable_derive::harness! {
             let f2: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(FourBytesAreEachAscii::requires((f0, pattern, f1, f2)));
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((
                 f0, f1, f2, pattern,
             )));
@@ -1234,7 +1234,7 @@ amenable_derive::harness! {
             let f2: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(FourBytesAreEachAscii::requires((f0, pattern, f1, f2)));
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((
                 f0, f1, f2, pattern,
             )));
@@ -1288,7 +1288,7 @@ amenable_derive::harness! {
             let f2: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(FourBytesAreEachAscii::requires((f0, pattern, f1, f2)));
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((
                 f0, f1, f2, pattern,
             )));
@@ -1346,7 +1346,7 @@ amenable_derive::harness! {
             let f2: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(f0 < 128 && pattern < 128 && f1 < 128 && f2 < 128);
+            kani::assume(FourBytesAreEachAscii::requires((f0, pattern, f1, f2)));
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((
                 f0, f1, f2, pattern,
             )));
