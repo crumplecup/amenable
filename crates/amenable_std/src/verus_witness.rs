@@ -1701,6 +1701,16 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static,
 const VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/chars_carrier.rs");
 
+const CHARS_INPUT_IS_AB_VERUS_FRAGMENT: &str = r#"pub open spec fn chars_input_is_ab(s: &str) -> bool {
+    s@.len() == 2 && s@[0] == 'a' && s@[1] == 'b'
+}"#;
+
+const CHARS_ITERATION_YIELDS_A_THEN_B_THEN_NONE_VERUS_FRAGMENT: &str = r#"pub open spec fn chars_iteration_yields_a_then_b_then_none(
+    result: (Option<char>, Option<char>, Option<char>),
+) -> bool {
+    result.0 == Some('a') && result.1 == Some('b') && result.2 is None
+}"#;
+
 impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1716,6 +1726,24 @@ impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
 
 bridge_verus_witness!(RustStdStandard<std::str::Chars<'static>>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "s@.len() == 2 && s@[0] == 'a' && s@[1] == 'b'"
+    }
+}
+
+impl Ensures<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result.0 == Some('a') && result.1 == Some('b') && result.2 is None"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
@@ -1723,6 +1751,42 @@ bridge_verus_witness!(RustStdStandard<std::str::Chars<'static>>);
         describe: || {
             <RustStdStandard<std::str::Chars<'static>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::str::Chars<'static>> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || CHARS_INPUT_IS_AB_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::str::Chars<'static>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHARS_ITERATION_YIELDS_A_THEN_B_THEN_NONE_VERUS_FRAGMENT,
     }
 }
 
