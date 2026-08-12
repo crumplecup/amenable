@@ -221,7 +221,10 @@ amenable_derive::harness! {
             let ip = Ipv4Addr::new(a, b, c, d);
             let addr = SocketAddrV4::new(ip, port);
             assert_eq!(*addr.ip(), ip, "SocketAddrV4::ip round-trips its address");
-            assert_eq!(addr.port(), port, "SocketAddrV4::port round-trips its port");
+            assert!(
+                RustStdStandard::<u16>::ensures((addr.port(), port)),
+                "SocketAddrV4::port round-trips its port"
+            );
         }
     }
 }
@@ -264,7 +267,10 @@ amenable_derive::harness! {
             let ip = Ipv6Addr::LOCALHOST;
             let addr = SocketAddrV6::new(ip, port, flowinfo, scope_id);
             assert_eq!(*addr.ip(), ip, "SocketAddrV6::ip round-trips its address");
-            assert_eq!(addr.port(), port, "SocketAddrV6::port round-trips its port");
+            assert!(
+                RustStdStandard::<u16>::ensures((addr.port(), port)),
+                "SocketAddrV6::port round-trips its port"
+            );
             assert_eq!(
                 addr.flowinfo(),
                 flowinfo,
@@ -315,13 +321,19 @@ amenable_derive::harness! {
             let addr = SocketAddr::V4(v4);
             assert!(addr.is_ipv4(), "V4 reports is_ipv4");
             assert!(!addr.is_ipv6(), "V4 reports !is_ipv6");
-            assert_eq!(addr.port(), port, "SocketAddr::port dispatches through V4");
+            assert!(
+                RustStdStandard::<u16>::ensures((addr.port(), port)),
+                "SocketAddr::port dispatches through V4"
+            );
 
             let v6 = SocketAddrV6::new(Ipv6Addr::LOCALHOST, port, 0, 0);
             let addr = SocketAddr::V6(v6);
             assert!(addr.is_ipv6(), "V6 reports is_ipv6");
             assert!(!addr.is_ipv4(), "V6 reports !is_ipv4");
-            assert_eq!(addr.port(), port, "SocketAddr::port dispatches through V6");
+            assert!(
+                RustStdStandard::<u16>::ensures((addr.port(), port)),
+                "SocketAddr::port dispatches through V6"
+            );
         }
     }
 }

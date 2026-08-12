@@ -76,6 +76,18 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+// A round-tripped port number matching the port a socket address was
+// constructed with is independently restated at 4 real sites across
+// `rust_std::net`'s `SocketAddrV4`/`SocketAddrV6`/`SocketAddr`
+// harnesses (`assert_eq!(addr.port(), port, ...)`).
+// `RustStdStandard<u16>`'s `Ensures<KaniVerifier>` slot was free.
+kani_ensures!(
+    RustStdStandard<u16>,
+    "amenable_std::rust_std::RustStdStandard<u16>",
+    (u16, u16),
+    |(actual, expected)| actual == expected
+);
+
 impl KaniWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
