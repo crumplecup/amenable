@@ -33,10 +33,31 @@ pub struct VerusFromUtf8ErrorModel {
     pub bytes: Vec<u8>,
 }
 
+pub open spec fn from_utf8_error_model_new_preserves_bytes(
+    bytes: Vec<u8>,
+    result: VerusFromUtf8ErrorModel,
+) -> bool {
+    result.bytes@ == bytes@
+}
+
+pub open spec fn from_utf8_error_model_as_bytes_preserves_bytes(
+    model: &VerusFromUtf8ErrorModel,
+    result: &Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}
+
+pub open spec fn from_utf8_error_model_into_bytes_preserves_bytes(
+    model: VerusFromUtf8ErrorModel,
+    result: Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}
+
 impl VerusFromUtf8ErrorModel {
     pub fn new(bytes: Vec<u8>) -> (result: Self)
         ensures
-            result.bytes@ == bytes@,
+            from_utf8_error_model_new_preserves_bytes(bytes, result),
     {
         Self { bytes }
     }
@@ -44,7 +65,7 @@ impl VerusFromUtf8ErrorModel {
     /// Borrows the original invalid byte sequence.
     pub fn as_bytes(&self) -> (result: &Vec<u8>)
         ensures
-            result@ == self.bytes@,
+            from_utf8_error_model_as_bytes_preserves_bytes(self, result),
     {
         &self.bytes
     }
@@ -53,7 +74,7 @@ impl VerusFromUtf8ErrorModel {
     /// sequence.
     pub fn into_bytes(self) -> (result: Vec<u8>)
         ensures
-            result@ == self.bytes@,
+            from_utf8_error_model_into_bytes_preserves_bytes(self, result),
     {
         self.bytes
     }

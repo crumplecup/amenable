@@ -2837,6 +2837,25 @@ bridge_verus_witness!(RustStdStandard<std::sync::Weak<i32>>);
 const VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/from_utf8_error_carrier.rs");
 
+const FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_new_preserves_bytes(
+    bytes: Vec<u8>,
+    result: VerusFromUtf8ErrorModel,
+) -> bool {
+    result.bytes@ == bytes@
+}"#;
+const FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_as_bytes_preserves_bytes(
+    model: &VerusFromUtf8ErrorModel,
+    result: &Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}"#;
+const FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_into_bytes_preserves_bytes(
+    model: VerusFromUtf8ErrorModel,
+    result: Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}"#;
+
 impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2859,6 +2878,33 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
         describe: || {
             <RustStdStandard<std::string::FromUtf8Error> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
     }
 }
 
