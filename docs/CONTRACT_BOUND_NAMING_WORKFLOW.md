@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-seven clusters named, 771 → 359 sites — see "Current state");
+fixed, twenty-eight clusters named, 771 → 355 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **359** sites (was 771; twenty-nine
+  session; total is now **355** sites (was 771; thirty
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -847,6 +847,13 @@ was brought back to zero in three focused follow-up commits.
       but a distinct type from the latter: `Option::is_none()` and
       `Result::is_err()` are different outcome shapes, not the same
       claim restated. Lives in `rust_std::alloc_rc.rs`.
+  30. **`X <= X` (4 sites)**: "a symbolic length bounded by
+      `KaniUtf8Buffer<2>`'s own fixed capacity" -- across
+      `rust_std::alloc_string`/`rust_std::primitives`/
+      `rust_std::std_ffi` and `utf8_model`'s own bookkeeping proof.
+      Registered directly on `KaniUtf8Buffer<2>` via `kani_requires!`
+      -- its `Requires<KaniVerifier>` slot was free (only `Ensures`
+      was previously registered there), no new type needed.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
