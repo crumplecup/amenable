@@ -2113,6 +2113,23 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
 const VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/binary_heap_carrier.rs");
 
+const BINARY_HEAP_MODEL_RECORDS_VALUES_IN_HEAP_ORDER_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_model_records_values_in_heap_order(
+    observed_max: i32,
+    observed_min: i32,
+    a: i32,
+    b: i32,
+) -> bool {
+    observed_max == if a >= b { a } else { b }
+        && observed_min == if a >= b { b } else { a }
+}"#;
+const BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_model_pop_returns_recorded_order(
+    first: i32,
+    second: i32,
+    max: i32,
+    min: i32,
+) -> bool {
+    first == max && second == min
+}"#;
 const BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_pop_yields_the_maximum_first(
     first: int,
     second: int,
@@ -2171,6 +2188,24 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BinaryHeap<i32
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
         verifier: "verus",
         kind: "ensures",
+        fragment: || BINARY_HEAP_MODEL_RECORDS_VALUES_IN_HEAP_ORDER_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        verifier: "verus",
+        kind: "ensures",
         fragment: || BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT,
     }
 }
@@ -2206,6 +2241,15 @@ bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
 const VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cell_carrier.rs");
 
+const CELL_MODEL_NEW_STORES_INITIAL_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_new_stores_initial_value(observed: int, initial: int) -> bool {
+    observed == initial
+}"#;
+const CELL_MODEL_GET_READS_CURRENT_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_get_reads_current_value(observed: int, current: int) -> bool {
+    observed == current
+}"#;
+const CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_replace_returns_previous_value(observed: int, previous: int) -> bool {
+    observed == previous
+}"#;
 const CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_get_set_replace_round_trip_holds(
     stores_initial: bool,
     set_overwrites: bool,
@@ -2255,6 +2299,33 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
         verifier: "verus",
         kind: "ensures",
         fragment: || <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CELL_MODEL_NEW_STORES_INITIAL_VALUE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CELL_MODEL_GET_READS_CURRENT_VALUE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT,
     }
 }
 
