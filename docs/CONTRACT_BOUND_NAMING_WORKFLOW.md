@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-three clusters named, 771 → 376 sites — see "Current state");
+fixed, twenty-four clusters named, 771 → 371 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **376** sites (was 771; twenty-five
+  session; total is now **371** sites (was 771; twenty-six
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -818,6 +818,11 @@ was brought back to zero in three focused follow-up commits.
       predicate over all four bytes at once -- fixed the count on
       re-rescan. Lives in `rust_std::primitives.rs`, next to
       `AsciiByte`'s own registration.
+  26. **`X == X.len()` (5 sites)**: "a read/write count matches the
+      buffer's own length" across `rust_std::io`'s
+      `Repeat`/`Sink`/`Chain`/`Cursor` harnesses. Registered directly
+      on `RustStdStandard<usize>` via `kani_ensures!` -- its
+      `Ensures<KaniVerifier>` slot was free, no new type needed.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
