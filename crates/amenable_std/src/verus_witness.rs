@@ -1088,6 +1088,29 @@ bridge_verus_witness!(RustStdStandard<std::array::TryFromSliceError>);
 
 const VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/from_utf16_error_carrier.rs");
+const FROM_UTF16_RESULT_MATCHES_SINGLE_UNIT_EXAMPLES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf16_result_matches_single_unit_examples(
+    units: &[u16],
+    result: Result<String, FromUtf16Error>,
+) -> bool {
+    ((units@.len() == 1 && units@[0] == 0x61) ==> result is Ok)
+        && ((units@.len() == 1 && units@[0] == 0xD800) ==> result is Err)
+        && ((units@.len() == 1 && units@[0] == 0xDC00) ==> result is Err)
+}"#;
+const FROM_UTF16_INPUTS_COVER_VALID_AND_LONE_SURROGATE_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf16_inputs_cover_valid_and_lone_surrogate_cases(
+    valid: &[u16],
+    lone_surrogate: &[u16],
+    lone_low_surrogate: &[u16],
+) -> bool {
+    valid@.len() == 1
+        && valid@[0] == 0x61
+        && lone_surrogate@.len() == 1
+        && lone_surrogate@[0] == 0xD800
+        && lone_low_surrogate@.len() == 1
+        && lone_low_surrogate@[0] == 0xDC00
+}"#;
+const FROM_UTF16_CASE_RESULTS_MATCH_ACCEPT_REJECT_TRIPLE_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf16_case_results_match_accept_reject_triple(result: (bool, bool, bool)) -> bool {
+    result.0 && result.1 && result.2
+}"#;
 
 impl VerusWitness for RustStdStandard<std::string::FromUtf16Error> {
     type SupportingEvidence = Self;
@@ -1111,6 +1134,33 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
         describe: || {
             <RustStdStandard<std::string::FromUtf16Error> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_UTF16_RESULT_MATCHES_SINGLE_UNIT_EXAMPLES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || FROM_UTF16_INPUTS_COVER_VALID_AND_LONE_SURROGATE_CASES_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || FROM_UTF16_CASE_RESULTS_MATCH_ACCEPT_REJECT_TRIPLE_VERUS_FRAGMENT,
     }
 }
 
