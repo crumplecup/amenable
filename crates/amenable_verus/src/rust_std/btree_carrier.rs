@@ -19,6 +19,30 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The input-side distinct-key precondition for the `BTreeMap`
+/// round-trip law.
+pub open spec fn btree_map_round_trip_inputs_are_distinct(k1: int, k2: int) -> bool {
+    k1 != k2
+}
+
+/// The insert/get/remove round-trip law this `BTreeMap` carrier
+/// establishes.
+pub open spec fn btree_map_insert_get_remove_round_trip_holds(result: bool) -> bool {
+    result
+}
+
+/// The input-side distinct-element precondition for the `BTreeSet`
+/// round-trip law.
+pub open spec fn btree_set_round_trip_inputs_are_distinct(a: int, b: int) -> bool {
+    a != b
+}
+
+/// The insert/contains/remove round-trip law this `BTreeSet` carrier
+/// establishes.
+pub open spec fn btree_set_insert_contains_remove_round_trip_holds(result: bool) -> bool {
+    result
+}
+
 /// Two keys inserted into a `BTreeMap` are both retrievable afterward
 /// with their own values, and removing one leaves the other behind —
 /// a real round trip against `BTreeMap`'s own genuine `vstd` spec
@@ -26,9 +50,9 @@ verus! {
 /// accommodation model of it.
 pub fn verify_btree_map_insert_get_remove_round_trips(k1: i32, k2: i32, v1: i32, v2: i32) -> (result: bool)
     requires
-        k1 != k2,
+        btree_map_round_trip_inputs_are_distinct(k1, k2),
     ensures
-        result,
+        btree_map_insert_get_remove_round_trip_holds(result),
 {
     let mut map: BTreeMap<i32, i32> = BTreeMap::new();
     map.insert(k1, v1);
@@ -59,9 +83,9 @@ pub fn verify_btree_map_insert_get_remove_round_trips(k1: i32, k2: i32, v1: i32,
 /// model of it.
 pub fn verify_btree_set_insert_contains_remove_round_trips(a: i32, b: i32) -> (result: bool)
     requires
-        a != b,
+        btree_set_round_trip_inputs_are_distinct(a, b),
     ensures
-        result,
+        btree_set_insert_contains_remove_round_trip_holds(result),
 {
     let mut set: BTreeSet<i32> = BTreeSet::new();
     set.insert(a);

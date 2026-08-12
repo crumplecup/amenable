@@ -1272,6 +1272,14 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
 const VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
 
+const BTREE_MAP_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_map_round_trip_inputs_are_distinct(k1: int, k2: int) -> bool {
+    k1 != k2
+}"#;
+
+const BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_map_insert_get_remove_round_trip_holds(result: bool) -> bool {
+    result
+}"#;
+
 impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1287,6 +1295,24 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BTreeMap<i32, i32>>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "k1 != k2"
+    }
+}
+
+impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
@@ -1298,8 +1324,52 @@ bridge_verus_witness!(RustStdStandard<std::collections::BTreeMap<i32, i32>>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || BTREE_MAP_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
+
+const BTREE_SET_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_set_round_trip_inputs_are_distinct(a: int, b: int) -> bool {
+    a != b
+}"#;
+
+const BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_set_insert_contains_remove_round_trip_holds(result: bool) -> bool {
+    result
+}"#;
 
 impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
     type SupportingEvidence = Self;
@@ -1316,6 +1386,24 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BTreeSet<i32>>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::collections::BTreeSet<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "a != b"
+    }
+}
+
+impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeSet<i32>> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
@@ -1323,6 +1411,42 @@ bridge_verus_witness!(RustStdStandard<std::collections::BTreeSet<i32>>);
         describe: || {
             <RustStdStandard<std::collections::BTreeSet<i32>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::collections::BTreeSet<i32>> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || BTREE_SET_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<std::collections::BTreeSet<i32>> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
     }
 }
 
