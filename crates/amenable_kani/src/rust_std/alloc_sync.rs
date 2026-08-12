@@ -15,6 +15,8 @@ use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::StrongCountTracksLiveReferences;
+#[cfg(kani)]
+use crate::WeakUpgradeReturnsNone;
 use crate::rust_std::macros::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<Arc<i32>> {
@@ -158,7 +160,7 @@ amenable_derive::harness! {
 
             drop(arc);
             assert!(
-                weak.upgrade().is_none(),
+                WeakUpgradeReturnsNone::ensures(weak.upgrade().is_none()),
                 "upgrade fails once all strong references are dropped"
             );
 
@@ -179,7 +181,7 @@ amenable_derive::harness! {
                 RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the value drops once the last strong ref drops, though a Weak to it still exists"
             );
-            assert!(weak_witness.upgrade().is_none());
+            assert!(WeakUpgradeReturnsNone::ensures(weak_witness.upgrade().is_none()));
         }
     }
 }

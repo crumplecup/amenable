@@ -156,6 +156,57 @@ amenable_derive::harness! {
 // string (see `alloc_rc.rs`'s own registration comment) disambiguate the
 // two for tooling reading the registry (e.g. `elicit_doc`'s coverage
 // report).
+/// A `Weak::upgrade()` outcome, once computed, known to report `None`:
+/// once every strong reference has dropped, upgrading a `Weak` to it
+/// can no longer succeed.
+///
+/// Independently hand-written as `assert!(weak.upgrade().is_none(),
+/// ...)` at 4 real sites split between `Rc`'s and `Arc`'s `Weak` --
+/// the identical claim regardless of the single-/multi-threaded
+/// carrier. Same "trust the body, name the flag" shape as
+/// `EmptiedContainerReportsEmpty`/`FallibleOperationReportsFailure`,
+/// but a distinct type from the latter: `Option::is_none()` and
+/// `Result::is_err()` are different outcome shapes, not the same
+/// claim restated.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct WeakUpgradeReturnsNone;
+
+impl KaniWitness for WeakUpgradeReturnsNone {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            claim: VERIFY_RC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(WeakUpgradeReturnsNone);
+
+kani_ensures!(
+    WeakUpgradeReturnsNone,
+    "amenable_kani::WeakUpgradeReturnsNone",
+    bool,
+    |is_none| is_none
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::WeakUpgradeReturnsNone",
+        verifier: "kani",
+        describe: || <WeakUpgradeReturnsNone as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<std::rc::Weak<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -209,7 +260,7 @@ amenable_derive::harness! {
 
             drop(rc);
             assert!(
-                weak.upgrade().is_none(),
+                WeakUpgradeReturnsNone::ensures(weak.upgrade().is_none()),
                 "upgrade fails once all strong references are dropped"
             );
 
@@ -230,7 +281,7 @@ amenable_derive::harness! {
                 RustStdStandard::<Cell<u32>>::ensures((drop_count.get(), 1)),
                 "the value drops once the last strong ref drops, though a Weak to it still exists"
             );
-            assert!(weak_witness.upgrade().is_none());
+            assert!(WeakUpgradeReturnsNone::ensures(weak_witness.upgrade().is_none()));
         }
     }
 }
