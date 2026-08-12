@@ -65,6 +65,17 @@ kani_requires!(
     |(a, b)| a.checked_add(b).is_some()
 );
 
+// A read/write count matching the buffer's own length is independently
+// restated at 5 real sites across `rust_std::io`'s `Repeat`/`Sink`/
+// `Chain`/`Cursor` harnesses (`assert_eq!(count, buffer.len(), ...)`).
+// `RustStdStandard<usize>`'s `Ensures<KaniVerifier>` slot was free.
+kani_ensures!(
+    RustStdStandard<usize>,
+    "amenable_std::rust_std::RustStdStandard<usize>",
+    (usize, usize),
+    |(actual, expected)| actual == expected
+);
+
 impl KaniWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

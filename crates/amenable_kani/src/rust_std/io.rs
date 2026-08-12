@@ -914,7 +914,10 @@ amenable_derive::harness! {
             let mut buffer = [0u8; 4];
             let mut reader = std::io::repeat(byte);
             let read = reader.read(&mut buffer).expect("Repeat::read never errors");
-            assert_eq!(read, buffer.len(), "Repeat::read always fills the whole buffer");
+            assert!(
+                RustStdStandard::<usize>::ensures((read, buffer.len())),
+                "Repeat::read always fills the whole buffer"
+            );
             for filled in buffer {
                 assert!(
                     RustStdStandard::<std::io::Repeat>::ensures((filled, byte)),
@@ -1032,7 +1035,10 @@ amenable_derive::harness! {
             let data: [u8; 4] = kani::any();
             let mut writer = std::io::sink();
             let written = writer.write(&data).expect("Sink::write never errors");
-            assert_eq!(written, data.len(), "Sink::write reports the full length written");
+            assert!(
+                RustStdStandard::<usize>::ensures((written, data.len())),
+                "Sink::write reports the full length written"
+            );
             writer.flush().expect("Sink::flush never errors");
         }
     }
@@ -1086,9 +1092,8 @@ amenable_derive::harness! {
             let read_first = chain
                 .read(&mut buffer)
                 .expect("Chain::read over in-memory slices never errors");
-            assert_eq!(
-                read_first,
-                buffer.len(),
+            assert!(
+                RustStdStandard::<usize>::ensures((read_first, buffer.len())),
                 "Chain::read drains the first source fully before touching the second"
             );
             assert!(
@@ -1101,9 +1106,8 @@ amenable_derive::harness! {
             let read_second = chain
                 .read(&mut buffer)
                 .expect("Chain::read over in-memory slices never errors");
-            assert_eq!(
-                read_second,
-                buffer.len(),
+            assert!(
+                RustStdStandard::<usize>::ensures((read_second, buffer.len())),
                 "Chain::read continues into the second source once the first is exhausted"
             );
             assert!(
@@ -1154,7 +1158,10 @@ amenable_derive::harness! {
             let read = cursor
                 .read(&mut buffer)
                 .expect("Cursor::read over an in-memory slice never errors");
-            assert_eq!(read, buffer.len(), "Cursor::read fills the requested buffer");
+            assert!(
+                RustStdStandard::<usize>::ensures((read, buffer.len())),
+                "Cursor::read fills the requested buffer"
+            );
             assert_eq!(
                 buffer,
                 [data[0], data[1]],
