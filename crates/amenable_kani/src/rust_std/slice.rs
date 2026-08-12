@@ -26,6 +26,8 @@ use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
+use crate::IteratorYieldsAReferenceToTheStoredValue;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -66,7 +68,10 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let data = [value];
             let mut it = data.iter();
-            assert_eq!(it.next(), Some(&value), "iter yields a reference to the element");
+            assert!(
+                IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&value))),
+                "iter yields a reference to the element"
+            );
         }
     }
 }

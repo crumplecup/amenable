@@ -67,7 +67,10 @@ mod task;
 mod thread;
 mod time;
 
-pub use alloc_collections::{EmptiedContainerReportsEmpty, FirstValueIsLessThanTheSecond};
+pub use alloc_collections::{
+    EmptiedContainerReportsEmpty, FirstValueIsLessThanTheSecond,
+    IteratorYieldsAReferenceToTheStoredValue,
+};
 pub use alloc_rc::StrongCountTracksLiveReferences;
 pub use alloc_vec::VecLengthTracksPushesAndPops;
 pub use fmt::RenderedKindMatchesTheBuildingOperation;

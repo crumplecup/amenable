@@ -10,6 +10,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::IteratorYieldsAReferenceToTheStoredValue;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -234,7 +236,7 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let opt = Some(value);
             let mut it = opt.iter();
-            assert_eq!(it.next(), Some(&value));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&value))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }
@@ -371,7 +373,7 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let res: Result<i32, i32> = Ok(value);
             let mut it = res.iter();
-            assert_eq!(it.next(), Some(&value));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&value))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
         }
     }

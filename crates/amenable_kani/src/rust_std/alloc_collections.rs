@@ -947,6 +947,102 @@ amenable_derive::harness! {
     }
 }
 
+/// An `(actual, expected)` pair of `.next()` results known to agree: an
+/// iterator over shared references yields a reference to the exact
+/// value known to be there.
+///
+/// Independently hand-written as `assert_eq!(it.next(), Some(&value),
+/// ...)` at 7 real sites spanning `LinkedList::iter`, `VecDeque::iter`,
+/// `Option::iter`, `Result::iter`, and `slice::iter` -- the identical
+/// claim regardless of container kind. Generic over the whole
+/// `Option<&value>` result type rather than just the referenced
+/// element type: unlike this session's other generic contract types
+/// (which vary over the *element* type across real sites, all fixed
+/// `i32` here), this one has to vary over the *borrow's lifetime*,
+/// which differs at every real call site (each borrows from its own
+/// local container) -- a non-generic type has no way to name an
+/// unconstrained lifetime, so `T` here is inferred as the full
+/// `Option<&'a i32>` at each call site instead.
+pub struct IteratorYieldsAReferenceToTheStoredValue<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for IteratorYieldsAReferenceToTheStoredValue<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for IteratorYieldsAReferenceToTheStoredValue<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for IteratorYieldsAReferenceToTheStoredValue<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_linked_list_iter_yields_references_in_order".to_owned(),
+            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier>
+    for IteratorYieldsAReferenceToTheStoredValue<T>
+{
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for IteratorYieldsAReferenceToTheStoredValue<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::IteratorYieldsAReferenceToTheStoredValue",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::IteratorYieldsAReferenceToTheStoredValue",
+        verifier: "kani",
+        describe: || <IteratorYieldsAReferenceToTheStoredValue<i32> as KaniWitness>::proof()
+            .to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<std::collections::linked_list::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -984,8 +1080,8 @@ amenable_derive::harness! {
             list.push_back(a);
             list.push_back(b);
             let mut it = list.iter();
-            assert_eq!(it.next(), Some(&a));
-            assert_eq!(it.next(), Some(&b));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&a))));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&b))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
             assert!(
@@ -1358,8 +1454,8 @@ amenable_derive::harness! {
             dq.push_back(a);
             dq.push_back(b);
             let mut it = dq.iter();
-            assert_eq!(it.next(), Some(&a));
-            assert_eq!(it.next(), Some(&b));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&a))));
+            assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((it.next(), Some(&b))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             drop(it);
             assert!(
