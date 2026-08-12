@@ -11,13 +11,15 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 391 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 386 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus twenty clusters named (two of which
-reused already-named types instead of minting new ones --
+missing negated-call shape) plus twenty-one clusters named (two of
+which reused already-named types instead of minting new ones --
 `FirstValueIsLessThanTheSecond` for `rust_std::iter`'s
 overflow-avoidance bounds, `IteratorYieldsAReferenceToTheStoredValue`
-for `rust_std::slice`'s chunk/window groupings) -- nine
+for `rust_std::slice`'s chunk/window groupings, plus a new
+`ByteIsDistinctFromTheMarker` for `rust_std::io`'s single-pair
+distinctness checks) -- nine
 generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`,

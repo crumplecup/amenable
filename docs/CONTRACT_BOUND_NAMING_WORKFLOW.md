@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty clusters named, 771 → 391 sites — see "Current state");
+fixed, twenty-one clusters named, 771 → 386 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,9 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **391** sites (was 771; twenty-two intervening
-  fixes landed, see below). Re-run the scan before picking the next
-  cluster — this list will drift as work lands.
+  session; total is now **386** sites (was 771; twenty-three
+  intervening fixes landed, see below). Re-run the scan before picking
+  the next cluster — this list will drift as work lands.
 
   **Both clusters caught by the mid-session correction (above) are now
   resolved.** `X.next() == Some(X)` (item 8 below) and `X.len() == X`
@@ -758,6 +758,17 @@ was brought back to zero in three focused follow-up commits.
       inside their harnesses: `chunks`'/`rchunks`'s single-element
       trailing-chunk checks (the sibling
       `X.next() == Some(&[X][..])` shape).
+  23. **`X != X` (5 sites)**: a byte distinct from a marker byte, split
+      between `verify_line_writer_flushes_on_a_newline_but_not_before_one`
+      (distinct from the fixed literal newline marker `b'\n'`, 2 sites)
+      and `verify_split_segments_on_the_given_byte_and_drops_it`
+      (distinct from the symbolic split delimiter, 3 sites). Named as
+      `amenable_kani::ByteIsDistinctFromTheMarker` -- deliberately
+      **not** a reuse of `SplitOperandsAreDistinctFromThePattern` (item
+      11), which combines two distinctness checks against one pattern
+      into a single call: every real site here asserts exactly one
+      pair at a time, no combined `&&`. Lives in `rust_std::io.rs`
+      (total owner, 5 of 5 sites).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
