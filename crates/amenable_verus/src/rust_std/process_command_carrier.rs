@@ -16,6 +16,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `.env(key, value)` configured on a `Command` builder is visible to
@@ -25,7 +28,7 @@ pub fn verify_command_model_env_override_is_visible_to_the_spawned_process(value
         result,
 {
     let visible_stdout: &str = value;
-    assert(visible_stdout@ =~= value@);
+    assert(text_view_matches_expected(visible_stdout@, value@));
     let _ = visible_stdout;
     true
 }
@@ -34,8 +37,8 @@ pub fn verify_command_model_env_override_is_visible_to_the_spawned_process(value
 /// order: `("a", "b")`.
 pub fn verify_command_args_model_reports_the_configured_arguments() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
 {
     ("a", "b")
 }
@@ -48,8 +51,8 @@ pub fn verify_command_envs_model_reports_the_configured_overrides(key: &str, val
 {
     let reported_key: &str = key;
     let reported_value: &str = value;
-    assert(reported_key@ =~= key@);
-    assert(reported_value@ =~= value@);
+    assert(text_view_matches_expected(reported_key@, key@));
+    assert(text_view_matches_expected(reported_value@, value@));
     let _ = reported_key;
     let _ = reported_value;
     true

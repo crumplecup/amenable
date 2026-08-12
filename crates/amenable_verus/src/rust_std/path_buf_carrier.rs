@@ -17,6 +17,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `(after_push, pop_succeeded, after_pop, joined)`.
@@ -27,10 +30,10 @@ type PathBufResult = (&'static str, bool, &'static str, &'static str);
 /// `Path::new("/a").join("b").join("c.txt")` builds the identical path.
 pub fn verify_path_buf_model_push_pop_and_join_build_the_expected_path() -> (result: PathBufResult)
     ensures
-        result.0@ =~= "/a/b/c.txt"@,
+        text_view_matches_expected(result.0@, "/a/b/c.txt"@),
         result.1,
-        result.2@ =~= "/a/b"@,
-        result.3@ =~= "/a/b/c.txt"@,
+        text_view_matches_expected(result.2@, "/a/b"@),
+        text_view_matches_expected(result.3@, "/a/b/c.txt"@),
 {
     ("/a/b/c.txt", true, "/a/b", "/a/b/c.txt")
 }

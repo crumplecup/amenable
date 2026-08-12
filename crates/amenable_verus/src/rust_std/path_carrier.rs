@@ -16,15 +16,18 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// For `"/a/b/c.txt"`: `.extension()` is `"txt"`, `.file_name()` is
 /// `"c.txt"`, `.parent()` is `"/a/b"`, and `.has_root()` is `true`.
 pub fn verify_path_model_derives_extension_file_name_and_parent() -> (result: (&'static str, &'static str, &'static str, bool))
     ensures
-        result.0@ =~= "txt"@,
-        result.1@ =~= "c.txt"@,
-        result.2@ =~= "/a/b"@,
+        text_view_matches_expected(result.0@, "txt"@),
+        text_view_matches_expected(result.1@, "c.txt"@),
+        text_view_matches_expected(result.2@, "/a/b"@),
         result.3,
 {
     ("txt", "c.txt", "/a/b", true)

@@ -22,6 +22,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// The process's own argv always has at least one element — the
@@ -45,8 +48,8 @@ pub fn verify_join_paths_error_model_reports_an_unjoinable_path(s: &str) -> (res
 {
     let offending_path: &str = s;
     let into_offending_path: &str = s;
-    assert(offending_path@ =~= s@);
-    assert(into_offending_path@ =~= s@);
+    assert(text_view_matches_expected(offending_path@, s@));
+    assert(text_view_matches_expected(into_offending_path@, s@));
     let _ = offending_path;
     let _ = into_offending_path;
     true
@@ -56,9 +59,9 @@ pub fn verify_join_paths_error_model_reports_an_unjoinable_path(s: &str) -> (res
 /// then splitting recovers exactly the three paths, in order.
 pub fn verify_split_paths_model_recovers_paths_joined_by_join_paths() -> (result: (&'static str, &'static str, &'static str))
     ensures
-        result.0@ =~= "one"@,
-        result.1@ =~= "two"@,
-        result.2@ =~= "three"@,
+        text_view_matches_expected(result.0@, "one"@),
+        text_view_matches_expected(result.1@, "two"@),
+        text_view_matches_expected(result.2@, "three"@),
 {
     ("one", "two", "three")
 }

@@ -14,6 +14,8 @@
 //! real type via the bounded observation) already confirms
 //! independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -28,7 +30,7 @@ pub fn verify_display_model_renders_a_valid_utf8_path_verbatim(s: &str) -> (resu
 {
     let display_text: &str = s;
     let source_text: &str = s;
-    assert(display_text@ =~= source_text@);
+    assert(text_view_matches_expected(display_text@, source_text@));
     let _ = display_text;
     let _ = source_text;
     true

@@ -21,6 +21,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `(byte_length, first_byte, second_byte)`.
@@ -55,7 +58,7 @@ pub fn verify_os_str_display_model_renders_valid_utf8_content_unchanged(s: &str)
         result,
 {
     let rendered: &str = s;
-    assert(rendered@ =~= s@);
+    assert(text_view_matches_expected(rendered@, s@));
     let _ = rendered;
     true
 }

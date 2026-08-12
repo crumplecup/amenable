@@ -17,6 +17,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `Path::new("/a/b/c").ancestors()` yields the path itself, then each
@@ -24,10 +27,10 @@ verus! {
 /// `"/"`.
 pub fn verify_ancestors_model_yields_self_then_each_parent_up_to_root() -> (result: (&'static str, &'static str, &'static str, &'static str))
     ensures
-        result.0@ =~= "/a/b/c"@,
-        result.1@ =~= "/a/b"@,
-        result.2@ =~= "/a"@,
-        result.3@ =~= "/"@,
+        text_view_matches_expected(result.0@, "/a/b/c"@),
+        text_view_matches_expected(result.1@, "/a/b"@),
+        text_view_matches_expected(result.2@, "/a"@),
+        text_view_matches_expected(result.3@, "/"@),
 {
     ("/a/b/c", "/a/b", "/a", "/")
 }

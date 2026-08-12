@@ -20,13 +20,16 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `"\n".escape_debug().collect()` yields `"\n"` (the two-character
 /// escape).
 pub fn verify_str_escape_debug_model_escapes_control_characters() -> (result: &'static str)
     ensures
-        result@ =~= "\\n"@,
+        text_view_matches_expected(result@, "\\n"@),
 {
     "\\n"
 }
@@ -35,7 +38,7 @@ pub fn verify_str_escape_debug_model_escapes_control_characters() -> (result: &'
 /// escape).
 pub fn verify_str_escape_default_model_escapes_control_characters() -> (result: &'static str)
     ensures
-        result@ =~= "\\n"@,
+        text_view_matches_expected(result@, "\\n"@),
 {
     "\\n"
 }
@@ -43,7 +46,7 @@ pub fn verify_str_escape_default_model_escapes_control_characters() -> (result: 
 /// `"a".escape_unicode().collect()` yields `"\u{61}"`.
 pub fn verify_str_escape_unicode_model_renders_the_codepoint_escape() -> (result: &'static str)
     ensures
-        result@ =~= "\\u{61}"@,
+        text_view_matches_expected(result@, "\\u{61}"@),
 {
     "\\u{61}"
 }

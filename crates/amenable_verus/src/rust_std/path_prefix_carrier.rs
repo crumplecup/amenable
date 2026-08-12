@@ -17,6 +17,8 @@
 //! (checking the real type via the bounded observation) already
 //! confirms independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -40,7 +42,7 @@ pub fn verify_prefix_component_model_pairs_raw_text_with_parsed_prefix(text: &st
         result.1 == letter,
 {
     let raw_text: &str = text;
-    assert(raw_text@ =~= text@);
+    assert(text_view_matches_expected(raw_text@, text@));
     let _ = raw_text;
     (true, letter)
 }

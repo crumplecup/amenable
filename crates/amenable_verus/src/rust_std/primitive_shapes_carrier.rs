@@ -37,6 +37,13 @@ use crate::rust_std::iter_sequence_carrier::single_increment_headroom_holds;
 
 verus! {
 
+/// A shared text-view equality predicate for Verus accommodation models
+/// that need to compare observed `str` content without relying on
+/// `str`'s unsupported exec `PartialEq`.
+pub open spec fn text_view_matches_expected(observed: Seq<char>, expected: Seq<char>) -> bool {
+    observed =~= expected
+}
+
 /// `[a, b, c].len() == 3`, and each index recovers the element the
 /// array was constructed with.
 pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))

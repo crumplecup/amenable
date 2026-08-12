@@ -18,6 +18,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `AssertUnwindSafe` is a bare assertion wrapper: `Deref`/`DerefMut`
@@ -43,7 +46,7 @@ pub fn verify_location_model_caller_reflects_the_immediate_call_site(file: &str,
         result,
 {
     let observed_file: &str = file;
-    assert(observed_file@ =~= file@);
+    assert(text_view_matches_expected(observed_file@, file@));
     let _ = observed_file;
     let _ = line_a;
     let _ = line_b;

@@ -16,14 +16,17 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `"a\nb".lines()` yields `"a"` then `"b"`, without a trailing empty
 /// line.
 pub fn verify_lines_model_splits_on_line_endings() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
 {
     ("a", "b")
 }
@@ -32,8 +35,8 @@ pub fn verify_lines_model_splits_on_line_endings() -> (result: (&'static str, &'
 /// splits on either `\n` or `\r\n`.
 pub fn verify_lines_any_model_splits_on_any_line_ending() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
 {
     ("a", "b")
 }

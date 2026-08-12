@@ -33,13 +33,16 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `'A'.to_lowercase()` yields `"a"` — the fixed example `ToLowercase`
 /// is expected to refine.
 pub fn verify_to_lowercase_model_maps_an_uppercase_ascii_letter() -> (result: &'static str)
     ensures
-        result@ =~= "a"@,
+        text_view_matches_expected(result@, "a"@),
 {
     "a"
 }
@@ -48,7 +51,7 @@ pub fn verify_to_lowercase_model_maps_an_uppercase_ascii_letter() -> (result: &'
 /// is expected to refine.
 pub fn verify_to_uppercase_model_maps_a_lowercase_ascii_letter() -> (result: &'static str)
     ensures
-        result@ =~= "A"@,
+        text_view_matches_expected(result@, "A"@),
 {
     "A"
 }
@@ -58,7 +61,7 @@ pub fn verify_to_uppercase_model_maps_a_lowercase_ascii_letter() -> (result: &'s
 /// refine.
 pub fn verify_char_escape_debug_model_escapes_a_newline() -> (result: &'static str)
     ensures
-        result@ =~= "\\n"@,
+        text_view_matches_expected(result@, "\\n"@),
 {
     "\\n"
 }
@@ -68,7 +71,7 @@ pub fn verify_char_escape_debug_model_escapes_a_newline() -> (result: &'static s
 /// to refine.
 pub fn verify_char_escape_default_model_escapes_a_newline() -> (result: &'static str)
     ensures
-        result@ =~= "\\n"@,
+        text_view_matches_expected(result@, "\\n"@),
 {
     "\\n"
 }
@@ -77,7 +80,7 @@ pub fn verify_char_escape_default_model_escapes_a_newline() -> (result: &'static
 /// `EscapeUnicode` is expected to refine.
 pub fn verify_char_escape_unicode_model_renders_the_codepoint_escape() -> (result: &'static str)
     ensures
-        result@ =~= "\\u{61}"@,
+        text_view_matches_expected(result@, "\\u{61}"@),
 {
     "\\u{61}"
 }

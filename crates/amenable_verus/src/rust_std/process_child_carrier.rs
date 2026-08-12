@@ -17,6 +17,8 @@
 //! exact type (checking the real type via the bounded observation)
 //! already confirms independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -54,7 +56,7 @@ pub fn verify_child_stdin_model_is_readable_by_the_child_process(s: &str) -> (re
 {
     let echoed_stdout: &str = s;
     let input_text: &str = s;
-    assert(echoed_stdout@ =~= input_text@);
+    assert(text_view_matches_expected(echoed_stdout@, input_text@));
     let _ = echoed_stdout;
     let _ = input_text;
     true

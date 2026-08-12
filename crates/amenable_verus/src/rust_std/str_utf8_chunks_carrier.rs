@@ -23,6 +23,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// Re-validating wholly valid UTF-8 bytes (`b"ab"`) yields exactly one
@@ -30,7 +33,7 @@ verus! {
 /// second chunk.
 pub fn verify_utf8_chunks_model_yields_one_chunk_for_wholly_valid_input() -> (result: (&'static str, bool, bool))
     ensures
-        result.0@ =~= "ab"@,
+        text_view_matches_expected(result.0@, "ab"@),
         result.1,
         !result.2,
 {
@@ -42,7 +45,7 @@ pub fn verify_utf8_chunks_model_yields_one_chunk_for_wholly_valid_input() -> (re
 /// (`0xFF`).
 pub fn verify_utf8_chunk_model_separates_the_valid_prefix_from_invalid_bytes() -> (result: (&'static str, u8))
     ensures
-        result.0@ =~= "ab"@,
+        text_view_matches_expected(result.0@, "ab"@),
         result.1 == 0xFFu8,
 {
     ("ab", 0xFFu8)

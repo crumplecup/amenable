@@ -11,6 +11,8 @@
 //! own harness for that exact type (checking the real type directly)
 //! already confirms independently, for the identical example.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -21,8 +23,8 @@ verus! {
 /// drops leading/trailing whitespace: yields `"a"` then `"b"`.
 pub fn verify_split_ascii_whitespace_model_collapses_runs_of_whitespace() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
 {
     ("a", "b")
 }
@@ -31,8 +33,8 @@ pub fn verify_split_ascii_whitespace_model_collapses_runs_of_whitespace() -> (re
 /// whitespace.
 pub fn verify_split_whitespace_model_collapses_runs_of_whitespace() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
 {
     ("a", "b")
 }

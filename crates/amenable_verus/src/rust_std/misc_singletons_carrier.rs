@@ -22,6 +22,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `Pin` is transparent to its pointee through `Deref`, and (for an
@@ -77,7 +80,7 @@ pub fn verify_panic_hook_info_model_reports_the_panics_own_message(s: &str) -> (
         result,
 {
     let captured: &str = s;
-    assert(captured@ =~= s@);
+    assert(text_view_matches_expected(captured@, s@));
     let _ = captured;
     true
 }

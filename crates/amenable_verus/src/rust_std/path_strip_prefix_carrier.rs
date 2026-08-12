@@ -14,6 +14,8 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical example.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -25,7 +27,7 @@ verus! {
 pub fn verify_strip_prefix_error_model_reports_a_non_matching_prefix() -> (result: (bool, &'static str))
     ensures
         result.0,
-        result.1@ =~= "b"@,
+        text_view_matches_expected(result.1@, "b"@),
 {
     (true, "b")
 }

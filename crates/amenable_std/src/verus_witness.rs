@@ -7685,6 +7685,41 @@ impl VerusWitness for RustStdStandard<str> {
 
 bridge_verus_witness!(RustStdStandard<str>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<str> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "observed @ =~= expected @"
+    }
+}
+
+const TEXT_VIEW_MATCHES_EXPECTED_VERUS_FRAGMENT: &str = r#"pub open spec fn text_view_matches_expected(observed: Seq<char>, expected: Seq<char>) -> bool {
+    observed =~= expected
+}"#;
+
+// `Ensures::ensures()` keeps a descriptive text-view-equality spelling
+// for cross-backend enumeration, while the real Verus proof sites across
+// the `str`, `path`, `process`, `env`, and panic carriers call the
+// shared `text_view_matches_expected` spec fn directly.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<str> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<str>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || TEXT_VIEW_MATCHES_EXPECTED_VERUS_FRAGMENT,
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<str>",

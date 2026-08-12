@@ -17,6 +17,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `DefaultHasher::new()` always starts from the same fixed seed, so
@@ -38,7 +41,7 @@ pub fn verify_random_state_model_gives_the_same_hasher_seed_across_calls(s: &str
         result,
 {
     let observed_input: &str = s;
-    assert(observed_input@ =~= s@);
+    assert(text_view_matches_expected(observed_input@, s@));
     let _ = observed_input;
     true
 }

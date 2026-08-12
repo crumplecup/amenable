@@ -13,6 +13,8 @@
 //! that exact type (checking the real type directly) already confirms
 //! independently, for the identical example.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -24,7 +26,7 @@ verus! {
 pub fn verify_component_model_distinguishes_root_from_normal_segments() -> (result: (bool, &'static str))
     ensures
         result.0,
-        result.1@ =~= "a"@,
+        text_view_matches_expected(result.1@, "a"@),
 {
     (true, "a")
 }
@@ -34,8 +36,8 @@ pub fn verify_component_model_distinguishes_root_from_normal_segments() -> (resu
 pub fn verify_components_model_yields_root_then_named_segments_in_order() -> (result: (bool, &'static str, &'static str))
     ensures
         result.0,
-        result.1@ =~= "a"@,
-        result.2@ =~= "b"@,
+        text_view_matches_expected(result.1@, "a"@),
+        text_view_matches_expected(result.2@, "b"@),
 {
     (true, "a", "b")
 }
@@ -45,8 +47,8 @@ pub fn verify_components_model_yields_root_then_named_segments_in_order() -> (re
 pub fn verify_iter_model_yields_the_named_segments() -> (result: (u32, &'static str, &'static str))
     ensures
         result.0 == 3,
-        result.1@ =~= "a"@,
-        result.2@ =~= "b"@,
+        text_view_matches_expected(result.1@, "a"@),
+        text_view_matches_expected(result.2@, "b"@),
 {
     (3, "a", "b")
 }

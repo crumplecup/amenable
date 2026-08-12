@@ -18,15 +18,18 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+
 verus! {
 
 /// `"a,b,c".split(',')` yields the substrings between matches, forward:
 /// `"a"`, `"b"`, `"c"`.
 pub fn verify_str_split_model_yields_substrings_between_pattern_matches() -> (result: (&'static str, &'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b"@,
-        result.2@ =~= "c"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b"@),
+        text_view_matches_expected(result.2@, "c"@),
 {
     ("a", "b", "c")
 }
@@ -35,8 +38,8 @@ pub fn verify_str_split_model_yields_substrings_between_pattern_matches() -> (re
 /// remainder unsplit: `"a"`, `"b,c"`.
 pub fn verify_str_splitn_model_limits_to_n_substrings() -> (result: (&'static str, &'static str))
     ensures
-        result.0@ =~= "a"@,
-        result.1@ =~= "b,c"@,
+        text_view_matches_expected(result.0@, "a"@),
+        text_view_matches_expected(result.1@, "b,c"@),
 {
     ("a", "b,c")
 }
@@ -45,9 +48,9 @@ pub fn verify_str_splitn_model_limits_to_n_substrings() -> (result: (&'static st
 /// to the end of the substring that precedes it: `"a,"`, `"b,"`, `"c"`.
 pub fn verify_str_split_inclusive_model_keeps_the_delimiter_attached() -> (result: (&'static str, &'static str, &'static str))
     ensures
-        result.0@ =~= "a,"@,
-        result.1@ =~= "b,"@,
-        result.2@ =~= "c"@,
+        text_view_matches_expected(result.0@, "a,"@),
+        text_view_matches_expected(result.1@, "b,"@),
+        text_view_matches_expected(result.2@, "c"@),
 {
     ("a,", "b,", "c")
 }
