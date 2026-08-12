@@ -24,14 +24,16 @@ use std::io::{
 };
 
 #[cfg(kani)]
-use amenable_core::Ensures;
+use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
+use crate::rust_std::macros::{
+    bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
+};
 use crate::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniVerifier, KaniWitness,
@@ -361,6 +363,58 @@ impl Establish<KaniLineWriterWitnessToken, KaniVerifier> for RustStdStandard<Lin
     }
 }
 
+/// A `(value, marker)` pair known to satisfy `value != marker`.
+///
+/// Independently hand-written as `kani::assume(a != b)` at 5 real
+/// sites: `verify_line_writer_flushes_on_a_newline_but_not_before_one`
+/// (a byte distinct from the fixed literal newline marker `b'\n'`, 2
+/// sites) and `verify_split_segments_on_the_given_byte_and_drops_it`
+/// (a byte distinct from the symbolic split delimiter, 3 sites) -- the
+/// identical single-pair distinctness precondition regardless of
+/// whether the marker is fixed or symbolic. Unlike
+/// `SplitOperandsAreDistinctFromThePattern`, which combines two
+/// distinctness checks against one pattern into a single call, every
+/// real site here asserts exactly one pair at a time, so this needs
+/// no type parameter and no combined `&&`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<u8>",
+    basis_ctor = "RustStdStandard::<u8>::new()",
+    provenance = "<u8 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct ByteIsDistinctFromTheMarker;
+
+impl KaniWitness for ByteIsDistinctFromTheMarker {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
+            claim: VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(ByteIsDistinctFromTheMarker);
+
+kani_requires!(
+    ByteIsDistinctFromTheMarker,
+    "amenable_kani::ByteIsDistinctFromTheMarker",
+    (u8, u8),
+    |(value, marker)| value != marker
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::ByteIsDistinctFromTheMarker",
+        verifier: "kani",
+        describe: || <ByteIsDistinctFromTheMarker as KaniWitness>::proof().to_string(),
+    }
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC, {
         /// A line ending in `\n` reaches the underlying writer
@@ -377,8 +431,8 @@ amenable_derive::harness! {
         fn verify_line_writer_flushes_on_a_newline_but_not_before_one() {
             let line_byte: u8 = kani::any();
             let trailing_byte: u8 = kani::any();
-            kani::assume(line_byte != b'\n');
-            kani::assume(trailing_byte != b'\n');
+            kani::assume(ByteIsDistinctFromTheMarker::requires((line_byte, b'\n')));
+            kani::assume(ByteIsDistinctFromTheMarker::requires((trailing_byte, b'\n')));
             let observation = crate::KaniLineWriterObservation::new(line_byte, trailing_byte);
             let demonstration = observation.demonstrate_flush_behavior(line_byte, trailing_byte);
 
@@ -671,9 +725,9 @@ amenable_derive::harness! {
             let delimiter: u8 = kani::any();
             let second: u8 = kani::any();
             let third: u8 = kani::any();
-            kani::assume(first != delimiter);
-            kani::assume(second != delimiter);
-            kani::assume(third != delimiter);
+            kani::assume(ByteIsDistinctFromTheMarker::requires((first, delimiter)));
+            kani::assume(ByteIsDistinctFromTheMarker::requires((second, delimiter)));
+            kani::assume(ByteIsDistinctFromTheMarker::requires((third, delimiter)));
             let observation = crate::KaniBufReadSplitObservation::new(
                 first, delimiter, second, third,
             );
