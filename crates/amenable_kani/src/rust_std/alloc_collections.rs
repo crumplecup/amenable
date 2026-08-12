@@ -11,9 +11,9 @@
 
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, TryReserveError, VecDeque};
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::{Ensures, Requires};
 use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 #[cfg(kani)]
@@ -25,7 +25,60 @@ use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures, kani_requires};
+
+/// A `(first, second)` pair known to satisfy `first < second`.
+///
+/// Independently hand-written as `kani::assume(a < b)` at 4 real sites:
+/// this file's `BTreeMap`/`BTreeSet`/`BinaryHeap` harnesses (ordering
+/// two fresh symbolic values before checking iteration/peek order) and
+/// `rust_std::iter::verify_successors_generates_from_the_previous_item`
+/// (bounding a generator seed below its model's fixed window, `seed <
+/// 100`) -- the identical `<` relation regardless of whether the right
+/// side is another symbolic value or a fixed literal, the same reason
+/// `SplitOperandsAreDistinctFromThePattern` treats a literal and a
+/// symbolic pattern uniformly. Registered as its own type rather than
+/// on `RustStdStandard<i32>` directly: that carrier's
+/// `Requires<KaniVerifier>` slot already holds the unrelated
+/// `checked_add` precondition (`rust_std::primitives`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct FirstValueIsLessThanTheSecond;
+
+impl KaniWitness for FirstValueIsLessThanTheSecond {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
+            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_kani_witness!(FirstValueIsLessThanTheSecond);
+
+kani_requires!(
+    FirstValueIsLessThanTheSecond,
+    "amenable_kani::FirstValueIsLessThanTheSecond",
+    (i32, i32),
+    |(a, b)| a < b
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::FirstValueIsLessThanTheSecond",
+        verifier: "kani",
+        describe: || <FirstValueIsLessThanTheSecond as KaniWitness>::proof().to_string(),
+    }
+}
 
 impl KaniWitness for RustStdStandard<BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
@@ -62,7 +115,7 @@ amenable_derive::harness! {
         fn verify_btree_map_iterates_in_key_order() {
             let k1: i32 = kani::any();
             let k2: i32 = kani::any();
-            kani::assume(k1 < k2);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((k1, k2)));
             let v1: i32 = kani::any();
             let v2: i32 = kani::any();
 
@@ -182,7 +235,7 @@ amenable_derive::harness! {
         fn verify_btree_set_iterates_in_sorted_order() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a < b);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, b)));
 
             let mut set = crate::KaniBTreeSet::new(b, a);
             assert_eq!(
@@ -859,7 +912,7 @@ amenable_derive::harness! {
         fn verify_binary_heap_peek_mut_exposes_the_maximum() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a < b);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, b)));
 
             let mut heap = BinaryHeap::new();
             heap.push(a);

@@ -32,9 +32,9 @@ use std::ops::Range;
 use std::slice::Iter;
 use std::vec::IntoIter;
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use std::cell::Cell;
@@ -42,6 +42,8 @@ use std::cell::Cell;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AtomicLoadReflectsTheLastWrite;
+#[cfg(kani)]
+use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -1754,7 +1756,7 @@ amenable_derive::harness! {
                 if *x < 100 { Some(x + 1) } else { None }
             }
             let seed: i32 = kani::any();
-            kani::assume(seed < 100);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((seed, 100)));
             let mut s = std::iter::successors(Some(seed), next_step);
             assert!(
                 RustStdStandard::<Successors<i32, fn(&i32) -> Option<i32>>>::ensures((

@@ -67,7 +67,7 @@ mod task;
 mod thread;
 mod time;
 
-pub use alloc_collections::EmptiedContainerReportsEmpty;
+pub use alloc_collections::{EmptiedContainerReportsEmpty, FirstValueIsLessThanTheSecond};
 pub use alloc_rc::StrongCountTracksLiveReferences;
 pub use alloc_vec::VecLengthTracksPushesAndPops;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
