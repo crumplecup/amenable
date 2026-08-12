@@ -27,13 +27,19 @@ use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 
 verus! {
 
+pub open spec fn args_model_count_matches_program_plus_extra(
+    extra_count: u8,
+    result: u32,
+) -> bool {
+    result >= 1 && result == 1 + extra_count as u32
+}
+
 /// The process's own argv always has at least one element — the
 /// program's own slot — plus however many extra arguments were given;
 /// `.args()`/`.args_os()` never yield an empty sequence.
 pub fn verify_args_model_reports_at_least_the_program_path(extra_count: u8) -> (result: u32)
     ensures
-        result >= 1,
-        result == 1 + extra_count as u32,
+        args_model_count_matches_program_plus_extra(extra_count, result),
 {
     1 + extra_count as u32
 }

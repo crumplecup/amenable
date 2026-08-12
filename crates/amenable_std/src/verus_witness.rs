@@ -7747,6 +7747,13 @@ bridge_verus_witness!(RustStdStandard<std::thread::ThreadId>);
 const VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/env_carrier.rs");
 
+const ARGS_MODEL_COUNT_MATCHES_PROGRAM_PLUS_EXTRA_VERUS_FRAGMENT: &str = r#"pub open spec fn args_model_count_matches_program_plus_extra(
+    extra_count: u8,
+    result: u32,
+) -> bool {
+    result >= 1 && result == 1 + extra_count as u32
+}"#;
+
 macro_rules! impl_env_args_verus_witness {
     ($ty:ty) => {
         impl VerusWitness for RustStdStandard<$ty> {
@@ -7769,6 +7776,15 @@ macro_rules! impl_env_args_verus_witness {
                 evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
                 verifier: "verus",
                 describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            }
+        }
+
+        ::inventory::submit! {
+            ::amenable_core::ContractRecord {
+                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                verifier: "verus",
+                kind: "ensures",
+                fragment: || ARGS_MODEL_COUNT_MATCHES_PROGRAM_PLUS_EXTRA_VERUS_FRAGMENT,
             }
         }
     };
