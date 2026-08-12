@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-nine clusters named, 771 → 351 sites — see "Current state");
+fixed, thirty clusters named, 771 → 348 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **351** sites (was 771; thirty-one
+  session; total is now **348** sites (was 771; thirty-two
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -859,6 +859,9 @@ was brought back to zero in three focused follow-up commits.
       recovered `KaniUtf8Buffer<2>` byte slice against the original
       input bytes. Reused item 14's `IndexRecoversTheStoredElement` --
       no new type needed.
+  32. **`X.X::<X>().is_err()` (3 sites)**: split between `char::from_str`
+      and `f64::from_str` parse failures. Reused item 15's
+      `FallibleOperationReportsFailure` -- no new type needed.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
