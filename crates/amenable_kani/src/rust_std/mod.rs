@@ -77,4 +77,5 @@ pub use primitives::{DerefReflectsTheStoredValue, IndexRecoversTheStoredElement}
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,
 };
+pub use str::CollectedSequenceMatchesExpected;
 pub use sync_atomic::AtomicLoadReflectsTheLastWrite;

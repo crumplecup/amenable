@@ -93,12 +93,12 @@ pub use registry::{
 };
 pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::{
-    AtomicLoadReflectsTheLastWrite, CheckedProof, DerefReflectsTheStoredValue,
-    EmptiedContainerReportsEmpty, FallibleOperationReportsFailure, FirstValueIsLessThanTheSecond,
-    IndexRecoversTheStoredElement, IteratorMatchesReferenceStepByStep,
-    IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
-    StrongCountTracksLiveReferences, ThreeSplitOperandsAreDistinctFromThePattern,
-    VecLengthTracksPushesAndPops,
+    AtomicLoadReflectsTheLastWrite, CheckedProof, CollectedSequenceMatchesExpected,
+    DerefReflectsTheStoredValue, EmptiedContainerReportsEmpty, FallibleOperationReportsFailure,
+    FirstValueIsLessThanTheSecond, IndexRecoversTheStoredElement,
+    IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted,
+    SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
+    ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};

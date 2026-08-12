@@ -12,6 +12,8 @@ use std::cell::Cell;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::EmptiedContainerReportsEmpty;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
@@ -355,8 +357,14 @@ amenable_derive::harness! {
             }
             let mut v = vec![1, 2, 3, 4];
             let extracted: Vec<i32> = v.extract_if(.., is_even as fn(&mut i32) -> bool).collect();
-            assert_eq!(extracted, vec![2, 4], "extract_if removes exactly the matching elements");
-            assert_eq!(v, vec![1, 3], "extract_if leaves the non-matching elements, in order");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((extracted, vec![2, 4])),
+                "extract_if removes exactly the matching elements"
+            );
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((v, vec![1, 3])),
+                "extract_if leaves the non-matching elements, in order"
+            );
 
             let mut early_drop = vec![1, 2, 3, 4];
             let mut extractor = early_drop.extract_if(.., is_even as fn(&mut i32) -> bool);
@@ -368,9 +376,8 @@ amenable_derive::harness! {
                 "extract_if yields the first matching element"
             );
             drop(extractor);
-            assert_eq!(
-                early_drop,
-                vec![1, 3, 4],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((early_drop, vec![1, 3, 4])),
                 "dropping ExtractIf preserves the unvisited elements in order"
             );
         }

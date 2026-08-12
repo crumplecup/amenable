@@ -21,7 +21,11 @@ use std::cell::Cell;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
@@ -587,10 +591,13 @@ amenable_derive::harness! {
             let second: i32 = kani::any();
             let mut v = vec![first, second];
             assert!(
-                v.try_reserve(usize::MAX).is_err(),
+                FallibleOperationReportsFailure::ensures(v.try_reserve(usize::MAX).is_err()),
                 "an impossible reservation is rejected, not aborted"
             );
-            assert_eq!(v, vec![first, second], "a failed reservation preserves existing values");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((v, vec![first, second])),
+                "a failed reservation preserves existing values"
+            );
         }
     }
 }
@@ -1267,7 +1274,10 @@ amenable_derive::harness! {
             dq.push_back(a);
             dq.push_back(b);
             let drained: Vec<i32> = dq.drain(..).collect();
-            assert_eq!(drained, vec![a, b], "drain yields every element in order");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((drained, vec![a, b])),
+                "drain yields every element in order"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(dq.is_empty()),
                 "drain leaves the deque empty"

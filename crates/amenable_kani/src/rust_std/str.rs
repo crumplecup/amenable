@@ -432,6 +432,98 @@ amenable_derive::harness! {
     }
 }
 
+/// A collected sequence known to match exactly the expected sequence.
+///
+/// Independently hand-written as `assert_eq!(collected, vec![...],
+/// ...)` at 8 real sites spanning `Vec<i32>` (a drained `VecDeque`, a
+/// rejected `try_reserve`'s untouched content, `Vec::extract_if`'s two
+/// halves), `Vec<u16>` (`encode_wide`'s UTF-16 units), and `Vec<&str>`
+/// (`split_ascii_whitespace`/`split_whitespace`/`splitn`'s parts) -- the
+/// identical claim regardless of collected element type. Generic over
+/// the collected sequence type rather than one registration per
+/// producer, the same reasoning (and the same reason it needs a
+/// hand-written `Witness`/`Ensures` impl instead of the
+/// `bridge_kani_witness!`/`kani_ensures!` macros) as
+/// `DerefReflectsTheStoredValue` (`rust_std::primitives`) -- not a
+/// reuse of that type directly, since its name states a deref claim
+/// this isn't.
+pub struct CollectedSequenceMatchesExpected<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for CollectedSequenceMatchesExpected<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for CollectedSequenceMatchesExpected<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for CollectedSequenceMatchesExpected<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
+            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for CollectedSequenceMatchesExpected<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for CollectedSequenceMatchesExpected<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::CollectedSequenceMatchesExpected",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::CollectedSequenceMatchesExpected",
+        verifier: "kani",
+        describe: || <CollectedSequenceMatchesExpected<i32> as KaniWitness>::proof().to_string(),
+    }
+}
+
 impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -464,7 +556,10 @@ amenable_derive::harness! {
         fn verify_split_ascii_whitespace_collapses_runs_of_whitespace() {
             let s = " a  b ";
             let parts: Vec<&str> = s.split_ascii_whitespace().collect();
-            assert_eq!(parts, vec!["a", "b"], "runs of whitespace collapse to a single split point");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((parts, vec!["a", "b"])),
+                "runs of whitespace collapse to a single split point"
+            );
         }
     }
 }
@@ -501,7 +596,10 @@ amenable_derive::harness! {
         fn verify_split_whitespace_collapses_runs_of_whitespace() {
             let s = " a  b ";
             let parts: Vec<&str> = s.split_whitespace().collect();
-            assert_eq!(parts, vec!["a", "b"], "runs of whitespace collapse to a single split point");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((parts, vec!["a", "b"])),
+                "runs of whitespace collapse to a single split point"
+            );
         }
     }
 }
@@ -768,7 +866,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_splitn_limits_to_n_substrings() {
             let parts: Vec<&str> = "a,b,c".splitn(2, ',').collect();
-            assert_eq!(parts, vec!["a", "b,c"], "splitn stops after n items, leaving the remainder unsplit");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((parts, vec!["a", "b,c"])),
+                "splitn stops after n items, leaving the remainder unsplit"
+            );
         }
     }
 }

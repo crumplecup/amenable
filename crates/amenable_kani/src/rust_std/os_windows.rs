@@ -18,6 +18,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -54,7 +56,7 @@ amenable_derive::harness! {
             use std::os::windows::ffi::OsStrExt;
 
             let wide: Vec<u16> = std::ffi::OsStr::new("hi").encode_wide().collect();
-            assert_eq!(wide, vec![0x68, 0x69]);
+            assert!(CollectedSequenceMatchesExpected::ensures((wide, vec![0x68, 0x69])));
         }
     }
 }
