@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, fourteen clusters named, 771 → 438 sites — see "Current state");
+fixed, fifteen clusters named, 771 → 430 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,11 +420,9 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **438** sites (was 771; sixteen intervening
-  fixes landed, see below). Current top clusters, by size (re-run the
-  scan before trusting these — this list will drift as work lands):
-  - `X < X` — 8 sites
-  - and onward down the ranked list in the checklist itself.
+  session; total is now **430** sites (was 771; seventeen intervening
+  fixes landed, see below). Re-run the scan before picking the next
+  cluster — this list will drift as work lands.
 
   **Both clusters caught by the mid-session correction (above) are now
   resolved.** `X.next() == Some(X)` (item 8 below) and `X.len() == X`
@@ -679,6 +677,24 @@ was brought back to zero in three focused follow-up commits.
       a plain `usize`) -- same shape as items 6 and 15. Lives in
       `rust_std::alloc_rc.rs`. Every touched `assert_eq!` rewritten to
       `assert!(Type::ensures(...), ..)`.
+  17. **`X < X` (8 sites)**: split into two real sub-claims on read. 4
+      sites in `rust_std::str` (`verify_bytes_yields_the_utf8_encoding`
+      and 3 siblings) already carried a comment naming their canonical
+      home -- `amenable_std::AsciiByte`'s existing
+      `Requires<KaniVerifier>` impl (`byte < 128`, registered back in
+      an earlier session) -- but still restated the raw comparison
+      instead of calling it; rewrote each to
+      `kani::assume(AsciiByte::requires(byte))`, no new type needed.
+      The other 4 sites (`rust_std::alloc_collections`'s
+      `BTreeMap`/`BTreeSet`/`BinaryHeap` ordering preconditions, plus
+      `rust_std::iter::verify_successors_generates_from_the_previous_item`'s
+      seed-below-100 bound) share the identical `<` relation regardless
+      of whether the right side is another symbolic value or a fixed
+      literal -- named as `amenable_kani::FirstValueIsLessThanTheSecond`,
+      registered as its own type rather than on `RustStdStandard<i32>`
+      directly since that carrier's `Requires<KaniVerifier>` slot
+      already holds the unrelated `checked_add` precondition (item 13).
+      Lives in `rust_std::alloc_collections.rs`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
