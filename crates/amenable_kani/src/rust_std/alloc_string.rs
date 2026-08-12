@@ -3,11 +3,13 @@
 use std::string::{FromUtf8Error, FromUtf16Error};
 
 #[cfg(kani)]
-use amenable_core::Requires;
+use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::KaniUtf8Buffer;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -240,9 +242,8 @@ amenable_derive::harness! {
                 .into_bytes();
 
             let err0 = crate::KaniUtf8::classify_owned(depth0.clone()).unwrap_err();
-            assert_eq!(
-                err0.as_bytes(),
-                &depth0[..],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err0.as_bytes(), &depth0[..])),
                 "depth0 as_bytes recovers the original bytes"
             );
             assert_eq!(
@@ -252,9 +253,8 @@ amenable_derive::harness! {
             );
 
             let err1 = crate::KaniUtf8::classify_owned(depth1.clone()).unwrap_err();
-            assert_eq!(
-                err1.as_bytes(),
-                &depth1[..],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err1.as_bytes(), &depth1[..])),
                 "depth1 as_bytes recovers the original bytes"
             );
             assert_eq!(
@@ -264,9 +264,8 @@ amenable_derive::harness! {
             );
 
             let err2 = crate::KaniUtf8::classify_owned(depth2.clone()).unwrap_err();
-            assert_eq!(
-                err2.as_bytes(),
-                &depth2[..],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err2.as_bytes(), &depth2[..])),
                 "depth2 as_bytes recovers the original bytes"
             );
             assert_eq!(
