@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, nineteen clusters named, 771 → 399 sites — see "Current state");
+fixed, twenty clusters named, 771 → 391 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **399** sites (was 771; twenty-one intervening
+  session; total is now **391** sites (was 771; twenty-two intervening
   fixes landed, see below). Re-run the scan before picking the next
   cluster — this list will drift as work lands.
 
@@ -749,6 +749,15 @@ was brought back to zero in three focused follow-up commits.
       the identical `<` relation regardless of whether the right side
       is a symbolic value or a computed bound like `i32::MAX - N`. No
       new type needed.
+  22. **`X.next() == Some(&[X, X][..])` (6 sites, +2 landed)**: reused
+      item 20's `IteratorYieldsAReferenceToTheStoredValue` across
+      `chunks`/`chunks_exact`/`rchunks`/`rchunks_exact`/`windows` --
+      the same claim, just with a slice reference (`&[i32]`) instead of
+      a scalar (`&i32`) as the referenced type; `T` is inferred either
+      way. Picked up 2 mechanically-identical extra sites while already
+      inside their harnesses: `chunks`'/`rchunks`'s single-element
+      trailing-chunk checks (the sibling
+      `X.next() == Some(&[X][..])` shape).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
