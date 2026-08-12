@@ -1035,7 +1035,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_parse_float_error_occurs_only_for_unparseable_input() {
             assert!(
-                "not a float".parse::<f64>().is_err(),
+                FallibleOperationReportsFailure::ensures("not a float".parse::<f64>().is_err()),
                 "a non-numeric string fails to parse as f64"
             );
             assert!(

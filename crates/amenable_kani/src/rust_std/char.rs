@@ -291,9 +291,12 @@ amenable_derive::harness! {
         /// `ParseCharError`, which has no accessor beyond success/failure.
         #[kani::proof]
         fn verify_parse_char_error_occurs_for_empty_or_multi_character_strings() {
-            assert!("".parse::<char>().is_err(), "an empty string fails to parse as char");
             assert!(
-                "ab".parse::<char>().is_err(),
+                FallibleOperationReportsFailure::ensures("".parse::<char>().is_err()),
+                "an empty string fails to parse as char"
+            );
+            assert!(
+                FallibleOperationReportsFailure::ensures("ab".parse::<char>().is_err()),
                 "a multi-character string fails to parse as char"
             );
             assert_eq!(
