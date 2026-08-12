@@ -2,10 +2,14 @@
 
 use std::string::{FromUtf8Error, FromUtf16Error};
 
+#[cfg(kani)]
+use amenable_core::Requires;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::KaniUtf8Buffer;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniVerifier, KaniWitness};
 
@@ -134,7 +138,7 @@ amenable_derive::harness! {
         fn verify_string_drain_removes_and_yields_the_content() {
             let bytes: [u8; 2] = kani::any();
             let len: usize = kani::any();
-            kani::assume(len <= 2);
+            kani::assume(KaniUtf8Buffer::<2>::requires(len));
 
             if let Ok(buffer) = crate::KaniUtf8Buffer::<2>::new(bytes, len) {
                 let observation = crate::KaniStringDrainObservation::new(buffer);

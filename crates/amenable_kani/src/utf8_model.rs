@@ -13,13 +13,13 @@
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
 #[cfg(kani)]
-use amenable_core::Ensures;
+use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::Standard;
 
 use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
-use crate::rust_std::macros::kani_ensures;
+use crate::rust_std::macros::{kani_ensures, kani_requires};
 use crate::{CalculationProof, KaniVerifier};
 
 const MAX_KANI_UTF8_BYTES: usize = 4;
@@ -483,6 +483,17 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+// A symbolic length bounded by the buffer's own fixed capacity is
+// independently restated at 4 real sites (`kani::assume(len <= 2)`)
+// across `rust_std::alloc_string`/`rust_std::primitives`/
+// `rust_std::std_ffi` and this file's own bookkeeping proof.
+kani_requires!(
+    KaniUtf8Buffer<2>,
+    "amenable_kani::utf8_model::KaniUtf8Buffer<2>",
+    usize,
+    |len| len <= 2
+);
+
 amenable_derive::harness! {
     kani, VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC, {
         /// `KaniUtf8Buffer`'s own invariant, proven once here rather than
@@ -495,7 +506,7 @@ amenable_derive::harness! {
         fn verify_kani_utf8_buffer_bookkeeping_is_consistent() {
             let bytes: [u8; 2] = kani::any();
             let len: usize = kani::any();
-            kani::assume(len <= 2);
+            kani::assume(KaniUtf8Buffer::<2>::requires(len));
 
             if let Ok(buffer) = KaniUtf8Buffer::<2>::new(bytes, len) {
                 assert!(

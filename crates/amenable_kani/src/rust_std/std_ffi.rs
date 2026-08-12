@@ -3,7 +3,7 @@
 use std::ffi::{OsStr, OsString};
 
 #[cfg(kani)]
-use amenable_core::Ensures;
+use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
@@ -82,7 +82,7 @@ amenable_derive::harness! {
 
             let bytes: [u8; 2] = kani::any();
             let len: usize = kani::any();
-            kani::assume(len <= 2);
+            kani::assume(KaniUtf8Buffer::<2>::requires(len));
 
             match KaniUtf8Buffer::<2>::new(bytes, len) {
                 Ok(buffer) => {
