@@ -5496,6 +5496,15 @@ impl_slice_split_verus_witness!(
 
 const VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/escape_ascii_carrier.rs");
+const ESCAPE_ASCII_INPUT_IS_PRINTABLE_ASCII_VERUS_FRAGMENT: &str = r#"pub open spec fn escape_ascii_input_is_printable_ascii(printable: u8) -> bool {
+    32 <= printable && printable <= 126
+}"#;
+const ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT: &str = r#"pub open spec fn escape_ascii_result_matches_printable_plus_newline_escape(
+    printable: u8,
+    result: (u8, u8, u8),
+) -> bool {
+    result.0 == printable && result.1 == 92 && result.2 == 110
+}"#;
 
 impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
     type SupportingEvidence = Self;
@@ -5519,6 +5528,24 @@ bridge_verus_witness!(RustStdStandard<std::slice::EscapeAscii<'static>>);
         describe: || {
             <RustStdStandard<std::slice::EscapeAscii<'static>> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || ESCAPE_ASCII_INPUT_IS_PRINTABLE_ASCII_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT,
     }
 }
 

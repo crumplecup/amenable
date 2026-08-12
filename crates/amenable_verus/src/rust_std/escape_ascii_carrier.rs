@@ -18,17 +18,25 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn escape_ascii_input_is_printable_ascii(printable: u8) -> bool {
+    32 <= printable && printable <= 126
+}
+
+pub open spec fn escape_ascii_result_matches_printable_plus_newline_escape(
+    printable: u8,
+    result: (u8, u8, u8),
+) -> bool {
+    result.0 == printable && result.1 == 92 && result.2 == 110
+}
+
 /// A printable ASCII byte (0x20..=0x7e) passes through unchanged; the
 /// following newline (byte value 10) escapes to the two-byte backslash
 /// form `\n` (byte values 92, 110).
 pub fn verify_escape_ascii_model_leaves_printable_bytes_unescaped(printable: u8) -> (result: (u8, u8, u8))
     requires
-        32 <= printable,
-        printable <= 126,
+        escape_ascii_input_is_printable_ascii(printable),
     ensures
-        result.0 == printable,
-        result.1 == 92,
-        result.2 == 110,
+        escape_ascii_result_matches_printable_plus_newline_escape(printable, result),
 {
     (printable, 92, 110)
 }
