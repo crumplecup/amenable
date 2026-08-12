@@ -1075,6 +1075,23 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
 const VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cstring_carrier.rs");
 
+const INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT: &str = r#"pub open spec fn into_vec_u8_spec_matches_input_vec(v: Vec<u8>) -> bool {
+    into_vec_u8_spec(v) == v@
+}"#;
+
+const CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn cstring_new_result_matches_input_bytes<T: Into<Vec<u8>>>(
+    bytes: T,
+    result: Result<CString, NulError>,
+) -> bool {
+    (cstring_input_has_no_preterminal_nul(bytes)
+        ==> (result is Ok && cstring_bytes_spec(result->Ok_0) == into_vec_u8_spec(bytes)))
+        && (cstring_input_has_a_preterminal_nul(bytes) ==> result is Err)
+}"#;
+
+const CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn cstring_test_byte_is_nonzero(byte: u8) -> bool {
+    byte != 0
+}"#;
+
 impl VerusWitness for RustStdStandard<std::ffi::CString> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1090,11 +1107,56 @@ impl VerusWitness for RustStdStandard<std::ffi::CString> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::CString>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::ffi::CString> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "byte != 0"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
         verifier: "verus",
         describe: || <RustStdStandard<std::ffi::CString> as VerusWitness>::proof().to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::ffi::CString> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
     }
 }
 
@@ -1113,11 +1175,56 @@ impl VerusWitness for RustStdStandard<std::ffi::NulError> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::NulError>);
 
+impl Requires<VerusVerifier> for RustStdStandard<std::ffi::NulError> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn requires(_: ()) -> &'static str {
+        "byte != 0"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
         verifier: "verus",
         describe: || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || <RustStdStandard<std::ffi::NulError> as Requires<VerusVerifier>>::requires(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        verifier: "verus",
+        kind: "requires",
+        fragment: || CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
     }
 }
 

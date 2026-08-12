@@ -25,10 +25,14 @@ pub struct ExNulError(NulError);
 /// the concrete `Vec<u8>` case by the broadcast axiom below.
 pub uninterp spec fn into_vec_u8_spec<T: Into<Vec<u8>>>(bytes: T) -> Seq<u8>;
 
+pub open spec fn into_vec_u8_spec_matches_input_vec(v: Vec<u8>) -> bool {
+    into_vec_u8_spec(v) == v@
+}
+
 #[verifier::external_body]
 pub broadcast proof fn axiom_vec_u8_into_vec_u8_is_identity(v: Vec<u8>)
     ensures
-        #[trigger] into_vec_u8_spec(v) == v@,
+        #[trigger] into_vec_u8_spec_matches_input_vec(v),
 {
 }
 
@@ -38,13 +42,31 @@ pub broadcast proof fn axiom_vec_u8_into_vec_u8_is_identity(v: Vec<u8>)
 /// `into_string_error_carrier.rs`.
 pub uninterp spec fn cstring_bytes_spec(s: CString) -> Seq<u8>;
 
+pub open spec fn cstring_input_has_a_preterminal_nul<T: Into<Vec<u8>>>(bytes: T) -> bool {
+    exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0
+}
+
+pub open spec fn cstring_input_has_no_preterminal_nul<T: Into<Vec<u8>>>(bytes: T) -> bool {
+    !cstring_input_has_a_preterminal_nul(bytes)
+}
+
+pub open spec fn cstring_new_result_matches_input_bytes<T: Into<Vec<u8>>>(
+    bytes: T,
+    result: Result<CString, NulError>,
+) -> bool {
+    (cstring_input_has_no_preterminal_nul(bytes)
+        ==> (result is Ok && cstring_bytes_spec(result->Ok_0) == into_vec_u8_spec(bytes)))
+        && (cstring_input_has_a_preterminal_nul(bytes) ==> result is Err)
+}
+
 pub assume_specification<T: Into<Vec<u8>>> [CString::new::<T>] (bytes: T) -> (result: Result<CString, NulError>)
     ensures
-        (!exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0)
-            ==> (result is Ok && cstring_bytes_spec(result->Ok_0) == into_vec_u8_spec(bytes)),
-        (exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0)
-            ==> result is Err,
+        cstring_new_result_matches_input_bytes(bytes, result),
 ;
+
+pub open spec fn cstring_test_byte_is_nonzero(byte: u8) -> bool {
+    byte != 0
+}
 
 /// `CString::new` appends its own nul terminator, and rejects any input
 /// that already contains an interior nul byte — the same claim the
@@ -55,7 +77,7 @@ pub fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul(byte: u8)
     requires
         // Canonical home: amenable_std::NonNulByte's Requires<VerusVerifier>
         // impl (rust_std::cstr_carrier) names this exact fragment.
-        byte != 0,
+        cstring_test_byte_is_nonzero(byte),
     ensures
         result,
 {
