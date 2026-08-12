@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, twenty-four clusters named, 771 → 371 sites — see "Current state");
+fixed, twenty-five clusters named, 771 → 367 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -440,7 +440,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **371** sites (was 771; twenty-six
+  session; total is now **367** sites (was 771; twenty-seven
   intervening fixes landed, see below). Re-run the scan before picking
   the next cluster — this list will drift as work lands.
 
@@ -823,6 +823,16 @@ was brought back to zero in three focused follow-up commits.
       `Repeat`/`Sink`/`Chain`/`Cursor` harnesses. Registered directly
       on `RustStdStandard<usize>` via `kani_ensures!` -- its
       `Ensures<KaniVerifier>` slot was free, no new type needed.
+  27. **`X.get() == Some(&X)` (4 sites)**: "a once-initialized cell's
+      getter yields a reference to the exact value it was set with" --
+      split evenly between `OnceCell` and `OnceLock`. Named as
+      `amenable_kani::GetterRecoversTheStoredReference<T>`, the
+      eleventh generic contract type this session -- a distinct access
+      pattern from `IteratorYieldsAReferenceToTheStoredValue` (item 20)
+      even though the `Ensures` impl body and the lifetime-generic
+      design are identical: that type's own name and doc comment are
+      specifically about iteration (`.next()`), not a plain getter.
+      Lives in `rust_std::cell.rs`.
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a

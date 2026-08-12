@@ -11,46 +11,16 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 371 sites: two real
-`elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus twenty-four clusters named (three of
-which reused already-named types/free carrier slots instead of
-minting new types --
-`FirstValueIsLessThanTheSecond` for `rust_std::iter`'s
-overflow-avoidance bounds, `IteratorYieldsAReferenceToTheStoredValue`
-for `rust_std::slice`'s chunk/window groupings, plus new
-`ByteIsDistinctFromTheMarker`, `FieldAccessRecoversTheStoredValue<T>`,
-and `FourBytesAreEachAscii` types for `rust_std::io`'s single-pair
-distinctness checks, the tuple/struct field-access equality bound, and
-a combined 4-way ASCII-range precondition respectively -- the
-ASCII-range one a re-do after a first attempt compiled clean but
-didn't move the rescan count, since the naming-workflow doc's
-`&&`-combined-clause Gotcha wasn't followed the first time -- plus a
-read/write-count-matches-buffer-length bound registered directly on
-`RustStdStandard<usize>`'s free `Ensures` slot) -- eleven
-generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
-`AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
-`IteratorMatchesReferenceStepByStep<T>`,
-`SplitOperandsAreDistinctFromThePattern<T>`,
-`ThreeSplitOperandsAreDistinctFromThePattern<T>`,
-`IndexRecoversTheStoredElement<T>`, `CollectedSequenceMatchesExpected<T>`,
-`IteratorYieldsAReferenceToTheStoredValue<T>`,
-`FieldAccessRecoversTheStoredValue<T>` -- two of these `Requires`-shaped,
-not `Ensures`, and one generic over a borrow's lifetime rather than an
-element type), seven non-generic (`EmptiedContainerReportsEmpty`,
-`FallibleOperationReportsFailure`, `StrongCountTracksLiveReferences`,
-`FirstValueIsLessThanTheSecond`, `RenderedKindMatchesTheBuildingOperation`,
-`ByteIsDistinctFromTheMarker`, `FourBytesAreEachAscii`), a per-width pair
-(`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own `Requires` slots,
-for `checked_add` not overflowing), a reuse of an already-existing type
-(`amenable_std::AsciiByte`'s `Requires` impl, whose 4 real call sites
-had a canonical-home comment but still restated the raw comparison
-instead of calling it), and three heterogeneous clusters
-(`X.next() == Some(X)` 42 sites, `X.len() == X` 16 sites,
-`X.pop_front() == Some(X)` 15 sites) named per-carrier since none is a
-shared claim -- see the naming-workflow doc's mid-session correction
-note before skipping any future heterogeneous cluster); `amenable_verus`
-not yet started under it.
+mechanism; `amenable_kani` now in progress, **771 → 367 sites** across
+twenty-seven fixes this session (two real `elicit_doc` matcher bugs
+plus twenty-five named clusters — eleven generic contract types, seven
+non-generic, several reuses of already-named types or free carrier
+`Ensures`/`Requires` slots, and three heterogeneous clusters named
+per-carrier). Full narrative of every fix lives in
+[CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)'s
+"Current state" section (the authoritative, itemized log — this
+summary intentionally stays short rather than duplicating it);
+`amenable_verus` not yet started under it.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
