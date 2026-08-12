@@ -33,7 +33,7 @@ fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
     assert_eq!(
         <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(()),
-        "(c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32)"
+        "char_is_valid_unicode_scalar(c)"
     );
 }
 

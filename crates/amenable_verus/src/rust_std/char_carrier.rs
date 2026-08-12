@@ -6,6 +6,15 @@ use vstd::prelude::*;
 
 verus! {
 
+pub open spec fn char_roundtrip_preserves_value(result: char, input: char) -> bool {
+    result == input
+}
+
+pub open spec fn char_is_valid_unicode_scalar(value: char) -> bool {
+    (value as u32) <= 0xD7FFu32
+        || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)
+}
+
 /// `char` is constrained to Unicode scalar values (excludes the surrogate
 /// range `0xD800..=0xDFFF`) and round-trips through itself — the same
 /// claim the Kani harness checks by symbolic exploration and the Creusot
@@ -23,8 +32,8 @@ verus! {
 /// fragment held as a reusable, backend-checkable claim.
 pub fn verify_char_roundtrip(c: char) -> (result: char)
     ensures
-        result == c,
-        (c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32),
+        char_roundtrip_preserves_value(result, c),
+        char_is_valid_unicode_scalar(c),
 {
     c
 }

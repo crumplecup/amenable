@@ -233,6 +233,15 @@ impl std::fmt::Display for VerusCheckedProof {
 const VERIFY_CHAR_ROUNDTRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_carrier.rs");
 
+const CHAR_ROUNDTRIP_PRESERVES_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn char_roundtrip_preserves_value(result: char, input: char) -> bool {
+    result == input
+}"#;
+
+const CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn char_is_valid_unicode_scalar(value: char) -> bool {
+    (value as u32) <= 0xD7FFu32
+        || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)
+}"#;
+
 impl VerusWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -248,11 +257,47 @@ impl VerusWitness for RustStdStandard<char> {
 
 bridge_verus_witness!(RustStdStandard<char>);
 
+impl Ensures<VerusVerifier> for RustStdStandard<char> {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "char_roundtrip_preserves_value(result, c) && char_is_valid_unicode_scalar(c)"
+    }
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<char>",
         verifier: "verus",
         describe: || <RustStdStandard<char> as VerusWitness>::proof().to_string(),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <RustStdStandard<char> as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHAR_ROUNDTRIP_PRESERVES_VALUE_VERUS_FRAGMENT,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<char>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT,
     }
 }
 
@@ -279,7 +324,7 @@ impl Ensures<VerusVerifier> for ValidUnicodeScalar {
     type Bound = &'static str;
 
     fn ensures(_: ()) -> &'static str {
-        "(c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32)"
+        "char_is_valid_unicode_scalar(c)"
     }
 }
 
