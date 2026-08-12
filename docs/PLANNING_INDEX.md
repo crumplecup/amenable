@@ -11,28 +11,28 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress (771 → 430 sites: two real
+mechanism; `amenable_kani` now in progress (771 → 420 sites: two real
 `elicit_doc` matcher bugs fixed (a `>>` tokenization mismatch, and a
-missing negated-call shape) plus fifteen clusters named -- seven
+missing negated-call shape) plus sixteen clusters named -- eight
 generic contract types (`IteratorYieldsNoneWhenExhausted<T>`,
 `AtomicLoadReflectsTheLastWrite<T>`, `DerefReflectsTheStoredValue<T>`,
 `IteratorMatchesReferenceStepByStep<T>`,
 `SplitOperandsAreDistinctFromThePattern<T>`,
 `ThreeSplitOperandsAreDistinctFromThePattern<T>`,
-`IndexRecoversTheStoredElement<T>` -- two of these `Requires`-shaped,
-not `Ensures`), four non-generic (`EmptiedContainerReportsEmpty`,
-`FallibleOperationReportsFailure`, `StrongCountTracksLiveReferences`,
-`FirstValueIsLessThanTheSecond`), a per-width pair
-(`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own `Requires` slots,
-for `checked_add` not overflowing), a reuse of an already-existing type
-(`amenable_std::AsciiByte`'s `Requires` impl, whose 4 real call sites
-had a canonical-home comment but still restated the raw comparison
-instead of calling it), and three heterogeneous clusters
-(`X.next() == Some(X)` 42 sites, `X.len() == X` 16 sites,
-`X.pop_front() == Some(X)` 15 sites) named per-carrier since none is a
-shared claim -- see the naming-workflow doc's mid-session correction
-note before skipping any future heterogeneous cluster); `amenable_verus`
-not yet started under it.
+`IndexRecoversTheStoredElement<T>`, `CollectedSequenceMatchesExpected<T>`
+-- two of these `Requires`-shaped, not `Ensures`), four non-generic
+(`EmptiedContainerReportsEmpty`, `FallibleOperationReportsFailure`,
+`StrongCountTracksLiveReferences`, `FirstValueIsLessThanTheSecond`), a
+per-width pair (`RustStdStandard<i32>`/`RustStdStandard<u64>`'s own
+`Requires` slots, for `checked_add` not overflowing), a reuse of an
+already-existing type (`amenable_std::AsciiByte`'s `Requires` impl,
+whose 4 real call sites had a canonical-home comment but still
+restated the raw comparison instead of calling it), and three
+heterogeneous clusters (`X.next() == Some(X)` 42 sites, `X.len() == X`
+16 sites, `X.pop_front() == Some(X)` 15 sites) named per-carrier since
+none is a shared claim -- see the naming-workflow doc's mid-session
+correction note before skipping any future heterogeneous cluster);
+`amenable_verus` not yet started under it.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,

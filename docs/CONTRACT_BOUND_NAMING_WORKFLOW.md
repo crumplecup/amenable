@@ -4,7 +4,7 @@
 earlier session (call-shape recognition replaced text matching);
 `amenable_creusot` fully cleared (twice — see "History" below);
 `amenable_kani` now in progress (two real `elicit_doc` matcher bugs
-fixed, fifteen clusters named, 771 → 430 sites — see "Current state");
+fixed, sixteen clusters named, 771 → 420 sites — see "Current state");
 `amenable_verus` not yet started under the new mechanism.
 
 **Purpose of this document:** a self-contained handoff so any agent (or
@@ -420,7 +420,7 @@ was brought back to zero in three focused follow-up commits.
 - **`amenable_creusot`: fully cleared** — zero raw sites, confirmed by a
   real rescan after the redesign (not carried over from before it).
 - **`amenable_kani`: in progress under the new mechanism.** Started this
-  session; total is now **430** sites (was 771; seventeen intervening
+  session; total is now **420** sites (was 771; eighteen intervening
   fixes landed, see below). Re-run the scan before picking the next
   cluster — this list will drift as work lands.
 
@@ -695,6 +695,29 @@ was brought back to zero in three focused follow-up commits.
       directly since that carrier's `Requires<KaniVerifier>` slot
       already holds the unrelated `checked_add` precondition (item 13).
       Lives in `rust_std::alloc_collections.rs`.
+  18. **`X == X![X, X]` (8 sites)**: "a collected sequence matches
+      exactly the expected sequence" -- spans `Vec<i32>` (a drained
+      `VecDeque`, a rejected `try_reserve`'s untouched content,
+      `Vec::extract_if`'s two halves), `Vec<u16>` (`encode_wide`'s
+      UTF-16 units), and `Vec<&str>`
+      (`split_ascii_whitespace`/`split_whitespace`/`splitn`'s parts).
+      Named as `amenable_kani::CollectedSequenceMatchesExpected<T>`,
+      the eighth generic contract type this session -- deliberately
+      **not** a reuse of `DerefReflectsTheStoredValue` despite
+      type-level compatibility (`Vec<T>: PartialEq` makes the generic
+      `Ensures` impl type-check either way): that type's name states a
+      deref claim this isn't, and a misleadingly-named reuse is worse
+      than a new type even when the Rust signatures unify. Lives in
+      `rust_std::str.rs` (plurality owner, 3 of 8 sites). Picked up 2
+      mechanically-identical extra sites while already inside their
+      harnesses: `verify_try_reserve_rejects_an_impossible_capacity`'s
+      `try_reserve(...).is_err()` (the `FallibleOperationReportsFailure`
+      shape from item 15, missed by that cluster since its receiver is
+      a nested call, not a bare identifier -- the shape-blinder treats
+      `X.try_reserve(X).is_err()` and `X.is_err()` as different shapes)
+      and `verify_vec_extract_if_partitions_by_the_predicate`'s
+      3-element `vec![1, 3, 4]` comparison (the sibling
+      `X == X![X, X, X]` cluster, otherwise still open).
 - **`amenable_verus`: not yet started under the new mechanism.** Total is
   now **663** sites, including the confirmed `NonNulByte` case from
   "History" above (register a real `spec fn` for it first — it's a
