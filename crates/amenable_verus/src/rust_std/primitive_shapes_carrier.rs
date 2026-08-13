@@ -63,10 +63,10 @@ pub open spec fn is_ascii_byte(value: u32) -> bool {
 /// array was constructed with.
 pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))
     ensures
-        result.0 == 3,
-        result.1 == a,
-        result.2 == b,
-        result.3 == c,
+        observed_value_matches_input(result.0 as int, 3int),
+        observed_value_matches_input(result.1 as int, a as int),
+        observed_value_matches_input(result.2 as int, b as int),
+        observed_value_matches_input(result.3 as int, c as int),
 {
     (3, a, b, c)
 }
@@ -77,10 +77,10 @@ pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result
 /// type.
 pub fn verify_slice_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))
     ensures
-        result.0 == 3,
-        result.1 == a,
-        result.2 == b,
-        result.3 == c,
+        observed_value_matches_input(result.0 as int, 3int),
+        observed_value_matches_input(result.1 as int, a as int),
+        observed_value_matches_input(result.2 as int, b as int),
+        observed_value_matches_input(result.3 as int, c as int),
 {
     (3, a, b, c)
 }
@@ -89,16 +89,15 @@ pub fn verify_slice_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result
 /// exactly its content's UTF-8 encoding — checked for any single-byte
 /// (ASCII) character.
 ///
-/// The precondition below is the canonical home
-/// `amenable_std::AsciiByte`'s own `Requires<VerusVerifier>` impl names
-/// (this file's own spelling, `byte < 128`, registered as one of its
-/// supplementary fragments).
+/// The precondition below reuses this file's own `is_ascii_byte`, the
+/// same predicate `amenable_std::AsciiByte` names on the Kani/Creusot
+/// side.
 pub fn verify_str_model_byte_length_and_content(byte: u8) -> (result: (u32, u8))
     requires
-        byte < 128,
+        is_ascii_byte(byte as u32),
     ensures
-        result.0 == 1,
-        result.1 == byte,
+        observed_value_matches_input(result.0 as int, 1int),
+        observed_value_matches_input(result.1 as int, byte as int),
 {
     (1, byte)
 }
