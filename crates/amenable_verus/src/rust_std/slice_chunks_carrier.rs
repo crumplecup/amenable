@@ -18,6 +18,8 @@
 //! exact type (checking the real type directly) already confirms
 //! independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -46,7 +48,7 @@ pub open spec fn ten_increment_write_through(before: int, after: int) -> bool {
 pub fn verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk(a: i32, b: i32, c: i32) -> (result: ((i32, i32), i32))
     ensures
         result.0 == (a, b),
-        result.1 == c,
+        observed_value_matches_input(result.1 as int, c as int),
 {
     ((a, b), c)
 }
@@ -57,7 +59,7 @@ pub fn verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk
 pub fn verify_chunks_exact_model_discards_a_short_remainder(a: i32, b: i32, c: i32) -> (result: ((i32, i32), i32))
     ensures
         result.0 == (a, b),
-        result.1 == c,
+        observed_value_matches_input(result.1 as int, c as int),
 {
     ((a, b), c)
 }
@@ -83,7 +85,7 @@ pub fn verify_chunks_exact_mut_model_leaves_the_remainder_untouched(a: i32, b: i
     ensures
         ten_increment_write_through(a as int, result.0 as int),
         ten_increment_write_through(b as int, result.1 as int),
-        result.2 == c,
+        observed_value_matches_input(result.2 as int, c as int),
 {
     (a + 10, b + 10, c)
 }
@@ -93,7 +95,7 @@ pub fn verify_chunks_exact_mut_model_leaves_the_remainder_untouched(a: i32, b: i
 pub fn verify_rchunks_model_groups_from_the_back(a: i32, b: i32, c: i32) -> (result: ((i32, i32), i32))
     ensures
         result.0 == (b, c),
-        result.1 == a,
+        observed_value_matches_input(result.1 as int, a as int),
 {
     ((b, c), a)
 }
@@ -104,7 +106,7 @@ pub fn verify_rchunks_model_groups_from_the_back(a: i32, b: i32, c: i32) -> (res
 pub fn verify_rchunks_exact_model_discards_a_short_remainder_at_the_front(a: i32, b: i32, c: i32) -> (result: ((i32, i32), i32))
     ensures
         result.0 == (b, c),
-        result.1 == a,
+        observed_value_matches_input(result.1 as int, a as int),
 {
     ((b, c), a)
 }
@@ -116,7 +118,7 @@ pub fn verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched(a: i3
         ten_increment_headroom_holds(b),
         ten_increment_headroom_holds(c),
     ensures
-        result.0 == a,
+        observed_value_matches_input(result.0 as int, a as int),
         ten_increment_write_through(b as int, result.1 as int),
         ten_increment_write_through(c as int, result.2 as int),
 {

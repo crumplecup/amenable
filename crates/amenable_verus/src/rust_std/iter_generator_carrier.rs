@@ -21,6 +21,8 @@
 //! the real type directly) already confirms independently, for the
 //! identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -48,9 +50,9 @@ pub fn verify_once_with_model_calls_its_closure_exactly_once(computed: i32) -> (
 /// `repeat(value)::next` yields the same value on every call.
 pub fn verify_repeat_model_yields_the_same_value_forever(value: i32) -> (result: (i32, i32, i32))
     ensures
-        result.0 == value,
-        result.1 == value,
-        result.2 == value,
+        observed_value_matches_input(result.0 as int, value as int),
+        observed_value_matches_input(result.1 as int, value as int),
+        observed_value_matches_input(result.2 as int, value as int),
 {
     (value, value, value)
 }
@@ -60,9 +62,9 @@ pub fn verify_repeat_model_yields_the_same_value_forever(value: i32) -> (result:
 /// its own symbolic parameter and returning each one exactly as given.
 pub fn verify_repeat_with_model_calls_its_closure_once_per_item(first: i32, second: i32, third: i32) -> (result: (i32, i32, i32))
     ensures
-        result.0 == first,
-        result.1 == second,
-        result.2 == third,
+        observed_value_matches_input(result.0 as int, first as int),
+        observed_value_matches_input(result.1 as int, second as int),
+        observed_value_matches_input(result.2 as int, third as int),
 {
     (first, second, third)
 }
