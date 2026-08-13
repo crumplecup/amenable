@@ -17,11 +17,12 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
 //!
-//! Every `requires (... as u32) < 128,` clause below is the canonical
-//! home `amenable_std::AsciiByte`'s own `Requires<VerusVerifier>` impl
-//! (and its supplementary fragments, one per local variable name used
-//! across this file family) names.
+//! Every `requires` clause below calls `amenable_std::AsciiByte`'s own
+//! shared Verus predicate, `is_ascii_byte` (defined once in
+//! `primitive_shapes_carrier`).
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -33,7 +34,7 @@ verus! {
 /// character.
 pub fn verify_bytes_model_yields_the_utf8_encoding(c: char) -> (result: u8)
     requires
-        (c as u32) < 128,
+        is_ascii_byte(c as u32),
     ensures
         (result as u32) == (c as u32),
 {
@@ -43,7 +44,7 @@ pub fn verify_bytes_model_yields_the_utf8_encoding(c: char) -> (result: u8)
 /// `.char_indices()` pairs the first (and only) char with byte offset 0.
 pub fn verify_char_indices_model_pairs_each_char_with_its_byte_offset(c: char) -> (result: (u32, char))
     requires
-        (c as u32) < 128,
+        is_ascii_byte(c as u32),
     ensures
         result.0 == 0,
         result.1 == c,
@@ -55,7 +56,7 @@ pub fn verify_char_indices_model_pairs_each_char_with_its_byte_offset(c: char) -
 /// the code unit numerically equals the character.
 pub fn verify_encode_utf16_model_yields_utf16_code_units(c: char) -> (result: u16)
     requires
-        (c as u32) < 128,
+        is_ascii_byte(c as u32),
     ensures
         (result as u32) == (c as u32),
 {

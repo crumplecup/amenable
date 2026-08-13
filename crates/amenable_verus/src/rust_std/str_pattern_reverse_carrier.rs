@@ -16,11 +16,12 @@
 //! exact type (checking the real type via the bounded observation)
 //! already confirms independently, for the identical claim.
 //!
-//! Every `requires (... as u32) < 128,` clause below is the canonical
-//! home `amenable_std::AsciiByte`'s own `Requires<VerusVerifier>` impl
-//! (and its supplementary fragments, one per local variable name used
-//! across this file family) names.
+//! Every `requires` clause below calls `amenable_std::AsciiByte`'s own
+//! shared Verus predicate, `is_ascii_byte` (defined once in
+//! `primitive_shapes_carrier`).
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -32,9 +33,9 @@ verus! {
 /// before it.
 pub fn verify_str_rsplit_model_yields_substrings_from_the_back(before: char, pattern: char, after: char) -> (result: (char, char))
     requires
-        (before as u32) < 128,
-        (pattern as u32) < 128,
-        (after as u32) < 128,
+        is_ascii_byte(before as u32),
+        is_ascii_byte(pattern as u32),
+        is_ascii_byte(after as u32),
         before != pattern,
         after != pattern,
     ensures
@@ -53,10 +54,10 @@ pub fn verify_str_rsplit_model_yields_substrings_from_the_back(before: char, pat
 /// then everything before it uncut (`[a, pattern, b]`).
 pub fn verify_str_rsplitn_model_limits_to_n_substrings_from_the_back(a: char, pattern: char, b: char, c: char) -> (result: (char, (char, char, char)))
     requires
-        (a as u32) < 128,
-        (pattern as u32) < 128,
-        (b as u32) < 128,
-        (c as u32) < 128,
+        is_ascii_byte(a as u32),
+        is_ascii_byte(pattern as u32),
+        is_ascii_byte(b as u32),
+        is_ascii_byte(c as u32),
         a != pattern,
         b != pattern,
         c != pattern,

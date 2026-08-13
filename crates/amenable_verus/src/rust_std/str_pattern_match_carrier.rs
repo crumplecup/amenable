@@ -20,10 +20,12 @@
 //! type via the bounded observation) already confirms independently,
 //! for the identical claim.
 //!
-//! Every `requires (pattern as u32) < 128,` clause below is the
-//! canonical home `amenable_std::AsciiByte`'s own
-//! `Requires<VerusVerifier>` impl names.
+//! Every `requires` clause below calls `amenable_std::AsciiByte`'s own
+//! shared Verus predicate, `is_ascii_byte` (defined once in
+//! `primitive_shapes_carrier`).
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -36,7 +38,7 @@ verus! {
 /// `pattern`.
 pub fn verify_str_matches_model_yields_every_non_overlapping_occurrence(pattern: char) -> (result: (char, char))
     requires
-        (pattern as u32) < 128,
+        is_ascii_byte(pattern as u32),
     ensures
         result.0 == pattern,
         result.1 == pattern,
@@ -50,7 +52,7 @@ pub fn verify_str_matches_model_yields_every_non_overlapping_occurrence(pattern:
 /// byte.
 pub fn verify_str_match_indices_model_pairs_each_match_with_its_byte_offset(pattern: char) -> (result: ((u32, char), (u32, char)))
     requires
-        (pattern as u32) < 128,
+        is_ascii_byte(pattern as u32),
     ensures
         result.0 == (1u32, pattern),
         result.1 == (3u32, pattern),
@@ -65,7 +67,7 @@ pub fn verify_str_match_indices_model_pairs_each_match_with_its_byte_offset(patt
 /// per occurrence.
 pub fn verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back(pattern: char) -> (result: ((u32, char), (u32, char)))
     requires
-        (pattern as u32) < 128,
+        is_ascii_byte(pattern as u32),
     ensures
         result.0 == (3u32, pattern),
         result.1 == (1u32, pattern),

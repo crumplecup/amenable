@@ -50,6 +50,15 @@ pub open spec fn text_view_matches_expected(observed: Seq<char>, expected: Seq<c
     observed =~= expected
 }
 
+/// A shared ASCII-range precondition for Verus accommodation models
+/// that need a genuinely symbolic single-character `str`/`char` window
+/// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot
+/// side): `char as u32` stays a valid one-byte UTF-8 encoding only below
+/// `128`.
+pub open spec fn is_ascii_byte(value: u32) -> bool {
+    value < 128
+}
+
 /// `[a, b, c].len() == 3`, and each index recovers the element the
 /// array was constructed with.
 pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))

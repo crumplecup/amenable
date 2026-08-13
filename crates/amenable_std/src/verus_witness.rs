@@ -6382,11 +6382,17 @@ impl_str_matches_verus_witness!(std::str::RMatches<'static, char>);
 
 /// [`AsciiByte`] reuses the same harness rather than adding a new Verus
 /// proof — it names the precondition the harness already requires, it
-/// doesn't prove anything new. The precondition recurs across six carrier
-/// files under six different local variable names (`pattern`, `c`, `a`,
-/// `b`, `before`, `after`) for the identical claim; `Requires<VerusVerifier>`
-/// carries the `pattern` spelling (this harness's own), and the other five
-/// are registered directly as supplementary `ContractRecord`s.
+/// doesn't prove anything new. The precondition recurs across four
+/// carrier files (`str_ascii_iter_carrier`, `str_pattern_match_carrier`,
+/// `str_pattern_reverse_carrier`, `str_pattern_terminator_carrier`) —
+/// every real site now calls the one shared spec fn,
+/// `primitive_shapes_carrier::is_ascii_byte`, registered below via
+/// [`IS_ASCII_BYTE_VERUS_FRAGMENT`]. (An earlier version of this
+/// registration hand-typed one inert, non-`fn` string per carrier's
+/// local variable spelling instead of a real shared predicate — that
+/// text could never satisfy the call-shape recognition rule and never
+/// actually named any of these sites; replaced rather than kept
+/// alongside the real fragment.)
 impl VerusWitness for AsciiByte {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -6407,9 +6413,13 @@ impl Requires<VerusVerifier> for AsciiByte {
     type Bound = &'static str;
 
     fn requires(_: ()) -> &'static str {
-        "(pattern as u32) < 128"
+        "value < 128"
     }
 }
+
+const IS_ASCII_BYTE_VERUS_FRAGMENT: &str = r#"pub open spec fn is_ascii_byte(value: u32) -> bool {
+    value < 128
+}"#;
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord {
@@ -6425,52 +6435,7 @@ impl Requires<VerusVerifier> for AsciiByte {
         evidence: "amenable_std::AsciiByte",
         verifier: "verus",
         kind: "requires",
-        fragment: || "(c as u32) < 128",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "(a as u32) < 128",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "(b as u32) < 128",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "(before as u32) < 128",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "(after as u32) < 128",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || "byte < 128",
+        fragment: || IS_ASCII_BYTE_VERUS_FRAGMENT,
     }
 }
 
