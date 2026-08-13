@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3566 8 3566 103 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3581 8 3581 103 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3569 19 3569 32
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3569 55 3569 56
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3569 40 3569 57
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3564 19 3564 23
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3565 18 3565 72
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3547 16 3550 46
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3584 19 3584 32
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3584 55 3584 56
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3584 40 3584 57
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3579 19 3579 23
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3580 18 3580 72
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3562 16 3565 46
 let%span soption = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 147 19 147 31
 let%span soption'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 148 18 148 38
 let%span soption'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 158 18 158 52
@@ -36,7 +36,7 @@ let rec unwrap_or_i32 (self_: t_Option_i32) (default: Int32.t) (return (x: Int32
 
 type tup4_Option_i32_i32_Option_i32_i32 = { f0: t_Option_i32; f1: Int32.t; f2: t_Option_i32; f3: Int32.t }
 
-predicate option_some_and_none_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3542 8 3545 17] (value: Int32.t) (option_result: tup4_Option_i32_i32_Option_i32_i32) =
+predicate option_some_and_none_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3557 8 3560 17] (value: Int32.t) (option_result: tup4_Option_i32_i32_Option_i32_i32) =
   [%#srust_std'4] option_result.f0 <> None
   /\ option_result.f1 = value /\ option_result.f2 = None /\ option_result.f3 = (0: Int32.t)
 
@@ -45,7 +45,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_option_some_and_none_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3566 8 3566 103] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3581 8 3581 103] (value: Int32.t)
   (return (x: tup4_Option_i32_i32_Option_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &some <- Some value ] s1

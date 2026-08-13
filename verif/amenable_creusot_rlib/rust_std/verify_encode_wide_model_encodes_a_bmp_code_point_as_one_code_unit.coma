@@ -1,19 +1,19 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4359 8 4359 101 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4374 8 4374 101 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4357 19 4357 57
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4358 18 4358 97
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4327 24 4327 45
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4342 24 4342 58
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4372 19 4372 57
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4373 18 4373 97
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4342 24 4342 45
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4357 24 4357 58
 
 use creusot.int.UInt32
 use creusot.int.UInt16
 use creusot.prelude.Any
 use int.Int
 
-predicate encode_wide_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4326 8 4326 62] (code_point: UInt32.t) =
+predicate encode_wide_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4341 8 4341 62] (code_point: UInt32.t) =
   [%#srust_std'1] UInt32.t'int code_point < 65536
 
-predicate encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4338 8 4341 17] (code_point: UInt32.t) (encode_result: UInt16.t) =
+predicate encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4353 8 4356 17] (code_point: UInt32.t) (encode_result: UInt16.t) =
   [%#srust_std'2] encode_result = UInt16.of_int (UInt32.t'int code_point)
 
 meta "compute_max_steps" 1000000
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4359 8 4359 101] (code_point: UInt32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4374 8 4374 101] (code_point: UInt32.t)
   (return (x: UInt16.t)) =
   {[@stop_split] [@expl:verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit requires] [%#srust_std] encode_wide_headroom_holds code_point}
   (! bb0

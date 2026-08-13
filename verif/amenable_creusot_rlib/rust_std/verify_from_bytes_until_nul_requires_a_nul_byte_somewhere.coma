@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2526 8 2526 94 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2541 8 2541 94 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2528 13 2528 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2528 19 2528 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2524 19 2524 43
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2525 18 2525 82
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2313 24 2313 34
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2510 16 2512 17
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2543 13 2543 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2543 19 2543 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2539 19 2539 43
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2540 18 2540 82
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2328 24 2328 34
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2525 16 2527 17
 
 use creusot.prelude.Any
 use creusot.int.UInt8
 
 type tup2_bool_bool = { f0: bool; f1: bool }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2312 8 2312 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2327 8 2327 47] (byte: UInt8.t) =
   [%#srust_std'3] UInt8.t'int byte <> 0
 
-predicate from_bytes_until_nul_requires_a_nul_byte_somewhere_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2506 8 2508 17] (from_bytes_until_nul_result: tup2_bool_bool) =
+predicate from_bytes_until_nul_requires_a_nul_byte_somewhere_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2521 8 2523 17] (from_bytes_until_nul_result: tup2_bool_bool) =
   [%#srust_std'4] match from_bytes_until_nul_result with
     | {f0 = accepted; f1 = rejected} -> accepted /\ rejected
     end
@@ -25,7 +25,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_from_bytes_until_nul_requires_a_nul_byte_somewhere
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2526 8 2526 94] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2541 8 2541 94] (byte: UInt8.t)
   (return (x: tup2_bool_bool)) =
   {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere requires] [%#srust_std'1] non_nul_byte_holds byte}
   (! bb0

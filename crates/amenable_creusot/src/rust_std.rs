@@ -1710,6 +1710,21 @@ amenable_derive::harness! {
         /// descriptive text alongside it. A draining operation yields
         /// its first item, then its second, then ends, leaving the
         /// container reporting empty.
+        ///
+        /// Independently restates `yields_two_values_in_order_then_ends`'s
+        /// two-then-None core rather than calling it: the natural DRY fix
+        /// (call that predicate and `&& drain_result.3`) requires marking
+        /// this fn `#[logic(opaque)]` (an `open` fn can't call a
+        /// less-visible item defined in a separate `harness!` block, and
+        /// that's what this is relative to it), but neither real site
+        /// backed by this postcondition (`verify_linked_list_is_fifo_
+        /// through_back_and_front`, `verify_vec_deque_drain_removes_and_
+        /// yields_in_order`) is `#[trusted]` -- both need the SMT solver
+        /// to actually discharge this postcondition against a literal
+        /// return tuple, and an opaque fn can't be auto-unfolded for
+        /// that. Confirmed by trying it: `just verify-creusot` failed
+        /// both goals once this became opaque. Restated text, not shared
+        /// code, is the correct tradeoff here.
         #[logic(open)]
         fn drains_two_values_in_order_and_empties(
             a: i32,

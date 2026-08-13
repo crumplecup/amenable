@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2150 8 2153 52 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2165 8 2168 52 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2148 19 2148 23
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2149 18 2149 68
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1878 24 1878 101
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2163 19 2163 23
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2164 18 2164 68
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1893 24 1893 101
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -11,7 +11,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_Option_i32_Option_i32_Option_i32 = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32 }
 
-predicate yields_two_values_in_order_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1873 8 1877 17] (a: Int32.t) (b: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Option_i32) =
+predicate yields_two_values_in_order_then_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1888 8 1892 17] (a: Int32.t) (b: Int32.t) (iter_result: tup3_Option_i32_Option_i32_Option_i32) =
   [%#srust_std'1] iter_result.f0 = Some a /\ iter_result.f1 = Some b /\ iter_result.f2 = None
 
 meta "compute_max_steps" 1000000
@@ -19,7 +19,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_into_iter_yields_owned_values_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2150 8 2153 52] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2165 8 2168 52] (a: Int32.t) (b: Int32.t)
   (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1

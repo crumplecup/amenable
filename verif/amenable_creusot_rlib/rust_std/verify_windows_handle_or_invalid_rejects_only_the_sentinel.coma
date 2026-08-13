@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4276 8 4276 100 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4291 8 4291 100 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4277 24 4277 26
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4278 17 4278 21
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4278 23 4278 24
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4280 17 4280 22
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4274 19 4274 23
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4275 18 4275 90
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4256 16 4257 94
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4292 24 4292 26
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4293 17 4293 21
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4293 23 4293 24
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4295 17 4295 22
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4289 19 4289 23
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4290 18 4290 90
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4271 16 4272 94
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -14,7 +14,7 @@ use int.Int
 
 type tup2_bool_isize = { f0: bool; f1: Int64.t }
 
-predicate windows_handle_or_invalid_rejects_only_the_sentinel_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4251 8 4254 17] (value: Int64.t) (conversion_result: tup2_bool_isize) =
+predicate windows_handle_or_invalid_rejects_only_the_sentinel_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4266 8 4269 17] (value: Int64.t) (conversion_result: tup2_bool_isize) =
   [%#srust_std'5] (Int64.to_int value = - 1 -> conversion_result.f0)
   /\ (Int64.to_int value <> - 1 -> not conversion_result.f0 /\ conversion_result.f1 = value)
 
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_or_invalid_rejects_only_the_sentinel
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4276 8 4276 100] (value: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 4291 8 4291 100] (value: Int64.t)
   (return (x: tup2_bool_isize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- value = ([%#srust_std] (-1: Int64.t)) ] s1

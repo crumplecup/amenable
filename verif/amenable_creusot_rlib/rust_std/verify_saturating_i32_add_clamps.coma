@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3038 8 3038 102 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3053 8 3053 102 *)
 
-let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3039 12 3039 17
-let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3036 19 3036 23
-let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3037 18 3037 63
-let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 2997 12 2998 47
-let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3000 18 3000 75
-let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3001 18 3001 75
-let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3018 16 3021 81
+let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3054 12 3054 17
+let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3051 19 3051 23
+let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3052 18 3052 63
+let%span srust_std'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3012 12 3013 47
+let%span srust_std'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3015 18 3015 75
+let%span srust_std'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3016 18 3016 75
+let%span srust_std'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3033 16 3036 81
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -31,7 +31,7 @@ let rec add_Saturating_i32 (self_: t_Saturating_i32) (rhs: t_Saturating_i32) (re
       > Int32.to_int const_MAX -> Int32.to_int result.f0 = Int32.to_int const_MAX)}
     (! return {result}) ]
 
-predicate saturating_i32_add_clamps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3012 8 3016 17] (a: t_Saturating_i32) (b: t_Saturating_i32) (add_result: t_Saturating_i32) =
+predicate saturating_i32_add_clamps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3027 8 3031 17] (a: t_Saturating_i32) (b: t_Saturating_i32) (add_result: t_Saturating_i32) =
   [%#srust_std'5] (Int32.to_int a.f0 + Int32.to_int b.f0 >= Int32.to_int const_MIN
       /\ Int32.to_int a.f0 + Int32.to_int b.f0 <= Int32.to_int const_MAX
     -> Int32.to_int add_result.f0 = Int32.to_int a.f0 + Int32.to_int b.f0)
@@ -45,7 +45,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_saturating_i32_add_clamps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3038 8 3038 102] (a: t_Saturating_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 3053 8 3053 102] (a: t_Saturating_i32)
   (b: t_Saturating_i32) (return (x: t_Saturating_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Saturating_i32 [%#srust_std] {a} {b} (fun (_x: t_Saturating_i32) -> [ &_ret <- _x ] s1)
