@@ -24,6 +24,8 @@
 //! type (checking the real type directly) already confirms
 //! independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -34,8 +36,8 @@ verus! {
 /// consuming the matched delimiter itself.
 pub fn verify_split_model_yields_subslices_between_matches(before: i32, after: i32) -> (result: (i32, i32))
     ensures
-        result.0 == before,
-        result.1 == after,
+        observed_value_matches_input(result.0 as int, before as int),
+        observed_value_matches_input(result.1 as int, after as int),
 {
     (before, after)
 }
@@ -44,9 +46,9 @@ pub fn verify_split_model_yields_subslices_between_matches(before: i32, after: i
 /// `updated` into the first piece is visible in the underlying data.
 pub fn verify_split_mut_model_writes_through_the_first_piece(before: i32, after: i32, updated: i32) -> (result: (i32, i32, i32))
     ensures
-        result.0 == before,
-        result.1 == after,
-        result.2 == updated,
+        observed_value_matches_input(result.0 as int, before as int),
+        observed_value_matches_input(result.1 as int, after as int),
+        observed_value_matches_input(result.2 as int, updated as int),
 {
     (before, after, updated)
 }
@@ -57,7 +59,7 @@ pub fn verify_split_mut_model_writes_through_the_first_piece(before: i32, after:
 pub fn verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece(before: i32, after: i32) -> (result: ((i32, i32), i32))
     ensures
         result.0 == (before, 0i32),
-        result.1 == after,
+        observed_value_matches_input(result.1 as int, after as int),
 {
     ((before, 0i32), after)
 }
@@ -68,8 +70,8 @@ pub fn verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece(bef
 /// (length 1).
 pub fn verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece() -> (result: (u8, u8))
     ensures
-        result.0 == 2,
-        result.1 == 1,
+        observed_value_matches_input(result.0 as int, 2int),
+        observed_value_matches_input(result.1 as int, 1int),
 {
     (2, 1)
 }
@@ -80,7 +82,7 @@ pub fn verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece
 /// is identical.
 pub fn verify_split_n_model_caps_the_number_of_pieces(first: i32, middle: i32, last: i32) -> (result: (i32, (i32, i32, i32)))
     ensures
-        result.0 == first,
+        observed_value_matches_input(result.0 as int, first as int),
         result.1 == (middle, 0i32, last),
 {
     (first, (middle, 0i32, last))
@@ -90,8 +92,8 @@ pub fn verify_split_n_model_caps_the_number_of_pieces(first: i32, middle: i32, l
 /// last piece first.
 pub fn verify_rsplit_model_yields_subslices_from_the_back(before: i32, after: i32) -> (result: (i32, i32))
     ensures
-        result.0 == after,
-        result.1 == before,
+        observed_value_matches_input(result.0 as int, after as int),
+        observed_value_matches_input(result.1 as int, before as int),
 {
     (after, before)
 }
@@ -100,9 +102,9 @@ pub fn verify_rsplit_model_yields_subslices_from_the_back(before: i32, after: i3
 /// rearmost piece is visible in the underlying data.
 pub fn verify_rsplit_mut_model_writes_through_the_rearmost_piece(before: i32, after: i32, updated: i32) -> (result: (i32, i32, i32))
     ensures
-        result.0 == before,
-        result.1 == after,
-        result.2 == updated,
+        observed_value_matches_input(result.0 as int, before as int),
+        observed_value_matches_input(result.1 as int, after as int),
+        observed_value_matches_input(result.2 as int, updated as int),
 {
     (before, after, updated)
 }
@@ -113,7 +115,7 @@ pub fn verify_rsplit_mut_model_writes_through_the_rearmost_piece(before: i32, af
 /// identical.
 pub fn verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back(first: i32, middle: i32, last: i32) -> (result: (i32, (i32, i32, i32)))
     ensures
-        result.0 == last,
+        observed_value_matches_input(result.0 as int, last as int),
         result.1 == (first, 0i32, middle),
 {
     (last, (first, 0i32, middle))
