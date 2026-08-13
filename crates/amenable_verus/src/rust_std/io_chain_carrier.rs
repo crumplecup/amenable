@@ -12,6 +12,8 @@
 //! (checking the real type directly) already confirms independently,
 //! for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -25,8 +27,8 @@ verus! {
 /// touched.
 pub fn verify_chain_model_reads_the_first_source_then_the_second(a0: u8, a1: u8, b0: u8, b1: u8) -> (result: ((u8, u8), (u8, u8)))
     ensures
-        result.0 == (a0, a1),
-        result.1 == (b0, b1),
+        observed_pair_matches_input(result.0, (a0, a1)),
+        observed_pair_matches_input(result.1, (b0, b1)),
 {
     ((a0, a1), (b0, b1))
 }

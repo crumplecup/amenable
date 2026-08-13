@@ -23,6 +23,8 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
@@ -34,7 +36,7 @@ verus! {
 /// `&mut` back to it — a write through it is visible through deref.
 pub fn verify_pin_model_derefs_and_get_mut_round_trip(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        result == (value, updated),
+        observed_pair_matches_input(result, (value, updated)),
 {
     (value, updated)
 }
@@ -91,8 +93,8 @@ pub fn verify_panic_hook_info_model_reports_the_panics_own_message(s: &str) -> (
 /// the deque empty.
 pub fn verify_vec_deque_drain_model_removes_and_yields_in_order(a: i32, b: i32) -> (result: (i32, i32, bool))
     ensures
-        result.0 == a,
-        result.1 == b,
+        observed_value_matches_input(result.0 as int, a as int),
+        observed_value_matches_input(result.1 as int, b as int),
         result.2,
 {
     (a, b, true)

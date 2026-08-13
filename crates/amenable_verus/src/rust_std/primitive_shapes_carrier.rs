@@ -136,7 +136,7 @@ pub fn verify_str_model_byte_length_and_content(byte: u8) -> (result: (u32, u8))
 /// with, in position order.
 pub fn verify_tuple_model_field_access(a: i32, b: i32) -> (result: (i32, i32))
     ensures
-        result == (a, b),
+        observed_pair_matches_input(result, (a, b)),
 {
     (a, b)
 }
@@ -188,7 +188,7 @@ pub fn verify_shared_reference_model_dereferences_to_the_referent(value: i32) ->
 /// reference.
 pub fn verify_mutable_reference_model_dereferences_to_and_updates_the_referent(initial: i32, next: i32) -> (result: (i32, i32))
     ensures
-        result == (initial, next),
+        observed_pair_matches_input(result, (initial, next)),
 {
     (initial, next)
 }

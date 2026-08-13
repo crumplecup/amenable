@@ -19,6 +19,8 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
 
 verus! {
@@ -28,7 +30,7 @@ verus! {
 /// `DerefMut` is visible afterward.
 pub fn verify_assert_unwind_safe_model_derefs_transparently(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        result == (value, updated),
+        observed_pair_matches_input(result, (value, updated)),
 {
     (value, updated)
 }

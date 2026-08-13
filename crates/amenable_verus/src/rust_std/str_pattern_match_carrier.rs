@@ -25,7 +25,7 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
+use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_pair_matches_input};
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -54,8 +54,8 @@ pub fn verify_str_match_indices_model_pairs_each_match_with_its_byte_offset(patt
     requires
         is_ascii_byte(pattern as u32),
     ensures
-        result.0 == (1u32, pattern),
-        result.1 == (3u32, pattern),
+        observed_pair_matches_input(result.0, (1u32, pattern)),
+        observed_pair_matches_input(result.1, (3u32, pattern)),
 {
     ((1u32, pattern), (3u32, pattern))
 }
@@ -69,8 +69,8 @@ pub fn verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_fro
     requires
         is_ascii_byte(pattern as u32),
     ensures
-        result.0 == (3u32, pattern),
-        result.1 == (1u32, pattern),
+        observed_pair_matches_input(result.0, (3u32, pattern)),
+        observed_pair_matches_input(result.1, (1u32, pattern)),
 {
     ((3u32, pattern), (1u32, pattern))
 }

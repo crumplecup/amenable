@@ -13,6 +13,8 @@
 //! (checking the real type via the bounded observation) already
 //! confirms independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -33,8 +35,8 @@ pub fn verify_line_writer_model_flushes_on_a_newline_but_not_before_one(line_byt
         line_byte != 10,
         trailing_byte != 10,
     ensures
-        result.0 == (line_byte, 10u8),
-        result.1 == (line_byte, 10u8),
+        observed_pair_matches_input(result.0, (line_byte, 10u8)),
+        observed_pair_matches_input(result.1, (line_byte, 10u8)),
         result.2 == (line_byte, 10u8, trailing_byte),
 {
     ((line_byte, 10), (line_byte, 10), (line_byte, 10, trailing_byte))

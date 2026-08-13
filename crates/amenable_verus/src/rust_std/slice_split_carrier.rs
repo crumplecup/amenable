@@ -25,7 +25,9 @@
 //! independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_pair_matches_input, observed_value_matches_input,
+};
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -58,7 +60,7 @@ pub fn verify_split_mut_model_writes_through_the_first_piece(before: i32, after:
 /// `after`.
 pub fn verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece(before: i32, after: i32) -> (result: ((i32, i32), i32))
     ensures
-        result.0 == (before, 0i32),
+        observed_pair_matches_input(result.0, (before, 0i32)),
         observed_value_matches_input(result.1 as int, after as int),
 {
     ((before, 0i32), after)

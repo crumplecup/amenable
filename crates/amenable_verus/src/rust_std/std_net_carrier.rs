@@ -18,6 +18,10 @@
 //! the real type directly) already confirms independently, for the
 //! identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_pair_matches_input, observed_value_matches_input,
+};
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -48,7 +52,7 @@ pub fn verify_shutdown_model_write_prevents_further_writes() -> (result: bool)
 /// address the client connected to.
 pub fn verify_tcp_listener_model_accepts_a_connecting_stream(addr: u32) -> (result: u32)
     ensures
-        result == addr,
+        observed_value_matches_input(result as int, addr as int),
 {
     addr
 }
@@ -57,7 +61,7 @@ pub fn verify_tcp_listener_model_accepts_a_connecting_stream(addr: u32) -> (resu
 /// accepted peer's side.
 pub fn verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer(a: u8, b: u8) -> (result: (u8, u8))
     ensures
-        result == (a, b),
+        observed_pair_matches_input(result, (a, b)),
 {
     (a, b)
 }
@@ -67,7 +71,7 @@ pub fn verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer(a: u8
 /// address.
 pub fn verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram(byte: u8, from_addr: u32) -> (result: (u8, u32))
     ensures
-        result == (byte, from_addr),
+        observed_pair_matches_input(result, (byte, from_addr)),
 {
     (byte, from_addr)
 }
