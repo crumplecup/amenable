@@ -22,6 +22,8 @@
 //! that exact type (checking the real adapter directly) already
 //! confirms independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -50,10 +52,10 @@ pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32,
     requires
         increment_headroom_holds(a),
     ensures
-        result.0 == a,
-        result.1 == (a + 1) as i32,
-        result.2 == a,
-        result.3 == (a + 1) as i32,
+        observed_value_matches_input(result.0 as int, a as int),
+        observed_value_matches_input(result.1 as int, (a + 1) as int),
+        observed_value_matches_input(result.2 as int, a as int),
+        observed_value_matches_input(result.3 as int, (a + 1) as int),
 {
     (a, a + 1, a, a + 1)
 }
@@ -79,9 +81,9 @@ pub fn verify_inspect_model_calls_once_per_item_without_changing_values(value: i
         single_increment_headroom_holds(value),
     ensures
         result.0 == Some(value),
-        result.1 == 1,
+        observed_value_matches_input(result.1 as int, 1int),
         result.2 is None,
-        result.3 == 1,
+        observed_value_matches_input(result.3 as int, 1int),
 {
     let mut calls: u32 = 0;
     calls += 1;
