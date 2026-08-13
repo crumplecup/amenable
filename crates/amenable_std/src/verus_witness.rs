@@ -54,9 +54,9 @@ use std::os::windows::io::{
 
 use crate::{
     ArrayIntoIterAdvanceMatchesPosition, ArrayIntoIterStartsAtFirstPosition, AsciiByte,
-    IncrementHeadroom, NonNulByte, ObservedOptionMatchesInput, ObservedValueMatchesInput,
-    RustStdProvenance, RustStdStandard, ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue,
-    YieldsThreeValuesInOrderThenEnds,
+    IncrementHeadroom, NonNulByte, ObservedOptionMatchesInput, ObservedPairMatchesInput,
+    ObservedValueMatchesInput, RustStdProvenance, RustStdStandard, ValidUnicodeScalar,
+    ValueUnchanged, WriteStoresNewValue, YieldsThreeValuesInOrderThenEnds,
 };
 
 /// The Verus verifier, local to this crate: there is only one verifier
@@ -3819,6 +3819,56 @@ const OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn o
         verifier: "verus",
         kind: "ensures",
         fragment: || OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT,
+    }
+}
+
+/// [`ObservedPairMatchesInput`] reuses the `AtomicBool` load-store
+/// harness rather than adding a new Verus proof — it names the direct
+/// pair-identity postcondition that several accommodation models now
+/// state through one shared, generic Verus `spec fn`.
+impl VerusWitness for ObservedPairMatchesInput {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_atomic_bool_model_load_store",
+            claim: VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ObservedPairMatchesInput);
+
+impl Ensures<VerusVerifier> for ObservedPairMatchesInput {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "observed == input"
+    }
+}
+
+const OBSERVED_PAIR_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_pair_matches_input<A, B>(observed: (A, B), input: (A, B)) -> bool {
+    observed == input
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedPairMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ObservedPairMatchesInput as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedPairMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || OBSERVED_PAIR_MATCHES_INPUT_VERUS_FRAGMENT,
     }
 }
 

@@ -69,6 +69,17 @@ pub open spec fn value_unchanged(before: int, after: int) -> bool {
     before == after
 }
 
+/// A shared pair-observation identity predicate for accommodation
+/// models whose observed two-tuple should match the input two-tuple
+/// exactly — generic over both slots (rather than fixed at `int`, the
+/// way `observed_value_matches_input` is) because Verus spec equality
+/// is already total over any type, so this covers `(bool, bool)`,
+/// `(i8, i8)` through `(u64, u64)`/`(usize, usize)`, and mixed-type
+/// pairs alike without a cast on either side.
+pub open spec fn observed_pair_matches_input<A, B>(observed: (A, B), input: (A, B)) -> bool {
+    observed == input
+}
+
 /// A shared ASCII-range precondition for Verus accommodation models
 /// that need a genuinely symbolic single-character `str`/`char` window
 /// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot
