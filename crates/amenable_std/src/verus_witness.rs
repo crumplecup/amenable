@@ -1744,25 +1744,7 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
         evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
         verifier: "verus",
         kind: "ensures",
-        fragment: || "#[trigger] to_owned_spec(&value) == value",
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
-        verifier: "verus",
-        kind: "ensures",
         fragment: || I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || "match cow { Cow::Borrowed(b) => result == to_owned_spec(b), Cow::Owned(o) => result == o, }",
     }
 }
 

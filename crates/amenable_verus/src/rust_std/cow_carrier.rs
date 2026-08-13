@@ -50,6 +50,18 @@ pub open spec fn cow_into_owned_preserves_variant_value<'a, B: ToOwned + ?Sized>
 /// operation) by the broadcast axiom below.
 pub uninterp spec fn to_owned_spec<B: ToOwned + ?Sized>(b: &B) -> <B as ToOwned>::Owned;
 
+// The `#[trigger]` clause below can't be replaced with a call to
+// `i32_to_owned_spec_is_identity` (confirmed by trying it: `just
+// verify-verus` then failed `verify_cow_borrowed_and_owned_agree_on_
+// their_value`'s own `assert(recovered == value)`). Verus's automatic
+// broadcast instantiation needs the trigger to be the literal term that
+// actually appears in the proof state -- here, `to_owned_spec(&value)`,
+// reached via `into_owned`'s own postcondition -- not an opaque call to
+// a same-meaning predicate the solver has no other reason to unfold.
+// The sibling `ensures` clause right below states the identical fact
+// through the real named predicate, so the claim itself is still named
+// once; this raw clause exists only to give the solver something to
+// pattern-match on.
 #[verifier::external_body]
 pub broadcast proof fn axiom_i32_to_owned_is_identity(value: i32)
     ensures
