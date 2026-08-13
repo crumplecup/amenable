@@ -1,5 +1,6 @@
 //! Core provenance and role types shared by every `RustStdType` registration.
 
+use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
 use amenable_core::{OwnedProvenanceReport, Provenance as _, Registry};
@@ -94,6 +95,12 @@ impl RustStdProvenance {
             type_name: type_name.into(),
             semantic_summary: semantic_summary.into(),
         }
+    }
+}
+
+impl Display for RustStdProvenance {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", OwnedProvenanceReport::new(self.clone()))
     }
 }
 

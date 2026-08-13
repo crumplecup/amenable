@@ -16,6 +16,7 @@
 //! the behavior we needed to confirm.
 
 mod atomic_ptr_compare_exchange;
+mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
 mod iter_materialization;
 mod replace_recommendations;

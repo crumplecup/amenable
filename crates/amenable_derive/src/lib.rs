@@ -5,13 +5,14 @@ mod evidence;
 mod harness;
 mod kani_compose;
 mod standard;
+mod witness;
 
 use proc_macro::TokenStream;
 
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::{
-    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, ItemFn, ItemImpl, LitStr, Path,
-    Type, Variant, WherePredicate, parse_macro_input, parse_quote,
+    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, Index, ItemFn, ItemImpl, LitStr,
+    Path, Type, Variant, WherePredicate, parse_macro_input, parse_quote,
 };
 
 use calculation::{CalculationArgs, expand_calculation};
@@ -19,6 +20,7 @@ use evidence::expand_evidence;
 use harness::expand_harness;
 use kani_compose::expand_kani_compose;
 use standard::expand_standard;
+use witness::expand_witness;
 
 /// Define a `#[cfg(...)]`-gated proof harness item and, alongside it, an
 /// always-available `&'static str` constant holding the harness's verbatim
@@ -99,6 +101,16 @@ pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
     }
 }
 
+#[proc_macro_derive(Witness, attributes(provenance))]
+pub fn derive_witness(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_witness(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
 struct ContainerOptions {
     crate_path: Path,
     tag: String,
@@ -160,9 +172,7 @@ fn expand_struct_metadata(
     crate_path: &Path,
     data: &DataStruct,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    let field_pushes = expand_named_fields(crate_path, &data.fields, |field_name, field_ident| {
-        expand_field_entries(crate_path, field_name, quote!(&self.#field_ident))
-    })?;
+    let field_pushes = expand_struct_field_pushes(crate_path, &data.fields)?;
 
     Ok(quote! {
         let mut entries = ::std::vec::Vec::new();
@@ -261,6 +271,46 @@ fn expand_variant_arm(
                 }
             })
         }
+        Fields::Unnamed(fields) => {
+            let field_bindings = fields
+                .unnamed
+                .iter()
+                .enumerate()
+                .map(|(index, _field)| format_ident!("__field_{index}"))
+                .collect::<Vec<_>>();
+            let field_pushes = fields
+                .unnamed
+                .iter()
+                .enumerate()
+                .map(|(index, field)| {
+                    let field_options = parse_member_options(&field.attrs)?;
+                    if field_options.skip {
+                        return Ok(None);
+                    }
+
+                    let field_name = field_options.rename.unwrap_or_else(|| index.to_string());
+                    let field_binding = &field_bindings[index];
+
+                    Ok(Some(expand_field_entries(
+                        crate_path,
+                        field_name,
+                        quote!(#field_binding),
+                    )))
+                })
+                .collect::<syn::Result<Vec<_>>>()?
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>();
+
+            Ok(quote! {
+                Self::#ident(#(#field_bindings),*) => {
+                    let mut entries = ::std::vec::Vec::new();
+                    entries.push(::#crate_path::MetadataEntry::new(#tag, #variant_name));
+                    #(#field_pushes)*
+                    entries.into_iter()
+                }
+            })
+        }
         Fields::Unit => Ok(quote! {
             Self::#ident => {
                 let mut entries = ::std::vec::Vec::new();
@@ -268,61 +318,54 @@ fn expand_variant_arm(
                 entries.into_iter()
             }
         }),
-        Fields::Unnamed(fields) => Err(Error::new_spanned(
-            fields,
-            "Provenance derive does not support tuple structs or tuple variants; use named fields instead",
-        )),
     }
 }
 
-fn expand_named_fields<F>(
+fn expand_struct_field_pushes(
     crate_path: &Path,
     fields: &Fields,
-    make_push: F,
-) -> syn::Result<Vec<proc_macro2::TokenStream>>
-where
-    F: Fn(String, proc_macro2::TokenStream) -> proc_macro2::TokenStream,
-{
+) -> syn::Result<Vec<proc_macro2::TokenStream>> {
     match fields {
         Fields::Named(fields) => fields
             .named
             .iter()
-            .map(|field| expand_named_field(field, crate_path, &make_push))
+            .map(|field| {
+                let field_ident = field
+                    .ident
+                    .as_ref()
+                    .expect("named-field expansion requires field identifiers");
+                expand_struct_field_push(crate_path, field, None, quote!(&self.#field_ident))
+            })
+            .collect(),
+        Fields::Unnamed(fields) => fields
+            .unnamed
+            .iter()
+            .enumerate()
+            .map(|(index, field)| {
+                let tuple_index = Index::from(index);
+                expand_struct_field_push(crate_path, field, Some(index), quote!(&self.#tuple_index))
+            })
             .collect(),
         Fields::Unit => Ok(Vec::new()),
-        Fields::Unnamed(fields) => Err(Error::new_spanned(
-            fields,
-            "Provenance derive does not support tuple structs or tuple variants; use named fields instead",
-        )),
     }
 }
 
-fn expand_named_field<F>(
+fn expand_struct_field_push(
+    crate_path: &Path,
     field: &Field,
-    _crate_path: &Path,
-    make_push: &F,
-) -> syn::Result<proc_macro2::TokenStream>
-where
-    F: Fn(String, proc_macro2::TokenStream) -> proc_macro2::TokenStream,
-{
+    position: Option<usize>,
+    field_access: proc_macro2::TokenStream,
+) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_member_options(&field.attrs)?;
     if options.skip {
         return Ok(quote! {});
     }
 
-    let field_name = options.rename.unwrap_or_else(|| {
-        field
-            .ident
-            .as_ref()
-            .expect("named-field expansion requires field identifiers")
-            .to_string()
-    });
-    let field_ident = field
-        .ident
-        .as_ref()
-        .expect("named-field expansion requires field identifiers");
-
-    Ok(make_push(field_name, quote!(#field_ident)))
+    Ok(expand_field_entries(
+        crate_path,
+        field_name(field, position)?,
+        field_access,
+    ))
 }
 
 fn expand_field_entries(
@@ -348,11 +391,11 @@ fn expand_field_entries(
 
 fn collect_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     match data {
-        Data::Struct(data) => collect_named_field_types(&data.fields),
+        Data::Struct(data) => collect_field_types_from_fields(&data.fields),
         Data::Enum(data) => data
             .variants
             .iter()
-            .map(|variant| collect_named_field_types(&variant.fields))
+            .map(|variant| collect_field_types_from_fields(&variant.fields))
             .collect::<syn::Result<Vec<_>>>()
             .map(|groups| groups.into_iter().flatten().collect()),
         Data::Union(data) => Err(Error::new_spanned(
@@ -362,23 +405,44 @@ fn collect_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     }
 }
 
-fn collect_named_field_types(fields: &Fields) -> syn::Result<Vec<Type>> {
+fn collect_field_types_from_fields(fields: &Fields) -> syn::Result<Vec<Type>> {
     match fields {
         Fields::Named(fields) => fields
             .named
             .iter()
-            .filter_map(|field| match parse_member_options(&field.attrs) {
-                Ok(options) if options.skip => None,
-                Ok(_) => Some(Ok(field.ty.clone())),
-                Err(error) => Some(Err(error)),
-            })
+            .map(collect_field_type)
+            .filter_map(Result::transpose)
+            .collect(),
+        Fields::Unnamed(fields) => fields
+            .unnamed
+            .iter()
+            .map(collect_field_type)
+            .filter_map(Result::transpose)
             .collect(),
         Fields::Unit => Ok(Vec::new()),
-        Fields::Unnamed(fields) => Err(Error::new_spanned(
-            fields,
-            "Provenance derive does not support tuple structs or tuple variants; use named fields instead",
-        )),
     }
+}
+
+fn collect_field_type(field: &Field) -> syn::Result<Option<Type>> {
+    let options = parse_member_options(&field.attrs)?;
+
+    if options.skip {
+        return Ok(None);
+    }
+
+    Ok(Some(field.ty.clone()))
+}
+
+fn field_name(field: &Field, position: Option<usize>) -> syn::Result<String> {
+    let options = parse_member_options(&field.attrs)?;
+
+    Ok(options
+        .rename
+        .unwrap_or_else(|| match (&field.ident, position) {
+            (Some(ident), _) => ident.to_string(),
+            (None, Some(index)) => index.to_string(),
+            (None, None) => unreachable!("tuple fields require an explicit position"),
+        }))
 }
 
 fn parse_container_options(attrs: &[syn::Attribute]) -> syn::Result<ContainerOptions> {

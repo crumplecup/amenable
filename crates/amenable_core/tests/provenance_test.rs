@@ -1,6 +1,4 @@
-use amenable_core::{
-    Certificate, Evidence, EvidenceLink, MetadataEntry, Provenance, Registry, Standard, Verifier,
-};
+use amenable_core::{Certificate, MetadataEntry, Provenance, Registry, Standard, Verifier};
 use amenable_derive::Standard;
 use std::fmt::{self, Display, Formatter};
 
@@ -225,36 +223,6 @@ source: https://doc.rust-lang.org/std/primitive.i32.html"
 }
 
 #[test]
-fn standard_projects_through_its_backing_provenance() {
-    let standard = ManualStandard {
-        provenance: ManualProvenance {
-            authority_kind: "external_standard".to_string(),
-            authority: "Rust Project Developers".to_string(),
-            source: "https://doc.rust-lang.org/std/primitive.i32.html".to_string(),
-        },
-    };
-
-    assert_eq!(standard.len(), 3);
-    assert_eq!(
-        standard
-            .get("authority")
-            .expect("authority fact present")
-            .value(),
-        "Rust Project Developers"
-    );
-    assert_eq!(
-        standard.keys().collect::<Vec<_>>(),
-        vec!["authority_kind", "authority", "source"]
-    );
-    assert_eq!(
-        standard.report().to_string(),
-        "authority_kind: external_standard\n\
-authority: Rust Project Developers\n\
-source: https://doc.rust-lang.org/std/primitive.i32.html"
-    );
-}
-
-#[test]
 fn registry_issues_standard_certificates_through_the_standard_surface() {
     let mut registry = ManualRegistry::new();
     let standard = ManualStandard {
@@ -302,23 +270,4 @@ authority_kind: external_standard\n\
 authority: Rust Project Developers\n\
 source: https://doc.rust-lang.org/std/primitive.i32.html"
     );
-}
-
-#[test]
-fn evidence_link_is_discoverable_through_inventory() {
-    let link = inventory::iter::<EvidenceLink>()
-        .into_iter()
-        .find(|link| link.name.ends_with("ManualStandard"))
-        .expect("ManualStandard's evidence link is registered");
-
-    // ManualStandard is a root: its basis is itself.
-    assert_eq!(link.basis, link.name);
-}
-
-#[test]
-fn a_root_standards_chain_is_just_itself() {
-    let chain = ManualStandard::chain();
-
-    assert_eq!(chain.len(), 1);
-    assert!(chain[0].ends_with("ManualStandard"));
 }

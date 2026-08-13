@@ -2,6 +2,7 @@ proof_id,timestamp,status
 amenable_kani::calculator::add_impl_computes_exact_sum,1785088495,passed
 amenable_kani::calculator::verify_credit_access_preserves_value,1785088501,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1785088507,passed
+amenable_kani::gallery::derive_witness_generic_enum::derive_witness_supports_concrete_generic_enums,1786587547,passed
 amenable_kani::gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new,1785343619,timeout
 amenable_kani::gallery::filesystem_observation_granularity::single_path_create_new_observation_passes,1785361185,passed
 amenable_kani::gallery::iter_materialization::find_routed_filter_over_array_source_passes,1785104893,passed
