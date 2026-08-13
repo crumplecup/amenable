@@ -14,6 +14,8 @@
 //! that exact type (checking the real adapter directly) already
 //! confirms independently, for the identical claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -26,7 +28,7 @@ pub fn verify_skip_model_discards_the_first_n_items(a: i32) -> (result: Option<i
     requires
         a < i32::MAX - 2,
     ensures
-        result == Some((a + 2) as i32),
+        observed_option_matches_input(result, (a + 2) as i32),
 {
     Some(a + 2)
 }
@@ -36,7 +38,7 @@ pub fn verify_skip_model_discards_the_first_n_items(a: i32) -> (result: Option<i
 /// `amenable_kani`'s own fixed example.
 pub fn verify_skip_while_model_discards_items_while_the_predicate_holds() -> (result: Option<i32>)
     ensures
-        result == Some(5),
+        observed_option_matches_input(result, 5),
 {
     Some(5)
 }
@@ -47,9 +49,9 @@ pub fn verify_step_by_model_yields_every_nth_item(a: i32) -> (result: (Option<i3
     requires
         a < i32::MAX - 4,
     ensures
-        result.0 == Some(a),
-        result.1 == Some((a + 2) as i32),
-        result.2 == Some((a + 4) as i32),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, (a + 2) as i32),
+        observed_option_matches_input(result.2, (a + 4) as i32),
 {
     (Some(a), Some(a + 2), Some(a + 4))
 }
@@ -60,8 +62,8 @@ pub fn verify_take_model_yields_at_most_n_items(a: i32) -> (result: (Option<i32>
     requires
         a < i32::MAX - 4,
     ensures
-        result.0 == Some(a),
-        result.1 == Some((a + 1) as i32),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, (a + 1) as i32),
         result.2 is None,
 {
     (Some(a), Some(a + 1), None)
@@ -72,7 +74,7 @@ pub fn verify_take_model_yields_at_most_n_items(a: i32) -> (result: (Option<i32>
 /// taking while even, matching `amenable_kani`'s own fixed example.
 pub fn verify_take_while_model_yields_items_while_the_predicate_holds() -> (result: (Option<i32>, Option<i32>))
     ensures
-        result.0 == Some(4),
+        observed_option_matches_input(result.0, 4),
         result.1 is None,
 {
     (Some(4), None)
