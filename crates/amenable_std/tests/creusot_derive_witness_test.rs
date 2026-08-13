@@ -7,8 +7,7 @@ use amenable_derive::{
 };
 use amenable_std::{CheckedProof, RustStdProvenance, RustStdStandard, RustStdType};
 
-type ConcreteDerivedWitnessEnum =
-    DerivedWitnessGenericEnum<CheckedCreusotLeaf, TrustedCreusotLeaf>;
+type ConcreteDerivedWitnessEnum = DerivedWitnessGenericEnum<CheckedCreusotLeaf, TrustedCreusotLeaf>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
 #[provenance(crate = "amenable_core")]
@@ -105,9 +104,9 @@ fn derive_witness_supports_concrete_generic_enums_for_creusot() {
     let _ = concrete_variants();
 
     let proof = <ConcreteDerivedWitnessEnum as Witness<CreusotVerifier>>::proof();
-    let proof_type = std::any::type_name::<<ConcreteDerivedWitnessEnum as Witness<
-        CreusotVerifier,
-    >>::ProofArtifact>();
+    let proof_type = std::any::type_name::<
+        <ConcreteDerivedWitnessEnum as Witness<CreusotVerifier>>::ProofArtifact,
+    >();
     let report = proof.to_string();
 
     assert!(

@@ -10,18 +10,16 @@
 //! The fixture intentionally mixes named, tuple, and unit variants so one
 //! explicit instantiation exercises the full enum surface.
 
+use amenable_core::Provenance;
 #[cfg(kani)]
 use amenable_core::Witness;
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
-use amenable_core::Provenance;
 
 type ConcreteDerivedWitnessEnum = DerivedWitnessGenericEnum<crate::Debit, crate::Credit>;
 
-#[derive(
-    Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core", tag = "entry_kind")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 enum DerivedWitnessGenericEnum<TDebit: Provenance + Clone, TAdjustment: Provenance + Clone> {

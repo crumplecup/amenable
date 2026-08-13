@@ -37,27 +37,20 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
         &collect_witness_field_types(&input.data)?,
     )?;
 
+    let proof_type_context = ProofTypeContext {
+        evidence_ident,
+        evidence_ty_generics: evidence_ty_generics.clone(),
+        evidence_generics: &input.generics,
+        proof_ident: &proof_ident,
+        proof_generics: &proof_generics,
+        display_generics: &display_generics,
+    };
+
     let proof_definition = match &input.data {
-        Data::Struct(data) => expand_struct_proof_type(
-            evidence_ident,
-            evidence_ty_generics.clone(),
-            &input.generics,
-            &proof_ident,
-            &proof_generics,
-            &display_generics,
-            data,
-        )?,
-        Data::Enum(data) => expand_enum_proof_types(
-            evidence_ident,
-            evidence_ty_generics.clone(),
-            &input.generics,
-            &proof_ident,
-            &variant_prefix,
-            &proof_generics,
-            &display_generics,
-            data,
-            &options.tag,
-        )?,
+        Data::Struct(data) => expand_struct_proof_type(&proof_type_context, data)?,
+        Data::Enum(data) => {
+            expand_enum_proof_types(&proof_type_context, &variant_prefix, data, &options.tag)?
+        }
         Data::Union(data) => {
             return Err(Error::new_spanned(
                 data.union_token,
@@ -94,15 +87,29 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+/// The shared parameter set every proof-type expansion (struct, enum,
+/// per-variant) needs from the enclosing `#[derive(Witness)]` invocation --
+/// bundled so each expansion function stays under clippy's argument-count
+/// lint without losing any of the context.
+struct ProofTypeContext<'a> {
+    evidence_ident: &'a syn::Ident,
+    evidence_ty_generics: syn::TypeGenerics<'a>,
+    evidence_generics: &'a Generics,
+    proof_ident: &'a syn::Ident,
+    proof_generics: &'a Generics,
+    display_generics: &'a Generics,
+}
+
 fn expand_struct_proof_type(
-    evidence_ident: &syn::Ident,
-    evidence_ty_generics: syn::TypeGenerics<'_>,
-    evidence_generics: &Generics,
-    proof_ident: &syn::Ident,
-    proof_generics: &Generics,
-    display_generics: &Generics,
+    ctx: &ProofTypeContext<'_>,
     data: &DataStruct,
 ) -> syn::Result<TokenStream> {
+    let evidence_ident = ctx.evidence_ident;
+    let evidence_ty_generics = &ctx.evidence_ty_generics;
+    let evidence_generics = ctx.evidence_generics;
+    let proof_ident = ctx.proof_ident;
+    let proof_generics = ctx.proof_generics;
+    let display_generics = ctx.display_generics;
     let shape_name = match &data.fields {
         Fields::Named(_) => "named_struct",
         Fields::Unnamed(_) => "tuple_struct",
@@ -164,16 +171,17 @@ fn expand_struct_proof_type(
 }
 
 fn expand_enum_proof_types(
-    evidence_ident: &syn::Ident,
-    evidence_ty_generics: syn::TypeGenerics<'_>,
-    evidence_generics: &Generics,
-    proof_ident: &syn::Ident,
+    ctx: &ProofTypeContext<'_>,
     variant_prefix: &syn::Ident,
-    proof_generics: &Generics,
-    display_generics: &Generics,
     data: &DataEnum,
     tag: &str,
 ) -> syn::Result<TokenStream> {
+    let evidence_ident = ctx.evidence_ident;
+    let evidence_ty_generics = &ctx.evidence_ty_generics;
+    let evidence_generics = ctx.evidence_generics;
+    let proof_ident = ctx.proof_ident;
+    let proof_generics = ctx.proof_generics;
+    let display_generics = ctx.display_generics;
     let variant_proofs = data
         .variants
         .iter()
