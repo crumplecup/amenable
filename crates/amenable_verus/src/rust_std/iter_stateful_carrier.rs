@@ -23,7 +23,9 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_option_matches_input, observed_value_matches_input,
+};
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -66,7 +68,7 @@ pub fn verify_fuse_model_keeps_returning_none_once_exhausted(a: i32) -> (result:
     requires
         single_increment_headroom_holds(a),
     ensures
-        result.0 == Some(a),
+        observed_option_matches_input(result.0, a),
         result.1 is None,
         result.2 is None,
 {
@@ -80,7 +82,7 @@ pub fn verify_inspect_model_calls_once_per_item_without_changing_values(value: i
     requires
         single_increment_headroom_holds(value),
     ensures
-        result.0 == Some(value),
+        observed_option_matches_input(result.0, value),
         observed_value_matches_input(result.1 as int, 1int),
         result.2 is None,
         observed_value_matches_input(result.3 as int, 1int),
@@ -102,9 +104,9 @@ pub fn verify_peekable_model_peek_does_not_consume(a: i32) -> (result: (Option<i
     requires
         increment_headroom_holds(a),
     ensures
-        result.0 == Some(a),
-        result.1 == Some(a),
-        result.2 == Some((a + 1) as i32),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, a),
+        observed_option_matches_input(result.2, (a + 1) as i32),
 {
     (Some(a), Some(a), Some(a + 1))
 }
@@ -116,8 +118,8 @@ pub fn verify_scan_model_threads_state_through_its_closure(a: i32) -> (result: (
     requires
         -1000 <= a <= 1000,
     ensures
-        result.0 == Some(a),
-        result.1 == Some((a + (a + 1)) as i32),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, (a + (a + 1)) as i32),
 {
     (Some(a), Some(a + (a + 1)))
 }
@@ -129,9 +131,9 @@ pub fn verify_scan_model_threads_state_through_its_closure(a: i32) -> (result: (
 /// wall documented above.
 pub fn verify_flat_map_model_flattens_each_generated_iterator() -> (result: (Option<i32>, Option<i32>, Option<i32>, Option<i32>))
     ensures
-        result.0 == Some(0),
-        result.1 == Some(1),
-        result.2 == Some(2),
+        observed_option_matches_input(result.0, 0),
+        observed_option_matches_input(result.1, 1),
+        observed_option_matches_input(result.2, 2),
         result.3 is None,
 {
     (Some(0), Some(1), Some(2), None)
@@ -143,9 +145,9 @@ pub fn verify_flat_map_model_flattens_each_generated_iterator() -> (result: (Opt
 /// achievable here).
 pub fn verify_flatten_model_concatenates_the_inner_iterators() -> (result: (Option<i32>, Option<i32>, Option<i32>, Option<i32>))
     ensures
-        result.0 == Some(0),
-        result.1 == Some(0),
-        result.2 == Some(1),
+        observed_option_matches_input(result.0, 0),
+        observed_option_matches_input(result.1, 0),
+        observed_option_matches_input(result.2, 1),
         result.3 is None,
 {
     (Some(0), Some(0), Some(1), None)
@@ -157,8 +159,8 @@ pub fn verify_successors_model_generates_from_the_previous_item(seed: i32) -> (r
     requires
         seed < 100,
     ensures
-        result.0 == Some(seed),
-        result.1 == Some((seed + 1) as i32),
+        observed_option_matches_input(result.0, seed),
+        observed_option_matches_input(result.1, (seed + 1) as i32),
 {
     (Some(seed), Some(seed + 1))
 }
@@ -169,8 +171,8 @@ pub fn verify_successors_model_generates_from_the_previous_item(seed: i32) -> (r
 /// `amenable_kani`'s real atomic counter.
 pub fn verify_from_fn_model_yields_until_the_closure_returns_none() -> (result: (Option<i32>, Option<i32>, Option<i32>))
     ensures
-        result.0 == Some(0),
-        result.1 == Some(1),
+        observed_option_matches_input(result.0, 0),
+        observed_option_matches_input(result.1, 1),
         result.2 is None,
 {
     let mut calls: i32 = 0;

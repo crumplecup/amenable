@@ -54,8 +54,9 @@ use std::os::windows::io::{
 
 use crate::{
     ArrayIntoIterAdvanceMatchesPosition, ArrayIntoIterStartsAtFirstPosition, AsciiByte,
-    IncrementHeadroom, NonNulByte, ObservedValueMatchesInput, RustStdProvenance, RustStdStandard,
-    ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue, YieldsThreeValuesInOrderThenEnds,
+    IncrementHeadroom, NonNulByte, ObservedOptionMatchesInput, ObservedValueMatchesInput,
+    RustStdProvenance, RustStdStandard, ValidUnicodeScalar, ValueUnchanged, WriteStoresNewValue,
+    YieldsThreeValuesInOrderThenEnds,
 };
 
 /// The Verus verifier, local to this crate: there is only one verifier
@@ -3742,6 +3743,57 @@ const OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn ob
         verifier: "verus",
         kind: "ensures",
         fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
+    }
+}
+
+/// [`ObservedOptionMatchesInput`] reuses the `Once` harness rather than
+/// adding a new Verus proof — it names the direct `Option`-wrapped
+/// identity postcondition that several `core::iter` generator carriers
+/// now state through one shared Verus `spec fn`, the `Option`-wrapped
+/// counterpart to [`ObservedValueMatchesInput`]'s bare-scalar version.
+impl VerusWitness for ObservedOptionMatchesInput {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        VerusCheckedProof {
+            harness: "verify_once_model_yields_exactly_one_value",
+            claim: VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC,
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+bridge_verus_witness!(ObservedOptionMatchesInput);
+
+impl Ensures<VerusVerifier> for ObservedOptionMatchesInput {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures(_: ()) -> &'static str {
+        "result == Some(value)"
+    }
+}
+
+const OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_option_matches_input(observed: Option<i32>, input: i32) -> bool {
+    observed == Some(input)
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedOptionMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ObservedOptionMatchesInput as Ensures<VerusVerifier>>::ensures(()),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedOptionMatchesInput",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT,
     }
 }
 

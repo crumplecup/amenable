@@ -50,6 +50,15 @@ pub open spec fn text_view_matches_expected(observed: Seq<char>, expected: Seq<c
     observed =~= expected
 }
 
+/// A shared `Option<i32>`-observation identity predicate for
+/// accommodation models whose observed slot should hold exactly
+/// `Some(input)` — the `Option`-wrapped counterpart to
+/// `observed_value_matches_input`, for iterator adapters whose `.next()`
+/// yields `Option<i32>` directly rather than a bare scalar.
+pub open spec fn observed_option_matches_input(observed: Option<i32>, input: i32) -> bool {
+    observed == Some(input)
+}
+
 /// A shared ASCII-range precondition for Verus accommodation models
 /// that need a genuinely symbolic single-character `str`/`char` window
 /// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot
