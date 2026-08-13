@@ -67,10 +67,12 @@ pub fn verify_into_string_error_recovers_the_original_cstring(bytes: Vec<u8>) ->
         result,
 {
     #[cfg(verus_keep_ghost)]
-    use super::cstring_carrier::{axiom_vec_u8_into_vec_u8_is_identity, into_vec_u8_spec};
+    use super::cstring_carrier::{axiom_vec_u8_into_vec_u8_is_identity, into_vec_u8_spec, into_vec_u8_spec_matches_input_vec};
     broadcast use axiom_vec_u8_into_vec_u8_is_identity;
 
+    assert(into_vec_u8_spec_matches_input_vec(bytes));
     assert(!exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0) by {
+        assert(into_vec_u8_spec_matches_input_vec(bytes));
         assert(into_vec_u8_spec(bytes)[0int] != 0);
     }
     let new_result = CString::new(bytes);

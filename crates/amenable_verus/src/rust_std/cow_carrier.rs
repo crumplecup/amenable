@@ -53,6 +53,7 @@ pub uninterp spec fn to_owned_spec<B: ToOwned + ?Sized>(b: &B) -> <B as ToOwned>
 #[verifier::external_body]
 pub broadcast proof fn axiom_i32_to_owned_is_identity(value: i32)
     ensures
+        #[trigger] to_owned_spec(&value) == value,
         i32_to_owned_spec_is_identity(value),
 {
 }

@@ -31,7 +31,12 @@ pub open spec fn box_derefs_and_writes_through(
 /// of the claim the Kani harness checks.
 pub fn verify_box_derefs_and_writes_through(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        box_derefs_and_writes_through(result.0, result.1, value, updated),
+        box_derefs_and_writes_through(
+            result.0 as int,
+            result.1 as int,
+            value as int,
+            updated as int,
+        ),
 {
     let mut boxed = Box::new(value);
     let deref_value = *boxed;

@@ -50,7 +50,7 @@ pub open spec fn btree_set_insert_contains_remove_round_trip_holds(result: bool)
 /// accommodation model of it.
 pub fn verify_btree_map_insert_get_remove_round_trips(k1: i32, k2: i32, v1: i32, v2: i32) -> (result: bool)
     requires
-        btree_map_round_trip_inputs_are_distinct(k1, k2),
+        btree_map_round_trip_inputs_are_distinct(k1 as int, k2 as int),
     ensures
         btree_map_insert_get_remove_round_trip_holds(result),
 {
@@ -83,7 +83,7 @@ pub fn verify_btree_map_insert_get_remove_round_trips(k1: i32, k2: i32, v1: i32,
 /// model of it.
 pub fn verify_btree_set_insert_contains_remove_round_trips(a: i32, b: i32) -> (result: bool)
     requires
-        btree_set_round_trip_inputs_are_distinct(a, b),
+        btree_set_round_trip_inputs_are_distinct(a as int, b as int),
     ensures
         btree_set_insert_contains_remove_round_trip_holds(result),
 {

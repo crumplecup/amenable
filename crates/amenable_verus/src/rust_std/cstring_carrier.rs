@@ -32,6 +32,7 @@ pub open spec fn into_vec_u8_spec_matches_input_vec(v: Vec<u8>) -> bool {
 #[verifier::external_body]
 pub broadcast proof fn axiom_vec_u8_into_vec_u8_is_identity(v: Vec<u8>)
     ensures
+        #[trigger] into_vec_u8_spec(v) == v@,
         #[trigger] into_vec_u8_spec_matches_input_vec(v),
 {
 }
@@ -84,12 +85,19 @@ pub fn verify_cstring_excludes_the_terminator_and_rejects_interior_nul(byte: u8)
     broadcast use axiom_vec_u8_into_vec_u8_is_identity;
 
     let single: Vec<u8> = vec![byte];
+    assert(into_vec_u8_spec_matches_input_vec(single));
+    assert(!exists|i: int| 0 <= i < into_vec_u8_spec(single).len() - 1 && into_vec_u8_spec(single)[i] == 0) by {
+        assert(into_vec_u8_spec_matches_input_vec(single));
+    }
     let new_result = CString::new(single);
     assert(new_result is Ok);
     let accepted = new_result.is_ok();
 
     let with_interior_nul: Vec<u8> = vec![byte, 0, byte];
-    assert(into_vec_u8_spec(with_interior_nul)[1int] == 0);
+    assert(into_vec_u8_spec_matches_input_vec(with_interior_nul));
+    assert(into_vec_u8_spec(with_interior_nul)[1int] == 0) by {
+        assert(into_vec_u8_spec_matches_input_vec(with_interior_nul));
+    }
     let rejected_result = CString::new(with_interior_nul);
     assert(rejected_result is Err);
     let rejected = rejected_result.is_err();
