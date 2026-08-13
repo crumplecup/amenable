@@ -13,6 +13,8 @@
 //! type directly) already confirms independently, for the identical
 //! claim.
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
@@ -33,11 +35,11 @@ pub fn verify_io_slice_model_derefs_to_the_wrapped_bytes(a: u8, b: u8, c: u8, d:
 /// `new_value` into the first slot is visible in the underlying slice.
 pub fn verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes(a: u8, b: u8, c: u8, d: u8, new_value: u8) -> (result: (u8, u8, u8, u8, u8))
     ensures
-        result.0 == a,
-        result.1 == b,
-        result.2 == c,
-        result.3 == d,
-        result.4 == new_value,
+        observed_value_matches_input(result.0 as int, a as int),
+        observed_value_matches_input(result.1 as int, b as int),
+        observed_value_matches_input(result.2 as int, c as int),
+        observed_value_matches_input(result.3 as int, d as int),
+        observed_value_matches_input(result.4 as int, new_value as int),
 {
     (a, b, c, d, new_value)
 }
