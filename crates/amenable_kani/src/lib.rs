@@ -98,7 +98,7 @@ pub use rust_std::{
     FieldAccessRecoversTheStoredValue, FirstValueIsLessThanTheSecond, FourBytesAreEachAscii,
     GetterRecoversTheStoredReference, IndexRecoversTheStoredElement,
     IteratorMatchesReferenceStepByStep, IteratorYieldsAReferenceToTheStoredValue,
-    IteratorYieldsNoneWhenExhausted, RenderedKindMatchesTheBuildingOperation,
+    IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, RenderedKindMatchesTheBuildingOperation,
     SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
     ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
     WeakUpgradeReturnsNone,

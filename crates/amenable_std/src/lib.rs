@@ -31,7 +31,6 @@ mod increment_headroom;
 mod indexing_and_length;
 mod iter_yields_value_once_then_ends;
 mod non_nul_byte;
-mod nonzero_get_round_trips;
 mod nul_only_at_the_end_validates;
 mod observed_value_matches_input;
 mod rust_std;
@@ -67,12 +66,6 @@ pub use increment_headroom::IncrementHeadroom;
 pub use indexing_and_length::IndexingAndLength;
 pub use iter_yields_value_once_then_ends::IterYieldsValueOnceThenEnds;
 pub use non_nul_byte::NonNulByte;
-pub use nonzero_get_round_trips::{
-    NonZeroI8GetRoundTrips, NonZeroI16GetRoundTrips, NonZeroI32GetRoundTrips,
-    NonZeroI64GetRoundTrips, NonZeroI128GetRoundTrips, NonZeroIsizeGetRoundTrips,
-    NonZeroU8GetRoundTrips, NonZeroU16GetRoundTrips, NonZeroU32GetRoundTrips,
-    NonZeroU64GetRoundTrips, NonZeroU128GetRoundTrips, NonZeroUsizeGetRoundTrips,
-};
 pub use nul_only_at_the_end_validates::NulOnlyAtTheEndValidates;
 pub use observed_value_matches_input::ObservedValueMatchesInput;
 pub use rust_std::{

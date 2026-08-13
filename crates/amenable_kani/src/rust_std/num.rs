@@ -22,7 +22,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::macros::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<NonZero<i8>> {
     type SupportingEvidence = Self;
@@ -64,7 +64,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroI8GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -119,7 +119,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroI16GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -174,7 +174,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroI32GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -229,7 +229,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroI64GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -284,7 +284,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroI128GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -339,7 +339,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroIsizeGetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -394,7 +394,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroU8GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -449,7 +449,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroU16GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -504,7 +504,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroU32GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -559,7 +559,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroU64GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -614,7 +614,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroU128GetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -669,7 +669,7 @@ amenable_derive::harness! {
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
-                        amenable_std::NonZeroUsizeGetRoundTrips::ensures((nz.get(), value)),
+                        NonZeroGetRoundTrips::ensures((nz.get(), value)),
                         "NonZero round-trips its wrapped value"
                     );
                 }
@@ -729,50 +729,93 @@ impl_nonzero_ensures_kani!(
 /// from [`impl_nonzero_ensures_kani`]'s `RustStdStandard<NonZero<T>>`
 /// impls above (those check `NonZero::new`'s *construction*
 /// precondition, `value != 0`; this checks the *accessor*
-/// postcondition), so it needs its own `Self` type per width:
+/// postcondition), so it can't reuse that carrier's slot:
 /// `RustStdStandard<NonZero<T>>` already has its one
-/// `Ensures<KaniVerifier>` impl claimed by the precondition. The twelve
-/// wrapper types themselves live in `amenable_std` (`NonZero{Width}GetRoundTrips`),
-/// alongside every other contract type this worklist has named.
-macro_rules! impl_nonzero_get_round_trips_kani {
-    ($(($ty:ty, $name:ident, $evidence:literal)),* $(,)?) => {
-        $(
-            impl crate::KaniWitness for amenable_std::$name {
-                type SupportingEvidence = Self;
-                type ProofArtifact = amenable_std::RustStdProvenance;
+/// `Ensures<KaniVerifier>` impl claimed by the precondition.
+///
+/// Generic over the wrapped width rather than twelve separate concrete
+/// types (`NonZeroI8GetRoundTrips`, `NonZeroI16GetRoundTrips`, ...): every
+/// one of those independently registered the identical fragment
+/// `actual == expected`, the same trivial-equality claim this session's
+/// other access-pattern types (`DerefReflectsTheStoredValue`,
+/// `IndexRecoversTheStoredElement`, ...) already generalize over `T`.
+/// Lives in `amenable_kani` rather than `amenable_std` — no Creusot/Verus
+/// coverage of `NonZero::get()` exists yet, and every other Kani-only
+/// generic contract type this session landed in `amenable_kani` for the
+/// same reason.
+pub struct NonZeroGetRoundTrips<T>(std::marker::PhantomData<T>);
 
-                fn proof() -> Self::ProofArtifact {
-                    amenable_core::Evidence::audit(
-                        &<Self::SupportingEvidence as amenable_core::Evidence>::basis(),
-                    )
-                }
-            }
+impl<T> amenable_core::Standard for NonZeroGetRoundTrips<T> {
+    type Provenance = amenable_std::RustStdProvenance;
 
-            bridge_kani_witness!(amenable_std::$name);
-
-            kani_ensures!(
-                amenable_std::$name,
-                $evidence,
-                ($ty, $ty),
-                |(actual, expected)| actual == expected
-            );
-        )*
-    };
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
 }
 
-impl_nonzero_get_round_trips_kani! {
-    (i8, NonZeroI8GetRoundTrips, "amenable_std::NonZeroI8GetRoundTrips"),
-    (i16, NonZeroI16GetRoundTrips, "amenable_std::NonZeroI16GetRoundTrips"),
-    (i32, NonZeroI32GetRoundTrips, "amenable_std::NonZeroI32GetRoundTrips"),
-    (i64, NonZeroI64GetRoundTrips, "amenable_std::NonZeroI64GetRoundTrips"),
-    (i128, NonZeroI128GetRoundTrips, "amenable_std::NonZeroI128GetRoundTrips"),
-    (isize, NonZeroIsizeGetRoundTrips, "amenable_std::NonZeroIsizeGetRoundTrips"),
-    (u8, NonZeroU8GetRoundTrips, "amenable_std::NonZeroU8GetRoundTrips"),
-    (u16, NonZeroU16GetRoundTrips, "amenable_std::NonZeroU16GetRoundTrips"),
-    (u32, NonZeroU32GetRoundTrips, "amenable_std::NonZeroU32GetRoundTrips"),
-    (u64, NonZeroU64GetRoundTrips, "amenable_std::NonZeroU64GetRoundTrips"),
-    (u128, NonZeroU128GetRoundTrips, "amenable_std::NonZeroU128GetRoundTrips"),
-    (usize, NonZeroUsizeGetRoundTrips, "amenable_std::NonZeroUsizeGetRoundTrips"),
+impl<T> Evidence for NonZeroGetRoundTrips<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for NonZeroGetRoundTrips<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof {
+            harness: "verify_nonzero_i8".to_owned(),
+            claim: VERIFY_NONZERO_I8_SRC.to_owned(),
+            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
+        }
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for NonZeroGetRoundTrips<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for NonZeroGetRoundTrips<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_kani::NonZeroGetRoundTrips",
+        verifier: "kani",
+        kind: "ensures",
+        fragment: || stringify!(actual == expected),
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_kani::NonZeroGetRoundTrips",
+        verifier: "kani",
+        describe: || <NonZeroGetRoundTrips<i8> as KaniWitness>::proof().to_string(),
+    }
 }
 
 impl KaniWitness for RustStdStandard<Wrapping<i32>> {
