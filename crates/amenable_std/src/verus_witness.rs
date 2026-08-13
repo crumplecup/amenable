@@ -7820,6 +7820,17 @@ bridge_verus_witness!(RustStdStandard<std::path::StripPrefixError>);
 const VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
 
+const DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_VERUS_FRAGMENT: &str = r#"pub open spec fn dir_builder_model_creates_nested_directories_recursively(
+    a: char,
+    b: char,
+    c: char,
+    result: DirBuilderResult,
+) -> bool {
+    &&& result.0 == (a,)
+    &&& result.1 == (a, b)
+    &&& result.2 == (a, b, c)
+}"#;
+
 impl VerusWitness for RustStdStandard<std::fs::DirBuilder> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -7845,8 +7856,26 @@ bridge_verus_witness!(RustStdStandard<std::fs::DirBuilder>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+
+const DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_VERUS_FRAGMENT: &str = r#"pub open spec fn dir_entry_model_reports_the_created_files_name_and_path(
+    parent: char,
+    name: char,
+    result: (char, (char, char)),
+) -> bool {
+    &&& result.0 == name
+    &&& result.1 == (parent, name)
+}"#;
 
 impl VerusWitness for RustStdStandard<std::fs::DirEntry> {
     type SupportingEvidence = Self;
@@ -7873,8 +7902,27 @@ bridge_verus_witness!(RustStdStandard<std::fs::DirEntry>);
     }
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_VERUS_FRAGMENT,
+    }
+}
+
 const VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+
+const READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_VERUS_FRAGMENT: &str = r#"pub open spec fn read_dir_model_iterates_every_entry_in_the_directory(
+    first_name: char,
+    second_name: char,
+    result: (u32, char, char),
+) -> bool {
+    &&& result.0 == 2
+    &&& result.1 == first_name
+    &&& result.2 == second_name
+}"#;
 
 impl VerusWitness for RustStdStandard<std::fs::ReadDir> {
     type SupportingEvidence = Self;
@@ -7898,6 +7946,15 @@ bridge_verus_witness!(RustStdStandard<std::fs::ReadDir>);
         describe: || {
             <RustStdStandard<std::fs::ReadDir> as VerusWitness>::proof().to_string()
         },
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_VERUS_FRAGMENT,
     }
 }
 
