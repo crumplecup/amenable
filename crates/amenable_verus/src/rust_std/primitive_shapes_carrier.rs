@@ -59,6 +59,16 @@ pub open spec fn observed_option_matches_input(observed: Option<i32>, input: i32
     observed == Some(input)
 }
 
+/// A shared before/after frame condition for accommodation models whose
+/// operation leaves one field untouched — the general form of
+/// `observed_value_matches_input`, named separately because its two
+/// sides are a state's own before/after snapshots (`old(self).field`,
+/// `final(self).field`) rather than an input parameter and an
+/// independently observed result.
+pub open spec fn value_unchanged(before: int, after: int) -> bool {
+    before == after
+}
+
 /// A shared ASCII-range precondition for Verus accommodation models
 /// that need a genuinely symbolic single-character `str`/`char` window
 /// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot

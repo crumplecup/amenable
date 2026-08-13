@@ -26,6 +26,8 @@ use vstd::prelude::*;
 // when Verus keeps ghost/spec items.
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::cell_carrier::write_stores_new_value;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::{observed_value_matches_input, value_unchanged};
 
 verus! {
 
@@ -42,8 +44,8 @@ pub struct VerusRefCellModel {
 impl VerusRefCellModel {
     pub fn new(initial: i32) -> (result: Self)
         ensures
-            result.value == initial,
-            result.borrow_state == 0,
+            observed_value_matches_input(result.value as int, initial as int),
+            observed_value_matches_input(result.borrow_state as int, 0int),
     {
         Self { value: initial, borrow_state: 0 }
     }
@@ -61,9 +63,7 @@ impl VerusRefCellModel {
             ).borrow_state + 1,
             old(self).borrow_state < 0 ==> !result && final(self).borrow_state
                 == old(self).borrow_state,
-            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == old(self).value,
+            value_unchanged(old(self).value as int, final(self).value as int),
     {
         if self.borrow_state >= 0 {
             self.borrow_state += 1;
@@ -80,9 +80,7 @@ impl VerusRefCellModel {
             old(self).borrow_state == 0 ==> result && final(self).borrow_state == -1,
             old(self).borrow_state != 0 ==> !result && final(self).borrow_state
                 == old(self).borrow_state,
-            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == old(self).value,
+            value_unchanged(old(self).value as int, final(self).value as int),
     {
         if self.borrow_state == 0 {
             self.borrow_state = -1;
@@ -98,9 +96,7 @@ impl VerusRefCellModel {
             old(self).borrow_state > 0,
         ensures
             final(self).borrow_state == old(self).borrow_state - 1,
-            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == old(self).value,
+            value_unchanged(old(self).value as int, final(self).value as int),
     {
         self.borrow_state -= 1;
     }
@@ -110,9 +106,9 @@ impl VerusRefCellModel {
     /// drops).
     pub fn release_exclusive(&mut self, new_value: i32)
         requires
-            old(self).borrow_state == -1,
+            observed_value_matches_input(old(self).borrow_state as int, -1int),
         ensures
-            final(self).borrow_state == 0,
+            observed_value_matches_input(final(self).borrow_state as int, 0int),
             write_stores_new_value(new_value as int, final(self).value as int),
     {
         self.value = new_value;
@@ -132,7 +128,7 @@ pub fn verify_ref_cell_model_dynamic_borrow_rules(initial: i32, updated: i32) ->
         result.2,
         !result.3,
         !result.4,
-        result.5 == updated,
+        observed_value_matches_input(result.5 as int, updated as int),
 {
     let mut model = VerusRefCellModel::new(initial);
 

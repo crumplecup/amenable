@@ -3660,9 +3660,8 @@ const TEN_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn te
 /// [`ValueUnchanged`] reuses `RefCell`'s own borrow-rules harness rather
 /// than adding a new Verus proof — the harness's own `ensures` clauses
 /// already establish this frame condition for `try_borrow`/
-/// `try_borrow_mut`/`release_shared`; `Weak::drop_strong` states the
-/// identical claim, covered by the same fragment text (no variable-name
-/// variance this time — all four sites use `self`/`value` verbatim).
+/// `try_borrow_mut`/`release_shared` (and `Weak::drop_strong` states the
+/// identical claim) through one shared Verus `spec fn`, `value_unchanged`.
 impl VerusWitness for ValueUnchanged {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -3683,7 +3682,20 @@ impl Ensures<VerusVerifier> for ValueUnchanged {
     type Bound = &'static str;
 
     fn ensures(_: ()) -> &'static str {
-        "final (self) . value == old (self) . value"
+        "before == after"
+    }
+}
+
+const VALUE_UNCHANGED_VERUS_FRAGMENT: &str = r#"pub open spec fn value_unchanged(before: int, after: int) -> bool {
+    before == after
+}"#;
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ValueUnchanged",
+        verifier: "verus",
+        kind: "ensures",
+        fragment: || <ValueUnchanged as Ensures<VerusVerifier>>::ensures(()),
     }
 }
 
@@ -3692,7 +3704,7 @@ impl Ensures<VerusVerifier> for ValueUnchanged {
         evidence: "amenable_std::ValueUnchanged",
         verifier: "verus",
         kind: "ensures",
-        fragment: || <ValueUnchanged as Ensures<VerusVerifier>>::ensures(()),
+        fragment: || VALUE_UNCHANGED_VERUS_FRAGMENT,
     }
 }
 
@@ -3742,6 +3754,19 @@ const OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn ob
         evidence: "amenable_std::ObservedValueMatchesInput",
         verifier: "verus",
         kind: "ensures",
+        fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
+    }
+}
+
+// Also registered under "requires": `ref_cell_carrier.rs`'s
+// `release_exclusive` states the identical direct-identity claim as a
+// precondition (`old(self).borrow_state == -1`), reusing the same real
+// spec fn rather than adding a requires-only twin.
+::inventory::submit! {
+    ::amenable_core::ContractRecord {
+        evidence: "amenable_std::ObservedValueMatchesInput",
+        verifier: "verus",
+        kind: "requires",
         fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
     }
 }

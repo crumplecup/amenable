@@ -26,6 +26,9 @@ use verus_builtin_macros::verus;
 #[allow(unused_imports)]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::{observed_value_matches_input, value_unchanged};
+
 verus! {
 
 /// Models `Weak`'s defining law — upgrades while a strong reference is
@@ -39,8 +42,8 @@ impl VerusWeakModel {
     /// A fresh model starts with one live strong reference.
     pub fn new(value: i32) -> (result: Self)
         ensures
-            result.value == value,
-            result.strong_count == 1,
+            observed_value_matches_input(result.value as int, value as int),
+            observed_value_matches_input(result.strong_count as int, 1int),
     {
         Self { value, strong_count: 1 }
     }
@@ -65,9 +68,7 @@ impl VerusWeakModel {
             old(self).strong_count > 0,
         ensures
             final(self).strong_count == old(self).strong_count - 1,
-            // Canonical home: amenable_std::ValueUnchanged's Ensures<VerusVerifier>
-            // impl (amenable_std::verus_witness) names this exact fragment.
-            final(self).value == old(self).value,
+            value_unchanged(old(self).value as int, final(self).value as int),
     {
         self.strong_count -= 1;
     }
