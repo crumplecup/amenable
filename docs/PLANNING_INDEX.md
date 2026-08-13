@@ -11,16 +11,13 @@ This file tracks all planning documents for the amenable project.
 **Status:** 🔲 Ongoing — matching mechanism redesigned in an earlier
 session (call-shape recognition replaced text matching, closing a real
 correctness gap it had); `amenable_creusot` fully cleared under the new
-mechanism; `amenable_kani` now in progress, **771 → 342 sites** across
-thirty-four fixes this session (two real `elicit_doc` matcher bugs
-plus thirty-two named clusters — eleven generic contract types, eight
-non-generic, several reuses of already-named types or free carrier
-`Ensures`/`Requires` slots, and three heterogeneous clusters named
-per-carrier). Full narrative of every fix lives in
-[CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)'s
-"Current state" section (the authoritative, itemized log — this
-summary intentionally stays short rather than duplicating it);
-`amenable_verus` not yet started under it.
+mechanism; `amenable_kani` and `amenable_verus` both actively in
+progress, each with many named clusters landed. Per this project's own
+convention (see the linked doc's own "Status" note), backlog counts are
+intentionally not tracked here or in the linked doc — they drift too
+fast to stay trustworthy. Re-run the `elicit_doc quality antipatterns`
+scan before picking up work; treat its live checklist as the only
+source of truth for what remains.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
