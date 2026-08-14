@@ -24,6 +24,7 @@
 
 mod error;
 pub mod paths;
+mod verus_export;
 
 pub mod assessment;
 pub mod gallery;
@@ -33,6 +34,7 @@ pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
 };
+pub use verus_export::write_verus_witness_modules;
 
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,

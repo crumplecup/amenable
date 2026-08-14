@@ -1,6 +1,6 @@
 //! Verifier-facing proof-emission roles.
 
-use crate::{Evidence, Verifier};
+use crate::{Evidence, MetadataEntry, Verifier};
 
 /// Coarse support class for a witness surface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -234,6 +234,9 @@ pub struct WitnessArtifactNode {
     /// Optional backend detail for leaves, such as a harness name or
     /// provenance report.
     pub detail: Option<String>,
+    /// Structured backend metadata for leaves, such as a harness name,
+    /// captured claim source, or provenance facts.
+    pub metadata: Vec<MetadataEntry>,
     /// Named child members for struct- and variant-like nodes.
     pub members: Vec<WitnessArtifactMember>,
     /// Named child variants for enum roots.
@@ -247,6 +250,16 @@ impl WitnessArtifactNode {
         support: WitnessSupportSummary,
         detail: impl Into<String>,
     ) -> Self {
+        Self::leaf_with_metadata(kind, support, detail, Vec::new())
+    }
+
+    /// Construct one leaf node with structured metadata facts.
+    pub fn leaf_with_metadata(
+        kind: WitnessSupportKind,
+        support: WitnessSupportSummary,
+        detail: impl Into<String>,
+        metadata: impl IntoIterator<Item = MetadataEntry>,
+    ) -> Self {
         Self {
             shape: WitnessArtifactShape::Leaf,
             support,
@@ -254,6 +267,7 @@ impl WitnessArtifactNode {
             tag: None,
             variant: None,
             detail: Some(detail.into()),
+            metadata: metadata.into_iter().collect(),
             members: Vec::new(),
             variants: Vec::new(),
         }
@@ -273,6 +287,7 @@ impl WitnessArtifactNode {
             tag: None,
             variant,
             detail: None,
+            metadata: Vec::new(),
             members,
             variants: Vec::new(),
         }
@@ -291,6 +306,7 @@ impl WitnessArtifactNode {
             tag: Some(tag.into()),
             variant: None,
             detail: None,
+            metadata: Vec::new(),
             members: Vec::new(),
             variants,
         }

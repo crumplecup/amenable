@@ -62,10 +62,11 @@ impl WitnessModulePath for LocalProofArtifact {
 
 impl WitnessArtifact for LocalProofArtifact {
     fn witness_artifact(&self) -> WitnessArtifactNode {
-        WitnessArtifactNode::leaf(
+        WitnessArtifactNode::leaf_with_metadata(
             WitnessSupportKind::Checked,
             WitnessSupportSummary::checked_leaf(),
             "harness: verify_local_evidence_shape",
+            [MetadataEntry::new("harness", "verify_local_evidence_shape")],
         )
     }
 }
@@ -104,5 +105,11 @@ fn witness_exports_include_concrete_local_registrations() {
     assert_eq!(
         record.artifact.detail.as_deref(),
         Some("harness: verify_local_evidence_shape")
+    );
+    assert_eq!(record.artifact.metadata.len(), 1);
+    assert_eq!(record.artifact.metadata[0].key(), "harness");
+    assert_eq!(
+        record.artifact.metadata[0].value(),
+        "verify_local_evidence_shape"
     );
 }

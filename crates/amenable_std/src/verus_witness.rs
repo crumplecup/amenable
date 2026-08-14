@@ -241,10 +241,11 @@ impl VerusProofArtifactSupport for RustStdProvenance {
 
 impl WitnessArtifact for RustStdProvenance {
     fn witness_artifact(&self) -> WitnessArtifactNode {
-        WitnessArtifactNode::leaf(
+        WitnessArtifactNode::leaf_with_metadata(
             WitnessSupportKind::Trusted,
             WitnessSupportSummary::trusted_leaf(),
             self.report().to_string(),
+            self.metadata(),
         )
     }
 }
@@ -275,10 +276,15 @@ impl VerusProofArtifactSupport for VerusCheckedProof {
 
 impl WitnessArtifact for VerusCheckedProof {
     fn witness_artifact(&self) -> WitnessArtifactNode {
-        WitnessArtifactNode::leaf(
+        WitnessArtifactNode::leaf_with_metadata(
             WitnessSupportKind::Checked,
             WitnessSupportSummary::checked_leaf(),
             format!("harness: {}", self.harness),
+            [
+                MetadataEntry::new("verifier", VerusVerifier::name()),
+                MetadataEntry::new("harness", self.harness),
+                MetadataEntry::new("claim", self.claim),
+            ],
         )
     }
 }

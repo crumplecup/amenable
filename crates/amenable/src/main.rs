@@ -24,6 +24,9 @@ enum Commands {
     Audit(AuditArgs),
     /// Record and report structured assessments of registered proof harnesses.
     Assess(assessment::AssessArgs),
+    /// Materialize derived Verus witness modules into a Verus source tree.
+    #[command(name = "emit-verus-witnesses")]
+    EmitVerusWitnesses(EmitVerusWitnessesArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
     Gallery(gallery::GalleryArgs),
     /// Write the full evidence and proof registry as JSON.
@@ -68,6 +71,7 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
     match cli.command {
         Some(Commands::Audit(args)) => run_audit(args),
         Some(Commands::Assess(args)) => assessment::run(args),
+        Some(Commands::EmitVerusWitnesses(args)) => run_emit_verus_witnesses(args),
         Some(Commands::Gallery(args)) => gallery::run(args),
         Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
         Some(Commands::Verify(VerifyArgs {
@@ -132,6 +136,24 @@ fn run_audit(args: AuditArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+fn run_emit_verus_witnesses(args: EmitVerusWitnessesArgs) -> AmenableResult<()> {
+    let root = args
+        .root
+        .unwrap_or_else(amenable::paths::verus_source_directory);
+    let paths = amenable::write_verus_witness_modules(&root)?;
+
+    println!(
+        "Wrote {} Verus witness module(s) under {}:",
+        paths.len(),
+        root.display()
+    );
+    for path in &paths {
+        println!("  {}", path.display());
+    }
+
+    Ok(())
+}
+
 #[derive(Debug, Args)]
 struct AuditArgs {
     /// Evidence name to audit.
@@ -142,6 +164,13 @@ struct AuditArgs {
     /// Restrict the report to one verifier; may be repeated.
     #[arg(long)]
     verifiers: Vec<String>,
+}
+
+#[derive(Debug, Args)]
+struct EmitVerusWitnessesArgs {
+    /// Root `src/` directory of the Verus crate to write into.
+    #[arg(long)]
+    root: Option<PathBuf>,
 }
 
 /// One [`amenable::EvidenceLink`], owned for JSON serialization.
@@ -197,6 +226,7 @@ struct WitnessArtifactNodeDump {
     tag: Option<String>,
     variant: Option<String>,
     detail: Option<String>,
+    metadata: Vec<WitnessArtifactMetadataDump>,
     support_kind: String,
     trivial: usize,
     checked: usize,
@@ -218,6 +248,14 @@ struct WitnessArtifactMemberDump {
 struct WitnessArtifactVariantDump {
     name: String,
     artifact: WitnessArtifactNodeDump,
+}
+
+/// One structured witness artifact metadata fact, owned for JSON
+/// serialization.
+#[derive(serde::Serialize)]
+struct WitnessArtifactMetadataDump {
+    key: String,
+    value: String,
 }
 
 /// The full registry dump written by `dump-registry`.
@@ -247,6 +285,14 @@ fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifact
         tag: node.tag,
         variant: node.variant,
         detail: node.detail,
+        metadata: node
+            .metadata
+            .into_iter()
+            .map(|entry| WitnessArtifactMetadataDump {
+                key: entry.key().to_owned(),
+                value: entry.value().to_owned(),
+            })
+            .collect(),
         support_kind: support.kind().as_str().to_owned(),
         trivial: support.trivial(),
         checked: support.checked(),

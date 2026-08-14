@@ -43,6 +43,13 @@ fn dump_registry_emits_witness_export_records_section() {
             first_export.get("artifact").is_some(),
             "witness export entries should include a structured artifact tree: {first_export}"
         );
+        assert!(
+            first_export
+                .get("artifact")
+                .and_then(|artifact| artifact.get("metadata"))
+                .is_some(),
+            "witness export artifacts should include structured leaf metadata: {first_export}"
+        );
     }
 
     let _ = fs::remove_file(&out);

@@ -9,3 +9,11 @@ use std::path::{Path, PathBuf};
 pub fn artifacts_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts")
 }
+
+/// The `amenable_verus` crate's `src/` directory, resolved relative to
+/// this crate's manifest so CLI entrypoints can emit proof modules
+/// without depending on the caller's current working directory.
+#[must_use]
+pub fn verus_source_directory() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src")
+}
