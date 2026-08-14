@@ -2,16 +2,31 @@
 
 ## Status
 
-🔲 In progress — Phases 1–3 implemented and verified (each ends with a
-clean `just check-all-verus` and an unchanged `just verify-verus`
-`335 verified, 0 errors`, confirming no phase so far touches proof
-content): `ClassifiedWitness<V>` + export-time enforcement + the
-`#[allow(dead_code)]` fix (commits `58baf89`, `aa14160`); owned-`String`
-conversion on `VerusCheckedProof` (commit `eb21da0`); the
-`VerusCallShape` call-shape registry, redesigned during implementation
-as a separate additive registry rather than a `VerusCheckedProof` field
-(commit `3e7b17c`; see Design B). Phases 4–8 (the renderer rewrite
-itself) not started.
+🔲 In progress — Phases 1–4 implemented and verified. Phases 1–3
+(`ClassifiedWitness<V>` + export-time enforcement + the
+`#[allow(dead_code)]` fix, commits `58baf89`/`aa14160`; owned-`String`
+conversion on `VerusCheckedProof`, commit `eb21da0`; the `VerusCallShape`
+call-shape registry, redesigned during implementation as a separate
+additive registry rather than a `VerusCheckedProof` field, commit
+`3e7b17c`; see Design B) each left proof content unchanged (`just
+verify-verus` stayed at `335 verified, 0 errors` throughout). **Phase 4
+is the core deliverable — real composition, no more free booleans**
+(commit `dbb0092`): `just verify-verus` now reports `334 verified,
+0 errors` — down from 335, correctly: the three tautological canary
+proofs are gone, replaced by two genuine ones that call real Verus
+code and would break if that code's real behavior changed. Two design
+gaps only the real `verus` tool surfaced during this phase (Verus
+`ensures` clauses can't reference body-local `let`s, only parameters
+and the declared return binding; spec predicates need an explicit
+`#[cfg(verus_keep_ghost)]`-gated `use`) are documented in the file's
+own module doc comment. Also fixed a real, independent bug found while
+wiring this up: `write_verus_witness_modules` aborted its entire batch
+at the first failing export — since `inventory` registration is
+process-global, one broken registration anywhere would silently starve
+every other, unrelated, working export in the same process; every
+export now renders independently. Phases 5–8 (`requires` propagation,
+mutating/model-method leaves, enum `match`-per-variant composition, and
+full rollout) not started.
 
 ## Problem
 
@@ -320,9 +335,17 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    the canary's harness, `verify_char_roundtrip` (commit `3e7b17c`).
    Remaining harnesses get registered as later phases' canaries need
    them, or in phase 8's rollout.
-4. **Renderer: categories 1–3** (direct predicates, value-returning
+4. ✅ **Renderer: categories 1–3** (direct predicates, value-returning
    functions, multi-clause). Get the existing canaries producing real,
-   content-bearing composite proofs — no free booleans anywhere.
+   content-bearing composite proofs — no free booleans anywhere
+   (commit `dbb0092`). Implemented as category 2 (value-returning
+   functions) directly, since `verify_char_roundtrip` already covers
+   category 1's shape by being called and cited rather than assumed;
+   category 3 (multi-clause) fell out for free, no special-casing
+   needed. Also fixed `write_verus_witness_modules`'s all-or-nothing
+   failure mode (see Status above) — not originally scoped to this
+   phase, but discovered to be necessary while wiring up the first two
+   real exports side by side with a temporarily-unsupported one.
 5. **Renderer: category 4** (`requires` propagation). Add a canary
    exercising a leaf with a real precondition.
 6. **Renderer: category 5** (mutating/model-method leaves). Add a canary
