@@ -1,6 +1,6 @@
 //! Live derived-witness canaries for the Verus export pipeline.
 
-use amenable_core::{Provenance, Witness, WitnessSupportSummary};
+use amenable_core::{ClassifiedWitness, Provenance, Witness, WitnessSupportSummary};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
@@ -51,6 +51,8 @@ impl Witness<VerusVerifier> for CheckedVerusExportLeaf {
     }
 }
 
+impl ClassifiedWitness<VerusVerifier> for CheckedVerusExportLeaf {}
+
 /// A leaf whose [`Witness<VerusVerifier>`] proof rests on explicit
 /// provenance rather than a machine-checked spec — exercises the
 /// `Trusted` slot of the derive-witness composition canaries.
@@ -82,6 +84,8 @@ impl Witness<VerusVerifier> for TrustedVerusExportLeaf {
         WitnessSupportSummary::trusted_leaf()
     }
 }
+
+impl ClassifiedWitness<VerusVerifier> for TrustedVerusExportLeaf {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core")]

@@ -47,9 +47,9 @@ pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
 pub use verifier::Verifier;
 pub use witness::{
-    Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape,
-    WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath,
-    WitnessSupportKind, WitnessSupportSummary, witness_exports,
+    ClassifiedWitness, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
+    WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,
+    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, witness_exports,
 };
 
 #[doc(hidden)]

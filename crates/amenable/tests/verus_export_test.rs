@@ -7,9 +7,9 @@ use std::{
 };
 
 use amenable::{
-    Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact, WitnessArtifactMember,
-    WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant, WitnessModulePath,
-    WitnessSupportKind, WitnessSupportSummary,
+    ClassifiedWitness, Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
+    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -174,6 +174,8 @@ impl Witness<LocalVerusVerifier> for LocalEnumEvidence {
     }
 }
 
+impl ClassifiedWitness<LocalVerusVerifier> for LocalEnumEvidence {}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct LocalLeafEvidence;
 
@@ -232,6 +234,8 @@ impl Witness<LocalVerusVerifier> for LocalLeafEvidence {
         WitnessSupportSummary::checked_leaf()
     }
 }
+
+impl ClassifiedWitness<LocalVerusVerifier> for LocalLeafEvidence {}
 
 amenable_core::register_witness_exports!(verifier = LocalVerusVerifier; LocalEnumEvidence, LocalLeafEvidence);
 

@@ -424,6 +424,29 @@ pub trait Witness<V: Verifier> {
     }
 }
 
+/// Marks a [`Witness`] whose support surface has actually been
+/// classified — never blanket-implemented, and never implemented by
+/// [`Witness`]'s own default `support()` (which stays `Opaque`).
+///
+/// Compositional structural closure (`#[derive(Witness)]`) propagates
+/// this bound onto every field/variant it composes, the same way it
+/// already propagates the base `Witness<V>` bound. A leaf that never
+/// overrode `support()` — still `Opaque` — never implements this trait,
+/// so a composite containing one fails to implement it too. Exporting a
+/// witness to a backend (`register_witness_exports!`) requires this
+/// bound, so an `Opaque` leaf anywhere in the composed tree turns into a
+/// real `cargo check`-time trait-resolution error naming the exact
+/// unclassified leaf — not a runtime failure, and not a `const`-eval
+/// panic (confirmed empirically during design: `assert!` in a `const`
+/// initializer does fail the build, but only via that one panic-shaped
+/// channel, and doesn't generalize to code still generic over field
+/// types — this trait-bound approach has neither limitation).
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no registered classification for this verifier (its Witness::support() is still Opaque)",
+    note = "implement `ClassifiedWitness<{V}>` for it (e.g. via `bridge_verus_witness!`, or by overriding `support()` directly) before it can be composed into an exported witness"
+)]
+pub trait ClassifiedWitness<V: Verifier>: Witness<V> {}
+
 /// Register explicit witness exports for a verifier backend.
 ///
 /// This is for backends such as Verus that compile proof content in a
@@ -435,6 +458,11 @@ pub trait Witness<V: Verifier> {
 macro_rules! register_witness_exports {
     (verifier = $verifier:ty; $($ty:ty),* $(,)?) => {
         $(
+            const _: fn() = || {
+                fn assert_classified<T: $crate::ClassifiedWitness<$verifier>>() {}
+                assert_classified::<$ty>();
+            };
+
             $crate::__inventory::submit! {
                 $crate::WitnessExportRecord {
                     verifier: || <$verifier as $crate::Verifier>::name(),

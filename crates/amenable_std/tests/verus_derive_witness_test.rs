@@ -3,8 +3,8 @@
 mod support;
 
 use amenable_core::{
-    Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath, WitnessSupportKind,
-    WitnessSupportSummary,
+    ClassifiedWitness, Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath,
+    WitnessSupportKind, WitnessSupportSummary,
 };
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
@@ -62,6 +62,8 @@ impl Witness<VerusVerifier> for CheckedVerusLeaf {
     }
 }
 
+impl ClassifiedWitness<VerusVerifier> for CheckedVerusLeaf {}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
@@ -89,6 +91,8 @@ impl Witness<VerusVerifier> for TrustedVerusLeaf {
         WitnessSupportSummary::trusted_leaf()
     }
 }
+
+impl ClassifiedWitness<VerusVerifier> for TrustedVerusLeaf {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core")]

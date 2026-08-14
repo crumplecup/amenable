@@ -45,8 +45,8 @@
 )]
 
 use amenable_core::{
-    Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness, WitnessArtifact,
-    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
+    ClassifiedWitness, Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness,
+    WitnessArtifact, WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
@@ -157,6 +157,13 @@ macro_rules! bridge_verus_witness {
                 <<$ty as VerusWitness>::ProofArtifact as VerusProofArtifactSupport>::support()
             }
         }
+
+        // Every VerusWitness-bridged type resolves to a real VerusCheckedProof
+        // or RustStdProvenance artifact -- both genuinely classified (Checked
+        // or Trusted respectively, see VerusProofArtifactSupport below), never
+        // the Witness::support() default (Opaque) -- so this impl is always
+        // sound to add unconditionally alongside the bridge.
+        impl ClassifiedWitness<VerusVerifier> for $ty {}
     };
 }
 

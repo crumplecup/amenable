@@ -1,6 +1,7 @@
 use amenable::{
-    Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact, WitnessArtifactNode,
-    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, witness_exports,
+    ClassifiedWitness, Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactNode, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
+    witness_exports,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -83,6 +84,8 @@ impl Witness<LocalVerifier> for LocalEvidence {
         WitnessSupportSummary::checked_leaf()
     }
 }
+
+impl ClassifiedWitness<LocalVerifier> for LocalEvidence {}
 
 amenable_core::register_witness_exports!(verifier = LocalVerifier; LocalEvidence);
 

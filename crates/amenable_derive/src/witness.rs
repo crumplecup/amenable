@@ -79,8 +79,32 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     witness_generics
         .make_where_clause()
         .predicates
-        .push(witness_type_predicate);
+        .push(witness_type_predicate.clone());
     let (witness_impl_generics, _, witness_where_clause) = witness_generics.split_for_impl();
+
+    // A separate impl, not folded into the Witness<__Verifier> one above:
+    // ClassifiedWitness<V>: Witness<V> is a supertrait, so requiring every
+    // field to satisfy ClassifiedWitness<__Verifier> here already implies
+    // each field's (weaker) Witness<__Verifier> bound -- no need to restate
+    // it. This only applies (and only lets this evidence type satisfy
+    // ClassifiedWitness itself) when every field's own support has actually
+    // been classified; a field still on Witness's Opaque default leaves this
+    // impl inapplicable, which is what turns an unclassified leaf anywhere
+    // in a composed tree into a real `cargo check`-time error at the point
+    // something requires ClassifiedWitness of the whole composite (see
+    // `amenable_core::register_witness_exports!`).
+    let mut classified_generics = input.generics.clone();
+    classified_generics.params.push(parse_quote!(__Verifier));
+    add_classified_witness_bounds(
+        &mut classified_generics,
+        &collect_witness_field_types(&input.data)?,
+    )?;
+    classified_generics
+        .make_where_clause()
+        .predicates
+        .push(witness_type_predicate);
+    let (classified_impl_generics, _, classified_where_clause) =
+        classified_generics.split_for_impl();
 
     Ok(quote! {
         #proof_definition
@@ -100,6 +124,11 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
                 #proof_ident #proof_turbofish::new().support
             }
         }
+
+        impl #classified_impl_generics ::amenable_core::ClassifiedWitness<__Verifier>
+            for #evidence_ident #evidence_ty_generics
+            #classified_where_clause
+        {}
     })
 }
 
@@ -595,6 +624,21 @@ fn add_witness_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Res
         where_clause
             .predicates
             .push(parse_quote!(#field_type: ::amenable_core::Witness<__Verifier>));
+    }
+
+    Ok(())
+}
+
+fn add_classified_witness_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
+    let where_clause = generics.make_where_clause();
+    where_clause
+        .predicates
+        .push(parse_quote!(__Verifier: ::amenable_core::Verifier));
+
+    for field_type in field_types {
+        where_clause
+            .predicates
+            .push(parse_quote!(#field_type: ::amenable_core::ClassifiedWitness<__Verifier>));
     }
 
     Ok(())

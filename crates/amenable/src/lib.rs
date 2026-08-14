@@ -38,13 +38,13 @@ pub use verus_export::write_verus_witness_modules;
 
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
-    ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange, MetadataEntry,
-    OwnedProvenanceReport, ProofChainReport, ProofRecord, ProofToken, Provenance, ProvenanceReport,
-    Registry, RegistryReport, Requires, Sidecar, Standard, StateMachine, Verifier, Witness,
-    WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape,
-    WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath,
-    WitnessSupportKind, WitnessSupportSummary, proof_chain, proof_chain_for_verifiers,
-    witness_exports,
+    ClassifiedWitness, ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange,
+    MetadataEntry, OwnedProvenanceReport, ProofChainReport, ProofRecord, ProofToken, Provenance,
+    ProvenanceReport, Registry, RegistryReport, Requires, Sidecar, Standard, StateMachine,
+    Verifier, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
+    WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,
+    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, proof_chain,
+    proof_chain_for_verifiers, witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};
