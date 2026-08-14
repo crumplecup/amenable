@@ -36,7 +36,18 @@ variant's own name can carry a provenance rename (e.g. `fallback`,
 lowercase) — a valid audit label but not a valid PascalCase Rust enum
 variant identifier — and normalized it before use in the synthetic
 types. `just verify-verus` went to `337 verified, 0 errors`, one new
-genuine proof. Phase 8 (full rollout) not started.
+genuine proof. **Phase 8 is broader canary coverage, not a "rollout"**:
+`amenable_std` hand-proves each std-lib leaf itself so derive-witness
+composition is ready for a downstream user's own custom composite —
+the crate never has a real (non-canary) composite of its own to
+register, by design. Several realistic shapes have never actually been
+run through the real `verus` tool: a struct with two independent
+checked leaves (the `result.0`/`result.1` tuple path), an enum variant
+with two checked leaves (the `r0`/`r1` bind-name path), and a
+struct-in-struct (recursion past depth 1). Also adding a permanent
+`trybuild` regression test for the `ClassifiedWitness` `E0277`
+guarantee, verified once by hand in Phase 1 but never locked in. Not
+started.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

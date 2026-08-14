@@ -72,7 +72,8 @@ Rust enum variant identifier; normalized before use in the synthetic
 types. `just verify-verus` went to `337 verified, 0 errors` — up from
 336, one new genuine proof.
 
-Phase 8 (full rollout) not started.
+Phase 8 (broader canary coverage, not a "rollout" — see its own entry
+below for why) not started.
 
 ## Problem
 
@@ -506,11 +507,33 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    (`LocalWorkingEnumEvidence`) asserting the generated `match` content
    verbatim. The real `match` arms discharge for real: `just
    verify-verus` went to `337 verified, 0 errors` (commit `b8ccaa8`).
-8. **Rollout.** Regenerate `derived_witness/` from real (non-canary)
-   crate registrations, `just verify-verus` across the whole tree,
-   confirm zero free-boolean tautologies remain in generated output, and
-   confirm attempting to export a deliberately-opaque type fails
-   `cargo check` with the expected `E0277`.
+8. **Broader canary coverage** (not a "rollout" of real crate
+   registrations — this crate never has any: `amenable_std` *is* the
+   library, meaning it hand-proves each leaf itself so that derive-
+   witness composition is ready for a downstream user composing a
+   custom type out of those already-proven leaves; the crate has no
+   custom composite type of its own to register, by design, not by
+   omission). Every phase so far verified its own renderer path with
+   the minimum canary needed to exercise it once — several realistic
+   shapes were never actually run through the real `verus` tool as a
+   result:
+   - A struct with *two* checked leaves (different real harnesses) —
+     the `-> (result: (T1, T2))`/`result.0`/`result.1` tuple path has
+     only ever been exercised by `RefCell`'s *single* checked leaf,
+     whose own real return type already happens to be a tuple; no
+     canary has combined two independent checked calls into one
+     composite's own tuple.
+   - An enum variant with *two* checked leaves — `render_enum_module`'s
+     `r0`/`r1` multi-call bind-name path (as opposed to the single-`r`
+     path) has no real coverage at all.
+   - A struct-in-struct: a composite field that is itself another
+     already-composed `Witness` type, not a bare leaf — confirms the
+     derive and the renderer both recurse correctly past depth 1.
+   - The `ClassifiedWitness` compile-time `E0277` guarantee (Design A)
+     was verified once by hand during Phase 1 and has no permanent
+     regression test; add one (`trybuild`) so a future refactor that
+     silently reopens the Opaque hole gets caught by `just test`, not
+     by another manual check.
 
 ## Verification plan
 
