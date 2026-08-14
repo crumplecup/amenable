@@ -11,14 +11,17 @@ use amenable_std::{CheckedProof, RustStdProvenance, RustStdStandard, RustStdType
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
     DerivedWitnessGenericEnum as SharedDerivedWitnessGenericEnum,
-    assert_checked_plus_trivial_report, assert_generic_enum_report, balanced_variant_support,
-    checked_plus_trivial_support, mixed_support,
+    DerivedWitnessTupleStruct as SharedDerivedWitnessTupleStruct,
+    assert_checked_plus_trivial_report, assert_generic_enum_report, assert_tuple_struct_report,
+    balanced_variant_support, checked_plus_trivial_support, mixed_support, tuple_struct_support,
 };
 
 type ConcreteDerivedWitnessEnum =
     SharedDerivedWitnessGenericEnum<CheckedCreusotLeaf, TrustedCreusotLeaf, CheckedCreusotLeaf>;
 type ConcreteDerivedCheckedPlusTrivialStruct =
     SharedDerivedWitnessCheckedPlusTrivialStruct<CheckedCreusotLeaf, TrivialCreusotLeaf>;
+type ConcreteDerivedTupleStruct =
+    SharedDerivedWitnessTupleStruct<CheckedCreusotLeaf, TrustedCreusotLeaf, TrivialCreusotLeaf>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
 #[provenance(crate = "amenable_core")]
@@ -98,6 +101,13 @@ fn concrete_checked_plus_trivial() -> ConcreteDerivedCheckedPlusTrivialStruct {
     ConcreteDerivedCheckedPlusTrivialStruct::new(CheckedCreusotLeaf::new("unicode scalar"))
 }
 
+fn concrete_tuple_struct() -> ConcreteDerivedTupleStruct {
+    ConcreteDerivedTupleStruct::new(
+        CheckedCreusotLeaf::new("unicode scalar"),
+        TrustedCreusotLeaf::new("rust bool docs"),
+    )
+}
+
 #[test]
 fn derive_witness_supports_concrete_generic_enums_for_creusot() {
     let _ = concrete_variants();
@@ -164,4 +174,20 @@ fn derive_witness_keeps_trivial_members_neutral_for_creusot() {
     );
     assert_eq!(proof.support, expected_support);
     assert_eq!(proof.marker.support, WitnessSupportSummary::trivial_leaf());
+}
+
+#[test]
+fn derive_witness_supports_tuple_structs_for_creusot() {
+    let _ = concrete_tuple_struct();
+    let expected_support = tuple_struct_support();
+
+    let proof = <ConcreteDerivedTupleStruct as Witness<CreusotVerifier>>::proof();
+    let report = proof.to_string();
+
+    assert_tuple_struct_report(&report, "creusot", expected_support);
+    assert_eq!(
+        <ConcreteDerivedTupleStruct as Witness<CreusotVerifier>>::support(),
+        expected_support
+    );
+    assert_eq!(proof.support, expected_support);
 }

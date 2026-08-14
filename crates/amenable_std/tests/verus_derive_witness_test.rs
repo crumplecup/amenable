@@ -15,18 +15,22 @@ use amenable_std::{
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
     DerivedWitnessGenericEnum as SharedDerivedWitnessGenericEnum,
-    assert_checked_plus_trivial_report, assert_generic_enum_report, balanced_variant_support,
-    checked_plus_trivial_support, mixed_support,
+    DerivedWitnessTupleStruct as SharedDerivedWitnessTupleStruct,
+    assert_checked_plus_trivial_report, assert_generic_enum_report, assert_tuple_struct_report,
+    balanced_variant_support, checked_plus_trivial_support, mixed_support, tuple_struct_support,
 };
 
 type ConcreteDerivedWitnessEnum =
     SharedDerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf, CheckedVerusLeaf>;
 type ConcreteDerivedCheckedPlusTrivialStruct =
     SharedDerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf, TrivialVerusLeaf>;
+type ConcreteDerivedTupleStruct =
+    SharedDerivedWitnessTupleStruct<CheckedVerusLeaf, TrustedVerusLeaf, TrivialVerusLeaf>;
 
 amenable_std::emit_verus_witnesses!(
     SharedDerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf, CheckedVerusLeaf>,
     SharedDerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf, TrivialVerusLeaf>,
+    SharedDerivedWitnessTupleStruct<CheckedVerusLeaf, TrustedVerusLeaf, TrivialVerusLeaf>,
 );
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
@@ -107,6 +111,13 @@ fn concrete_checked_plus_trivial() -> ConcreteDerivedCheckedPlusTrivialStruct {
     ConcreteDerivedCheckedPlusTrivialStruct::new(CheckedVerusLeaf::new("unicode scalar"))
 }
 
+fn concrete_tuple_struct() -> ConcreteDerivedTupleStruct {
+    ConcreteDerivedTupleStruct::new(
+        CheckedVerusLeaf::new("unicode scalar"),
+        TrustedVerusLeaf::new("rust bool docs"),
+    )
+}
+
 #[test]
 fn derive_witness_supports_concrete_generic_enums_for_verus() {
     let _ = concrete_variants();
@@ -179,6 +190,22 @@ fn derive_witness_keeps_trivial_members_neutral_for_verus() {
 }
 
 #[test]
+fn derive_witness_supports_tuple_structs_for_verus() {
+    let _ = concrete_tuple_struct();
+    let expected_support = tuple_struct_support();
+
+    let proof = <ConcreteDerivedTupleStruct as Witness<VerusVerifier>>::proof();
+    let report = proof.to_string();
+
+    assert_tuple_struct_report(&report, "verus", expected_support);
+    assert_eq!(
+        <ConcreteDerivedTupleStruct as Witness<VerusVerifier>>::support(),
+        expected_support
+    );
+    assert_eq!(proof.support, expected_support);
+}
+
+#[test]
 fn explicit_verus_witness_exports_register_concrete_instantiations() {
     let exports = inventory::iter::<WitnessExportRecord>()
         .filter(|record| (record.verifier)() == "verus")
@@ -193,10 +220,11 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         .filter(|(evidence, _, _, _)| {
             evidence.contains("DerivedWitnessGenericEnum<")
                 || evidence.contains("DerivedWitnessCheckedPlusTrivialStruct<")
+                || evidence.contains("DerivedWitnessTupleStruct<")
         })
         .collect::<Vec<_>>();
 
-    assert_eq!(exports.len(), 2);
+    assert_eq!(exports.len(), 3);
 
     let enum_export = exports
         .iter()
@@ -206,6 +234,10 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         .iter()
         .find(|(evidence, _, _, _)| evidence.contains("DerivedWitnessCheckedPlusTrivialStruct<"))
         .expect("expected explicit export for the checked-plus-trivial struct");
+    let tuple_export = exports
+        .iter()
+        .find(|(evidence, _, _, _)| evidence.contains("DerivedWitnessTupleStruct<"))
+        .expect("expected explicit export for the tuple struct");
 
     assert_eq!(
         enum_export.1,
@@ -241,6 +273,25 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         <ConcreteDerivedCheckedPlusTrivialStruct as Witness<VerusVerifier>>::support()
     );
 
+    assert_eq!(
+        tuple_export.1,
+        <<ConcreteDerivedTupleStruct as Witness<VerusVerifier>>::ProofArtifact as WitnessModulePath>::MODULE_PATH
+    );
+    assert!(
+        tuple_export.2.contains("verifier: verus"),
+        "{}",
+        tuple_export.2
+    );
+    assert!(
+        tuple_export.2.contains("shape: tuple_struct"),
+        "{}",
+        tuple_export.2
+    );
+    assert_eq!(
+        tuple_export.3,
+        <ConcreteDerivedTupleStruct as Witness<VerusVerifier>>::support()
+    );
+
     let structured_exports = amenable_core::witness_exports();
     let enum_artifact = structured_exports
         .iter()
@@ -256,6 +307,12 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
                 .contains("DerivedWitnessCheckedPlusTrivialStruct<")
         })
         .expect("expected structured export for the checked-plus-trivial struct")
+        .artifact
+        .clone();
+    let tuple_artifact = structured_exports
+        .iter()
+        .find(|record| record.evidence.contains("DerivedWitnessTupleStruct<"))
+        .expect("expected structured export for the tuple struct")
         .artifact
         .clone();
 
@@ -299,6 +356,14 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     assert_eq!(struct_artifact.members.len(), 2);
     assert_eq!(
         struct_artifact.members[0].artifact.shape,
+        WitnessArtifactShape::Leaf
+    );
+
+    assert_eq!(tuple_artifact.shape, WitnessArtifactShape::TupleStruct);
+    assert_eq!(tuple_artifact.kind, WitnessSupportKind::Mixed);
+    assert_eq!(tuple_artifact.members.len(), 3);
+    assert_eq!(
+        tuple_artifact.members[0].artifact.shape,
         WitnessArtifactShape::Leaf
     );
 }

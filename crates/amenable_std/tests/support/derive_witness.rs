@@ -26,6 +26,30 @@ impl<TChecked: Provenance + Clone + Default, TTrivial: Provenance + Clone + Defa
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+pub struct DerivedWitnessTupleStruct<
+    TChecked: Provenance + Clone + Default,
+    TTrusted: Provenance + Clone + Default,
+    TTrivial: Provenance + Clone + Default,
+>(
+    pub TChecked,
+    #[provenance(rename = "trusted")] pub TTrusted,
+    #[provenance(rename = "marker")] pub TTrivial,
+);
+
+impl<
+    TChecked: Provenance + Clone + Default,
+    TTrusted: Provenance + Clone + Default,
+    TTrivial: Provenance + Clone + Default,
+> DerivedWitnessTupleStruct<TChecked, TTrusted, TTrivial>
+{
+    pub fn new(checked: TChecked, trusted: TTrusted) -> Self {
+        Self(checked, trusted, TTrivial::default())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core", tag = "entry_kind")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub enum DerivedWitnessGenericEnum<
@@ -69,6 +93,14 @@ pub fn balanced_variant_support() -> WitnessSupportSummary {
     WitnessSupportSummary::compose(&[
         WitnessSupportSummary::checked_leaf(),
         WitnessSupportSummary::trusted_leaf(),
+    ])
+}
+
+pub fn tuple_struct_support() -> WitnessSupportSummary {
+    WitnessSupportSummary::compose(&[
+        WitnessSupportSummary::checked_leaf(),
+        WitnessSupportSummary::trusted_leaf(),
+        WitnessSupportSummary::trivial_leaf(),
     ])
 }
 
@@ -116,6 +148,31 @@ pub fn assert_generic_enum_report(
     assert!(
         closed_report.contains("shape: unit_variant"),
         "{closed_report}"
+    );
+}
+
+pub fn assert_tuple_struct_report(
+    report: &str,
+    verifier_label: &str,
+    expected_support: WitnessSupportSummary,
+) {
+    assert!(
+        report.contains(&format!("verifier: {verifier_label}")),
+        "{report}"
+    );
+    assert!(report.contains("shape: tuple_struct"), "{report}");
+    assert!(
+        report.contains(&format!("support: {expected_support}")),
+        "{report}"
+    );
+    assert!(
+        report.contains("member 0: harness: verify_char_roundtrip"),
+        "{report}"
+    );
+    assert!(report.contains("member trusted:"), "{report}");
+    assert!(
+        report.contains(&format!("member marker: verifier: {verifier_label}")),
+        "{report}"
     );
 }
 
