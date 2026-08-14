@@ -10,7 +10,8 @@ use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
 use amenable_std::{
-    RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof, VerusVerifier,
+    CheckedVerusExportLeaf, RustStdProvenance, RustStdStandard, RustStdType,
+    TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum, VerusVerifier,
 };
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
@@ -386,4 +387,38 @@ fn live_verus_canary_exports_include_tuple_struct_shape() {
     assert_eq!(export.artifact.members[0].label, "0");
     assert_eq!(export.artifact.members[1].label, "trusted");
     assert_eq!(export.artifact.members[2].label, "marker");
+}
+
+type CanaryEnum = VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
+
+#[test]
+fn verus_export_canary_enum_variants_are_constructible() {
+    let balanced = CanaryEnum::Balanced {
+        checked: CheckedVerusExportLeaf::new("checked"),
+        trusted: TrustedVerusExportLeaf::new("trusted"),
+    };
+    let adjustment = CanaryEnum::Adjustment(
+        TrustedVerusExportLeaf::new("trusted"),
+        CheckedVerusExportLeaf::new("checked"),
+    );
+    let closed = CanaryEnum::Closed;
+
+    assert!(format!("{balanced:?}").starts_with("Balanced"));
+    assert!(format!("{adjustment:?}").starts_with("Adjustment"));
+    assert!(format!("{closed:?}").starts_with("Closed"));
+}
+
+#[test]
+fn live_verus_canary_exports_include_canary_enum_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_canary_enum_witness"
+        })
+        .expect("expected library Verus canary-enum export");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
+    assert_eq!(export.artifact.variants.len(), 3);
 }

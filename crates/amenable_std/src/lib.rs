@@ -81,6 +81,10 @@ pub use rust_std::{
 pub use valid_unicode_scalar::ValidUnicodeScalar;
 pub use value_unchanged::ValueUnchanged;
 #[cfg(feature = "verus")]
+pub use verus_derive_canary::{
+    CheckedVerusExportLeaf, TrustedVerusExportLeaf, VerusExportCanaryEnum,
+};
+#[cfg(feature = "verus")]
 pub use verus_gallery::{
     VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,
 };

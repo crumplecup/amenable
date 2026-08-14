@@ -19,11 +19,23 @@ crate::emit_verus_witnesses!(
     ConcreteVerusExportTupleStruct,
 );
 
+/// A leaf whose [`Witness<VerusVerifier>`] proof is real and
+/// machine-checked — exercises the `Checked` slot of the derive-witness
+/// composition canaries.
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
-struct CheckedVerusExportLeaf {
+pub struct CheckedVerusExportLeaf {
     label: String,
+}
+
+impl CheckedVerusExportLeaf {
+    /// Wrap a label for [`VerusExportCanaryEnum`]'s checked-leaf slots.
+    pub fn new(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+        }
+    }
 }
 
 impl Witness<VerusVerifier> for CheckedVerusExportLeaf {
@@ -39,11 +51,23 @@ impl Witness<VerusVerifier> for CheckedVerusExportLeaf {
     }
 }
 
+/// A leaf whose [`Witness<VerusVerifier>`] proof rests on explicit
+/// provenance rather than a machine-checked spec — exercises the
+/// `Trusted` slot of the derive-witness composition canaries.
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
-struct TrustedVerusExportLeaf {
+pub struct TrustedVerusExportLeaf {
     label: String,
+}
+
+impl TrustedVerusExportLeaf {
+    /// Wrap a label for [`VerusExportCanaryEnum`]'s trusted-leaf slots.
+    pub fn new(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+        }
+    }
 }
 
 impl Witness<VerusVerifier> for TrustedVerusExportLeaf {
@@ -88,27 +112,34 @@ struct VerusExportTupleStruct<
     #[provenance(rename = "marker")] TrivialVerusExportLeaf,
 );
 
-#[allow(
-    dead_code,
-    reason = "the canary exists to register and export a concrete derived proof shape; no runtime construction is required"
-)]
+/// An enum-shaped derive-witness composition canary: one variant mixing
+/// a checked and a trusted leaf, one variant carrying only a trusted
+/// leaf (plus a skipped checked one), and one leaf-free variant —
+/// exercises named-variant, tuple-variant, and unit-variant derive
+/// codegen in a single registered export.
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core", tag = "entry_kind")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 #[witness(verus(module = "crate::derived_witness::verus_export_canary_enum_witness"))]
-enum VerusExportCanaryEnum<
+pub enum VerusExportCanaryEnum<
     TChecked: Provenance + Clone + Default,
     TTrusted: Provenance + Clone + Default,
 > {
+    /// Mixes a generic checked leaf with a fixed trusted leaf.
     Balanced {
+        /// The checked leaf.
         checked: TChecked,
+        /// The trusted leaf.
         trusted: TrustedVerusExportLeaf,
     },
+    /// Carries a generic trusted leaf and a fixed checked leaf (skipped
+    /// from provenance metadata) — the fallback path.
     #[provenance(rename = "fallback")]
     Adjustment(
         #[provenance(rename = "trusted")] TTrusted,
         #[provenance(skip)] CheckedVerusExportLeaf,
     ),
+    /// Carries no leaves at all.
     #[default]
     Closed,
 }
