@@ -41,4 +41,5 @@ syn = { version = "3", features = ["full"] }
 time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
 trybuild = "1"
 verus_builtin_macros = "0.0.0-2026-05-31-0205"
+verus_syn = "0.0.0-2026-08-02-0125"
 vstd = "0.0.0-2026-05-31-0205"
