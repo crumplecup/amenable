@@ -104,10 +104,13 @@ impl WitnessArtifact for LocalEnumProofArtifact {
                                 artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
                                     WitnessSupportKind::Checked,
                                     WitnessSupportSummary::checked_leaf(),
-                                    "harness: verify_char_roundtrip",
+                                    "harness: verify_local_enum_evidence_missing_harness",
                                     [
                                         MetadataEntry::new("verifier", "verus"),
-                                        MetadataEntry::new("harness", "verify_char_roundtrip"),
+                                        MetadataEntry::new(
+                                            "harness",
+                                            "verify_local_enum_evidence_missing_harness",
+                                        ),
                                     ],
                                 )),
                             },
@@ -251,7 +254,111 @@ amenable_std::register_verus_call_shape! {
     imports = [("crate::custom::shape_override_carrier", "shape_override_holds")],
 }
 
-amenable_core::register_witness_exports!(verifier = LocalVerusVerifier; LocalEnumEvidence, LocalLeafEvidence);
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+struct LocalWorkingEnumEvidence;
+
+impl Evidence for LocalWorkingEnumEvidence {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        Self
+    }
+
+    fn audit(&self) -> Self::Audit {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct LocalWorkingEnumProofArtifact;
+
+impl std::fmt::Display for LocalWorkingEnumProofArtifact {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "verifier: verus\nshape: enum\nsupport: {}",
+            WitnessSupportSummary::compose(&[
+                WitnessSupportSummary::checked_leaf(),
+                WitnessSupportSummary::trivial_leaf(),
+            ])
+        )
+    }
+}
+
+impl WitnessModulePath for LocalWorkingEnumProofArtifact {
+    const MODULE_PATH: &'static str = "crate::derived_witness::working_enum_witness";
+}
+
+impl WitnessArtifact for LocalWorkingEnumProofArtifact {
+    fn witness_artifact(&self) -> WitnessArtifactNode {
+        WitnessArtifactNode::enum_variants(
+            WitnessSupportSummary::compose(&[
+                WitnessSupportSummary::checked_leaf(),
+                WitnessSupportSummary::trivial_leaf(),
+            ]),
+            "state",
+            vec![
+                WitnessArtifactVariant {
+                    name: "Active".to_owned(),
+                    artifact: Box::new(WitnessArtifactNode::members(
+                        WitnessArtifactShape::NamedVariant,
+                        WitnessSupportSummary::checked_leaf(),
+                        Some("Active".to_owned()),
+                        vec![WitnessArtifactMember {
+                            label: "checked".to_owned(),
+                            artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
+                                WitnessSupportKind::Checked,
+                                WitnessSupportSummary::checked_leaf(),
+                                "harness: verify_shape_override",
+                                [
+                                    MetadataEntry::new("verifier", "verus"),
+                                    MetadataEntry::new("harness", "verify_shape_override"),
+                                ],
+                            )),
+                        }],
+                    )),
+                },
+                WitnessArtifactVariant {
+                    name: "Idle".to_owned(),
+                    artifact: Box::new(WitnessArtifactNode::members(
+                        WitnessArtifactShape::UnitVariant,
+                        WitnessSupportSummary::trivial_leaf(),
+                        Some("Idle".to_owned()),
+                        vec![],
+                    )),
+                },
+            ],
+        )
+    }
+}
+
+impl Witness<LocalVerusVerifier> for LocalWorkingEnumEvidence {
+    type SupportingEvidence = Self;
+    type ProofArtifact = LocalWorkingEnumProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        LocalWorkingEnumProofArtifact
+    }
+
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
+    }
+}
+
+impl ClassifiedWitness<LocalVerusVerifier> for LocalWorkingEnumEvidence {}
+
+amenable_core::register_witness_exports!(
+    verifier = LocalVerusVerifier;
+    LocalEnumEvidence,
+    LocalLeafEvidence,
+    LocalWorkingEnumEvidence,
+);
 
 fn read_file(path: &Path) -> miette::Result<String> {
     fs::read_to_string(path)
@@ -259,17 +366,18 @@ fn read_file(path: &Path) -> miette::Result<String> {
 }
 
 /// `LocalEnumEvidence` (registered alongside `LocalLeafEvidence` above)
-/// is enum-shaped, which the renderer deliberately doesn't support yet
-/// (see `amenable::verus_export`'s own doc comment) -- so this call
-/// returns an overall `Err` naming it. That must not stop
-/// `LocalLeafEvidence`'s own, unrelated, working export from still
-/// being rendered and written to disk: `write_verus_witness_modules`
-/// renders every export independently and reports every failure
-/// together, rather than aborting the whole batch at the first one
-/// (confirmed as a real problem while building this -- `inventory`
-/// registration is process-global, so a single broken registration
-/// anywhere would otherwise silently starve every other, working export
-/// in the same process).
+/// is enum-shaped -- supported at the root level -- but its own
+/// `checked` leaf names a harness with no registered
+/// `VerusCallShape` (deliberately, for this test), so this call returns
+/// an overall `Err` naming it. That must not stop `LocalLeafEvidence`'s
+/// own, unrelated, working export from still being rendered and written
+/// to disk: `write_verus_witness_modules` renders every export
+/// independently and reports every failure together, rather than
+/// aborting the whole batch at the first one (confirmed as a real
+/// problem while building this -- `inventory` registration is
+/// process-global, so a single broken registration anywhere would
+/// otherwise silently starve every other, working export in the same
+/// process).
 #[test]
 fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::Result<()> {
     let stamp = SystemTime::now()
@@ -283,14 +391,21 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
     }
 
     let report = support::library(amenable::write_verus_witness_modules(&root))
-        .expect_err("LocalEnumEvidence's enum shape is not supported yet");
+        .expect_err("LocalEnumEvidence's checked leaf names an unregistered harness");
     let error_text = report.to_string();
-    assert!(error_text.contains("enum"), "{error_text}");
+    assert!(
+        error_text.contains("no registered Verus call shape"),
+        "{error_text}"
+    );
+    assert!(
+        error_text.contains("verify_local_enum_evidence_missing_harness"),
+        "{error_text}"
+    );
     assert!(error_text.contains("LocalEnumEvidence"), "{error_text}");
 
     assert!(
         !root.join("derived_witness/local_shape_witness.rs").exists(),
-        "the unsupported enum export must not produce a file"
+        "the export with a missing harness registration must not produce a file"
     );
 
     let lib_rs = read_file(&root.join("lib.rs"))?;
@@ -321,6 +436,45 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
     assert!(
         leaf_module.contains("use crate::custom::shape_override_carrier::shape_override_holds;"),
         "{leaf_module}"
+    );
+
+    // LocalWorkingEnumEvidence is also enum-shaped, but its checked leaf
+    // names a real, registered harness -- so unlike LocalEnumEvidence
+    // above, it renders and writes successfully: match-per-variant
+    // composition (selector param + `match`, unified result enum) is
+    // supported at an export's own root shape (see Design E in
+    // docs/VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md).
+    let enum_module = read_file(&root.join("derived_witness/working_enum_witness.rs"))?;
+    assert!(
+        enum_module.contains("pub enum WorkingEnumWitnessSelector"),
+        "{enum_module}"
+    );
+    assert!(
+        enum_module.contains("pub enum WorkingEnumWitnessResult"),
+        "{enum_module}"
+    );
+    assert!(enum_module.contains("Active(i32)"), "{enum_module}");
+    assert!(enum_module.contains("Idle,"), "{enum_module}");
+    assert!(
+        enum_module.contains(
+            "pub fn verify_working_enum_witness(selector: WorkingEnumWitnessSelector, value: i32) -> (result: WorkingEnumWitnessResult)"
+        ),
+        "{enum_module}"
+    );
+    assert!(
+        enum_module.contains(
+            "WorkingEnumWitnessSelector::Active => WorkingEnumWitnessResult::Active(crate::custom::shape_override_carrier::verify_shape_override(value)),"
+        ),
+        "{enum_module}"
+    );
+    assert!(
+        enum_module
+            .contains("WorkingEnumWitnessResult::Active(r) => shape_override_holds(r, value),"),
+        "{enum_module}"
+    );
+    assert!(
+        enum_module.contains("WorkingEnumWitnessSelector::Idle => WorkingEnumWitnessResult::Idle,"),
+        "{enum_module}"
     );
 
     fs::remove_dir_all(&root)

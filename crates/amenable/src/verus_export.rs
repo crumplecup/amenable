@@ -22,10 +22,16 @@
 //! `Opaque` leaves cannot reach this code at all:
 //! `amenable_core::ClassifiedWitness` blocks them from ever being
 //! exported, at `cargo check` time (see `amenable_core::witness`'s own
-//! doc comments). Enum-shaped composites are not supported yet — a real
-//! value only occupies one variant at a time, so composing one needs a
-//! `match`-per-variant proof structure, not this file's flat
-//! conjunction; that lands in a later phase.
+//! doc comments). An export's own root shape may be enum-shaped — a real
+//! value only occupies one variant at a time, so `render_enum_module`
+//! composes it as one function taking a synthetic selector param and
+//! returning a synthetic result enum, with a real `match selector { ...
+//! }` in both the body and `ensures`, proving only the selected variant's
+//! own composed claim in its arm (see Design E in
+//! `docs/VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md`). A nested enum shape
+//! — a member inside a struct, or inside another variant — is still
+//! rejected; no real nested-enum type is registered anywhere in this
+//! codebase yet.
 
 use std::{
     fs,
@@ -228,7 +234,17 @@ impl PendingClause {
         } else {
             format!("result.{}", self.result_index)
         };
-        substitute_placeholder(&self.template, "result", &result_ref)
+        self.render_with(&result_ref)
+    }
+
+    /// Resolve to real Verus source given an explicit reference string
+    /// for this clause's `$result` occurrence, rather than deriving one
+    /// from a top-level `result`/`result.N` tuple projection. Used by
+    /// enum composition, where `$result` resolves to a locally bound
+    /// name (`r`, or `r0`/`r1`/... for a multi-call variant) inside a
+    /// `match result { ... }` arm instead.
+    fn render_with(&self, result_ref: &str) -> String {
+        substitute_placeholder(&self.template, "result", result_ref)
     }
 }
 
@@ -292,13 +308,15 @@ fn substitute_placeholder(template: &str, name: &str, replacement: &str) -> Stri
     output
 }
 
-// Only `Member` exists today: enum-shaped composites are rejected
-// before any of their variants are ever walked (see `render_node`), so
-// there's nothing that would construct a `Variant` segment yet. Add it
-// back alongside the match-per-variant rendering that needs it.
 #[derive(Debug, Clone)]
 enum RouteSegment {
     Member(String),
+    /// A root-level enum's own variant, e.g. `Balanced` -- lets sibling
+    /// variants' same-named params (a `value: char` in `Balanced` and
+    /// another, semantically unrelated `value: char` in `Fallback`)
+    /// disambiguate through `NameAllocator` exactly like sibling members
+    /// already do, instead of silently aliasing.
+    Variant(String),
 }
 
 /// Allocates unique local identifiers across an entire composite,
@@ -331,47 +349,24 @@ fn render_verus_module(
         .expect("module path parsing guarantees at least one segment");
     let module_stem = normalize_identifier(module_name);
     let mut names = NameAllocator::default();
+
+    // A real value only occupies one variant at a time, so an enum root
+    // needs match-per-variant composition -- structurally different
+    // enough (selector/result types, no single flat return tuple) that
+    // it gets its own render path rather than folding into the one
+    // below. Nested `Enum` shapes (a member inside a struct, or inside
+    // another variant) still fall through to `render_node`'s own
+    // rejection -- no real nested-enum type is registered anywhere in
+    // this codebase yet.
+    if export.artifact.shape == WitnessArtifactShape::Enum {
+        return render_enum_module(export, &module_stem, &mut names);
+    }
+
     let rendered = render_node(&export.artifact, &[], &mut names)?;
     let checked_call_count = rendered.checked_calls.len();
 
     let mut source = String::new();
-    source.push_str(&format!(
-        "//! Derived Verus closure for `{}`.\n\n",
-        export.evidence
-    ));
-    source.push_str("use verus_builtin_macros::verus;\n");
-    source.push_str("#[allow(unused_imports)]\n");
-    source.push_str("use vstd::prelude::*;\n");
-
-    let predicate_imports = predicate_import_lines(&rendered);
-    if !predicate_imports.is_empty() {
-        source.push('\n');
-        for import in &predicate_imports {
-            // Spec fns have no runtime representation and don't exist
-            // under plain `cargo check` -- gate every predicate import
-            // the same way every hand-written carrier in this crate
-            // already does, or `cargo check`/`clippy-verus` (which don't
-            // set `verus_keep_ghost`) fail with an unresolved import.
-            source.push_str("#[cfg(verus_keep_ghost)]\n");
-            source.push_str(import);
-            source.push('\n');
-        }
-    }
-    source.push('\n');
-
-    source.push_str("verus! {\n\n");
-    source.push_str(&format!("// evidence: {}\n", export.evidence));
-    source.push_str(&format!("// destination: {}\n", export.destination_module));
-    source.push_str(&format!("// support: {}\n", export.support));
-
-    if !rendered.comments.is_empty() {
-        source.push('\n');
-        for comment in &rendered.comments {
-            source.push_str(comment);
-            source.push('\n');
-        }
-    }
-    source.push('\n');
+    write_module_header(&mut source, export, &rendered.imports, &rendered.comments);
 
     let params = rendered
         .params
@@ -434,14 +429,64 @@ fn render_verus_module(
     Ok(source)
 }
 
+/// Shared module preamble: doc comment, `use`s (incl. gated predicate
+/// imports), and the `verus! {}` opener with its evidence/destination/
+/// support/audit comments — identical for the flat (struct/tuple-
+/// struct) and enum-composite render paths, so both build onto the same
+/// `source` buffer via this helper rather than duplicating it.
+fn write_module_header(
+    source: &mut String,
+    export: &WitnessExportSnapshot,
+    imports: &[(String, String)],
+    comments: &[String],
+) {
+    source.push_str(&format!(
+        "//! Derived Verus closure for `{}`.\n\n",
+        export.evidence
+    ));
+    source.push_str("use verus_builtin_macros::verus;\n");
+    source.push_str("#[allow(unused_imports)]\n");
+    source.push_str("use vstd::prelude::*;\n");
+
+    let predicate_imports = predicate_import_lines(imports);
+    if !predicate_imports.is_empty() {
+        source.push('\n');
+        for import in &predicate_imports {
+            // Spec fns have no runtime representation and don't exist
+            // under plain `cargo check` -- gate every predicate import
+            // the same way every hand-written carrier in this crate
+            // already does, or `cargo check`/`clippy-verus` (which don't
+            // set `verus_keep_ghost`) fail with an unresolved import.
+            source.push_str("#[cfg(verus_keep_ghost)]\n");
+            source.push_str(import);
+            source.push('\n');
+        }
+    }
+    source.push('\n');
+
+    source.push_str("verus! {\n\n");
+    source.push_str(&format!("// evidence: {}\n", export.evidence));
+    source.push_str(&format!("// destination: {}\n", export.destination_module));
+    source.push_str(&format!("// support: {}\n", export.support));
+
+    if !comments.is_empty() {
+        source.push('\n');
+        for comment in comments {
+            source.push_str(comment);
+            source.push('\n');
+        }
+    }
+    source.push('\n');
+}
+
 /// Verus spec predicates need an explicit `use`, unlike ordinary
 /// functions (which resolve fine via a fully qualified call path) —
 /// confirmed against the real `verus` tool while building this.
-fn predicate_import_lines(rendered: &RenderedNode) -> Vec<String> {
+fn predicate_import_lines(imports: &[(String, String)]) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let mut lines = Vec::new();
 
-    for (module_path, name) in &rendered.imports {
+    for (module_path, name) in imports {
         if seen.insert((module_path.clone(), name.clone())) {
             lines.push(format!("use {module_path}::{name};"));
         }
@@ -454,6 +499,200 @@ fn predicate_import_lines(rendered: &RenderedNode) -> Vec<String> {
     lines
 }
 
+/// One root-level enum export: a synthetic local selector enum (one
+/// unit variant per real artifact variant, chooses which arm's claim is
+/// being proved) and a synthetic local result enum (one variant per
+/// real artifact variant, payload = that variant's own checked-call
+/// tuple, no payload if it has none) replace the flat struct path's
+/// single parameter list/tuple return — see Design E in
+/// `docs/VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md` for the rejected
+/// alternatives and why this shape was chosen. The body and `ensures`
+/// are both a real `match selector { ... }`; `ensures`'s arms further
+/// `match result { ... }`, citing exactly the selected variant's own
+/// composed claim and `false` for every other (structurally
+/// unreachable, but syntactically required for exhaustiveness) result
+/// shape.
+fn render_enum_module(
+    export: &WitnessExportSnapshot,
+    module_stem: &str,
+    names: &mut NameAllocator,
+) -> AmenableResult<String> {
+    if export.artifact.variants.is_empty() {
+        return Err(AmenableError::invariant(format!(
+            "enum-shaped export {} has no variants -- nothing to compose",
+            export.evidence
+        )));
+    }
+
+    let type_prefix = to_pascal_case(module_stem);
+    let selector_ty = format!("{type_prefix}Selector");
+    let result_ty = format!("{type_prefix}Result");
+
+    let mut per_variant = Vec::with_capacity(export.artifact.variants.len());
+    for variant in &export.artifact.variants {
+        let route = vec![RouteSegment::Variant(variant.name.clone())];
+        let rendered = render_node(&variant.artifact, &route, names)?;
+        // The artifact's own variant name may carry a provenance rename
+        // (e.g. `fallback`, all-lowercase) rather than the real source
+        // identifier's casing -- fine for audit labels/comments (route
+        // display keeps the original above), but not a valid Rust enum
+        // variant identifier on its own. Normalize to PascalCase for the
+        // synthetic selector/result enums' own variant names.
+        let variant_ident = to_pascal_case(&normalize_identifier(&variant.name));
+        per_variant.push((variant_ident, rendered));
+    }
+
+    let mut imports = Vec::new();
+    let mut comments = Vec::new();
+    for (_, rendered) in &per_variant {
+        imports.extend(rendered.imports.iter().cloned());
+        comments.extend(rendered.comments.iter().cloned());
+    }
+
+    let mut source = String::new();
+    write_module_header(&mut source, export, &imports, &comments);
+
+    let selector_variants = per_variant
+        .iter()
+        .map(|(name, _)| format!("    {name},"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    source.push_str(&format!(
+        "pub enum {selector_ty} {{\n{selector_variants}\n}}\n\n"
+    ));
+
+    let mut result_variant_decls = Vec::new();
+    let mut body_arms = Vec::new();
+    let mut ensures_arms = Vec::new();
+    let mut requires_arms = Vec::new();
+    let mut any_requires = false;
+
+    for (name, rendered) in &per_variant {
+        let call_count = rendered.checked_calls.len();
+        let bind_names: Vec<String> = match call_count {
+            0 => Vec::new(),
+            1 => vec!["r".to_owned()],
+            _ => (0..call_count).map(|index| format!("r{index}")).collect(),
+        };
+
+        let (result_decl, result_pattern, result_ctor) = if call_count == 0 {
+            (name.clone(), name.clone(), name.clone())
+        } else {
+            let types = rendered
+                .checked_calls
+                .iter()
+                .map(|call| call.ty.clone())
+                .collect::<Vec<_>>()
+                .join(", ");
+            let exprs = rendered
+                .checked_calls
+                .iter()
+                .map(|call| call.expr.clone())
+                .collect::<Vec<_>>()
+                .join(", ");
+            (
+                format!("{name}({types})"),
+                format!("{name}({})", bind_names.join(", ")),
+                format!("{name}({exprs})"),
+            )
+        };
+        result_variant_decls.push(format!("    {result_decl},"));
+        body_arms.push(format!(
+            "        {selector_ty}::{name} => {result_ty}::{result_ctor},"
+        ));
+
+        let claim = if rendered.ensures.is_empty() {
+            "true".to_owned()
+        } else {
+            rendered
+                .ensures
+                .iter()
+                .map(|clause| clause.render_with(&bind_names[clause.result_index]))
+                .collect::<Vec<_>>()
+                .join(" && ")
+        };
+        ensures_arms.push(format!(
+            "            {selector_ty}::{name} => match result {{\n                \
+             {result_ty}::{result_pattern} => {claim},\n                _ => false,\n            }},"
+        ));
+
+        if !rendered.requires.is_empty() {
+            any_requires = true;
+        }
+        let requires_claim = if rendered.requires.is_empty() {
+            "true".to_owned()
+        } else {
+            rendered
+                .requires
+                .iter()
+                .map(|clause| clause.render_with("result"))
+                .collect::<Vec<_>>()
+                .join(" && ")
+        };
+        requires_arms.push(format!(
+            "            {selector_ty}::{name} => {requires_claim},"
+        ));
+    }
+
+    source.push_str(&format!(
+        "pub enum {result_ty} {{\n{}\n}}\n\n",
+        result_variant_decls.join("\n")
+    ));
+
+    let params = per_variant
+        .iter()
+        .flat_map(|(_, rendered)| rendered.params.iter())
+        .map(|param| format!("{}: {}", param.local_name, param.ty))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let full_params = if params.is_empty() {
+        format!("selector: {selector_ty}")
+    } else {
+        format!("selector: {selector_ty}, {params}")
+    };
+
+    source.push_str(&format!(
+        "pub fn verify_{module_stem}({full_params}) -> (result: {result_ty})\n"
+    ));
+
+    if any_requires {
+        source.push_str("    requires\n");
+        source.push_str("        match selector {\n");
+        source.push_str(&requires_arms.join("\n"));
+        source.push_str("\n        },\n");
+    }
+
+    source.push_str("    ensures\n");
+    source.push_str("        match selector {\n");
+    source.push_str(&ensures_arms.join("\n"));
+    source.push_str("\n        },\n");
+
+    source.push_str("{\n    match selector {\n");
+    source.push_str(&body_arms.join("\n"));
+    source.push_str("\n    }\n}\n");
+    source.push_str("\n} // verus!\n");
+
+    Ok(source)
+}
+
+/// `module_stem` (already `snake_case`) to `PascalCase`, for synthetic
+/// local type names (`{Stem}Selector`/`{Stem}Result`) that need to look
+/// like real Rust type identifiers, not the `snake_case` function name
+/// they're derived from.
+fn to_pascal_case(snake_case: &str) -> String {
+    snake_case
+        .split('_')
+        .filter(|segment| !segment.is_empty())
+        .map(|segment| {
+            let mut chars = segment.chars();
+            match chars.next() {
+                Some(first) => first.to_ascii_uppercase().to_string() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect()
+}
+
 fn render_node(
     node: &WitnessArtifactNode,
     route: &[RouteSegment],
@@ -462,10 +701,10 @@ fn render_node(
     match node.shape {
         WitnessArtifactShape::Leaf => render_leaf_node(node, route, names),
         WitnessArtifactShape::Enum => Err(AmenableError::invariant(format!(
-            "Verus composition for enum-shaped witnesses is not supported yet (route: {}); \
-             a real value only occupies one variant at a time, so this needs a match-per-variant \
-             proof structure this renderer doesn't build yet -- exclude this type from Verus \
-             export until it does",
+            "Verus composition for a nested enum-shaped witness is not supported yet (route: {}); \
+             match-per-variant composition (see render_enum_module) only handles an export's own \
+             root shape -- no real nested-enum type is registered anywhere in this codebase yet, \
+             so exclude this type from Verus export until one needs it",
             route_display(route)
         ))),
         WitnessArtifactShape::NamedStruct
@@ -650,9 +889,9 @@ fn route_display(route: &[RouteSegment]) -> String {
 
     route
         .iter()
-        .map(|segment| {
-            let RouteSegment::Member(label) = segment;
-            format!("member {label}")
+        .map(|segment| match segment {
+            RouteSegment::Member(label) => format!("member {label}"),
+            RouteSegment::Variant(name) => format!("variant {name}"),
         })
         .collect::<Vec<_>>()
         .join(" -> ")
@@ -671,8 +910,9 @@ fn route_hint_name(route: &[RouteSegment]) -> String {
 }
 
 fn route_segment_name(segment: &RouteSegment) -> String {
-    let RouteSegment::Member(label) = segment;
-    normalize_identifier(label)
+    match segment {
+        RouteSegment::Member(label) | RouteSegment::Variant(label) => normalize_identifier(label),
+    }
 }
 
 fn normalize_identifier(value: &str) -> String {

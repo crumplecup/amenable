@@ -376,6 +376,62 @@ codegen. Fix during implementation via one of CLAUDE.md's documented
 paths (real construction in a test, `pub(crate)` narrowing, or
 restructuring) — not another `#[allow]`.
 
+### E. Enum composition: selector param + `match`, unified result enum
+
+Struct/tuple-struct composition synthesizes a flat parameter list and a
+plain tuple return type from the union of its checked leaves' own real
+harness parameters/returns (never the real struct's own fields) — a
+single function, single signature, single body expression. An enum's
+variants can each carry a *different* set of checked leaves, so there
+is no single tuple type that fits every variant; some case-split is
+unavoidable. Three shapes were considered:
+
+- **Take the real enum value, spec-fn only.** Truest to "the
+  constructed value" as an actual runtime value — match on a real
+  `MyEnum` parameter, cite each variant's own predicates. Rejected:
+  Verus spec fns can't call exec fns, so this only works when every
+  leaf is already a bare predicate (category 1); it can't express
+  today's checked leaves, which are value-returning function calls
+  (category 2) — most of what's registered so far.
+- **One independent function per variant.** No selector, no `match`
+  keyword: emit N sibling functions, each exactly like today's
+  struct-composition renderer scoped to one variant's own members.
+  Simplest to implement, and structurally sound (each proof only ever
+  concerns one variant, so nothing is claimed across variants) — but
+  doesn't literally satisfy the "match on the constructed value" shape
+  the Problem/Goals sections call for, and splits one artifact export
+  into N unrelated top-level functions with no single point that states
+  "these are mutually exclusive."
+- **Selector param + `match`, unified result enum (chosen).** One
+  function. A synthetic local selector enum (one unit variant per real
+  artifact variant name) is added as a parameter alongside the union of
+  every variant's own params (`NameAllocator`, already collision-safe
+  per route, now keyed by a reinstated `RouteSegment::Variant(name)` —
+  the exact gap the renderer's own leftover comment flagged). A
+  synthetic local result enum (one variant per real artifact variant,
+  payload = that variant's own checked-call tuple, no payload if it has
+  none) is the return type. The body is a real `match selector { ... }`
+  building the matching arm's own result variant; `ensures` is a real
+  `match selector { ... }` over `match result { ... }` per arm, each arm
+  citing exactly that variant's own composed claim and `false`/`true`
+  for the mismatched-arm fallback. This is the literal match-per-variant
+  structure the plan calls for, generalizes the existing per-leaf
+  `PendingClause`/`NameAllocator` machinery rather than replacing it
+  (the `$result` placeholder now resolves to a locally bound name like
+  `r`/`r0`/`r1` inside a variant's own `match result` arm, instead of
+  `result`/`result.N` at the function's top level — same substitution
+  mechanism, different reference string), and keeps every variant's own
+  requirement (never claim a property of a variant that wasn't
+  constructed) enforced by the type system itself: only the `match
+  result` arm matching the current `selector` arm is ever reachable.
+
+Scope: only the export's own root shape may be `Enum` — an `Enum`-shaped
+*member* nested inside a struct or another enum variant still hits the
+existing "not supported yet" error. No real nested-enum type is
+registered anywhere in this codebase yet, so building the (materially
+harder — nested selector/result types, nested match) general case would
+be speculative; add it if and when a real one shows up.
+
 ## Implementation phases
 
 Each phase ends with a real `verus` run (`just verify-verus`, not just

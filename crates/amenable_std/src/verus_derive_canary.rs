@@ -10,18 +10,15 @@ use crate::{RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof, 
 type ConcreteVerusExportCanaryStruct = VerusExportCheckedPlusTrivialStruct<CheckedVerusExportLeaf>;
 type ConcreteVerusExportTupleStruct =
     VerusExportTupleStruct<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
+type ConcreteVerusExportCanaryEnum =
+    VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
 
-// VerusExportCanaryEnum is deliberately NOT opted into export here yet:
-// the renderer's enum support (match-per-variant composition, not the
-// flat conjunction struct/tuple-struct composites use) lands in a later
-// phase of docs/VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md. The type
-// itself, and its ClassifiedWitness coverage, are still exercised
-// directly by tests/verus_derive_witness_test.rs.
 crate::emit_verus_witnesses!(
     ConcreteVerusExportCanaryStruct,
     ConcreteVerusExportTupleStruct,
     VerusExportRequiresStruct,
     VerusExportRawTemplateStruct,
+    ConcreteVerusExportCanaryEnum,
 );
 
 /// A leaf whose [`Witness<VerusVerifier>`] proof is real and
