@@ -1,8 +1,10 @@
 #![cfg(feature = "verus")]
 
+mod support;
+
 use amenable_core::{
-    Provenance, Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath,
-    WitnessSupportKind, WitnessSupportSummary,
+    Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath, WitnessSupportKind,
+    WitnessSupportSummary,
 };
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
@@ -10,14 +12,21 @@ use amenable_derive::{
 use amenable_std::{
     RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof, VerusVerifier,
 };
+use support::derive_witness::{
+    DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
+    DerivedWitnessGenericEnum as SharedDerivedWitnessGenericEnum,
+    assert_checked_plus_trivial_report, assert_generic_enum_report, balanced_variant_support,
+    checked_plus_trivial_support, mixed_support,
+};
 
-type ConcreteDerivedWitnessEnum = DerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf>;
+type ConcreteDerivedWitnessEnum =
+    SharedDerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf, CheckedVerusLeaf>;
 type ConcreteDerivedCheckedPlusTrivialStruct =
-    DerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf>;
+    SharedDerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf, TrivialVerusLeaf>;
 
 amenable_std::emit_verus_witnesses!(
-    DerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf>,
-    DerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf>,
+    SharedDerivedWitnessGenericEnum<CheckedVerusLeaf, TrustedVerusLeaf, CheckedVerusLeaf>,
+    SharedDerivedWitnessCheckedPlusTrivialStruct<CheckedVerusLeaf, TrivialVerusLeaf>,
 );
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
@@ -81,52 +90,6 @@ impl Witness<VerusVerifier> for TrustedVerusLeaf {
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 struct TrivialVerusLeaf;
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
-#[provenance(crate = "amenable_core")]
-#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
-struct DerivedWitnessCheckedPlusTrivialStruct<TChecked: Provenance + Clone + Default> {
-    checked: TChecked,
-    marker: TrivialVerusLeaf,
-}
-
-impl<TChecked: Provenance + Clone + Default> DerivedWitnessCheckedPlusTrivialStruct<TChecked> {
-    fn new(checked: TChecked) -> Self {
-        Self {
-            checked,
-            marker: TrivialVerusLeaf,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
-#[provenance(crate = "amenable_core", tag = "entry_kind")]
-#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
-enum DerivedWitnessGenericEnum<TChecked: Provenance + Clone, TTrusted: Provenance + Clone> {
-    Balanced {
-        checked: TChecked,
-        trusted: TrustedVerusLeaf,
-    },
-    #[provenance(rename = "fallback")]
-    Adjustment(
-        #[provenance(rename = "trusted")] TTrusted,
-        #[provenance(skip)] CheckedVerusLeaf,
-    ),
-    #[default]
-    Closed,
-}
-
-impl<TChecked: Provenance + Clone, TTrusted: Provenance + Clone>
-    DerivedWitnessGenericEnum<TChecked, TTrusted>
-{
-    fn balanced(checked: TChecked, trusted: TrustedVerusLeaf) -> Self {
-        Self::Balanced { checked, trusted }
-    }
-
-    fn adjustment(trusted: TTrusted, skipped_checked: CheckedVerusLeaf) -> Self {
-        Self::Adjustment(trusted, skipped_checked)
-    }
-}
-
 fn concrete_variants() -> (ConcreteDerivedWitnessEnum, ConcreteDerivedWitnessEnum) {
     (
         ConcreteDerivedWitnessEnum::balanced(
@@ -147,14 +110,7 @@ fn concrete_checked_plus_trivial() -> ConcreteDerivedCheckedPlusTrivialStruct {
 #[test]
 fn derive_witness_supports_concrete_generic_enums_for_verus() {
     let _ = concrete_variants();
-    let mixed_support = WitnessSupportSummary::compose(&[
-        WitnessSupportSummary::compose(&[
-            WitnessSupportSummary::checked_leaf(),
-            WitnessSupportSummary::trusted_leaf(),
-        ]),
-        WitnessSupportSummary::trusted_leaf(),
-        WitnessSupportSummary::trivial_leaf(),
-    ]);
+    let expected_support = mixed_support();
 
     let proof = <ConcreteDerivedWitnessEnum as Witness<VerusVerifier>>::proof();
     let proof_type = std::any::type_name::<
@@ -162,49 +118,19 @@ fn derive_witness_supports_concrete_generic_enums_for_verus() {
     >();
     let report = proof.to_string();
 
-    assert!(
-        proof_type.contains("DerivedWitnessGenericEnumWitnessProof"),
-        "{proof_type}"
-    );
-    assert!(report.contains("verifier: verus"), "{report}");
-    assert!(report.contains("shape: enum"), "{report}");
-    assert!(
-        report.contains(&format!("support: {mixed_support}")),
-        "{report}"
-    );
-    assert!(report.contains("tag: entry_kind"), "{report}");
-    assert!(
-        report.contains("variant Balanced: shape: named_variant"),
-        "{report}"
-    );
-    assert!(
-        report.contains("member checked: harness: verify_char_roundtrip"),
-        "{report}"
-    );
-    assert!(
-        report.contains("variant fallback: shape: tuple_variant"),
-        "{report}"
-    );
-    assert!(
-        proof
-            .variant_closed
-            .to_string()
-            .contains("shape: unit_variant"),
-        "{}",
-        proof.variant_closed
+    assert_generic_enum_report(
+        proof_type,
+        &report,
+        &proof.variant_closed.to_string(),
+        "verus",
+        expected_support,
     );
     assert_eq!(
         <ConcreteDerivedWitnessEnum as Witness<VerusVerifier>>::support(),
-        mixed_support
+        expected_support
     );
-    assert_eq!(proof.support, mixed_support);
-    assert_eq!(
-        proof.variant_balanced.support,
-        WitnessSupportSummary::compose(&[
-            WitnessSupportSummary::checked_leaf(),
-            WitnessSupportSummary::trusted_leaf(),
-        ])
-    );
+    assert_eq!(proof.support, expected_support);
+    assert_eq!(proof.variant_balanced.support, balanced_variant_support());
     assert_eq!(
         proof.variant_adjustment.support,
         WitnessSupportSummary::trusted_leaf()
@@ -238,28 +164,12 @@ fn derive_witness_supports_concrete_generic_enums_for_verus() {
 #[test]
 fn derive_witness_keeps_trivial_members_neutral_for_verus() {
     let _ = concrete_checked_plus_trivial();
-    let expected_support = WitnessSupportSummary::compose(&[
-        WitnessSupportSummary::checked_leaf(),
-        WitnessSupportSummary::trivial_leaf(),
-    ]);
+    let expected_support = checked_plus_trivial_support();
 
     let proof = <ConcreteDerivedCheckedPlusTrivialStruct as Witness<VerusVerifier>>::proof();
     let report = proof.to_string();
 
-    assert!(report.contains("verifier: verus"), "{report}");
-    assert!(report.contains("shape: named_struct"), "{report}");
-    assert!(
-        report.contains(&format!("support: {expected_support}")),
-        "{report}"
-    );
-    assert!(
-        report.contains("member checked: harness: verify_char_roundtrip"),
-        "{report}"
-    );
-    assert!(
-        report.contains("member marker: verifier: verus"),
-        "{report}"
-    );
+    assert_checked_plus_trivial_report(&report, "verus", expected_support);
     assert_eq!(
         <ConcreteDerivedCheckedPlusTrivialStruct as Witness<VerusVerifier>>::support(),
         expected_support
