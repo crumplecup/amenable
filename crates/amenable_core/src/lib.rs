@@ -49,6 +49,8 @@ pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]
+pub use verus_carrier::predicate_body as verus_predicate_body;
+#[cfg(feature = "verus")]
 pub use verus_carrier::{find_fn as verus_find_fn, literal_clauses as verus_literal_clauses};
 #[cfg(feature = "verus")]
 pub use verus_carrier::{param_name as verus_param_name, walk_tokens as verus_walk_tokens};

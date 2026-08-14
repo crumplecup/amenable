@@ -164,6 +164,30 @@ pub fn verus_requires_witness(input: TokenStream) -> TokenStream {
     }
 }
 
+/// `verus_ensures_predicate!(Type, evidence_expr, "predicate_name")` --
+/// like [`verus_ensures_witness!`], but for a claim that's a real,
+/// named `pub open spec fn`'s own declaration (shared across several
+/// different harnesses/carrier files) rather than any one harness's own
+/// clause list. See [`verus_contract`]'s own doc comment.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_ensures_predicate(input: TokenStream) -> TokenStream {
+    match verus_contract::expand_verus_predicate_witness(input.into(), true) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Like [`verus_ensures_predicate!`], for `Requires` instead.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_requires_predicate(input: TokenStream) -> TokenStream {
+    match verus_contract::expand_verus_predicate_witness(input.into(), false) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
 struct ProvenanceContainerOptions {
     crate_path: Path,
     tag: String,

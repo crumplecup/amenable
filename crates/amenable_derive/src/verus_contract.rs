@@ -17,8 +17,22 @@
 //! `elicit_doc`'s scanner don't need to change) -- this macro just
 //! generates the N per-clause registrations mechanically instead of by
 //! hand.
+//!
+//! `verus_ensures_predicate!`/`verus_requires_predicate!` cover the
+//! other real shape: a claim that isn't any *one* harness's own clause
+//! at all, but a real, named `pub open spec fn` shared across several
+//! different harnesses/carrier files (e.g. `write_stores_new_value`,
+//! called with different real arguments from `Cell`/`RefCell`/
+//! `UnsafeCell`/`OrderedPair`'s own methods) -- there's no single
+//! harness to anchor a clause-index selector on, so these derive from
+//! the predicate's own real declaration instead, in its own parameter
+//! names, not any one caller's argument-substituted instance of it.
+//! A type can name a bracketed list of several such predicates (e.g.
+//! `IncrementHeadroom`'s tight/single/wide margin variants) instead of
+//! just one -- each contributes its own real clause the same way a
+//! harness's own multiple clauses do.
 
-use amenable_core::{verus_find_fn, verus_literal_clauses};
+use amenable_core::{verus_find_fn, verus_literal_clauses, verus_predicate_body};
 use quote::{format_ident, quote};
 use syn::{
     Expr, LitInt, LitStr, Token, Type, bracketed,
@@ -120,8 +134,92 @@ pub(crate) fn expand_verus_witness(
         })
         .collect::<syn::Result<Vec<_>>>()?;
 
-    let ty = &args.ty;
-    let evidence = &args.evidence;
+    codegen(&args.ty, &args.evidence, ensures, &clauses)
+}
+
+struct VerusPredicateWitnessArgs {
+    ty: Type,
+    evidence: Expr,
+    /// One real spec fn's own name is the common case. A type can also
+    /// name several -- e.g. `IncrementHeadroom`'s tight/single/wide
+    /// margin predicates, three real, distinctly-named `open spec fn`s
+    /// each already shared across several carrier files -- rather than
+    /// picking one as "canonical" and hand-registering the rest as
+    /// bespoke supplementary `ContractRecord`s.
+    predicates: Vec<LitStr>,
+}
+
+impl Parse for VerusPredicateWitnessArgs {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let ty: Type = input.parse()?;
+        input.parse::<Token![,]>()?;
+        let evidence: Expr = input.parse()?;
+        input.parse::<Token![,]>()?;
+
+        let predicates = if input.peek(syn::token::Bracket) {
+            let content;
+            bracketed!(content in input);
+            let items: Punctuated<LitStr, Token![,]> =
+                content.parse_terminated(<LitStr as Parse>::parse, Token![,])?;
+            items.into_iter().collect()
+        } else {
+            vec![input.parse::<LitStr>()?]
+        };
+        input.parse::<Option<Token![,]>>()?;
+
+        Ok(Self {
+            ty,
+            evidence,
+            predicates,
+        })
+    }
+}
+
+pub(crate) fn expand_verus_predicate_witness(
+    input: proc_macro2::TokenStream,
+    ensures: bool,
+) -> syn::Result<proc_macro2::TokenStream> {
+    let args: VerusPredicateWitnessArgs = syn::parse2(input)?;
+
+    let clauses = args
+        .predicates
+        .iter()
+        .map(|predicate| {
+            let name = predicate.value();
+
+            let (_, _, item_fn) = verus_find_fn(&name).ok_or_else(|| {
+                syn::Error::new(
+                    predicate.span(),
+                    format!(
+                        "no real, public `pub open spec fn {name}` found under \
+                         `crates/amenable_verus/src` -- this macro derives its impl from the \
+                         real predicate declaration, so it must exist there"
+                    ),
+                )
+            })?;
+
+            verus_predicate_body(&item_fn).map_err(|reason| {
+                syn::Error::new(
+                    predicate.span(),
+                    format!(
+                        "predicate `{name}` {reason}, so its declaration can't be its own claim \
+                         verbatim"
+                    ),
+                )
+            })
+        })
+        .collect::<syn::Result<Vec<_>>>()?;
+
+    codegen(&args.ty, &args.evidence, ensures, &clauses)
+}
+
+fn codegen(
+    ty: &Type,
+    evidence: &Expr,
+    ensures: bool,
+    clauses: &[String],
+) -> syn::Result<proc_macro2::TokenStream> {
+    let kind = if ensures { "ensures" } else { "requires" };
     let trait_ident = format_ident!("{}", if ensures { "Ensures" } else { "Requires" });
     let method_ident = format_ident!("{}", kind);
 

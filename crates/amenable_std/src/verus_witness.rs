@@ -45,8 +45,8 @@
 )]
 
 use amenable_core::{
-    ClassifiedWitness, Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness,
-    WitnessArtifact, WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
+    ClassifiedWitness, Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
@@ -2289,42 +2289,20 @@ impl VerusWitness for WriteStoresNewValue {
 
 bridge_verus_witness!(WriteStoresNewValue);
 
-impl Ensures<VerusVerifier> for WriteStoresNewValue {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "final (self) . value == new_value"
-    }
-}
-
-const WRITE_STORES_NEW_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn write_stores_new_value(new_value: int, observed: int) -> bool {
-    observed == new_value
-}"#;
-
-// `Ensures::ensures()` keeps the descriptive `final(self).value ==
-// new_value` spelling as WriteStoresNewValue's canonical text, while the
-// real Verus proof sites in `cell_carrier`, `ref_cell_carrier`,
-// `unsafe_cell_carrier`, and `ordered_pair_iter_mut_carrier` call the
-// shared `write_stores_new_value` spec fn defined in
-// `amenable_verus::rust_std::cell_carrier`.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::WriteStoresNewValue",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <WriteStoresNewValue as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::WriteStoresNewValue",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || WRITE_STORES_NEW_VALUE_VERUS_FRAGMENT,
-    }
-}
+// `write_stores_new_value` is shared across `cell_carrier`,
+// `ref_cell_carrier`, `unsafe_cell_carrier`, and
+// `ordered_pair_iter_mut_carrier` -- no single harness to derive a
+// clause-index selector from, so this derives from the predicate's own
+// real declaration (`observed == new_value`, in its own parameter
+// names) rather than any one caller's argument-substituted instance of
+// it (previously `final(self).value == new_value`, `cell_carrier`'s own
+// call-site spelling -- also real, just a different, less general
+// representation of the same shared law).
+amenable_derive::verus_ensures_predicate!(
+    WriteStoresNewValue,
+    "amenable_std::WriteStoresNewValue",
+    "write_stores_new_value"
+);
 
 const VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/array_into_iter_carrier.rs");
@@ -2347,47 +2325,11 @@ impl VerusWitness for ArrayIntoIterStartsAtFirstPosition {
 
 bridge_verus_witness!(ArrayIntoIterStartsAtFirstPosition);
 
-impl Ensures<VerusVerifier> for ArrayIntoIterStartsAtFirstPosition {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.first == first && result.second == second && result.third == third && result.position == 0"
-    }
-}
-
-const ARRAY_INTO_ITER_STARTS_AT_FIRST_POSITION_VERUS_FRAGMENT: &str = r#"pub open spec fn array_into_iter_model_starts_at_first_position(
-    observed_first: i32,
-    observed_second: i32,
-    observed_third: i32,
-    observed_position: u8,
-    first: i32,
-    second: i32,
-    third: i32,
-) -> bool {
-    observed_first == first
-        && observed_second == second
-        && observed_third == third
-        && observed_position == 0
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArrayIntoIterStartsAtFirstPosition",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ArrayIntoIterStartsAtFirstPosition as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArrayIntoIterStartsAtFirstPosition",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || ARRAY_INTO_ITER_STARTS_AT_FIRST_POSITION_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    ArrayIntoIterStartsAtFirstPosition,
+    "amenable_std::ArrayIntoIterStartsAtFirstPosition",
+    "array_into_iter_model_starts_at_first_position"
+);
 
 /// [`ArrayIntoIterAdvanceMatchesPosition`] reuses the array `IntoIter`
 /// harness rather than adding a new Verus proof: it names the model's
@@ -2407,52 +2349,11 @@ impl VerusWitness for ArrayIntoIterAdvanceMatchesPosition {
 
 bridge_verus_witness!(ArrayIntoIterAdvanceMatchesPosition);
 
-impl Ensures<VerusVerifier> for ArrayIntoIterAdvanceMatchesPosition {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "old(self).position drives the yielded value, final position, and element preservation"
-    }
-}
-
-const ARRAY_INTO_ITER_ADVANCE_MATCHES_POSITION_VERUS_FRAGMENT: &str = r#"pub open spec fn array_into_iter_advance_matches_position(
-    old_position: u8,
-    yielded: Option<i32>,
-    final_position: u8,
-    old_first: i32,
-    old_second: i32,
-    old_third: i32,
-    final_first: i32,
-    final_second: i32,
-    final_third: i32,
-) -> bool {
-    (old_position == 0 ==> yielded == Some(old_first) && final_position == 1)
-        && (old_position == 1 ==> yielded == Some(old_second) && final_position == 2)
-        && (old_position == 2 ==> yielded == Some(old_third) && final_position == 3)
-        && (old_position >= 3 ==> yielded is None && final_position == old_position)
-        && final_first == old_first
-        && final_second == old_second
-        && final_third == old_third
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArrayIntoIterAdvanceMatchesPosition",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ArrayIntoIterAdvanceMatchesPosition as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArrayIntoIterAdvanceMatchesPosition",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || ARRAY_INTO_ITER_ADVANCE_MATCHES_POSITION_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    ArrayIntoIterAdvanceMatchesPosition,
+    "amenable_std::ArrayIntoIterAdvanceMatchesPosition",
+    "array_into_iter_advance_matches_position"
+);
 
 /// [`YieldsThreeValuesInOrderThenEnds`] reuses the array `IntoIter`
 /// harness rather than adding a new Verus proof: it names the
@@ -2547,23 +2448,11 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
     }
 }
 
-impl Ensures<VerusVerifier> for RustStdStandard<std::cell::RefCell<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "final (self) . value == new_value"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::cell::RefCell<i32>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::cell::RefCell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
+    "write_stores_new_value"
+);
 
 const VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/once_cell_carrier.rs");
@@ -2621,23 +2510,11 @@ bridge_verus_witness!(RustStdStandard<std::cell::UnsafeCell<i32>>);
     }
 }
 
-impl Ensures<VerusVerifier> for RustStdStandard<std::cell::UnsafeCell<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "final (self) . value == new_value"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::UnsafeCell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::cell::UnsafeCell<i32>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::cell::UnsafeCell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::UnsafeCell<i32>>",
+    "write_stores_new_value"
+);
 
 const VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/lazy_cell_carrier.rs");
@@ -3433,83 +3310,32 @@ impl VerusWitness for IncrementHeadroom {
 
 bridge_verus_witness!(IncrementHeadroom);
 
-impl Requires<VerusVerifier> for IncrementHeadroom {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "a < i32 :: MAX - 1"
-    }
-}
-
-const INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn increment_headroom_holds(a: i32) -> bool {
-    a < i32::MAX - 1
-}"#;
-
-const SINGLE_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn single_increment_headroom_holds(a: i32) -> bool {
-    a < i32::MAX
-}"#;
-
-const TEN_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn ten_increment_headroom_holds(a: i32) -> bool {
-    a <= i32::MAX - 10
-}"#;
-
-// `Requires::requires()` still returns the tight-margin spelling as
-// IncrementHeadroom's canonical descriptive text (for cross-backend
-// enumeration), but no real site restates it raw anymore. Four sites
-// need the tight, two-increment margin (verify_enumerate_model_pairs_
-// each_item_with_its_index, verify_rev_model_reverses_iteration_order,
-// verify_cycle_model_repeats_its_sequence_forever, verify_peekable_
-// model_peek_does_not_consume) and call increment_headroom_holds
-// directly; eight more need only the loosest, one-increment margin
-// (verify_chain_model_sequences_two_iterators_end_to_end,
-// verify_zip_model_pairs_items_from_two_iterators,
-// verify_fuse_model_keeps_returning_none_once_exhausted,
-// verify_inspect_model_calls_once_per_item_without_changing_values,
-// verify_fn_pointer_model_calls_the_underlying_function,
-// verify_map_model_applies_its_closure_to_each_item) and call
-// single_increment_headroom_holds. The slice-chunk write-through models
-// need a wider margin still and call ten_increment_headroom_holds. All
-// three are real, shared `open spec fn`s in
-// amenable_verus::rust_std::iter_sequence_carrier confirmed
-// under real verus to give every call site genuine proof credit across
-// carrier files -- see amenable_std::verus_gallery's
+// Four sites need the tight, two-increment margin
+// (verify_enumerate_model_pairs_each_item_with_its_index, verify_rev_
+// model_reverses_iteration_order, verify_cycle_model_repeats_its_
+// sequence_forever, verify_peekable_model_peek_does_not_consume) and call
+// increment_headroom_holds directly; eight more need only the loosest,
+// one-increment margin (verify_chain_model_sequences_two_iterators_end_
+// to_end, verify_zip_model_pairs_items_from_two_iterators, verify_fuse_
+// model_keeps_returning_none_once_exhausted, verify_inspect_model_calls_
+// once_per_item_without_changing_values, verify_fn_pointer_model_calls_
+// the_underlying_function, verify_map_model_applies_its_closure_to_each_
+// item) and call single_increment_headroom_holds. The slice-chunk
+// write-through models need a wider margin still and call
+// ten_increment_headroom_holds. All three are real, shared
+// `open spec fn`s in amenable_verus::rust_std::iter_sequence_carrier
+// confirmed under real verus to give every call site genuine proof
+// credit across carrier files -- see amenable_std::verus_gallery's
 // cross_file_spec_fn_reuse_gets_real_proof_credit case.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <IncrementHeadroom as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || SINGLE_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IncrementHeadroom",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || TEN_INCREMENT_HEADROOM_HOLDS_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_requires_predicate!(
+    IncrementHeadroom,
+    "amenable_std::IncrementHeadroom",
+    [
+        "increment_headroom_holds",
+        "single_increment_headroom_holds",
+        "ten_increment_headroom_holds"
+    ]
+);
 
 /// [`ValueUnchanged`] reuses `RefCell`'s own borrow-rules harness rather
 /// than adding a new Verus proof — the harness's own `ensures` clauses
@@ -3531,36 +3357,11 @@ impl VerusWitness for ValueUnchanged {
 
 bridge_verus_witness!(ValueUnchanged);
 
-impl Ensures<VerusVerifier> for ValueUnchanged {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "before == after"
-    }
-}
-
-const VALUE_UNCHANGED_VERUS_FRAGMENT: &str = r#"pub open spec fn value_unchanged(before: int, after: int) -> bool {
-    before == after
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ValueUnchanged",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ValueUnchanged as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ValueUnchanged",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || VALUE_UNCHANGED_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    ValueUnchanged,
+    "amenable_std::ValueUnchanged",
+    "value_unchanged"
+);
 
 /// [`ObservedValueMatchesInput`] reuses the shared-reference harness
 /// rather than adding a new Verus proof — it names the direct identity
@@ -3581,49 +3382,21 @@ impl VerusWitness for ObservedValueMatchesInput {
 
 bridge_verus_witness!(ObservedValueMatchesInput);
 
-impl Ensures<VerusVerifier> for ObservedValueMatchesInput {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result == value"
-    }
-}
-
-const OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_value_matches_input(observed: int, input: int) -> bool {
-    observed == input
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedValueMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ObservedValueMatchesInput as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedValueMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
-    }
-}
-
-// Also registered under "requires": `ref_cell_carrier.rs`'s
+// Registered under both "ensures" and "requires": `ref_cell_carrier.rs`'s
 // `release_exclusive` states the identical direct-identity claim as a
-// precondition (`old(self).borrow_state == -1`), reusing the same real
-// spec fn rather than adding a requires-only twin.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedValueMatchesInput",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || OBSERVED_VALUE_MATCHES_INPUT_VERUS_FRAGMENT,
-    }
-}
+// precondition too (`old(self).borrow_state == -1`), reusing the same
+// real spec fn rather than adding a requires-only twin.
+amenable_derive::verus_ensures_predicate!(
+    ObservedValueMatchesInput,
+    "amenable_std::ObservedValueMatchesInput",
+    "observed_value_matches_input"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ObservedValueMatchesInput,
+    "amenable_std::ObservedValueMatchesInput",
+    "observed_value_matches_input"
+);
 
 /// [`ObservedOptionMatchesInput`] reuses the `Once` harness rather than
 /// adding a new Verus proof — it names the direct `Option`-wrapped
@@ -3645,36 +3418,11 @@ impl VerusWitness for ObservedOptionMatchesInput {
 
 bridge_verus_witness!(ObservedOptionMatchesInput);
 
-impl Ensures<VerusVerifier> for ObservedOptionMatchesInput {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result == Some(value)"
-    }
-}
-
-const OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_option_matches_input(observed: Option<i32>, input: i32) -> bool {
-    observed == Some(input)
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedOptionMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ObservedOptionMatchesInput as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedOptionMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || OBSERVED_OPTION_MATCHES_INPUT_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    ObservedOptionMatchesInput,
+    "amenable_std::ObservedOptionMatchesInput",
+    "observed_option_matches_input"
+);
 
 /// [`ObservedPairMatchesInput`] reuses the `AtomicBool` load-store
 /// harness rather than adding a new Verus proof — it names the direct
@@ -3695,36 +3443,11 @@ impl VerusWitness for ObservedPairMatchesInput {
 
 bridge_verus_witness!(ObservedPairMatchesInput);
 
-impl Ensures<VerusVerifier> for ObservedPairMatchesInput {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "observed == input"
-    }
-}
-
-const OBSERVED_PAIR_MATCHES_INPUT_VERUS_FRAGMENT: &str = r#"pub open spec fn observed_pair_matches_input<A, B>(observed: (A, B), input: (A, B)) -> bool {
-    observed == input
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedPairMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ObservedPairMatchesInput as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ObservedPairMatchesInput",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || OBSERVED_PAIR_MATCHES_INPUT_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_predicate!(
+    ObservedPairMatchesInput,
+    "amenable_std::ObservedPairMatchesInput",
+    "observed_pair_matches_input"
+);
 
 const VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
@@ -6299,36 +6022,7 @@ impl VerusWitness for AsciiByte {
 
 bridge_verus_witness!(AsciiByte);
 
-impl Requires<VerusVerifier> for AsciiByte {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "value < 128"
-    }
-}
-
-const IS_ASCII_BYTE_VERUS_FRAGMENT: &str = r#"pub open spec fn is_ascii_byte(value: u32) -> bool {
-    value < 128
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <AsciiByte as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || IS_ASCII_BYTE_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_requires_predicate!(AsciiByte, "amenable_std::AsciiByte", "is_ascii_byte");
 
 const VERIFY_STR_MATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/str_pattern_match_carrier.rs");
@@ -9298,40 +8992,14 @@ impl VerusWitness for RustStdStandard<str> {
 
 bridge_verus_witness!(RustStdStandard<str>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<str> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "observed @ =~= expected @"
-    }
-}
-
-const TEXT_VIEW_MATCHES_EXPECTED_VERUS_FRAGMENT: &str = r#"pub open spec fn text_view_matches_expected(observed: Seq<char>, expected: Seq<char>) -> bool {
-    observed =~= expected
-}"#;
-
-// `Ensures::ensures()` keeps a descriptive text-view-equality spelling
-// for cross-backend enumeration, while the real Verus proof sites across
-// the `str`, `path`, `process`, `env`, and panic carriers call the
-// shared `text_view_matches_expected` spec fn directly.
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<str> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || TEXT_VIEW_MATCHES_EXPECTED_VERUS_FRAGMENT,
-    }
-}
+// The real Verus proof sites across the `str`, `path`, `process`, `env`,
+// and panic carriers all call the shared `text_view_matches_expected`
+// spec fn directly.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<str>,
+    "amenable_std::rust_std::RustStdStandard<str>",
+    "text_view_matches_expected"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {

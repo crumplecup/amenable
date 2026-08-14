@@ -620,3 +620,69 @@ a real, intermittently-failing test
 (`verus_call_shape_is_registered_for_char_roundtrip`, ~40% failure rate
 across 8 repeated runs). Fixed by using an order-preserving `Vec`
 instead, confirmed clean across 8+ repeated runs afterward.
+
+## Post-Phase-8: closing the `Ensures`/`Requires` duplication
+
+The call-shape derivation above closed the templates-vs-source
+duplication for `register_verus_call_shape!`. A parallel, unrelated
+duplication remained in every `impl Ensures<VerusVerifier>`/
+`impl Requires<VerusVerifier>` in `amenable_std::verus_witness`: a human
+hand-typed the bound text (a beta-reduced/paraphrased restatement of a
+real harness clause or spec fn, verified only by eye, never mechanically
+checked against the real source), then hand-registered any additional
+`ContractRecord`s a type needed one `inventory::submit!` at a time. The
+worst instance — `NonZero<T>`'s two real clauses, one picked as
+"primary" through the trait impl and one bolted on as a bespoke
+supplementary registration, repeated by hand across all 12 real
+widths — was the concrete case that made this "too hacky" to leave as
+precedent.
+
+Closed the same way as the call-shape work: derive the bound text from
+the real carrier source at proc-macro-expansion time, not by hand.
+`amenable_core::verus_carrier` (an ordinary crate, not
+`amenable_derive` itself — proc-macro crates can only export
+`#[proc_macro]`/`#[proc_macro_derive]`/`#[proc_macro_attribute]` items,
+confirmed by a real compiler error when this was tried the other way)
+holds the shared `verus_syn`-based parsing logic
+(`find_fn`/`literal_clauses`/`predicate_body`/`walk_tokens`) that both
+`amenable_derive`'s macros and `amenable_std`'s runtime call-shape
+derivation now depend on.
+
+Two macro families in `amenable_derive::verus_contract`, both
+generating `Bound = &'static [&'static str]` (a harness's postcondition
+is sometimes more than one real clause — an `iff` becomes two
+directional `ensures` in Verus) plus one `ContractRecord` per clause:
+
+- `verus_ensures_witness!`/`verus_requires_witness!(Type, evidence,
+  "harness_name" [, [indices]])` — derives from a real harness's own
+  `requires`/`ensures` clause list, with an optional index subset for a
+  type that reuses a shared harness but claims only some of its
+  clauses (e.g. `ValidUnicodeScalar` naming only
+  `verify_char_roundtrip`'s unicode-scalar clause).
+- `verus_ensures_predicate!`/`verus_requires_predicate!(Type, evidence,
+  "predicate_name")` or `(Type, evidence, ["name1", "name2", ...])` —
+  derives from one or more real, named `pub open spec fn`s directly,
+  for a claim that isn't anchored to any single harness at all (e.g.
+  `write_stores_new_value`, shared across `Cell`/`RefCell`/
+  `UnsafeCell`/`OrderedPair`). The bracketed multi-predicate form
+  covers a type needing several independently-declared predicates at
+  once (e.g. `IncrementHeadroom`'s tight/single/wide margin variants),
+  the same way the witness macro's index list covers several clauses
+  from one harness.
+
+All 34 real `Ensures`/`Requires` sites in `verus_witness.rs` now derive
+from real source through one of these four macros; none are hand-typed
+`&'static str`/`&'static [&'static str]` literals anymore.
+
+While migrating, re-verified (not just re-asserted) several earlier
+claims of "drift" between hand-typed text and real predicates from an
+initial 22-site migration pass — all four checked turned out to be
+correct, not errors: a predicate's own declared parameter names
+differing from a caller's local variable names is not drift, and a
+beta-reduced/inlined restatement is not drift either. The real value
+of this migration is removing a *class* of risk (hand-typed text with
+zero mechanical drift-detection), not fixing already-manifested bugs.
+
+Verified the same two ways as the call-shape work: `derived_witness/`
+regenerates byte-identical (this work touches nothing the renderer
+reads), and `just verify-verus` stays at `340 verified, 0 errors`.

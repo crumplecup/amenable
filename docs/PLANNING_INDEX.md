@@ -49,7 +49,21 @@ struct-in-struct (recursion past depth 1). `just verify-verus` went to
 permanent `trybuild` regression test for the `ClassifiedWitness`
 `E0277` guarantee, verified once by hand in Phase 1 but never locked in
 until now — the committed `.stderr` snapshot confirms the error still
-names the exact unclassified leaf.
+names the exact unclassified leaf. **Post-Phase-8** closed a second,
+unrelated duplication: every `impl Ensures<VerusVerifier>`/
+`impl Requires<VerusVerifier>` in `verus_witness.rs` was a hand-typed
+`&'static str` restatement of real carrier source, verified only by
+eye — worst case, `NonZero<T>`'s two real clauses split across a
+"primary" trait impl and a bolted-on supplementary registration,
+repeated by hand across all 12 real widths. Four new
+`amenable_derive` macros (`verus_ensures_witness!`/
+`verus_requires_witness!` for harness-clause-anchored claims,
+`verus_ensures_predicate!`/`verus_requires_predicate!` for claims
+anchored to one or more named `spec fn`s directly) now derive
+`Bound = &'static [&'static str]` and every `ContractRecord` from the
+real source at macro-expansion time. All 34 real sites migrated; none
+hand-typed anymore. `just verify-verus` unchanged at `340 verified,
+0 errors`; `derived_witness/` regenerates byte-identical.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

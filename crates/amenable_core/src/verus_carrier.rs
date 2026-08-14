@@ -319,3 +319,23 @@ pub fn literal_clauses(item_fn: &verus_syn::ItemFn, ensures: bool) -> Vec<String
     })
     .unwrap_or_default()
 }
+
+/// Extract a real `pub open spec fn NAME(...) -> bool { EXPR }`
+/// predicate's own body as literal text -- its real, canonical
+/// declaration, not any one caller's argument-substituted instance of
+/// it. `Err` if the body isn't exactly one trailing expression (spec
+/// fns are pure by Verus's own rules, so this covers every real one in
+/// this codebase; a body with intermediate `let`s or other statements
+/// would need a human decision about which part *is* the claim, which
+/// this deliberately doesn't guess at).
+pub fn predicate_body(item_fn: &verus_syn::ItemFn) -> Result<String, &'static str> {
+    match item_fn.block.stmts.as_slice() {
+        [verus_syn::Stmt::Expr(expr, None)] => Ok(walk_tokens(
+            quote::quote!(#expr),
+            &HashSet::new(),
+            &mut Vec::new(),
+        )),
+        [] => Err("has an empty body"),
+        _ => Err("has a body that isn't a single trailing expression"),
+    }
+}
