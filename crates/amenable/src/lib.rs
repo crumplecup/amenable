@@ -24,6 +24,7 @@
 
 mod error;
 pub mod paths;
+#[cfg(feature = "verus")]
 mod verus_export;
 
 pub mod assessment;
@@ -34,6 +35,7 @@ pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
 };
+#[cfg(feature = "verus")]
 pub use verus_export::write_verus_witness_modules;
 
 pub use amenable_core::{

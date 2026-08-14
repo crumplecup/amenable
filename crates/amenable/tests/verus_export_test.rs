@@ -1,3 +1,5 @@
+#![cfg(feature = "verus")]
+
 mod support;
 
 use std::{

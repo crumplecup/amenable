@@ -25,6 +25,7 @@ enum Commands {
     /// Record and report structured assessments of registered proof harnesses.
     Assess(assessment::AssessArgs),
     /// Materialize derived Verus witness modules into a Verus source tree.
+    #[cfg(feature = "verus")]
     #[command(name = "emit-verus-witnesses")]
     EmitVerusWitnesses(EmitVerusWitnessesArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
@@ -71,6 +72,7 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
     match cli.command {
         Some(Commands::Audit(args)) => run_audit(args),
         Some(Commands::Assess(args)) => assessment::run(args),
+        #[cfg(feature = "verus")]
         Some(Commands::EmitVerusWitnesses(args)) => run_emit_verus_witnesses(args),
         Some(Commands::Gallery(args)) => gallery::run(args),
         Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
@@ -136,6 +138,7 @@ fn run_audit(args: AuditArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[cfg(feature = "verus")]
 fn run_emit_verus_witnesses(args: EmitVerusWitnessesArgs) -> AmenableResult<()> {
     let root = args
         .root
@@ -166,6 +169,7 @@ struct AuditArgs {
     verifiers: Vec<String>,
 }
 
+#[cfg(feature = "verus")]
 #[derive(Debug, Args)]
 struct EmitVerusWitnessesArgs {
     /// Root `src/` directory of the Verus crate to write into.
