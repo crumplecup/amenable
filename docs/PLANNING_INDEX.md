@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
 
-**Status:** 🔲 In progress — Phases 1–6 implemented and verified.
+**Status:** 🔲 In progress — Phases 1–7 implemented and verified.
 Phases 1–3 (`ClassifiedWitness<V>` marker trait and compile-time export
 enforcement plus an `#[allow(dead_code)]` fix; owned-`String`
 conversion on `VerusCheckedProof`; a real, additive `VerusCallShape`
@@ -27,8 +27,16 @@ function; the actual gap was citation text (`result.0`/`!result.1`/
 representation), fixed by replacing structured citations with
 `$placeholder` text templates, plus a second real gap (imports need
 their own `module_path`, not the harness's). `just verify-verus` went
-to `336 verified, 0 errors`, one new genuine proof. Phases 7–8 (enum
-composition, full rollout) not started.
+to `336 verified, 0 errors`, one new genuine proof. **Phase 7** adds
+enum `match`-per-variant composition: a synthetic local selector enum
+and result enum, with a real `match selector { ... }` in both the
+function body and `ensures`, proving only the selected variant's own
+composed claim in its arm. Along the way, found that an artifact
+variant's own name can carry a provenance rename (e.g. `fallback`,
+lowercase) — a valid audit label but not a valid PascalCase Rust enum
+variant identifier — and normalized it before use in the synthetic
+types. `just verify-verus` went to `337 verified, 0 errors`, one new
+genuine proof. Phase 8 (full rollout) not started.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

@@ -2,7 +2,7 @@
 
 ## Status
 
-🔲 In progress — Phases 1–6 implemented and verified.
+🔲 In progress — Phases 1–7 implemented and verified.
 
 Phases 1–3 each left proof content unchanged (`just verify-verus`
 stayed at `335 verified, 0 errors` throughout): `ClassifiedWitness<V>`
@@ -57,8 +57,22 @@ a real `E0603`). `VerusImport` now carries its own `module_path` per
 entry. `just verify-verus` went to `336 verified, 0 errors` — up from
 335, one new genuine proof.
 
-Phases 7–8 (enum `match`-per-variant composition, and full rollout)
-not started.
+**Phase 7 (enum `match`-per-variant composition, commit `b8ccaa8`)**:
+`render_enum_module` adds a synthetic local selector enum and a
+synthetic local result enum, with a real `match selector { ... }` in
+both the body and `ensures` — see Design E. Reinstated
+`RouteSegment::Variant` (left as a Phase-4-6 TODO) so sibling variants'
+same-named params disambiguate correctly, and generalized
+`PendingClause`'s `$result` substitution (`render_with`) to resolve to
+a locally bound match-arm name instead of a top-level `result`/
+`result.N` projection. Found a real bug via the real `verus` tool: an
+artifact variant's own `.name` can carry a provenance rename (e.g.
+`fallback`, lowercase) — fine as an audit label, not a valid PascalCase
+Rust enum variant identifier; normalized before use in the synthetic
+types. `just verify-verus` went to `337 verified, 0 errors` — up from
+336, one new genuine proof.
+
+Phase 8 (full rollout) not started.
 
 ## Problem
 
@@ -483,10 +497,15 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    (`observed_value_matches_input` lives in `primitive_shapes_carrier`,
    only privately `use`d by `ref_cell_carrier`); `VerusImport` now
    carries its own `module_path` per entry (commit `21edd94`).
-7. **Renderer: category 6** (enum `match`-per-variant generation).
-   Rewrite the enum path; extend `VerusExportCanaryEnum` (or add a new
-   canary) so at least two variants use genuinely different real leaf
-   types, and verify the generated `match` arms each discharge for real.
+7. ✅ **Renderer: category 6** (enum `match`-per-variant generation, see
+   Design E). Enabled a concrete `VerusExportCanaryEnum` instantiation
+   in `emit_verus_witnesses!` (its `Balanced`/`Adjustment` variants
+   already mix a checked and a trusted leaf vs. a trusted-only leaf —
+   genuinely different real leaf types) and added a second, two-variant
+   fixture directly in `amenable/tests/verus_export_test.rs`
+   (`LocalWorkingEnumEvidence`) asserting the generated `match` content
+   verbatim. The real `match` arms discharge for real: `just
+   verify-verus` went to `337 verified, 0 errors` (commit `b8ccaa8`).
 8. **Rollout.** Regenerate `derived_witness/` from real (non-canary)
    crate registrations, `just verify-verus` across the whole tree,
    confirm zero free-boolean tautologies remain in generated output, and
