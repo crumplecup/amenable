@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
 
-**Status:** 🔲 In progress — Phases 1–5 implemented and verified.
+**Status:** 🔲 In progress — Phases 1–6 implemented and verified.
 Phases 1–3 (`ClassifiedWitness<V>` marker trait and compile-time export
 enforcement plus an `#[allow(dead_code)]` fix; owned-`String`
 conversion on `VerusCheckedProof`; a real, additive `VerusCallShape`
@@ -19,7 +19,15 @@ from `335 verified, 0 errors` to `334 verified, 0 errors`, correctly
 (three tautologies replaced by two genuine proofs). Phase 5 (`requires`
 propagation) needed no renderer changes, just a real canary with a
 genuine precondition — `just verify-verus` is back to `335 verified,
-0 errors`, one new genuine proof. Phases 6–8 (mutating leaves, enum
+0 errors`, one new genuine proof. **Phase 6 overturned its own
+premise**: "mutating/model-method leaves" turned out not to exist —
+every real harness, including `RefCell`'s, is a plain value-returning
+function; the actual gap was citation text (`result.0`/`!result.1`/
+`result.5 as int` don't fit a structured `predicate(args)`-only
+representation), fixed by replacing structured citations with
+`$placeholder` text templates, plus a second real gap (imports need
+their own `module_path`, not the harness's). `just verify-verus` went
+to `336 verified, 0 errors`, one new genuine proof. Phases 7–8 (enum
 composition, full rollout) not started.
 
 **Description:** The derive-witness/Verus-export pipeline added in

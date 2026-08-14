@@ -2,7 +2,7 @@
 
 ## Status
 
-🔲 In progress — Phases 1–5 implemented and verified.
+🔲 In progress — Phases 1–6 implemented and verified.
 
 Phases 1–3 each left proof content unchanged (`just verify-verus`
 stayed at `335 verified, 0 errors` throughout): `ClassifiedWitness<V>`
@@ -36,8 +36,29 @@ with a genuine precondition) proving the existing propagation path
 against real data instead of an empty list. `just verify-verus` went
 to `335 verified, 0 errors` — up from 334, one new genuine proof.
 
-Phases 6–8 (mutating/model-method leaves, enum `match`-per-variant
-composition, and full rollout) not started.
+**Phase 6 overturned its own premise** (commit `21edd94`): "mutating/
+model-method leaves need receiver construction and `old`/`final`
+translation" turned out to be wrong — every real registered harness,
+including `RefCell`'s, is already a plain value-returning function;
+its `&mut self`/`old`/`final` methods are purely internal to that one
+harness's body, never independently composed. `VerusCallKind::Method`
+was never needed. The real gap `RefCell`'s harness exposed instead: its
+own `ensures` mixes raw tuple-field projections with a named-predicate
+citation whose own argument is a projection-and-cast
+(`result.5 as int`) — neither fits a structured `predicate(args)`-only
+citation. Replaced `VerusPredicateCite`/`VerusCiteArg` with plain
+`$placeholder` text templates (`VerusCallShape.requires`/`.ensures:
+Vec<String>`), which handle raw expressions and bare calls uniformly.
+Also found and fixed a second real gap: an import's real defining
+module isn't always the harness's own (`observed_value_matches_input`
+is defined in `primitive_shapes_carrier`, only privately `use`d by
+`ref_cell_carrier` — importing it via the harness's module failed with
+a real `E0603`). `VerusImport` now carries its own `module_path` per
+entry. `just verify-verus` went to `336 verified, 0 errors` — up from
+335, one new genuine proof.
+
+Phases 7–8 (enum `match`-per-variant composition, and full rollout)
+not started.
 
 ## Problem
 
@@ -230,11 +251,13 @@ actually reachable from an exported type. Instead:
 
 ```rust
 pub struct VerusCallShape {
-    pub module_path: String,           // e.g. "crate::rust_std::chars_carrier"
-    pub name: String,                  // real fn or spec-predicate name
-    pub params: Vec<VerusParam>,       // symbolic inputs, in order
-    pub requires: Vec<String>,         // named preconditions the leaf itself needs
-    pub kind: VerusCallKind,           // see below
+    pub module_path: String,       // e.g. "crate::rust_std::char_carrier"
+    pub name: String,              // real fn name
+    pub params: Vec<VerusParam>,   // symbolic inputs, in order
+    pub requires: Vec<String>,     // $placeholder templates -- see below
+    pub ensures: Vec<String>,      // $placeholder templates
+    pub imports: Vec<VerusImport>, // real (module_path, name) pairs needing a `use`
+    pub kind: VerusCallKind,       // always Function { returns } in practice so far
 }
 
 pub struct VerusParam {
@@ -242,16 +265,14 @@ pub struct VerusParam {
     pub ty: String,
 }
 
+pub struct VerusImport {
+    pub module_path: String,  // the predicate/spec-fn's OWN defining module --
+    pub name: String,         // not necessarily the harness's own (see Phase 6)
+}
+
 pub enum VerusCallKind {
-    /// A bare `open spec fn` predicate, directly citable by name —
-    /// no call needed, the composite's own spec fn just conjoins it.
-    Predicate,
-    /// A value-returning function: call it, bind the result, cite its
-    /// real `ensures` predicate with the bound result in scope.
-    Function { returns: String },
-    // Method { receiver_ty: String, mutates: bool } deferred: no real
-    // canary needs a &mut self/old/final receiver leaf yet (see phase 6
-    // below) — added when one does, not speculatively.
+    Predicate,                        // a bare open spec fn, no call needed
+    Function { returns: String },     // the only kind any real harness needs so far
 }
 
 /// Additive, opt-in, keyed by harness name — mirrors
@@ -261,6 +282,20 @@ pub struct VerusCallShapeRecord {
     pub call_shape: fn() -> VerusCallShape,
 }
 ```
+
+**This is the Phase 6 (final) shape, not the original design.** The
+original `requires`/`ensures` were `Vec<VerusPredicateCite>` — a
+structured `{ predicate: String, args: Vec<VerusCiteArg> }` (`VerusCiteArg`
+= `Result` or `Param(name)`), assuming every clause is a bare
+`predicate(args)` call. That held for `char_roundtrip`/`escape_ascii`,
+but broke on `RefCell`'s real harness (see Phase 6 in Status above):
+its `ensures` mixes raw tuple-field projections (`result.0`,
+`!result.1`, ...) with a call whose own argument is a projection-and-
+cast (`result.5 as int`), neither of which a bare-call-only structure
+can express. `requires`/`ensures` became plain text templates instead
+— the harness's own real clause text, verbatim, with `$result`/
+`$paramname` placeholders — which the renderer substitutes without
+ever needing to parse the clause's grammar.
 
 `register_verus_call_shape!` registers one entry per harness name (not
 per `Witness`-impl type — several types can share one harness, e.g.
@@ -295,10 +330,23 @@ implementation phases below tackle them (see Implementation):
    applied to the same parameter the composite exposes. Standard
    modular Hoare-logic composition — preconditions accumulate upward,
    postconditions accumulate downward.
-5. **Mutating/model-method leaves** (`RefCell`/`Weak`-style `old`/`final`
-   methods on a real model struct): construct or accept the receiver,
-   call the real method, rebind `old`/`final` at the composite's own
-   before/after boundary.
+5. **Leaves whose `ensures` mixes raw expressions with named-predicate
+   citations** (e.g. `RefCell`'s harness: raw tuple-field projections
+   like `result.0`/`!result.1` alongside a named-predicate citation
+   whose own argument is itself a projection-and-cast,
+   `observed_value_matches_input(result.5 as int, updated as int)`):
+   not a distinct call shape — every real registered harness, including
+   this one, is a plain value-returning function, so it falls out of
+   (2). What's distinct is only the citation text: it doesn't fit a
+   structured `predicate(args)`-only representation, so `requires`/
+   `ensures` are plain `$placeholder` text templates
+   (`$result`/`$paramname` substituted at render time) copied verbatim
+   from the real Verus source, handling raw expressions and bare calls
+   uniformly. (Phase 6 originally planned this category as
+   "mutating/model-method leaves" needing receiver construction and
+   `old`/`final` translation — investigation of the real harnesses
+   showed no such method-shaped call is ever registered, so
+   `VerusCallKind::Method` was dropped from the design.)
 6. **Enum composition**: a real value only occupies one variant at a
    time, so the current flat `&&` across every variant's hypothetical
    claim is wrong independent of the tautology issue — no value can
@@ -363,8 +411,22 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    — the propagation logic was already generic from Phase 4, so no
    renderer changes were needed, only the real data to prove it against
    (commit `874904b`).
-6. **Renderer: category 5** (mutating/model-method leaves). Add a canary
-   wrapping a `RefCell`-style model leaf.
+6. ✅ **Renderer: category 5** (`ensures` mixing raw expressions with
+   named-predicate citations). Added a canary wrapping `RefCell`'s real
+   harness. Originally scoped as "mutating/model-method leaves"
+   (`VerusCallKind::Method` with receiver construction and `old`/
+   `final` translation), but investigation of the real harness showed
+   every registered call, including this one, is already a plain
+   value-returning function — no method-shaped call is ever registered,
+   so category 2's call handling already covered it. The real gap was
+   citation *text*: `result.0`/`!result.1`/`result.5 as int` don't fit
+   a structured `predicate(args)`-only representation. Replaced
+   `VerusPredicateCite`/`VerusCiteArg` with plain `$placeholder` text
+   templates. Also fixed a second real gap found via `verus` itself: an
+   import's defining module isn't always the harness's own module
+   (`observed_value_matches_input` lives in `primitive_shapes_carrier`,
+   only privately `use`d by `ref_cell_carrier`); `VerusImport` now
+   carries its own `module_path` per entry (commit `21edd94`).
 7. **Renderer: category 6** (enum `match`-per-variant generation).
    Rewrite the enum path; extend `VerusExportCanaryEnum` (or add a new
    canary) so at least two variants use genuinely different real leaf
