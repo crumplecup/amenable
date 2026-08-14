@@ -12,7 +12,7 @@ use amenable_derive::{
 use amenable_std::{
     CheckedVerusExportLeaf, RawTemplateVerusExportLeaf, RequiresVerusExportLeaf, RustStdProvenance,
     RustStdStandard, RustStdType, TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum,
-    VerusVerifier,
+    VerusExportMultiCheckedEnum, VerusVerifier,
 };
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
@@ -446,6 +446,53 @@ fn live_verus_canary_exports_include_canary_enum_shape() {
 }
 
 #[test]
+fn verus_export_multi_checked_enum_variants_are_constructible() {
+    let active = VerusExportMultiCheckedEnum::Active {
+        first: CheckedVerusExportLeaf::new("checked"),
+        second: RequiresVerusExportLeaf::new("printable"),
+    };
+    let idle = VerusExportMultiCheckedEnum::Idle;
+
+    assert!(format!("{active:?}").starts_with("Active"));
+    assert!(format!("{idle:?}").starts_with("Idle"));
+}
+
+#[test]
+fn live_verus_canary_exports_include_multi_checked_enum_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_multi_checked_enum_witness"
+        })
+        .expect("expected library Verus multi-checked-enum export");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
+    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.variants.len(), 2);
+    assert_eq!(export.artifact.variants[0].name, "Active");
+    assert_eq!(
+        export.artifact.variants[0].artifact.shape,
+        WitnessArtifactShape::NamedVariant
+    );
+    assert_eq!(export.artifact.variants[0].artifact.members.len(), 2);
+    assert_eq!(
+        export.artifact.variants[0].artifact.members[0].label,
+        "first"
+    );
+    assert_eq!(
+        export.artifact.variants[0].artifact.members[1].label,
+        "second"
+    );
+    assert_eq!(export.artifact.variants[1].name, "Idle");
+    assert_eq!(
+        export.artifact.variants[1].artifact.shape,
+        WitnessArtifactShape::UnitVariant
+    );
+}
+
+#[test]
 fn requires_verus_export_leaf_is_constructible_and_checked() {
     let leaf = RequiresVerusExportLeaf::new("printable");
 
@@ -495,4 +542,49 @@ fn live_verus_canary_exports_include_raw_template_struct_shape() {
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+}
+
+#[test]
+fn live_verus_canary_exports_include_multi_checked_struct_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_multi_checked_struct_witness"
+        })
+        .expect("expected library Verus multi-checked-struct export");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.members.len(), 2);
+    assert_eq!(export.artifact.members[0].label, "first");
+    assert_eq!(export.artifact.members[1].label, "second");
+}
+
+#[test]
+fn live_verus_canary_exports_include_nested_struct_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_nested_struct_witness"
+        })
+        .expect("expected library Verus nested-struct export");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
+    assert_eq!(export.artifact.members.len(), 2);
+    assert_eq!(export.artifact.members[0].label, "inner");
+    assert_eq!(
+        export.artifact.members[0].artifact.shape,
+        WitnessArtifactShape::NamedStruct
+    );
+    assert_eq!(export.artifact.members[0].artifact.members.len(), 1);
+    assert_eq!(
+        export.artifact.members[0].artifact.members[0].label,
+        "checked"
+    );
+    assert_eq!(export.artifact.members[1].label, "trusted");
 }

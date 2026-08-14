@@ -1,5 +1,8 @@
 pub mod verus_export_canary_enum_witness;
 pub mod verus_export_checked_plus_trivial_struct_witness;
+pub mod verus_export_multi_checked_enum_witness;
+pub mod verus_export_multi_checked_struct_witness;
+pub mod verus_export_nested_struct_witness;
 pub mod verus_export_raw_template_struct_witness;
 pub mod verus_export_requires_struct_witness;
 pub mod verus_export_tuple_struct_witness;

@@ -83,7 +83,7 @@ pub use value_unchanged::ValueUnchanged;
 #[cfg(feature = "verus")]
 pub use verus_derive_canary::{
     CheckedVerusExportLeaf, RawTemplateVerusExportLeaf, RequiresVerusExportLeaf,
-    TrustedVerusExportLeaf, VerusExportCanaryEnum,
+    TrustedVerusExportLeaf, VerusExportCanaryEnum, VerusExportMultiCheckedEnum,
 };
 #[cfg(feature = "verus")]
 pub use verus_gallery::{
