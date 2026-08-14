@@ -412,17 +412,11 @@ fn verus_export_canary_enum_variants_are_constructible() {
     assert!(format!("{closed:?}").starts_with("Closed"));
 }
 
-#[test]
-fn live_verus_canary_exports_include_canary_enum_shape() {
-    let export = amenable_core::witness_exports()
-        .into_iter()
-        .find(|record| {
-            record.verifier == "verus"
-                && record.destination_module
-                    == "crate::derived_witness::verus_export_canary_enum_witness"
-        })
-        .expect("expected library Verus canary-enum export");
-
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
-    assert_eq!(export.artifact.variants.len(), 3);
-}
+// No `live_verus_canary_exports_include_canary_enum_shape` test:
+// VerusExportCanaryEnum is deliberately not opted into
+// `emit_verus_witnesses!` right now (see verus_derive_canary.rs) --
+// amenable::verus_export's renderer doesn't support enum-shaped
+// composites yet (a real value only occupies one variant at a time, so
+// it needs match-per-variant composition, not the flat conjunction
+// struct/tuple-struct composites use). Re-add an equivalent test
+// alongside re-registering the enum once that lands.

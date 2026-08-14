@@ -1,4 +1,31 @@
 //! Emit derived Verus witness modules from registered artifact trees.
+//!
+//! Each generated module composes its leaves' *real* Verus proofs: a
+//! `Checked` leaf's real harness gets called (looked up by harness name
+//! in `amenable_std::verus_call_shape`, never assumed), its call
+//! expression becomes part of the composite's own return value, and its
+//! real `ensures`/`requires` predicates are cited verbatim against that
+//! return value — never restated, never assumed as a free boolean.
+//! (Verus `ensures` clauses can only reference a function's own
+//! parameters and its declared `-> (result: T)` binding, never an
+//! arbitrary body-local `let` — confirmed against the real `verus` tool
+//! while building this: an earlier version tried `let result = call();`
+//! with a bodyless-of-return-type function and got `cannot find value
+//! "result" in this scope` at the `ensures` clause. The fix is to make
+//! each checked leaf's call expression part of the composite's own
+//! return value, exactly like a real hand-written carrier does.)
+//! `Trivial` leaves contribute nothing (there is nothing to prove).
+//! `Trusted` leaves contribute nothing checkable either — Verus has no
+//! way to verify an externally-provenance-backed claim — but their
+//! trust boundary is rendered as an explicit, auditable comment rather
+//! than silently smuggled into the proof as an assumed premise.
+//! `Opaque` leaves cannot reach this code at all:
+//! `amenable_core::ClassifiedWitness` blocks them from ever being
+//! exported, at `cargo check` time (see `amenable_core::witness`'s own
+//! doc comments). Enum-shaped composites are not supported yet — a real
+//! value only occupies one variant at a time, so composing one needs a
+//! `match`-per-variant proof structure, not this file's flat
+//! conjunction; that lands in a later phase.
 
 use std::{
     fs,
@@ -9,6 +36,7 @@ use amenable_core::{
     MetadataEntry, WitnessArtifactNode, WitnessArtifactShape, WitnessExportSnapshot,
     WitnessSupportKind, witness_exports,
 };
+use amenable_std::{VerusCiteArg, VerusPredicateCite, verus_call_shape};
 
 use crate::{AmenableError, AmenableResult};
 
@@ -17,20 +45,46 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
     fs::create_dir_all(root).map_err(|error| AmenableError::io(root, error))?;
 
     let mut written_paths = Vec::new();
+    let mut failures = Vec::new();
 
+    // Each export is rendered independently: one unsupported or
+    // misregistered export (e.g. an enum-shaped composite, or a checked
+    // leaf whose harness has no registered call shape yet) must not
+    // block every *other*, unrelated export from being written --
+    // confirmed as a real problem while building this, not a
+    // hypothetical: with `inventory`-based registration being
+    // process-global, a single broken registration anywhere silently
+    // starved every working export in the same process under the
+    // original fail-fast version.
     for export in witness_exports()
         .into_iter()
         .filter(|record| record.verifier == "verus")
     {
-        let module_segments = parse_destination_module(&export.destination_module)?;
-        let output_path = ensure_module_tree(root, &module_segments)?;
-        let source = render_verus_module(&export, &module_segments);
+        match render_and_write_export(root, &export) {
+            Ok(path) => written_paths.push(path),
+            Err(error) => failures.push(format!("{}: {error}", export.evidence)),
+        }
+    }
 
-        fs::write(&output_path, source).map_err(|error| AmenableError::io(&output_path, error))?;
-        written_paths.push(output_path);
+    if !failures.is_empty() {
+        return Err(AmenableError::invariant(format!(
+            "failed to render {} of {} Verus witness export(s):\n{}",
+            failures.len(),
+            written_paths.len() + failures.len(),
+            failures.join("\n")
+        )));
     }
 
     Ok(written_paths)
+}
+
+fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> AmenableResult<PathBuf> {
+    let module_segments = parse_destination_module(&export.destination_module)?;
+    let output_path = ensure_module_tree(root, &module_segments)?;
+    let source = render_verus_module(export, &module_segments)?;
+
+    fs::write(&output_path, source).map_err(|error| AmenableError::io(&output_path, error))?;
+    Ok(output_path)
 }
 
 fn parse_destination_module(destination_module: &str) -> AmenableResult<Vec<String>> {
@@ -124,20 +178,141 @@ fn ensure_module_declaration(module_file: &Path, module_name: &str) -> AmenableR
     fs::write(module_file, content).map_err(|error| AmenableError::io(module_file, error))
 }
 
-fn render_verus_module(export: &WitnessExportSnapshot, module_segments: &[String]) -> String {
+/// One real typed parameter a composite's generated proof function
+/// needs, already collision-resolved to a unique local name.
+#[derive(Debug, Clone)]
+struct RenderedParam {
+    local_name: String,
+    ty: String,
+}
+
+/// One checked leaf's real call expression and its real return type —
+/// becomes one component of the composite's own return value.
+#[derive(Debug, Clone)]
+struct CheckedCall {
+    expr: String,
+    ty: String,
+}
+
+/// One argument position in a not-yet-finalized predicate citation.
+/// `ResultOf` indices are relative to the owning subtree until merged
+/// into a parent, at which point [`RenderedNode::merge`] rebases them —
+/// by the time rendering reaches the module root, every index is a
+/// direct, global index into the root's own `checked_calls`.
+#[derive(Debug, Clone)]
+enum PendingArg {
+    ResultOf(usize),
+    Local(String),
+}
+
+#[derive(Debug, Clone)]
+struct PendingCite {
+    predicate: String,
+    module_path: String,
+    args: Vec<PendingArg>,
+}
+
+impl PendingCite {
+    fn rebase(self, base: usize) -> Self {
+        PendingCite {
+            predicate: self.predicate,
+            module_path: self.module_path,
+            args: self
+                .args
+                .into_iter()
+                .map(|arg| match arg {
+                    PendingArg::ResultOf(index) => PendingArg::ResultOf(base + index),
+                    local @ PendingArg::Local(_) => local,
+                })
+                .collect(),
+        }
+    }
+
+    /// Resolve to real Verus source, once the final checked-call count
+    /// is known: a single checked call's result is just `result`; with
+    /// more than one, the composite returns a tuple and each call's
+    /// result is `result.N`.
+    fn render(&self, checked_call_count: usize) -> String {
+        let args = self
+            .args
+            .iter()
+            .map(|arg| match arg {
+                PendingArg::ResultOf(index) if checked_call_count <= 1 => "result".to_owned(),
+                PendingArg::ResultOf(index) => format!("result.{index}"),
+                PendingArg::Local(name) => name.clone(),
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        format!("{}({args})", self.predicate)
+    }
+}
+
+/// The composed contribution of one artifact subtree: real parameters,
+/// real checked-leaf calls, real cited predicates, and audit comments —
+/// never an assumed boolean.
+#[derive(Debug, Clone, Default)]
+struct RenderedNode {
+    params: Vec<RenderedParam>,
+    checked_calls: Vec<CheckedCall>,
+    requires: Vec<PendingCite>,
+    ensures: Vec<PendingCite>,
+    comments: Vec<String>,
+}
+
+impl RenderedNode {
+    fn merge(&mut self, other: RenderedNode) {
+        let base = self.checked_calls.len();
+        self.params.extend(other.params);
+        self.checked_calls.extend(other.checked_calls);
+        self.requires
+            .extend(other.requires.into_iter().map(|cite| cite.rebase(base)));
+        self.ensures
+            .extend(other.ensures.into_iter().map(|cite| cite.rebase(base)));
+        self.comments.extend(other.comments);
+    }
+}
+
+// Only `Member` exists today: enum-shaped composites are rejected
+// before any of their variants are ever walked (see `render_node`), so
+// there's nothing that would construct a `Variant` segment yet. Add it
+// back alongside the match-per-variant rendering that needs it.
+#[derive(Debug, Clone)]
+enum RouteSegment {
+    Member(String),
+}
+
+/// Allocates unique local identifiers across an entire composite,
+/// reusing a leaf's own real parameter names whenever nothing else
+/// already claimed them, and falling back to a route-qualified name
+/// only on an actual collision between sibling leaves.
+#[derive(Debug, Default)]
+struct NameAllocator {
+    used: std::collections::HashSet<String>,
+}
+
+impl NameAllocator {
+    fn allocate(&mut self, preferred: &str, route_hint: &str) -> String {
+        if self.used.insert(preferred.to_owned()) {
+            return preferred.to_owned();
+        }
+
+        let qualified = format!("{route_hint}_{preferred}");
+        self.used.insert(qualified.clone());
+        qualified
+    }
+}
+
+fn render_verus_module(
+    export: &WitnessExportSnapshot,
+    module_segments: &[String],
+) -> AmenableResult<String> {
     let module_name = module_segments
         .last()
         .expect("module path parsing guarantees at least one segment");
     let module_stem = normalize_identifier(module_name);
-    let rendered = render_node(&export.artifact, &module_stem, &[]);
-    let premise_comments = rendered
-        .premises
-        .iter()
-        .map(render_premise_comment)
-        .collect::<Vec<_>>()
-        .join("\n");
-    let proof_signature = render_proof_signature(&module_stem, &rendered.premises);
-    let proof_body = render_proof_body(&module_stem, &rendered.premises);
+    let mut names = NameAllocator::default();
+    let rendered = render_node(&export.artifact, &[], &mut names)?;
+    let checked_call_count = rendered.checked_calls.len();
 
     let mut source = String::new();
     source.push_str(&format!(
@@ -146,210 +321,297 @@ fn render_verus_module(export: &WitnessExportSnapshot, module_segments: &[String
     ));
     source.push_str("use verus_builtin_macros::verus;\n");
     source.push_str("#[allow(unused_imports)]\n");
-    source.push_str("use vstd::prelude::*;\n\n");
+    source.push_str("use vstd::prelude::*;\n");
+
+    let predicate_imports = predicate_import_lines(&rendered);
+    if !predicate_imports.is_empty() {
+        source.push('\n');
+        for import in &predicate_imports {
+            // Spec fns have no runtime representation and don't exist
+            // under plain `cargo check` -- gate every predicate import
+            // the same way every hand-written carrier in this crate
+            // already does, or `cargo check`/`clippy-verus` (which don't
+            // set `verus_keep_ghost`) fail with an unresolved import.
+            source.push_str("#[cfg(verus_keep_ghost)]\n");
+            source.push_str(import);
+            source.push('\n');
+        }
+    }
+    source.push('\n');
+
     source.push_str("verus! {\n\n");
     source.push_str(&format!("// evidence: {}\n", export.evidence));
     source.push_str(&format!("// destination: {}\n", export.destination_module));
-    source.push_str(&format!("// support: {}\n\n", export.support));
+    source.push_str(&format!("// support: {}\n", export.support));
 
-    for definition in &rendered.definitions {
-        source.push_str(definition);
+    if !rendered.comments.is_empty() {
         source.push('\n');
+        for comment in &rendered.comments {
+            source.push_str(comment);
+            source.push('\n');
+        }
+    }
+    source.push('\n');
+
+    let params = rendered
+        .params
+        .iter()
+        .map(|param| format!("{}: {}", param.local_name, param.ty))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let return_ty = match checked_call_count {
+        0 => String::new(),
+        1 => format!(" -> (result: {})", rendered.checked_calls[0].ty),
+        _ => format!(
+            " -> (result: ({}))",
+            rendered
+                .checked_calls
+                .iter()
+                .map(|call| call.ty.clone())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+    };
+    source.push_str(&format!(
+        "pub fn verify_{module_stem}({params}){return_ty}\n"
+    ));
+
+    if !rendered.requires.is_empty() {
+        source.push_str("    requires\n");
+        for requires in &rendered.requires {
+            source.push_str(&format!(
+                "        {},\n",
+                requires.render(checked_call_count)
+            ));
+        }
     }
 
-    if !premise_comments.is_empty() {
-        source.push_str(&premise_comments);
-        source.push('\n');
+    if !rendered.ensures.is_empty() {
+        source.push_str("    ensures\n");
+        for ensures in &rendered.ensures {
+            source.push_str(&format!(
+                "        {},\n",
+                ensures.render(checked_call_count)
+            ));
+        }
     }
 
-    source.push_str(&proof_signature);
-    source.push_str(&proof_body);
+    let body = match checked_call_count {
+        0 => String::new(),
+        1 => rendered.checked_calls[0].expr.clone(),
+        _ => format!(
+            "({})",
+            rendered
+                .checked_calls
+                .iter()
+                .map(|call| call.expr.clone())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+    };
+    source.push_str(&format!("{{\n    {body}\n}}\n"));
     source.push_str("\n} // verus!\n");
-    source
+    Ok(source)
 }
 
-#[derive(Debug, Clone)]
-struct RenderedNode {
-    definitions: Vec<String>,
-    premises: Vec<LeafPremise>,
-    expression: String,
-}
+/// Verus spec predicates need an explicit `use`, unlike ordinary
+/// functions (which resolve fine via a fully qualified call path) —
+/// confirmed against the real `verus` tool while building this.
+fn predicate_import_lines(rendered: &RenderedNode) -> Vec<String> {
+    let mut seen = std::collections::HashSet::new();
+    let mut lines = Vec::new();
 
-#[derive(Debug, Clone)]
-struct LeafPremise {
-    name: String,
-    kind: WitnessSupportKind,
-    route: Vec<RouteSegment>,
-    metadata: Vec<(String, String)>,
-}
+    for cite in rendered.requires.iter().chain(rendered.ensures.iter()) {
+        if seen.insert((cite.module_path.clone(), cite.predicate.clone())) {
+            lines.push(format!("use {}::{};", cite.module_path, cite.predicate));
+        }
+    }
 
-#[derive(Debug, Clone)]
-enum RouteSegment {
-    Member(String),
-    Variant(String),
+    // rustfmt sorts `use` groups alphabetically; sorting here too keeps
+    // every regeneration byte-for-byte rustfmt-clean, so `emit-verus-
+    // witnesses` never leaves a dirty `cargo fmt --all --check`.
+    lines.sort();
+    lines
 }
 
 fn render_node(
     node: &WitnessArtifactNode,
-    module_stem: &str,
     route: &[RouteSegment],
-) -> RenderedNode {
-    if node.shape == WitnessArtifactShape::Leaf {
-        return render_leaf_node(node, module_stem, route);
-    }
-
-    let mut definitions = Vec::new();
-    let mut premises = Vec::new();
-    let mut child_expressions = Vec::new();
-
-    for member in &node.members {
-        let mut child_route = route.to_vec();
-        child_route.push(RouteSegment::Member(member.label.clone()));
-        let rendered = render_node(&member.artifact, module_stem, &child_route);
-        definitions.extend(rendered.definitions);
-        extend_premises(&mut premises, rendered.premises);
-        child_expressions.push(rendered.expression);
-    }
-
-    for variant in &node.variants {
-        let mut child_route = route.to_vec();
-        child_route.push(RouteSegment::Variant(variant.name.clone()));
-        let rendered = render_node(&variant.artifact, module_stem, &child_route);
-        definitions.extend(rendered.definitions);
-        extend_premises(&mut premises, rendered.premises);
-        child_expressions.push(rendered.expression);
-    }
-
-    let definition = render_spec_definition(module_stem, route, &premises, &child_expressions);
-    let expression = render_spec_call(module_stem, route, &premises);
-    definitions.push(definition);
-
-    RenderedNode {
-        definitions,
-        premises,
-        expression,
+    names: &mut NameAllocator,
+) -> AmenableResult<RenderedNode> {
+    match node.shape {
+        WitnessArtifactShape::Leaf => render_leaf_node(node, route, names),
+        WitnessArtifactShape::Enum => Err(AmenableError::invariant(format!(
+            "Verus composition for enum-shaped witnesses is not supported yet (route: {}); \
+             a real value only occupies one variant at a time, so this needs a match-per-variant \
+             proof structure this renderer doesn't build yet -- exclude this type from Verus \
+             export until it does",
+            route_display(route)
+        ))),
+        WitnessArtifactShape::NamedStruct
+        | WitnessArtifactShape::TupleStruct
+        | WitnessArtifactShape::UnitStruct
+        | WitnessArtifactShape::NamedVariant
+        | WitnessArtifactShape::TupleVariant
+        | WitnessArtifactShape::UnitVariant => {
+            let mut combined = RenderedNode::default();
+            for member in &node.members {
+                let mut child_route = route.to_vec();
+                child_route.push(RouteSegment::Member(member.label.clone()));
+                combined.merge(render_node(&member.artifact, &child_route, names)?);
+            }
+            Ok(combined)
+        }
     }
 }
 
 fn render_leaf_node(
     node: &WitnessArtifactNode,
-    module_stem: &str,
     route: &[RouteSegment],
-) -> RenderedNode {
-    let expression = if node.kind == WitnessSupportKind::Trivial {
-        "true".to_owned()
-    } else {
-        leaf_premise_name(module_stem, route, node.kind)
-    };
-
-    let premises = if node.kind == WitnessSupportKind::Trivial {
-        Vec::new()
-    } else {
-        vec![LeafPremise {
-            name: expression.clone(),
-            kind: node.kind,
-            route: route.to_vec(),
-            metadata: filtered_metadata(&node.metadata),
-        }]
-    };
-
-    if route.is_empty() {
-        let definition = render_spec_definition(
-            module_stem,
-            route,
-            &premises,
-            std::slice::from_ref(&expression),
-        );
-        let root_expression = render_spec_call(module_stem, route, &premises);
-        return RenderedNode {
-            definitions: vec![definition],
-            premises,
-            expression: root_expression,
-        };
-    }
-
-    RenderedNode {
-        definitions: Vec::new(),
-        premises,
-        expression,
-    }
-}
-
-fn filtered_metadata(entries: &[MetadataEntry]) -> Vec<(String, String)> {
-    entries
-        .iter()
-        .filter(|entry| entry.key() != "claim")
-        .map(|entry| (entry.key().to_owned(), entry.value().to_owned()))
-        .collect()
-}
-
-fn extend_premises(target: &mut Vec<LeafPremise>, additions: Vec<LeafPremise>) {
-    for premise in additions {
-        if target.iter().all(|existing| existing.name != premise.name) {
-            target.push(premise);
+    names: &mut NameAllocator,
+) -> AmenableResult<RenderedNode> {
+    match node.kind {
+        WitnessSupportKind::Trivial => Ok(RenderedNode::default()),
+        WitnessSupportKind::Trusted => Ok(RenderedNode {
+            comments: vec![render_trust_comment(node, route)],
+            ..RenderedNode::default()
+        }),
+        WitnessSupportKind::Checked => render_checked_leaf(node, route, names),
+        WitnessSupportKind::Mixed | WitnessSupportKind::Opaque => {
+            Err(AmenableError::invariant(format!(
+                "leaf at {} reports an impossible per-leaf support kind {:?} -- Mixed only \
+                 arises from composing multiple leaves, and Opaque leaves cannot reach this \
+                 renderer (amenable_core::ClassifiedWitness blocks them at cargo check time)",
+                route_display(route),
+                node.kind
+            )))
         }
     }
 }
 
-fn render_spec_definition(
-    module_stem: &str,
+fn render_checked_leaf(
+    node: &WitnessArtifactNode,
     route: &[RouteSegment],
-    premises: &[LeafPremise],
-    child_expressions: &[String],
-) -> String {
-    let spec_name = spec_name(module_stem, route);
-    let arguments = render_bool_arguments(premises);
-    let body = if child_expressions.is_empty() {
-        "true".to_owned()
-    } else {
-        child_expressions.join("\n        && ")
+    names: &mut NameAllocator,
+) -> AmenableResult<RenderedNode> {
+    let harness = metadata_value(&node.metadata, "harness").ok_or_else(|| {
+        AmenableError::invariant(format!(
+            "checked leaf at {} has no \"harness\" metadata entry",
+            route_display(route)
+        ))
+    })?;
+
+    let shape = verus_call_shape(harness).ok_or_else(|| {
+        AmenableError::invariant(format!(
+            "no registered Verus call shape for harness `{harness}` (route: {}) -- register one \
+             via amenable_std::register_verus_call_shape! before exporting this composite",
+            route_display(route)
+        ))
+    })?;
+
+    let route_hint = route_hint_name(route);
+    let mut local_names: std::collections::HashMap<String, String> =
+        std::collections::HashMap::new();
+    let mut params = Vec::new();
+
+    for param in &shape.params {
+        let local = names.allocate(&param.name, &route_hint);
+        local_names.insert(param.name.clone(), local.clone());
+        params.push(RenderedParam {
+            local_name: local,
+            ty: param.ty.clone(),
+        });
+    }
+
+    let call_args = shape
+        .params
+        .iter()
+        .map(|param| local_names[&param.name].clone())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let call = CheckedCall {
+        expr: format!("{}::{}({call_args})", shape.module_path, shape.name),
+        ty: match &shape.kind {
+            amenable_std::VerusCallKind::Function { returns } => returns.clone(),
+            amenable_std::VerusCallKind::Predicate => {
+                return Err(AmenableError::invariant(format!(
+                    "harness `{harness}` (route: {}) is registered as a bare predicate, not a \
+                     callable function -- predicate-kind composition isn't wired up yet",
+                    route_display(route)
+                )));
+            }
+        },
     };
 
-    format!("pub open spec fn {spec_name}({arguments}) -> bool {{\n    {body}\n}}\n")
+    let requires = shape
+        .requires
+        .iter()
+        .map(|cite| pending_cite(cite, &shape.module_path, &local_names))
+        .collect();
+    let ensures = shape
+        .ensures
+        .iter()
+        .map(|cite| pending_cite(cite, &shape.module_path, &local_names))
+        .collect();
+
+    let comment = format!(
+        "// checked leaf at {}: calls {}::{}",
+        route_display(route),
+        shape.module_path,
+        shape.name
+    );
+
+    Ok(RenderedNode {
+        params,
+        checked_calls: vec![call],
+        requires,
+        ensures,
+        comments: vec![comment],
+    })
 }
 
-fn render_spec_call(module_stem: &str, route: &[RouteSegment], premises: &[LeafPremise]) -> String {
-    let spec_name = spec_name(module_stem, route);
-    let arguments = premises
-        .iter()
-        .map(|premise| premise.name.as_str())
-        .collect::<Vec<_>>();
-
-    if arguments.is_empty() {
-        format!("{spec_name}()")
-    } else {
-        format!("{spec_name}({})", arguments.join(", "))
+fn pending_cite(
+    cite: &VerusPredicateCite,
+    module_path: &str,
+    local_names: &std::collections::HashMap<String, String>,
+) -> PendingCite {
+    PendingCite {
+        predicate: cite.predicate.clone(),
+        module_path: module_path.to_owned(),
+        args: cite
+            .args
+            .iter()
+            .map(|arg| match arg {
+                VerusCiteArg::Result => PendingArg::ResultOf(0),
+                VerusCiteArg::Param(name) => PendingArg::Local(local_names[name].clone()),
+            })
+            .collect(),
     }
 }
 
-fn render_bool_arguments(premises: &[LeafPremise]) -> String {
-    premises
+fn render_trust_comment(node: &WitnessArtifactNode, route: &[RouteSegment]) -> String {
+    let mut line = format!("// trusted leaf at {}", route_display(route));
+
+    let metadata = node
+        .metadata
         .iter()
-        .map(|premise| format!("{}: bool", premise.name))
+        .map(|entry| format!("{} = {}", entry.key(), entry.value()))
         .collect::<Vec<_>>()
-        .join(", ")
-}
+        .join(", ");
 
-fn render_premise_comment(premise: &LeafPremise) -> String {
-    let mut line = format!(
-        "// premise {}: {} leaf at {}",
-        premise.name,
-        premise.kind.as_str(),
-        route_display(&premise.route)
-    );
-
-    if !premise.metadata.is_empty() {
-        let metadata = premise
-            .metadata
-            .iter()
-            .map(|(key, value)| format!("{key} = {value}"))
-            .collect::<Vec<_>>()
-            .join(", ");
+    if !metadata.is_empty() {
         line.push_str("; ");
         line.push_str(&metadata);
     }
 
     line
+}
+
+fn metadata_value<'a>(metadata: &'a [MetadataEntry], key: &str) -> Option<&'a str> {
+    metadata
+        .iter()
+        .find(|entry| entry.key() == key)
+        .map(MetadataEntry::value)
 }
 
 fn route_display(route: &[RouteSegment]) -> String {
@@ -359,83 +621,29 @@ fn route_display(route: &[RouteSegment]) -> String {
 
     route
         .iter()
-        .map(|segment| match segment {
-            RouteSegment::Member(label) => format!("member {label}"),
-            RouteSegment::Variant(name) => format!("variant {name}"),
+        .map(|segment| {
+            let RouteSegment::Member(label) = segment;
+            format!("member {label}")
         })
         .collect::<Vec<_>>()
         .join(" -> ")
 }
 
-fn render_proof_signature(module_stem: &str, premises: &[LeafPremise]) -> String {
-    let arguments = render_bool_arguments(premises);
-    let signature = if arguments.is_empty() {
-        format!("pub proof fn verify_{module_stem}()")
-    } else {
-        format!("pub proof fn verify_{module_stem}({arguments})")
-    };
-
-    let requires = if premises.is_empty() {
-        String::new()
-    } else {
-        format!(
-            "\n    requires\n{}\n",
-            premises
-                .iter()
-                .map(|premise| format!("        {},", premise.name))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )
-    };
-
-    format!(
-        "{signature}{requires}    ensures\n        {},\n",
-        render_spec_call(module_stem, &[], premises)
-    )
-}
-
-fn render_proof_body(module_stem: &str, premises: &[LeafPremise]) -> String {
-    let call = render_spec_call(module_stem, &[], premises);
-    format!("{{\n    assert({call});\n}}\n")
-}
-
-fn spec_name(module_stem: &str, route: &[RouteSegment]) -> String {
+fn route_hint_name(route: &[RouteSegment]) -> String {
     if route.is_empty() {
-        return format!("{module_stem}_holds");
+        return "root".to_owned();
     }
 
-    format!(
-        "{module_stem}_{}_holds",
-        route
-            .iter()
-            .map(route_segment_name)
-            .collect::<Vec<_>>()
-            .join("_")
-    )
-}
-
-fn leaf_premise_name(
-    module_stem: &str,
-    route: &[RouteSegment],
-    kind: WitnessSupportKind,
-) -> String {
-    let route_name = if route.is_empty() {
-        "leaf".to_owned()
-    } else {
-        route
-            .iter()
-            .map(route_segment_name)
-            .collect::<Vec<_>>()
-            .join("_")
-    };
-    format!("{module_stem}_{route_name}_{}_holds", kind.as_str())
+    route
+        .iter()
+        .map(route_segment_name)
+        .collect::<Vec<_>>()
+        .join("_")
 }
 
 fn route_segment_name(segment: &RouteSegment) -> String {
-    match segment {
-        RouteSegment::Member(label) => format!("member_{}", normalize_identifier(label)),
-        RouteSegment::Variant(name) => format!("variant_{}", normalize_identifier(name)),
-    }
+    let RouteSegment::Member(label) = segment;
+    normalize_identifier(label)
 }
 
 fn normalize_identifier(value: &str) -> String {

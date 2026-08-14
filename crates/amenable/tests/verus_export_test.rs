@@ -237,6 +237,19 @@ impl Witness<LocalVerusVerifier> for LocalLeafEvidence {
 
 impl ClassifiedWitness<LocalVerusVerifier> for LocalLeafEvidence {}
 
+// A local, test-only call shape for LocalLeafEvidence's harness --
+// doesn't need to correspond to any real Verus source, since this test
+// only inspects the renderer's generated text, never runs the real
+// `verus` tool on it.
+amenable_std::register_verus_call_shape! {
+    harness = "verify_shape_override",
+    module_path = "crate::custom::shape_override_carrier",
+    params = [("value", "i32")],
+    returns = "i32",
+    requires = [],
+    ensures = [("shape_override_holds", ["result", "value"])],
+}
+
 amenable_core::register_witness_exports!(verifier = LocalVerusVerifier; LocalEnumEvidence, LocalLeafEvidence);
 
 fn read_file(path: &Path) -> miette::Result<String> {
@@ -244,6 +257,18 @@ fn read_file(path: &Path) -> miette::Result<String> {
         .map_err(|error| miette::miette!("failed to read {}: {error}", path.display()))
 }
 
+/// `LocalEnumEvidence` (registered alongside `LocalLeafEvidence` above)
+/// is enum-shaped, which the renderer deliberately doesn't support yet
+/// (see `amenable::verus_export`'s own doc comment) -- so this call
+/// returns an overall `Err` naming it. That must not stop
+/// `LocalLeafEvidence`'s own, unrelated, working export from still
+/// being rendered and written to disk: `write_verus_witness_modules`
+/// renders every export independently and reports every failure
+/// together, rather than aborting the whole batch at the first one
+/// (confirmed as a real problem while building this -- `inventory`
+/// registration is process-global, so a single broken registration
+/// anywhere would otherwise silently starve every other, working export
+/// in the same process).
 #[test]
 fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::Result<()> {
     let stamp = SystemTime::now()
@@ -256,30 +281,19 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
         fs::remove_dir_all(&root).expect("stale temp directory should be removable");
     }
 
-    let written = support::library(amenable::write_verus_witness_modules(&root))?;
+    let report = support::library(amenable::write_verus_witness_modules(&root))
+        .expect_err("LocalEnumEvidence's enum shape is not supported yet");
+    let error_text = report.to_string();
+    assert!(error_text.contains("enum"), "{error_text}");
+    assert!(error_text.contains("LocalEnumEvidence"), "{error_text}");
 
     assert!(
-        written
-            .iter()
-            .any(|path| path.ends_with("derived_witness/local_shape_witness.rs")),
-        "{written:?}"
-    );
-    assert!(
-        written
-            .iter()
-            .any(|path| path.ends_with("custom/proofs/shape_override_witness.rs")),
-        "{written:?}"
+        !root.join("derived_witness/local_shape_witness.rs").exists(),
+        "the unsupported enum export must not produce a file"
     );
 
     let lib_rs = read_file(&root.join("lib.rs"))?;
     assert!(lib_rs.contains("pub mod custom;"), "{lib_rs}");
-    assert!(lib_rs.contains("pub mod derived_witness;"), "{lib_rs}");
-
-    let derived_mod = read_file(&root.join("derived_witness/mod.rs"))?;
-    assert!(
-        derived_mod.contains("pub mod local_shape_witness;"),
-        "{derived_mod}"
-    );
 
     let custom_mod = read_file(&root.join("custom/mod.rs"))?;
     assert!(custom_mod.contains("pub mod proofs;"), "{custom_mod}");
@@ -290,47 +304,21 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
         "{nested_mod}"
     );
 
-    let enum_module = read_file(&root.join("derived_witness/local_shape_witness.rs"))?;
-    assert!(
-        enum_module.contains("pub open spec fn local_shape_witness_holds("),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("pub open spec fn local_shape_witness_variant_balanced_holds("),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("pub open spec fn local_shape_witness_variant_fallback_holds("),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("pub open spec fn local_shape_witness_variant_closed_holds() -> bool"),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("pub proof fn verify_local_shape_witness("),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("verify_char_roundtrip"),
-        "{enum_module}"
-    );
-    assert!(
-        enum_module.contains("authority = Rust Project Developers"),
-        "{enum_module}"
-    );
-
     let leaf_module = read_file(&root.join("custom/proofs/shape_override_witness.rs"))?;
     assert!(
-        leaf_module.contains("pub open spec fn shape_override_witness_holds("),
+        leaf_module.contains("crate::custom::shape_override_carrier::verify_shape_override(value)"),
         "{leaf_module}"
     );
     assert!(
-        leaf_module.contains("pub proof fn verify_shape_override_witness("),
+        leaf_module.contains("shape_override_holds(result, value)"),
         "{leaf_module}"
     );
     assert!(
-        leaf_module.contains("verify_shape_override"),
+        leaf_module.contains("pub fn verify_shape_override_witness(value: i32) -> (result: i32)"),
+        "{leaf_module}"
+    );
+    assert!(
+        leaf_module.contains("use crate::custom::shape_override_carrier::shape_override_holds;"),
         "{leaf_module}"
     );
 
