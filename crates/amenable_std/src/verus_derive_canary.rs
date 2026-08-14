@@ -10,10 +10,13 @@ use crate::{RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof, 
 type ConcreteVerusExportCanaryEnum =
     VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
 type ConcreteVerusExportCanaryStruct = VerusExportCheckedPlusTrivialStruct<CheckedVerusExportLeaf>;
+type ConcreteVerusExportTupleStruct =
+    VerusExportTupleStruct<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
 
 crate::emit_verus_witnesses!(
     ConcreteVerusExportCanaryEnum,
     ConcreteVerusExportCanaryStruct,
+    ConcreteVerusExportTupleStruct,
 );
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
@@ -72,9 +75,22 @@ struct VerusExportCheckedPlusTrivialStruct<TChecked: Provenance + Clone + Defaul
     marker: TrivialVerusExportLeaf,
 }
 
-#[expect(
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+#[witness(verus(module = "crate::derived_witness::verus_export_tuple_struct_witness"))]
+struct VerusExportTupleStruct<
+    TChecked: Provenance + Clone + Default,
+    TTrusted: Provenance + Clone + Default,
+>(
+    TChecked,
+    #[provenance(rename = "trusted")] TTrusted,
+    #[provenance(rename = "marker")] TrivialVerusExportLeaf,
+);
+
+#[allow(
     dead_code,
-    reason = "the canary exists to register and export a concrete derived proof shape; no runtime value construction is required"
+    reason = "the canary exists to register and export a concrete derived proof shape; no runtime construction is required"
 )]
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core", tag = "entry_kind")]

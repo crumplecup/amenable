@@ -367,3 +367,23 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         WitnessArtifactShape::Leaf
     );
 }
+
+#[test]
+fn live_verus_canary_exports_include_tuple_struct_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_tuple_struct_witness"
+        })
+        .expect("expected library Verus tuple-struct export canary");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::TupleStruct);
+    assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
+    assert_eq!(export.support, tuple_struct_support());
+    assert_eq!(export.artifact.members.len(), 3);
+    assert_eq!(export.artifact.members[0].label, "0");
+    assert_eq!(export.artifact.members[1].label, "trusted");
+    assert_eq!(export.artifact.members[2].label, "marker");
+}
