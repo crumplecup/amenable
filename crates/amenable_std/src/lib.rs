@@ -89,7 +89,10 @@ pub use verus_gallery::{
     VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,
 };
 #[cfg(feature = "verus")]
-pub use verus_witness::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+pub use verus_witness::{
+    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusParam,
+    VerusVerifier, VerusVerifierMetadata, VerusWitness, verus_call_shape,
+};
 pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
 pub use write_stores_new_value::WriteStoresNewValue;
 pub use yields_three_values_in_order_then_ends::YieldsThreeValuesInOrderThenEnds;

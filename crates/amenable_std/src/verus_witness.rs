@@ -304,6 +304,122 @@ impl std::fmt::Display for VerusCheckedProof {
     }
 }
 
+/// One symbolic input a real Verus harness takes, in declaration order.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerusParam {
+    /// The parameter's real name in the harness signature.
+    pub name: String,
+    /// The parameter's real Verus type, as written in the signature.
+    pub ty: String,
+}
+
+/// How a compositional renderer should invoke a leaf's real Verus proof,
+/// rather than assuming its conclusion as a free boolean.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VerusCallKind {
+    /// A bare `open spec fn` predicate, directly citable by name — no
+    /// call needed, a composite's own spec fn can just conjoin it.
+    Predicate,
+    /// A value-returning function: call it, bind the result, cite its
+    /// real `ensures` predicate with the bound result in scope.
+    Function {
+        /// The harness's real return type.
+        returns: String,
+    },
+}
+
+/// Structural, machine-usable call shape for a real Verus harness —
+/// enough for a compositional renderer to emit a literal call to (or
+/// citation of) the real proof, instead of assuming its conclusion.
+///
+/// A separate, additive registry (see [`VerusCallShapeRecord`]) rather
+/// than a field on [`VerusCheckedProof`] itself: [`VerusCheckedProof`]
+/// already has ~280 construction sites across this file, almost none of
+/// which are opted into Verus export (`register_witness_exports!` is
+/// deliberately opt-in — see its own doc comment). Requiring every one
+/// of those sites to supply a call shape up front, before any renderer
+/// exists to use it, would force touching all of them for no immediate
+/// benefit. Registering a call shape only for harnesses actually opted
+/// into export keeps the two concerns (this crate's own witness
+/// registrations vs. what a downstream Verus-rendering tool needs) from
+/// forcing lockstep changes on each other.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerusCallShape {
+    /// The crate-relative module path the harness lives in.
+    pub module_path: String,
+    /// The harness function's real name.
+    pub name: String,
+    /// The harness's real symbolic parameters, in order.
+    pub params: Vec<VerusParam>,
+    /// Named preconditions the harness itself requires, propagated
+    /// upward into a composite's own `requires` when this leaf composes.
+    pub requires: Vec<String>,
+    /// How to invoke this specific harness.
+    pub kind: VerusCallKind,
+}
+
+/// A statically registered call shape for one Verus harness, keyed by
+/// harness name.
+///
+/// Additive and opt-in, matching [`amenable_core::WitnessExportRecord`]'s
+/// own opt-in registration story: only harnesses a compositional
+/// renderer actually needs to call get one.
+pub struct VerusCallShapeRecord {
+    /// The harness name this call shape describes.
+    pub harness: &'static str,
+    /// Build the real call shape.
+    pub call_shape: fn() -> VerusCallShape,
+}
+
+inventory::collect!(VerusCallShapeRecord);
+
+/// Look up the registered call shape for a harness by name.
+pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
+    inventory::iter::<VerusCallShapeRecord>()
+        .find(|record| record.harness == harness)
+        .map(|record| (record.call_shape)())
+}
+
+/// Register a real Verus harness's call shape.
+///
+/// ```ignore
+/// register_verus_call_shape! {
+///     harness = "verify_char_roundtrip",
+///     module_path = "crate::rust_std::char_carrier",
+///     params = [("c", "char")],
+///     returns = "char",
+/// }
+/// ```
+#[macro_export]
+macro_rules! register_verus_call_shape {
+    (
+        harness = $harness:literal,
+        module_path = $module_path:literal,
+        params = [$(($param_name:literal, $param_ty:literal)),* $(,)?],
+        returns = $returns:literal $(,)?
+    ) => {
+        ::inventory::submit! {
+            $crate::VerusCallShapeRecord {
+                harness: $harness,
+                call_shape: || $crate::VerusCallShape {
+                    module_path: $module_path.to_owned(),
+                    name: $harness.to_owned(),
+                    params: ::std::vec![
+                        $($crate::VerusParam {
+                            name: $param_name.to_owned(),
+                            ty: $param_ty.to_owned(),
+                        }),*
+                    ],
+                    requires: ::std::vec::Vec::new(),
+                    kind: $crate::VerusCallKind::Function {
+                        returns: $returns.to_owned(),
+                    },
+                },
+            }
+        }
+    };
+}
+
 const VERIFY_CHAR_ROUNDTRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_carrier.rs");
 
@@ -315,6 +431,18 @@ const CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn ch
     (value as u32) <= 0xD7FFu32
         || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)
 }"#;
+
+// The real signature (crates/amenable_verus/src/rust_std/char_carrier.rs):
+// `pub fn verify_char_roundtrip(c: char) -> (result: char)`. Registered
+// once per harness name, not per Witness-impl type — RustStdStandard<char>,
+// ValidUnicodeScalar, and the Verus derive-witness canary's
+// CheckedVerusExportLeaf all reuse this exact harness.
+crate::register_verus_call_shape! {
+    harness = "verify_char_roundtrip",
+    module_path = "crate::rust_std::char_carrier",
+    params = [("c", "char")],
+    returns = "char",
+}
 
 impl VerusWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;

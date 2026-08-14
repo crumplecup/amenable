@@ -1,7 +1,10 @@
 #![cfg(feature = "verus")]
 
 use amenable_core::{Ensures, Witness, WitnessSupportSummary};
-use amenable_std::{RustStdStandard, RustStdType, ValidUnicodeScalar, VerusVerifier};
+use amenable_std::{
+    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusVerifier,
+    verus_call_shape,
+};
 
 #[expect(
     deprecated,
@@ -4787,4 +4790,28 @@ fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
     assert_eq!(proof.harness, "<OwnedSocket as AsRawSocket>::as_raw_socket");
     assert_eq!(proof.provenance, <OwnedSocket as RustStdType>::provenance());
+}
+
+#[test]
+fn verus_call_shape_is_registered_for_char_roundtrip() {
+    let shape =
+        verus_call_shape("verify_char_roundtrip").expect("expected a registered call shape");
+
+    assert_eq!(shape.module_path, "crate::rust_std::char_carrier");
+    assert_eq!(shape.name, "verify_char_roundtrip");
+    assert_eq!(shape.params.len(), 1);
+    assert_eq!(shape.params[0].name, "c");
+    assert_eq!(shape.params[0].ty, "char");
+    assert!(shape.requires.is_empty());
+    assert_eq!(
+        shape.kind,
+        VerusCallKind::Function {
+            returns: "char".to_owned()
+        }
+    );
+}
+
+#[test]
+fn verus_call_shape_is_absent_for_an_unregistered_harness() {
+    assert!(verus_call_shape("verify_something_never_registered").is_none());
 }
