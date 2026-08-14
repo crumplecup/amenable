@@ -101,7 +101,7 @@ pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(Witness, attributes(provenance))]
+#[proc_macro_derive(Witness, attributes(provenance, witness))]
 pub fn derive_witness(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
@@ -111,12 +111,12 @@ pub fn derive_witness(input: TokenStream) -> TokenStream {
     }
 }
 
-struct ContainerOptions {
+struct ProvenanceContainerOptions {
     crate_path: Path,
     tag: String,
 }
 
-impl Default for ContainerOptions {
+impl Default for ProvenanceContainerOptions {
     fn default() -> Self {
         Self {
             crate_path: parse_quote!(amenable_core),
@@ -126,13 +126,18 @@ impl Default for ContainerOptions {
 }
 
 #[derive(Default)]
+struct WitnessContainerOptions {
+    verus_module: Option<String>,
+}
+
+#[derive(Default)]
 struct MemberOptions {
     rename: Option<String>,
     skip: bool,
 }
 
 fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-    let options = parse_container_options(&input.attrs)?;
+    let options = parse_provenance_container_options(&input.attrs)?;
     let name = &input.ident;
     let crate_path = &options.crate_path;
     let field_types = collect_field_types(&input.data)?;
@@ -184,7 +189,7 @@ fn expand_struct_metadata(
 fn expand_enum_metadata(
     crate_path: &Path,
     data: &DataEnum,
-    options: &ContainerOptions,
+    options: &ProvenanceContainerOptions,
 ) -> syn::Result<proc_macro2::TokenStream> {
     let tag = &options.tag;
     let arms = data
@@ -445,8 +450,10 @@ fn field_name(field: &Field, position: Option<usize>) -> syn::Result<String> {
         }))
 }
 
-fn parse_container_options(attrs: &[syn::Attribute]) -> syn::Result<ContainerOptions> {
-    let mut options = ContainerOptions::default();
+fn parse_provenance_container_options(
+    attrs: &[syn::Attribute],
+) -> syn::Result<ProvenanceContainerOptions> {
+    let mut options = ProvenanceContainerOptions::default();
 
     for attr in attrs
         .iter()
@@ -466,6 +473,34 @@ fn parse_container_options(attrs: &[syn::Attribute]) -> syn::Result<ContainerOpt
             }
 
             Err(meta.error("unsupported provenance container attribute"))
+        })?;
+    }
+
+    Ok(options)
+}
+
+fn parse_witness_container_options(
+    attrs: &[syn::Attribute],
+) -> syn::Result<WitnessContainerOptions> {
+    let mut options = WitnessContainerOptions::default();
+
+    for attr in attrs.iter().filter(|attr| attr.path().is_ident("witness")) {
+        attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident("verus") {
+                meta.parse_nested_meta(|meta| {
+                    if meta.path.is_ident("module") {
+                        let value: LitStr = meta.value()?.parse()?;
+                        options.verus_module = Some(value.value());
+                        return Ok(());
+                    }
+
+                    Err(meta.error("unsupported witness verus attribute"))
+                })?;
+
+                return Ok(());
+            }
+
+            Err(meta.error("unsupported witness container attribute"))
         })?;
     }
 

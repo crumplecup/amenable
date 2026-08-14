@@ -39,7 +39,8 @@ pub use amenable_core::{
     ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange, MetadataEntry,
     OwnedProvenanceReport, ProofChainReport, ProofRecord, ProofToken, Provenance, ProvenanceReport,
     Registry, RegistryReport, Requires, Sidecar, Standard, StateMachine, Verifier, Witness,
-    proof_chain, proof_chain_for_verifiers,
+    WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind,
+    WitnessSupportSummary, proof_chain, proof_chain_for_verifiers, witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};

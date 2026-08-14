@@ -14,14 +14,19 @@ use syn::{
 };
 
 use crate::{
-    collect_field_types_from_fields, field_name, parse_container_options, parse_member_options,
+    collect_field_types_from_fields, field_name, parse_member_options,
+    parse_provenance_container_options, parse_witness_container_options,
 };
 
 pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     let evidence_ident = &input.ident;
     let proof_ident = format_ident!("{evidence_ident}WitnessProof");
     let variant_prefix = format_ident!("{evidence_ident}WitnessVariant");
-    let options = parse_container_options(&input.attrs)?;
+    let options = parse_provenance_container_options(&input.attrs)?;
+    let witness_options = parse_witness_container_options(&input.attrs)?;
+    let verus_module_path = witness_options
+        .verus_module
+        .unwrap_or_else(|| default_verus_module_path(evidence_ident));
     let (_, evidence_ty_generics, _) = input.generics.split_for_impl();
 
     let mut proof_generics = input.generics.clone();
@@ -44,6 +49,7 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
         proof_ident: &proof_ident,
         proof_generics: &proof_generics,
         display_generics: &display_generics,
+        verus_module_path: &verus_module_path,
     };
 
     let proof_definition = match &input.data {
@@ -83,6 +89,10 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
             fn proof() -> Self::ProofArtifact {
                 #proof_ident #proof_turbofish::new()
             }
+
+            fn support() -> ::amenable_core::WitnessSupportSummary {
+                #proof_ident #proof_turbofish::new().support
+            }
         }
     })
 }
@@ -98,6 +108,7 @@ struct ProofTypeContext<'a> {
     proof_ident: &'a syn::Ident,
     proof_generics: &'a Generics,
     display_generics: &'a Generics,
+    verus_module_path: &'a str,
 }
 
 fn expand_struct_proof_type(
@@ -110,6 +121,7 @@ fn expand_struct_proof_type(
     let proof_ident = ctx.proof_ident;
     let proof_generics = ctx.proof_generics;
     let display_generics = ctx.display_generics;
+    let verus_module_path = ctx.verus_module_path;
     let shape_name = match &data.fields {
         Fields::Named(_) => "named_struct",
         Fields::Unnamed(_) => "tuple_struct",
@@ -124,6 +136,13 @@ fn expand_struct_proof_type(
 
         quote! {
             #field_ident: <#component_type as ::amenable_core::Witness<__Verifier>>::proof()
+        }
+    });
+    let support_terms = fields.iter().map(|field| {
+        let component_type = &field.component_type;
+
+        quote! {
+            <#component_type as ::amenable_core::Witness<__Verifier>>::support()
         }
     });
     let report_lines = fields.iter().map(|field| {
@@ -145,14 +164,20 @@ fn expand_struct_proof_type(
         pub struct #proof_ident #proof_impl_generics #proof_where_clause {
             #(pub #field_names: #field_types,)*
             #generics_marker
+            pub support: ::amenable_core::WitnessSupportSummary,
             pub verifier: ::std::marker::PhantomData<__Verifier>,
         }
 
         impl #proof_impl_generics #proof_ident #proof_ty_generics #proof_where_clause {
+            pub const VERUS_MODULE_PATH: &'static str = #verus_module_path;
+
             pub fn new() -> Self {
                 Self {
                     #(#constructor_fields,)*
                     __evidence_generics: ::std::marker::PhantomData,
+                    support: ::amenable_core::WitnessSupportSummary::compose(&[
+                        #(#support_terms,)*
+                    ]),
                     verifier: ::std::marker::PhantomData,
                 }
             }
@@ -163,9 +188,17 @@ fn expand_struct_proof_type(
                 writeln!(f, "verifier: {}", <__Verifier as ::amenable_core::Verifier>::name())?;
                 writeln!(f, "evidence: {}", ::std::any::type_name::<#evidence_ident #evidence_ty_generics>())?;
                 writeln!(f, "shape: {}", #shape_name)?;
+                writeln!(f, "support: {}", self.support)?;
                 #(#report_lines)*
                 Ok(())
             }
+        }
+
+        impl #proof_impl_generics ::amenable_core::WitnessModulePath
+            for #proof_ident #proof_ty_generics
+            #proof_where_clause
+        {
+            const MODULE_PATH: &'static str = Self::VERUS_MODULE_PATH;
         }
     })
 }
@@ -182,6 +215,7 @@ fn expand_enum_proof_types(
     let proof_ident = ctx.proof_ident;
     let proof_generics = ctx.proof_generics;
     let display_generics = ctx.display_generics;
+    let verus_module_path = ctx.verus_module_path;
     let variant_proofs = data
         .variants
         .iter()
@@ -214,14 +248,28 @@ fn expand_enum_proof_types(
 
     let outer_field_idents = outer_fields.iter().map(|field| &field.field_ident);
     let outer_field_types = outer_fields.iter().map(|field| &field.proof_ident);
-    let constructors = outer_fields.iter().map(|field| {
+    let constructor_bindings = outer_fields.iter().map(|field| {
         let field_ident = &field.field_ident;
         let proof_ident = &field.proof_ident;
         let (_, proof_ty_generics, _) = proof_generics.split_for_impl();
         let proof_turbofish = proof_ty_generics.as_turbofish();
 
         quote! {
-            #field_ident: #proof_ident #proof_turbofish::new()
+            let #field_ident = #proof_ident #proof_turbofish::new();
+        }
+    });
+    let support_terms = outer_fields.iter().map(|field| {
+        let field_ident = &field.field_ident;
+
+        quote! {
+            #field_ident.support
+        }
+    });
+    let constructors = outer_fields.iter().map(|field| {
+        let field_ident = &field.field_ident;
+
+        quote! {
+            #field_ident
         }
     });
     let reports = outer_fields.iter().map(|field| {
@@ -243,13 +291,22 @@ fn expand_enum_proof_types(
 
         pub struct #proof_ident #proof_impl_generics #proof_where_clause {
             #(pub #outer_field_idents: #outer_field_types #proof_ty_generics,)*
+            pub support: ::amenable_core::WitnessSupportSummary,
             pub verifier: ::std::marker::PhantomData<__Verifier>,
         }
 
         impl #proof_impl_generics #proof_ident #proof_ty_generics #proof_where_clause {
+            pub const VERUS_MODULE_PATH: &'static str = #verus_module_path;
+
             pub fn new() -> Self {
+                #(#constructor_bindings)*
+                let support = ::amenable_core::WitnessSupportSummary::compose(&[
+                    #(#support_terms,)*
+                ]);
+
                 Self {
                     #(#constructors,)*
+                    support,
                     verifier: ::std::marker::PhantomData,
                 }
             }
@@ -260,10 +317,18 @@ fn expand_enum_proof_types(
                 writeln!(f, "verifier: {}", <__Verifier as ::amenable_core::Verifier>::name())?;
                 writeln!(f, "evidence: {}", ::std::any::type_name::<#evidence_ident #evidence_ty_generics>())?;
                 writeln!(f, "shape: enum")?;
+                writeln!(f, "support: {}", self.support)?;
                 writeln!(f, "tag: {}", #tag)?;
                 #(#reports)*
                 Ok(())
             }
+        }
+
+        impl #proof_impl_generics ::amenable_core::WitnessModulePath
+            for #proof_ident #proof_ty_generics
+            #proof_where_clause
+        {
+            const MODULE_PATH: &'static str = Self::VERUS_MODULE_PATH;
         }
     })
 }
@@ -293,6 +358,13 @@ fn expand_enum_variant_proof_type(
             #field_ident: <#component_type as ::amenable_core::Witness<__Verifier>>::proof()
         }
     });
+    let support_terms = fields.iter().map(|field| {
+        let component_type = &field.component_type;
+
+        quote! {
+            <#component_type as ::amenable_core::Witness<__Verifier>>::support()
+        }
+    });
     let report_lines = fields.iter().map(|field| {
         let field_ident = &field.ident;
         let label = &field.label;
@@ -311,6 +383,7 @@ fn expand_enum_variant_proof_type(
         pub struct #proof_ident #proof_impl_generics #proof_where_clause {
             #(pub #field_names: #field_types,)*
             #generics_marker
+            pub support: ::amenable_core::WitnessSupportSummary,
             pub verifier: ::std::marker::PhantomData<__Verifier>,
         }
 
@@ -319,6 +392,9 @@ fn expand_enum_variant_proof_type(
                 Self {
                     #(#constructor_fields,)*
                     __evidence_generics: ::std::marker::PhantomData,
+                    support: ::amenable_core::WitnessSupportSummary::compose(&[
+                        #(#support_terms,)*
+                    ]),
                     verifier: ::std::marker::PhantomData,
                 }
             }
@@ -327,6 +403,7 @@ fn expand_enum_variant_proof_type(
         impl #display_impl_generics ::std::fmt::Display for #proof_ident #display_ty_generics #display_where_clause {
             fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
                 writeln!(f, "shape: {}", #shape_name)?;
+                writeln!(f, "support: {}", self.support)?;
                 writeln!(f, "variant: {}", stringify!(#variant_ident))?;
                 #(#report_lines)*
                 Ok(())
@@ -465,6 +542,43 @@ fn generic_marker_member(param: &GenericParam) -> TokenStream {
             quote!([(); #ident])
         }
     }
+}
+
+fn default_verus_module_path(evidence_ident: &syn::Ident) -> String {
+    format!(
+        "crate::derived_witness::{}_witness",
+        to_snake_case(&evidence_ident.to_string())
+    )
+}
+
+fn to_snake_case(name: &str) -> String {
+    let chars = name.chars().collect::<Vec<_>>();
+    let mut snake = String::new();
+
+    for (index, ch) in chars.iter().copied().enumerate() {
+        if ch.is_uppercase() {
+            let previous = index
+                .checked_sub(1)
+                .and_then(|position| chars.get(position));
+            let next = chars.get(index + 1);
+            let needs_separator = index > 0
+                && previous.is_some_and(|ch| ch.is_lowercase() || ch.is_ascii_digit())
+                || previous.is_some_and(|ch| ch.is_uppercase())
+                    && next.is_some_and(|ch| ch.is_lowercase());
+
+            if needs_separator {
+                snake.push('_');
+            }
+
+            for lowercase in ch.to_lowercase() {
+                snake.push(lowercase);
+            }
+        } else {
+            snake.push(ch);
+        }
+    }
+
+    snake
 }
 
 struct ProofField {

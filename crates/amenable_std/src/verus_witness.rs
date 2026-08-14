@@ -44,7 +44,10 @@
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 
-use amenable_core::{Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness};
+use amenable_core::{
+    Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness,
+    WitnessSupportSummary,
+};
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
 #[cfg(windows)]
@@ -119,6 +122,27 @@ pub trait VerusWitness {
     fn proof() -> Self::ProofArtifact;
 }
 
+/// Register explicit Verus witness exports for concrete instantiated
+/// types.
+///
+/// Verus compiles a separate source tree and cannot discover every
+/// derived witness automatically. This macro records the concrete types a
+/// crate wants to materialize in that separate Verus pipeline while
+/// keeping the registration itself in ordinary Rust macro expansion.
+#[macro_export]
+macro_rules! emit_verus_witnesses {
+    ($($ty:ty),* $(,)?) => {
+        ::amenable_core::register_witness_exports!(
+            verifier = $crate::VerusVerifier;
+            $($ty),*
+        );
+    };
+}
+
+trait VerusProofArtifactSupport {
+    fn support() -> WitnessSupportSummary;
+}
+
 macro_rules! bridge_verus_witness {
     ($ty:ty) => {
         impl Witness<VerusVerifier> for $ty {
@@ -127,6 +151,10 @@ macro_rules! bridge_verus_witness {
 
             fn proof() -> Self::ProofArtifact {
                 <$ty as VerusWitness>::proof()
+            }
+
+            fn support() -> WitnessSupportSummary {
+                <<$ty as VerusWitness>::ProofArtifact as VerusProofArtifactSupport>::support()
             }
         }
     };
@@ -205,6 +233,12 @@ impl_verus_witness_trusted!(
     ()
 );
 
+impl VerusProofArtifactSupport for RustStdProvenance {
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::trusted_leaf()
+    }
+}
+
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
 /// names the spec function, carries its verbatim source as `claim`, and
 /// still rests on the chain-derived provenance.
@@ -221,6 +255,12 @@ pub struct VerusCheckedProof {
     pub claim: &'static str,
     /// The chain-derived provenance this claim still rests on.
     pub provenance: RustStdProvenance,
+}
+
+impl VerusProofArtifactSupport for VerusCheckedProof {
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::checked_leaf()
+    }
 }
 
 impl std::fmt::Display for VerusCheckedProof {

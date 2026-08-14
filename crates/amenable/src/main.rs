@@ -174,12 +174,27 @@ struct ContractRecordDump {
     fragment: String,
 }
 
+/// One explicit [`amenable::WitnessExportRecord`], owned for JSON
+/// serialization.
+#[derive(serde::Serialize)]
+struct WitnessExportRecordDump {
+    verifier: String,
+    evidence: String,
+    destination_module: String,
+    support_kind: String,
+    trivial: usize,
+    checked: usize,
+    trusted: usize,
+    opaque: usize,
+}
+
 /// The full registry dump written by `dump-registry`.
 #[derive(serde::Serialize)]
 struct RegistryDump {
     evidence_links: Vec<EvidenceLinkDump>,
     proof_records: Vec<ProofRecordDump>,
     contract_records: Vec<ContractRecordDump>,
+    witness_export_records: Vec<WitnessExportRecordDump>,
     kani_proofs: Vec<KaniProofDump>,
 }
 
@@ -212,6 +227,19 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
                 verifier: record.verifier.to_owned(),
                 kind: record.kind.to_owned(),
                 fragment: (record.fragment)().to_owned(),
+            })
+            .collect(),
+        witness_export_records: amenable::witness_exports()
+            .into_iter()
+            .map(|record| WitnessExportRecordDump {
+                support_kind: record.support.kind().as_str().to_owned(),
+                trivial: record.support.trivial(),
+                checked: record.support.checked(),
+                trusted: record.support.trusted(),
+                opaque: record.support.opaque(),
+                verifier: record.verifier,
+                evidence: record.evidence,
+                destination_module: record.destination_module,
             })
             .collect(),
         kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()

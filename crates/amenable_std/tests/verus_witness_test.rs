@@ -1,6 +1,6 @@
 #![cfg(feature = "verus")]
 
-use amenable_core::{Ensures, Witness};
+use amenable_core::{Ensures, Witness, WitnessSupportSummary};
 use amenable_std::{RustStdStandard, RustStdType, ValidUnicodeScalar, VerusVerifier};
 
 #[expect(
@@ -15,6 +15,10 @@ fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
         <RustStdStandard<bool> as Witness<VerusVerifier>>::proof(),
         <bool as RustStdType>::provenance()
     );
+    assert_eq!(
+        <RustStdStandard<bool> as Witness<VerusVerifier>>::support(),
+        WitnessSupportSummary::trusted_leaf()
+    );
 }
 
 #[test]
@@ -23,6 +27,10 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     assert_eq!(proof.harness, "verify_char_roundtrip");
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(
+        <RustStdStandard<char> as Witness<VerusVerifier>>::support(),
+        WitnessSupportSummary::checked_leaf()
+    );
 }
 
 #[test]

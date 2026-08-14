@@ -5,11 +5,11 @@ use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
 use support::{
-    DeriveFixtureKind, FixtureCase, FixtureVerifier, GenericEnumFixture, GenericStructFixture,
-    GenericTupleStructFixture, NamedEnumFixture, NamedStructFixture, NestedStructFixture,
-    NestedTupleStructFixture, TupleEnumFixture, TupleStructFixture, UnitEnumFixture,
-    UnitStructFixture, WitnessLeaf, expected_keys, expected_report, expected_values,
-    generic_enum_variants,
+    CheckedPlusTrivialStructFixture, DeriveFixtureKind, FixtureCase, FixtureVerifier,
+    GenericEnumFixture, GenericStructFixture, GenericTupleStructFixture, NamedEnumFixture,
+    NamedStructFixture, NestedStructFixture, NestedTupleStructFixture, TupleEnumFixture,
+    TupleStructFixture, UnitEnumFixture, UnitStructFixture, WitnessLeaf, expected_keys,
+    expected_report, expected_values, generic_enum_variants,
 };
 
 fn assert_witness_fixture<F>()
@@ -24,6 +24,7 @@ where
     let _ = expected_report::<F>();
 
     let proof = <F as Witness<FixtureVerifier>>::proof().to_string();
+    let support = <F as Witness<FixtureVerifier>>::support();
     let proof_type = std::any::type_name::<<F as Witness<FixtureVerifier>>::ProofArtifact>();
     let evidence_nominal_type = std::any::type_name::<F>()
         .split('<')
@@ -40,6 +41,11 @@ where
     assert!(
         proof_type.contains(&format!("{evidence_nominal_type}WitnessProof")),
         "{proof_type}"
+    );
+    assert_eq!(support, F::expected_support());
+    assert!(
+        proof.contains(&format!("support: {}", F::expected_support())),
+        "{proof}"
     );
 
     for fragment in expected_witness_fragments(F::KIND) {
@@ -64,6 +70,12 @@ fn expected_witness_fragments(kind: DeriveFixtureKind) -> &'static [&'static str
             "shape: tuple_struct",
             "member authority: leaf:",
             "member 1: leaf:",
+        ],
+        DeriveFixtureKind::CheckedPlusTrivialStruct => &[
+            "verifier: fixture",
+            "shape: named_struct",
+            "member authority: leaf:",
+            "member marker: verifier: fixture",
         ],
         DeriveFixtureKind::UnitEnum => &[
             "verifier: fixture",
@@ -158,6 +170,14 @@ impl Default for ShapeMirrorEnum {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+#[witness(verus(module = "crate::custom::proofs::shape_override_witness"))]
+struct ShapeOverrideStruct {
+    alpha: WitnessLeaf,
+}
+
 #[test]
 fn witness_derive_projects_expected_structure_for_every_fixture() {
     let _ = generic_enum_variants();
@@ -165,6 +185,7 @@ fn witness_derive_projects_expected_structure_for_every_fixture() {
     assert_witness_fixture::<UnitStructFixture>();
     assert_witness_fixture::<NamedStructFixture>();
     assert_witness_fixture::<TupleStructFixture>();
+    assert_witness_fixture::<CheckedPlusTrivialStructFixture>();
     assert_witness_fixture::<UnitEnumFixture>();
     assert_witness_fixture::<NamedEnumFixture>();
     assert_witness_fixture::<TupleEnumFixture>();
@@ -195,4 +216,33 @@ fn witness_proofs_remember_enclosing_shape_not_just_leaf_multiset() {
     );
     assert!(enum_proof.contains("shape: enum"), "{enum_proof}");
     assert!(enum_proof.contains("tag: shape"), "{enum_proof}");
+}
+
+#[test]
+fn witness_derive_exposes_default_verus_destination_contract() {
+    type ShapeMirrorStructProof = <ShapeMirrorStruct as Witness<FixtureVerifier>>::ProofArtifact;
+    type ShapeMirrorEnumProof = <ShapeMirrorEnum as Witness<FixtureVerifier>>::ProofArtifact;
+
+    assert_eq!(
+        ShapeMirrorStructProof::VERUS_MODULE_PATH,
+        "crate::derived_witness::shape_mirror_struct_witness"
+    );
+    assert_eq!(
+        ShapeMirrorEnumProof::VERUS_MODULE_PATH,
+        "crate::derived_witness::shape_mirror_enum_witness"
+    );
+}
+
+#[test]
+fn witness_derive_respects_explicit_verus_destination_override() {
+    type ShapeOverrideStructProof =
+        <ShapeOverrideStruct as Witness<FixtureVerifier>>::ProofArtifact;
+
+    let report = <ShapeOverrideStruct as Witness<FixtureVerifier>>::proof().to_string();
+
+    assert_eq!(
+        ShapeOverrideStructProof::VERUS_MODULE_PATH,
+        "crate::custom::proofs::shape_override_witness"
+    );
+    assert!(report.contains("shape: named_struct"), "{report}");
 }

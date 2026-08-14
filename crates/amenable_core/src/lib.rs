@@ -46,4 +46,10 @@ pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, Provenanc
 pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
 pub use verifier::Verifier;
-pub use witness::Witness;
+pub use witness::{
+    Witness, WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind,
+    WitnessSupportSummary, witness_exports,
+};
+
+#[doc(hidden)]
+pub use inventory as __inventory;
