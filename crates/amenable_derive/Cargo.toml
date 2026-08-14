@@ -17,11 +17,23 @@ categories = ["development-tools::procedural-macro-helpers", "rust-patterns"]
 proc-macro = true
 
 [dependencies]
+amenable_core = { workspace = true, optional = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }
+verus_syn = { workspace = true, optional = true }
 
 [dev-dependencies]
 amenable_core = { workspace = true }
 inventory = { workspace = true }
 strum = { version = "0.27", features = ["derive"] }
+trybuild = { workspace = true }
+
+[features]
+# The verus_ensures_fragments!/verus_requires_fragments! macros parse real
+# Verus carrier source via amenable_core::verus_carrier (a proc-macro
+# crate can't export that logic itself -- confirmed by a real compiler
+# error, see amenable_core::verus_carrier's own doc comment) -- kept
+# optional since every OTHER macro this crate exports has nothing to do
+# with Verus and shouldn't pull either dependency in unconditionally.
+verus = ["dep:amenable_core", "amenable_core/verus", "dep:verus_syn"]

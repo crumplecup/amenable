@@ -1,0 +1,5 @@
+error: no real, public `pub fn this_harness_does_not_exist` found under `crates/amenable_verus/src` -- this macro derives its fragment from the real carrier source, so the harness must exist there
+ --> tests/ui/verus_ensures_fragments_missing_harness.rs:6:64
+  |
+6 |     let _: &[&str] = amenable_derive::verus_ensures_fragments!("this_harness_does_not_exist");
+  |                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

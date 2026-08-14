@@ -31,6 +31,8 @@ mod provenance;
 mod roles;
 mod state_machine;
 mod verifier;
+#[cfg(feature = "verus")]
+mod verus_carrier;
 mod witness;
 
 pub use calculation::{Calculation, CarriesToken};
@@ -46,6 +48,10 @@ pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, Provenanc
 pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
 pub use verifier::Verifier;
+#[cfg(feature = "verus")]
+pub use verus_carrier::{find_fn as verus_find_fn, literal_clauses as verus_literal_clauses};
+#[cfg(feature = "verus")]
+pub use verus_carrier::{param_name as verus_param_name, walk_tokens as verus_walk_tokens};
 pub use witness::{
     ClassifiedWitness, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
     WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,

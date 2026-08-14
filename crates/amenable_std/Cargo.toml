@@ -43,4 +43,11 @@ creusot = ["dep:amenable_creusot"]
 # `amenable::paths::verus_source_directory` already uses) and parses them
 # with Verus's own real parser, rather than a human hand-typing a second
 # copy of each harness's real `requires`/`ensures` clauses.
-verus = ["dep:proc-macro2", "dep:quote", "dep:syn", "dep:verus_syn"]
+verus = [
+  "amenable_core/verus",
+  "amenable_derive/verus",
+  "dep:proc-macro2",
+  "dep:quote",
+  "dep:syn",
+  "dep:verus_syn",
+]

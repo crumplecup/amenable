@@ -15,10 +15,24 @@ categories = ["development-tools", "rust-patterns"]
 
 [dependencies]
 inventory = { workspace = true }
+proc-macro2 = { workspace = true, optional = true }
+quote = { workspace = true, optional = true }
+syn = { workspace = true, optional = true }
+verus_syn = { workspace = true, optional = true }
 
 [dev-dependencies]
 amenable_derive = { workspace = true }
 trybuild = { workspace = true }
+
+[features]
+# `verus_carrier` parses real Verus carrier source with `verus_syn` --
+# kept optional since most consumers of this crate have nothing to do
+# with Verus and shouldn't pull that dependency in unconditionally.
+# Shared here (not in `amenable_derive`, a proc-macro crate that cannot
+# export anything but macro items) so `amenable_derive`'s compile-time
+# fragment macros and `amenable_std`'s runtime VerusCallShape derivation
+# both call the same one implementation.
+verus = ["dep:proc-macro2", "dep:quote", "dep:syn", "dep:verus_syn"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

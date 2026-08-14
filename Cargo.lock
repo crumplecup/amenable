@@ -40,7 +40,11 @@ version = "0.1.0"
 dependencies = [
  "amenable_derive",
  "inventory",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.3",
  "trybuild",
+ "verus_syn",
 ]
 
 [[package]]
@@ -62,6 +66,8 @@ dependencies = [
  "quote",
  "strum",
  "syn 3.0.3",
+ "trybuild",
+ "verus_syn",
 ]
 
 [[package]]

@@ -5,6 +5,8 @@ mod evidence;
 mod harness;
 mod kani_compose;
 mod standard;
+#[cfg(feature = "verus")]
+mod verus_fragment;
 mod witness;
 
 use proc_macro::TokenStream;
@@ -106,6 +108,30 @@ pub fn derive_witness(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     match expand_witness(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Expand a real Verus harness name to a `&'static [&'static str]` array
+/// literal of its real `ensures` clauses, extracted from the real
+/// carrier source at compile time -- a missing harness or clause is a
+/// real compile error here, not a runtime failure discovered later.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_ensures_fragments(input: TokenStream) -> TokenStream {
+    match verus_fragment::expand_verus_fragments(input.into(), true) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Like [`verus_ensures_fragments!`], for a harness's real `requires`
+/// clauses instead.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_requires_fragments(input: TokenStream) -> TokenStream {
+    match verus_fragment::expand_verus_fragments(input.into(), false) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }
