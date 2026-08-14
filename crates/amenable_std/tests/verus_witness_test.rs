@@ -2,7 +2,7 @@
 
 use amenable_core::{Ensures, Witness, WitnessSupportSummary};
 use amenable_std::{
-    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusCiteArg, VerusVerifier,
+    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusImport, VerusVerifier,
     verus_call_shape,
 };
 
@@ -4803,22 +4803,61 @@ fn verus_call_shape_is_registered_for_char_roundtrip() {
     assert_eq!(shape.params[0].name, "c");
     assert_eq!(shape.params[0].ty, "char");
     assert!(shape.requires.is_empty());
-    assert_eq!(shape.ensures.len(), 2);
-    assert_eq!(shape.ensures[0].predicate, "char_roundtrip_preserves_value");
     assert_eq!(
-        shape.ensures[0].args,
-        vec![VerusCiteArg::Result, VerusCiteArg::Param("c".to_owned())]
+        shape.ensures,
+        vec![
+            "char_roundtrip_preserves_value($result, $c)",
+            "char_is_valid_unicode_scalar($c)",
+        ]
     );
-    assert_eq!(shape.ensures[1].predicate, "char_is_valid_unicode_scalar");
     assert_eq!(
-        shape.ensures[1].args,
-        vec![VerusCiteArg::Param("c".to_owned())]
+        shape.imports,
+        vec![
+            VerusImport {
+                module_path: "crate::rust_std::char_carrier".to_owned(),
+                name: "char_roundtrip_preserves_value".to_owned(),
+            },
+            VerusImport {
+                module_path: "crate::rust_std::char_carrier".to_owned(),
+                name: "char_is_valid_unicode_scalar".to_owned(),
+            },
+        ]
     );
     assert_eq!(
         shape.kind,
         VerusCallKind::Function {
             returns: "char".to_owned()
         }
+    );
+}
+
+#[test]
+fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() {
+    let shape = verus_call_shape("verify_ref_cell_model_dynamic_borrow_rules")
+        .expect("expected a registered call shape");
+
+    assert_eq!(shape.module_path, "crate::rust_std::ref_cell_carrier");
+    assert_eq!(shape.params.len(), 2);
+    assert_eq!(shape.params[0].name, "initial");
+    assert_eq!(shape.params[1].name, "updated");
+    assert!(shape.requires.is_empty());
+    assert_eq!(
+        shape.ensures,
+        vec![
+            "$result.0",
+            "!$result.1",
+            "$result.2",
+            "!$result.3",
+            "!$result.4",
+            "observed_value_matches_input($result.5 as int, $updated as int)",
+        ]
+    );
+    assert_eq!(
+        shape.imports,
+        vec![VerusImport {
+            module_path: "crate::rust_std::primitive_shapes_carrier".to_owned(),
+            name: "observed_value_matches_input".to_owned(),
+        }]
     );
 }
 

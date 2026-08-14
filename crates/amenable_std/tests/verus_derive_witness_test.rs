@@ -10,8 +10,9 @@ use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
 use amenable_std::{
-    CheckedVerusExportLeaf, RequiresVerusExportLeaf, RustStdProvenance, RustStdStandard,
-    RustStdType, TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum, VerusVerifier,
+    CheckedVerusExportLeaf, RawTemplateVerusExportLeaf, RequiresVerusExportLeaf, RustStdProvenance,
+    RustStdStandard, RustStdType, TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum,
+    VerusVerifier,
 };
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
@@ -442,6 +443,32 @@ fn live_verus_canary_exports_include_requires_struct_shape() {
                     == "crate::derived_witness::verus_export_requires_struct_witness"
         })
         .expect("expected library Verus requires-struct export");
+
+    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+}
+
+#[test]
+fn raw_template_verus_export_leaf_is_constructible_and_checked() {
+    let leaf = RawTemplateVerusExportLeaf::new("borrow-state");
+
+    assert_eq!(
+        <RawTemplateVerusExportLeaf as Witness<VerusVerifier>>::support(),
+        WitnessSupportSummary::checked_leaf()
+    );
+    assert!(format!("{leaf:?}").contains("borrow-state"));
+}
+
+#[test]
+fn live_verus_canary_exports_include_raw_template_struct_shape() {
+    let export = amenable_core::witness_exports()
+        .into_iter()
+        .find(|record| {
+            record.verifier == "verus"
+                && record.destination_module
+                    == "crate::derived_witness::verus_export_raw_template_struct_witness"
+        })
+        .expect("expected library Verus raw-template-struct export");
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);

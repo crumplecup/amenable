@@ -82,7 +82,8 @@ pub use valid_unicode_scalar::ValidUnicodeScalar;
 pub use value_unchanged::ValueUnchanged;
 #[cfg(feature = "verus")]
 pub use verus_derive_canary::{
-    CheckedVerusExportLeaf, RequiresVerusExportLeaf, TrustedVerusExportLeaf, VerusExportCanaryEnum,
+    CheckedVerusExportLeaf, RawTemplateVerusExportLeaf, RequiresVerusExportLeaf,
+    TrustedVerusExportLeaf, VerusExportCanaryEnum,
 };
 #[cfg(feature = "verus")]
 pub use verus_gallery::{
@@ -90,9 +91,8 @@ pub use verus_gallery::{
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::{
-    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusCiteArg,
-    VerusParam, VerusPredicateCite, VerusVerifier, VerusVerifierMetadata, VerusWitness,
-    verus_call_shape, verus_cite_arg,
+    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusImport,
+    VerusParam, VerusVerifier, VerusVerifierMetadata, VerusWitness, verus_call_shape,
 };
 pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
 pub use write_stores_new_value::WriteStoresNewValue;

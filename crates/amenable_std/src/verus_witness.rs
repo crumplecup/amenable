@@ -313,6 +313,23 @@ pub struct VerusParam {
     pub ty: String,
 }
 
+/// A real predicate/spec-fn a harness's clause templates cite, together
+/// with its own defining module — not necessarily the harness's own
+/// module. Confirmed as a real, not hypothetical, distinction against
+/// the real `verus` tool: `RefCell`'s harness cites
+/// `observed_value_matches_input`, which is *defined* in
+/// `primitive_shapes_carrier` and only privately `use`d by
+/// `ref_cell_carrier` — importing it via the harness's own module path
+/// (`crate::rust_std::ref_cell_carrier::observed_value_matches_input`)
+/// failed with `E0603: function import ... is private`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerusImport {
+    /// The predicate/spec-fn's own defining module.
+    pub module_path: String,
+    /// The predicate/spec-fn's real name.
+    pub name: String,
+}
+
 /// How a compositional renderer should invoke a leaf's real Verus proof,
 /// rather than assuming its conclusion as a free boolean.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -328,33 +345,24 @@ pub enum VerusCallKind {
     },
 }
 
-/// One argument position in a cited predicate call, expressed relative
-/// to the harness's own signature so a compositional renderer can
-/// re-emit the identical call against whatever local names it chooses
-/// for the composite (its own parameters may need renaming to avoid
-/// colliding with a sibling leaf's).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VerusCiteArg {
-    /// The harness's own bound return value.
-    Result,
-    /// One of the harness's own named parameters.
-    Param(String),
-}
-
-/// One real predicate call a harness's own `requires`/`ensures` clause
-/// makes, in call order — never restated by hand, always naming exactly
-/// what the real source calls.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct VerusPredicateCite {
-    /// The predicate's real name.
-    pub predicate: String,
-    /// The predicate's real call-site arguments, in order.
-    pub args: Vec<VerusCiteArg>,
-}
-
 /// Structural, machine-usable call shape for a real Verus harness —
 /// enough for a compositional renderer to emit a literal call to (or
 /// citation of) the real proof, instead of assuming its conclusion.
+///
+/// `requires`/`ensures` are the harness's own real clause text, copied
+/// verbatim, with `$name` placeholders standing in for whatever local
+/// name a composite ends up choosing (`$result` for the harness's own
+/// bound return value, `$paramname` for one of its own named
+/// parameters) — never restated by hand, never restructured into a
+/// predicate-call-only shape. A first design here tried a structured
+/// `predicate(args)`-only representation, which worked for
+/// `char_roundtrip`/`escape_ascii`'s harnesses but broke on
+/// `RefCell`'s: its own top-level harness's `ensures` includes raw
+/// tuple-field projections (`result.0`, `!result.1`, ...) alongside a
+/// named-predicate call whose own argument is itself a projection-and-
+/// cast (`result.5 as int`) — neither fits a "bare call" shape. Plain
+/// text templates handle both uniformly, since the renderer never needs
+/// to parse the clause's grammar, only substitute placeholder tokens.
 ///
 /// A separate, additive registry (see [`VerusCallShapeRecord`]) rather
 /// than a field on [`VerusCheckedProof`] itself: [`VerusCheckedProof`]
@@ -375,12 +383,18 @@ pub struct VerusCallShape {
     pub name: String,
     /// The harness's real symbolic parameters, in order.
     pub params: Vec<VerusParam>,
-    /// The harness's own real preconditions, propagated upward into a
-    /// composite's own `requires` when this leaf composes.
-    pub requires: Vec<VerusPredicateCite>,
-    /// The harness's own real postconditions, cited (never restated) in
-    /// a composite's own `ensures` when this leaf composes.
-    pub ensures: Vec<VerusPredicateCite>,
+    /// The harness's own real precondition templates, propagated
+    /// upward into a composite's own `requires` when this leaf composes.
+    pub requires: Vec<String>,
+    /// The harness's own real postcondition templates, cited (never
+    /// restated) in a composite's own `ensures` when this leaf composes.
+    pub ensures: Vec<String>,
+    /// Real predicate/spec-fns the templates above reference and that
+    /// need an explicit `use` to resolve — listed separately from the
+    /// templates themselves rather than parsed out of them, since a
+    /// template may be a raw expression with no callable name in it at
+    /// all (e.g. `$result.0`).
+    pub imports: Vec<VerusImport>,
     /// How to invoke this specific harness.
     pub kind: VerusCallKind,
 }
@@ -407,23 +421,17 @@ pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
         .map(|record| (record.call_shape)())
 }
 
-/// `"result"` refers to the harness's own bound return value; anything
-/// else names one of its own parameters. Used only by
-/// [`register_verus_call_shape!`] to build [`VerusCiteArg`] values from
-/// plain string literals.
-pub fn verus_cite_arg(arg: &str) -> VerusCiteArg {
-    if arg == "result" {
-        VerusCiteArg::Result
-    } else {
-        VerusCiteArg::Param(arg.to_owned())
-    }
-}
-
 /// Register a real Verus harness's call shape.
 ///
-/// `requires`/`ensures` entries are `(predicate_name, [args...])` pairs,
-/// with arguments spelled exactly as the real clause calls them
-/// (`"result"` for the harness's own bound return value).
+/// `requires`/`ensures` entries are the harness's own real clause text,
+/// verbatim, with `$result`/`$paramname` placeholders in place of
+/// whatever local names a composite ends up choosing. `imports` lists
+/// the real `(module_path, name)` of each predicate/spec-fn those
+/// templates reference, so the renderer knows what needs a `use` — its
+/// own defining module, not necessarily the harness's own (a shared
+/// predicate like `observed_value_matches_input` is defined once in
+/// `primitive_shapes_carrier` and merely `use`d by many carriers,
+/// including a harness's own).
 ///
 /// ```ignore
 /// register_verus_call_shape! {
@@ -433,8 +441,12 @@ pub fn verus_cite_arg(arg: &str) -> VerusCiteArg {
 ///     returns = "char",
 ///     requires = [],
 ///     ensures = [
-///         ("char_roundtrip_preserves_value", ["result", "c"]),
-///         ("char_is_valid_unicode_scalar", ["c"]),
+///         "char_roundtrip_preserves_value($result, $c)",
+///         "char_is_valid_unicode_scalar($c)",
+///     ],
+///     imports = [
+///         ("crate::rust_std::char_carrier", "char_roundtrip_preserves_value"),
+///         ("crate::rust_std::char_carrier", "char_is_valid_unicode_scalar"),
 ///     ],
 /// }
 /// ```
@@ -445,8 +457,9 @@ macro_rules! register_verus_call_shape {
         module_path = $module_path:literal,
         params = [$(($param_name:literal, $param_ty:literal)),* $(,)?],
         returns = $returns:literal,
-        requires = [$(($requires_pred:literal, [$($requires_arg:literal),* $(,)?])),* $(,)?],
-        ensures = [$(($ensures_pred:literal, [$($ensures_arg:literal),* $(,)?])),* $(,)?] $(,)?
+        requires = [$($requires_template:literal),* $(,)?],
+        ensures = [$($ensures_template:literal),* $(,)?],
+        imports = [$(($import_module:literal, $import_name:literal $(,)?)),* $(,)?] $(,)?
     ) => {
         ::inventory::submit! {
             $crate::VerusCallShapeRecord {
@@ -460,16 +473,12 @@ macro_rules! register_verus_call_shape {
                             ty: $param_ty.to_owned(),
                         }),*
                     ],
-                    requires: ::std::vec![
-                        $($crate::VerusPredicateCite {
-                            predicate: $requires_pred.to_owned(),
-                            args: ::std::vec![$($crate::verus_cite_arg($requires_arg)),*],
-                        }),*
-                    ],
-                    ensures: ::std::vec![
-                        $($crate::VerusPredicateCite {
-                            predicate: $ensures_pred.to_owned(),
-                            args: ::std::vec![$($crate::verus_cite_arg($ensures_arg)),*],
+                    requires: ::std::vec![$($requires_template.to_owned()),*],
+                    ensures: ::std::vec![$($ensures_template.to_owned()),*],
+                    imports: ::std::vec![
+                        $($crate::VerusImport {
+                            module_path: $import_module.to_owned(),
+                            name: $import_name.to_owned(),
                         }),*
                     ],
                     kind: $crate::VerusCallKind::Function {
@@ -505,8 +514,12 @@ crate::register_verus_call_shape! {
     returns = "char",
     requires = [],
     ensures = [
-        ("char_roundtrip_preserves_value", ["result", "c"]),
-        ("char_is_valid_unicode_scalar", ["c"]),
+        "char_roundtrip_preserves_value($result, $c)",
+        "char_is_valid_unicode_scalar($c)",
+    ],
+    imports = [
+        ("crate::rust_std::char_carrier", "char_roundtrip_preserves_value"),
+        ("crate::rust_std::char_carrier", "char_is_valid_unicode_scalar"),
     ],
 }
 
@@ -2917,6 +2930,35 @@ bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
 
 const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_cell_carrier.rs");
+
+// The real signature (crates/amenable_verus/src/rust_std/ref_cell_carrier.rs):
+// `pub fn verify_ref_cell_model_dynamic_borrow_rules(initial: i32, updated: i32) -> (result: (bool, bool, bool, bool, bool, i32))`.
+// Its own `&mut self`/`old`/`final` methods (`try_borrow`, `release_shared`,
+// etc.) are purely internal to this one harness's body -- never
+// independently registered or composed; this top-level harness is a
+// plain value-returning function like any other. Its own `ensures` mixes
+// raw tuple-field projections (some negated) with one named-predicate
+// citation whose own argument is itself a projection-and-cast
+// (`result.5 as int`) -- the reason `VerusCallShape.ensures`/`.requires`
+// are plain `$placeholder` text templates rather than a structured
+// predicate-call-only representation (a first design tried the latter
+// and it didn't fit this harness at all).
+crate::register_verus_call_shape! {
+    harness = "verify_ref_cell_model_dynamic_borrow_rules",
+    module_path = "crate::rust_std::ref_cell_carrier",
+    params = [("initial", "i32"), ("updated", "i32")],
+    returns = "(bool, bool, bool, bool, bool, i32)",
+    requires = [],
+    ensures = [
+        "$result.0",
+        "!$result.1",
+        "$result.2",
+        "!$result.3",
+        "!$result.4",
+        "observed_value_matches_input($result.5 as int, $updated as int)",
+    ],
+    imports = [("crate::rust_std::primitive_shapes_carrier", "observed_value_matches_input")],
+}
 
 impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
     type SupportingEvidence = Self;
@@ -6316,10 +6358,17 @@ crate::register_verus_call_shape! {
     params = [("printable", "u8")],
     returns = "(u8, u8, u8)",
     requires = [
-        ("escape_ascii_input_is_printable_ascii", ["printable"]),
+        "escape_ascii_input_is_printable_ascii($printable)",
     ],
     ensures = [
-        ("escape_ascii_result_matches_printable_plus_newline_escape", ["printable", "result"]),
+        "escape_ascii_result_matches_printable_plus_newline_escape($printable, $result)",
+    ],
+    imports = [
+        ("crate::rust_std::escape_ascii_carrier", "escape_ascii_input_is_printable_ascii"),
+        (
+            "crate::rust_std::escape_ascii_carrier",
+            "escape_ascii_result_matches_printable_plus_newline_escape",
+        ),
     ],
 }
 

@@ -247,7 +247,8 @@ amenable_std::register_verus_call_shape! {
     params = [("value", "i32")],
     returns = "i32",
     requires = [],
-    ensures = [("shape_override_holds", ["result", "value"])],
+    ensures = ["shape_override_holds($result, $value)"],
+    imports = [("crate::custom::shape_override_carrier", "shape_override_holds")],
 }
 
 amenable_core::register_witness_exports!(verifier = LocalVerusVerifier; LocalEnumEvidence, LocalLeafEvidence);

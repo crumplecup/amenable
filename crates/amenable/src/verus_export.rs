@@ -36,7 +36,7 @@ use amenable_core::{
     MetadataEntry, WitnessArtifactNode, WitnessArtifactShape, WitnessExportSnapshot,
     WitnessSupportKind, witness_exports,
 };
-use amenable_std::{VerusCiteArg, VerusPredicateCite, verus_call_shape};
+use amenable_std::verus_call_shape;
 
 use crate::{AmenableError, AmenableResult};
 
@@ -194,56 +194,41 @@ struct CheckedCall {
     ty: String,
 }
 
-/// One argument position in a not-yet-finalized predicate citation.
-/// `ResultOf` indices are relative to the owning subtree until merged
-/// into a parent, at which point [`RenderedNode::merge`] rebases them —
-/// by the time rendering reaches the module root, every index is a
-/// direct, global index into the root's own `checked_calls`.
+/// One not-yet-finalized `requires`/`ensures` clause: the harness's own
+/// real clause text, with every `$paramname` placeholder already
+/// substituted for this leaf's chosen local names, but `$result` left
+/// literal until the final checked-call count is known. `result_index`
+/// is relative to the owning subtree until merged into a parent, at
+/// which point [`RenderedNode::merge`] rebases it — by the time
+/// rendering reaches the module root, it's a direct, global index into
+/// the root's own `checked_calls`.
 #[derive(Debug, Clone)]
-enum PendingArg {
-    ResultOf(usize),
-    Local(String),
+struct PendingClause {
+    template: String,
+    result_index: usize,
 }
 
-#[derive(Debug, Clone)]
-struct PendingCite {
-    predicate: String,
-    module_path: String,
-    args: Vec<PendingArg>,
-}
-
-impl PendingCite {
+impl PendingClause {
     fn rebase(self, base: usize) -> Self {
-        PendingCite {
-            predicate: self.predicate,
-            module_path: self.module_path,
-            args: self
-                .args
-                .into_iter()
-                .map(|arg| match arg {
-                    PendingArg::ResultOf(index) => PendingArg::ResultOf(base + index),
-                    local @ PendingArg::Local(_) => local,
-                })
-                .collect(),
+        PendingClause {
+            template: self.template,
+            result_index: base + self.result_index,
         }
     }
 
     /// Resolve to real Verus source, once the final checked-call count
     /// is known: a single checked call's result is just `result`; with
     /// more than one, the composite returns a tuple and each call's
-    /// result is `result.N`.
+    /// result is `result.N`. A no-op if the template never referenced
+    /// `$result` at all (some don't -- e.g. a precondition purely about
+    /// a parameter).
     fn render(&self, checked_call_count: usize) -> String {
-        let args = self
-            .args
-            .iter()
-            .map(|arg| match arg {
-                PendingArg::ResultOf(index) if checked_call_count <= 1 => "result".to_owned(),
-                PendingArg::ResultOf(index) => format!("result.{index}"),
-                PendingArg::Local(name) => name.clone(),
-            })
-            .collect::<Vec<_>>()
-            .join(", ");
-        format!("{}({args})", self.predicate)
+        let result_ref = if checked_call_count <= 1 {
+            "result".to_owned()
+        } else {
+            format!("result.{}", self.result_index)
+        };
+        substitute_placeholder(&self.template, "result", &result_ref)
     }
 }
 
@@ -254,8 +239,12 @@ impl PendingCite {
 struct RenderedNode {
     params: Vec<RenderedParam>,
     checked_calls: Vec<CheckedCall>,
-    requires: Vec<PendingCite>,
-    ensures: Vec<PendingCite>,
+    requires: Vec<PendingClause>,
+    ensures: Vec<PendingClause>,
+    /// `(module_path, name)` pairs needing a `use` — a leaf's own
+    /// `VerusCallShape::imports`, carried through unchanged (no need to
+    /// rebase; imports aren't indexed by checked-call position).
+    imports: Vec<(String, String)>,
     comments: Vec<String>,
 }
 
@@ -265,11 +254,42 @@ impl RenderedNode {
         self.params.extend(other.params);
         self.checked_calls.extend(other.checked_calls);
         self.requires
-            .extend(other.requires.into_iter().map(|cite| cite.rebase(base)));
+            .extend(other.requires.into_iter().map(|clause| clause.rebase(base)));
         self.ensures
-            .extend(other.ensures.into_iter().map(|cite| cite.rebase(base)));
+            .extend(other.ensures.into_iter().map(|clause| clause.rebase(base)));
+        self.imports.extend(other.imports);
         self.comments.extend(other.comments);
     }
+}
+
+/// Replace every `$name` occurrence in `template` with `replacement`,
+/// leaving anything else (including other `$other` placeholders)
+/// untouched. Placeholders are `$` followed by ASCII alphanumeric/`_`
+/// characters; a bare `$` not followed by an identifier is left as-is.
+fn substitute_placeholder(template: &str, name: &str, replacement: &str) -> String {
+    let chars: Vec<char> = template.chars().collect();
+    let mut output = String::new();
+    let mut i = 0;
+
+    while i < chars.len() {
+        if chars[i] == '$' {
+            let start = i + 1;
+            let mut end = start;
+            while end < chars.len() && (chars[end].is_ascii_alphanumeric() || chars[end] == '_') {
+                end += 1;
+            }
+            let token: String = chars[start..end].iter().collect();
+            if token == name {
+                output.push_str(replacement);
+                i = end;
+                continue;
+            }
+        }
+        output.push(chars[i]);
+        i += 1;
+    }
+
+    output
 }
 
 // Only `Member` exists today: enum-shaped composites are rejected
@@ -421,9 +441,9 @@ fn predicate_import_lines(rendered: &RenderedNode) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let mut lines = Vec::new();
 
-    for cite in rendered.requires.iter().chain(rendered.ensures.iter()) {
-        if seen.insert((cite.module_path.clone(), cite.predicate.clone())) {
-            lines.push(format!("use {}::{};", cite.module_path, cite.predicate));
+    for (module_path, name) in &rendered.imports {
+        if seen.insert((module_path.clone(), name.clone())) {
+            lines.push(format!("use {module_path}::{name};"));
         }
     }
 
@@ -546,12 +566,17 @@ fn render_checked_leaf(
     let requires = shape
         .requires
         .iter()
-        .map(|cite| pending_cite(cite, &shape.module_path, &local_names))
+        .map(|template| pending_clause(template, &local_names))
         .collect();
     let ensures = shape
         .ensures
         .iter()
-        .map(|cite| pending_cite(cite, &shape.module_path, &local_names))
+        .map(|template| pending_clause(template, &local_names))
+        .collect();
+    let imports = shape
+        .imports
+        .iter()
+        .map(|import| (import.module_path.clone(), import.name.clone()))
         .collect();
 
     let comment = format!(
@@ -566,26 +591,30 @@ fn render_checked_leaf(
         checked_calls: vec![call],
         requires,
         ensures,
+        imports,
         comments: vec![comment],
     })
 }
 
-fn pending_cite(
-    cite: &VerusPredicateCite,
-    module_path: &str,
+/// Substitute every `$paramname` placeholder (i.e. every placeholder
+/// except `$result`) with this leaf's own chosen local name -- fully
+/// resolved already, no rebasing needed. `$result` is left literal for
+/// [`PendingClause::render`] to resolve once the final checked-call
+/// count is known.
+fn pending_clause(
+    template: &str,
     local_names: &std::collections::HashMap<String, String>,
-) -> PendingCite {
-    PendingCite {
-        predicate: cite.predicate.clone(),
-        module_path: module_path.to_owned(),
-        args: cite
-            .args
-            .iter()
-            .map(|arg| match arg {
-                VerusCiteArg::Result => PendingArg::ResultOf(0),
-                VerusCiteArg::Param(name) => PendingArg::Local(local_names[name].clone()),
-            })
-            .collect(),
+) -> PendingClause {
+    let mut resolved = template.to_owned();
+    for (name, local) in local_names {
+        if name != "result" {
+            resolved = substitute_placeholder(&resolved, name, local);
+        }
+    }
+
+    PendingClause {
+        template: resolved,
+        result_index: 0,
     }
 }
 
