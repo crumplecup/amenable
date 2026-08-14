@@ -18,6 +18,7 @@ inventory = { workspace = true }
 
 [dev-dependencies]
 amenable_derive = { workspace = true }
+trybuild = { workspace = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

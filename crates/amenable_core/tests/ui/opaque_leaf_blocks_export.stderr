@@ -1,0 +1,18 @@
+error[E0277]: `OpaqueEvidence` has no registered classification for this verifier (its Witness::support() is still Opaque)
+  --> tests/ui/opaque_leaf_blocks_export.rs:90:67
+   |
+90 | amenable_core::register_witness_exports!(verifier = DemoVerifier; OpaqueEvidence);
+   |                                                                   ^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `ClassifiedWitness<DemoVerifier>` is not implemented for `OpaqueEvidence`
+  --> tests/ui/opaque_leaf_blocks_export.rs:35:1
+   |
+35 | struct OpaqueEvidence;
+   | ^^^^^^^^^^^^^^^^^^^^^
+   = note: implement `ClassifiedWitness<DemoVerifier>` for it (e.g. via `bridge_verus_witness!`, or by overriding `support()` directly) before it can be composed into an exported witness
+note: required by a bound in `assert_classified`
+  --> tests/ui/opaque_leaf_blocks_export.rs:90:1
+   |
+90 | amenable_core::register_witness_exports!(verifier = DemoVerifier; OpaqueEvidence);
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `assert_classified`
+   = note: this error originates in the macro `amenable_core::register_witness_exports` (in Nightly builds, run with -Z macro-backtrace for more info)
