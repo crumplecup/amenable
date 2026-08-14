@@ -41,6 +41,11 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
         &mut display_generics,
         &collect_witness_field_types(&input.data)?,
     )?;
+    let mut artifact_generics = proof_generics.clone();
+    add_witness_artifact_bounds(
+        &mut artifact_generics,
+        &collect_witness_field_types(&input.data)?,
+    )?;
 
     let proof_type_context = ProofTypeContext {
         evidence_ident,
@@ -49,6 +54,7 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
         proof_ident: &proof_ident,
         proof_generics: &proof_generics,
         display_generics: &display_generics,
+        artifact_generics: &artifact_generics,
         verus_module_path: &verus_module_path,
     };
 
@@ -108,6 +114,7 @@ struct ProofTypeContext<'a> {
     proof_ident: &'a syn::Ident,
     proof_generics: &'a Generics,
     display_generics: &'a Generics,
+    artifact_generics: &'a Generics,
     verus_module_path: &'a str,
 }
 
@@ -121,6 +128,7 @@ fn expand_struct_proof_type(
     let proof_ident = ctx.proof_ident;
     let proof_generics = ctx.proof_generics;
     let display_generics = ctx.display_generics;
+    let artifact_generics = ctx.artifact_generics;
     let verus_module_path = ctx.verus_module_path;
     let shape_name = match &data.fields {
         Fields::Named(_) => "named_struct",
@@ -153,12 +161,27 @@ fn expand_struct_proof_type(
             writeln!(f, "member {}: {}", #label, self.#field_ident)?;
         }
     });
+    let artifact_members = fields.iter().map(|field| {
+        let field_ident = &field.ident;
+        let label = &field.label;
+
+        quote! {
+            ::amenable_core::WitnessArtifactMember {
+                label: #label.to_owned(),
+                artifact: ::std::boxed::Box::new(
+                    ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
+                ),
+            }
+        }
+    });
     let generics_marker = expand_generics_marker(evidence_generics);
 
     let (proof_impl_generics, proof_ty_generics, proof_where_clause) =
         proof_generics.split_for_impl();
     let (display_impl_generics, display_ty_generics, display_where_clause) =
         display_generics.split_for_impl();
+    let (artifact_impl_generics, artifact_ty_generics, artifact_where_clause) =
+        artifact_generics.split_for_impl();
 
     Ok(quote! {
         pub struct #proof_ident #proof_impl_generics #proof_where_clause {
@@ -200,6 +223,25 @@ fn expand_struct_proof_type(
         {
             const MODULE_PATH: &'static str = Self::VERUS_MODULE_PATH;
         }
+
+        impl #artifact_impl_generics ::amenable_core::WitnessArtifact
+            for #proof_ident #artifact_ty_generics
+            #artifact_where_clause
+        {
+            fn witness_artifact(&self) -> ::amenable_core::WitnessArtifactNode {
+                ::amenable_core::WitnessArtifactNode::members(
+                    match #shape_name {
+                        "named_struct" => ::amenable_core::WitnessArtifactShape::NamedStruct,
+                        "tuple_struct" => ::amenable_core::WitnessArtifactShape::TupleStruct,
+                        "unit_struct" => ::amenable_core::WitnessArtifactShape::UnitStruct,
+                        _ => unreachable!("struct proof shapes are exhaustive"),
+                    },
+                    self.support,
+                    None,
+                    vec![#(#artifact_members,)*],
+                )
+            }
+        }
     })
 }
 
@@ -215,6 +257,7 @@ fn expand_enum_proof_types(
     let proof_ident = ctx.proof_ident;
     let proof_generics = ctx.proof_generics;
     let display_generics = ctx.display_generics;
+    let artifact_generics = ctx.artifact_generics;
     let verus_module_path = ctx.verus_module_path;
     let variant_proofs = data
         .variants
@@ -225,6 +268,7 @@ fn expand_enum_proof_types(
                 evidence_generics,
                 proof_generics,
                 display_generics,
+                artifact_generics,
                 variant,
             )
         })
@@ -280,11 +324,26 @@ fn expand_enum_proof_types(
             writeln!(f, "variant {}: {}", #variant_name, self.#field_ident)?;
         }
     });
+    let artifact_variants = outer_fields.iter().map(|field| {
+        let field_ident = &field.field_ident;
+        let variant_name = &field.variant_name;
+
+        quote! {
+            ::amenable_core::WitnessArtifactVariant {
+                name: #variant_name.to_owned(),
+                artifact: ::std::boxed::Box::new(
+                    ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
+                ),
+            }
+        }
+    });
 
     let (proof_impl_generics, proof_ty_generics, proof_where_clause) =
         proof_generics.split_for_impl();
     let (display_impl_generics, display_ty_generics, display_where_clause) =
         display_generics.split_for_impl();
+    let (artifact_impl_generics, artifact_ty_generics, artifact_where_clause) =
+        artifact_generics.split_for_impl();
 
     Ok(quote! {
         #(#variant_proofs)*
@@ -330,6 +389,19 @@ fn expand_enum_proof_types(
         {
             const MODULE_PATH: &'static str = Self::VERUS_MODULE_PATH;
         }
+
+        impl #artifact_impl_generics ::amenable_core::WitnessArtifact
+            for #proof_ident #artifact_ty_generics
+            #artifact_where_clause
+        {
+            fn witness_artifact(&self) -> ::amenable_core::WitnessArtifactNode {
+                ::amenable_core::WitnessArtifactNode::enum_variants(
+                    self.support,
+                    #tag,
+                    vec![#(#artifact_variants,)*],
+                )
+            }
+        }
     })
 }
 
@@ -338,6 +410,7 @@ fn expand_enum_variant_proof_type(
     evidence_generics: &Generics,
     proof_generics: &Generics,
     display_generics: &Generics,
+    artifact_generics: &Generics,
     variant: &Variant,
 ) -> syn::Result<TokenStream> {
     let variant_ident = &variant.ident;
@@ -373,11 +446,26 @@ fn expand_enum_variant_proof_type(
             writeln!(f, "member {}: {}", #label, self.#field_ident)?;
         }
     });
+    let artifact_members = fields.iter().map(|field| {
+        let field_ident = &field.ident;
+        let label = &field.label;
+
+        quote! {
+            ::amenable_core::WitnessArtifactMember {
+                label: #label.to_owned(),
+                artifact: ::std::boxed::Box::new(
+                    ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
+                ),
+            }
+        }
+    });
     let generics_marker = expand_generics_marker(evidence_generics);
     let (proof_impl_generics, proof_ty_generics, proof_where_clause) =
         proof_generics.split_for_impl();
     let (display_impl_generics, display_ty_generics, display_where_clause) =
         display_generics.split_for_impl();
+    let (artifact_impl_generics, artifact_ty_generics, artifact_where_clause) =
+        artifact_generics.split_for_impl();
 
     Ok(quote! {
         pub struct #proof_ident #proof_impl_generics #proof_where_clause {
@@ -407,6 +495,25 @@ fn expand_enum_variant_proof_type(
                 writeln!(f, "variant: {}", stringify!(#variant_ident))?;
                 #(#report_lines)*
                 Ok(())
+            }
+        }
+
+        impl #artifact_impl_generics ::amenable_core::WitnessArtifact
+            for #proof_ident #artifact_ty_generics
+            #artifact_where_clause
+        {
+            fn witness_artifact(&self) -> ::amenable_core::WitnessArtifactNode {
+                ::amenable_core::WitnessArtifactNode::members(
+                    match #shape_name {
+                        "named_variant" => ::amenable_core::WitnessArtifactShape::NamedVariant,
+                        "tuple_variant" => ::amenable_core::WitnessArtifactShape::TupleVariant,
+                        "unit_variant" => ::amenable_core::WitnessArtifactShape::UnitVariant,
+                        _ => unreachable!("variant proof shapes are exhaustive"),
+                    },
+                    self.support,
+                    Some(stringify!(#variant_ident).to_owned()),
+                    vec![#(#artifact_members,)*],
+                )
             }
         }
     })
@@ -499,6 +606,18 @@ fn add_display_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Res
     for field_type in field_types {
         where_clause.predicates.push(parse_quote!(
             <#field_type as ::amenable_core::Witness<__Verifier>>::ProofArtifact: ::std::fmt::Display
+        ));
+    }
+
+    Ok(())
+}
+
+fn add_witness_artifact_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
+    let where_clause = generics.make_where_clause();
+
+    for field_type in field_types {
+        where_clause.predicates.push(parse_quote!(
+            <#field_type as ::amenable_core::Witness<__Verifier>>::ProofArtifact: ::amenable_core::WitnessArtifact
         ));
     }
 

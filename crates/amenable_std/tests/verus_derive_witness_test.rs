@@ -1,7 +1,8 @@
 #![cfg(feature = "verus")]
 
 use amenable_core::{
-    Provenance, Witness, WitnessExportRecord, WitnessModulePath, WitnessSupportSummary,
+    Provenance, Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath,
+    WitnessSupportKind, WitnessSupportSummary,
 };
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
@@ -328,5 +329,40 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     assert_eq!(
         struct_export.3,
         <ConcreteDerivedCheckedPlusTrivialStruct as Witness<VerusVerifier>>::support()
+    );
+
+    let structured_exports = amenable_core::witness_exports();
+    let enum_artifact = structured_exports
+        .iter()
+        .find(|record| record.evidence.contains("DerivedWitnessGenericEnum<"))
+        .expect("expected structured export for the concrete generic enum")
+        .artifact
+        .clone();
+    let struct_artifact = structured_exports
+        .iter()
+        .find(|record| {
+            record
+                .evidence
+                .contains("DerivedWitnessCheckedPlusTrivialStruct<")
+        })
+        .expect("expected structured export for the checked-plus-trivial struct")
+        .artifact
+        .clone();
+
+    assert_eq!(enum_artifact.shape, WitnessArtifactShape::Enum);
+    assert_eq!(enum_artifact.kind, WitnessSupportKind::Mixed);
+    assert_eq!(enum_artifact.tag.as_deref(), Some("entry_kind"));
+    assert_eq!(enum_artifact.variants.len(), 3);
+    assert_eq!(
+        enum_artifact.variants[0].artifact.shape,
+        WitnessArtifactShape::NamedVariant
+    );
+
+    assert_eq!(struct_artifact.shape, WitnessArtifactShape::NamedStruct);
+    assert_eq!(struct_artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(struct_artifact.members.len(), 2);
+    assert_eq!(
+        struct_artifact.members[0].artifact.shape,
+        WitnessArtifactShape::Leaf
     );
 }

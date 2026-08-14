@@ -45,8 +45,8 @@
 )]
 
 use amenable_core::{
-    Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness,
-    WitnessSupportSummary,
+    Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 #[cfg(windows)]
 use std::os::windows::ffi::EncodeWide;
@@ -239,6 +239,16 @@ impl VerusProofArtifactSupport for RustStdProvenance {
     }
 }
 
+impl WitnessArtifact for RustStdProvenance {
+    fn witness_artifact(&self) -> WitnessArtifactNode {
+        WitnessArtifactNode::leaf(
+            WitnessSupportKind::Trusted,
+            WitnessSupportSummary::trusted_leaf(),
+            self.report().to_string(),
+        )
+    }
+}
+
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
 /// names the spec function, carries its verbatim source as `claim`, and
 /// still rests on the chain-derived provenance.
@@ -260,6 +270,16 @@ pub struct VerusCheckedProof {
 impl VerusProofArtifactSupport for VerusCheckedProof {
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl WitnessArtifact for VerusCheckedProof {
+    fn witness_artifact(&self) -> WitnessArtifactNode {
+        WitnessArtifactNode::leaf(
+            WitnessSupportKind::Checked,
+            WitnessSupportSummary::checked_leaf(),
+            format!("harness: {}", self.harness),
+        )
     }
 }
 

@@ -35,6 +35,15 @@ fn dump_registry_emits_witness_export_records_section() {
         witness_exports.is_array(),
         "witness_export_records should be an array: {witness_exports}"
     );
+    if let Some(first_export) = witness_exports
+        .as_array()
+        .and_then(|exports| exports.first())
+    {
+        assert!(
+            first_export.get("artifact").is_some(),
+            "witness export entries should include a structured artifact tree: {first_export}"
+        );
+    }
 
     let _ = fs::remove_file(&out);
 }

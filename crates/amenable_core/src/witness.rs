@@ -163,6 +163,147 @@ pub trait WitnessModulePath {
     const MODULE_PATH: &'static str;
 }
 
+/// Structural shape classification for one witness artifact node.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum WitnessArtifactShape {
+    /// A named-field struct proof artifact.
+    NamedStruct,
+    /// A tuple-struct proof artifact.
+    TupleStruct,
+    /// A unit-struct proof artifact.
+    UnitStruct,
+    /// An enum proof artifact carrying per-variant sub-artifacts.
+    Enum,
+    /// A named-field enum variant proof artifact.
+    NamedVariant,
+    /// A tuple enum variant proof artifact.
+    TupleVariant,
+    /// A unit enum variant proof artifact.
+    UnitVariant,
+    /// A leaf artifact with no child members or variants.
+    Leaf,
+}
+
+impl WitnessArtifactShape {
+    /// Stable label for audit and generated-code scaffolding.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::NamedStruct => "named_struct",
+            Self::TupleStruct => "tuple_struct",
+            Self::UnitStruct => "unit_struct",
+            Self::Enum => "enum",
+            Self::NamedVariant => "named_variant",
+            Self::TupleVariant => "tuple_variant",
+            Self::UnitVariant => "unit_variant",
+            Self::Leaf => "leaf",
+        }
+    }
+}
+
+/// One named child member inside a witness artifact tree.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WitnessArtifactMember {
+    /// Stable field/member label.
+    pub label: String,
+    /// Nested proof artifact for that member.
+    pub artifact: Box<WitnessArtifactNode>,
+}
+
+/// One named enum variant inside a witness artifact tree.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WitnessArtifactVariant {
+    /// Stable variant label after any derive-side rename.
+    pub name: String,
+    /// Nested proof artifact for that variant.
+    pub artifact: Box<WitnessArtifactNode>,
+}
+
+/// One node in a verifier-facing witness artifact tree.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WitnessArtifactNode {
+    /// Structural shape for this node.
+    pub shape: WitnessArtifactShape,
+    /// Support summary this node closes over.
+    pub support: WitnessSupportSummary,
+    /// Leaf classification or the collapsed class of this composite node.
+    pub kind: WitnessSupportKind,
+    /// Optional tag name for enum roots.
+    pub tag: Option<String>,
+    /// Optional source-language variant name for enum-variant nodes.
+    pub variant: Option<String>,
+    /// Optional backend detail for leaves, such as a harness name or
+    /// provenance report.
+    pub detail: Option<String>,
+    /// Named child members for struct- and variant-like nodes.
+    pub members: Vec<WitnessArtifactMember>,
+    /// Named child variants for enum roots.
+    pub variants: Vec<WitnessArtifactVariant>,
+}
+
+impl WitnessArtifactNode {
+    /// Construct one leaf node.
+    pub fn leaf(
+        kind: WitnessSupportKind,
+        support: WitnessSupportSummary,
+        detail: impl Into<String>,
+    ) -> Self {
+        Self {
+            shape: WitnessArtifactShape::Leaf,
+            support,
+            kind,
+            tag: None,
+            variant: None,
+            detail: Some(detail.into()),
+            members: Vec::new(),
+            variants: Vec::new(),
+        }
+    }
+
+    /// Construct one composite node with named child members.
+    pub fn members(
+        shape: WitnessArtifactShape,
+        support: WitnessSupportSummary,
+        variant: Option<String>,
+        members: Vec<WitnessArtifactMember>,
+    ) -> Self {
+        Self {
+            shape,
+            support,
+            kind: support.kind(),
+            tag: None,
+            variant,
+            detail: None,
+            members,
+            variants: Vec::new(),
+        }
+    }
+
+    /// Construct one enum root node with named variants.
+    pub fn enum_variants(
+        support: WitnessSupportSummary,
+        tag: impl Into<String>,
+        variants: Vec<WitnessArtifactVariant>,
+    ) -> Self {
+        Self {
+            shape: WitnessArtifactShape::Enum,
+            support,
+            kind: support.kind(),
+            tag: Some(tag.into()),
+            variant: None,
+            detail: None,
+            members: Vec::new(),
+            variants,
+        }
+    }
+}
+
+/// Shape-reporting surface for a witness proof artifact.
+pub trait WitnessArtifact {
+    /// Reify this proof artifact as a structured tree for audit and
+    /// backend-specific scaffold generation.
+    fn witness_artifact(&self) -> WitnessArtifactNode;
+}
+
 /// A statically registered export target for an explicitly instantiated
 /// witness surface.
 ///
@@ -181,6 +322,8 @@ pub struct WitnessExportRecord {
     pub describe: fn() -> String,
     /// Summarize the support surface the witness closes over.
     pub support: fn() -> WitnessSupportSummary,
+    /// Structured witness artifact tree for backend-specific generation.
+    pub artifact: fn() -> WitnessArtifactNode,
 }
 
 inventory::collect!(WitnessExportRecord);
@@ -196,6 +339,8 @@ pub struct WitnessExportSnapshot {
     pub destination_module: String,
     /// Structural summary of the support surface this export closes over.
     pub support: WitnessSupportSummary,
+    /// Structured witness artifact tree for backend-specific generation.
+    pub artifact: WitnessArtifactNode,
 }
 
 /// Collect every registered witness export target into owned values.
@@ -209,6 +354,7 @@ pub fn witness_exports() -> Vec<WitnessExportSnapshot> {
             evidence: (record.evidence)().to_owned(),
             destination_module: (record.destination_module)().to_owned(),
             support: (record.support)(),
+            artifact: (record.artifact)(),
         })
         .collect();
 
@@ -280,6 +426,10 @@ macro_rules! register_witness_exports {
                     destination_module: || <<$ty as $crate::Witness<$verifier>>::ProofArtifact as $crate::WitnessModulePath>::MODULE_PATH,
                     describe: || <$ty as $crate::Witness<$verifier>>::proof().to_string(),
                     support: || <$ty as $crate::Witness<$verifier>>::support(),
+                    artifact: || {
+                        let proof = <$ty as $crate::Witness<$verifier>>::proof();
+                        $crate::WitnessArtifact::witness_artifact(&proof)
+                    },
                 }
             }
         )*

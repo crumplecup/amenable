@@ -186,6 +186,38 @@ struct WitnessExportRecordDump {
     checked: usize,
     trusted: usize,
     opaque: usize,
+    artifact: WitnessArtifactNodeDump,
+}
+
+/// One structured witness artifact node, owned for JSON serialization.
+#[derive(serde::Serialize)]
+struct WitnessArtifactNodeDump {
+    shape: String,
+    kind: String,
+    tag: Option<String>,
+    variant: Option<String>,
+    detail: Option<String>,
+    support_kind: String,
+    trivial: usize,
+    checked: usize,
+    trusted: usize,
+    opaque: usize,
+    members: Vec<WitnessArtifactMemberDump>,
+    variants: Vec<WitnessArtifactVariantDump>,
+}
+
+/// One named witness artifact member, owned for JSON serialization.
+#[derive(serde::Serialize)]
+struct WitnessArtifactMemberDump {
+    label: String,
+    artifact: WitnessArtifactNodeDump,
+}
+
+/// One named witness artifact variant, owned for JSON serialization.
+#[derive(serde::Serialize)]
+struct WitnessArtifactVariantDump {
+    name: String,
+    artifact: WitnessArtifactNodeDump,
 }
 
 /// The full registry dump written by `dump-registry`.
@@ -204,6 +236,39 @@ struct KaniProofDump {
     id: String,
     harness: String,
     package: String,
+}
+
+fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifactNodeDump {
+    let support = node.support;
+
+    WitnessArtifactNodeDump {
+        shape: node.shape.as_str().to_owned(),
+        kind: node.kind.as_str().to_owned(),
+        tag: node.tag,
+        variant: node.variant,
+        detail: node.detail,
+        support_kind: support.kind().as_str().to_owned(),
+        trivial: support.trivial(),
+        checked: support.checked(),
+        trusted: support.trusted(),
+        opaque: support.opaque(),
+        members: node
+            .members
+            .into_iter()
+            .map(|member| WitnessArtifactMemberDump {
+                label: member.label,
+                artifact: dump_witness_artifact(*member.artifact),
+            })
+            .collect(),
+        variants: node
+            .variants
+            .into_iter()
+            .map(|variant| WitnessArtifactVariantDump {
+                name: variant.name,
+                artifact: dump_witness_artifact(*variant.artifact),
+            })
+            .collect(),
+    }
 }
 
 fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
@@ -237,6 +302,7 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
                 checked: record.support.checked(),
                 trusted: record.support.trusted(),
                 opaque: record.support.opaque(),
+                artifact: dump_witness_artifact(record.artifact),
                 verifier: record.verifier,
                 evidence: record.evidence,
                 destination_module: record.destination_module,

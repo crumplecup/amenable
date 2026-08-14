@@ -1,6 +1,6 @@
 use amenable::{
-    Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessModulePath,
-    WitnessSupportSummary, witness_exports,
+    Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact, WitnessArtifactNode,
+    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, witness_exports,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -60,6 +60,16 @@ impl WitnessModulePath for LocalProofArtifact {
     const MODULE_PATH: &'static str = "crate::derived_witness::local_evidence_witness";
 }
 
+impl WitnessArtifact for LocalProofArtifact {
+    fn witness_artifact(&self) -> WitnessArtifactNode {
+        WitnessArtifactNode::leaf(
+            WitnessSupportKind::Checked,
+            WitnessSupportSummary::checked_leaf(),
+            "harness: verify_local_evidence_shape",
+        )
+    }
+}
+
 impl Witness<LocalVerifier> for LocalEvidence {
     type SupportingEvidence = Self;
     type ProofArtifact = LocalProofArtifact;
@@ -89,4 +99,10 @@ fn witness_exports_include_concrete_local_registrations() {
         "crate::derived_witness::local_evidence_witness"
     );
     assert_eq!(record.support, WitnessSupportSummary::checked_leaf());
+    assert_eq!(record.artifact.shape.as_str(), "leaf");
+    assert_eq!(record.artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(
+        record.artifact.detail.as_deref(),
+        Some("harness: verify_local_evidence_shape")
+    );
 }
