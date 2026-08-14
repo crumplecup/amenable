@@ -20,6 +20,7 @@ type ConcreteVerusExportTupleStruct =
 crate::emit_verus_witnesses!(
     ConcreteVerusExportCanaryStruct,
     ConcreteVerusExportTupleStruct,
+    VerusExportRequiresStruct,
 );
 
 /// A leaf whose [`Witness<VerusVerifier>`] proof is real and
@@ -89,6 +90,49 @@ impl Witness<VerusVerifier> for TrustedVerusExportLeaf {
 }
 
 impl ClassifiedWitness<VerusVerifier> for TrustedVerusExportLeaf {}
+
+/// A leaf whose real Verus harness has a real `requires` precondition —
+/// exercises the derive-witness composition renderer's `requires`-
+/// propagation path (reuses `EscapeAscii`'s real harness/call shape,
+/// registered in `verus_witness.rs`).
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+pub struct RequiresVerusExportLeaf {
+    label: String,
+}
+
+impl RequiresVerusExportLeaf {
+    /// Wrap a label for the `requires`-propagation canary's leaf slot.
+    pub fn new(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+        }
+    }
+}
+
+impl Witness<VerusVerifier> for RequiresVerusExportLeaf {
+    type SupportingEvidence = Self;
+    type ProofArtifact = VerusCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        <RustStdStandard<std::slice::EscapeAscii<'static>> as Witness<VerusVerifier>>::proof()
+    }
+
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl ClassifiedWitness<VerusVerifier> for RequiresVerusExportLeaf {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+#[witness(verus(module = "crate::derived_witness::verus_export_requires_struct_witness"))]
+struct VerusExportRequiresStruct {
+    checked: RequiresVerusExportLeaf,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
 #[provenance(crate = "amenable_core")]

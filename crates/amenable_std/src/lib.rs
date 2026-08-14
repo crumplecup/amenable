@@ -82,7 +82,7 @@ pub use valid_unicode_scalar::ValidUnicodeScalar;
 pub use value_unchanged::ValueUnchanged;
 #[cfg(feature = "verus")]
 pub use verus_derive_canary::{
-    CheckedVerusExportLeaf, TrustedVerusExportLeaf, VerusExportCanaryEnum,
+    CheckedVerusExportLeaf, RequiresVerusExportLeaf, TrustedVerusExportLeaf, VerusExportCanaryEnum,
 };
 #[cfg(feature = "verus")]
 pub use verus_gallery::{

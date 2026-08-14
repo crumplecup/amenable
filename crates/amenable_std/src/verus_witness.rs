@@ -6303,6 +6303,26 @@ const ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT: 
     result.0 == printable && result.1 == 92 && result.2 == 110
 }"#;
 
+// The real signature
+// (crates/amenable_verus/src/rust_std/escape_ascii_carrier.rs):
+// `pub fn verify_escape_ascii_model_leaves_printable_bytes_unescaped(printable: u8) -> (result: (u8, u8, u8))
+//     requires escape_ascii_input_is_printable_ascii(printable),
+//     ensures escape_ascii_result_matches_printable_plus_newline_escape(printable, result)`.
+// The first harness with a real `requires` clause registered here --
+// exercises the compositional renderer's requires-propagation.
+crate::register_verus_call_shape! {
+    harness = "verify_escape_ascii_model_leaves_printable_bytes_unescaped",
+    module_path = "crate::rust_std::escape_ascii_carrier",
+    params = [("printable", "u8")],
+    returns = "(u8, u8, u8)",
+    requires = [
+        ("escape_ascii_input_is_printable_ascii", ["printable"]),
+    ],
+    ensures = [
+        ("escape_ascii_result_matches_printable_plus_newline_escape", ["printable", "result"]),
+    ],
+}
+
 impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;

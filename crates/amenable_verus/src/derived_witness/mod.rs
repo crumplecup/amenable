@@ -1,2 +1,3 @@
 pub mod verus_export_checked_plus_trivial_struct_witness;
+pub mod verus_export_requires_struct_witness;
 pub mod verus_export_tuple_struct_witness;
