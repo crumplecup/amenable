@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
 
-**Status:** 🔲 In progress — Phases 1–4 implemented and verified.
+**Status:** 🔲 In progress — Phases 1–5 implemented and verified.
 Phases 1–3 (`ClassifiedWitness<V>` marker trait and compile-time export
 enforcement plus an `#[allow(dead_code)]` fix; owned-`String`
 conversion on `VerusCheckedProof`; a real, additive `VerusCallShape`
@@ -16,9 +16,11 @@ call-shape registry) each left proof content unchanged. **Phase 4 is
 the core deliverable**: the renderer now emits real calls to real Verus
 harnesses instead of assumed free booleans — `just verify-verus` went
 from `335 verified, 0 errors` to `334 verified, 0 errors`, correctly
-(three tautologies replaced by two genuine proofs). Phases 5–8
-(`requires` propagation, mutating leaves, enum composition, full
-rollout) not started.
+(three tautologies replaced by two genuine proofs). Phase 5 (`requires`
+propagation) needed no renderer changes, just a real canary with a
+genuine precondition — `just verify-verus` is back to `335 verified,
+0 errors`, one new genuine proof. Phases 6–8 (mutating leaves, enum
+composition, full rollout) not started.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

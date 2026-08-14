@@ -2,31 +2,42 @@
 
 ## Status
 
-🔲 In progress — Phases 1–4 implemented and verified. Phases 1–3
-(`ClassifiedWitness<V>` + export-time enforcement + the
-`#[allow(dead_code)]` fix, commits `58baf89`/`aa14160`; owned-`String`
-conversion on `VerusCheckedProof`, commit `eb21da0`; the `VerusCallShape`
+🔲 In progress — Phases 1–5 implemented and verified.
+
+Phases 1–3 each left proof content unchanged (`just verify-verus`
+stayed at `335 verified, 0 errors` throughout): `ClassifiedWitness<V>`
+with export-time enforcement and the `#[allow(dead_code)]` fix
+(commits `58baf89`/`aa14160`); owned-`String` conversion on
+`VerusCheckedProof` (commit `eb21da0`); the `VerusCallShape`
 call-shape registry, redesigned during implementation as a separate
-additive registry rather than a `VerusCheckedProof` field, commit
-`3e7b17c`; see Design B) each left proof content unchanged (`just
-verify-verus` stayed at `335 verified, 0 errors` throughout). **Phase 4
-is the core deliverable — real composition, no more free booleans**
-(commit `dbb0092`): `just verify-verus` now reports `334 verified,
-0 errors` — down from 335, correctly: the three tautological canary
-proofs are gone, replaced by two genuine ones that call real Verus
-code and would break if that code's real behavior changed. Two design
-gaps only the real `verus` tool surfaced during this phase (Verus
-`ensures` clauses can't reference body-local `let`s, only parameters
-and the declared return binding; spec predicates need an explicit
-`#[cfg(verus_keep_ghost)]`-gated `use`) are documented in the file's
-own module doc comment. Also fixed a real, independent bug found while
-wiring this up: `write_verus_witness_modules` aborted its entire batch
-at the first failing export — since `inventory` registration is
-process-global, one broken registration anywhere would silently starve
-every other, unrelated, working export in the same process; every
-export now renders independently. Phases 5–8 (`requires` propagation,
-mutating/model-method leaves, enum `match`-per-variant composition, and
-full rollout) not started.
+additive registry rather than a `VerusCheckedProof` field (commit
+`3e7b17c`; see Design B).
+
+**Phase 4 is the core deliverable — real composition, no more free
+booleans** (commit `dbb0092`): `just verify-verus` went to `334
+verified, 0 errors` — down from 335, correctly: the three tautological
+canary proofs are gone, replaced by two genuine ones that call real
+Verus code and would break if that code's real behavior changed. Two
+design gaps only the real `verus` tool surfaced during this phase
+(Verus `ensures` clauses can't reference body-local `let`s, only
+parameters and the declared return binding; spec predicates need an
+explicit `#[cfg(verus_keep_ghost)]`-gated `use`) are documented in the
+file's own module doc comment. Also fixed a real, independent bug
+found while wiring this up: `write_verus_witness_modules` aborted its
+entire batch at the first failing export — since `inventory`
+registration is process-global, one broken registration anywhere would
+silently starve every other, unrelated, working export in the same
+process; every export now renders independently.
+
+Phase 5 (`requires` propagation, commit `874904b`) needed no renderer
+changes — category 4 was already generic in Phase 4's implementation —
+just a real canary (`EscapeAscii`'s harness, the first registered one
+with a genuine precondition) proving the existing propagation path
+against real data instead of an empty list. `just verify-verus` went
+to `335 verified, 0 errors` — up from 334, one new genuine proof.
+
+Phases 6–8 (mutating/model-method leaves, enum `match`-per-variant
+composition, and full rollout) not started.
 
 ## Problem
 
@@ -346,8 +357,12 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    failure mode (see Status above) — not originally scoped to this
    phase, but discovered to be necessary while wiring up the first two
    real exports side by side with a temporarily-unsupported one.
-5. **Renderer: category 4** (`requires` propagation). Add a canary
-   exercising a leaf with a real precondition.
+5. ✅ **Renderer: category 4** (`requires` propagation). Registered
+   `EscapeAscii`'s real harness (a genuine precondition,
+   `escape_ascii_input_is_printable_ascii`) and a canary exercising it
+   — the propagation logic was already generic from Phase 4, so no
+   renderer changes were needed, only the real data to prove it against
+   (commit `874904b`).
 6. **Renderer: category 5** (mutating/model-method leaves). Add a canary
    wrapping a `RefCell`-style model leaf.
 7. **Renderer: category 6** (enum `match`-per-variant generation).
