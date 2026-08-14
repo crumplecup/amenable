@@ -2,15 +2,16 @@
 
 ## Status
 
-🔲 In progress — Phase 1 (`ClassifiedWitness<V>` + export-time
-enforcement + the `#[allow(dead_code)]` fix) is implemented and
-verified: `just check-all-verus` passes in full, `just verify-verus`
-still reports `335 verified, 0 errors` (unaffected — Phase 1 is
-enforcement, not proof content), and the negative case (an
-intentionally-unclassified leaf) was confirmed twice against the real
-crate to fail `cargo check` with the expected `E0277`, naming the exact
-leaf, then restored. Phases 2–8 (owned-`String` conversion, real
-call-shape metadata, and the renderer rewrite) not started.
+🔲 In progress — Phases 1–3 implemented and verified (each ends with a
+clean `just check-all-verus` and an unchanged `just verify-verus`
+`335 verified, 0 errors`, confirming no phase so far touches proof
+content): `ClassifiedWitness<V>` + export-time enforcement + the
+`#[allow(dead_code)]` fix (commits `58baf89`, `aa14160`); owned-`String`
+conversion on `VerusCheckedProof` (commit `eb21da0`); the
+`VerusCallShape` call-shape registry, redesigned during implementation
+as a separate additive registry rather than a `VerusCheckedProof` field
+(commit `3e7b17c`; see Design B). Phases 4–8 (the renderer rewrite
+itself) not started.
 
 ## Problem
 
@@ -190,8 +191,16 @@ aren't re-derived:
 
 `VerusCheckedProof` currently carries a harness *name* and the whole
 carrier file's source (for display/audit) — enough to describe a leaf in
-a comment, not enough to call it. Extend it (owned `String`/`Vec`, not
-`&'static str` — see Design C) with a machine-usable call shape:
+a comment, not enough to call it. **Implemented as a separate, additive
+registry, not a field on `VerusCheckedProof`** (a refinement made during
+Phase 3, not the original plan): `VerusCheckedProof` has ~280
+construction sites in `verus_witness.rs`, almost none of which are
+opted into Verus export (`register_witness_exports!` is deliberately
+opt-in — see its own doc comment; today only the 3 canary types are
+exported at all). A required new field on `VerusCheckedProof` would
+force touching every one of those 280 sites for no immediate benefit,
+since the renderer only ever needs a real call shape for harnesses
+actually reachable from an exported type. Instead:
 
 ```rust
 pub struct VerusCallShape {
@@ -214,12 +223,31 @@ pub enum VerusCallKind {
     /// A value-returning function: call it, bind the result, cite its
     /// real `ensures` predicate with the bound result in scope.
     Function { returns: String },
-    /// A `&mut self`/`old`/`final` method on a real model type: needs a
-    /// constructed receiver, a real method call, and old/final rebinding
-    /// at the composite's own before/after boundary.
-    Method { receiver_ty: String, mutates: bool },
+    // Method { receiver_ty: String, mutates: bool } deferred: no real
+    // canary needs a &mut self/old/final receiver leaf yet (see phase 6
+    // below) — added when one does, not speculatively.
+}
+
+/// Additive, opt-in, keyed by harness name — mirrors
+/// amenable_core::WitnessExportRecord's own opt-in registration story.
+pub struct VerusCallShapeRecord {
+    pub harness: &'static str,
+    pub call_shape: fn() -> VerusCallShape,
 }
 ```
+
+`register_verus_call_shape!` registers one entry per harness name (not
+per `Witness`-impl type — several types can share one harness, e.g.
+`RustStdStandard<char>`/`ValidUnicodeScalar`/the canary's
+`CheckedVerusExportLeaf` all reuse `verify_char_roundtrip`). The
+renderer looks a leaf's harness up via `verus_call_shape(name)`; a
+`None` result for a harness actually reached from an exported type is a
+real, well-defined tool error (an `AmenableResult::Err` from the
+renderer, not a silent fallback to the old free-boolean behavior) — a
+qualitatively smaller and more honest gap than the `Opaque` case Design
+A closes, since it only means "this already-classified leaf hasn't
+been wired into the composition renderer yet," not "this leaf has no
+proof at all."
 
 Renderer categories in `amenable::verus_export`, in the order the
 implementation phases below tackle them (see Implementation):
@@ -284,11 +312,14 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    unproven into an export." Also fixed the `#[allow(dead_code)]` while
    touching `verus_derive_canary.rs` in this phase (commits `58baf89`,
    `aa14160`).
-2. **Owned-`String` conversion** on `VerusCheckedProof`. Mechanical,
-   unblocks phase 3 starting clean.
-3. **`VerusCallShape`/`VerusParam` plumbing** into every `impl
-   VerusWitness`/`bridge_verus_witness!` site, starting with the canary
-   leaves.
+2. ✅ **Owned-`String` conversion** on `VerusCheckedProof`. Mechanical,
+   unblocked phase 3 starting clean (commit `eb21da0`).
+3. ✅ **`VerusCallShape`/`VerusParam` registry**, redesigned during
+   implementation as a separate additive registry rather than a
+   `VerusCheckedProof` field (see Design B above for why). Registered
+   the canary's harness, `verify_char_roundtrip` (commit `3e7b17c`).
+   Remaining harnesses get registered as later phases' canaries need
+   them, or in phase 8's rollout.
 4. **Renderer: categories 1–3** (direct predicates, value-returning
    functions, multi-clause). Get the existing canaries producing real,
    content-bearing composite proofs — no free booleans anywhere.
