@@ -20,12 +20,25 @@
 
 use amenable_core::{verus_find_fn, verus_literal_clauses};
 use quote::{format_ident, quote};
-use syn::{Expr, LitStr, Token, Type, parse::Parse, parse::ParseStream};
+use syn::{
+    Expr, LitInt, LitStr, Token, Type, bracketed,
+    parse::{Parse, ParseStream},
+    punctuated::Punctuated,
+};
 
 struct VerusWitnessArgs {
     ty: Type,
     evidence: Expr,
     harness: LitStr,
+    /// Which of the harness's own real clauses this specific type
+    /// claims, by 0-based index -- `None` means all of them (the
+    /// common case: a leaf's own dedicated harness). `Some` is for a
+    /// type that reuses a harness shared with others but only claims
+    /// *some* of its real clauses (e.g. `ValidUnicodeScalar` naming
+    /// just `verify_char_roundtrip`'s unicode-scalar clause, not its
+    /// roundtrip clause too) -- an explicit, uniform selector, not a
+    /// bespoke supplementary registration.
+    indices: Option<Vec<usize>>,
 }
 
 impl Parse for VerusWitnessArgs {
@@ -35,11 +48,28 @@ impl Parse for VerusWitnessArgs {
         let evidence: Expr = input.parse()?;
         input.parse::<Token![,]>()?;
         let harness: LitStr = input.parse()?;
+
+        let indices = if input.parse::<Option<Token![,]>>()?.is_some() && !input.is_empty() {
+            let content;
+            bracketed!(content in input);
+            let items: Punctuated<LitInt, Token![,]> =
+                content.parse_terminated(<LitInt as Parse>::parse, Token![,])?;
+            Some(
+                items
+                    .iter()
+                    .map(LitInt::base10_parse)
+                    .collect::<syn::Result<Vec<usize>>>()?,
+            )
+        } else {
+            None
+        };
         input.parse::<Option<Token![,]>>()?;
+
         Ok(Self {
             ty,
             evidence,
             harness,
+            indices,
         })
     }
 }
@@ -63,13 +93,32 @@ pub(crate) fn expand_verus_witness(
         )
     })?;
 
-    let clauses = verus_literal_clauses(&item_fn, ensures);
-    if clauses.is_empty() {
+    let all_clauses = verus_literal_clauses(&item_fn, ensures);
+    if all_clauses.is_empty() {
         return Err(syn::Error::new(
             args.harness.span(),
             format!("harness `{name}` has no real `{kind}` clause to derive an impl from"),
         ));
     }
+
+    let selected = match &args.indices {
+        Some(indices) => indices.clone(),
+        None => (0..all_clauses.len()).collect(),
+    };
+    let clauses = selected
+        .iter()
+        .map(|&index| {
+            all_clauses.get(index).cloned().ok_or_else(|| {
+                syn::Error::new(
+                    args.harness.span(),
+                    format!(
+                        "harness `{name}` only has {} real `{kind}` clause(s), no index {index}",
+                        all_clauses.len()
+                    ),
+                )
+            })
+        })
+        .collect::<syn::Result<Vec<_>>>()?;
 
     let ty = &args.ty;
     let evidence = &args.evidence;

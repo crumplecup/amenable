@@ -506,15 +506,6 @@ macro_rules! register_verus_call_shape {
 const VERIFY_CHAR_ROUNDTRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_carrier.rs");
 
-const CHAR_ROUNDTRIP_PRESERVES_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn char_roundtrip_preserves_value(result: char, input: char) -> bool {
-    result == input
-}"#;
-
-const CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn char_is_valid_unicode_scalar(value: char) -> bool {
-    (value as u32) <= 0xD7FFu32
-        || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)
-}"#;
-
 // `verify_char_roundtrip`'s real VerusCallShape (params/requires/ensures/
 // imports) is no longer registered by hand here -- `verus_call_shape`
 // derives it by parsing the real signature directly from
@@ -537,47 +528,17 @@ impl VerusWitness for RustStdStandard<char> {
 
 bridge_verus_witness!(RustStdStandard<char>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<char> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "char_roundtrip_preserves_value(result, c) && char_is_valid_unicode_scalar(c)"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<char>,
+    "amenable_std::rust_std::RustStdStandard<char>",
+    "verify_char_roundtrip"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<char>",
         verifier: "verus",
         describe: || <RustStdStandard<char> as VerusWitness>::proof().to_string(),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<char> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHAR_ROUNDTRIP_PRESERVES_VALUE_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT,
     }
 }
 
@@ -599,23 +560,14 @@ impl VerusWitness for ValidUnicodeScalar {
 
 bridge_verus_witness!(ValidUnicodeScalar);
 
-impl Ensures<VerusVerifier> for ValidUnicodeScalar {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "char_is_valid_unicode_scalar(c)"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
+// verify_char_roundtrip's second real clause only -- see
+// RustStdStandard<char> just above for its first.
+amenable_derive::verus_ensures_witness!(
+    ValidUnicodeScalar,
+    "amenable_std::ValidUnicodeScalar",
+    "verify_char_roundtrip",
+    [1]
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -1030,15 +982,6 @@ bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
 const VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/box_carrier.rs");
 
-const BOX_DEREFS_AND_WRITES_THROUGH_VERUS_FRAGMENT: &str = r#"pub open spec fn box_derefs_and_writes_through(
-    deref_value: int,
-    observed_after_write: int,
-    initial: int,
-    updated: int,
-) -> bool {
-    deref_value == initial && observed_after_write == updated
-}"#;
-
 impl VerusWitness for RustStdStandard<Box<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1054,38 +997,17 @@ impl VerusWitness for RustStdStandard<Box<i32>> {
 
 bridge_verus_witness!(RustStdStandard<Box<i32>>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<Box<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 == value && result.1 == updated"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<Box<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+    "verify_box_derefs_and_writes_through"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
         verifier: "verus",
         describe: || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Box<i32>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BOX_DEREFS_AND_WRITES_THROUGH_VERUS_FRAGMENT,
     }
 }
 
@@ -1466,10 +1388,6 @@ const CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT: &str = r#"pub open 
         && (cstring_input_has_a_preterminal_nul(bytes) ==> result is Err)
 }"#;
 
-const CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn cstring_test_byte_is_nonzero(byte: u8) -> bool {
-    byte != 0
-}"#;
-
 impl VerusWitness for RustStdStandard<std::ffi::CString> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1485,38 +1403,17 @@ impl VerusWitness for RustStdStandard<std::ffi::CString> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::CString>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::ffi::CString> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "byte != 0"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::ffi::CString>,
+    "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+    "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
         verifier: "verus",
         describe: || <RustStdStandard<std::ffi::CString> as VerusWitness>::proof().to_string(),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::ffi::CString> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
     }
 }
 
@@ -1553,38 +1450,17 @@ impl VerusWitness for RustStdStandard<std::ffi::NulError> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::NulError>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::ffi::NulError> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "byte != 0"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::ffi::NulError>,
+    "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+    "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
         evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
         verifier: "verus",
         describe: || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::ffi::NulError> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || CSTRING_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
     }
 }
 
@@ -1620,10 +1496,6 @@ const FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT: &str = r#"p
         && ((exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0) ==> result is Err)
 }"#;
 
-const FROM_VEC_WITH_NUL_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn from_vec_with_nul_test_byte_is_nonzero(byte: u8) -> bool {
-    byte != 0
-}"#;
-
 impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1639,14 +1511,11 @@ impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
 
 bridge_verus_witness!(RustStdStandard<std::ffi::FromVecWithNulError>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::ffi::FromVecWithNulError> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "byte != 0"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::ffi::FromVecWithNulError>,
+    "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+    "verify_from_vec_with_nul_requires_the_nul_only_at_the_end"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -1655,24 +1524,6 @@ impl Requires<VerusVerifier> for RustStdStandard<std::ffi::FromVecWithNulError> 
         describe: || {
             <RustStdStandard<std::ffi::FromVecWithNulError> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::ffi::FromVecWithNulError> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || FROM_VEC_WITH_NUL_TEST_BYTE_IS_NONZERO_VERUS_FRAGMENT,
     }
 }
 
@@ -1806,13 +1657,6 @@ const CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT: &str
         && (cstr_bytes_contain_no_nul(bytes) ==> result is Err)
 }"#;
 
-const CSTR_UNTIL_NUL_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_until_nul_test_inputs_cover_both_cases(
-    with_nul: &[u8],
-    without_nul: &[u8],
-) -> bool {
-    cstr_bytes_contain_a_nul(with_nul) && cstr_bytes_contain_no_nul(without_nul)
-}"#;
-
 impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1828,14 +1672,11 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
 
 bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesUntilNulError>);
 
-impl Requires<VerusVerifier> for RustStdStandard<core::ffi::FromBytesUntilNulError> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "exists|i: int| 0 <= i < with_nul@.len() && with_nul@[i] == 0 && !exists|i: int| 0 <= i < without_nul@.len() && without_nul@[i] == 0"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<core::ffi::FromBytesUntilNulError>,
+    "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+    "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -1844,24 +1685,6 @@ impl Requires<VerusVerifier> for RustStdStandard<core::ffi::FromBytesUntilNulErr
         describe: || {
             <RustStdStandard<core::ffi::FromBytesUntilNulError> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<core::ffi::FromBytesUntilNulError> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || CSTR_UNTIL_NUL_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
     }
 }
 
@@ -2048,14 +1871,6 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
 const VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
 
-const BTREE_MAP_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_map_round_trip_inputs_are_distinct(k1: int, k2: int) -> bool {
-    k1 != k2
-}"#;
-
-const BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_map_insert_get_remove_round_trip_holds(result: bool) -> bool {
-    result
-}"#;
-
 impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2071,23 +1886,17 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BTreeMap<i32, i32>>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
-    type Input = ();
-    type Bound = &'static str;
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::collections::BTreeMap<i32, i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+    "verify_btree_map_insert_get_remove_round_trips"
+);
 
-    fn requires(_: ()) -> &'static str {
-        "k1 != k2"
-    }
-}
-
-impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::collections::BTreeMap<i32, i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+    "verify_btree_map_insert_get_remove_round_trips"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -2100,52 +1909,8 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeMap<i32, 
     }
 }
 
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || BTREE_MAP_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
-    }
-}
-
 const VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/btree_carrier.rs");
-
-const BTREE_SET_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_set_round_trip_inputs_are_distinct(a: int, b: int) -> bool {
-    a != b
-}"#;
-
-const BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn btree_set_insert_contains_remove_round_trip_holds(result: bool) -> bool {
-    result
-}"#;
 
 impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
     type SupportingEvidence = Self;
@@ -2162,23 +1927,17 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BTreeSet<i32>>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::collections::BTreeSet<i32>> {
-    type Input = ();
-    type Bound = &'static str;
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::collections::BTreeSet<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+    "verify_btree_set_insert_contains_remove_round_trips"
+);
 
-    fn requires(_: ()) -> &'static str {
-        "a != b"
-    }
-}
-
-impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeSet<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::collections::BTreeSet<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+    "verify_btree_set_insert_contains_remove_round_trips"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -2187,42 +1946,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BTreeSet<i32>>
         describe: || {
             <RustStdStandard<std::collections::BTreeSet<i32>> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::collections::BTreeSet<i32>> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || BTREE_SET_ROUND_TRIP_INPUTS_ARE_DISTINCT_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::collections::BTreeSet<i32>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
     }
 }
 
@@ -2342,16 +2065,6 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static,
 const VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/chars_carrier.rs");
 
-const CHARS_INPUT_IS_AB_VERUS_FRAGMENT: &str = r#"pub open spec fn chars_input_is_ab(s: &str) -> bool {
-    s@.len() == 2 && s@[0] == 'a' && s@[1] == 'b'
-}"#;
-
-const CHARS_ITERATION_YIELDS_A_THEN_B_THEN_NONE_VERUS_FRAGMENT: &str = r#"pub open spec fn chars_iteration_yields_a_then_b_then_none(
-    result: (Option<char>, Option<char>, Option<char>),
-) -> bool {
-    result.0 == Some('a') && result.1 == Some('b') && result.2 is None
-}"#;
-
 impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2367,23 +2080,17 @@ impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
 
 bridge_verus_witness!(RustStdStandard<std::str::Chars<'static>>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
-    type Input = ();
-    type Bound = &'static str;
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::str::Chars<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+    "verify_chars_yields_characters_in_order"
+);
 
-    fn requires(_: ()) -> &'static str {
-        "s@.len() == 2 && s@[0] == 'a' && s@[1] == 'b'"
-    }
-}
-
-impl Ensures<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 == Some('a') && result.1 == Some('b') && result.2 is None"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::str::Chars<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+    "verify_chars_yields_characters_in_order"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -2392,42 +2099,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::str::Chars<'static>> {
         describe: || {
             <RustStdStandard<std::str::Chars<'static>> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::str::Chars<'static>> as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || CHARS_INPUT_IS_AB_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::str::Chars<'static>> as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHARS_ITERATION_YIELDS_A_THEN_B_THEN_NONE_VERUS_FRAGMENT,
     }
 }
 
@@ -2451,15 +2122,6 @@ const BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT: &str = r#"pub
 ) -> bool {
     first == max && second == min
 }"#;
-const BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_pop_yields_the_maximum_first(
-    first: int,
-    second: int,
-    a: int,
-    b: int,
-) -> bool {
-    first == if a >= b { a } else { b }
-        && second == if a >= b { b } else { a }
-}"#;
 
 impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
     type SupportingEvidence = Self;
@@ -2476,14 +2138,11 @@ impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::collections::BinaryHeap<i32>>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BinaryHeap<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 == if a >= b { a } else { b } && result.1 == if a >= b { b } else { a }"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::collections::BinaryHeap<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+    "verify_max_heap_pair_pops_the_maximum_first"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -2492,15 +2151,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BinaryHeap<i32
         describe: || {
             <RustStdStandard<std::collections::BinaryHeap<i32>> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::collections::BinaryHeap<i32>> as Ensures<VerusVerifier>>::ensures(()),
     }
 }
 
@@ -2519,15 +2169,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::collections::BinaryHeap<i32
         verifier: "verus",
         kind: "ensures",
         fragment: || BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_VERUS_FRAGMENT,
     }
 }
 
@@ -2571,14 +2212,6 @@ const CELL_MODEL_GET_READS_CURRENT_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec
 const CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_replace_returns_previous_value(observed: int, previous: int) -> bool {
     observed == previous
 }"#;
-const CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_get_set_replace_round_trip_holds(
-    stores_initial: bool,
-    set_overwrites: bool,
-    replace_returns_old: bool,
-    replace_stores_new: bool,
-) -> bool {
-    stores_initial && set_overwrites && replace_returns_old && replace_stores_new
-}"#;
 
 impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
     type SupportingEvidence = Self;
@@ -2595,14 +2228,11 @@ impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::cell::Cell<i32>>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 && result.1 && result.2 && result.3"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::cell::Cell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+    "verify_cell_model_get_set_replace_round_trip"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -2611,15 +2241,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
         describe: || {
             <RustStdStandard<std::cell::Cell<i32>> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::cell::Cell<i32>> as Ensures<VerusVerifier>>::ensures(()),
     }
 }
 
@@ -2647,15 +2268,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::cell::Cell<i32>> {
         verifier: "verus",
         kind: "ensures",
         fragment: || CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_HOLDS_VERUS_FRAGMENT,
     }
 }
 
@@ -2860,47 +2472,11 @@ impl VerusWitness for YieldsThreeValuesInOrderThenEnds {
 
 bridge_verus_witness!(YieldsThreeValuesInOrderThenEnds);
 
-impl Ensures<VerusVerifier> for YieldsThreeValuesInOrderThenEnds {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 == Some(first) && result.1 == Some(second) && result.2 == Some(third) && result.3 is None"
-    }
-}
-
-const YIELDS_THREE_VALUES_IN_ORDER_THEN_ENDS_VERUS_FRAGMENT: &str = r#"pub open spec fn yields_three_values_in_order_then_ends(
-    observed_first: Option<i32>,
-    observed_second: Option<i32>,
-    observed_third: Option<i32>,
-    exhausted: Option<i32>,
-    first: i32,
-    second: i32,
-    third: i32,
-) -> bool {
-    observed_first == Some(first)
-        && observed_second == Some(second)
-        && observed_third == Some(third)
-        && exhausted is None
-}"#;
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::YieldsThreeValuesInOrderThenEnds",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <YieldsThreeValuesInOrderThenEnds as Ensures<VerusVerifier>>::ensures(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::YieldsThreeValuesInOrderThenEnds",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || YIELDS_THREE_VALUES_IN_ORDER_THEN_ENDS_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    YieldsThreeValuesInOrderThenEnds,
+    "amenable_std::YieldsThreeValuesInOrderThenEnds",
+    "verify_array_into_iter_model_yields_elements_in_order"
+);
 
 impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type SupportingEvidence = Self;
@@ -3332,36 +2908,11 @@ impl VerusWitness for NonNulByte {
 
 bridge_verus_witness!(NonNulByte);
 
-const NON_NUL_BYTE_VALUE_IS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_nul_byte_value_is_nonzero(byte: u8) -> bool {
-    byte != 0
-}"#;
-
-impl Requires<VerusVerifier> for NonNulByte {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "byte != 0"
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::NonNulByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <NonNulByte as Requires<VerusVerifier>>::requires(()),
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::NonNulByte",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || NON_NUL_BYTE_VALUE_IS_NONZERO_VERUS_FRAGMENT,
-    }
-}
+amenable_derive::verus_requires_witness!(
+    NonNulByte,
+    "amenable_std::NonNulByte",
+    "verify_cstr_excludes_the_terminating_nul_from_to_bytes"
+);
 
 const VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordered_pair_into_iter_carrier.rs");
@@ -5209,21 +4760,16 @@ bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
 }
 
 /// `RustStdStandard<NonZero<T>>`'s Verus proof states its claim as two
-/// separate `ensures` clauses (`value != 0 ==> result`, `value == 0 ==>
-/// !result`) — an iff split into its two implications, not one expression.
-/// `Ensures<VerusVerifier>` still returns the first direction as the
-/// canonical descriptive text for cross-backend enumeration, while the
-/// real Verus proof sites call shared `non_zero_new_accepts_nonzero` and
-/// `non_zero_new_rejects_zero` spec fns defined in
-/// `amenable_verus::rust_std::non_zero_carrier`.
-const NON_ZERO_NEW_ACCEPTS_NONZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_zero_new_accepts_nonzero(value: int, result: bool) -> bool {
-    value != 0 ==> result
-}"#;
-
-const NON_ZERO_NEW_REJECTS_ZERO_VERUS_FRAGMENT: &str = r#"pub open spec fn non_zero_new_rejects_zero(value: int, result: bool) -> bool {
-    value == 0 ==> !result
-}"#;
-
+/// separate real `ensures` clauses (`non_zero_new_accepts_nonzero`,
+/// `non_zero_new_rejects_zero`) — an iff split into its two
+/// implications, not one expression, since Verus has no single iff
+/// operator. `Ensures<VerusVerifier>::Bound = &'static [&'static str]`
+/// holds both, uniformly, as first-class elements of the trait's own
+/// value -- the original motivating case for that shape (see Design E
+/// in `docs/VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md`'s companion
+/// contract-type work): no more picking one direction as "canonical"
+/// and smuggling the other in through a bespoke supplementary
+/// `ContractRecord`.
 macro_rules! impl_non_zero_verus_witness {
     ($($ty:ty => $harness:literal),* $(,)?) => {
         $(
@@ -5250,41 +4796,11 @@ macro_rules! impl_non_zero_verus_witness {
                 }
             }
 
-            impl Ensures<VerusVerifier> for RustStdStandard<std::num::NonZero<$ty>> {
-                type Input = ();
-                type Bound = &'static str;
-
-                fn ensures(_: ()) -> &'static str {
-                    "value != 0 ==> result"
-                }
-            }
-
-            ::inventory::submit! {
-                ::amenable_core::ContractRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
-                    verifier: "verus",
-                    kind: "ensures",
-                    fragment: || <RustStdStandard<std::num::NonZero<$ty>> as Ensures<VerusVerifier>>::ensures(()),
-                }
-            }
-
-            ::inventory::submit! {
-                ::amenable_core::ContractRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
-                    verifier: "verus",
-                    kind: "ensures",
-                    fragment: || NON_ZERO_NEW_ACCEPTS_NONZERO_VERUS_FRAGMENT,
-                }
-            }
-
-            ::inventory::submit! {
-                ::amenable_core::ContractRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
-                    verifier: "verus",
-                    kind: "ensures",
-                    fragment: || NON_ZERO_NEW_REJECTS_ZERO_VERUS_FRAGMENT,
-                }
-            }
+            amenable_derive::verus_ensures_witness!(
+                RustStdStandard<std::num::NonZero<$ty>>,
+                concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                $harness
+            );
         )*
     };
 }
@@ -5772,14 +5288,6 @@ const DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT: &str = r#"pu
     result == Err(unit)
 }"#;
 
-const DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_test_inputs_cover_both_cases(
-    bmp_unit: u16,
-    lone_surrogate: u16,
-) -> bool {
-    decode_utf16_unit_is_non_surrogate(bmp_unit)
-        && decode_utf16_unit_is_surrogate(lone_surrogate)
-}"#;
-
 impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -5795,16 +5303,11 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIte
 
 bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>);
 
-impl Requires<VerusVerifier>
-    for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>
-{
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "(bmp_unit < 0xD800 || bmp_unit > 0xDFFF) && 0xD800 <= lone_surrogate <= 0xDFFF"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>,
+    "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+    "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -5814,15 +5317,6 @@ impl Requires<VerusVerifier>
             <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as Requires<VerusVerifier>>::requires(()),
     }
 }
 
@@ -5841,15 +5335,6 @@ impl Requires<VerusVerifier>
         verifier: "verus",
         kind: "requires",
         fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
     }
 }
 
@@ -5886,14 +5371,11 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
 
 bridge_verus_witness!(RustStdStandard<std::char::DecodeUtf16Error>);
 
-impl Requires<VerusVerifier> for RustStdStandard<std::char::DecodeUtf16Error> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn requires(_: ()) -> &'static str {
-        "(bmp_unit < 0xD800 || bmp_unit > 0xDFFF) && 0xD800 <= lone_surrogate <= 0xDFFF"
-    }
-}
+amenable_derive::verus_requires_witness!(
+    RustStdStandard<std::char::DecodeUtf16Error>,
+    "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+    "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -5902,15 +5384,6 @@ impl Requires<VerusVerifier> for RustStdStandard<std::char::DecodeUtf16Error> {
         describe: || {
             <RustStdStandard<std::char::DecodeUtf16Error> as VerusWitness>::proof().to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || <RustStdStandard<std::char::DecodeUtf16Error> as Requires<VerusVerifier>>::requires(()),
     }
 }
 
@@ -5929,15 +5402,6 @@ impl Requires<VerusVerifier> for RustStdStandard<std::char::DecodeUtf16Error> {
         verifier: "verus",
         kind: "requires",
         fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_TEST_INPUTS_COVER_BOTH_CASES_VERUS_FRAGMENT,
     }
 }
 
@@ -7471,23 +6935,15 @@ macro_rules! impl_sync_atomic_verus_witness {
             }
         }
 
-        impl Ensures<VerusVerifier> for RustStdStandard<$ty> {
-            type Input = ();
-            type Bound = &'static str;
-
-            fn ensures(_: ()) -> &'static str {
-                "result == (initial, next)"
-            }
-        }
-
-        ::inventory::submit! {
-            ::amenable_core::ContractRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                kind: "ensures",
-                fragment: || <RustStdStandard<$ty> as Ensures<VerusVerifier>>::ensures(()),
-            }
-        }
+        amenable_derive::verus_ensures_witness!(
+            RustStdStandard<$ty>,
+            concat!(
+                "amenable_std::rust_std::RustStdStandard<",
+                stringify!($ty),
+                ">"
+            ),
+            $harness
+        );
     };
 }
 
@@ -7585,14 +7041,11 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
 
 bridge_verus_witness!(RustStdStandard<std::sync::atomic::AtomicPtr<i32>>);
 
-impl Ensures<VerusVerifier> for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures(_: ()) -> &'static str {
-        "result.0 == initial && result.1 == stored && result.2 == stored && result.3 == swapped_in && result.4 == swapped_in && result.5 == exchange_target"
-    }
-}
+amenable_derive::verus_ensures_witness!(
+    RustStdStandard<std::sync::atomic::AtomicPtr<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+    "verify_atomic_ptr_model_load_store_swap_and_compare_exchange"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord {
@@ -7602,15 +7055,6 @@ impl Ensures<VerusVerifier> for RustStdStandard<std::sync::atomic::AtomicPtr<i32
             <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as Ensures<VerusVerifier>>::ensures(()),
     }
 }
 

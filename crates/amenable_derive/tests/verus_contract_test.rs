@@ -61,6 +61,45 @@ amenable_derive::verus_ensures_witness!(
     "verify_char_roundtrip"
 );
 
+struct ValidUnicodeScalarLike;
+
+impl Evidence for ValidUnicodeScalarLike {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        Self
+    }
+
+    fn audit(&self) -> Self::Audit {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+impl Witness<VerusVerifier> for ValidUnicodeScalarLike {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::checked_leaf()
+    }
+}
+
+// Reuses verify_char_roundtrip's harness like CharRoundtrip above, but
+// claims only its second real clause (the unicode-scalar one, not the
+// roundtrip one) -- the subset-index feature real ValidUnicodeScalar
+// needs.
+amenable_derive::verus_ensures_witness!(
+    ValidUnicodeScalarLike,
+    "verus_contract_test::ValidUnicodeScalarLike",
+    "verify_char_roundtrip",
+    [1]
+);
+
 struct EscapeAsciiModel;
 
 impl Evidence for EscapeAsciiModel {
@@ -116,6 +155,13 @@ fn requires_bound_is_the_real_clause_slice() {
         clauses,
         ["escape_ascii_input_is_printable_ascii(printable)"]
     );
+}
+
+#[test]
+fn indexed_subset_claims_only_the_selected_real_clause() {
+    let clauses: &[&str] = ValidUnicodeScalarLike::ensures(());
+
+    assert_eq!(clauses, ["char_is_valid_unicode_scalar(c)"]);
 }
 
 #[test]

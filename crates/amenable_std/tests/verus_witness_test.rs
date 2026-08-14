@@ -44,7 +44,7 @@ fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
     assert_eq!(proof.provenance, <char as RustStdType>::provenance());
     assert_eq!(
         <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(()),
-        "char_is_valid_unicode_scalar(c)"
+        ["char_is_valid_unicode_scalar(c)"]
     );
 }
 
