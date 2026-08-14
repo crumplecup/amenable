@@ -4,6 +4,27 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Verus Derive-Witness Composition
+
+**Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
+
+**Status:** 🔲 Planning — design settled and verified against real
+`rustc`/`verus` behavior; implementation not started.
+
+**Description:** The derive-witness/Verus-export pipeline added in
+commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are
+tautological (assumed-true free booleans instead of real leaf-proof
+calls) and treats `Opaque` (unclassified) leaves identically to `Checked`/
+`Trusted` ones — confirmed by a real `just verify-verus` count going from
+`332 verified` to `335 verified` with zero new genuine content. This plan
+replaces the free-boolean composition with real calls to (or citations
+of) each leaf's actual proof, blocks `Opaque` leaves from ever being
+exportable via a compile-time `ClassifiedWitness<V>` marker trait
+(verified real `E0277`, not a runtime failure or a `const`-eval panic,
+with field-level precision), converts the touched structs to owned
+`String` fields, and removes a `#[allow(dead_code)]` policy violation
+along the way.
+
 ### Naming Raw Requires/Ensures Bounds (elicit_doc-driven)
 
 **Document:** [CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)
