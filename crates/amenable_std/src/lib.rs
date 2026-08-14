@@ -39,6 +39,8 @@ mod rust_std;
 mod valid_unicode_scalar;
 mod value_unchanged;
 #[cfg(feature = "verus")]
+mod verus_derive_canary;
+#[cfg(feature = "verus")]
 mod verus_gallery;
 #[cfg(feature = "verus")]
 mod verus_witness;

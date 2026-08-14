@@ -353,9 +353,37 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     assert_eq!(enum_artifact.kind, WitnessSupportKind::Mixed);
     assert_eq!(enum_artifact.tag.as_deref(), Some("entry_kind"));
     assert_eq!(enum_artifact.variants.len(), 3);
+    let balanced_variant = enum_artifact
+        .variants
+        .iter()
+        .find(|variant| variant.name == "Balanced")
+        .expect("expected Balanced variant artifact");
     assert_eq!(
-        enum_artifact.variants[0].artifact.shape,
+        balanced_variant.artifact.shape,
         WitnessArtifactShape::NamedVariant
+    );
+    let checked_leaf_metadata = &balanced_variant.artifact.members[0].artifact.metadata;
+    assert_eq!(checked_leaf_metadata.len(), 3);
+    assert_eq!(checked_leaf_metadata[0].key(), "verifier");
+    assert_eq!(checked_leaf_metadata[0].value(), "verus");
+    assert_eq!(checked_leaf_metadata[1].key(), "harness");
+    assert_eq!(checked_leaf_metadata[1].value(), "verify_char_roundtrip");
+    assert_eq!(checked_leaf_metadata[2].key(), "claim");
+    assert!(
+        checked_leaf_metadata[2]
+            .value()
+            .contains("pub fn verify_char_roundtrip(c: char)"),
+        "{}",
+        checked_leaf_metadata[2].value()
+    );
+    let trusted_leaf_metadata = &balanced_variant.artifact.members[1].artifact.metadata;
+    assert!(
+        trusted_leaf_metadata
+            .iter()
+            .any(|entry| {
+                entry.key() == "rust.authority" && entry.value() == "Rust Project Developers"
+            }),
+        "{trusted_leaf_metadata:?}"
     );
 
     assert_eq!(struct_artifact.shape, WitnessArtifactShape::NamedStruct);

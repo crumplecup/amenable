@@ -34,3 +34,4 @@
 //! demonstrates the real `s@.len()` pattern this crate uses directly).
 
 pub mod rust_std;
+pub mod derived_witness;
