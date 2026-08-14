@@ -378,11 +378,9 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     );
     let trusted_leaf_metadata = &balanced_variant.artifact.members[1].artifact.metadata;
     assert!(
-        trusted_leaf_metadata
-            .iter()
-            .any(|entry| {
-                entry.key() == "rust.authority" && entry.value() == "Rust Project Developers"
-            }),
+        trusted_leaf_metadata.iter().any(|entry| {
+            entry.key() == "rust.authority" && entry.value() == "Rust Project Developers"
+        }),
         "{trusted_leaf_metadata:?}"
     );
 

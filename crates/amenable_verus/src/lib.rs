@@ -33,5 +33,5 @@
 //! needs at the time, but `elicitation_verus`'s own `gallery::level5`
 //! demonstrates the real `s@.len()` pattern this crate uses directly).
 
-pub mod rust_std;
 pub mod derived_witness;
+pub mod rust_std;
