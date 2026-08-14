@@ -6,6 +6,8 @@ mod harness;
 mod kani_compose;
 mod standard;
 #[cfg(feature = "verus")]
+mod verus_contract;
+#[cfg(feature = "verus")]
 mod verus_fragment;
 mod witness;
 
@@ -132,6 +134,31 @@ pub fn verus_ensures_fragments(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn verus_requires_fragments(input: TokenStream) -> TokenStream {
     match verus_fragment::expand_verus_fragments(input.into(), false) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// `verus_ensures_witness!(Type, evidence_expr, "harness")` generates a
+/// real `impl Ensures<crate::VerusVerifier> for Type` (`Bound =
+/// &'static [&'static str]`, one real clause per element) plus one
+/// `ContractRecord` registration per clause -- see
+/// [`verus_contract`]'s own doc comment for why `Bound` is a slice
+/// and why the registration is generated rather than hand-written.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_ensures_witness(input: TokenStream) -> TokenStream {
+    match verus_contract::expand_verus_witness(input.into(), true) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Like [`verus_ensures_witness!`], for `Requires` instead.
+#[cfg(feature = "verus")]
+#[proc_macro]
+pub fn verus_requires_witness(input: TokenStream) -> TokenStream {
+    match verus_contract::expand_verus_witness(input.into(), false) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }
