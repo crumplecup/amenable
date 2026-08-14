@@ -2,10 +2,8 @@ mod support;
 
 use amenable_core::{EvidenceLink, Standard};
 use support::{
-    FixtureCase, GenericEnumFixture, GenericStructFixture, GenericTupleStructFixture,
-    NamedEnumFixture, NamedStructFixture, NestedStructFixture, NestedTupleStructFixture,
-    TupleEnumFixture, TupleStructFixture, UnitEnumFixture, UnitStructFixture, WitnessLeaf,
-    expected_keys, expected_report, expected_values, generic_enum_variants,
+    DeriveFixtureKind, FixtureCase, expected_keys, expected_report, expected_values,
+    for_each_fixture_type,
 };
 
 fn assert_registered_root_link<F>()
@@ -25,10 +23,8 @@ fn assert_standard_fixture<F>()
 where
     F: FixtureCase,
 {
-    let standard = F::sample();
+    let _ = F::expected_support();
 
-    assert_eq!(standard.provenance(), standard.clone(), "{:?}", F::KIND);
-    assert_eq!(standard.audit(), standard.clone(), "{:?}", F::KIND);
     assert_eq!(F::basis(), F::default(), "{:?}", F::KIND);
     assert!(F::is_root(), "{:?}", F::KIND);
     assert_eq!(
@@ -37,52 +33,73 @@ where
         "{:?}",
         F::KIND
     );
-    assert_eq!(
-        Standard::len(&standard),
-        F::expected_entries().len(),
-        "{:?}",
-        F::KIND
-    );
-    assert_eq!(
-        Standard::keys(&standard).collect::<Vec<_>>(),
-        expected_keys::<F>()
-    );
-    assert_eq!(
-        Standard::values(&standard).collect::<Vec<_>>(),
-        expected_values::<F>()
-    );
-    assert_eq!(
-        Standard::report(&standard).to_string(),
-        expected_report::<F>()
-    );
 
     if expects_registered_root_link(F::KIND) {
         assert_registered_root_link::<F>();
     }
+
+    for instance in F::instances() {
+        assert_eq!(
+            instance.value.provenance(),
+            instance.value.clone(),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            instance.value.audit(),
+            instance.value.clone(),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Standard::len(&instance.value),
+            instance.expected_entries.len(),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Standard::keys(&instance.value).collect::<Vec<_>>(),
+            expected_keys(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Standard::values(&instance.value).collect::<Vec<_>>(),
+            expected_values(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Standard::report(&instance.value).to_string(),
+            expected_report(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+    }
 }
 
-fn expects_registered_root_link(kind: support::DeriveFixtureKind) -> bool {
+fn expects_registered_root_link(kind: DeriveFixtureKind) -> bool {
     !matches!(
         kind,
-        support::DeriveFixtureKind::InstantiatedGenericStruct
-            | support::DeriveFixtureKind::InstantiatedGenericTupleStruct
-            | support::DeriveFixtureKind::InstantiatedGenericEnum
+        DeriveFixtureKind::InstantiatedGenericStruct
+            | DeriveFixtureKind::InstantiatedGenericTupleStruct
+            | DeriveFixtureKind::InstantiatedGenericEnum
     )
 }
 
 #[test]
 fn standard_derive_projects_expected_metadata_for_every_fixture() {
-    let _ = generic_enum_variants();
+    macro_rules! assert_fixture {
+        ($fixture:ty) => {
+            assert_standard_fixture::<$fixture>();
+        };
+    }
 
-    assert_standard_fixture::<UnitStructFixture>();
-    assert_standard_fixture::<NamedStructFixture>();
-    assert_standard_fixture::<TupleStructFixture>();
-    assert_standard_fixture::<UnitEnumFixture>();
-    assert_standard_fixture::<NamedEnumFixture>();
-    assert_standard_fixture::<TupleEnumFixture>();
-    assert_standard_fixture::<NestedStructFixture>();
-    assert_standard_fixture::<NestedTupleStructFixture>();
-    assert_standard_fixture::<GenericStructFixture<WitnessLeaf, WitnessLeaf>>();
-    assert_standard_fixture::<GenericTupleStructFixture<WitnessLeaf, WitnessLeaf>>();
-    assert_standard_fixture::<GenericEnumFixture<WitnessLeaf, WitnessLeaf>>();
+    for_each_fixture_type!(assert_fixture);
 }

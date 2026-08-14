@@ -1,15 +1,12 @@
 mod support;
 
-use amenable_core::Witness;
+use amenable_core::{Provenance, Witness};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
 use support::{
-    CheckedPlusTrivialStructFixture, DeriveFixtureKind, FixtureCase, FixtureVerifier,
-    GenericEnumFixture, GenericStructFixture, GenericTupleStructFixture, NamedEnumFixture,
-    NamedStructFixture, NestedStructFixture, NestedTupleStructFixture, TupleEnumFixture,
-    TupleStructFixture, UnitEnumFixture, UnitStructFixture, WitnessLeaf, expected_keys,
-    expected_report, expected_values, generic_enum_variants,
+    DeriveFixtureKind, FixtureCase, FixtureVerifier, WitnessLeaf, expected_keys, expected_report,
+    expected_values, for_each_fixture_type,
 };
 
 fn assert_witness_fixture<F>()
@@ -17,11 +14,36 @@ where
     F: FixtureCase + Witness<FixtureVerifier>,
     <F as Witness<FixtureVerifier>>::ProofArtifact: std::fmt::Display,
 {
-    let _ = F::sample();
-    let _ = F::expected_entries();
-    let _ = expected_keys::<F>();
-    let _ = expected_values::<F>();
-    let _ = expected_report::<F>();
+    for instance in F::instances() {
+        assert_eq!(
+            Provenance::len(&instance.value),
+            instance.expected_entries.len(),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Provenance::keys(&instance.value).collect::<Vec<_>>(),
+            expected_keys(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Provenance::values(&instance.value).collect::<Vec<_>>(),
+            expected_values(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+        assert_eq!(
+            Provenance::report(&instance.value).to_string(),
+            expected_report(instance.expected_entries),
+            "{:?}::{}",
+            F::KIND,
+            instance.label
+        );
+    }
 
     let proof = <F as Witness<FixtureVerifier>>::proof().to_string();
     let support = <F as Witness<FixtureVerifier>>::support();
@@ -180,20 +202,13 @@ struct ShapeOverrideStruct {
 
 #[test]
 fn witness_derive_projects_expected_structure_for_every_fixture() {
-    let _ = generic_enum_variants();
+    macro_rules! assert_fixture {
+        ($fixture:ty) => {
+            assert_witness_fixture::<$fixture>();
+        };
+    }
 
-    assert_witness_fixture::<UnitStructFixture>();
-    assert_witness_fixture::<NamedStructFixture>();
-    assert_witness_fixture::<TupleStructFixture>();
-    assert_witness_fixture::<CheckedPlusTrivialStructFixture>();
-    assert_witness_fixture::<UnitEnumFixture>();
-    assert_witness_fixture::<NamedEnumFixture>();
-    assert_witness_fixture::<TupleEnumFixture>();
-    assert_witness_fixture::<NestedStructFixture>();
-    assert_witness_fixture::<NestedTupleStructFixture>();
-    assert_witness_fixture::<GenericStructFixture<WitnessLeaf, WitnessLeaf>>();
-    assert_witness_fixture::<GenericTupleStructFixture<WitnessLeaf, WitnessLeaf>>();
-    assert_witness_fixture::<GenericEnumFixture<WitnessLeaf, WitnessLeaf>>();
+    for_each_fixture_type!(assert_fixture);
 }
 
 #[test]

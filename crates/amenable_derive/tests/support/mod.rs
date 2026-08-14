@@ -1,4 +1,6 @@
-use amenable_core::{Evidence, MetadataEntry, Provenance, Standard, Verifier, Witness};
+use amenable_core::{
+    Evidence, MetadataEntry, Provenance, Standard, Verifier, Witness, WitnessSupportSummary,
+};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
@@ -63,6 +65,10 @@ impl Witness<FixtureVerifier> for WitnessLeaf {
             evidence: std::any::type_name::<Self>(),
         }
     }
+
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::checked_leaf()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
@@ -70,6 +76,7 @@ pub enum DeriveFixtureKind {
     UnitStruct,
     NamedStruct,
     TupleStruct,
+    CheckedPlusTrivialStruct,
     UnitEnum,
     NamedEnum,
     TupleEnum,
@@ -78,6 +85,12 @@ pub enum DeriveFixtureKind {
     InstantiatedGenericStruct,
     InstantiatedGenericTupleStruct,
     InstantiatedGenericEnum,
+}
+
+pub struct FixtureInstance<F> {
+    pub label: &'static str,
+    pub value: F,
+    pub expected_entries: &'static [(&'static str, &'static str)],
 }
 
 pub trait FixtureCase:
@@ -93,9 +106,9 @@ pub trait FixtureCase:
 {
     const KIND: DeriveFixtureKind;
 
-    fn sample() -> Self;
+    fn instances() -> Vec<FixtureInstance<Self>>;
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)];
+    fn expected_support() -> WitnessSupportSummary;
 }
 
 pub trait FixtureWitnessMember:
@@ -126,12 +139,7 @@ impl<T> FixtureWitnessMember for T where
 {
 }
 
-pub fn expected_report<F>() -> String
-where
-    F: FixtureCase,
-{
-    let entries = F::expected_entries();
-
+pub fn expected_report(entries: &[(&str, &str)]) -> String {
     if entries.is_empty() {
         return "(no provenance metadata)".to_string();
     }
@@ -143,21 +151,12 @@ where
         .join("\n")
 }
 
-pub fn expected_keys<F>() -> Vec<String>
-where
-    F: FixtureCase,
-{
-    F::expected_entries()
-        .iter()
-        .map(|(key, _)| (*key).to_string())
-        .collect()
+pub fn expected_keys(entries: &[(&str, &str)]) -> Vec<String> {
+    entries.iter().map(|(key, _)| (*key).to_string()).collect()
 }
 
-pub fn expected_values<F>() -> Vec<String>
-where
-    F: FixtureCase,
-{
-    F::expected_entries()
+pub fn expected_values(entries: &[(&str, &str)]) -> Vec<String> {
+    entries
         .iter()
         .map(|(_, value)| (*value).to_string())
         .collect()
@@ -171,12 +170,16 @@ pub struct UnitStructFixture;
 impl FixtureCase for UnitStructFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::UnitStruct;
 
-    fn sample() -> Self {
-        Self
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "unit",
+            value: Self,
+            expected_entries: &[],
+        }]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::trivial_leaf()
     }
 }
 
@@ -208,19 +211,26 @@ impl NamedStructFixture {
 impl FixtureCase for NamedStructFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::NamedStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            "UI Working Group",
-            "layout-12",
-            "not for metadata projection",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "named",
+            value: Self::new(
+                "UI Working Group",
+                "layout-12",
+                "not for metadata projection",
+            ),
+            expected_entries: &[
+                ("authority", "UI Working Group"),
+                ("decision_id", "layout-12"),
+            ],
+        }]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority", "UI Working Group"),
-            ("decision_id", "layout-12"),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
     }
 }
 
@@ -250,16 +260,59 @@ impl TupleStructFixture {
 impl FixtureCase for TupleStructFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::TupleStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            "UI Working Group",
-            "layout-12",
-            "not for metadata projection",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "tuple",
+            value: Self::new(
+                "UI Working Group",
+                "layout-12",
+                "not for metadata projection",
+            ),
+            expected_entries: &[("authority", "UI Working Group"), ("1", "layout-12")],
+        }]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[("authority", "UI Working Group"), ("1", "layout-12")]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
+#[provenance(crate = "amenable_core")]
+#[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
+pub struct CheckedPlusTrivialStructFixture {
+    authority: WitnessLeaf,
+    marker: UnitStructFixture,
+}
+
+impl CheckedPlusTrivialStructFixture {
+    pub fn new(authority: impl Into<String>) -> Self {
+        Self {
+            authority: WitnessLeaf::new(authority),
+            marker: UnitStructFixture,
+        }
+    }
+}
+
+impl FixtureCase for CheckedPlusTrivialStructFixture {
+    const KIND: DeriveFixtureKind = DeriveFixtureKind::CheckedPlusTrivialStruct;
+
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "checked_plus_trivial",
+            value: Self::new("UI Working Group"),
+            expected_entries: &[("authority", "UI Working Group")],
+        }]
+    }
+
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
     }
 }
 
@@ -281,12 +334,26 @@ impl UnitEnumFixture {
 impl FixtureCase for UnitEnumFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::UnitEnum;
 
-    fn sample() -> Self {
-        Self::external_standard()
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "internal_only",
+                value: Self::InternalOnly,
+                expected_entries: &[("authority_kind", "InternalOnly")],
+            },
+            FixtureInstance {
+                label: "external_standard",
+                value: Self::external_standard(),
+                expected_entries: &[("authority_kind", "ExternalStandard")],
+            },
+        ]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[("authority_kind", "ExternalStandard")]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::trivial_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
     }
 }
 
@@ -322,22 +389,48 @@ impl NamedEnumFixture {
 impl FixtureCase for NamedEnumFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::NamedEnum;
 
-    fn sample() -> Self {
-        Self::rust_project(
-            "Rust Project Developers",
-            "https://doc.rust-lang.org/std/primitive.i32.html",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "rust_project",
+                value: Self::rust_project(
+                    "Rust Project Developers",
+                    "https://doc.rust-lang.org/std/primitive.i32.html",
+                ),
+                expected_entries: &[
+                    ("authority_kind", "RustProject"),
+                    ("authority", "Rust Project Developers"),
+                    (
+                        "source_url",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                ],
+            },
+            FixtureInstance {
+                label: "local",
+                value: Self::local("UI Working Group"),
+                expected_entries: &[
+                    ("authority_kind", "local_design"),
+                    ("owner", "UI Working Group"),
+                ],
+            },
+            FixtureInstance {
+                label: "internal_only",
+                value: Self::InternalOnly,
+                expected_entries: &[("authority_kind", "InternalOnly")],
+            },
+        ]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority_kind", "RustProject"),
-            ("authority", "Rust Project Developers"),
-            (
-                "source_url",
-                "https://doc.rust-lang.org/std/primitive.i32.html",
-            ),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::compose(&[
+                WitnessSupportSummary::checked_leaf(),
+                WitnessSupportSummary::checked_leaf(),
+            ]),
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
     }
 }
 
@@ -368,19 +461,45 @@ impl TupleEnumFixture {
 impl FixtureCase for TupleEnumFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::TupleEnum;
 
-    fn sample() -> Self {
-        Self::rust_project(
-            "Rust Project Developers",
-            "https://doc.rust-lang.org/std/primitive.i32.html",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "rust_project",
+                value: Self::rust_project(
+                    "Rust Project Developers",
+                    "https://doc.rust-lang.org/std/primitive.i32.html",
+                ),
+                expected_entries: &[
+                    ("authority_kind", "RustProject"),
+                    ("authority", "Rust Project Developers"),
+                    ("1", "https://doc.rust-lang.org/std/primitive.i32.html"),
+                ],
+            },
+            FixtureInstance {
+                label: "local",
+                value: Self::local("UI Working Group", "not for metadata projection"),
+                expected_entries: &[
+                    ("authority_kind", "local_design"),
+                    ("owner", "UI Working Group"),
+                ],
+            },
+            FixtureInstance {
+                label: "internal_only",
+                value: Self::InternalOnly,
+                expected_entries: &[("authority_kind", "InternalOnly")],
+            },
+        ]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority_kind", "RustProject"),
-            ("authority", "Rust Project Developers"),
-            ("1", "https://doc.rust-lang.org/std/primitive.i32.html"),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::compose(&[
+                WitnessSupportSummary::checked_leaf(),
+                WitnessSupportSummary::checked_leaf(),
+            ]),
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
     }
 }
 
@@ -404,22 +523,53 @@ impl NestedStructFixture {
 impl FixtureCase for NestedStructFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::NestedStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            NamedEnumFixture::local("UI Working Group"),
-            "Layout invariants are selected by the application author.",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "nested_local",
+                value: Self::new(
+                    NamedEnumFixture::local("UI Working Group"),
+                    "Layout invariants are selected by the application author.",
+                ),
+                expected_entries: &[
+                    ("authority_source.authority_kind", "local_design"),
+                    ("authority_source.owner", "UI Working Group"),
+                    (
+                        "semantic_summary",
+                        "Layout invariants are selected by the application author.",
+                    ),
+                ],
+            },
+            FixtureInstance {
+                label: "nested_rust_project",
+                value: Self::new(
+                    NamedEnumFixture::rust_project(
+                        "Rust Project Developers",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                    "Layout invariants defer to the upstream primitive contract.",
+                ),
+                expected_entries: &[
+                    ("authority_source.authority_kind", "RustProject"),
+                    ("authority_source.authority", "Rust Project Developers"),
+                    (
+                        "authority_source.source_url",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                    (
+                        "semantic_summary",
+                        "Layout invariants defer to the upstream primitive contract.",
+                    ),
+                ],
+            },
+        ]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority_source.authority_kind", "local_design"),
-            ("authority_source.owner", "UI Working Group"),
-            (
-                "semantic_summary",
-                "Layout invariants are selected by the application author.",
-            ),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            NamedEnumFixture::expected_support(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
     }
 }
 
@@ -440,22 +590,53 @@ impl NestedTupleStructFixture {
 impl FixtureCase for NestedTupleStructFixture {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::NestedTupleStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            TupleEnumFixture::local("UI Working Group", "not for metadata projection"),
-            "Layout invariants are selected by the application author.",
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "nested_local",
+                value: Self::new(
+                    TupleEnumFixture::local("UI Working Group", "not for metadata projection"),
+                    "Layout invariants are selected by the application author.",
+                ),
+                expected_entries: &[
+                    ("authority_source.authority_kind", "local_design"),
+                    ("authority_source.owner", "UI Working Group"),
+                    (
+                        "semantic_summary",
+                        "Layout invariants are selected by the application author.",
+                    ),
+                ],
+            },
+            FixtureInstance {
+                label: "nested_rust_project",
+                value: Self::new(
+                    TupleEnumFixture::rust_project(
+                        "Rust Project Developers",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                    "Layout invariants defer to the upstream primitive contract.",
+                ),
+                expected_entries: &[
+                    ("authority_source.authority_kind", "RustProject"),
+                    ("authority_source.authority", "Rust Project Developers"),
+                    (
+                        "authority_source.1",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                    (
+                        "semantic_summary",
+                        "Layout invariants defer to the upstream primitive contract.",
+                    ),
+                ],
+            },
+        ]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority_source.authority_kind", "local_design"),
-            ("authority_source.owner", "UI Working Group"),
-            (
-                "semantic_summary",
-                "Layout invariants are selected by the application author.",
-            ),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            TupleEnumFixture::expected_support(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
     }
 }
 
@@ -482,18 +663,25 @@ impl<TAuthority: FixtureWitnessMember, TDecision: FixtureWitnessMember>
 impl FixtureCase for GenericStructFixture<WitnessLeaf, WitnessLeaf> {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::InstantiatedGenericStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            WitnessLeaf::new("UI Working Group"),
-            WitnessLeaf::new("layout-12"),
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "generic_named",
+            value: Self::new(
+                WitnessLeaf::new("UI Working Group"),
+                WitnessLeaf::new("layout-12"),
+            ),
+            expected_entries: &[
+                ("authority", "UI Working Group"),
+                ("decision_id", "layout-12"),
+            ],
+        }]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority", "UI Working Group"),
-            ("decision_id", "layout-12"),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
     }
 }
 
@@ -519,18 +707,25 @@ impl<TAuthority: FixtureWitnessMember, TDecision: FixtureWitnessMember>
 impl FixtureCase for GenericTupleStructFixture<WitnessLeaf, WitnessLeaf> {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::InstantiatedGenericTupleStruct;
 
-    fn sample() -> Self {
-        Self::new(
-            WitnessLeaf::new("UI Working Group"),
-            WitnessLeaf::new("layout-12"),
-        )
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![FixtureInstance {
+            label: "generic_tuple",
+            value: Self::new(
+                WitnessLeaf::new("UI Working Group"),
+                WitnessLeaf::new("layout-12"),
+            ),
+            expected_entries: &[
+                ("authority", "UI Working Group"),
+                ("decision_id", "layout-12"),
+            ],
+        }]
     }
 
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority", "UI Working Group"),
-            ("decision_id", "layout-12"),
-        ]
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::checked_leaf(),
+        ])
     }
 }
 
@@ -569,37 +764,73 @@ impl<TAuthority: FixtureWitnessMember, TOwner: FixtureWitnessMember>
 impl FixtureCase for GenericEnumFixture<WitnessLeaf, WitnessLeaf> {
     const KIND: DeriveFixtureKind = DeriveFixtureKind::InstantiatedGenericEnum;
 
-    fn sample() -> Self {
-        Self::rust_project(
-            WitnessLeaf::new("Rust Project Developers"),
-            "https://doc.rust-lang.org/std/primitive.i32.html",
-        )
-    }
-
-    fn expected_entries() -> &'static [(&'static str, &'static str)] {
-        &[
-            ("authority_kind", "RustProject"),
-            ("authority", "Rust Project Developers"),
-            (
-                "source_url",
-                "https://doc.rust-lang.org/std/primitive.i32.html",
-            ),
+    fn instances() -> Vec<FixtureInstance<Self>> {
+        vec![
+            FixtureInstance {
+                label: "rust_project",
+                value: Self::rust_project(
+                    WitnessLeaf::new("Rust Project Developers"),
+                    "https://doc.rust-lang.org/std/primitive.i32.html",
+                ),
+                expected_entries: &[
+                    ("authority_kind", "RustProject"),
+                    ("authority", "Rust Project Developers"),
+                    (
+                        "source_url",
+                        "https://doc.rust-lang.org/std/primitive.i32.html",
+                    ),
+                ],
+            },
+            FixtureInstance {
+                label: "local",
+                value: Self::local(
+                    WitnessLeaf::new("UI Working Group"),
+                    "not for metadata projection",
+                ),
+                expected_entries: &[
+                    ("authority_kind", "local_design"),
+                    ("owner", "UI Working Group"),
+                ],
+            },
+            FixtureInstance {
+                label: "internal_only",
+                value: Self::InternalOnly,
+                expected_entries: &[("authority_kind", "InternalOnly")],
+            },
         ]
     }
+
+    fn expected_support() -> WitnessSupportSummary {
+        WitnessSupportSummary::compose(&[
+            WitnessSupportSummary::compose(&[
+                WitnessSupportSummary::checked_leaf(),
+                WitnessSupportSummary::checked_leaf(),
+            ]),
+            WitnessSupportSummary::checked_leaf(),
+            WitnessSupportSummary::trivial_leaf(),
+        ])
+    }
 }
 
-pub fn generic_enum_variants() -> (
-    GenericEnumFixture<WitnessLeaf, WitnessLeaf>,
-    GenericEnumFixture<WitnessLeaf, WitnessLeaf>,
-) {
-    (
-        GenericEnumFixture::rust_project(
-            WitnessLeaf::new("Rust Project Developers"),
-            "https://doc.rust-lang.org/std/primitive.i32.html",
-        ),
-        GenericEnumFixture::local(
-            WitnessLeaf::new("UI Working Group"),
-            "not for metadata projection",
-        ),
-    )
+pub type ConcreteGenericStructFixture = GenericStructFixture<WitnessLeaf, WitnessLeaf>;
+pub type ConcreteGenericTupleStructFixture = GenericTupleStructFixture<WitnessLeaf, WitnessLeaf>;
+pub type ConcreteGenericEnumFixture = GenericEnumFixture<WitnessLeaf, WitnessLeaf>;
+
+macro_rules! for_each_fixture_type {
+    ($callback:ident) => {
+        $callback!(crate::support::UnitStructFixture);
+        $callback!(crate::support::NamedStructFixture);
+        $callback!(crate::support::TupleStructFixture);
+        $callback!(crate::support::CheckedPlusTrivialStructFixture);
+        $callback!(crate::support::UnitEnumFixture);
+        $callback!(crate::support::NamedEnumFixture);
+        $callback!(crate::support::TupleEnumFixture);
+        $callback!(crate::support::NestedStructFixture);
+        $callback!(crate::support::NestedTupleStructFixture);
+        $callback!(crate::support::ConcreteGenericStructFixture);
+        $callback!(crate::support::ConcreteGenericTupleStructFixture);
+        $callback!(crate::support::ConcreteGenericEnumFixture);
+    };
 }
+
+pub(crate) use for_each_fixture_type;
