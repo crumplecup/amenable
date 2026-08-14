@@ -79,17 +79,23 @@ verify-creusot:
 # surface). `amenable_verus` itself is never gated: it's never a Cargo
 # dependency of anything (see `amenable_std::verus_witness`'s own doc
 # comment for why), so it has no feature to turn on.
+emit-verus-witnesses:
+    cargo run -p amenable --features verus -- emit-verus-witnesses
+
 check-verus:
+    just emit-verus-witnesses
     cargo check -p amenable_verus
     cargo check -p amenable_std --features verus
     cargo check -p amenable --features verus
 
 clippy-verus:
+    just emit-verus-witnesses
     cargo clippy -p amenable_verus --all-targets -- -D warnings
     cargo clippy -p amenable_std --features verus --all-targets -- -D warnings
     cargo clippy -p amenable --features verus --all-targets -- -D warnings
 
 test-verus:
+    just emit-verus-witnesses
     cargo test -p amenable_std --features verus
     cargo test -p amenable --features verus
 
@@ -105,6 +111,7 @@ check-all-verus:
 # usual `verus-lang/verus` build); see VERUS_GUIDE.md in ~/repos/elicitation
 # for the reference invocation this mirrors.
 verify-verus:
+    just emit-verus-witnesses
     verus --crate-type=lib crates/amenable_verus/src/lib.rs
 
 # Cross-checks the Windows-gated std paths (std::os::windows, etc.) that
