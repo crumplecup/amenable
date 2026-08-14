@@ -2,7 +2,7 @@
 
 use amenable_core::{Ensures, Witness, WitnessSupportSummary};
 use amenable_std::{
-    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusVerifier,
+    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusCiteArg, VerusVerifier,
     verus_call_shape,
 };
 
@@ -4803,6 +4803,17 @@ fn verus_call_shape_is_registered_for_char_roundtrip() {
     assert_eq!(shape.params[0].name, "c");
     assert_eq!(shape.params[0].ty, "char");
     assert!(shape.requires.is_empty());
+    assert_eq!(shape.ensures.len(), 2);
+    assert_eq!(shape.ensures[0].predicate, "char_roundtrip_preserves_value");
+    assert_eq!(
+        shape.ensures[0].args,
+        vec![VerusCiteArg::Result, VerusCiteArg::Param("c".to_owned())]
+    );
+    assert_eq!(shape.ensures[1].predicate, "char_is_valid_unicode_scalar");
+    assert_eq!(
+        shape.ensures[1].args,
+        vec![VerusCiteArg::Param("c".to_owned())]
+    );
     assert_eq!(
         shape.kind,
         VerusCallKind::Function {

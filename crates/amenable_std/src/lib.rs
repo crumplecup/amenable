@@ -90,8 +90,9 @@ pub use verus_gallery::{
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::{
-    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusParam,
-    VerusVerifier, VerusVerifierMetadata, VerusWitness, verus_call_shape,
+    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusCiteArg,
+    VerusParam, VerusPredicateCite, VerusVerifier, VerusVerifierMetadata, VerusWitness,
+    verus_call_shape, verus_cite_arg,
 };
 pub use windows_handle_or_invalid_rejects_only_the_sentinel::WindowsHandleOrInvalidRejectsOnlyTheSentinel;
 pub use write_stores_new_value::WriteStoresNewValue;

@@ -328,6 +328,30 @@ pub enum VerusCallKind {
     },
 }
 
+/// One argument position in a cited predicate call, expressed relative
+/// to the harness's own signature so a compositional renderer can
+/// re-emit the identical call against whatever local names it chooses
+/// for the composite (its own parameters may need renaming to avoid
+/// colliding with a sibling leaf's).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VerusCiteArg {
+    /// The harness's own bound return value.
+    Result,
+    /// One of the harness's own named parameters.
+    Param(String),
+}
+
+/// One real predicate call a harness's own `requires`/`ensures` clause
+/// makes, in call order — never restated by hand, always naming exactly
+/// what the real source calls.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerusPredicateCite {
+    /// The predicate's real name.
+    pub predicate: String,
+    /// The predicate's real call-site arguments, in order.
+    pub args: Vec<VerusCiteArg>,
+}
+
 /// Structural, machine-usable call shape for a real Verus harness —
 /// enough for a compositional renderer to emit a literal call to (or
 /// citation of) the real proof, instead of assuming its conclusion.
@@ -351,9 +375,12 @@ pub struct VerusCallShape {
     pub name: String,
     /// The harness's real symbolic parameters, in order.
     pub params: Vec<VerusParam>,
-    /// Named preconditions the harness itself requires, propagated
-    /// upward into a composite's own `requires` when this leaf composes.
-    pub requires: Vec<String>,
+    /// The harness's own real preconditions, propagated upward into a
+    /// composite's own `requires` when this leaf composes.
+    pub requires: Vec<VerusPredicateCite>,
+    /// The harness's own real postconditions, cited (never restated) in
+    /// a composite's own `ensures` when this leaf composes.
+    pub ensures: Vec<VerusPredicateCite>,
     /// How to invoke this specific harness.
     pub kind: VerusCallKind,
 }
@@ -380,7 +407,23 @@ pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
         .map(|record| (record.call_shape)())
 }
 
+/// `"result"` refers to the harness's own bound return value; anything
+/// else names one of its own parameters. Used only by
+/// [`register_verus_call_shape!`] to build [`VerusCiteArg`] values from
+/// plain string literals.
+pub fn verus_cite_arg(arg: &str) -> VerusCiteArg {
+    if arg == "result" {
+        VerusCiteArg::Result
+    } else {
+        VerusCiteArg::Param(arg.to_owned())
+    }
+}
+
 /// Register a real Verus harness's call shape.
+///
+/// `requires`/`ensures` entries are `(predicate_name, [args...])` pairs,
+/// with arguments spelled exactly as the real clause calls them
+/// (`"result"` for the harness's own bound return value).
 ///
 /// ```ignore
 /// register_verus_call_shape! {
@@ -388,6 +431,11 @@ pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
 ///     module_path = "crate::rust_std::char_carrier",
 ///     params = [("c", "char")],
 ///     returns = "char",
+///     requires = [],
+///     ensures = [
+///         ("char_roundtrip_preserves_value", ["result", "c"]),
+///         ("char_is_valid_unicode_scalar", ["c"]),
+///     ],
 /// }
 /// ```
 #[macro_export]
@@ -396,7 +444,9 @@ macro_rules! register_verus_call_shape {
         harness = $harness:literal,
         module_path = $module_path:literal,
         params = [$(($param_name:literal, $param_ty:literal)),* $(,)?],
-        returns = $returns:literal $(,)?
+        returns = $returns:literal,
+        requires = [$(($requires_pred:literal, [$($requires_arg:literal),* $(,)?])),* $(,)?],
+        ensures = [$(($ensures_pred:literal, [$($ensures_arg:literal),* $(,)?])),* $(,)?] $(,)?
     ) => {
         ::inventory::submit! {
             $crate::VerusCallShapeRecord {
@@ -410,7 +460,18 @@ macro_rules! register_verus_call_shape {
                             ty: $param_ty.to_owned(),
                         }),*
                     ],
-                    requires: ::std::vec::Vec::new(),
+                    requires: ::std::vec![
+                        $($crate::VerusPredicateCite {
+                            predicate: $requires_pred.to_owned(),
+                            args: ::std::vec![$($crate::verus_cite_arg($requires_arg)),*],
+                        }),*
+                    ],
+                    ensures: ::std::vec![
+                        $($crate::VerusPredicateCite {
+                            predicate: $ensures_pred.to_owned(),
+                            args: ::std::vec![$($crate::verus_cite_arg($ensures_arg)),*],
+                        }),*
+                    ],
                     kind: $crate::VerusCallKind::Function {
                         returns: $returns.to_owned(),
                     },
@@ -442,6 +503,11 @@ crate::register_verus_call_shape! {
     module_path = "crate::rust_std::char_carrier",
     params = [("c", "char")],
     returns = "char",
+    requires = [],
+    ensures = [
+        ("char_roundtrip_preserves_value", ["result", "c"]),
+        ("char_is_valid_unicode_scalar", ["c"]),
+    ],
 }
 
 impl VerusWitness for RustStdStandard<char> {
