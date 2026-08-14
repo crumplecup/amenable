@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
 
-**Status:** 🔲 In progress — Phases 1–7 implemented and verified.
+**Status:** ✅ Done — all 8 phases implemented and verified.
 Phases 1–3 (`ClassifiedWitness<V>` marker trait and compile-time export
 enforcement plus an `#[allow(dead_code)]` fix; owned-`String`
 conversion on `VerusCheckedProof`; a real, additive `VerusCallShape`
@@ -36,18 +36,20 @@ variant's own name can carry a provenance rename (e.g. `fallback`,
 lowercase) — a valid audit label but not a valid PascalCase Rust enum
 variant identifier — and normalized it before use in the synthetic
 types. `just verify-verus` went to `337 verified, 0 errors`, one new
-genuine proof. **Phase 8 is broader canary coverage, not a "rollout"**:
-`amenable_std` hand-proves each std-lib leaf itself so derive-witness
-composition is ready for a downstream user's own custom composite —
-the crate never has a real (non-canary) composite of its own to
-register, by design. Several realistic shapes have never actually been
-run through the real `verus` tool: a struct with two independent
+genuine proof. **Phase 8 was broader canary coverage, not a
+"rollout"**: `amenable_std` hand-proves each std-lib leaf itself so
+derive-witness composition is ready for a downstream user's own custom
+composite — the crate never has a real (non-canary) composite of its
+own to register, by design. Added three canaries no prior phase's
+minimal-coverage approach had exercised: a struct with two independent
 checked leaves (the `result.0`/`result.1` tuple path), an enum variant
 with two checked leaves (the `r0`/`r1` bind-name path), and a
-struct-in-struct (recursion past depth 1). Also adding a permanent
-`trybuild` regression test for the `ClassifiedWitness` `E0277`
-guarantee, verified once by hand in Phase 1 but never locked in. Not
-started.
+struct-in-struct (recursion past depth 1). `just verify-verus` went to
+`340 verified, 0 errors`, three new genuine proofs. Also added a
+permanent `trybuild` regression test for the `ClassifiedWitness`
+`E0277` guarantee, verified once by hand in Phase 1 but never locked in
+until now — the committed `.stderr` snapshot confirms the error still
+names the exact unclassified leaf.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

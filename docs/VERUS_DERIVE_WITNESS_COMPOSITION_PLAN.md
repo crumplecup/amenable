@@ -2,7 +2,7 @@
 
 ## Status
 
-🔲 In progress — Phases 1–7 implemented and verified.
+✅ All 8 phases implemented and verified.
 
 Phases 1–3 each left proof content unchanged (`just verify-verus`
 stayed at `335 verified, 0 errors` throughout): `ClassifiedWitness<V>`
@@ -72,8 +72,25 @@ Rust enum variant identifier; normalized before use in the synthetic
 types. `just verify-verus` went to `337 verified, 0 errors` — up from
 336, one new genuine proof.
 
-Phase 8 (broader canary coverage, not a "rollout" — see its own entry
-below for why) not started.
+**Phase 8 is broader canary coverage, not a "rollout"** (commits
+`adb9f20`/`6198546`): `amenable_std` hand-proves each std-lib leaf
+itself so derive-witness composition is ready for a downstream user's
+own custom composite — the crate never has a real (non-canary)
+composite of its own to register, by design. Added three canaries no
+prior phase's minimal-coverage approach had exercised:
+`VerusExportMultiCheckedStruct` (two checked leaves, different real
+harnesses, `-> (result: (T1, T2))`/`result.0`/`result.1`),
+`VerusExportMultiCheckedEnum` (a variant with two checked leaves,
+`render_enum_module`'s `r0`/`r1` bind-name path), and
+`VerusExportNestedStruct` (a composite field that's itself another
+already-composed `Witness` type, confirming recursion past depth 1).
+`just verify-verus` went to `340 verified, 0 errors` — up from 337,
+three new genuine proofs. Also added a permanent `trybuild` regression
+test (`amenable_core/tests/classified_witness_compile_fail.rs`) locking
+in the `ClassifiedWitness` `E0277` guarantee (Design A) — verified by
+hand during Phase 1 but never captured as a test until now; the
+committed `.stderr` snapshot confirms the error still names the exact
+unclassified leaf, not just "fails somehow".
 
 ## Problem
 
@@ -507,7 +524,7 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    (`LocalWorkingEnumEvidence`) asserting the generated `match` content
    verbatim. The real `match` arms discharge for real: `just
    verify-verus` went to `337 verified, 0 errors` (commit `b8ccaa8`).
-8. **Broader canary coverage** (not a "rollout" of real crate
+8. ✅ **Broader canary coverage** (not a "rollout" of real crate
    registrations — this crate never has any: `amenable_std` *is* the
    library, meaning it hand-proves each leaf itself so that derive-
    witness composition is ready for a downstream user composing a
@@ -516,24 +533,27 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
    omission). Every phase so far verified its own renderer path with
    the minimum canary needed to exercise it once — several realistic
    shapes were never actually run through the real `verus` tool as a
-   result:
-   - A struct with *two* checked leaves (different real harnesses) —
-     the `-> (result: (T1, T2))`/`result.0`/`result.1` tuple path has
-     only ever been exercised by `RefCell`'s *single* checked leaf,
-     whose own real return type already happens to be a tuple; no
-     canary has combined two independent checked calls into one
-     composite's own tuple.
-   - An enum variant with *two* checked leaves — `render_enum_module`'s
-     `r0`/`r1` multi-call bind-name path (as opposed to the single-`r`
-     path) has no real coverage at all.
-   - A struct-in-struct: a composite field that is itself another
-     already-composed `Witness` type, not a bare leaf — confirms the
-     derive and the renderer both recurse correctly past depth 1.
-   - The `ClassifiedWitness` compile-time `E0277` guarantee (Design A)
-     was verified once by hand during Phase 1 and has no permanent
-     regression test; add one (`trybuild`) so a future refactor that
-     silently reopens the Opaque hole gets caught by `just test`, not
-     by another manual check.
+   result. Added, and verified against the real `verus` tool (commit
+   `adb9f20`):
+   - `VerusExportMultiCheckedStruct`: a struct with *two* checked
+     leaves (different real harnesses) — the `-> (result: (T1,
+     T2))`/`result.0`/`result.1` tuple path had only ever been
+     exercised by `RefCell`'s *single* checked leaf, whose own real
+     return type already happens to be a tuple.
+   - `VerusExportMultiCheckedEnum`: an enum variant with *two* checked
+     leaves — `render_enum_module`'s `r0`/`r1` multi-call bind-name path
+     (as opposed to the single-`r` path) had no real coverage at all.
+   - `VerusExportNestedStruct`: a composite field that is itself
+     another already-composed `Witness` type, not a bare leaf —
+     confirms the derive and the renderer both recurse correctly past
+     depth 1.
+
+   `just verify-verus` went to `340 verified, 0 errors` — up from 337,
+   three new genuine proofs. Also added a permanent `trybuild`
+   regression test locking in the `ClassifiedWitness` `E0277` guarantee
+   (Design A) — verified once by hand during Phase 1, never a test
+   until now (commit `6198546`); the committed `.stderr` snapshot
+   confirms the error still names the exact unclassified leaf.
 
 ## Verification plan
 
@@ -552,9 +572,11 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
 ## Affected crates
 
 `amenable_core` (`witness.rs`: `ClassifiedWitness`, `VerusCallShape`/
-`VerusParam` types), `amenable_derive` (`witness.rs`: propagate
-`ClassifiedWitness`, thread call-shape data instead of just names),
-`amenable_std` (`verus_witness.rs`: every `VerusWitness` impl site gets
-richer, owned-`String` metadata; `verus_derive_canary.rs`: remove
-`#[allow]`, add canaries per phase 5–7), `amenable` (`verus_export.rs`:
-the renderer rewrite is the bulk of this work).
+`VerusParam` types; `tests/classified_witness_compile_fail.rs` +
+`tests/ui/`: the `trybuild` regression test added in Phase 8),
+`amenable_derive` (`witness.rs`: propagate `ClassifiedWitness`, thread
+call-shape data instead of just names), `amenable_std`
+(`verus_witness.rs`: every `VerusWitness` impl site gets richer,
+owned-`String` metadata; `verus_derive_canary.rs`: remove `#[allow]`,
+add canaries per phase 5–8), `amenable` (`verus_export.rs`: the
+renderer rewrite is the bulk of this work).
