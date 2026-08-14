@@ -29,12 +29,9 @@ dependencies = [
  "derive_more",
  "inventory",
  "miette",
- "quote",
  "serde",
  "serde_json",
- "syn 3.0.3",
  "time",
- "verus_syn",
 ]
 
 [[package]]
@@ -85,6 +82,10 @@ dependencies = [
  "amenable_creusot",
  "amenable_derive",
  "inventory",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.3",
+ "verus_syn",
 ]
 
 [[package]]

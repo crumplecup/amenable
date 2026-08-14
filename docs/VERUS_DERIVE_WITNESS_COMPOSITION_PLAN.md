@@ -578,5 +578,45 @@ Each phase ends with a real `verus` run (`just verify-verus`, not just
 call-shape data instead of just names), `amenable_std`
 (`verus_witness.rs`: every `VerusWitness` impl site gets richer,
 owned-`String` metadata; `verus_derive_canary.rs`: remove `#[allow]`,
-add canaries per phase 5–8), `amenable` (`verus_export.rs`: the
-renderer rewrite is the bulk of this work).
+add canaries per phase 5–8; `verus_call_shape_derive.rs`: the fully
+dynamic derivation added post-Phase-8, see below), `amenable`
+(`verus_export.rs`: the renderer rewrite is the bulk of this work).
+
+## Post-Phase-8: fully dynamic call-shape derivation
+
+All 8 phases closed the tautology and Opaque-leaf problems, but left one
+duplication in place: `register_verus_call_shape!`'s `$placeholder`
+templates were a human-retyped copy of each real harness's own
+`requires`/`ensures` clauses (verified only indirectly, by `just
+verify-verus` failing if the retyped claim was outright false — but
+silent if it was merely a *true but incomplete* restatement).
+
+Closed by making the real carrier source the single source of truth,
+computed at the point of use rather than cached anywhere: `verus_syn`
+(the real parser `verus_builtin_macros` itself uses for the `verus! {
+... }` DSL, confirmed already a transitive dependency in this workspace)
+parses a harness's real signature directly, and
+`amenable_std::verus_call_shape_derive::derive_call_shape` builds the
+`VerusCallShape` from that real AST — no generated intermediate file,
+no second copy to fall out of sync, ever. `register_verus_call_shape!`
+stays only as an explicit fallback for synthetic/test-only shapes with
+no real carrier file behind them (`amenable`'s own renderer tests).
+
+Verified in two ways, not just by inspection:
+
+- Removed all 3 real hand-typed registrations (`verify_char_roundtrip`,
+  `verify_escape_ascii_model_leaves_printable_bytes_unescaped`,
+  `verify_ref_cell_model_dynamic_borrow_rules`) and regenerated
+  `derived_witness/` — byte-identical to the hand-typed-registration
+  output, confirming the derivation reproduces exactly what was
+  previously retyped by hand.
+- `just verify-verus`: unchanged at `340 verified, 0 errors`.
+
+One real bug found during this work, the hard way: the token walk's
+`calls` accumulator started as a `HashSet<String>`, whose iteration
+order is randomized per-process — `shape.imports`'s order (and
+therefore the generated `use` line order) varied between runs, causing
+a real, intermittently-failing test
+(`verus_call_shape_is_registered_for_char_roundtrip`, ~40% failure rate
+across 8 repeated runs). Fixed by using an order-preserving `Vec`
+instead, confirmed clean across 8+ repeated runs afterward.

@@ -37,11 +37,6 @@ optional = true
 [dev-dependencies.miette]
 workspace = true
 
-[dev-dependencies]
-quote = { workspace = true }
-syn = { workspace = true }
-verus_syn = { workspace = true }
-
 [features]
 default = ["cli"]
 cli = ["dep:miette"]

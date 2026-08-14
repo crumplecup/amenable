@@ -762,8 +762,11 @@ fn render_checked_leaf(
 
     let shape = verus_call_shape(harness).ok_or_else(|| {
         AmenableError::invariant(format!(
-            "no registered Verus call shape for harness `{harness}` (route: {}) -- register one \
-             via amenable_std::register_verus_call_shape! before exporting this composite",
+            "no Verus call shape found for harness `{harness}` (route: {}) -- it should be a real, \
+             public `pub fn` in some crates/amenable_verus/src/**/*.rs carrier file (call shapes \
+             derive automatically from real source), or explicitly registered via \
+             amenable_std::register_verus_call_shape! if it's a synthetic/test-only shape with no \
+             real carrier file behind it",
             route_display(route)
         ))
     })?;

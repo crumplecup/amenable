@@ -396,7 +396,7 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
         .expect_err("LocalEnumEvidence's checked leaf names an unregistered harness");
     let error_text = report.to_string();
     assert!(
-        error_text.contains("no registered Verus call shape"),
+        error_text.contains("no Verus call shape found"),
         "{error_text}"
     );
     assert!(

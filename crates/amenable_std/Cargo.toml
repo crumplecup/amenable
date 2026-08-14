@@ -18,6 +18,10 @@ amenable_core = { workspace = true }
 amenable_creusot = { workspace = true, optional = true }
 amenable_derive = { workspace = true }
 inventory = { workspace = true }
+proc-macro2 = { workspace = true, optional = true }
+quote = { workspace = true, optional = true }
+syn = { workspace = true, optional = true }
+verus_syn = { workspace = true, optional = true }
 
 [features]
 # See `amenable`'s own `creusot` feature for the full rationale: an
@@ -33,5 +37,10 @@ creusot = ["dep:amenable_creusot"]
 # `amenable_verus`'s real proof source files by relative path — a
 # real, if informal, coupling (this build breaks if those files move),
 # which is exactly why this stays gated behind a feature like `creusot`
-# rather than being unconditional.
-verus = []
+# rather than being unconditional. `syn`/`verus_syn`/`quote` back
+# `verus_call_shape_derive`, which reads those same real source files at
+# runtime (relative to `CARGO_MANIFEST_DIR`, the same resolution
+# `amenable::paths::verus_source_directory` already uses) and parses them
+# with Verus's own real parser, rather than a human hand-typing a second
+# copy of each harness's real `requires`/`ensures` clauses.
+verus = ["dep:proc-macro2", "dep:quote", "dep:syn", "dep:verus_syn"]

@@ -414,14 +414,27 @@ pub struct VerusCallShapeRecord {
 
 inventory::collect!(VerusCallShapeRecord);
 
-/// Look up the registered call shape for a harness by name.
+/// Look up a harness's real call shape: an explicit
+/// `register_verus_call_shape!` registration first (an escape hatch for
+/// synthetic/test-only shapes with no real carrier file behind them,
+/// e.g. `amenable`'s own renderer tests), falling back to deriving it by
+/// parsing the harness's real carrier source directly -- the single
+/// source of truth for every real harness, with nothing to keep in sync
+/// by hand. See `verus_call_shape_derive`'s own doc comment.
 pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
     inventory::iter::<VerusCallShapeRecord>()
         .find(|record| record.harness == harness)
         .map(|record| (record.call_shape)())
+        .or_else(|| crate::verus_call_shape_derive::derive_call_shape(harness))
 }
 
-/// Register a real Verus harness's call shape.
+/// Manually register a Verus harness's call shape — an escape hatch for
+/// synthetic/test-only shapes with no real carrier file behind them
+/// (e.g. `amenable`'s own renderer tests). Every real harness gets its
+/// call shape derived automatically instead, by
+/// `verus_call_shape_derive` parsing the real carrier source directly;
+/// this macro exists only for the case a real source file can't back
+/// the shape at all.
 ///
 /// `requires`/`ensures` entries are the harness's own real clause text,
 /// verbatim, with `$result`/`$paramname` placeholders in place of
@@ -502,26 +515,12 @@ const CHAR_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn ch
         || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)
 }"#;
 
-// The real signature (crates/amenable_verus/src/rust_std/char_carrier.rs):
-// `pub fn verify_char_roundtrip(c: char) -> (result: char)`. Registered
-// once per harness name, not per Witness-impl type — RustStdStandard<char>,
-// ValidUnicodeScalar, and the Verus derive-witness canary's
-// CheckedVerusExportLeaf all reuse this exact harness.
-crate::register_verus_call_shape! {
-    harness = "verify_char_roundtrip",
-    module_path = "crate::rust_std::char_carrier",
-    params = [("c", "char")],
-    returns = "char",
-    requires = [],
-    ensures = [
-        "char_roundtrip_preserves_value($result, $c)",
-        "char_is_valid_unicode_scalar($c)",
-    ],
-    imports = [
-        ("crate::rust_std::char_carrier", "char_roundtrip_preserves_value"),
-        ("crate::rust_std::char_carrier", "char_is_valid_unicode_scalar"),
-    ],
-}
+// `verify_char_roundtrip`'s real VerusCallShape (params/requires/ensures/
+// imports) is no longer registered by hand here -- `verus_call_shape`
+// derives it by parsing the real signature directly from
+// crates/amenable_verus/src/rust_std/char_carrier.rs. Reused by
+// RustStdStandard<char>, ValidUnicodeScalar, and the Verus derive-witness
+// canary's CheckedVerusExportLeaf, all keyed by this one harness name.
 
 impl VerusWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
@@ -2931,9 +2930,11 @@ bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
 const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ref_cell_carrier.rs");
 
-// The real signature (crates/amenable_verus/src/rust_std/ref_cell_carrier.rs):
-// `pub fn verify_ref_cell_model_dynamic_borrow_rules(initial: i32, updated: i32) -> (result: (bool, bool, bool, bool, bool, i32))`.
-// Its own `&mut self`/`old`/`final` methods (`try_borrow`, `release_shared`,
+// `verify_ref_cell_model_dynamic_borrow_rules`'s real VerusCallShape is
+// no longer registered by hand here -- `verus_call_shape` derives it by
+// parsing the real signature directly from
+// crates/amenable_verus/src/rust_std/ref_cell_carrier.rs. Its own
+// `&mut self`/`old`/`final` methods (`try_borrow`, `release_shared`,
 // etc.) are purely internal to this one harness's body -- never
 // independently registered or composed; this top-level harness is a
 // plain value-returning function like any other. Its own `ensures` mixes
@@ -2942,23 +2943,8 @@ const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
 // (`result.5 as int`) -- the reason `VerusCallShape.ensures`/`.requires`
 // are plain `$placeholder` text templates rather than a structured
 // predicate-call-only representation (a first design tried the latter
-// and it didn't fit this harness at all).
-crate::register_verus_call_shape! {
-    harness = "verify_ref_cell_model_dynamic_borrow_rules",
-    module_path = "crate::rust_std::ref_cell_carrier",
-    params = [("initial", "i32"), ("updated", "i32")],
-    returns = "(bool, bool, bool, bool, bool, i32)",
-    requires = [],
-    ensures = [
-        "$result.0",
-        "!$result.1",
-        "$result.2",
-        "!$result.3",
-        "!$result.4",
-        "observed_value_matches_input($result.5 as int, $updated as int)",
-    ],
-    imports = [("crate::rust_std::primitive_shapes_carrier", "observed_value_matches_input")],
-}
+// and it didn't fit this harness at all), and derivation walks tokens
+// directly rather than `Expr`'s own AST shape for the same reason.
 
 impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
     type SupportingEvidence = Self;
@@ -6345,32 +6331,12 @@ const ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT: 
     result.0 == printable && result.1 == 92 && result.2 == 110
 }"#;
 
-// The real signature
-// (crates/amenable_verus/src/rust_std/escape_ascii_carrier.rs):
-// `pub fn verify_escape_ascii_model_leaves_printable_bytes_unescaped(printable: u8) -> (result: (u8, u8, u8))
-//     requires escape_ascii_input_is_printable_ascii(printable),
-//     ensures escape_ascii_result_matches_printable_plus_newline_escape(printable, result)`.
-// The first harness with a real `requires` clause registered here --
-// exercises the compositional renderer's requires-propagation.
-crate::register_verus_call_shape! {
-    harness = "verify_escape_ascii_model_leaves_printable_bytes_unescaped",
-    module_path = "crate::rust_std::escape_ascii_carrier",
-    params = [("printable", "u8")],
-    returns = "(u8, u8, u8)",
-    requires = [
-        "escape_ascii_input_is_printable_ascii($printable)",
-    ],
-    ensures = [
-        "escape_ascii_result_matches_printable_plus_newline_escape($printable, $result)",
-    ],
-    imports = [
-        ("crate::rust_std::escape_ascii_carrier", "escape_ascii_input_is_printable_ascii"),
-        (
-            "crate::rust_std::escape_ascii_carrier",
-            "escape_ascii_result_matches_printable_plus_newline_escape",
-        ),
-    ],
-}
+// `verify_escape_ascii_model_leaves_printable_bytes_unescaped`'s real
+// VerusCallShape is no longer registered by hand here -- `verus_call_shape`
+// derives it (including its `requires` clause -- the first harness with a
+// real precondition, exercising the compositional renderer's
+// requires-propagation) by parsing the real signature directly from
+// crates/amenable_verus/src/rust_std/escape_ascii_carrier.rs.
 
 impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
     type SupportingEvidence = Self;
