@@ -8,8 +8,12 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
 
-**Status:** 🔲 Planning — design settled and verified against real
-`rustc`/`verus` behavior; implementation not started.
+**Status:** 🔲 In progress — Phase 1 (`ClassifiedWitness<V>` marker
+trait, compile-time export enforcement, `#[allow(dead_code)]` fix)
+implemented and verified (`just check-all-verus` clean, `just
+verify-verus` still `335 verified, 0 errors`, negative case confirmed
+against the real crate). Phases 2–8 (owned-`String` conversion, real
+call-shape metadata, renderer rewrite) not started.
 
 **Description:** The derive-witness/Verus-export pipeline added in
 commits `969b460`..`0a0abd5` renders composite Verus "proofs" that are

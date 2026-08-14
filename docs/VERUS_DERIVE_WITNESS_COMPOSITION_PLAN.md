@@ -2,8 +2,15 @@
 
 ## Status
 
-🔲 Planning — design settled and verified against real `rustc`/`verus`
-behavior; implementation not started.
+🔲 In progress — Phase 1 (`ClassifiedWitness<V>` + export-time
+enforcement + the `#[allow(dead_code)]` fix) is implemented and
+verified: `just check-all-verus` passes in full, `just verify-verus`
+still reports `335 verified, 0 errors` (unaffected — Phase 1 is
+enforcement, not proof content), and the negative case (an
+intentionally-unclassified leaf) was confirmed twice against the real
+crate to fail `cargo check` with the expected `E0277`, naming the exact
+leaf, then restored. Phases 2–8 (owned-`String` conversion, real
+call-shape metadata, and the renderer rewrite) not started.
 
 ## Problem
 
@@ -272,10 +279,11 @@ restructuring) — not another `#[allow]`.
 Each phase ends with a real `verus` run (`just verify-verus`, not just
 `cargo check`) and `just check-all-verus`, committed separately.
 
-1. **`ClassifiedWitness<V>` + propagation + export-time enforcement.**
+1. ✅ **`ClassifiedWitness<V>` + propagation + export-time enforcement.**
    Smallest, self-contained, immediately closes "can compose something
-   unproven into an export." Also fix the `#[allow(dead_code)]` while
-   touching `verus_derive_canary.rs` in this phase.
+   unproven into an export." Also fixed the `#[allow(dead_code)]` while
+   touching `verus_derive_canary.rs` in this phase (commits `58baf89`,
+   `aa14160`).
 2. **Owned-`String` conversion** on `VerusCheckedProof`. Mechanical,
    unblocks phase 3 starting clean.
 3. **`VerusCallShape`/`VerusParam` plumbing** into every `impl
