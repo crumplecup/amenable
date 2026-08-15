@@ -25,7 +25,18 @@ transform, not a name substitution), it's a real consistency-check
 test (`stoplight_mirror_consistency_test.rs`) that parses both real
 sources off disk and asserts they match modulo that one transform,
 validated by injecting and reverting drift on both sides. See Step 2
-below.
+below. Step 3 is also complete, also not as originally framed: the
+plan's original sketch put the generated contract directly on
+`Exchange::exchange`, but Step 1 already found that has to live on a
+plain inherent method instead; and Step 1's Creusot side turned out to
+need no new generation at all (it was already minimal, free-function,
+`harness!`-wrapped). What landed is `#[amenable_derive::exchange(..)]`
+on the Kani-side inherent-method `impl` block, generating the
+`Witness<V>`/`ProofRecord`/`Exchange`-impl trio while deliberately
+leaving the contract, body, and `harness!` invocation hand-written —
+see Step 3 below for why and how it was verified (`cargo expand`
+byte-for-byte match, real `cargo kani` re-verification of all three
+edges, a real injected-regression check).
 
 ## Motivation
 
@@ -583,27 +594,84 @@ new test file don't disturb the real Creusot toolchain invocation,
 since they never enter the `#[cfg(creusot)]`-compiled lib surface.
 Step 2 is complete.
 
-### Step 3 — generalize into an attribute macro
+### Step 3 — generalize into an attribute macro — done
 
-Something in the shape of `#[amenable_exchange(kani = "predicate_
-name", creusot = "predicate_name")]` on the real `fn exchange(&self,
-input) -> Result<Output, Error>`, generating:
+**Original framing (superseded on two points, both discovered
+empirically, not assumed).** The plan as first drafted imagined
+`#[amenable_exchange(kani = "predicate_name", creusot =
+"predicate_name")]` sitting directly on `fn exchange(&self, input) ->
+Result<Output, Error>` and generating the contract itself. Two things
+Step 1 already established make that exact shape wrong:
 
-- The Kani-contracted wrapper + `proof_for_contract` harness +
-  `inventory` registration (mirroring `harness!`'s existing
-  `ContractRecord`/`KaniProofRegistration` pattern).
-- The Creusot `requires`/`ensures` companion (mirroring the existing
-  real-body pattern already proven in `amenable_creusot/src/
-  rust_std.rs`).
-- A `Witness<KaniVerifier>`/`Witness<CreusotVerifier>` impl for the
-  transition's target evidence, naming the real generated harness —
-  closing the loop into the existing derive-witness composition
-  pipeline so `Exchange`-backed proofs can compose into larger
-  `Witness` artifacts the same way struct/enum leaves already do.
+1. The contract and the real body can't live on `Exchange::exchange`
+   at all — Kani 0.67.0 rejects contracts on a trait method when the
+   trait itself is generic. They live on a plain inherent method
+   instead (`Stoplight::green_to_yellow` et al.), with `exchange`
+   reduced to delegation. So the macro has to attach to that inherent
+   method's `impl SelfType { .. }` block, not to the trait impl.
+2. On the Creusot side, the by-hand pattern already **is** about as
+   terse as generation could make it: `amenable_creusot::stoplight`'s
+   harness functions are free functions with `#[requires(true)]
+   #[ensures(true)]` wrapped directly in `harness!` — no per-edge
+   `Witness`/`ProofRecord`/`Exchange`-impl scaffolding exists on that
+   side to mechanize, because the mirror doesn't implement `Exchange`
+   at all (see Step 1's Creusot writeup — it's a proof function over
+   the mirror types, not a method on a mirror `Stoplight`). So Step
+   3's real scope narrowed to the Kani side; no new Creusot macro was
+   needed or built.
 
-`Exchange::exchange` takes `&self`, which elicitation's free-function-
-only macro never had to handle — resolving that is part of this step,
-not assumed solved by analogy.
+**What was actually built:** `#[amenable_derive::exchange(cfg = ..,
+verifier = .., evidence = .., proof_artifact = .., harness_fn = ..,
+harness_const = .., evidence_id = ..)]` (`crates/amenable_derive/src/
+exchange.rs`), applied to the inherent `impl Stoplight { fn
+method(&self, input: Input) -> Result<Output, Error> { .. } }` block.
+It deliberately does **not** touch two things that already carry
+their own real guarantees:
+
+- The `#[cfg_attr(kani, kani::ensures(..))]` contract and the method
+  body — real proof content, stays hand-written.
+- The `amenable_derive::harness! { .. }` invocation — its verbatim-
+  source capture (`Span::source_text()`) only works when the braced
+  item is written directly at the call site (see `harness.rs`'s own
+  doc comment). Splicing a macro-argument setup block through this
+  macro's `quote!` output would silently degrade that capture to a
+  token-reconstructed, whitespace-losing fallback — a real, if minor,
+  guarantee this macro must not weaken. So `harness!` stays a separate
+  invocation immediately below the attribute, unchanged from Step 1.
+
+What it *does* generate, since none of it carries either guarantee
+above and all of it was previously identical boilerplate repeated
+once per edge: the `Witness<V>` impl for the transition's target
+evidence (naming the harness by function/const identifier, closing
+the loop into the existing derive-witness composition pipeline the
+same way `#[calculation]`-backed leaves already do), the `ProofRecord`
+registration backing it, and the `Exchange<Input, Output, V>` impl
+that delegates to the real method — `Input`/`Output`/`Error` are
+extracted from the method's own signature via `syn`, not re-typed as
+macro arguments.
+
+Applied to all three `Stoplight` edges, replacing their by-hand
+`Witness`/`ProofRecord`/`Exchange`-impl trio (the cycle-back edge's
+`"::cycle_back"` `ProofRecord` id suffix preserved via an optional
+`evidence_id` argument). Verified for real, not just "it compiles":
+`cargo expand -p amenable_kani stoplight` confirmed the generated code
+is byte-for-byte identical to the prior hand-written expansion,
+including the `harness!` verbatim-source constant (still capturing
+real multi-line source, confirming the harness!-stays-untouched
+design choice actually preserves the property it was meant to);
+`just verify-kani-contract` re-run on all three harnesses, all still
+`VERIFICATION:- SUCCESSFUL`; a real injected-`panic!()` regression
+check on `green_to_yellow` failed at the exact injected line
+(confirming the macro-generated `Exchange::exchange` delegation still
+routes through the real body), then reverted and re-verified clean.
+Full workspace `fmt --check`/`check`/`clippy --all-targets
+--all-features -D warnings`/`test` all clean (61/61, unchanged from
+Step 2 — no test count regression), plus the Step 2 consistency test
+re-run unaffected (it reads the method body's tokens, which this
+macro never touches). Net effect on `stoplight.rs`: 161 lines changed,
+a real ~114-line reduction against a ~24-line addition to
+`amenable_derive`, not counting the doc-comment prose added to explain
+what moved where. Step 3 is complete.
 
 ### Step 4 — modular composition via `stub_verified`
 
@@ -774,13 +842,12 @@ concluding something in Step 1+ is a novel problem:
 
 ## Next step
 
-Steps 0, 1, and 2 are all done — Kani and Creusot bodies for all three
+Steps 0 through 3 are all done — Kani and Creusot bodies for all three
 edges, each verified for real with a genuine injected-regression
-check, and a real consistency test keeping the Creusot mirror honest
-against the real Kani source (also verified in both directions). Next
-is Step 3: generalizing the now-proven-by-hand shape (inherent method
-plus contract, trait-impl delegation, `harness!`-captured source,
-mirror consistency check) into an attribute macro, per the "Exact macro
-attribute shape" open question below — not yet started, and shouldn't
-be without explicit direction, matching this plan's own pacing so
-far.
+check; a real consistency test keeping the Creusot mirror honest
+against the real Kani source; and the by-hand Kani-side pattern
+generalized into `#[amenable_derive::exchange(..)]`, re-verified
+against all three edges after the swap (real `cargo expand` diff, real
+`cargo kani`, a real regression check). Next is Step 4: modular
+composition via `stub_verified` — not yet started, and shouldn't be
+without explicit direction, matching this plan's own pacing so far.

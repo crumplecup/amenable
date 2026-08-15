@@ -2,6 +2,7 @@
 
 mod calculation;
 mod evidence;
+mod exchange;
 mod harness;
 mod kani_compose;
 mod standard;
@@ -21,6 +22,7 @@ use syn::{
 
 use calculation::{CalculationArgs, expand_calculation};
 use evidence::expand_evidence;
+use exchange::{ExchangeArgs, expand_exchange};
 use harness::expand_harness;
 use kani_compose::expand_kani_compose;
 use standard::expand_standard;
@@ -66,6 +68,28 @@ pub fn calculation(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemFn);
 
     match expand_calculation(&args, &input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generalizes the by-hand `Exchange` transition pattern proven in
+/// `amenable_kani::stoplight` (see `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+/// Step 3): given `impl SelfType { fn method(&self, input: Input) ->
+/// Result<Output, Error> { .. } }` — the real inherent method, its
+/// `#[cfg_attr(.., kani::ensures(..))]` contract, and its body left
+/// exactly as authored — generates the `Witness<V>` impl for `evidence`
+/// naming the given harness, the `ProofRecord` registration backing it,
+/// and the `Exchange<Input, Output, V>` impl that delegates to `method`.
+/// Deliberately does not touch or generate the `harness! { .. }`
+/// invocation itself, since that macro's verbatim-source capture only
+/// works when written directly at its own call site.
+#[proc_macro_attribute]
+pub fn exchange(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(attr as ExchangeArgs);
+    let input = parse_macro_input!(item as ItemImpl);
+
+    match expand_exchange(&args, &input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

@@ -35,8 +35,7 @@
 //! credential; `input.primary()` doesn't type-check).
 
 use amenable_core::{
-    Establish, Evidence, Exchange, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
-    Witness,
+    Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine, Witness,
 };
 use amenable_derive::Standard;
 
@@ -235,32 +234,9 @@ impl ProofToken for YellowToken {
     type Proposition = Yellow;
 }
 
-/// Backs `Establish<Green, KaniVerifier> for Yellow`: without this impl,
-/// that `Establish` impl does not compile, so `Stoplight`'s `Green ->
-/// Yellow` exchange cannot exist until the transition it claims is proven.
-impl Witness<KaniVerifier> for Yellow {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CalculationProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_green_transitions_only_to_yellow".to_owned(),
-            claim: VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC.to_owned(),
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(Yellow)),
-        verifier: "kani",
-        describe: || <Yellow as Witness<KaniVerifier>>::proof().to_string(),
-    }
-}
-
 // The real logic and its Kani contract both live on `Stoplight::
 // green_to_yellow`, a plain inherent method, not on the `Exchange` trait
-// impl below -- Kani 0.67.0 cannot place contracts on a trait method when
+// impl -- Kani 0.67.0 cannot place contracts on a trait method when
 // the trait itself is generic (`Exchange<Input, Output, V>` is), a real,
 // documented tooling limitation (confirmed empirically: the identical
 // `#[kani::proof_for_contract(<Stoplight as Exchange<...>>::exchange)]`
@@ -283,6 +259,23 @@ impl Witness<KaniVerifier> for Yellow {
 // branching would earn a real, substantive `ensures` the same way -- see
 // `ObservedValueMatchesInput`-style predicates elsewhere in this
 // codebase for what that looks like once there's real content.
+//
+// `#[amenable_derive::exchange]` generates the `Witness<KaniVerifier> for
+// Yellow` impl (without it, `Establish<Green, KaniVerifier> for Yellow`
+// below does not compile, so this exchange cannot exist until the
+// transition it claims is proven), the `ProofRecord` registration backing
+// it, and the `Exchange` trait impl delegating to `green_to_yellow` --
+// see that macro's own doc comment for exactly what it generates and,
+// as importantly, does not touch (the contract and the `harness!`
+// invocation below stay hand-written, for reasons documented there).
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = KaniVerifier,
+    evidence = Yellow,
+    proof_artifact = CalculationProof,
+    harness_fn = verify_green_transitions_only_to_yellow,
+    harness_const = VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
+)]
 impl Stoplight {
     #[cfg_attr(
         kani,
@@ -316,19 +309,6 @@ impl Establish<GreenToken, KaniVerifier> for Yellow {
     }
 }
 
-impl Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>, KaniVerifier>
-    for Stoplight
-{
-    type Error = std::convert::Infallible;
-
-    fn exchange(
-        &self,
-        input: Established<Green, GreenToken>,
-    ) -> Result<Established<Yellow, YellowToken>, Self::Error> {
-        self.green_to_yellow(input)
-    }
-}
-
 /// Lawful token minted once `Red` is established from a proven `Yellow`.
 #[derive(Debug, Clone, Copy)]
 pub struct RedToken(());
@@ -337,32 +317,20 @@ impl ProofToken for RedToken {
     type Proposition = Red;
 }
 
-/// Backs `Establish<Yellow, KaniVerifier> for Red` — see `Yellow`'s
-/// `Witness` impl above for the rationale.
-impl Witness<KaniVerifier> for Red {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CalculationProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_yellow_transitions_only_to_red".to_owned(),
-            claim: VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC.to_owned(),
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(Red)),
-        verifier: "kani",
-        describe: || <Red as Witness<KaniVerifier>>::proof().to_string(),
-    }
-}
-
 // See the Green -> Yellow contract above for why the real logic/contract
 // live on a plain inherent method (Kani 0.67.0 can't contract a trait
-// method when the trait is generic) and why the content is legitimately
-// trivial.
+// method when the trait is generic), why the content is legitimately
+// trivial, and what `#[amenable_derive::exchange]` generates/leaves
+// hand-written. Backs `Establish<Yellow, KaniVerifier> for Red` below —
+// see `Yellow`'s edge above for the rationale.
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = KaniVerifier,
+    evidence = Red,
+    proof_artifact = CalculationProof,
+    harness_fn = verify_yellow_transitions_only_to_red,
+    harness_const = VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
+)]
 impl Stoplight {
     #[cfg_attr(
         kani,
@@ -396,46 +364,24 @@ impl Establish<YellowToken, KaniVerifier> for Red {
     }
 }
 
-impl Exchange<Established<Yellow, YellowToken>, Established<Red, RedToken>, KaniVerifier>
-    for Stoplight
-{
-    type Error = std::convert::Infallible;
-
-    fn exchange(
-        &self,
-        input: Established<Yellow, YellowToken>,
-    ) -> Result<Established<Red, RedToken>, Self::Error> {
-        self.yellow_to_red(input)
-    }
-}
-
-/// Backs `Establish<Red, KaniVerifier> for Green` — the cycle-back edge.
-/// Distinct from [`Green`]'s root case: this is the proof that a `Red`
-/// light lawfully cycles back to `Green`, not the power-on assertion.
-impl Witness<KaniVerifier> for Green {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CalculationProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_red_transitions_only_to_green".to_owned(),
-            claim: VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC.to_owned(),
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(Green), "::cycle_back"),
-        verifier: "kani",
-        describe: || <Green as Witness<KaniVerifier>>::proof().to_string(),
-    }
-}
-
 // See the Green -> Yellow contract above for why the real logic/contract
 // live on a plain inherent method (Kani 0.67.0 can't contract a trait
-// method when the trait is generic) and why the content is legitimately
-// trivial.
+// method when the trait is generic), why the content is legitimately
+// trivial, and what `#[amenable_derive::exchange]` generates/leaves
+// hand-written. Backs `Establish<Red, KaniVerifier> for Green` below —
+// the cycle-back edge, distinct from [`Green`]'s root case: this is the
+// proof that a `Red` light lawfully cycles back to `Green`, not the
+// power-on assertion (hence `evidence_id = "cycle_back"`, keeping this
+// `ProofRecord`'s id distinct from a future root-case registration).
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = KaniVerifier,
+    evidence = Green,
+    evidence_id = "cycle_back",
+    proof_artifact = CalculationProof,
+    harness_fn = verify_red_transitions_only_to_green,
+    harness_const = VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC,
+)]
 impl Stoplight {
     #[cfg_attr(
         kani,
@@ -466,18 +412,5 @@ impl Establish<RedToken, KaniVerifier> for Green {
 
     fn establish(_credential: RedToken) -> Self::Token {
         GreenToken(())
-    }
-}
-
-impl Exchange<Established<Red, RedToken>, Established<Green, GreenToken>, KaniVerifier>
-    for Stoplight
-{
-    type Error = std::convert::Infallible;
-
-    fn exchange(
-        &self,
-        input: Established<Red, RedToken>,
-    ) -> Result<Established<Green, GreenToken>, Self::Error> {
-        self.red_to_green(input)
     }
 }

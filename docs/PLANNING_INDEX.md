@@ -148,16 +148,18 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Steps 0, 1, and 2 all done and verified — Kani and
+**Status:** 🔲 Steps 0 through 3 all done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
 edge per backend, plus a real consistency test keeping the Creusot
 mirror honest against the real Kani source (Step 2, verified in both
-drift directions). The Creusot mirror genuinely implements the real
-`amenable_core` trait family, corrected from an over-flattened first
-version while starting Step 2. Kani and Creusot first, by deliberate
-sequencing — Verus
+drift directions), plus the by-hand Kani-side wiring generalized into
+a real `#[amenable_derive::exchange(..)]` attribute macro (Step 3),
+re-verified against all three edges post-swap. The Creusot mirror
+genuinely implements the real `amenable_core` trait family, corrected
+from an over-flattened first version while starting Step 2. Kani and
+Creusot first, by deliberate sequencing — Verus
 support for
 `Exchange` remains a real goal, just not yet solvable the same way
 (Verus can't check an arbitrary compiled Rust body, only `verus! {}`-
@@ -324,6 +326,45 @@ clippy --workspace --all-targets --all-features -- -D warnings`, and
 verify-creusot` still `Proved (110 files) ✔`, confirming the new
 test-only `syn`/`quote`/`proc-macro2` dev-dependencies don't disturb
 the real Creusot toolchain invocation. Step 2 is complete.
+
+Step 3 landed too, generalizing the by-hand pattern into an attribute
+macro -- also not quite as originally framed, on two points the plan's
+own earlier steps had already settled empirically. First: the plan's
+sketch put the generated contract on `Exchange::exchange` itself, but
+Step 1 already found that has to live on a plain inherent method
+instead (Kani's generic-trait-method limitation), so the macro attaches
+to that inherent method's `impl SelfType { .. }` block. Second: Step
+1's Creusot side turned out to need no new generated scaffolding at
+all -- its harness functions are free functions wrapped directly in
+`harness!`, with no per-edge `Witness`/`ProofRecord`/`Exchange`-impl
+trio to mechanize, so Step 3's real scope narrowed to Kani only. What
+got built: `#[amenable_derive::exchange(cfg = .., verifier = ..,
+evidence = .., proof_artifact = .., harness_fn = .., harness_const =
+.., evidence_id = ..)]` (`crates/amenable_derive/src/exchange.rs`),
+generating the `Witness<V>` impl, its `ProofRecord` registration, and
+the `Exchange` trait-impl delegation -- deliberately *not* touching the
+contract, the method body, or the `harness!` invocation, since the
+latter's verbatim-source capture (`Span::source_text()`) only works
+when its braced item is written directly at the call site; splicing it
+through this macro would have silently degraded that capture to a
+token-reconstructed fallback. `Input`/`Output`/`Error` are extracted
+from the method's own signature via `syn`, not re-typed as macro
+arguments. Applied to all three `Stoplight` edges in place of their
+by-hand trio (the cycle-back edge's `"::cycle_back"` id preserved via
+an `evidence_id` argument). Verified for real: `cargo expand -p
+amenable_kani stoplight` confirmed byte-for-byte identical output to
+the prior hand-written expansion, including the `harness!` constant
+still capturing real multi-line source (not the degraded fallback);
+`just verify-kani-contract` re-run on all three harnesses, all still
+`VERIFICATION:- SUCCESSFUL`; a real injected `panic!()` in
+`green_to_yellow` failed at the exact injected line under `cargo kani`
+(confirming the generated delegation still routes through the real
+body), reverted and re-verified clean. Full workspace `fmt --check`/
+`check`/`clippy --all-targets --all-features -D warnings`/`test` all
+clean (61/61, unchanged), and the Step 2 consistency test unaffected
+(it never touches macro-generated code). Net: `stoplight.rs` shed
+about 114 lines against a roughly 24-line addition to
+`amenable_derive`. Step 3 is complete.
 
 ### Kani Filesystem Accommodation Model
 
