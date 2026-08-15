@@ -36,7 +36,16 @@ on the Kani-side inherent-method `impl` block, generating the
 leaving the contract, body, and `harness!` invocation hand-written —
 see Step 3 below for why and how it was verified (`cargo expand`
 byte-for-byte match, real `cargo kani` re-verification of all three
-edges, a real injected-regression check).
+edges, a real injected-regression check). Step 4 is also complete,
+after a real dead end: `std::convert::Infallible` (the edges' original
+`Error` type) is uninhabited by design, and `#[kani::stub_verified]`
+composition needs `Arbitrary` for the whole return type including the
+`Err` side — mathematically impossible for a genuinely uninhabited
+type, confirmed empirically across three attempts, not assumed. Fixed
+by trading `Infallible` for a real, ordinary, never-actually-
+constructed `StoplightError::NotUsed` variant instead, an approach the
+user supplied after the dead end was surfaced rather than pushed
+through unilaterally — see Step 4 below.
 
 ## Motivation
 
@@ -673,14 +682,83 @@ a real ~114-line reduction against a ~24-line addition to
 `amenable_derive`, not counting the doc-comment prose added to explain
 what moved where. Step 3 is complete.
 
-### Step 4 — modular composition via `stub_verified`
+### Step 4 — modular composition via `stub_verified` — done
 
-Once individual transitions are `proof_for_contract`-verified, use
-Kani's real `stub_verified()` to compose multi-step `Exchange` chains
-(e.g. the full `Stoplight` cycle) without re-exploring each
-transition's body on every use — the first real use of compositional/
-modular Kani verification in this codebase; every existing `#[kani::
-proof]` harness today is direct symbolic execution with no contracts.
+Composes all three `Stoplight` edges into one full-cycle harness via
+`#[kani::stub_verified]`, which replaces each stubbed call's body
+with its already-proven contract instead of re-exploring it — the
+first real use of compositional/modular Kani verification in this
+codebase; every other `#[kani::proof]` harness here is direct
+symbolic execution with no stubbing.
+
+**A real dead end hit and resolved along the way, not smoothed over.**
+`stub_verified` needs `ReturnType: kani::Arbitrary` for every stubbed
+call, since stubbing reconstructs a symbolic stand-in for whatever the
+real call would have returned. `Established<T, Token>: kani::
+Arbitrary` was straightforward (own type, own fields — `Established::
+new(T::any(), Token::any())`). But every edge's real return type is
+`Result<Established<T, Token>, std::convert::Infallible>`, and
+`Infallible` is uninhabited by design (the type-level expression of
+"this can never fail"). Three attempts to reconcile that with
+`Arbitrary`, each a real, confirmed failure, not a hypothetical:
+
+1. Implement `Arbitrary` for the whole `Result<..., Infallible>`
+   directly — blocked twice by the orphan rules: first as a generic
+   impl over `T, Token` (real `E0117`, "uncovered type parameter"),
+   then narrowed to three concrete edge types — still blocked (`Result`
+   is foreign and not a `#[fundamental]` type, so no downstream crate
+   may implement a foreign trait for it, generic or concrete, full
+   stop).
+2. Swap `Infallible` for a local uninhabited `enum Never {}`, so
+   `impl kani::Arbitrary for Never` becomes legal (local type). It
+   compiled, and Kani's own conditional `Result<T, E>: Arbitrary`
+   impl (which lives in Kani's crate, not ours, and is why option 1
+   was even conceivable) picked it up automatically. But real `cargo
+   kani` still failed: Kani's `Result` reconstruction unconditionally
+   calls `E::any()` while exploring the stub's symbolic return-value
+   space, and CBMC actually executes that call. The only body a
+   genuinely uninhabited type's `any()` can have is `unreachable!()`
+   (no safe-Rust value of an uninhabited type exists to return), and
+   that panics for real under verification — confirmed by the exact
+   `internal error: entered unreachable code` failure, not assumed.
+   Constructing a value of a truly uninhabited type is impossible, and
+   no amount of type-juggling changes that.
+3. At this point the honest options seemed to be: accept a real,
+   documented limitation and skip to Step 5 with no composition demo,
+   or redesign `Exchange`'s core signature (fixed in Step 0) to use a
+   locally-owned `Result`-analog whose `Arbitrary` impl this crate
+   could actually write — a change disproportionate to what Step 4
+   asked for, rippling into the trait family itself. Presented to the
+   user as a real fork rather than picked unilaterally.
+
+**The actual fix, from the user:** the root problem was never *which*
+crate owns the uninhabited type — it's that `Infallible`'s
+*uninhabitedness itself* is what `Arbitrary` reconstruction cannot
+survive. So stop using an uninhabited type. `StoplightError` (an enum
+with one variant, `NotUsed`) replaces `Infallible` as every edge's
+`Error` type: ordinary, safely constructible data, never actually
+returned by any edge (each edge's own `#[kani::ensures]` contract,
+already proven per-edge in Step 1/3, is what establishes that — not
+the type system). This trades a compile-time "impossible to
+construct" guarantee for a runtime "never actually happens" one,
+specifically so `kani::Arbitrary` can be honest (`NotUsed`, no
+`unreachable!()`, no unsafe). Real, not hypothetical: `cargo kani`
+verifies the composition harness clean once this lands.
+
+**Verified for real**, including the one check unique to this step —
+does `stub_verified` actually skip the body, not just accept a
+trivial one? A `panic!()` injected into `green_to_yellow`'s real body
+made its own `proof_for_contract` harness fail at the exact injected
+line (confirming the panic is live, reachable code), while the
+*composition* harness — which stubs that same function — stayed
+`VERIFICATION:- SUCCESSFUL` throughout, since stubbing never executes
+the body at all. Reverted and re-verified both clean afterward. Full
+workspace `fmt --check`/`check`/`clippy --all-targets --all-features
+-D warnings`/`test` all clean (61/61, unchanged — the composition
+harness is Kani-only, not a `cargo test` target); the Step 2
+consistency test and the real `stoplight_test.rs` integration tests
+(updated to use `StoplightError` in place of `Infallible`) both still
+pass. Step 4 is complete.
 
 ### Step 5 — wire into `Amenable`
 
@@ -842,12 +920,17 @@ concluding something in Step 1+ is a novel problem:
 
 ## Next step
 
-Steps 0 through 3 are all done — Kani and Creusot bodies for all three
+Steps 0 through 4 are all done — Kani and Creusot bodies for all three
 edges, each verified for real with a genuine injected-regression
 check; a real consistency test keeping the Creusot mirror honest
-against the real Kani source; and the by-hand Kani-side pattern
+against the real Kani source; the by-hand Kani-side pattern
 generalized into `#[amenable_derive::exchange(..)]`, re-verified
-against all three edges after the swap (real `cargo expand` diff, real
-`cargo kani`, a real regression check). Next is Step 4: modular
-composition via `stub_verified` — not yet started, and shouldn't be
-without explicit direction, matching this plan's own pacing so far.
+against all three edges after the swap; and all three edges composed
+into one full-cycle `#[kani::stub_verified]` harness, after a real,
+documented dead end (`Infallible`'s uninhabitedness, not just its
+foreign-crate ownership, is what blocked `Arbitrary` reconstruction)
+resolved by trading it for `StoplightError::NotUsed`. Next is Step 5:
+wire the derived per-transition harnesses into `Amenable::
+kani_surface()`/`creusot_surface()` — not yet started, and shouldn't
+be without explicit direction, matching this plan's own pacing so
+far.

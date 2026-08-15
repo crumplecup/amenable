@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Steps 0 through 3 all done and verified — Kani and
+**Status:** 🔲 Steps 0 through 4 all done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
@@ -156,10 +156,15 @@ edge per backend, plus a real consistency test keeping the Creusot
 mirror honest against the real Kani source (Step 2, verified in both
 drift directions), plus the by-hand Kani-side wiring generalized into
 a real `#[amenable_derive::exchange(..)]` attribute macro (Step 3),
-re-verified against all three edges post-swap. The Creusot mirror
-genuinely implements the real `amenable_core` trait family, corrected
-from an over-flattened first version while starting Step 2. Kani and
-Creusot first, by deliberate sequencing — Verus
+re-verified against all three edges post-swap, plus all three edges
+composed into one `#[kani::stub_verified]` full-cycle harness (Step
+4) after a real dead end (`Infallible`'s uninhabitedness blocks
+`Arbitrary` reconstruction outright, not just an ownership problem)
+resolved by swapping in a real, constructible `StoplightError::
+NotUsed` variant. The Creusot mirror genuinely implements the real
+`amenable_core` trait family, corrected from an over-flattened first
+version while starting Step 2. Kani and Creusot first, by deliberate
+sequencing — Verus
 support for
 `Exchange` remains a real goal, just not yet solvable the same way
 (Verus can't check an arbitrary compiled Rust body, only `verus! {}`-
@@ -365,6 +370,49 @@ clean (61/61, unchanged), and the Step 2 consistency test unaffected
 (it never touches macro-generated code). Net: `stoplight.rs` shed
 about 114 lines against a roughly 24-line addition to
 `amenable_derive`. Step 3 is complete.
+
+Step 4 landed too, composing all three edges into one full-cycle
+`#[kani::stub_verified]` harness -- but only after a real dead end,
+surfaced to the user rather than pushed through. `stub_verified`
+needs `Arbitrary` for a stubbed call's whole return type, since
+stubbing reconstructs a symbolic stand-in for it. `Established<T,
+Token>: Arbitrary` was easy (own type, own fields). But every edge
+returned `Result<Established<T, Token>, std::convert::Infallible>`,
+and `Infallible` is uninhabited by design. Three real attempts, each
+a confirmed failure: implementing `Arbitrary` for the whole `Result`
+directly (blocked by the orphan rules twice over -- `Result` is
+foreign and not `#[fundamental]`, so no downstream crate may
+implement a foreign trait for it at all, generic or concrete);
+swapping `Infallible` for a local uninhabited `enum Never {}` so a
+local `Arbitrary` impl became legal (compiled, but Kani's `Result`
+reconstruction unconditionally calls `E::any()` while exploring the
+stub's return-value space, and the only body an uninhabited type's
+`any()` can have -- `unreachable!()` -- panics for real under `cargo
+kani`, confirmed by the exact failure, not assumed). At that point the
+honest options were a documented limitation with no composition demo,
+or redesigning `Exchange`'s core signature (fixed in Step 0) to use a
+locally-owned `Result`-analog -- disproportionate to what Step 4
+asked for. Surfaced to the user as a real fork instead of decided
+unilaterally.
+
+The user's fix: the problem was never which crate owns the
+uninhabited type, it's the uninhabitedness itself that `Arbitrary`
+reconstruction can't survive -- so stop using an uninhabited type.
+`StoplightError` (one variant, `NotUsed`) replaces `Infallible` as
+every edge's `Error`: ordinary, safely constructible, never actually
+returned by any edge (each edge's own already-proven `#[kani::
+ensures]` contract is what establishes that, not the type system).
+Verified for real, including the check unique to this step: a
+`panic!()` injected into `green_to_yellow`'s real body failed its own
+`proof_for_contract` harness at the exact line, while the composition
+harness -- which stubs that same function -- stayed `VERIFICATION:-
+SUCCESSFUL` throughout, confirming stubbing genuinely never executes
+the body. Reverted and re-verified clean. Full workspace `fmt
+--check`/`check`/`clippy --all-targets --all-features -D
+warnings`/`test` all clean (61/61, unchanged), plus the real
+`stoplight_test.rs` integration tests (updated to use `StoplightError`
+in place of `Infallible`) and the Step 2 consistency test both still
+passing. Step 4 is complete.
 
 ### Kani Filesystem Accommodation Model
 

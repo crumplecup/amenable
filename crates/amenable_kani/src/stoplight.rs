@@ -46,6 +46,7 @@ use crate::{CalculationProof, KaniVerifier};
 /// Transitions Are Relations"): the first assertion any running instance
 /// makes is not computed from anything, it's asserted.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 #[standard(basis = "Self")]
 pub struct Green;
 
@@ -68,6 +69,7 @@ impl Provenance for Green {
 /// reaches `Yellow` via a proven `Exchange<Established<Green, GreenToken>,
 /// Established<Yellow, YellowToken>>` transition.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 #[standard(basis = "Self")]
 pub struct Yellow;
 
@@ -87,6 +89,7 @@ impl Provenance for Yellow {
 
 /// The light is red — see [`Green`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 #[standard(basis = "Self")]
 pub struct Red;
 
@@ -185,8 +188,56 @@ where
     }
 }
 
+/// Lets Kani reconstruct an `Established<T, Token>` symbolically without
+/// running any `Exchange` body — required for `#[kani::stub_verified]`
+/// composition (Step 4 of `EXCHANGE_PROOF_DERIVATION_PLAN.md`): a stubbed
+/// function's body is replaced by its proven contract, so Kani needs a way
+/// to conjure an arbitrary value of its return type standing in for "some
+/// value satisfying the postcondition," the same real, documented
+/// requirement `~/repos/elicitation`'s `KANI_FOR_VSMS.md` §6.4 found for
+/// its own `Established<P>`. Both fields are honest here (unlike
+/// elicitation's `PhantomData`-only case): a real `T::any()`/`Token::any()`
+/// call each, not a placeholder.
+#[cfg(kani)]
+impl<T: kani::Arbitrary, Token: kani::Arbitrary> kani::Arbitrary for Established<T, Token> {
+    fn any() -> Self {
+        Self::new(T::any(), Token::any())
+    }
+}
+
+/// Every `Stoplight` edge's `Error` type. Not `std::convert::Infallible`:
+/// an *uninhabited* `Error` turned out to be incompatible with
+/// `#[kani::stub_verified]` composition (Step 4), not merely inconvenient
+/// — confirmed empirically, not assumed. Kani's own `Result<T, E>`
+/// reconstruction unconditionally needs `E: kani::Arbitrary`'s `any()` to
+/// be callable, and CBMC actually executes that call while exploring the
+/// stub's symbolic return-value space; the only body a genuinely
+/// uninhabited type can offer is `unreachable!()`, which then fails for
+/// real, and no safe-Rust `any()` can construct a value of a type with no
+/// values. `StoplightError` trades a compile-time "this can never be
+/// constructed" guarantee for a runtime one instead: `NotUsed` is real,
+/// ordinary, constructible data — Kani can build it honestly — and no
+/// edge below ever actually returns it (each edge's own `#[kani::
+/// ensures]` contract, proven per-edge in Step 1/3, is what establishes
+/// that; `stub_verified` composition then reuses those proofs rather than
+/// re-deriving them).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StoplightError {
+    /// The one variant. Exists so `StoplightError` is an ordinary
+    /// constructible type, not so any edge below constructs it.
+    NotUsed,
+}
+
+#[cfg(kani)]
+impl kani::Arbitrary for StoplightError {
+    fn any() -> Self {
+        Self::NotUsed
+    }
+}
+
 /// Lawful token minted once a [`Stoplight`] is confirmed `Green`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct GreenToken(());
 
 impl GreenToken {
@@ -228,6 +279,7 @@ impl Established<Green, GreenToken> {
 
 /// Lawful token minted once `Yellow` is established from a proven `Green`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct YellowToken(());
 
 impl ProofToken for YellowToken {
@@ -279,12 +331,12 @@ impl ProofToken for YellowToken {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Yellow, YellowToken>, std::convert::Infallible>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Yellow, YellowToken>, StoplightError>| result.is_ok())
     )]
     fn green_to_yellow(
         &self,
         input: Established<Green, GreenToken>,
-    ) -> Result<Established<Yellow, YellowToken>, std::convert::Infallible> {
+    ) -> Result<Established<Yellow, YellowToken>, StoplightError> {
         let token = Yellow::establish(input.sidecar());
         Ok(Established::new(Yellow, token))
     }
@@ -311,6 +363,7 @@ impl Establish<GreenToken, KaniVerifier> for Yellow {
 
 /// Lawful token minted once `Red` is established from a proven `Yellow`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct RedToken(());
 
 impl ProofToken for RedToken {
@@ -334,12 +387,12 @@ impl ProofToken for RedToken {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Red, RedToken>, std::convert::Infallible>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Red, RedToken>, StoplightError>| result.is_ok())
     )]
     fn yellow_to_red(
         &self,
         input: Established<Yellow, YellowToken>,
-    ) -> Result<Established<Red, RedToken>, std::convert::Infallible> {
+    ) -> Result<Established<Red, RedToken>, StoplightError> {
         let token = Red::establish(input.sidecar());
         Ok(Established::new(Red, token))
     }
@@ -385,12 +438,12 @@ impl Establish<YellowToken, KaniVerifier> for Red {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Green, GreenToken>, std::convert::Infallible>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Green, GreenToken>, StoplightError>| result.is_ok())
     )]
     fn red_to_green(
         &self,
         input: Established<Red, RedToken>,
-    ) -> Result<Established<Green, GreenToken>, std::convert::Infallible> {
+    ) -> Result<Established<Green, GreenToken>, StoplightError> {
         let token = Green::establish(input.sidecar());
         Ok(Established::new(Green, token))
     }
@@ -412,5 +465,37 @@ impl Establish<RedToken, KaniVerifier> for Green {
 
     fn establish(_credential: RedToken) -> Self::Token {
         GreenToken(())
+    }
+}
+
+// Step 4 of `EXCHANGE_PROOF_DERIVATION_PLAN.md`: modular composition. Each
+// individual edge above is already `proof_for_contract`-verified in
+// isolation; this harness composes all three into the full cycle via
+// `#[kani::stub_verified]`, which replaces a stubbed call's body with its
+// already-proven contract rather than re-exploring it -- CBMC's task here
+// reduces to "does each step's postcondition satisfy the next step's
+// precondition," not three full body explorations stacked into one. The
+// first real use of compositional/modular Kani verification in this
+// codebase; every other `#[kani::proof]` harness here is direct symbolic
+// execution with no stubbing. Requires `Established<T, Token>`/
+// `StoplightError`: `kani::Arbitrary` above so Kani can reconstruct each
+// stubbed call's return value -- the same real requirement `~/repos/
+// elicitation`'s `KANI_FOR_VSMS.md` §6.4/§6.5 documents for its own
+// composition proofs, plus `StoplightError` existing at all in the first
+// place (see its own doc comment: an uninhabited `Error`, `std::convert::
+// Infallible`, blocks this specific composition, confirmed empirically).
+amenable_derive::harness! {
+    kani, VERIFY_FULL_CYCLE_COMPOSES_SRC, {
+        #[kani::proof]
+        #[kani::stub_verified(Stoplight::green_to_yellow)]
+        #[kani::stub_verified(Stoplight::yellow_to_red)]
+        #[kani::stub_verified(Stoplight::red_to_green)]
+        fn verify_full_cycle_composes() {
+            let stoplight = Stoplight;
+            let green = Established::<Green, GreenToken>::root();
+            let yellow = stoplight.green_to_yellow(green).unwrap();
+            let red = stoplight.yellow_to_red(yellow).unwrap();
+            let _green_again = stoplight.red_to_green(red).unwrap();
+        }
     }
 }

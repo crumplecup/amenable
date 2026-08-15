@@ -7,11 +7,11 @@
 
 use amenable_core::{Exchange, Sidecar};
 use amenable_kani::{
-    Established, Green, GreenToken, Red, RedToken, Stoplight, Yellow, YellowToken,
+    Established, Green, GreenToken, Red, RedToken, Stoplight, StoplightError, Yellow, YellowToken,
 };
 
 #[test]
-fn green_to_yellow_exchange_succeeds() -> Result<(), std::convert::Infallible> {
+fn green_to_yellow_exchange_succeeds() -> Result<(), StoplightError> {
     let stoplight = Stoplight;
 
     let yellow: Established<Yellow, YellowToken> =
@@ -22,7 +22,7 @@ fn green_to_yellow_exchange_succeeds() -> Result<(), std::convert::Infallible> {
 }
 
 #[test]
-fn full_cycle_returns_to_green() -> Result<(), std::convert::Infallible> {
+fn full_cycle_returns_to_green() -> Result<(), StoplightError> {
     let stoplight = Stoplight;
 
     let yellow: Established<Yellow, YellowToken> =
