@@ -45,7 +45,14 @@ type, confirmed empirically across three attempts, not assumed. Fixed
 by trading `Infallible` for a real, ordinary, never-actually-
 constructed `StoplightError::NotUsed` variant instead, an approach the
 user supplied after the dead end was surfaced rather than pushed
-through unilaterally — see Step 4 below.
+through unilaterally — see Step 4 below. Step 5 is also complete:
+`impl Amenable for Stoplight` is the first real occupant of
+`kani_surface()`/`creusot_surface()`/`verus_surface()`/`audit_surface()`
+anywhere in the tree, every method backed by real queried/referenced
+data rather than a hand-typed list — including a new, real, feature-
+gated Cargo dependency (`amenable_kani`'s own `creusot` feature) added
+specifically so `creusot_surface()` isn't a drift-prone hand-typed name
+list — see Step 5 below.
 
 ## Motivation
 
@@ -760,12 +767,77 @@ consistency test and the real `stoplight_test.rs` integration tests
 (updated to use `StoplightError` in place of `Infallible`) both still
 pass. Step 4 is complete.
 
-### Step 5 — wire into `Amenable`
+### Step 5 — wire into `Amenable` — done
 
-Aggregate the derived per-transition harnesses into `Amenable::
-kani_surface()`/`creusot_surface()` — the first real occupant of that
-trait surface, mirroring elicitation's `VerifiedStateMachine::
-transition_harnesses()`/`vsm_kani_proof()` as the aggregation point.
+`impl Amenable for Stoplight` (`amenable_kani/src/stoplight.rs`) is the
+first real occupant of `kani_surface()`/`creusot_surface()`/
+`verus_surface()`/`audit_surface()` anywhere in the tree — grepping the
+whole tree before this found zero `impl Amenable for`. Not elicitation's
+`VerifiedStateMachine::transition_harnesses()`/`vsm_kani_proof()` shape
+(a `Vec<proc_macro2::TokenStream>` a `build.rs` writes out to a generated
+`.rs` file) — amenable doesn't do proof-source codegen anywhere, so that
+shape doesn't map onto anything real here. Instead, each method either
+queries data that already exists (no new registration mechanism
+invented) or references real, compiler-checked items:
+
+- `type ProofSurface = Vec<String>;` — a plain list of proof
+  identifiers, reusing `KaniProof.id`'s own format
+  (`crate::module::path::harness_name`) rather than inventing a second,
+  near-identical struct just for this trait.
+- `kani_surface()` queries the same real `KaniProofRegistration`
+  `inventory` catalog `harness!` already populates — the exact
+  mechanism `amenable::kani::registered_proofs` (the CLI's own harness
+  listing) already uses — filtered to this module's own entries via
+  `module_path!()`. Evaluated inside `stoplight.rs` itself, so it's the
+  literal same string `harness!`'s own `id: concat!(module_path!(), "::",
+  ..)` computed when each harness registered; no hand-typed module name
+  on either side to drift apart.
+- `creusot_surface()` — `amenable_creusot::stoplight` has no
+  `inventory`-backed registry of its own (deliberately: see that
+  module's own doc comment on why `inventory::submit!` is off-limits
+  there), so nothing is queryable the way `kani_surface()` queries. This
+  method instead references the real exported harness-source constants
+  directly (`let _: &str = amenable_creusot::VERIFY_GREEN_TO_YELLOW_
+  EXCHANGE_SRC;` et al.) — confirmed for real, not assumed, that this
+  actually catches drift: renaming one of those constants in
+  `amenable_creusot/src/stoplight.rs` broke `cargo check -p amenable_kani
+  --features creusot` immediately (`E0432`, unresolved import), reverted
+  after confirming. Gated behind a **new** `creusot` feature on
+  `amenable_kani` itself (`amenable_creusot = { workspace = true,
+  optional = true }` + `creusot = ["dep:amenable_creusot"]`), mirroring
+  `amenable_std`'s identical dependency for the identical reason — a
+  real, new Cargo edge, added because the alternative (hand-typing
+  Creusot harness names inside `amenable_kani`, with zero mechanism
+  keeping them in sync) would have reintroduced the exact drift risk
+  this whole plan exists to close. Confirmed to not create a dependency
+  cycle (`amenable_creusot` depends on neither `amenable_kani` nor
+  `amenable_std`) and confirmed not to disturb Creusot's own translator
+  (`just verify-creusot` still `Proved (110 files) ✔` afterward) — the
+  new edge only ever participates in ordinary `cargo check`/`cargo kani`
+  builds of `amenable_kani`, never in `cargo creusot -p amenable_creusot`
+  itself. `amenable`'s own `creusot` feature updated to also enable
+  `amenable_kani/creusot`, so the facade gets real end-to-end data.
+- `verus_surface()` returns `Vec::new()` — honest, not aspirational: no
+  Verus `Exchange` proof exists for `Stoplight` (Verus is deliberately
+  out of scope for this plan; see Motivation).
+- `audit_surface()` returns the real `harness!`-captured verbatim
+  source of all four Kani harnesses (the three edges plus the Step 4
+  composition harness) — literal source, not identifiers, the same
+  constants the `Witness::proof()` impls already rely on.
+
+**Verified for real**, not just "it compiles": a new test file
+(`amenable_kani/tests/stoplight_amenable_test.rs`) asserts `kani_surface()`
+returns exactly the four expected, module-scoped harness ids;
+`creusot_surface()` returns the three expected edges under the `creusot`
+feature and an honestly-empty list without it; `verus_surface()` is
+empty; `audit_surface()` contains four entries whose real source text
+names every edge plus `stub_verified`. All pass under both feature
+configurations (`cargo test -p amenable_kani --test
+stoplight_amenable_test` with and without `--features creusot`). Full
+workspace `fmt --check`/`check`/`clippy --all-targets --all-features -D
+warnings` clean under both configurations, `cargo test --workspace`
+62/62 (up from 61 — the new test binary), `just verify-creusot` still
+`Proved (110 files) ✔`. Step 5 is complete.
 
 ## Open questions
 
@@ -920,17 +992,17 @@ concluding something in Step 1+ is a novel problem:
 
 ## Next step
 
-Steps 0 through 4 are all done — Kani and Creusot bodies for all three
-edges, each verified for real with a genuine injected-regression
-check; a real consistency test keeping the Creusot mirror honest
-against the real Kani source; the by-hand Kani-side pattern
-generalized into `#[amenable_derive::exchange(..)]`, re-verified
-against all three edges after the swap; and all three edges composed
-into one full-cycle `#[kani::stub_verified]` harness, after a real,
-documented dead end (`Infallible`'s uninhabitedness, not just its
-foreign-crate ownership, is what blocked `Arbitrary` reconstruction)
-resolved by trading it for `StoplightError::NotUsed`. Next is Step 5:
-wire the derived per-transition harnesses into `Amenable::
-kani_surface()`/`creusot_surface()` — not yet started, and shouldn't
-be without explicit direction, matching this plan's own pacing so
-far.
+Steps 0 through 5 — every step this plan originally scoped — are now
+complete: the `Sidecar<V>` trait-family fix; real Kani and Creusot
+bodies for all three `Stoplight` edges; a real consistency test
+keeping the Creusot mirror honest against the real Kani source; the
+by-hand Kani-side pattern generalized into `#[amenable_derive::
+exchange(..)]`; all three edges composed into one full-cycle
+`#[kani::stub_verified]` harness; and `Stoplight`'s real `Amenable`
+impl, the first anywhere in the tree. Nothing further is queued —
+extending this pattern to more `Exchange` edges beyond `Stoplight`,
+building the Step 3 macro out into a full attribute-driven pipeline for
+arbitrary transitions, or picking up the Verus follow-up plan this
+plan's own Motivation section deferred are all real future directions,
+but none should be started without explicit new direction, matching
+this plan's pacing throughout.

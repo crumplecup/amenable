@@ -35,11 +35,12 @@
 //! credential; `input.primary()` doesn't type-check).
 
 use amenable_core::{
-    Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine, Witness,
+    Amenable, Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
+    Witness,
 };
 use amenable_derive::Standard;
 
-use crate::{CalculationProof, KaniVerifier};
+use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
 
 /// The light is green — a root state claim, asserted rather than derived
 /// from a prior transition (see `docs/AMENABLE_PLAN.md`, "States Are Roots,
@@ -497,5 +498,88 @@ amenable_derive::harness! {
             let red = stoplight.yellow_to_red(yellow).unwrap();
             let _green_again = stoplight.red_to_green(red).unwrap();
         }
+    }
+}
+
+// Step 5 of `EXCHANGE_PROOF_DERIVATION_PLAN.md`: the first real occupant
+// of `Amenable::kani_surface()`/`creusot_surface()`/`verus_surface()`/
+// `audit_surface()` -- grepping the whole tree before this found zero
+// `impl Amenable for` anywhere. Every method below either queries real,
+// already-registered data or references real, compiler-checked items --
+// no hand-typed name that could silently drift from what this module
+// actually proved, matching the whole plan's own discipline.
+impl Amenable for Stoplight {
+    /// A list of proof identifiers -- verifier-agnostic in shape (Kani's
+    /// own `KaniProof.id` format, `crate::module::path::harness_name`),
+    /// reused rather than inventing a second near-identical struct just
+    /// for this trait.
+    type ProofSurface = Vec<String>;
+
+    /// Queries the same real `KaniProofRegistration` inventory `harness!`
+    /// already populates (the exact mechanism `amenable::kani::
+    /// registered_proofs` uses for the CLI's own harness listing),
+    /// filtered to this module's own entries via `module_path!()` --
+    /// evaluated here, in `stoplight.rs`, so it's the same string
+    /// `harness!`'s own `id: concat!(module_path!(), "::", ..)` computed
+    /// when it ran, with no hand-typed module name to drift from either
+    /// side.
+    fn kani_surface() -> Self::ProofSurface {
+        let mut ids: Vec<String> = inventory::iter::<KaniProofRegistration>()
+            .map(|registration| (registration.proof)())
+            .filter(|proof: &KaniProof| proof.id.starts_with(concat!(module_path!(), "::")))
+            .map(|proof| proof.id)
+            .collect();
+        ids.sort_unstable();
+        ids
+    }
+
+    /// `amenable_creusot::stoplight` has no `inventory`-backed registry of
+    /// its own to query (deliberately -- see that module's own doc
+    /// comment on why `inventory::submit!` is off-limits there), so this
+    /// references the real exported harness-source constants directly:
+    /// renaming or removing any of them breaks this build rather than
+    /// silently leaving a stale surface behind. Only compiled when this
+    /// crate's own `creusot` feature is on, mirroring `amenable_std`'s
+    /// identical `amenable_creusot` dependency and for the same reason.
+    #[cfg(feature = "creusot")]
+    fn creusot_surface() -> Self::ProofSurface {
+        let _: &str = amenable_creusot::VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC;
+        let _: &str = amenable_creusot::VERIFY_YELLOW_TO_RED_EXCHANGE_SRC;
+        let _: &str = amenable_creusot::VERIFY_RED_TO_GREEN_EXCHANGE_SRC;
+        vec![
+            "amenable_creusot::stoplight::green_to_yellow".to_owned(),
+            "amenable_creusot::stoplight::yellow_to_red".to_owned(),
+            "amenable_creusot::stoplight::red_to_green".to_owned(),
+        ]
+    }
+
+    /// Honest, not aspirational: without the `creusot` feature this crate
+    /// has no dependency on `amenable_creusot` at all, so there is
+    /// nothing real to report here.
+    #[cfg(not(feature = "creusot"))]
+    fn creusot_surface() -> Self::ProofSurface {
+        Vec::new()
+    }
+
+    /// Honest, not aspirational: no Verus `Exchange` proof exists for
+    /// `Stoplight` yet (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Motivation
+    /// section explains why Verus is deliberately out of scope for this
+    /// plan -- it can't check an arbitrary compiled Rust body, only
+    /// `verus! {}`-native code -- and gets its own plan once it has a
+    /// real answer).
+    fn verus_surface() -> Self::ProofSurface {
+        Vec::new()
+    }
+
+    /// Real captured verbatim source, not identifiers -- every Kani
+    /// harness in this module, via the same `harness!`-exported constants
+    /// its own contracts already use to keep `Witness::proof()` honest.
+    fn audit_surface() -> &'static [&'static str] {
+        &[
+            VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
+            VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
+            VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC,
+            VERIFY_FULL_CYCLE_COMPOSES_SRC,
+        ]
     }
 }

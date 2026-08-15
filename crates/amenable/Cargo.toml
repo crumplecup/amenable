@@ -46,7 +46,7 @@ cli = ["dep:miette"]
 # anything special to compile (plain stable `cargo check --features
 # creusot` works fine). `dump-registry`'s output only includes Creusot's
 # registered ProofRecords when this feature is on.
-creusot = ["dep:amenable_creusot", "amenable_std/creusot"]
+creusot = ["dep:amenable_creusot", "amenable_std/creusot", "amenable_kani/creusot"]
 # `amenable_verus` itself is never a Cargo dependency of anything (see
 # `amenable_std::verus_witness`'s own doc comment for why: Verus never
 # resolves `Cargo.toml`, so there's no witness/registry machinery to

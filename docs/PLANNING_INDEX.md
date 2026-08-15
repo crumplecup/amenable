@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Steps 0 through 4 all done and verified — Kani and
+**Status:** ✅ All six steps (0 through 5) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
@@ -161,10 +161,14 @@ composed into one `#[kani::stub_verified]` full-cycle harness (Step
 4) after a real dead end (`Infallible`'s uninhabitedness blocks
 `Arbitrary` reconstruction outright, not just an ownership problem)
 resolved by swapping in a real, constructible `StoplightError::
-NotUsed` variant. The Creusot mirror genuinely implements the real
-`amenable_core` trait family, corrected from an over-flattened first
-version while starting Step 2. Kani and Creusot first, by deliberate
-sequencing — Verus
+NotUsed` variant, plus `Stoplight`'s real `Amenable` impl (Step 5) —
+the first anywhere in the tree, every surface backed by queried or
+compiler-checked data, including a new feature-gated `amenable_kani ->
+amenable_creusot` dependency added specifically to keep
+`creusot_surface()` honest. The Creusot mirror genuinely implements
+the real `amenable_core` trait family, corrected from an
+over-flattened first version while starting Step 2. Kani and Creusot
+first, by deliberate sequencing — Verus
 support for
 `Exchange` remains a real goal, just not yet solvable the same way
 (Verus can't check an arbitrary compiled Rust body, only `verus! {}`-
@@ -413,6 +417,40 @@ warnings`/`test` all clean (61/61, unchanged), plus the real
 `stoplight_test.rs` integration tests (updated to use `StoplightError`
 in place of `Infallible`) and the Step 2 consistency test both still
 passing. Step 4 is complete.
+
+Step 5 landed last, wiring `Stoplight` into `Amenable` for real -- the
+first `impl Amenable for` anywhere in the tree. Not elicitation's
+`VerifiedStateMachine::transition_harnesses()`/`vsm_kani_proof()` shape
+(`Vec<proc_macro2::TokenStream>` for a `build.rs` to write out) --
+amenable has no proof-source codegen pipeline anywhere, so that shape
+doesn't map onto anything real here. Every method instead queries
+already-existing data or references real, compiler-checked items:
+`kani_surface()` queries the same `KaniProofRegistration` inventory
+catalog `harness!` already populates (the same mechanism the CLI's own
+harness listing uses), filtered to this module's own entries via
+`module_path!()` evaluated in the same file `harness!`'s own ids were
+built from -- no hand-typed module name on either side.
+`creusot_surface()` has no registry to query (Creusot's translator
+can't tolerate `inventory::submit!`), so it references
+`amenable_creusot::stoplight`'s real exported harness-source constants
+directly, gated behind a **new** `creusot` feature added to
+`amenable_kani` itself (mirroring `amenable_std`'s identical
+dependency) specifically so this couldn't become a hand-typed name
+list with nothing keeping it honest -- confirmed for real, not
+assumed, by renaming one of those constants and watching `cargo check
+-p amenable_kani --features creusot` fail immediately (`E0432`),
+reverted after confirming. Confirmed no dependency cycle and confirmed
+`just verify-creusot` still `Proved (110 files) ✔` afterward (the new
+edge only participates in ordinary Rust builds of `amenable_kani`,
+never in Creusot's own translation of `amenable_creusot`).
+`verus_surface()` returns an honest empty list (no Verus `Exchange`
+proof exists yet). `audit_surface()` returns the real captured
+verbatim source of all four Kani harnesses. A new test file
+(`stoplight_amenable_test.rs`) asserts all four surfaces for real under
+both feature configurations, not just that the code compiles. Full
+workspace `fmt`/`check`/`clippy --all-features -D warnings` clean under
+both configurations, `cargo test --workspace` 62/62 (up from 61). Step
+5 is complete -- every step this plan originally scoped now is.
 
 ### Kani Filesystem Accommodation Model
 
