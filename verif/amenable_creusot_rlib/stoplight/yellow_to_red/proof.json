@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_establish_Red": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_new_Red": { "prover": "alt-ergo", "time": 0.017 },
+      "vc_sidecar_Established_Yellow_YellowToken": {
+        "prover": "alt-ergo",
+        "time": 0.016
+      },
+      "vc_yellow_to_red": { "prover": "alt-ergo", "time": 0.01 }
+    }
+  }
+}

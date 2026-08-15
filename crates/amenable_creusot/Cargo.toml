@@ -18,5 +18,10 @@ amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 creusot-std = { workspace = true }
 
+[dev-dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(creusot)"] }

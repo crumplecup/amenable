@@ -107,7 +107,7 @@ pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};
 pub use stoplight::{
     Color, Established, Green, GreenToken, Red, RedToken, SequentialCycle, Stoplight, Yellow,
-    YellowToken, next,
+    YellowToken,
 };
 pub use str_pattern_model::{
     KaniStrMatchObservation, KaniStrRSplitNObservation, KaniStrRSplitObservation,

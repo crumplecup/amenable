@@ -1,0 +1,44 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 288 8 290 43 *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 41 291 56
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 24 291 57
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 292 12 292 42
+let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 19 286 23
+let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 18 287 22
+
+use creusot.prelude.Any
+
+type t_RedToken = { f0: () }
+
+type t_Established_Red_RedToken = { primary: (); token: t_RedToken }
+
+let rec sidecar_Established_Red_RedToken (self: t_Established_Red_RedToken) (return (x: t_RedToken)) = any
+  [ return (result: t_RedToken) -> (! return {result}) ]
+
+type t_GreenToken = { f0'0: () }
+
+let rec establish_Green (_credential: t_RedToken) (return (x: t_GreenToken)) = any
+  [ return (result: t_GreenToken) -> (! return {result}) ]
+
+type t_Established_Green_GreenToken = { primary'0: (); token'0: t_GreenToken }
+
+let rec new_Green (primary'1: ()) (token'1: t_GreenToken) (return (x: t_Established_Green_GreenToken)) = any
+  [ return (result: t_Established_Green_GreenToken) -> (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 288 8 290 43]
+  (input: t_Established_Red_RedToken) (return (x: t_Established_Green_GreenToken)) = (! bb0
+  [ bb0 = s0
+    [ s0 = sidecar_Established_Red_RedToken [%#sstoplight] {input} (fun (_x: t_RedToken) -> [ &_5 <- _x ] s1)
+    | s1 = establish_Green [%#sstoplight'0] {_5} (fun (_x: t_GreenToken) -> [ &token'1 <- _x ] s2)
+    | s2 = [ &_7 <- () ] s3
+    | s3 = new_Green [%#sstoplight'1] {_7} {token'1} (fun (_x: t_Established_Green_GreenToken) -> [ &_ret <- _x ] s4)
+    | s4 = return {_ret} ] ]
+  [ & _ret: t_Established_Green_GreenToken = Any.any_l ()
+  | & input: t_Established_Red_RedToken = input
+  | & token'1: t_GreenToken = Any.any_l ()
+  | & _5: t_RedToken = Any.any_l ()
+  | & _7: () = Any.any_l () ]) [ return (result: t_Established_Green_GreenToken) -> (! return {result}) ]

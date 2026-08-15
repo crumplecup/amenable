@@ -9,6 +9,12 @@ use crate::{Evidence, MetadataEntry, OwnedProvenanceReport, Provenance, Registry
 /// Every `Standard` is also `Evidence`: it terminates an evidence chain by
 /// naming itself as its own [`Basis`](Evidence::Basis), since nothing
 /// stands behind a root obligation but the provenance that grounds it.
+/// Deliberately verifier-agnostic, like `Evidence` itself — a `Standard`
+/// used purely for provenance/audit reporting (see `Evidence`'s own doc
+/// comment) has no business requiring a proof under any particular backend
+/// just to compile. Where a `Standard`-backed value genuinely needs to
+/// carry a real proof, that requirement is stated explicitly at the
+/// `Sidecar`/`Exchange` level that actually needs it, not baked in here.
 pub trait Standard: Evidence {
     /// Structured provenance for this root obligation.
     type Provenance: Provenance;

@@ -21,6 +21,7 @@
 #![warn(missing_docs)]
 
 mod rust_std;
+mod stoplight;
 mod witness;
 
 pub use rust_std::{
@@ -166,5 +167,11 @@ pub use rust_std::{
     WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC,
     WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
     WRAPPING_I32_ADD_WRAPS_HOLDS_SRC, YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC,
+};
+#[cfg(creusot)]
+pub use stoplight::{Established, Green, GreenToken, Red, RedToken, Yellow, YellowToken};
+pub use stoplight::{
+    VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC, VERIFY_RED_TO_GREEN_EXCHANGE_SRC,
+    VERIFY_YELLOW_TO_RED_EXCHANGE_SRC,
 };
 pub use witness::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};

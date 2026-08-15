@@ -34,6 +34,21 @@ check-all-package package:
 verify-kani harness:
     cargo kani -p amenable_kani --lib --all-features --output-format terse --exact --harness {{harness}} -Z unstable-options --harness-timeout 3m
 
+# For `#[kani::proof_for_contract(...)]` harnesses (real function contracts
+# via DFCC, see EXCHANGE_PROOF_DERIVATION_PLAN.md). `-Z function-contracts`
+# is required for any harness using `kani::requires`/`kani::ensures`/
+# `kani::proof_for_contract`; `-Z stubbing` additionally for
+# `kani::stub_verified` composition harnesses (not yet used, staged here
+# for when Step 4 needs it). Harness names for contract harnesses include
+# their module path (see `cargo kani list -Z function-contracts` from
+# inside `crates/amenable_kani` to discover exact names) -- `--exact` still
+# applies. Kani cannot place contracts on trait methods when the trait
+# itself is generic (a real 0.67.0 tooling limitation, not a project
+# convention): contracted logic lives on plain inherent methods instead,
+# with trait impls reduced to single-expression delegation.
+verify-kani-contract harness:
+    cargo kani -p amenable_kani --lib --all-features --output-format terse --exact --harness {{harness}} -Z unstable-options -Z function-contracts -Z stubbing --harness-timeout 3m
+
 # Required env vars for cargo-creusot/why3find; see CREUSOT_GUIDE.md in
 # ~/repos/elicitation for the reference invocation this mirrors.
 creusot_env := "PATH=" + home_directory() + "/.local/share/creusot/bin:${PATH} DUNE_DIR_LOCATIONS=why3find:lib:" + home_directory() + "/.local/share/creusot/share/why3find WHY3CONFIG=" + home_directory() + "/.config/creusot/why3.conf"

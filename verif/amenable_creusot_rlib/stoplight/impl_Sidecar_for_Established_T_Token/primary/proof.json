@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_primary_Established_T_Token": {
+        "prover": "alt-ergo",
+        "time": 0.017
+      }
+    }
+  }
+}

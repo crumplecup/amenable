@@ -1,0 +1,6 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": { "vc_basis_Yellow": { "prover": "alt-ergo", "time": 0.01 } }
+  }
+}

@@ -1,0 +1,39 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 194 4 194 44 *)
+
+(* stoplight::Established<T, Token> *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 194 11 194 18
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 194 23 194 28
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 194 40 194 44
+
+use creusot.prelude.Any
+
+type t_T
+
+type t_Token
+
+type t_Established_T_Token = { primary: t_T; token: t_Token }
+
+predicate inv_T (_1: t_T)
+
+predicate inv_Token (_1: t_Token)
+
+predicate inv_Established_T_Token (_1: t_Established_T_Token)
+
+axiom inv_axiom [@rewrite]: forall x: t_Established_T_Token [inv_Established_T_Token x]. inv_Established_T_Token x
+    = (inv_T x.primary /\ inv_Token x.token)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec new_T [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 194 4 194 44] (primary'0: t_T)
+  (token'0: t_Token) (return (x: t_Established_T_Token)) =
+  {[@stop_split] [@expl:new_T requires] ([@stop_split] [@expl:new 'primary' type invariant] [%#sstoplight] inv_T primary'0)
+  /\ ([@stop_split] [@expl:new 'token' type invariant] [%#sstoplight'0] inv_Token token'0)}
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- { primary = primary'0; token = token'0 } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Established_T_Token = Any.any_l () | & primary'0: t_T = primary'0 | & token'0: t_Token = token'0 ])
+  [ return (result: t_Established_T_Token) ->
+  {[@stop_split] [@expl:new result type invariant] [%#sstoplight'1] inv_Established_T_Token result}
+    (! return {result}) ]

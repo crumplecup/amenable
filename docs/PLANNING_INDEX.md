@@ -144,6 +144,187 @@ impl where already gated by construction). See
 [PROVABLE_FROM_PLAN.md](PROVABLE_FROM_PLAN.md)'s Resolution section for
 the full site list.
 
+### Exchange Method Proof Derivation (Kani + Creusot First)
+
+**Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
+
+**Status:** 🔲 Steps 0, 1, and 2 all done and verified — Kani and
+Creusot, all three `stoplight.rs` edges, each carrying real,
+tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
+`Proved (110 files) ✔`) with a genuine injected-regression check per
+edge per backend, plus a real consistency test keeping the Creusot
+mirror honest against the real Kani source (Step 2, verified in both
+drift directions). The Creusot mirror genuinely implements the real
+`amenable_core` trait family, corrected from an over-flattened first
+version while starting Step 2. Kani and Creusot first, by deliberate
+sequencing — Verus
+support for
+`Exchange` remains a real goal, just not yet solvable the same way
+(Verus can't check an arbitrary compiled Rust body, only `verus! {}`-
+native code), so it gets its own plan once it has a real answer
+instead of a weak one bolted on
+here.
+
+**Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
+claim over a real method body, not a static structural fact — the
+derive-witness composition machinery's generic conjunction/case-split
+rule has no analog here, since correctness depends on the transition's
+actual logic. The one real `Exchange` impl in the tree
+(`amenable_kani::stoplight`) doesn't prove its own body: the Kani
+harness backing each transition's `Witness` proof calls a disconnected
+free function (`next()`) that's supposed to mirror the real `exchange()`
+logic, kept in sync only by a doc comment — the same hand-authored-
+claim-can-drift-from-source risk this session's `Ensures`/`Requires`
+macro work closed for descriptive text, one level more dangerous since
+what could drift here is executable logic. Real prior art exists in
+`~/repos/elicitation` (`#[formal_method]`/`#[derive(
+VerifiedStateMachine)]` plus the operational reference `KANI_FOR_VSMS.
+md`, all read directly before writing this plan, not summarized from
+memory): real `#[kani::requires]`/`#[kani::ensures]` on the actual
+transition body (never a call-through wrapper — that doubles CBMC's
+work under DFCC), checked via `#[kani::proof_for_contract]` using a
+forgive-and-forget construction, reusable via `stub_verified()` for
+modular composition; a real Creusot `requires`/`ensures` companion
+against the real body. Checking amenable's own source (not assuming
+from the elicitation read) found `KaniCompose` already ported,
+including the `kani_any()` method the forgive-and-forget pattern
+needs, with a genuinely different — not yet empirically confirmed
+equivalent — approach to symbolic enum construction than
+elicitation's; `KaniVariantState` was not ported, and per elicitation's
+own current-architecture notes is likely unnecessary since it only
+supports their now-legacy per-variant harness path. `amenable_core`'s
+own trait family (`Establish`/`ProofToken`/`Witness<V>`) is already
+stricter than elicitation's `Established`/`Prop` equivalents (no
+`assert()` escape hatch; no defaulted-empty/silently-trivial invariant
+naming), so this plan ports the *technique*, not the trait scaffolding,
+and keeps that extra strictness rather than loosening it for codegen
+convenience. Kani function contracts (`requires`/`ensures`/
+`proof_for_contract`/`stub_verified`) are entirely unused in this
+codebase today — this is the first real occupant of `Amenable::
+kani_surface()`/`creusot_surface()`, which exist in `amenable_core::
+state_machine` but have zero implementors anywhere in the tree.
+
+Design converged on a deeper fix during this discussion, now landed as
+Step 0: `Sidecar::Proposition: Evidence` alone can never guarantee a
+real proof exists, for any transition, because `Evidence` is
+deliberately verifier-blind. The fix that shipped is `Sidecar<V:
+Verifier>` with `Proposition: Evidence + Witness<V>` — a compound
+bound on the one trait that actually needs it, using the exact shape
+`Establish<C, V>: Evidence + Witness<V>` already used. `V` is a shared
+generic parameter (not an associated type: an associated type is only
+checked where a caller remembers an explicit equality bound, a shared
+parameter makes a verifier-mixing pipeline a plain type error
+everywhere). Also corrected along the way: an earlier read of
+`AMENABLE_PLAN.md`'s root-state discussion over-generalized "the light
+is currently Green is asserted, not derived" (a real claim about
+*runtime* state occupancy) into "root states are categorically
+unproven" (false) — root-ness and whether a *type's construction* has
+real invariant content are orthogonal axes; `Green`'s proof is trivial
+because its constructor is infallible, not because it's a root.
+Notably, the first fix attempted — adding `V` to `Evidence` itself as
+a supertrait (`Evidence<V>: Witness<V>`) — was fully built (including
+new macro machinery in `amenable_derive`) before `cargo check
+--workspace` showed it broke `amenable_std`'s generic provenance/
+audit-report writer, which has no relationship to any verifier's proof
+and shouldn't need one to compile. Reverted in full once that surfaced;
+`Sidecar<V>` doesn't have that cost, because it states the requirement
+only where it's needed. `stoplight.rs`'s three `Exchange` impls and one
+`Sidecar` impl were the only real migration; no `ProofToken` impl
+anywhere needed touching. `cargo check`/`test`/`clippy --all-targets
+--all-features -D warnings --workspace` all clean.
+
+Step 1's Kani side then landed for all three `stoplight.rs` edges, with
+a real, previously-undocumented Kani 0.67.0 limitation discovered
+along the way: contracts can't target a trait method when the trait
+itself is generic (`Exchange<Input, Output, V>` is) — a real compiler
+error, not a syntax mistake, confirmed by trying the direct approach
+first and getting "Kani does not currently support stubs or function
+contracts on generic functions in traits." Fix: real logic and its
+contract moved to plain inherent methods (`Stoplight::green_to_yellow`
+etc.), with each `Exchange::exchange` impl reduced to a single-
+expression delegation — the same body, not a proxy with different
+logic. Contract content is legitimately trivial (every state type here
+is zero-field with exactly one possible value, no body branches or can
+panic) — proving "never panics, always `Ok`" once the type system
+itself already enforces which transitions are legal. Verified for
+real three ways: all three harnesses pass under real `cargo kani`
+(`-Z function-contracts`, wired into a new `verify-kani-contract`
+justfile recipe); a deliberately injected `panic!` in one body made
+the same harness fail at the exact injected line, then verified clean
+again after reverting; an unrelated pre-existing Kani harness spot-
+checked to confirm nothing else regressed.
+
+The Creusot side landed too, after a real design detour: the obvious
+approach (`amenable_creusot` depends on whatever crate owns `Stoplight`)
+is a dead end no matter which crate that is — `amenable_std` and
+`amenable` both already optionally depend back on `amenable_creusot`
+(a direct cycle either way), and even a cycle-safe new crate would hand
+`creusot-rustc`'s translator ordinary Rust infrastructure it has
+already ICE'd on for real in this exact codebase (confirmed via
+`amenable_std::creusot_witness`'s own doc comment: it sweeps *every*
+local item in whatever crate it directly compiles, gated or not, and
+crashed on a return-position `impl Trait` and an `inventory::submit!`
+static). Resolution: reuse the accommodation-model pattern already
+proven on the Kani side — `amenable_creusot/src/stoplight.rs` defines
+sanitized, locally-owned mirror types (no Cargo dependency on the real
+ones at all) plus one real contract function per edge, now covering
+all three (`green_to_yellow`, `yellow_to_red`, `red_to_green`).
+Verified for real: `cargo creusot prove -- -p amenable_creusot`
+succeeds; an injected `panic!()` in each of the three functions in
+turn made the exact same run fail at that function's own goal (`Goal
+Coma.vc_green_to_yellow: ✘`, `::vc_yellow_to_red: ✘`, `::
+vc_red_to_green: ✘`), confirming every contract is real, not vacuous;
+each reverted and re-verified clean.
+
+Then, while starting Step 2 (deriving the contract from real source
+instead of hand-typing it), a real correction: the mirror's own doc
+comment claimed it couldn't use *any* `amenable_core` trait-family
+machinery, conflating "can't depend on `amenable_kani`/`amenable_std`"
+(true) with "can't use `amenable_core`'s traits" (false) —
+`amenable_creusot` already has a real, unconditional dependency on
+`amenable_core`, and none of `Evidence`/`Witness<V>`/`Sidecar<V>`/
+`Establish<C, V>` contain the specific patterns that caused the real
+ICEs (those were `Provenance`'s `Box<dyn Iterator>` and `inventory::
+submit!`, not the trait family itself). Rebuilt the mirror to
+genuinely implement the real traits — a real generic `Established<T,
+Token>: Sidecar<CreusotVerifier>`, real `Establish<_, CreusotVerifier>`
+impls — so the exchange bodies now use the same call shape as the real
+Kani bodies (`Yellow::establish(input.sidecar())`), differing only in
+which concrete types they close over. Re-verified the full cycle
+afterward: `cargo creusot prove` still succeeds (`Proved (110 files)
+✔`, more proof obligations than before since the trait methods
+themselves now get checked too), all three edges still fail their own
+regression check when broken, and full workspace `check`/`test`/
+`clippy --all-features -D warnings`/`fmt` and `just check-all-creusot`
+all clean afterward. Step 1 is complete for both backends, all three
+edges.
+
+Step 2 landed too, but not as originally framed. The plan's original
+text described a `syn`-based generator deriving the Creusot mirror
+body from the real Kani source; once both bodies existed side by side
+it became clear that framing was ill-defined — the real body
+(`Result`-returning, `&self`-taking) and the mirror body (bare return,
+free function) necessarily differ by one specific transform (stripping
+the real body's trailing `Ok(...)` wrapper), not a literal token
+substitution, so "derive B from A" isn't well-defined the way Verus's
+verbatim predicate-text extraction is. What got built instead:
+`amenable_creusot/tests/stoplight_mirror_consistency_test.rs`, a real
+consistency check — reads `amenable_kani/src/stoplight.rs` directly
+off disk (`fs::read_to_string`, no Cargo dependency, same constraint
+as the mirror itself), parses both the real body and the mirror's own
+already-exported `harness!`-captured source constants with `syn`,
+applies the one documented `Ok(...)`-unwrap transform, and asserts
+token-stream equality — three tests, one per edge, all passing.
+Verified as real (not vacuous) by injecting drift on both the mirror
+side and the real Kani side separately and confirming a precise
+failure each time, then reverting both. Full re-verification after
+landing: `cargo fmt --all --check`, `cargo check --workspace`, `cargo
+clippy --workspace --all-targets --all-features -- -D warnings`, and
+`cargo test --workspace` (61/61, up from 60) all clean; `just
+verify-creusot` still `Proved (110 files) ✔`, confirming the new
+test-only `syn`/`quote`/`proc-macro2` dev-dependencies don't disturb
+the real Creusot toolchain invocation. Step 2 is complete.
+
 ### Kani Filesystem Accommodation Model
 
 **Document:** [KANI_FILESYSTEM_MODEL_PLAN.md](KANI_FILESYSTEM_MODEL_PLAN.md)

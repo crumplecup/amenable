@@ -11,6 +11,23 @@
 /// a given instance, and does depend on it. Evidence says nothing about
 /// verifier backends or how proofs get derived; consuming a chain of
 /// evidence to produce a backend-specific proof is `Witness`'s job.
+///
+/// Deliberately verifier-agnostic, not an oversight: plenty of legitimate
+/// `Evidence` use has nothing to do with any specific backend's proof (a
+/// generic provenance/audit report over an arbitrary `Standard`, for
+/// instance) and must not be forced to name one just to compile. Where a
+/// real proof genuinely is required — a value flowing through a `Sidecar`,
+/// carried across a proof-bearing `Exchange` — that requirement is stated
+/// explicitly there as a compound `Evidence + Witness<V>` bound, the same
+/// pattern `Establish<C, V>: Evidence + Witness<V>` already used before
+/// this trait was touched. An earlier version of this trait added `V:
+/// Verifier` directly to `Evidence` itself as a supertrait bound
+/// (`Evidence<V>: Witness<V>`); that broke every legitimately
+/// verifier-agnostic use of `Evidence` in the tree (concretely:
+/// `amenable_std::write_rust_std_certificate_artifacts`'s generic
+/// provenance-dump helper, which never asks "is this proven," only "what
+/// does this claim to be") and was reverted in favor of this narrower,
+/// call-site-specific bound.
 pub trait Evidence {
     /// The prior link this evidence was built on top of.
     type Basis: Evidence;
