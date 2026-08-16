@@ -1084,11 +1084,11 @@ and all three edges' DFCC postconditions routed through registered
 Nothing further is queued — extending this pattern to more `Exchange`
 edges beyond `Stoplight`; building the Step 3 macro out into a full
 attribute-driven pipeline for arbitrary transitions (now including
-Step 6's `kani_ensures!`-wiring pattern); wiring `Requires<
-KaniVerifier>` for a real (non-trivial) precondition once one exists;
-or applying the same `Ensures`/`Requires`-as-source-of-truth pattern
-to the Verus side (`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
-`gallery::stoplight_exchange` still states its `ensures` clauses
-inline) are all real future directions, but none should be started
-without explicit new direction, matching this plan's pacing
-throughout.
+Step 6's `kani_ensures!`-wiring pattern, and its Verus counterpart —
+see `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 5, which
+landed the identical `Ensures<V>`-contract-routing pattern for
+`gallery::stoplight_exchange` via `#[verifier::when_used_as_spec]`);
+or wiring `Requires<KaniVerifier>` for a real (non-trivial)
+precondition once one exists are all real future directions, but none
+should be started without explicit new direction, matching this
+plan's pacing throughout.

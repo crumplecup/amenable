@@ -9,7 +9,7 @@
 //! test suite's same-name/same-module cases are).
 //!
 //! **Disposition: best practice, confirmed.** **Expected/actual
-//! outcome: passes, for real -- `385 verified, 0 errors`.**
+//! outcome: passes, for real -- `395 verified, 0 errors`.**
 //!
 //! ## A real, new finding: no Kani-style workaround needed
 //!
@@ -27,15 +27,39 @@
 //! function syntax, so this isn't surprising in hindsight, but it was
 //! checked rather than presumed.
 //!
+//! ## The `ensures(...)` clauses route through registered `Ensures` impls
+//!
+//! Each edge's postcondition used to restate `result.is_ok()` inline,
+//! the same hand-authored-claim-can-drift shape `EXCHANGE_PROOF_
+//! DERIVATION_PLAN.md`'s Step 6 closed for Kani. Closed here the same
+//! way: `Yellow`/`Red`/`Green` each carry a real `impl Ensures<
+//! GalleryVerifier>` whose `ensures()` is the single source of truth,
+//! and the `ensures(...)` clause below calls through it (`Yellow::
+//! ensures(result)`, etc.) instead of restating the bound. This works
+//! for Verus via `#[verifier::when_used_as_spec]` -- a genuine
+//! discovery, not assumed: `amenable_core::contract`'s own doc comment
+//! anticipated Verus needing the weaker `Bound = &'static str`
+//! (description text, not a checked value) since its bound "can only be
+//! expressed in its own non-Rust spec syntax." That's not the case here
+//! -- `Bound = bool` works, matching Kani's own shape, because each
+//! `Ensures` impl pairs its real exec `ensures()` body with a private
+//! `spec fn` companion of identical logic, and `when_used_as_spec`
+//! transparently substitutes the spec version wherever the exec version
+//! is referenced from spec position (the exact mechanism `vstd::
+//! std_specs::result::is_ok` uses for `Result::is_ok()` itself -- see
+//! `gallery::ensures_contract_bound` for the isolated case that found
+//! and confirmed this, including the real rejection ("cannot call
+//! function with mode exec") when the bridge is missing).
+//!
 //! ## Verified non-vacuous
 //!
 //! A real bug (`Err(())` swapped in for the `Green -> Yellow` edge's
 //! real `Ok(..)` body) produced a real, precise failure --
 //! `error: postcondition not satisfied`, pointing at the exact
-//! `result.is_ok()` clause and the exact `Err(())` return that violates
-//! it -- confirming the `ensures` clause is a real, checked claim on
-//! this exact body, not a vacuous pass. Reverted and re-verified clean
-//! afterward.
+//! `Yellow::ensures(result)` clause and the exact `Err(())` return that
+//! violates it -- confirming the `ensures` clause is a real, checked
+//! claim on this exact body, not a vacuous pass. Reverted and
+//! re-verified clean afterward.
 //!
 //! `full_cycle` chains all three real `Exchange::exchange` calls
 //! together (not a hand-rolled shortcut using the underlying `establish`
@@ -49,7 +73,7 @@ use vstd::prelude::*;
 // `exchange_support`'s `external_trait_specification`s apply crate-wide
 // once compiled in, via `lib.rs`'s own `pub mod exchange_support;` --
 // no explicit import needed here for Verus to pick them up.
-use crate::{Establish, Evidence, Exchange, ProofToken, Sidecar, Verifier, Witness};
+use crate::{Ensures, Establish, Evidence, Exchange, ProofToken, Sidecar, Verifier, Witness};
 
 verus! {
 
@@ -228,6 +252,41 @@ pub struct Stoplight;
 /// is) -- a completely different mechanism (Kani's contracts are a
 /// separate DFCC-checked attribute; Verus's `ensures` is ordinary
 /// function syntax), so the answer isn't assumed to carry over.
+/// Pure companion to `Yellow`'s `Ensures::ensures()` below -- see
+/// `gallery::ensures_contract_bound`'s own doc comment for the real
+/// mechanism (`#[verifier::when_used_as_spec]`) and the confirmed,
+/// non-vacuous check that this bridge is load-bearing, not incidental.
+pub open spec fn yellow_ensures_spec(result: Result<Established<Yellow, YellowToken>, ()>) -> bool {
+    result.is_ok()
+}
+
+/// The contract type carries the bound; the `ensures(...)` clause below
+/// calls through it rather than restating it -- the same single-source-
+/// of-truth pattern `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 6 wires
+/// up for Kani (`kani_ensures!`), confirmed to also work for Verus (not
+/// merely `Bound = &'static str` description text, contrary to
+/// `amenable_core::contract`'s own doc comment at the time it was
+/// written -- see `gallery::ensures_contract_bound` for where that was
+/// checked, not assumed).
+impl Ensures<GalleryVerifier> for Yellow {
+    type Input = Result<Established<Yellow, YellowToken>, ()>;
+    type Bound = bool;
+
+    #[verifier::when_used_as_spec(yellow_ensures_spec)]
+    fn ensures(result: Result<Established<Yellow, YellowToken>, ()>) -> bool {
+        result.is_ok()
+    }
+}
+
+/// The first, load-bearing question this case exists to answer: can
+/// Verus place a real `ensures` clause directly on `impl Exchange<..>
+/// for Stoplight`'s own `exchange` method, or does it need the same
+/// "move to a plain inherent method" workaround Kani 0.67.0 required
+/// (Kani can't place `#[kani::proof_for_contract]` on a trait method
+/// when the trait itself is generic, and `Exchange<Input, Output, V>`
+/// is) -- a completely different mechanism (Kani's contracts are a
+/// separate DFCC-checked attribute; Verus's `ensures` is ordinary
+/// function syntax), so the answer isn't assumed to carry over.
 impl Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>, GalleryVerifier>
     for Stoplight
 {
@@ -235,10 +294,25 @@ impl Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>, 
 
     fn exchange(&self, input: Established<Green, GreenToken>) -> (result: Result<Established<Yellow, YellowToken>, ()>)
         ensures
-            result.is_ok(),
+            Yellow::ensures(result),
     {
         let token = Yellow::establish(input.sidecar());
         Ok(Established::new(Yellow, token))
+    }
+}
+
+/// See `Yellow::yellow_ensures_spec`/`Ensures` above for the pattern.
+pub open spec fn red_ensures_spec(result: Result<Established<Red, RedToken>, ()>) -> bool {
+    result.is_ok()
+}
+
+impl Ensures<GalleryVerifier> for Red {
+    type Input = Result<Established<Red, RedToken>, ()>;
+    type Bound = bool;
+
+    #[verifier::when_used_as_spec(red_ensures_spec)]
+    fn ensures(result: Result<Established<Red, RedToken>, ()>) -> bool {
+        result.is_ok()
     }
 }
 
@@ -249,10 +323,27 @@ impl Exchange<Established<Yellow, YellowToken>, Established<Red, RedToken>, Gall
 
     fn exchange(&self, input: Established<Yellow, YellowToken>) -> (result: Result<Established<Red, RedToken>, ()>)
         ensures
-            result.is_ok(),
+            Red::ensures(result),
     {
         let token = Red::establish(input.sidecar());
         Ok(Established::new(Red, token))
+    }
+}
+
+/// See `Yellow::yellow_ensures_spec`/`Ensures` above for the pattern.
+/// Backs the cycle-back edge, same as `Green`'s `Witness<GalleryVerifier>`
+/// impl above.
+pub open spec fn green_ensures_spec(result: Result<Established<Green, GreenToken>, ()>) -> bool {
+    result.is_ok()
+}
+
+impl Ensures<GalleryVerifier> for Green {
+    type Input = Result<Established<Green, GreenToken>, ()>;
+    type Bound = bool;
+
+    #[verifier::when_used_as_spec(green_ensures_spec)]
+    fn ensures(result: Result<Established<Green, GreenToken>, ()>) -> bool {
+        result.is_ok()
     }
 }
 
@@ -263,7 +354,7 @@ impl Exchange<Established<Red, RedToken>, Established<Green, GreenToken>, Galler
 
     fn exchange(&self, input: Established<Red, RedToken>) -> (result: Result<Established<Green, GreenToken>, ()>)
         ensures
-            result.is_ok(),
+            Green::ensures(result),
     {
         let token = Green::establish(input.sidecar());
         Ok(Established::new(Green, token))

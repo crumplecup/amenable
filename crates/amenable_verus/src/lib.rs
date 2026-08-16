@@ -57,6 +57,8 @@ mod witness_accommodation;
 // own.
 #[path = "../../amenable_core/src/cert.rs"]
 mod amenable_core_cert;
+#[path = "../../amenable_core/src/contract.rs"]
+mod amenable_core_contract;
 #[path = "../../amenable_core/src/evidence.rs"]
 mod amenable_core_evidence;
 #[path = "../../amenable_core/src/exchange.rs"]
@@ -69,6 +71,7 @@ mod amenable_core_roles;
 mod amenable_core_verifier;
 
 pub use amenable_core_cert::{Certificate, Registry, RegistryReport};
+pub use amenable_core_contract::{Ensures, Requires};
 pub use amenable_core_evidence::Evidence;
 pub use amenable_core_exchange::{Establish, Exchange, ProofToken, Sidecar};
 pub use amenable_core_provenance::{

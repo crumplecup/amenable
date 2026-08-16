@@ -463,13 +463,16 @@ both configurations, `cargo test --workspace` 62/62 (up from 61). Step
 
 **Document:** [VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md](VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ Steps 0 through 4 done and verified — the real, unmodified
+**Status:** ✅ Steps 0 through 5 done and verified — the real, unmodified
 `amenable_core` trait family (`Evidence` including a genuine
 self-referential root, `Witness<V>`, `ProofToken`, `Sidecar<V>`,
-`Establish<C, V>`, `Exchange<Input, Output, V>`) compiles and verifies
-under real Verus via `#[path]` mod-inclusion, with the complete
-`Stoplight` three-edge cycle proven as a worked example: `verus
---crate-type=lib` reports `385 verified, 0 errors`. Closes the Verus
+`Establish<C, V>`, `Exchange<Input, Output, V>`, and now `Ensures<V>`)
+compiles and verifies under real Verus via `#[path]` mod-inclusion,
+with the complete `Stoplight` three-edge cycle proven as a worked
+example, its `ensures(...)` clauses routed through registered
+`Ensures<GalleryVerifier>` contract types rather than restated inline:
+`verus --crate-type=lib` reports `395 verified, 0 errors`. Closes the
+Verus
 deferral `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own "Scope" section
 left explicitly open, via a third option neither that section nor
 elicitation's own real Verus prior art (`VERUS_FOR_VSMS.md`'s "V13"
@@ -525,10 +528,40 @@ producing a precise `postcondition not satisfied` failure at the exact
 line, reverted and re-verified clean; `full_cycle` chains all three real
 `Exchange::exchange` calls together, matching the real `Stoplight`'s own
 cycle. Full workspace `fmt`/`check`/`clippy --all-features -D
-warnings`/`test` clean throughout (62/62), `just check-all-verus` clean,
-`just verify-creusot` unaffected (`Proved (110 files) ✔`). Landed in two
-commits: `ce77446` (the two trait-family fixes plus gallery
-infrastructure) and `5eb3566` (the full `Stoplight` cycle).
+warnings`/`test` clean throughout, `just check-all-verus` clean,
+`just verify-creusot` unaffected (`Proved (110 files) ✔`). Landed in
+three commits: `ce77446` (the two trait-family fixes plus gallery
+infrastructure), `5eb3566` (the full `Stoplight` cycle), and Step 5.
+
+Step 5, tackled by explicit direction ("let's tackle 2 before 3" —
+Verus contract-routing before extending the pattern into a macro
+layer): `amenable_core::contract` (`Ensures<V>`, `Requires<V>`) mod-
+included for the first time, closing the same gap `EXCHANGE_PROOF_
+DERIVATION_PLAN.md`'s own Step 6 closed for Kani. A real finding,
+checked rather than assumed: `contract.rs`'s own doc comment predicted
+Verus would need the weaker `Bound = &'static str` shape (description
+text, not a checked value), since Kani's `Bound = bool`/`ensures()`
+-*is*-the-check pattern seemingly can't cross the exec/spec boundary.
+That's only true for bounds needing genuinely spec-only constructs —
+`Bound = bool` works for Verus too, via `#[verifier::
+when_used_as_spec]`: each `Ensures<GalleryVerifier>` impl pairs a real
+exec `ensures()` body with a private `spec fn` companion of identical
+logic, the same mechanism `vstd::std_specs::result::is_ok` itself uses
+to make `Result::is_ok()` usable from spec position. Isolated first in
+a dedicated gallery case (`gallery::ensures_contract_bound`) before
+touching the real `Stoplight` cycle. Two real sub-fixes needed: the
+`when_used_as_spec` attribute has to live on the *impl*, not the trait
+declaration (the trait can't carry Verus attributes at all, having no
+dependency on `verus_builtin_macros`) — confirmed legal per-impl via
+Verus's own test suite and confirmed load-bearing by removing it and
+getting a real "cannot call function ... with mode exec" rejection;
+and the spec companion needs at least the same visibility as the exec
+method it bridges, or a real "more private" rejection follows. Verified
+non-vacuous the same way as every other case (a real injected bug
+producing a precise `postcondition not satisfied` failure, reverted).
+`amenable_core::contract`'s own doc comment updated to describe both
+shapes accurately instead of only the Kani case it was originally
+written against.
 
 ### Kani Filesystem Accommodation Model
 

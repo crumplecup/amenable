@@ -5,15 +5,19 @@
 Done and verified: the real, unmodified `amenable_core` trait family —
 `Evidence` (including a genuine self-referential root), `Witness<V>`,
 `ProofToken`, `Sidecar<V>`, `Establish<C, V>`, `Exchange<Input, Output,
-V>` — compiles and verifies under real Verus, with the complete
-`Stoplight` three-edge cycle (`Green -> Yellow -> Red -> Green`) proven
-as a worked example: `verus --crate-type=lib crates/amenable_verus/src/
-lib.rs` reports `385 verified, 0 errors`. Landed in two commits:
-`ce77446` (the two real trait-family fixes plus the permanent gallery
-infrastructure) and `5eb3566` (the full `Stoplight` cycle extension).
-Full workspace `fmt`/`check`/`clippy --all-features -D warnings`/`test`
-clean throughout (62/62), `just check-all-verus` clean, `just
-verify-creusot` unaffected (`Proved (110 files) ✔`).
+V>`, and (Step 5) `Ensures<V>` — compiles and verifies under real
+Verus, with the complete `Stoplight` three-edge cycle (`Green -> Yellow
+-> Red -> Green`) proven as a worked example, its `ensures(...)`
+clauses now routed through registered `Ensures<GalleryVerifier>`
+contract types rather than restated inline: `verus --crate-type=lib
+crates/amenable_verus/src/lib.rs` reports `395 verified, 0 errors`.
+Landed in three commits: `ce77446` (the two real trait-family fixes
+plus the permanent gallery infrastructure), `5eb3566` (the full
+`Stoplight` cycle extension), and Step 5 (contract-bound `ensures`,
+this doc's own most recent update). Full workspace `fmt`/`check`/
+`clippy --all-features -D warnings`/`test` clean throughout, `just
+check-all-verus` clean, `just verify-creusot` unaffected (`Proved (110
+files) ✔`).
 
 This closes `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own "Scope" section,
 which explicitly deferred Verus support rather than bolt a weak answer
@@ -277,6 +281,93 @@ directly), matching the real `Stoplight`'s own full cycle, and also
 verifies clean (`385 verified, 0 errors` for the whole crate with this
 case included).
 
+### Step 5 — route `ensures(...)` clauses through registered `Ensures<V>` impls — done
+
+`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 6 closed this gap for
+Kani (each `Stoplight` edge's DFCC postcondition now calls through a
+`kani_ensures!`-registered `Ensures<KaniVerifier>` impl rather than
+restating the bound inline); this step closes the identical gap for
+Verus, tackled second and deliberately after the Kani side per
+explicit direction — "let's tackle 2 before 3," where 2 was this step
+and 3 was extending the same pattern into `#[amenable_derive::
+exchange]` itself (not yet started, either side).
+
+`amenable_core::contract` — `Ensures<V>: Witness<V>` and `Requires<V>:
+Witness<V>`, previously never mod-included into `amenable_verus` at
+all — is now a seventh `#[path]`-included file (`lib.rs`), re-exported
+as `Ensures`/`Requires`. Compiles clean immediately (`385 verified, 0
+errors`, unchanged count): no cyclic-self-reference or `ProofToken`-
+style AIR-backend issue, since `Ensures<V>`/`Requires<V>` have no
+default methods and their `Input`/`Bound` associated types are
+unconstrained.
+
+**The real finding, checked before being assumed:** `amenable_core::
+contract`'s own doc comment (written when only Kani had a real impl)
+predicted Verus would need the weaker `Bound = &'static str`/`Input =
+()` shape — a *description* of the bound for audit purposes, not a
+checked value, since "a backend whose bound can only be expressed in
+its own non-Rust spec syntax" can't run Kani's `Bound = bool`/`ensures()`
+*is*-the-check pattern directly. That turned out to be true only for
+bounds needing genuinely spec-only constructs (Verus's `int`/`Seq`/
+`Map`) — not for this case. `Bound = bool` works for Verus too, via
+`#[verifier::when_used_as_spec]`: each `Ensures<GalleryVerifier>` impl
+pairs its real, callable exec `ensures()` body with a private `spec fn`
+companion of identical logic, and Verus transparently substitutes the
+spec version wherever the exec version is referenced from spec
+position (an `ensures(...)` clause) — the exact mechanism `vstd::
+std_specs::result::is_ok` itself uses to make `Result::is_ok()` usable
+from spec position at all, confirmed by reading `~/repos/verus/source/
+vstd/std_specs/result.rs` directly rather than assumed. Isolated first
+in a dedicated gallery case (`gallery::ensures_contract_bound`, `392
+verified, 0 errors`) before touching the real `Stoplight` cycle,
+matching this whole lineage's "small isolated case first" discipline.
+
+Two real sub-fixes needed along the way, both confirmed via the actual
+rejection text, not guessed:
+
+1. **The `when_used_as_spec` attribute has to live on the impl, not the
+   trait declaration.** `Ensures<V>::ensures()` is declared as a plain,
+   unattributed `fn` in `amenable_core::contract` — it has to be, since
+   that crate has no dependency on `verus_builtin_macros` and can't
+   write Verus-only syntax at all, even behind a `#[cfg(verus_keep_ghost)]`
+   branch (unlike `Evidence`'s Step 1 dual-declaration fix, "spec fn"
+   isn't valid token soup plain `rustc` can parse and then discard —
+   it's not wrapped in a macro invocation that would swallow it
+   opaquely). Confirmed legal per-impl by Verus's own test suite
+   (`rust_verify_test/tests/when_used_as_spec.rs`'s `test_traits` case:
+   different impls of the same trait attach `when_used_as_spec` to
+   different spec targets), and confirmed load-bearing here directly:
+   removing the attribute from the impl produces a real, immediate
+   rejection ("cannot call function ... with mode exec").
+2. **The spec companion needs at least the same visibility as the exec
+   method it bridges.** A private `spec fn` companion for a `pub` trait
+   method produced a real rejection ("when_used_as_spec refers to
+   function which is more private") — fixed with `pub open spec fn`.
+
+**Verified non-vacuous**, same discipline as every other case: a real
+bug (`Err(())` swapped in for the `Green -> Yellow` edge's real `Ok(..)`
+body, and separately, `result.is_err()` swapped into the isolated
+gallery case's own spec companion) each produced a real, precise
+`postcondition not satisfied` failure pointing at the exact `Yellow::
+ensures(result)`/`EnsuresGreen::ensures(..)` clause, not a silent pass
+— reverted and re-verified clean both times. Also confirmed a real,
+separate clippy lint this case's own probe tripped and fixed properly
+rather than suppressed: a bare `pub fn` returning `Result<_, ()>` hits
+`clippy::result_unit_err` (a real trait-impl method like `Exchange::
+exchange` is exempt, since the trait dictates its signature; a free
+function isn't) — fixed by having the probe return the bare success
+type and wrap it in `Ok(..)` inside the `ensures(...)` clause itself,
+not by adding `#[allow]`.
+
+Full workspace `fmt --check`/`check`/`clippy --all-targets
+--all-features -D warnings` clean, `cargo test -p amenable_verus`
+clean, `just verify-verus`/`just check-all-verus` both clean, `just
+verify-creusot` unaffected. `amenable_core::contract`'s own doc comment
+updated to describe both shapes accurately (`Bound = bool` via
+`when_used_as_spec` when the predicate is exec-representable; `Bound =
+&'static str` only once no exec mirror of the predicate exists at all)
+rather than left describing only the Kani case it was written against.
+
 ## Open questions
 
 - **Every claim proven so far is legitimately trivial** (`result.
@@ -286,7 +377,9 @@ case included).
   Step 1 documents for the Kani side. A genuinely non-trivial `ensures`
   (real branching, a real property to preserve) hasn't been exercised
   under this design yet — real next step, not started without explicit
-  direction.
+  direction. Step 5's contract-routing doesn't change this: the *bound*
+  now has one source of truth instead of being restated inline, but its
+  *content* is exactly as trivial as before.
 - **The "external trait as a bound" warning is closed only for the
   four traits given specifications so far** (`Verifier`, `Evidence`,
   `ProofToken`, `Witness`). Any new trait used as a Verus-side generic
@@ -342,14 +435,25 @@ case included).
 - **`#[path]` mod-inclusion works for bringing real, unmodified,
   dependency-free source into Verus's single-file-tree compilation**,
   with no Cargo dependency and no cross-crate `--extern` resolution
-  needed — confirmed real and load-bearing (`385 verified, 0 errors`
+  needed — confirmed real and load-bearing (`395 verified, 0 errors`
   for the full real trait family plus a full worked example), not
   merely "it happens to parse."
+- **A trait method declared outside `verus! {}` can still be bridged to
+  a real spec-mode companion via `#[verifier::when_used_as_spec]`
+  attached at the *impl* site**, even though the trait declaration
+  itself can carry no Verus attribute at all (no dependency on
+  `verus_builtin_macros`) — the exec method stays real, callable code
+  for ordinary callers; Verus substitutes the spec companion only when
+  the call appears in spec position. The companion must be at least as
+  visible as the method it bridges, or a real "more private" rejection
+  follows.
 
 ## Next step
 
-Steps 0 through 4 are complete. The natural next step is exercising
-this foundation with a genuinely non-trivial `ensures`/`requires`
-clause (real branching, a real property to preserve, not `result.
-is_ok()`) — not started without explicit direction, matching this
-lineage's own pacing throughout.
+Steps 0 through 5 are complete. Two real next steps, neither started
+without explicit direction: exercising this foundation with a
+genuinely non-trivial `ensures`/`requires` clause (real branching, a
+real property to preserve, not `result.is_ok()`); and extending the
+same `Ensures<V>`-contract-routing pattern into a macro layer (this
+lineage's Non-goals section already defers all codegen), the natural
+"3" after this step's "2" in the user's own stated ordering.
