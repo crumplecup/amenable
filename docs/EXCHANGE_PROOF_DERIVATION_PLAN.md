@@ -52,7 +52,11 @@ anywhere in the tree, every method backed by real queried/referenced
 data rather than a hand-typed list — including a new, real, feature-
 gated Cargo dependency (`amenable_kani`'s own `creusot` feature) added
 specifically so `creusot_surface()` isn't a drift-prone hand-typed name
-list — see Step 5 below.
+list — see Step 5 below. Step 6 is also complete: all three edges'
+DFCC `#[kani::ensures(...)]` closures now call through real,
+registered `Ensures<KaniVerifier>` impls (`kani_ensures!`) instead of
+restating the boolean inline, closing the same hand-authored-claim-
+can-drift gap one level deeper than Step 3 did — see Step 6 below.
 
 ## Motivation
 
@@ -826,9 +830,15 @@ invented) or references real, compiler-checked items:
   builds of `amenable_kani`, never in `cargo creusot -p amenable_creusot`
   itself. `amenable`'s own `creusot` feature updated to also enable
   `amenable_kani/creusot`, so the facade gets real end-to-end data.
-- `verus_surface()` returns `Vec::new()` — honest, not aspirational: no
-  Verus `Exchange` proof exists for `Stoplight` (Verus is deliberately
-  out of scope for this plan; see Motivation).
+- `verus_surface()` returned `Vec::new()` at the time Step 5 landed —
+  honest, not aspirational: no Verus `Exchange` proof existed for
+  `Stoplight` yet (Verus was out of scope for this plan at the time;
+  see Motivation). **Superseded by Step 6/`VERUS_EXCHANGE_PROOF_
+  DERIVATION_PLAN.md`**: a real Verus proof of this same cycle now
+  exists (`amenable_verus::gallery::stoplight_exchange`), but in a
+  separate crate with no `inventory`-backed registry yet, so
+  `verus_surface()` still returns `Vec::new()` — still honest, just for
+  a different reason now (nothing to query, not nothing to report).
 - `audit_surface()` returns the real `harness!`-captured verbatim
   source of all four Kani harnesses (the three edges plus the Step 4
   composition harness) — literal source, not identifiers, the same
@@ -847,6 +857,66 @@ workspace `fmt --check`/`check`/`clippy --all-targets --all-features -D
 warnings` clean under both configurations, `cargo test --workspace`
 62/62 (up from 61 — the new test binary), `just verify-creusot` still
 `Proved (110 files) ✔`. Step 5 is complete.
+
+### Step 6 — route DFCC `ensures` closures through registered `Ensures<KaniVerifier>` impls — done
+
+Not part of the plan's original five steps — added after the fact,
+prompted by the same source-of-truth discipline `rust_std`'s own
+proofs already apply everywhere else in the tree (`kani_ensures!`/
+`kani_requires!`, dozens of real call sites) but that this plan's own
+Step 1 never retrofitted onto the three `Stoplight` edges it created:
+each `#[kani::ensures(...)]` closure restated its claim inline
+(`|result: &Result<..>| result.is_ok()`) instead of calling through a
+registered contract type the way every other proof in this codebase
+does. That's the same hand-authored-claim-can-drift risk the
+Motivation section already names for `next()` vs. `exchange()`, just
+recurring one level deeper — this time in the contract's own content,
+not the surrounding registration/delegation machinery Step 3 already
+closed.
+
+Fixed by wiring all three edges' postconditions through real, `kani_
+ensures!`-registered `Ensures<KaniVerifier>` impls (`Yellow::ensures`,
+`Red::ensures`, `Green::ensures`, one per edge, each with its own
+`ContractRecord` evidence-string literal — `Green`'s cycle-back edge
+keeps the existing `::cycle_back` suffix convention so it stays
+distinct from any future root-case registration). Each DFCC closure
+now reads `|result: &Result<..>| Yellow::ensures(*result)` (etc.)
+instead of restating the boolean. `Established<T, Token>` gained
+`#[derive(Clone, Copy)]` so the closure's `&Result<..>` can be
+dereferenced into the owned `Ensures::Input` these contract types take.
+
+The `Ensures` import needed its own `#[cfg(kani)] use amenable_core::
+Ensures;` line, not a plain unconditional one (mirroring the existing
+convention already in `primitives.rs`) — the same "compiles clean
+under plain `cargo check` doesn't mean the real path was checked"
+lesson `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md` hit independently:
+the whole `#[kani::ensures(...)]` closure body is inert under ordinary
+compilation, so an unconditional import looked unused there and only
+surfaced as a real `E0599` under actual `cargo kani`.
+
+**Verified for real**: `cargo kani` re-verified all three edges
+individually (`VERIFICATION:- SUCCESSFUL` each) plus the Step 4
+`stub_verified` composition harness (0 of 49 failed). A real,
+non-vacuous regression check on `green_to_yellow` (swapped `is_ok()`
+for `is_err()` inside the `kani_ensures!` invocation) produced a
+precise failure pointing at the exact `Yellow::ensures(*result)` call
+site, then reverted and re-verified clean. Full workspace `fmt
+--check`/`check`/`clippy --all-targets --all-features -D warnings`
+clean, `cargo test --workspace` 62/62 unaffected,
+`stoplight_mirror_consistency_test` still 3/3 (confirms Step 2 is
+unaffected — it only compares the method body, not the surrounding
+attribute), `stoplight_amenable_test` still 6/6, `just verify-creusot`
+still `Proved (110 files) ✔`. Step 6 is complete.
+
+Left for future direction, not started here: the `Input`/`Output`
+sidecar's `Requires<KaniVerifier>` (precondition) side — the current
+edges have no real precondition beyond type-safety (each `Input` is
+already a proven `Sidecar`), so there was nothing non-trivial to wire;
+and generating this `kani_ensures!`/closure-through-contract pattern
+from `#[amenable_derive::exchange(..)]` itself, rather than hand-
+written per edge — deliberately not done here, matching this plan's
+"one real example by hand first, generalize later" discipline used at
+every other step.
 
 ## Open questions
 
@@ -1001,17 +1071,24 @@ concluding something in Step 1+ is a novel problem:
 
 ## Next step
 
-Steps 0 through 5 — every step this plan originally scoped — are now
-complete: the `Sidecar<V>` trait-family fix; real Kani and Creusot
-bodies for all three `Stoplight` edges; a real consistency test
-keeping the Creusot mirror honest against the real Kani source; the
-by-hand Kani-side pattern generalized into `#[amenable_derive::
-exchange(..)]`; all three edges composed into one full-cycle
-`#[kani::stub_verified]` harness; and `Stoplight`'s real `Amenable`
-impl, the first anywhere in the tree. Nothing further is queued —
-extending this pattern to more `Exchange` edges beyond `Stoplight`,
-building the Step 3 macro out into a full attribute-driven pipeline for
-arbitrary transitions, or picking up the Verus follow-up plan this
-plan's own Motivation section deferred are all real future directions,
-but none should be started without explicit new direction, matching
-this plan's pacing throughout.
+Steps 0 through 5 — every step this plan originally scoped — plus
+Step 6 (added after the fact) are now complete: the `Sidecar<V>`
+trait-family fix; real Kani and Creusot bodies for all three
+`Stoplight` edges; a real consistency test keeping the Creusot mirror
+honest against the real Kani source; the by-hand Kani-side pattern
+generalized into `#[amenable_derive::exchange(..)]`; all three edges
+composed into one full-cycle `#[kani::stub_verified]` harness;
+`Stoplight`'s real `Amenable` impl, the first anywhere in the tree;
+and all three edges' DFCC postconditions routed through registered
+`Ensures<KaniVerifier>` contract types instead of restated inline.
+Nothing further is queued — extending this pattern to more `Exchange`
+edges beyond `Stoplight`; building the Step 3 macro out into a full
+attribute-driven pipeline for arbitrary transitions (now including
+Step 6's `kani_ensures!`-wiring pattern); wiring `Requires<
+KaniVerifier>` for a real (non-trivial) precondition once one exists;
+or applying the same `Ensures`/`Requires`-as-source-of-truth pattern
+to the Verus side (`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+`gallery::stoplight_exchange` still states its `ensures` clauses
+inline) are all real future directions, but none should be started
+without explicit new direction, matching this plan's pacing
+throughout.

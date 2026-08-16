@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ All six steps (0 through 5) done and verified — Kani and
+**Status:** ✅ All seven steps (0 through 6) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
@@ -172,7 +172,16 @@ first, by deliberate sequencing — Verus support for `Exchange` was
 deferred here rather than bolted on weak (Verus can't check an
 arbitrary compiled Rust body directly, only `verus! {}`-native code),
 and has since landed with a real answer of its own: see "Verus
-Exchange Proof Derivation" below.
+Exchange Proof Derivation" below. Step 6, added after the fact: all
+three edges' DFCC `#[kani::ensures(...)]` closures now call through
+real, registered `Ensures<KaniVerifier>` contract types
+(`kani_ensures!`) instead of restating the boolean inline — the same
+source-of-truth discipline `rust_std`'s own proofs already apply
+everywhere else, closing the same drift risk one level deeper than
+Step 3 did (the contract's own content, not just its registration/
+delegation machinery). Re-verified via real `cargo kani` on all three
+edges plus the Step 4 composition harness, and a real non-vacuous
+regression check.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the

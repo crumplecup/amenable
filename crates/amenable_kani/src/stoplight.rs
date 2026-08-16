@@ -34,12 +34,15 @@
 //! `Stoplight::exchange` must call `input.sidecar()` to obtain a lawful
 //! credential; `input.primary()` doesn't type-check).
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{
     Amenable, Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
     Witness,
 };
 use amenable_derive::Standard;
 
+use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
 
 /// The light is green — a root state claim, asserted rather than derived
@@ -160,6 +163,15 @@ impl StateMachine for Stoplight {
 /// `Exchange` impls, both of which mint the token via a real
 /// `Establish`/`Witness`-gated call rather than handing back an
 /// independently re-minted token disconnected from what happened.
+///
+/// `Clone`/`Copy` (bounded on `T`/`Token`, both always `Copy` for every
+/// concrete state/token pair in this module): needed so a `#[kani::
+/// ensures]` closure's `&Result<Established<..>, StoplightError>` can be
+/// dereferenced into the owned `Ensures::Input` the real contract types
+/// below take — the postcondition closure calls through the registered
+/// contract rather than restating the check inline, so it needs an owned
+/// value to hand it, not just a borrow to read.
+#[derive(Clone, Copy)]
 pub struct Established<T, Token> {
     primary: T,
     token: Token,
@@ -308,11 +320,28 @@ impl ProofToken for YellowToken {
 // claim left to state once the type system itself already guarantees
 // "Green's only lawful successor is Yellow" (there is exactly one
 // `Exchange` impl for this `Input` type). What DFCC genuinely checks
-// here: the body never panics and always returns `Ok`. A body with real
-// branching would earn a real, substantive `ensures` the same way -- see
-// `ObservedValueMatchesInput`-style predicates elsewhere in this
-// codebase for what that looks like once there's real content.
+// here: the body never panics and always returns `Ok`.
 //
+// The claim itself lives in a real, registered `Ensures<KaniVerifier>`
+// impl (`kani_ensures!` below) -- the same single-source-of-truth
+// pattern `rust_std`'s own proofs already use throughout (e.g.
+// `RustStdStandard::<char>::ensures(..)`, called directly from inside a
+// plain harness body), just not previously applied to any `Exchange`
+// edge. The DFCC `#[kani::ensures]` closure calls through `Yellow::
+// ensures(..)` rather than restating the boolean inline: the contract
+// type carries the bound, and every proof context that needs to check
+// it -- this closure, and eventually a real (not just trivial) claim's
+// own richer `Input`/`Bound` shape -- calls through the one definition
+// rather than each independently retyping it. `Established<T, Token>`
+// derives `Copy` specifically so the closure's `&Result<..>` can be
+// dereferenced into the owned `Ensures::Input` this needs.
+kani_ensures!(
+    Yellow,
+    "amenable_kani::stoplight::Yellow::green_to_yellow_ensures",
+    Result<Established<Yellow, YellowToken>, StoplightError>,
+    |result| result.is_ok()
+);
+
 // `#[amenable_derive::exchange]` generates the `Witness<KaniVerifier> for
 // Yellow` impl (without it, `Establish<Green, KaniVerifier> for Yellow`
 // below does not compile, so this exchange cannot exist until the
@@ -332,7 +361,7 @@ impl ProofToken for YellowToken {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Yellow, YellowToken>, StoplightError>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Yellow, YellowToken>, StoplightError>| Yellow::ensures(*result))
     )]
     fn green_to_yellow(
         &self,
@@ -374,9 +403,18 @@ impl ProofToken for RedToken {
 // See the Green -> Yellow contract above for why the real logic/contract
 // live on a plain inherent method (Kani 0.67.0 can't contract a trait
 // method when the trait is generic), why the content is legitimately
-// trivial, and what `#[amenable_derive::exchange]` generates/leaves
-// hand-written. Backs `Establish<Yellow, KaniVerifier> for Red` below —
-// see `Yellow`'s edge above for the rationale.
+// trivial, why the claim itself lives in a real, registered `Ensures<
+// KaniVerifier>` impl rather than inline, and what `#[amenable_derive::
+// exchange]` generates/leaves hand-written. Backs `Establish<Yellow,
+// KaniVerifier> for Red` below — see `Yellow`'s edge above for the
+// rationale.
+kani_ensures!(
+    Red,
+    "amenable_kani::stoplight::Red::yellow_to_red_ensures",
+    Result<Established<Red, RedToken>, StoplightError>,
+    |result| result.is_ok()
+);
+
 #[amenable_derive::exchange(
     cfg = kani,
     verifier = KaniVerifier,
@@ -388,7 +426,7 @@ impl ProofToken for RedToken {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Red, RedToken>, StoplightError>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Red, RedToken>, StoplightError>| Red::ensures(*result))
     )]
     fn yellow_to_red(
         &self,
@@ -421,12 +459,21 @@ impl Establish<YellowToken, KaniVerifier> for Red {
 // See the Green -> Yellow contract above for why the real logic/contract
 // live on a plain inherent method (Kani 0.67.0 can't contract a trait
 // method when the trait is generic), why the content is legitimately
-// trivial, and what `#[amenable_derive::exchange]` generates/leaves
-// hand-written. Backs `Establish<Red, KaniVerifier> for Green` below —
-// the cycle-back edge, distinct from [`Green`]'s root case: this is the
-// proof that a `Red` light lawfully cycles back to `Green`, not the
-// power-on assertion (hence `evidence_id = "cycle_back"`, keeping this
-// `ProofRecord`'s id distinct from a future root-case registration).
+// trivial, why the claim itself lives in a real, registered `Ensures<
+// KaniVerifier>` impl rather than inline, and what `#[amenable_derive::
+// exchange]` generates/leaves hand-written. Backs `Establish<Red,
+// KaniVerifier> for Green` below — the cycle-back edge, distinct from
+// [`Green`]'s root case: this is the proof that a `Red` light lawfully
+// cycles back to `Green`, not the power-on assertion (hence
+// `evidence_id = "cycle_back"` below and on the macro invocation,
+// keeping both registrations distinct from a future root-case one).
+kani_ensures!(
+    Green,
+    "amenable_kani::stoplight::Green::red_to_green_ensures::cycle_back",
+    Result<Established<Green, GreenToken>, StoplightError>,
+    |result| result.is_ok()
+);
+
 #[amenable_derive::exchange(
     cfg = kani,
     verifier = KaniVerifier,
@@ -439,7 +486,7 @@ impl Establish<YellowToken, KaniVerifier> for Red {
 impl Stoplight {
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Established<Green, GreenToken>, StoplightError>| result.is_ok())
+        kani::ensures(|result: &Result<Established<Green, GreenToken>, StoplightError>| Green::ensures(*result))
     )]
     fn red_to_green(
         &self,
@@ -561,12 +608,13 @@ impl Amenable for Stoplight {
         Vec::new()
     }
 
-    /// Honest, not aspirational: no Verus `Exchange` proof exists for
-    /// `Stoplight` yet (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Motivation
-    /// section explains why Verus is deliberately out of scope for this
-    /// plan -- it can't check an arbitrary compiled Rust body, only
-    /// `verus! {}`-native code -- and gets its own plan once it has a
-    /// real answer).
+    /// Honest, not aspirational: a real Verus `Exchange` proof of this
+    /// same `Stoplight` cycle exists now (`amenable_verus::gallery::
+    /// stoplight_exchange`, see `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`)
+    /// via `#[path]` mod-inclusion of this crate's own trait family, not
+    /// mere axiomatization -- but it lives in a separate crate with no
+    /// `inventory`-backed registry of its own yet (an open question in
+    /// that plan doc), so there is nothing real to query from here.
     fn verus_surface() -> Self::ProofSurface {
         Vec::new()
     }
