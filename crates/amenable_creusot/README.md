@@ -11,18 +11,27 @@ bridging `CreusotWitness`/`Witness<CreusotVerifier>` to concrete std
 carriers (`RustStdStandard<T>`) live in `amenable_std` instead of here.
 
 That split exists because `creusot-rustc`'s whole-crate translation pass
-sweeps every local item in a `creusot-std`-dependent crate — including
-ones no `#[cfg(creusot)]` gate protects, since Rust items don't need to
-*run* to be enumerated — and chokes on ordinary Rust infrastructure that's
-completely unremarkable to plain `rustc`: a return-position `impl Trait`
-on a local `impl` panicked its intrinsics-gathering pass outright (a real
-ICE, confirmed empirically, not a hypothetical), and the `static` item
-`inventory::submit!` expands to hits "unsupported definition kind" the
-same way. So this crate stays pure Pearlite proof-function content — the
-thing `cargo creusot -- -p amenable_creusot` actually needs to translate
-— and everything about *finding* those proofs (the witness bridge, the
-registry) lives in `amenable_std` instead, the crate that already owns
-the types being proved about.
+chokes on ordinary Rust infrastructure that's completely unremarkable to
+plain `rustc`: a return-position `impl Trait` on a local `impl` panicked
+its intrinsics-gathering pass outright (a real ICE, confirmed
+empirically, not a hypothetical), `Box<dyn Iterator<..>>` as a concrete
+associated-type value is rejected outright ("forbidden dyn type... dyn
+support is currently minimal"), and `inventory::collect!`/`inventory::
+submit!`'s generated `static` items hit "unsupported definition kind" /
+"unsupported constant value" the same way. All three are avoidable with
+precise `#[cfg(not(creusot))]` gating *in place* — confirmed in an
+isolated probe crate, see `amenable_std::creusot_gallery`'s own
+`cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors`
+case — so the historical fix of relocating *all* witness-bridge/registry
+code to `amenable_std` wasn't the only option, just the one applied at
+the time for the ~90-carrier `rust_std.rs` surface. `stoplight.rs`
+registers its own, much smaller set of `ProofRecord`s directly, gated
+this way, rather than following that same relocation. This crate still
+stays pure Pearlite proof-function content plus its own gated registry
+entries — the thing `cargo creusot -- -p amenable_creusot` actually
+needs to translate — while `rust_std.rs`'s much larger witness-bridge
+surface (the witness bridge, the registry, for ~90 std carriers) still
+lives in `amenable_std` instead, unchanged for now.
 
 That split is legal under Rust's orphan rule via a different
 justification than usual: it's `RustStdStandard<T>` (the `Self` type,

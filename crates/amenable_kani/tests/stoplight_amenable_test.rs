@@ -1,8 +1,14 @@
 //! Exercises `Stoplight`'s `Amenable` impl -- the first real occupant of
 //! `Amenable::kani_surface()`/`creusot_surface()`/`verus_surface()`/
 //! `audit_surface()` anywhere in the tree (Step 5 of
-//! `EXCHANGE_PROOF_DERIVATION_PLAN.md`). Confirms every surface reports
-//! real, specific content, not an empty or vacuous default.
+//! `EXCHANGE_PROOF_DERIVATION_PLAN.md`). Confirms `kani_surface()`/
+//! `audit_surface()` report real, specific content, not an empty or
+//! vacuous default. `creusot_surface()` is honestly empty *here* (Step 8:
+//! `amenable_kani` has no Cargo dependency on `amenable_creusot` at all,
+//! so nothing is linked into this crate's own test binary) -- see
+//! `amenable/tests/stoplight_creusot_surface_test.rs` for the real,
+//! non-empty assertion. `verus_surface()` is honestly empty too (no Verus
+//! `Exchange` proof exists yet).
 
 use amenable_core::Amenable;
 use amenable_kani::Stoplight;
@@ -34,24 +40,16 @@ fn kani_surface_only_reports_stoplight_s_own_harnesses() {
     );
 }
 
-#[cfg(feature = "creusot")]
+// `amenable_kani` has no Cargo dependency on `amenable_creusot` at all
+// (Step 8 of `EXCHANGE_PROOF_DERIVATION_PLAN.md` removed it -- verifier
+// backend crates never depend on each other), so `amenable_creusot`'s
+// registrations are never linked into this crate's own test binary,
+// regardless of any feature. This is honest, not a compromise: see
+// `amenable/tests/stoplight_creusot_surface_test.rs` for the real,
+// non-empty assertion, which runs in the one binary that actually links
+// both crates (`amenable` itself, under its own `creusot` feature).
 #[test]
-fn creusot_surface_reports_all_three_stoplight_edges() {
-    let surface = Stoplight::creusot_surface();
-
-    assert_eq!(
-        surface,
-        vec![
-            "amenable_creusot::stoplight::green_to_yellow".to_owned(),
-            "amenable_creusot::stoplight::yellow_to_red".to_owned(),
-            "amenable_creusot::stoplight::red_to_green".to_owned(),
-        ]
-    );
-}
-
-#[cfg(not(feature = "creusot"))]
-#[test]
-fn creusot_surface_is_honestly_empty_without_the_creusot_feature() {
+fn creusot_surface_is_honestly_empty_in_this_crate_s_own_test_binary() {
     assert_eq!(Stoplight::creusot_surface(), Vec::<String>::new());
 }
 

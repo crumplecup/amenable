@@ -6,28 +6,32 @@
 //! The state/token/sidecar types here are a minimal accommodation model,
 //! not the real `amenable_kani::stoplight` types — this crate cannot
 //! carry a Cargo dependency on `amenable_kani`/`amenable_std`/`amenable`
-//! at all: any of the three either closes a real dependency cycle
-//! (`amenable_std` already optionally depends back on this crate;
-//! `amenable` depends on this crate too) or would drag `creusot-rustc`'s
-//! translator across ordinary Rust infrastructure it has already choked
-//! on for real, once, in this exact codebase — see `amenable_std::
-//! creusot_witness`'s doc comment (a return-position `impl Trait`
-//! panicked its intrinsics pass outright; `inventory::submit!`'s
-//! generated `static` hit "unsupported definition kind"). What is *not*
-//! off-limits, though, and an earlier version of this file wrongly
-//! assumed was: `amenable_core`'s own trait family (`Evidence`,
+//! at all, and never will: verifier backend crates (`amenable_kani`,
+//! `amenable_creusot`, `amenable_verus`) are independent and never link
+//! to each other directly, full stop — any candidate edge would also
+//! close a real dependency cycle (`amenable_std` already optionally
+//! depends back on this crate; `amenable` depends on this crate too).
+//! What is *not* off-limits, though, and an earlier version of this file
+//! wrongly assumed was: `amenable_core`'s own trait family (`Evidence`,
 //! `Witness<V>`, `Sidecar<V>`, `Establish<C, V>`, `ProofToken`) — this
 //! crate already has a real, unconditional Cargo dependency on
 //! `amenable_core`, and none of those trait *definitions* use the
-//! specific patterns that actually caused the real crashes (those were
-//! `Provenance` impls returning `Box<dyn Iterator<..>>`, and
-//! `inventory::submit!` registrations — neither of which this file
-//! needs). So the state/token/sidecar types below genuinely implement
-//! the real `amenable_core` traits, gated to `CreusotVerifier`, the same
-//! way the Kani side implements them gated to `KaniVerifier` — only
-//! `Provenance` and the registry-facing machinery (`inventory::submit!`,
-//! `ProofRecord`/`EvidenceLink`) are left out, since neither is needed
-//! to state a contract and both risk the translator crash above.
+//! specific patterns that actually caused real `creusot-rustc` translator
+//! crashes in this exact codebase (`Provenance` impls returning `Box<dyn
+//! Iterator<..>>`; a return-position `impl Trait` method; ungated
+//! `inventory::collect!`/`inventory::submit!` — see `amenable_std::
+//! creusot_witness`'s doc comment and `amenable_std::creusot_gallery`'s
+//! own confirmed findings). So the state/token/sidecar types below
+//! genuinely implement the real `amenable_core` traits, gated to
+//! `CreusotVerifier`, the same way the Kani side implements them gated
+//! to `KaniVerifier` — `Provenance` stays left out (this file has no use
+//! for it), but `inventory::submit!` does not, below: `#[cfg(not(creusot))]`
+//! -gating it precisely in place (confirmed to work in an isolated probe,
+//! not assumed) is what lets this crate register its own edges' `Proof
+//! Record`s for `amenable_kani::stoplight::creusot_surface()` to query,
+//! with no Cargo dependency in either direction — the registry (`amenable_
+//! core::ProofRecord`) is the shared mechanism, matching how `kani_
+//! surface()` already queries `KaniProofRegistration` the same way.
 //!
 //! Because the sidecar/establish machinery is now the real thing, not a
 //! flattened stand-in, the real exchange bodies below (`Yellow::
@@ -262,6 +266,30 @@ amenable_derive::harness! {
     }
 }
 
+// Registered here, in this crate, rather than read cross-crate by
+// `amenable_kani::stoplight::creusot_surface()` -- verifier backend
+// crates never depend on each other; the registry (`amenable_core::
+// ProofRecord`, queried the same way `kani_surface()` already queries
+// `KaniProofRegistration`) is the shared mechanism, not a direct import.
+// `#[cfg(not(creusot))]`, not unconditional: a real, confirmed-working
+// alternative to this crate's earlier "move every inventory call to a
+// different crate" fix -- gated precisely in place, `cargo creusot`'s
+// translator never sees the `static` item `inventory::submit!` expands
+// to at all (see `amenable_std::creusot_gallery`'s own confirmed finding
+// for the isolated probe this was checked against before applying it
+// here for real). `VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC` itself stays
+// ungated (see `amenable_derive::harness!`'s own expansion), so it's
+// still available to reference from inside this `#[cfg(not(creusot))]`
+// block even though `Green`/`Yellow`/the harness body above are not.
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_creusot::stoplight::green_to_yellow",
+        verifier: "creusot",
+        describe: || VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC.to_owned(),
+    }
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_YELLOW_TO_RED_EXCHANGE_SRC, {
         /// Same call shape as `amenable_kani::stoplight::Stoplight::
@@ -278,6 +306,17 @@ amenable_derive::harness! {
     }
 }
 
+// See `green_to_yellow`'s own registration above for the pattern and
+// rationale.
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_creusot::stoplight::yellow_to_red",
+        verifier: "creusot",
+        describe: || VERIFY_YELLOW_TO_RED_EXCHANGE_SRC.to_owned(),
+    }
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_RED_TO_GREEN_EXCHANGE_SRC, {
         /// Same call shape as `amenable_kani::stoplight::Stoplight::
@@ -291,5 +330,16 @@ amenable_derive::harness! {
             let token = Green::establish(input.sidecar());
             Established::new(Green, token)
         }
+    }
+}
+
+// See `green_to_yellow`'s own registration above for the pattern and
+// rationale.
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_creusot::stoplight::red_to_green",
+        verifier: "creusot",
+        describe: || VERIFY_RED_TO_GREEN_EXCHANGE_SRC.to_owned(),
     }
 }

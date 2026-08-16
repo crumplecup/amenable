@@ -3,21 +3,21 @@
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
-fn all_twenty_seven_gallery_findings_are_registered_and_distinct() {
+fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case)())
         .collect();
 
     assert_eq!(
         cases.len(),
-        27,
-        "expected exactly the 27 findings from this session's real pipeline work: {cases:#?}"
+        28,
+        "expected exactly the 28 findings from this session's real pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 27, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 28, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
@@ -51,8 +51,11 @@ fn all_twenty_seven_gallery_findings_are_registered_and_distinct() {
         .filter(|case| case.expected == CreusotGalleryExpectation::Proved)
         .count();
     assert_eq!(
-        proved_count, 1,
-        "one finding is a dangerous false-trail proof that Creusot reported as proved despite contractless externals"
+        proved_count, 2,
+        "one finding is a dangerous false-trail proof that Creusot reported as proved despite \
+         contractless externals; the other is the real, confirmed best practice that #[cfg(not(\
+         creusot))]-gating inventory::collect!/submit! and Box<dyn Iterator<..>> in place avoids \
+         the translator errors entirely"
     );
 
     for case in &cases {

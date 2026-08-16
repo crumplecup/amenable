@@ -219,6 +219,84 @@ impl Provenance for CreusotVerifierMetadata {
 ::inventory::submit! {
     CreusotGalleryRegistration {
         case: || CreusotGalleryCase {
+            id: "amenable_std::creusot_gallery::cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors".to_owned(),
+            title: "#[cfg(not(creusot))]-gating inventory::collect!/submit! and Box<dyn Iterator<..>> avoids both translator errors entirely -- confirmed in an isolated probe crate, not assumed from the earlier crate-split fix".to_owned(),
+            disposition: CreusotGalleryDisposition::BestPractice,
+            expected: CreusotGalleryExpectation::Proved,
+            claim: r#"
+// The `inventory_submit_static_is_unsupported` case above (and this
+// crate's own historical split of witness-bridge code out of
+// amenable_creusot into amenable_std) concluded "any use of inventory
+// inside a creusot-translated crate fails this way" and moved the whole
+// mechanism to a different crate, without separately testing whether
+// #[cfg(not(creusot))]-gating the offending items *in place* would have
+// been enough on its own. Tested directly in an isolated, throwaway
+// probe crate (creusot_ice_probe, deleted after confirming the finding
+// -- not kept live in the real workspace, matching this gallery's own
+// "reduced repro as a string, not live risky code" discipline) rather
+// than risking `amenable_creusot`'s real 110-file proof suite:
+//
+// Gating only `submit!` and leaving `collect!` ungated still fails --
+// `collect!` independently trips its own translator error, a different
+// message from the Static one above:
+inventory::collect!(Entry);           // ungated: fails on its own
+#[cfg(not(creusot))]
+inventory::submit! { Entry { name: "probe" } }
+//   error: Unsupported constant value: Scalar(alloc1) of type
+//   &'?2 inventory::Registry
+//     --> src/lib.rs:22:1
+//      |
+//   22 | inventory::collect!(Entry);
+//      | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+//
+// Gating BOTH `collect!` and `submit!` — real fix, confirmed clean
+// (`cargo creusot -- -p creusot_ice_probe` succeeds, only ordinary
+// unused-import/dead-code warnings):
+#[cfg(not(creusot))]
+inventory::collect!(Entry);
+#[cfg(not(creusot))]
+inventory::submit! { Entry { name: "probe" } }
+//   Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+//
+// A second, independent pattern was also checked in the same probe:
+// `Box<dyn Iterator<Item = i32>>` as an associated-type value (the
+// pattern `amenable_kani::stoplight`'s real `Green`/`Yellow`/`Red`
+// `Provenance` impls use) — NOT the same thing as the already-fixed
+// `rpitit_panics_intrinsics_gathering` case above (return-position impl
+// Trait; `Box<dyn Iterator<..>>` is a concrete, ordinary trait-object
+// type, no RPITIT desugaring involved at all). Left deliberately
+// ungated first, confirming it is a real, independent, separate
+// translator error, not folklore carried over from the RPITIT case:
+impl HasIter for Boxed {
+    type Iter = Box<dyn Iterator<Item = i32>>;    // ungated: fails on its own
+    fn iter(&self) -> Self::Iter { Box::new(std::iter::once(1)) }
+}
+//   error: forbidden dyn type: dyn std::iter::Iterator<Item = i32>
+//   (dyn support is currently minimal, please open an issue to improve
+//   this feature)
+//
+// Gated the same way, it also translates clean.
+//
+// Implication, not yet applied anywhere real: the whole-crate ICE risk
+// that justified `amenable_creusot::stoplight`'s accommodation-model
+// mirror (a separately-authored, hand-kept-in-sync copy of `amenable_
+// kani::stoplight`'s concrete types, needing `stoplight_mirror_
+// consistency_test.rs` to guard drift) and the `amenable_kani ->
+// amenable_creusot`/`amenable_std -> amenable_creusot` Cargo dependency
+// edges built to work around it may not have been the only available
+// fix. `#[cfg(not(creusot))]`-gating the specific offending items *in
+// place*, precisely (both `collect!` and `submit!`, and any `Box<dyn
+// ..>` associated type), is a real, confirmed, working alternative --
+// worth real consideration next time this class of tradeoff comes up,
+// not assumed away by this gallery's own earlier, narrower test.
+"#,
+        },
+    }
+}
+
+::inventory::submit! {
+    CreusotGalleryRegistration {
+        case: || CreusotGalleryCase {
             id: "amenable_std::creusot_gallery::char_as_u32_cast_is_unsupported".to_owned(),
             title: "`c as u32` isn't a supported cast in Pearlite logic context; use the `@` View operator".to_owned(),
             disposition: CreusotGalleryDisposition::FalseTrail,

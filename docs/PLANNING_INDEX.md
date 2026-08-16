@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ All eight steps (0 through 7) done and verified — Kani and
+**Status:** ✅ All nine steps (0 through 8) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
@@ -163,9 +163,10 @@ composed into one `#[kani::stub_verified]` full-cycle harness (Step
 resolved by swapping in a real, constructible `StoplightError::
 NotUsed` variant, plus `Stoplight`'s real `Amenable` impl (Step 5) —
 the first anywhere in the tree, every surface backed by queried or
-compiler-checked data, including a new feature-gated `amenable_kani ->
-amenable_creusot` dependency added specifically to keep
-`creusot_surface()` honest. The Creusot mirror genuinely implements
+compiler-checked data (Step 5 originally added a feature-gated
+`amenable_kani -> amenable_creusot` dependency to keep `creusot_
+surface()` honest; Step 8 later removed it as a real architectural
+violation -- see below). The Creusot mirror genuinely implements
 the real `amenable_core` trait family, corrected from an
 over-flattened first version while starting Step 2. Kani and Creusot
 first, by deliberate sequencing — Verus support for `Exchange` was
@@ -197,6 +198,41 @@ authoritative way (`cargo expand` can't render Kani's own attribute
 macro output outside the real toolchain): real `cargo kani` on all
 three edges plus the composition harness, and a real non-vacuous
 regression check pointing at the exact generated closure.
+
+Step 8, a direct, firm correction, not a self-initiated cleanup:
+"kani, creusot and verus never depend on each other... shared types
+live in core." Step 5's `amenable_kani -> amenable_creusot` Cargo
+dependency was exactly that violation. The real fix needed a real
+question answered first: why did `creusot_surface()` need a cross-
+crate import at all, when `kani_surface()` queries a shared registry
+with none? Because `amenable_creusot` was believed unable to call
+`inventory::submit!` at all (a real, confirmed ICE documented in
+`amenable_std::creusot_witness`, which is why that crate's own ~90-
+carrier witness-bridge surface was relocated there in the first
+place, years earlier). Checked directly with the real toolchain, not
+assumed still true: in an isolated, throwaway probe crate (deleted
+after confirming, never kept live), `#[cfg(not(creusot))]`-gating
+`inventory::collect!`/`inventory::submit!` *in place* avoids the
+translator error entirely -- with two real refinements found in the
+same probe, not assumed from the existing gallery case: `collect!`
+needs its own gate too (a different, independent translator error,
+not just `submit!`'s), and `Box<dyn Iterator<..>>` as a concrete
+associated-type value (the exact pattern `amenable_kani::stoplight`'s
+real `Provenance` impls use) is a real, separate translation error
+("forbidden dyn type"), confirmed distinct from the already-fixed
+RPITIT case by testing it ungated first. Documented permanently as a
+new `amenable_std::creusot_gallery` case before applying it for real,
+matching the gallery's own stated purpose (hypothesis, trial, error,
+resolution). `amenable_creusot::stoplight` now registers its own three
+`ProofRecord`s this way; `creusot_surface()` queries the shared
+registry instead of importing across crates; `amenable_kani`'s
+`creusot` feature and Cargo dependency on `amenable_creusot` are gone
+entirely, with no `#[cfg(feature = ..)]` split needed anymore either.
+Full workspace clean, `just verify-creusot` still `Proved (110 files)
+✔`. Deliberately not done here: migrating `amenable_std::creusot_
+witness`'s own much larger (~90-registration) surface the same way --
+a real, much bigger undertaking, flagged for explicit future
+direction, not started.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the
@@ -452,21 +488,18 @@ catalog `harness!` already populates (the same mechanism the CLI's own
 harness listing uses), filtered to this module's own entries via
 `module_path!()` evaluated in the same file `harness!`'s own ids were
 built from -- no hand-typed module name on either side.
-`creusot_surface()` has no registry to query (Creusot's translator
-can't tolerate `inventory::submit!`), so it references
-`amenable_creusot::stoplight`'s real exported harness-source constants
-directly, gated behind a **new** `creusot` feature added to
-`amenable_kani` itself (mirroring `amenable_std`'s identical
-dependency) specifically so this couldn't become a hand-typed name
-list with nothing keeping it honest -- confirmed for real, not
-assumed, by renaming one of those constants and watching `cargo check
--p amenable_kani --features creusot` fail immediately (`E0432`),
-reverted after confirming. Confirmed no dependency cycle and confirmed
-`just verify-creusot` still `Proved (110 files) ✔` afterward (the new
-edge only participates in ordinary Rust builds of `amenable_kani`,
-never in Creusot's own translation of `amenable_creusot`).
-`verus_surface()` returns an honest empty list (no Verus `Exchange`
-proof exists yet). `audit_surface()` returns the real captured
+`creusot_surface()` originally (Step 5) referenced `amenable_creusot::
+stoplight`'s real exported harness-source constants directly, gated
+behind a **new** `creusot` feature added to `amenable_kani` itself
+(mirroring `amenable_std`'s identical dependency) -- a real Cargo
+dependency from `amenable_kani` to `amenable_creusot`, later caught as
+a genuine architectural violation and fixed in Step 8 (see below):
+`creusot_surface()` now queries the same shared `inventory` registry
+`kani_surface()` already does, with `amenable_creusot::stoplight`
+registering its own `ProofRecord`s instead of `amenable_kani` importing
+its constants across a Cargo edge. `verus_surface()` returns an honest
+empty list (no Verus `Exchange` proof exists yet). `audit_surface()`
+returns the real captured
 verbatim source of all four Kani harnesses. A new test file
 (`stoplight_amenable_test.rs`) asserts all four surfaces for real under
 both feature configurations, not just that the code compiles. Full

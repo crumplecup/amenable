@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 67 4 67 34 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 71 4 71 34 *)
 
 (* <stoplight::Green as amenable_core::Evidence> *)
 
@@ -8,6 +8,6 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec audit_Green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 67 4 67 34] (self: ())
+let rec audit_Green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 71 4 71 34] (self: ())
   (return (x: ())) = (! bb0
   [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

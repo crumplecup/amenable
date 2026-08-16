@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 288 8 290 43 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 327 8 329 43 *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 41 291 56
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 24 291 57
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 292 12 292 42
-let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 19 286 23
-let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 18 287 22
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 330 41 330 56
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 330 24 330 57
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 331 12 331 42
+let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 325 19 325 23
+let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 326 18 326 22
 
 use creusot.prelude.Any
 
@@ -29,7 +29,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 288 8 290 43]
+let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 327 8 329 43]
   (input: t_Established_Red_RedToken) (return (x: t_Established_Green_GreenToken)) = (! bb0
   [ bb0 = s0
     [ s0 = sidecar_Established_Red_RedToken [%#sstoplight] {input} (fun (_x: t_RedToken) -> [ &_5 <- _x ] s1)

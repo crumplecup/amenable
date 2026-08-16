@@ -569,32 +569,34 @@ impl Amenable for Stoplight {
         ids
     }
 
-    /// `amenable_creusot::stoplight` has no `inventory`-backed registry of
-    /// its own to query (deliberately -- see that module's own doc
-    /// comment on why `inventory::submit!` is off-limits there), so this
-    /// references the real exported harness-source constants directly:
-    /// renaming or removing any of them breaks this build rather than
-    /// silently leaving a stale surface behind. Only compiled when this
-    /// crate's own `creusot` feature is on, mirroring `amenable_std`'s
-    /// identical `amenable_creusot` dependency and for the same reason.
-    #[cfg(feature = "creusot")]
+    /// Queries the shared `amenable_core::ProofRecord` registry -- the
+    /// same mechanism `kani_surface()` above already uses, not a
+    /// cross-crate import. Verifier backend crates never depend on each
+    /// other (`amenable_kani` has no Cargo dependency on `amenable_
+    /// creusot` at all, and never will): `amenable_creusot::stoplight`
+    /// registers its own `ProofRecord`s for these three edges, `#[cfg(
+    /// not(creusot))]`-gated in place so `cargo creusot`'s translator
+    /// never sees the registration (see that module's own doc comment,
+    /// and `amenable_std::creusot_gallery`'s confirmed finding that
+    /// precise gating avoids the translator errors that used to justify
+    /// routing every registry call through a different crate entirely).
+    /// `inventory` only sees registrations from crates actually linked
+    /// into the binary querying it, so this returns real data when
+    /// something (e.g. `amenable`'s own CLI/tests) links both `amenable_
+    /// kani` and `amenable_creusot`, and an honestly empty list from
+    /// `amenable_kani`'s own test binaries, which never link `amenable_
+    /// creusot` at all -- no `#[cfg(feature = ..)]` branching needed
+    /// either way, unlike the cross-crate-import version this replaced.
     fn creusot_surface() -> Self::ProofSurface {
-        let _: &str = amenable_creusot::VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC;
-        let _: &str = amenable_creusot::VERIFY_YELLOW_TO_RED_EXCHANGE_SRC;
-        let _: &str = amenable_creusot::VERIFY_RED_TO_GREEN_EXCHANGE_SRC;
-        vec![
-            "amenable_creusot::stoplight::green_to_yellow".to_owned(),
-            "amenable_creusot::stoplight::yellow_to_red".to_owned(),
-            "amenable_creusot::stoplight::red_to_green".to_owned(),
-        ]
-    }
-
-    /// Honest, not aspirational: without the `creusot` feature this crate
-    /// has no dependency on `amenable_creusot` at all, so there is
-    /// nothing real to report here.
-    #[cfg(not(feature = "creusot"))]
-    fn creusot_surface() -> Self::ProofSurface {
-        Vec::new()
+        let mut ids: Vec<String> = inventory::iter::<amenable_core::ProofRecord>()
+            .filter(|record| {
+                record.verifier == "creusot"
+                    && record.evidence.starts_with("amenable_creusot::stoplight::")
+            })
+            .map(|record| record.evidence.to_owned())
+            .collect();
+        ids.sort_unstable();
+        ids
     }
 
     /// Honest, not aspirational: a real Verus `Exchange` proof of this

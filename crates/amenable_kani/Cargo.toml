@@ -15,23 +15,9 @@ categories = ["development-tools"]
 
 [dependencies]
 amenable_core = { workspace = true }
-amenable_creusot = { workspace = true, optional = true }
 amenable_derive = { workspace = true }
 amenable_std = { workspace = true }
 inventory = { workspace = true }
-
-[features]
-# `Stoplight`'s `Amenable::creusot_surface()` (Step 5 of
-# EXCHANGE_PROOF_DERIVATION_PLAN.md) needs a real, compiler-checked
-# reference to `amenable_creusot::stoplight`'s exported harness-source
-# constants, not a hand-typed name list that could silently drift -- the
-# same real dependency edge `amenable_std`'s own `creusot` feature
-# already established for the same reason (see that crate's Cargo.toml).
-# This is a plain, unconditional-Rust dependency, not a build participant
-# in `cargo creusot`'s own translation of `amenable_creusot` itself, so
-# it carries none of that crate's ICE risk (see `amenable_creusot::
-# stoplight`'s own doc comment for what that risk actually is).
-creusot = ["dep:amenable_creusot"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

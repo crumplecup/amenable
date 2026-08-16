@@ -62,7 +62,14 @@ generates that same DFCC `ensures` attribute itself, rather than
 requiring it hand-typed at each of the three call sites — the actual
 predicate stays exactly as hand-authored as before, in the same
 `kani_ensures!` invocation, just no longer re-typed as a closure per
-edge — see Step 7 below.
+edge — see Step 7 below. Step 8 is also complete: Step 5's `creusot_
+surface()` had added a real Cargo dependency from `amenable_kani` to
+`amenable_creusot` — a genuine violation of verifier-backend
+independence, caught by direct correction and fixed by having `amenable
+_creusot::stoplight` register its own `ProofRecord`s (`#[cfg(not(
+creusot))]`-gated, confirmed to work in an isolated probe) for `creusot
+_surface()` to query via the shared `amenable_core` registry instead of
+importing across crates — see Step 8 below.
 
 ## Motivation
 
@@ -811,31 +818,29 @@ invented) or references real, compiler-checked items:
   literal same string `harness!`'s own `id: concat!(module_path!(), "::",
   ..)` computed when each harness registered; no hand-typed module name
   on either side to drift apart.
-- `creusot_surface()` — `amenable_creusot::stoplight` has no
-  `inventory`-backed registry of its own (deliberately: see that
-  module's own doc comment on why `inventory::submit!` is off-limits
-  there), so nothing is queryable the way `kani_surface()` queries. This
-  method instead references the real exported harness-source constants
-  directly (`let _: &str = amenable_creusot::VERIFY_GREEN_TO_YELLOW_
-  EXCHANGE_SRC;` et al.) — confirmed for real, not assumed, that this
-  actually catches drift: renaming one of those constants in
-  `amenable_creusot/src/stoplight.rs` broke `cargo check -p amenable_kani
-  --features creusot` immediately (`E0432`, unresolved import), reverted
-  after confirming. Gated behind a **new** `creusot` feature on
-  `amenable_kani` itself (`amenable_creusot = { workspace = true,
-  optional = true }` + `creusot = ["dep:amenable_creusot"]`), mirroring
-  `amenable_std`'s identical dependency for the identical reason — a
-  real, new Cargo edge, added because the alternative (hand-typing
-  Creusot harness names inside `amenable_kani`, with zero mechanism
-  keeping them in sync) would have reintroduced the exact drift risk
-  this whole plan exists to close. Confirmed to not create a dependency
-  cycle (`amenable_creusot` depends on neither `amenable_kani` nor
-  `amenable_std`) and confirmed not to disturb Creusot's own translator
-  (`just verify-creusot` still `Proved (110 files) ✔` afterward) — the
-  new edge only ever participates in ordinary `cargo check`/`cargo kani`
-  builds of `amenable_kani`, never in `cargo creusot -p amenable_creusot`
-  itself. `amenable`'s own `creusot` feature updated to also enable
-  `amenable_kani/creusot`, so the facade gets real end-to-end data.
+- `creusot_surface()` — at the time Step 5 landed, `amenable_creusot::
+  stoplight` had no `inventory`-backed registry of its own (deliberately:
+  see that module's own doc comment on why `inventory::submit!` was
+  off-limits there), so nothing was queryable the way `kani_surface()`
+  queries. This method instead referenced the real exported harness-
+  source constants directly (`let _: &str = amenable_creusot::
+  VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC;` et al.) — confirmed for real, not
+  assumed, that this actually caught drift: renaming one of those
+  constants in `amenable_creusot/src/stoplight.rs` broke `cargo check -p
+  amenable_kani --features creusot` immediately (`E0432`, unresolved
+  import), reverted after confirming. Gated behind a **new** `creusot`
+  feature on `amenable_kani` itself (`amenable_creusot = { workspace =
+  true, optional = true }` + `creusot = ["dep:amenable_creusot"]`),
+  mirroring `amenable_std`'s identical dependency for the identical
+  reason. **Superseded by Step 8, and for a real, substantive reason, not
+  just a style preference**: this Cargo edge was a genuine violation of
+  "verifier backend crates never depend on each other" — `amenable_kani`
+  linking directly to `amenable_creusot` — caught and fixed after direct
+  correction. See Step 8 below for the real fix (a shared, `amenable_
+  core`-owned registry query, no cross-crate import at all) and why the
+  original justification here ("the alternative would have reintroduced
+  the drift risk this plan exists to close") turned out to have a third
+  option neither predicted.
 - `verus_surface()` returned `Vec::new()` at the time Step 5 landed —
   honest, not aspirational: no Verus `Exchange` proof existed for
   `Stoplight` yet (Verus was out of scope for this plan at the time;
@@ -1001,6 +1006,104 @@ macros rather than a proc-macro crate like `amenable_derive`, since
 `verus --crate-type=lib` never resolves any extern crate beyond what
 the real `verus` binary itself bakes in.
 
+### Step 8 — remove the `amenable_kani -> amenable_creusot` Cargo edge — done
+
+A direct, firm correction, not a self-initiated cleanup: "kani, creusot
+and verus never depend on each other. Rather we need to move shared
+types to core, simple as that. I don't know when or how you decided to
+link kani to creusot, but that also needs to be fixed." Step 5's own
+`creusot_surface()` (see above) had added exactly that link —
+`amenable_kani = { ..., amenable_creusot = { workspace = true, optional
+= true } }`, gated behind a new `creusot` feature — to get a real,
+compiler-checked reference to `amenable_creusot`'s harness-source
+constants instead of a hand-typed, drift-prone name list. Solving one
+real problem (drift) by creating another (backend crates linking to each
+other) — verifier backend crates are supposed to be, and mostly already
+were, independent; `amenable_core` is where shared types live.
+
+**The real fix needed a real question answered first, not just the
+dependency deleted and the list re-hand-typed**: why did `creusot_
+surface()` need a cross-crate import in the first place, when `kani_
+surface()` (right above it) queries a shared `inventory` registry with
+no cross-crate import at all? Because `amenable_creusot` itself was
+believed unable to call `inventory::submit!` — `amenable_std::
+creusot_witness`'s own doc comment documents a real, confirmed ICE from
+exactly that pattern, which is why `amenable_creusot`'s entire witness-
+bridge/registry surface for ~90 std carriers was relocated into
+`amenable_std` instead, years before this plan started.
+
+**Checked directly with the real toolchain, not assumed to still be the
+only fix** (in an isolated, throwaway probe crate — `creusot_ice_probe`,
+deleted after confirming the finding, never kept live in the real
+workspace, matching this whole plan's own "hypothesis, trial, error,
+resolution" gallery discipline): `#[cfg(not(creusot))]`-gating `inventory
+::collect!`/`inventory::submit!` *in place*, precisely, avoids the
+translator error entirely — confirmed clean under real `cargo creusot --
+-p <probe>`. Two real, previously-undocumented refinements found in the
+same probe, not assumed from the existing gallery case:
+
+1. Gating only `submit!` and leaving `collect!` ungated still fails —
+   `collect!` independently trips its own, differently-worded translator
+   error (`Unsupported constant value: Scalar(alloc1) of type &'?2
+   inventory::Registry`). Both need gating. (Not relevant to `amenable_
+   creusot::stoplight`'s own fix below, since `amenable_core` already
+   owns the one `inventory::collect!(ProofRecord)` call site, outside
+   the crate `cargo creusot -p amenable_creusot` actually translates —
+   only `submit!` calls, added locally in `amenable_creusot`, needed
+   gating there.)
+2. `Box<dyn Iterator<Item = ..>>` as a concrete associated-type value —
+   the pattern `amenable_kani::stoplight`'s real `Green`/`Yellow`/`Red`
+   `Provenance` impls use — is a real, independent translator error
+   (`forbidden dyn type ... dyn support is currently minimal`), *not*
+   the same thing as the already-fixed, differently-shaped
+   `rpitit_panics_intrinsics_gathering` case (return-position `impl
+   Trait`, a compiler-synthesized opaque type; `Box<dyn ..>` is an
+   ordinary, named trait-object type, no RPITIT desugaring at all).
+   Confirmed real by testing it ungated first (it failed on its own),
+   then gated (it translated clean) — not assumed to be the same known
+   issue by proximity in an old summary.
+
+Documented permanently as a new `amenable_std::creusot_gallery` case
+(`cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors`,
+`BestPractice`/`Proved`) — the gallery is exactly where a finding like
+this belongs, per its own stated purpose (demonstrating hypothesis,
+trial, error, and resolution), not just applied silently.
+
+**The real fix, landed**: `amenable_creusot::stoplight` now registers
+its own three `ProofRecord`s (`#[cfg(not(creusot))]`-gated `inventory::
+submit!` calls, referencing its own already-ungated `VERIFY_*_SRC`
+constants), and `amenable_kani::stoplight::creusot_surface()` queries
+the shared registry (`inventory::iter::<amenable_core::ProofRecord>()`,
+filtered by `verifier == "creusot"` and an `evidence` string prefix) —
+the identical shape `kani_surface()` already used. No Cargo dependency
+in either direction: `inventory` only requires both crates to be linked
+into the *same final binary* (e.g. `amenable`'s own CLI/tests, which
+already depend on both), not a direct edge between them. This also
+simplified the code: no `#[cfg(feature = "creusot")]`/`#[cfg(not(feature
+= "creusot"))]` split needed anymore — one unconditional implementation,
+honestly empty when `amenable_creusot` isn't linked in, real when it is.
+`amenable_kani`'s `creusot` feature and its `amenable_creusot` Cargo
+dependency were removed entirely; `amenable`'s own `creusot` feature
+updated to drop the now-nonexistent `amenable_kani/creusot` unification.
+
+**Verified for real**: full workspace `fmt --check`/`check`/`clippy
+--all-targets --all-features -D warnings`/`test` clean, `just
+verify-creusot` still `Proved (110 files) ✔` (the new `#[cfg(not(
+creusot))]`-gated registrations never reach `cargo creusot -p
+amenable_creusot`'s translator at all), `cargo check -p amenable_kani`
+confirmed to no longer resolve `amenable_creusot` by any path. Step 8
+is complete.
+
+**Deliberately not done here, a separate and much larger question**:
+whether `amenable_std::creusot_witness`'s own, much larger witness-
+bridge/registry surface (~90 real std-carrier registrations, the
+original reason for that whole crate split) should be migrated the same
+way. The new finding may undermine part of that split's original
+justification too, but unwinding ~90 existing, real, working
+registrations is a different scale of change than three `Stoplight`
+edges, and wasn't part of what was asked for here — flagged for
+explicit future direction, not started.
+
 ## Open questions
 
 - **Creusot compilation model — resolved, landed in Step 1.** Not
@@ -1155,7 +1258,7 @@ concluding something in Step 1+ is a novel problem:
 ## Next step
 
 Steps 0 through 5 — every step this plan originally scoped — plus
-Steps 6 and 7 (added after the fact) are now complete: the `Sidecar<V>`
+Steps 6, 7, and 8 (added after the fact) are now complete: the `Sidecar<V>`
 trait-family fix; real Kani and Creusot bodies for all three
 `Stoplight` edges; a real consistency test keeping the Creusot mirror
 honest against the real Kani source; the by-hand Kani-side pattern
@@ -1178,7 +1281,16 @@ rules!` macros (a proc-macro crate structurally cannot resolve under
 (Step 2) keeping its hand-written mirror honest against the real Kani
 source. On both Kani and Verus, only each edge's real transition body
 remains hand-authored; every mechanical piece around it is generated.
-Nothing further is queued — extending this pattern to more `Exchange`
+Step 8 fixed a real architectural violation Step 5 introduced (a Cargo
+dependency from `amenable_kani` to `amenable_creusot` — verifier
+backend crates never depend on each other) via a shared-registry query
+instead, and along the way found real, confirmed evidence that `#[cfg(
+not(creusot))]`-gating `inventory` calls precisely in place is a
+working alternative to relocating them to a different crate entirely —
+not yet applied to `amenable_std::creusot_witness`'s own, much larger
+such surface, a real, explicitly-deferred future direction, not started
+without explicit new direction. Nothing further is queued —
+extending this pattern to more `Exchange`
 edges beyond `Stoplight`; wiring `Requires<KaniVerifier>`/`Requires<V>`
 for a real (non-trivial) precondition once one exists; or generating
 `Evidence`/`ProofToken`/`Establish` themselves, or the coarser-grained

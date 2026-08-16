@@ -17,6 +17,7 @@ categories = ["development-tools"]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 creusot-std = { workspace = true }
+inventory = { workspace = true }
 
 [dev-dependencies]
 proc-macro2 = { workspace = true }
