@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 213 4 213 39 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 219 4 219 39 *)
 
 (* <stoplight::Established<T, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 213 16 213 20
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 213 25 213 39
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 219 16 219 20
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 219 25 219 39
 
 use creusot.prelude.Any
 
@@ -45,7 +45,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec primary_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 213 4 213 39]
+let rec primary_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 219 4 219 39]
   (self: t_Established_T_Token) (return (x: t_T)) =
   {[@stop_split] [@expl:primary 'self' type invariant] [%#sstoplight] inv_ref_Established_T_Token self}
   (! bb0

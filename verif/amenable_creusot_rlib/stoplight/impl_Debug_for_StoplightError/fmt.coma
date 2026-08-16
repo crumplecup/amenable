@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 269 9 269 14 *)
 
-(* <witness::CreusotVerifierMetadata as std::fmt::Debug> *)
+(* <stoplight::StoplightError as std::fmt::Debug> *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 269 9 269 14
 let%span sfmt = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 8 26 8 30
 let%span sfmt'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 7 19 7 23
-let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any
@@ -33,22 +33,24 @@ predicate resolve_refmut_Formatter [@inline:trivial] (_1: MutBorrow.t t_Formatte
 
 meta "rewrite_def" predicate resolve_refmut_Formatter
 
+type t_StoplightError = NotUsed
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec fmt_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14]
-  (self: ()) (f: MutBorrow.t t_Formatter) (return (x: t_Result_unit_Error)) =
-  {[@stop_split] [@expl:fmt 'f' type invariant] [%#switness] inv_refmut_Formatter f}
+let rec fmt_StoplightError [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 269 9 269 14]
+  (self: t_StoplightError) (f: MutBorrow.t t_Formatter) (return (x: t_Result_unit_Error)) =
+  {[@stop_split] [@expl:fmt 'f' type invariant] [%#sstoplight] inv_refmut_Formatter f}
   (! bb0
   [ bb0 = s0
-    [ s0 = [ &_5 <- [%#switness] "CreusotVerifierMetadata" ] s1
+    [ s0 = [ &_5 <- [%#sstoplight] "NotUsed" ] s1
     | s1 = MutBorrow.borrow_final <t_Formatter> {f.current} {MutBorrow.get_id f}
         (fun (_bor: MutBorrow.t t_Formatter) ->
           [ &_3 <- _bor ] -{inv_Formatter _bor.final}-
           [ &f <- { f with current = _bor.final } ] s2)
       [ _ck -> (! {[@expl:type invariant] inv_Formatter f.current} any) ]
-    | s2 = write_str [%#switness] {_3} {_5} (fun (_x: t_Result_unit_Error) -> [ &_ret <- _x ] s3)
+    | s2 = write_str [%#sstoplight] {_3} {_5} (fun (_x: t_Result_unit_Error) -> [ &_ret <- _x ] s3)
     | s3 = s4 [ _ck -> (! {[@expl:type invariant] inv_refmut_Formatter f} any) ]
     | s4 = -{resolve_refmut_Formatter f}- s5
     | s5 = return {_ret} ] ]

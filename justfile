@@ -57,17 +57,36 @@ creusot_env := "PATH=" + home_directory() + "/.local/share/creusot/bin:${PATH} D
 # dependency needs no nightly feature) -- these recipes just turn on the
 # `creusot` feature, which is off by default (an experimental, still-partial
 # verifier backend, not yet part of the default proof-chain surface).
+
+# Regenerates `amenable_creusot/src/generated/*.rs` -- real `Exchange`-edge
+# companions written from `amenable_core::ExchangeEdgeRecord` (registered
+# by `#[amenable_derive::exchange(..)]` in `amenable_kani`), the same
+# "regenerate before checking" discipline `emit-verus-witnesses` already
+# uses. Run this after changing a real Kani-side transition; the generated
+# files are checked in, not built fresh by `cargo creusot` itself.
+# `rustfmt` invoked directly per file, not `cargo fmt -p amenable_creusot`
+# -- confirmed empirically that `cargo fmt` never reaches `src/generated/
+# *.rs` at all, since they're `include!`d into `stoplight.rs`, not `mod`-
+# declared, and `cargo fmt`'s file discovery walks the module tree, not
+# the literal file tree.
+generate-creusot:
+    cargo run -p amenable --features creusot -- emit-creusot-companions
+    rustfmt crates/amenable_creusot/src/generated/*.rs
+
 check-creusot:
+    just generate-creusot
     cargo check -p amenable_creusot
     cargo check -p amenable_std --features creusot
     cargo check -p amenable --features creusot
 
 clippy-creusot:
+    just generate-creusot
     cargo clippy -p amenable_creusot --all-targets -- -D warnings
     cargo clippy -p amenable_std --features creusot --all-targets -- -D warnings
     cargo clippy -p amenable --features creusot --all-targets -- -D warnings
 
 test-creusot:
+    just generate-creusot
     cargo test -p amenable_creusot
     cargo test -p amenable_std --features creusot
     cargo test -p amenable --features creusot
@@ -80,10 +99,12 @@ check-all-creusot:
 # Rust -> Why3/COMA translation only, no SMT solving -- fastest way to check
 # that contracts actually parse under the real Creusot toolchain.
 verify-creusot-translate:
+    just generate-creusot
     env {{creusot_env}} cargo creusot -- -p amenable_creusot
 
 # Full translate + prove for amenable_creusot's own contracts.
 verify-creusot:
+    just generate-creusot
     env {{creusot_env}} cargo creusot prove -- -p amenable_creusot
 
 # `amenable_verus` compiles fine on plain stable (`verus_builtin_macros`/

@@ -17,3 +17,10 @@ pub fn artifacts_directory() -> PathBuf {
 pub fn verus_source_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src")
 }
+
+/// The `amenable_creusot` crate's generated-companion directory, resolved
+/// the same way `verus_source_directory` is.
+#[must_use]
+pub fn creusot_generated_directory() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_creusot/src/generated")
+}

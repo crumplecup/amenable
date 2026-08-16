@@ -148,13 +148,11 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ All nine steps (0 through 8) done and verified — Kani and
+**Status:** ✅ All ten steps (0 through 9) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
-`Proved (110 files) ✔`) with a genuine injected-regression check per
-edge per backend, plus a real consistency test keeping the Creusot
-mirror honest against the real Kani source (Step 2, verified in both
-drift directions), plus the by-hand Kani-side wiring generalized into
+`Proved (112 files) ✔`) with a genuine injected-regression check per
+edge per backend, plus the by-hand Kani-side wiring generalized into
 a real `#[amenable_derive::exchange(..)]` attribute macro (Step 3),
 re-verified against all three edges post-swap, plus all three edges
 composed into one `#[kani::stub_verified]` full-cycle harness (Step
@@ -166,9 +164,12 @@ the first anywhere in the tree, every surface backed by queried or
 compiler-checked data (Step 5 originally added a feature-gated
 `amenable_kani -> amenable_creusot` dependency to keep `creusot_
 surface()` honest; Step 8 later removed it as a real architectural
-violation -- see below). The Creusot mirror genuinely implements
-the real `amenable_core` trait family, corrected from an
-over-flattened first version while starting Step 2. Kani and Creusot
+violation -- see below). Creusot's own companion is now generated
+directly from the real Kani body (Step 9, see below) — the mirror
+that used to genuinely (if separately) implement the real `amenable_
+core` trait family, and the `stoplight_mirror_consistency_test.rs`
+that kept it honest against drift (Step 2), are both gone, superseded
+by generation rather than hand-duplication. Kani and Creusot
 first, by deliberate sequencing — Verus support for `Exchange` was
 deferred here rather than bolted on weak (Verus can't check an
 arbitrary compiled Rust body directly, only `verus! {}`-native code),
@@ -233,6 +234,69 @@ Full workspace clean, `just verify-creusot` still `Proved (110 files)
 witness`'s own much larger (~90-registration) surface the same way --
 a real, much bigger undertaking, flagged for explicit future
 direction, not started.
+
+Step 9, direct pointed pushback on Step 8 itself: "why is codegen
+deliberately been ignored, in spite of multiple issues with inventory
+at every step? Isn't the solution staring us in the face?" Step 8's
+own `#[cfg(not(creusot))]`-gating fix was real but still a patch
+*around* `inventory`'s repeated friction with Creusot's translator,
+not a fix for the friction itself. Pointed at real, already-shipped
+proof this codebase already had a better answer:
+`amenable::verus_export`/`emit-verus-witnesses` (~950 lines, real,
+already shipped) reads a registry from inside an ordinary, never-
+translated binary and *generates* real, checked-in, `inventory`-free
+source the verifier just compiles as static code -- `inventory` never
+has to survive into the translated crate at all, not gated out item by
+item, simply never present. `#[amenable_derive::exchange(..)]` now
+captures each real edge's transition body verbatim (`Span::
+source_text()` on the method's own block, the same technique
+`harness!` already uses) and registers it, with its real type names,
+as a new `amenable_core::ExchangeEdgeRecord` -- safe unconditionally,
+since `amenable_kani` is never translated by anything. A new
+`amenable::creusot_export`/`emit-creusot-companions` (mirroring
+`verus_export`'s own architecture exactly) reads that registry and
+writes real `harness! { creusot, .. }` + `ProofRecord` files into
+`amenable_creusot/src/generated/*.rs`, `include!`d into `stoplight.rs`
+directly (no `mod`, so no imports needed -- also means `cargo fmt -p
+<crate>` never discovers them, a real, confirmed gap fixed by running
+`rustfmt` directly on the generated files instead). Deliberately
+narrow: generates only the per-edge transition body, not the
+surrounding state/token/sidecar type definitions, which stay hand-
+written, stable, one-time infrastructure.
+
+Five real bugs found and fixed while building this, none assumed away:
+capturing the real `Ok(..)`-wrapped body meant the generated signature
+needed the real `Result<Output, Error>` return type (not the old
+mirror's silently-simplified bare `Output`), which meant `StoplightError`
+itself needed a real Creusot-local counterpart; `rustfmt` doesn't
+reformat inside an opaque macro invocation by default, confirmed
+directly (a real generated file's `stringify!`-produced type spacing
+survived a real `cargo fmt` run untouched), fixed with a targeted
+text-cleanup pass; the captured body's own first line loses its
+original indentation to `.trim()` while every other line keeps it, a
+real confirmed dedent bug, fixed with a real dedent-then-reindent
+pass; a real chicken-and-egg bootstrap problem (the generator needs
+`amenable_creusot` to compile, which needs the generated files to
+exist), broken by committing minimal placeholders once; and the
+generated header's `//!` caused a real `E0753` once `include!`d
+mid-file, fixed with plain `//`. `stoplight_mirror_consistency_test.rs`
+is gone entirely, not superseded by a freshness check -- with the
+body generated directly from the real source, there's nothing left to
+guard drift *between*. `amenable_creusot`'s now-unused `proc-macro2`/
+`quote`/`syn` dev-dependencies (only needed by that test) removed too.
+
+Verified for real at every step: `just verify-creusot` -- `Proved (112
+files) ✔` (up from 110). Full workspace clean, `just check-all-creusot`/
+`test-creusot` clean end to end, `cargo test --workspace` clean
+(matching this project's own per-package/per-feature testing
+convention -- a real, confirmed nuance found along the way: a blanket
+`--all-features` sweep transitively links `amenable_creusot` into
+`amenable_kani`'s own test binary via `amenable_std`'s `creusot`
+feature, even with no edge `amenable_kani` itself declares, which its
+own test's doc comment now states precisely rather than overclaiming).
+`just generate-creusot` wired into every Creusot recipe that checks
+anything, matching `emit-verus-witnesses`'s own "regenerate before
+checking" placement exactly.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the

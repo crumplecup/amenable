@@ -69,7 +69,16 @@ independence, caught by direct correction and fixed by having `amenable
 _creusot::stoplight` register its own `ProofRecord`s (`#[cfg(not(
 creusot))]`-gated, confirmed to work in an isolated probe) for `creusot
 _surface()` to query via the shared `amenable_core` registry instead of
-importing across crates — see Step 8 below.
+importing across crates — see Step 8 below. Step 9 is also complete:
+Step 8's own `#[cfg(not(creusot))]`-gating fix was real but still a
+patch around `inventory`'s repeated friction with Creusot's
+translator, not a fix for the friction itself — replaced with a real
+codegen layer (`amenable::creusot_export`/`emit-creusot-companions`,
+mirroring `emit-verus-witnesses`'s own already-shipped architecture)
+that generates `amenable_creusot`'s per-edge companions directly from
+`amenable_kani`'s real, captured transition bodies, eliminating both
+the hand-written mirror and `stoplight_mirror_consistency_test.rs`
+entirely — see Step 9 below.
 
 ## Motivation
 
@@ -1104,6 +1113,130 @@ registrations is a different scale of change than three `Stoplight`
 edges, and wasn't part of what was asked for here — flagged for
 explicit future direction, not started.
 
+### Step 9 — a real codegen layer replaces the hand-written Creusot mirror — done
+
+Direct, pointed pushback on Step 8 itself, not a new request: "why is
+codegen deliberately been ignored, in spite of multiple issues with
+inventory at every step? Isn't the solution staring us in the face?"
+Step 8's `#[cfg(not(creusot))]`-gating fix was real and correctly
+removed the `amenable_kani -> amenable_creusot` Cargo edge, but it was
+still a patch *around* `inventory`'s repeated friction with Creusot's
+whole-crate translator, not a fix that made the friction stop
+recurring. The user pointed at `amenable`'s own `emit-verus-witnesses`
+(`crates/amenable/src/verus_export.rs`, ~950 lines, real and already
+shipped) as proof a better answer already existed in this exact
+codebase: read a real registry from inside an ordinary, never-
+translated binary, and *generate* real, checked-in, `inventory`-free
+source the verifier just compiles as ordinary static code. `inventory`
+never has to survive into the translated crate at all — not gated out
+item by item, simply never present.
+
+**What got built.** `#[amenable_derive::exchange(..)]` now captures
+each real edge's transition body verbatim (the same `Span::
+source_text()` technique `harness!` already uses, applied to the
+method's own `block` this time) and registers it, alongside its real
+type names (`self_ty`/`input_ty`/`output_ty`/`error_ty`/`evidence`/
+`method_name`), as a new `amenable_core::ExchangeEdgeRecord` —
+unconditionally, regardless of `#cfg`, since `amenable_kani` is
+ordinary Cargo-built and never translated by anything, so this
+`inventory::submit!` carries none of the risk a translator-based
+crate's own would. A new `amenable::creusot_export` module (mirroring
+`verus_export.rs`'s own architecture) plus `emit-creusot-companions`
+CLI command queries that registry from inside the safe `amenable`
+binary and writes real `amenable_derive::harness! { creusot, .. }` +
+`ProofRecord`-registration files into `amenable_creusot/src/
+generated/*.rs`, `include!`d (not `mod`-declared, so the generated
+files share `stoplight.rs`'s own scope with no imports needed) from
+`amenable_creusot/src/stoplight.rs`. Deliberately narrow scope, one
+real example first: generates only the per-edge transition-body
+content, not the surrounding state/token/sidecar type definitions
+(`Green`/`Yellow`/`Established<T, Token>`), which stay hand-written —
+stable, one-time accommodation-model infrastructure with far lower
+drift risk than a transition body's own evolving logic, and not
+something a different backend's real source can be captured verbatim
+*from* in the first place (Creusot's own `Green` is a different,
+locally-defined concrete type from Kani's, matching by name/shape
+convention, not by shared source).
+
+**Real bugs found and fixed while building this, not assumed away:**
+
+1. Capturing the real body verbatim, `Ok(..)` wrapper included, meant
+   the generated function's return type had to be the real `Result<
+   Output, Error>`, not the bare `Output` type the old hand-written
+   mirror used (which had silently simplified the signature and
+   dropped the wrapper). This meant `StoplightError` itself needed a
+   real Creusot-local counterpart — one more small, stable, hand-
+   written accommodation-model type, matching `Green`/`Yellow`/`Red`'s
+   own treatment, not something codegen could avoid needing.
+2. `rustfmt` does not reformat inside an opaque macro invocation's own
+   token tree (`harness! { .. }`) by default — confirmed directly, not
+   assumed: a real generated file's `stringify!`-produced type text
+   (`Established < Green , GreenToken >`, from `stringify!`'s one-
+   space-per-token join) survived a real `cargo fmt -p amenable_creusot`
+   run untouched. Fixed with a narrow, targeted text-cleanup pass
+   (`tidy_stringified_type`) rather than relying on a later format
+   pass that never actually reaches the text — and confirmed `cargo
+   fmt -p <crate>` doesn't even discover `include!`d (not `mod`-
+   declared) files at all, fixed by invoking `rustfmt` directly on the
+   generated files in the `generate-creusot` recipe instead.
+3. The captured body's own first line loses its original indentation
+   to `.trim()` (which only strips the very start/end of the *whole*
+   captured string), while every other line keeps its real, original
+   column — a real, confirmed dedent bug (visibly double-indented
+   non-first lines in an actual generated file), not a hypothetical
+   one, fixed with a real dedent-then-reindent pass, not a uniform
+   re-indent alone.
+4. A real chicken-and-egg bootstrap problem: `emit-creusot-companions`
+   itself needs `amenable_creusot` to compile successfully to run at
+   all (it's linked into the `amenable` binary), but `amenable_creusot`
+   needs the generated files to exist to compile. Broken by committing
+   minimal placeholder generated files (matching `pub const NAME: &str
+   = "";` shape) once, the same bootstrap step `elicitation`'s own
+   generator docs describe for an identical reason.
+5. The generated file's own header used `//!` (inner doc comment) —
+   valid for a real module, a real `E0753` compile error once
+   `include!`d mid-file into `stoplight.rs`'s own scope instead of its
+   own module. Fixed with a plain `//` comment.
+
+**`stoplight_mirror_consistency_test.rs` is gone**, not superseded by
+a regeneration-freshness check: with the transition bodies now
+generated directly from the real source (not a hand-kept-in-sync
+copy), there is nothing left for a consistency test to guard against
+drift *between* — the single source of truth and its Creusot
+companion are mechanically the same by construction. `amenable_creusot`'s
+now-unused `proc-macro2`/`quote`/`syn` dev-dependencies (only ever
+needed by that test's own source-parsing) were removed too.
+
+**Verified for real, against the actual toolchain at every step, not
+assumed**: `just verify-creusot` — `Proved (112 files) ✔` (up from
+110; the generated-file split changes proof-unit granularity slightly,
+still a full clean proof). Full workspace `fmt --check`/`check`/
+`clippy --all-targets --all-features -D warnings` clean, `just
+check-all-creusot`/`just test-creusot` clean end to end, `cargo test
+--workspace` clean (matching this project's own per-package/per-
+feature testing convention, not a blanket `--all-features` sweep — a
+real, confirmed nuance found along the way: workspace-wide feature
+unification transitively links `amenable_creusot` into `amenable_
+kani`'s own test binary via `amenable_std`'s own `creusot` feature,
+even though `amenable_kani` itself declares no such edge, which is why
+`creusot_surface_is_honestly_empty_in_this_crate_s_own_test_binary`'s
+own doc comment now states that caveat precisely rather than
+overclaiming). `just generate-creusot` (the new recipe) wired into
+`check-creusot`/`clippy-creusot`/`test-creusot`/`verify-creusot`/
+`verify-creusot-translate`, matching `emit-verus-witnesses`'s own
+"regenerate before checking" placement exactly. Step 9 is complete.
+
+**Left for explicit future direction, not started here**: migrating
+`amenable_std::creusot_witness`'s own much larger (~90-registration)
+surface the same way — Step 8's own deferred question, now with an
+even stronger case for it (real codegen, not just cfg-gating, is
+proven out for this exact class of problem) but still a much bigger
+undertaking than this step; and a `creusot_ensures!`-style mechanism
+for a genuinely non-trivial Pearlite predicate, once one exists to
+generate for (every real edge today is still trivially `#[requires(
+true)] #[ensures(true)]`, hardcoded in the generator rather than
+designed speculatively for a case that doesn't exist yet).
+
 ## Open questions
 
 - **Creusot compilation model — resolved, landed in Step 1.** Not
@@ -1258,44 +1391,48 @@ concluding something in Step 1+ is a novel problem:
 ## Next step
 
 Steps 0 through 5 — every step this plan originally scoped — plus
-Steps 6, 7, and 8 (added after the fact) are now complete: the `Sidecar<V>`
-trait-family fix; real Kani and Creusot bodies for all three
-`Stoplight` edges; a real consistency test keeping the Creusot mirror
-honest against the real Kani source; the by-hand Kani-side pattern
-generalized into `#[amenable_derive::exchange(..)]`; all three edges
-composed into one full-cycle `#[kani::stub_verified]` harness;
-`Stoplight`'s real `Amenable` impl, the first anywhere in the tree;
-all three edges' DFCC postconditions routed through registered
-`Ensures<KaniVerifier>` contract types instead of restated inline; and
-that routing generated by the macro itself rather than hand-typed per
-edge. The Verus counterpart of that last piece has since landed too,
-in two parts — `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 6
-(`exchange_support::verus_ensures!`, the `Ensures<V>`-wiring
-counterpart) and Step 7 (`exchange_support::verus_exchange!`, the
-`Witness<V>`/`Exchange<V>` counterpart, added after direct pushback —
-"hand-written is not the goal here" — on Step 6 alone) — completing
-what the user called the "trifecta": Kani's contract/scaffold
-generated by a proc-macro attribute, Verus's generated by `macro_
-rules!` macros (a proc-macro crate structurally cannot resolve under
-`verus --crate-type=lib` at all), and Creusot's own consistency test
-(Step 2) keeping its hand-written mirror honest against the real Kani
-source. On both Kani and Verus, only each edge's real transition body
-remains hand-authored; every mechanical piece around it is generated.
-Step 8 fixed a real architectural violation Step 5 introduced (a Cargo
-dependency from `amenable_kani` to `amenable_creusot` — verifier
-backend crates never depend on each other) via a shared-registry query
-instead, and along the way found real, confirmed evidence that `#[cfg(
-not(creusot))]`-gating `inventory` calls precisely in place is a
-working alternative to relocating them to a different crate entirely —
-not yet applied to `amenable_std::creusot_witness`'s own, much larger
-such surface, a real, explicitly-deferred future direction, not started
-without explicit new direction. Nothing further is queued —
-extending this pattern to more `Exchange`
+Steps 6 through 9 (added after the fact) are now complete: the
+`Sidecar<V>` trait-family fix; real Kani and Creusot bodies for all
+three `Stoplight` edges; the by-hand Kani-side pattern generalized
+into `#[amenable_derive::exchange(..)]`; all three edges composed into
+one full-cycle `#[kani::stub_verified]` harness; `Stoplight`'s real
+`Amenable` impl, the first anywhere in the tree; all three edges' DFCC
+postconditions routed through registered `Ensures<KaniVerifier>`
+contract types instead of restated inline, that routing generated by
+the macro itself rather than hand-typed per edge (Steps 6/7); the
+`amenable_kani -> amenable_creusot` Cargo dependency Step 5 introduced
+removed as a real architectural violation (Step 8); and the hand-
+written Creusot mirror — plus `stoplight_mirror_consistency_test.rs`,
+the drift-guard it needed — replaced entirely by a real codegen layer
+generating Creusot's companions directly from Kani's own captured
+transition bodies (Step 9). The Verus counterpart of Steps 6/7 has
+since landed too, in two parts — `VERUS_EXCHANGE_PROOF_DERIVATION_
+PLAN.md`'s own Step 6 (`exchange_support::verus_ensures!`) and Step 7
+(`exchange_support::verus_exchange!`, added after direct pushback —
+"hand-written is not the goal here") — completing what the user called
+the "trifecta": Kani's contract/scaffold generated by a proc-macro
+attribute, Verus's by `macro_rules!` macros (a proc-macro crate
+structurally cannot resolve under `verus --crate-type=lib` at all),
+and Creusot's now generated too, by a real codegen tool reading a safe
+registry (mirroring `emit-verus-witnesses`'s own architecture) rather
+than either hand-copying or embedding `inventory` in the translated
+crate itself. On all three backends, only each edge's real transition
+body remains hand-authored; every mechanical piece around it is
+generated.
+
+Nothing further is queued — extending this pattern to more `Exchange`
 edges beyond `Stoplight`; wiring `Requires<KaniVerifier>`/`Requires<V>`
-for a real (non-trivial) precondition once one exists; or generating
-`Evidence`/`ProofToken`/`Establish` themselves, or the coarser-grained
-per-state-machine carrier shape (`Established<T, Token>`/`Sidecar<V>`
-on the Verus side; there is no Kani analog since `amenable_kani::
-stoplight`'s own `Established<T, Token>` already plays that role) are
-all real future directions, but none should be started without
-explicit new direction, matching this plan's pacing throughout.
+for a real (non-trivial) precondition once one exists; a `creusot_
+ensures!`-style mechanism for a genuinely non-trivial Pearlite
+predicate (Step 9's own generator still hardcodes a trivial `requires`/
+`ensures` pair, honestly, since nothing non-trivial exists yet);
+migrating `amenable_std::creusot_witness`'s own much larger (~90-
+registration) witness-bridge surface to the same codegen pattern (Step
+8/9's own deferred question, now with a stronger case for it); or
+generating `Evidence`/`ProofToken`/`Establish` themselves, or the
+coarser-grained per-state-machine carrier shape (`Established<T,
+Token>`/`Sidecar<V>` on the Verus side; there is no Kani analog since
+`amenable_kani::stoplight`'s own `Established<T, Token>` already plays
+that role) are all real future directions, but none should be started
+without explicit new direction, matching this plan's pacing
+throughout.

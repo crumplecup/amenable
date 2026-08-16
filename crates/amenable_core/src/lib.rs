@@ -43,7 +43,7 @@ pub use chain::{
 pub use contract::{Ensures, Requires};
 pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
-pub use link::{ContractRecord, EvidenceLink, ProofRecord};
+pub use link::{ContractRecord, EvidenceLink, ExchangeEdgeRecord, ProofRecord};
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};

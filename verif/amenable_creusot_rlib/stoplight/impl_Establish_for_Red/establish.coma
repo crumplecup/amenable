@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 235 4 235 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 241 4 241 57 *)
 
 (* <stoplight::Red as amenable_core::Establish<stoplight::YellowToken, witness::CreusotVerifier>> *)
 
@@ -12,7 +12,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec establish_Red [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 235 4 235 57]
+let rec establish_Red [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 241 4 241 57]
   (_credential: t_YellowToken) (return (x: t_RedToken)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- { f0 = _2 } ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_RedToken = Any.any_l () | & _2: () = Any.any_l () ])

@@ -22,6 +22,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+#[cfg(feature = "creusot")]
+mod creusot_export;
 mod error;
 pub mod paths;
 #[cfg(feature = "verus")]
@@ -31,6 +33,8 @@ pub mod assessment;
 pub mod gallery;
 pub mod kani;
 
+#[cfg(feature = "creusot")]
+pub use creusot_export::write_creusot_exchange_companions;
 pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
@@ -41,12 +45,12 @@ pub use verus_export::write_verus_witness_modules;
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
     ClassifiedWitness, ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange,
-    MetadataEntry, OwnedProvenanceReport, ProofChainReport, ProofRecord, ProofToken, Provenance,
-    ProvenanceReport, Registry, RegistryReport, Requires, Sidecar, Standard, StateMachine,
-    Verifier, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
-    WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,
-    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, proof_chain,
-    proof_chain_for_verifiers, witness_exports,
+    ExchangeEdgeRecord, MetadataEntry, OwnedProvenanceReport, ProofChainReport, ProofRecord,
+    ProofToken, Provenance, ProvenanceReport, Registry, RegistryReport, Requires, Sidecar,
+    Standard, StateMachine, Verifier, Witness, WitnessArtifact, WitnessArtifactMember,
+    WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord,
+    WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
+    proof_chain, proof_chain_for_verifiers, witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{CreusotVerifier, CreusotVerifierMetadata, CreusotWitness};

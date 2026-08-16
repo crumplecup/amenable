@@ -56,7 +56,7 @@
 //! method's own DFCC `ensures` attribute.
 
 use proc_macro2::{Ident, TokenStream};
-use quote::quote;
+use quote::{ToTokens, quote};
 use syn::{
     Error, Expr, FnArg, GenericArgument, ImplItem, ItemImpl, LitStr, MetaNameValue, Path,
     PathArguments, ReturnType, Token, Type,
@@ -224,6 +224,21 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
         None => quote! { concat!(module_path!(), "::", stringify!(#evidence)) },
     };
 
+    // Verbatim source of the method's own body -- the same `Span::
+    // source_text()` technique `harness!` uses for its own braced group,
+    // applied here to the parsed method's `block` instead. Feeds
+    // `ExchangeEdgeRecord::body` below: the one piece of real, hand-
+    // authored content a different backend's codegen tool needs to
+    // generate its own companion from, without duplicating it by hand.
+    let body_source = method
+        .block
+        .brace_token
+        .span
+        .join()
+        .source_text()
+        .map(|text| trim_braces(&text).to_owned())
+        .unwrap_or_else(|| method.block.to_token_stream().to_string());
+
     // Inject the DFCC contract onto a clone of the method rather than
     // requiring it hand-written at the call site (see this file's own doc
     // comment for why this doesn't weaken the "real proof content stays
@@ -270,6 +285,25 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
             }
         }
 
+        // Always registered, regardless of `#cfg` -- this crate is
+        // ordinary Cargo-built and never translated by anything, so
+        // `inventory::submit!` here carries none of the ICE risk a
+        // translator-based backend's own crate would (see `amenable_core::
+        // ExchangeEdgeRecord`'s own doc comment). A different backend's
+        // codegen tool queries this to generate its own companion from the
+        // real body, without a Cargo dependency on this crate at all.
+        ::inventory::submit! {
+            ::amenable_core::ExchangeEdgeRecord {
+                self_ty: stringify!(#self_ty),
+                input_ty: stringify!(#input_ty),
+                output_ty: stringify!(#output_ty),
+                error_ty: stringify!(#error_ty),
+                evidence: stringify!(#evidence),
+                method_name: stringify!(#method_ident),
+                body: #body_source,
+            }
+        }
+
         impl ::amenable_core::Exchange<#input_ty, #output_ty, #verifier> for #self_ty {
             type Error = #error_ty;
 
@@ -281,6 +315,17 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
             }
         }
     })
+}
+
+/// Strip the outer `{`/`}` a brace-spanning `source_text()` includes,
+/// along with the whitespace immediately inside them -- the same helper
+/// `harness.rs` defines for its own, structurally identical need.
+fn trim_braces(text: &str) -> &str {
+    text.trim()
+        .strip_prefix('{')
+        .and_then(|text| text.strip_suffix('}'))
+        .map(str::trim)
+        .unwrap_or(text)
 }
 
 /// Extract `(T, E)` from a `Result<T, E>` return type.

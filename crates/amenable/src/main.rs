@@ -28,6 +28,11 @@ enum Commands {
     #[cfg(feature = "verus")]
     #[command(name = "emit-verus-witnesses")]
     EmitVerusWitnesses(EmitVerusWitnessesArgs),
+    /// Materialize derived Creusot `Exchange`-edge companions from the
+    /// real registry.
+    #[cfg(feature = "creusot")]
+    #[command(name = "emit-creusot-companions")]
+    EmitCreusotCompanions(EmitCreusotCompanionsArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
     Gallery(gallery::GalleryArgs),
     /// Write the full evidence and proof registry as JSON.
@@ -74,6 +79,8 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
         Some(Commands::Assess(args)) => assessment::run(args),
         #[cfg(feature = "verus")]
         Some(Commands::EmitVerusWitnesses(args)) => run_emit_verus_witnesses(args),
+        #[cfg(feature = "creusot")]
+        Some(Commands::EmitCreusotCompanions(args)) => run_emit_creusot_companions(args),
         Some(Commands::Gallery(args)) => gallery::run(args),
         Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
         Some(Commands::Verify(VerifyArgs {
@@ -155,6 +162,33 @@ fn run_emit_verus_witnesses(args: EmitVerusWitnessesArgs) -> AmenableResult<()> 
     }
 
     Ok(())
+}
+
+#[cfg(feature = "creusot")]
+fn run_emit_creusot_companions(args: EmitCreusotCompanionsArgs) -> AmenableResult<()> {
+    let root = args
+        .root
+        .unwrap_or_else(amenable::paths::creusot_generated_directory);
+    let paths = amenable::write_creusot_exchange_companions(&root)?;
+
+    println!(
+        "Wrote {} Creusot Exchange-edge companion(s) under {}:",
+        paths.len(),
+        root.display()
+    );
+    for path in &paths {
+        println!("  {}", path.display());
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "creusot")]
+#[derive(Debug, Args)]
+struct EmitCreusotCompanionsArgs {
+    /// Directory to write generated companion files into.
+    #[arg(long)]
+    root: Option<PathBuf>,
 }
 
 #[derive(Debug, Args)]

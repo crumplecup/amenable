@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 327 8 329 43 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 16 8 16 116 *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 330 41 330 56
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 330 24 330 57
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 331 12 331 42
-let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 325 19 325 23
-let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 326 18 326 22
+let%span sred_to_green = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 41 17 56
+let%span sred_to_green'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 24 17 57
+let%span sred_to_green'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 18 15 18 45
+let%span sred_to_green'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 14 19 14 23
+let%span sred_to_green'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 15 18 15 22
 
 use creusot.prelude.Any
 
@@ -25,20 +25,27 @@ type t_Established_Green_GreenToken = { primary'0: (); token'0: t_GreenToken }
 let rec new_Green (primary'1: ()) (token'1: t_GreenToken) (return (x: t_Established_Green_GreenToken)) = any
   [ return (result: t_Established_Green_GreenToken) -> (! return {result}) ]
 
+type t_StoplightError = NotUsed
+
+type t_Result_Established_Green_GreenToken_StoplightError = Ok t_Established_Green_GreenToken | Err t_StoplightError
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 327 8 329 43]
-  (input: t_Established_Red_RedToken) (return (x: t_Established_Green_GreenToken)) = (! bb0
+let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 16 8 16 116]
+  (input: t_Established_Red_RedToken) (return (x: t_Result_Established_Green_GreenToken_StoplightError)) = (! bb0
   [ bb0 = s0
-    [ s0 = sidecar_Established_Red_RedToken [%#sstoplight] {input} (fun (_x: t_RedToken) -> [ &_5 <- _x ] s1)
-    | s1 = establish_Green [%#sstoplight'0] {_5} (fun (_x: t_GreenToken) -> [ &token'1 <- _x ] s2)
-    | s2 = [ &_7 <- () ] s3
-    | s3 = new_Green [%#sstoplight'1] {_7} {token'1} (fun (_x: t_Established_Green_GreenToken) -> [ &_ret <- _x ] s4)
-    | s4 = return {_ret} ] ]
-  [ & _ret: t_Established_Green_GreenToken = Any.any_l ()
+    [ s0 = sidecar_Established_Red_RedToken [%#sred_to_green] {input} (fun (_x: t_RedToken) -> [ &_5 <- _x ] s1)
+    | s1 = establish_Green [%#sred_to_green'0] {_5} (fun (_x: t_GreenToken) -> [ &token'1 <- _x ] s2)
+    | s2 = [ &_8 <- () ] s3
+    | s3 = new_Green [%#sred_to_green'1] {_8} {token'1} (fun (_x: t_Established_Green_GreenToken) -> [ &_7 <- _x ] s4)
+    | s4 = [ &_ret <- Ok _7 ] s5
+    | s5 = return {_ret} ] ]
+  [ & _ret: t_Result_Established_Green_GreenToken_StoplightError = Any.any_l ()
   | & input: t_Established_Red_RedToken = input
   | & token'1: t_GreenToken = Any.any_l ()
   | & _5: t_RedToken = Any.any_l ()
-  | & _7: () = Any.any_l () ]) [ return (result: t_Established_Green_GreenToken) -> (! return {result}) ]
+  | & _7: t_Established_Green_GreenToken = Any.any_l ()
+  | & _8: () = Any.any_l () ])
+  [ return (result: t_Result_Established_Green_GreenToken_StoplightError) -> (! return {result}) ]

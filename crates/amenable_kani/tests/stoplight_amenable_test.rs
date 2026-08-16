@@ -3,12 +3,23 @@
 //! `audit_surface()` anywhere in the tree (Step 5 of
 //! `EXCHANGE_PROOF_DERIVATION_PLAN.md`). Confirms `kani_surface()`/
 //! `audit_surface()` report real, specific content, not an empty or
-//! vacuous default. `creusot_surface()` is honestly empty *here* (Step 8:
-//! `amenable_kani` has no Cargo dependency on `amenable_creusot` at all,
-//! so nothing is linked into this crate's own test binary) -- see
-//! `amenable/tests/stoplight_creusot_surface_test.rs` for the real,
-//! non-empty assertion. `verus_surface()` is honestly empty too (no Verus
-//! `Exchange` proof exists yet).
+//! vacuous default. `creusot_surface()` is honestly empty *here* under
+//! this crate's own default-feature test run (Step 8: `amenable_kani`
+//! has no Cargo dependency on `amenable_creusot` at all, so nothing is
+//! linked into this crate's own test binary) -- see `amenable/tests/
+//! stoplight_creusot_surface_test.rs` for the real, non-empty assertion.
+//! Not true under a blanket `cargo test --workspace --all-features`
+//! sweep, confirmed directly: workspace-wide feature unification forces
+//! `amenable_std`'s own `creusot` feature on too, which pulls `amenable_
+//! creusot` in *transitively* (via `amenable_std`, not any edge `amenable
+//! _kani` itself declares) and links its registrations into every test
+//! binary that includes `amenable_std` -- consistent with the rest of
+//! this project's own testing convention (`just test-creusot`/`check-all
+//! -creusot`, always per-package/per-feature, never a blanket `--all-
+//! features` workspace sweep) rather than a gap this test needs to guard
+//! against.
+//! `verus_surface()` is honestly empty too (no Verus `Exchange` proof
+//! exists yet).
 
 use amenable_core::Amenable;
 use amenable_kani::Stoplight;

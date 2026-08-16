@@ -8,44 +8,50 @@
 //! carry a Cargo dependency on `amenable_kani`/`amenable_std`/`amenable`
 //! at all, and never will: verifier backend crates (`amenable_kani`,
 //! `amenable_creusot`, `amenable_verus`) are independent and never link
-//! to each other directly, full stop — any candidate edge would also
-//! close a real dependency cycle (`amenable_std` already optionally
-//! depends back on this crate; `amenable` depends on this crate too).
-//! What is *not* off-limits, though, and an earlier version of this file
-//! wrongly assumed was: `amenable_core`'s own trait family (`Evidence`,
-//! `Witness<V>`, `Sidecar<V>`, `Establish<C, V>`, `ProofToken`) — this
-//! crate already has a real, unconditional Cargo dependency on
-//! `amenable_core`, and none of those trait *definitions* use the
-//! specific patterns that actually caused real `creusot-rustc` translator
-//! crashes in this exact codebase (`Provenance` impls returning `Box<dyn
-//! Iterator<..>>`; a return-position `impl Trait` method; ungated
-//! `inventory::collect!`/`inventory::submit!` — see `amenable_std::
-//! creusot_witness`'s doc comment and `amenable_std::creusot_gallery`'s
-//! own confirmed findings). So the state/token/sidecar types below
-//! genuinely implement the real `amenable_core` traits, gated to
-//! `CreusotVerifier`, the same way the Kani side implements them gated
+//! to each other directly, full stop. What is *not* off-limits: `amenable_
+//! core`'s own trait family (`Evidence`, `Witness<V>`, `Sidecar<V>`,
+//! `Establish<C, V>`, `ProofToken`) — this crate already has a real,
+//! unconditional Cargo dependency on `amenable_core`, and none of those
+//! trait *definitions* use the specific patterns that actually caused real
+//! `creusot-rustc` translator crashes in this exact codebase (`Provenance`
+//! impls returning `Box<dyn Iterator<..>>`; a return-position `impl
+//! Trait` method; ungated `inventory::collect!`/`inventory::submit!` —
+//! see `amenable_std::creusot_witness`'s doc comment and `amenable_std::
+//! creusot_gallery`'s own confirmed findings). So the state/token/sidecar
+//! types below genuinely implement the real `amenable_core` traits, gated
+//! to `CreusotVerifier`, the same way the Kani side implements them gated
 //! to `KaniVerifier` — `Provenance` stays left out (this file has no use
-//! for it), but `inventory::submit!` does not, below: `#[cfg(not(creusot))]`
-//! -gating it precisely in place (confirmed to work in an isolated probe,
-//! not assumed) is what lets this crate register its own edges' `Proof
-//! Record`s for `amenable_kani::stoplight::creusot_surface()` to query,
-//! with no Cargo dependency in either direction — the registry (`amenable_
-//! core::ProofRecord`) is the shared mechanism, matching how `kani_
-//! surface()` already queries `KaniProofRegistration` the same way.
+//! for it).
 //!
-//! Because the sidecar/establish machinery is now the real thing, not a
-//! flattened stand-in, the real exchange bodies below (`Yellow::
-//! establish(input.sidecar()); Established::new(Yellow, token)`) use the
-//! *same call shape* as `amenable_kani::stoplight::Stoplight::
-//! green_to_yellow` et al., differing only in which concrete types they
-//! close over (`CreusotVerifier`/local mirror types vs. `KaniVerifier`/
-//! the real ones) — closer to a real extraction-with-substitution
-//! candidate for a future Step 2 tool than the earlier, more flattened
-//! version of this file was.
+//! **The three per-edge transition bodies are generated, not hand-written
+//! or hand-kept-in-sync.** An earlier version of this file hand-copied
+//! `amenable_kani::stoplight`'s real transition logic per edge, needing
+//! `stoplight_mirror_consistency_test.rs` to catch drift between the two
+//! copies — a real, standing risk this whole `EXCHANGE_PROOF_DERIVATION_
+//! PLAN.md` lineage otherwise exists to close. `#[amenable_derive::
+//! exchange(..)]` now captures each real edge's transition body verbatim
+//! at macro-expansion time and registers it, alongside its real type
+//! names, as an `amenable_core::ExchangeEdgeRecord` — safe to do from
+//! `amenable_kani` (an ordinary, never-translated Cargo crate) even
+//! though this crate could never do the same for itself. `amenable`'s own
+//! `emit-creusot-companions` CLI command (`amenable::creusot_export`)
+//! reads that registry and *writes* the three `include!`d files below —
+//! real, checked-in, `inventory`-free source `cargo creusot` just
+//! compiles as ordinary static code, the same "generate from a safe
+//! registry query, never call `inventory` inside the translated crate"
+//! pattern `amenable::verus_export`/`emit-verus-witnesses` already uses
+//! for the witness-composition system. Regenerate with `just
+//! generate-creusot` after changing a real Kani-side transition; do not
+//! hand-edit `src/generated/*.rs`.
 //!
-//! Hand-built for now, to validate the shape for real before any
-//! generation tooling exists (matching this project's own "one real
-//! example by hand first" discipline).
+//! The state/token/sidecar type definitions below stay hand-written:
+//! stable, one-time accommodation-model infrastructure with far lower
+//! drift risk than a transition body's own evolving logic, and (unlike
+//! the transition bodies) not something a different backend's real source
+//! can be captured verbatim *from* in the first place -- Kani's own
+//! `Green`/`Yellow`/`Established<T, Token>` are a different, concrete
+//! type from this file's own, even though both names and shapes match by
+//! convention.
 
 #[cfg(creusot)]
 use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
@@ -246,100 +252,38 @@ impl Establish<RedToken, CreusotVerifier> for Green {
     }
 }
 
-amenable_derive::harness! {
-    creusot, VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC, {
-        /// Same call shape as `amenable_kani::stoplight::Stoplight::
-        /// green_to_yellow`'s real body — the real claim is legitimately
-        /// trivial, the same as the Kani-side contract: this function
-        /// never panics and always produces a well-formed `Established<
-        /// Yellow, YellowToken>`, because there is no branching to falsify
-        /// once the type system already enforces that Green's only lawful
-        /// successor is Yellow.
-        #[requires(true)]
-        #[ensures(true)]
-        fn green_to_yellow(
-            input: Established<Green, GreenToken>,
-        ) -> Established<Yellow, YellowToken> {
-            let token = Yellow::establish(input.sidecar());
-            Established::new(Yellow, token)
-        }
-    }
+/// Sanitized mirror of `amenable_kani::stoplight::StoplightError` — a
+/// real, ordinary, constructible type, matching the real one's own
+/// justification exactly: an uninhabited error type (`std::convert::
+/// Infallible`) is incompatible with the same class of reconstruction
+/// concern (Kani's `stub_verified` needs `Arbitrary`; here, the
+/// generated body's own `Ok(..)` still needs *some* concrete `Err` type
+/// to name in its signature, even though no generated edge ever
+/// constructs one). Needed only because the generated bodies below are
+/// the real Kani bodies' own verbatim text, `Ok(..)` wrapper included —
+/// an earlier, hand-written version of this file simplified the return
+/// type to the bare `Ok` payload and dropped the wrapper entirely, which
+/// a *generated, unmodified* body can no longer do without becoming a
+/// silently different claim than the one actually captured.
+#[cfg(creusot)]
+#[derive(Debug, Clone, Copy)]
+pub enum StoplightError {
+    /// The one variant. Exists so `StoplightError` is an ordinary
+    /// constructible type, not so any edge below constructs it.
+    NotUsed,
 }
 
-// Registered here, in this crate, rather than read cross-crate by
-// `amenable_kani::stoplight::creusot_surface()` -- verifier backend
-// crates never depend on each other; the registry (`amenable_core::
-// ProofRecord`, queried the same way `kani_surface()` already queries
-// `KaniProofRegistration`) is the shared mechanism, not a direct import.
-// `#[cfg(not(creusot))]`, not unconditional: a real, confirmed-working
-// alternative to this crate's earlier "move every inventory call to a
-// different crate" fix -- gated precisely in place, `cargo creusot`'s
-// translator never sees the `static` item `inventory::submit!` expands
-// to at all (see `amenable_std::creusot_gallery`'s own confirmed finding
-// for the isolated probe this was checked against before applying it
-// here for real). `VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC` itself stays
-// ungated (see `amenable_derive::harness!`'s own expansion), so it's
-// still available to reference from inside this `#[cfg(not(creusot))]`
-// block even though `Green`/`Yellow`/the harness body above are not.
-#[cfg(not(creusot))]
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_creusot::stoplight::green_to_yellow",
-        verifier: "creusot",
-        describe: || VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC.to_owned(),
-    }
-}
-
-amenable_derive::harness! {
-    creusot, VERIFY_YELLOW_TO_RED_EXCHANGE_SRC, {
-        /// Same call shape as `amenable_kani::stoplight::Stoplight::
-        /// yellow_to_red`'s real body — same legitimately trivial claim as
-        /// `green_to_yellow`.
-        #[requires(true)]
-        #[ensures(true)]
-        fn yellow_to_red(
-            input: Established<Yellow, YellowToken>,
-        ) -> Established<Red, RedToken> {
-            let token = Red::establish(input.sidecar());
-            Established::new(Red, token)
-        }
-    }
-}
-
-// See `green_to_yellow`'s own registration above for the pattern and
-// rationale.
-#[cfg(not(creusot))]
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_creusot::stoplight::yellow_to_red",
-        verifier: "creusot",
-        describe: || VERIFY_YELLOW_TO_RED_EXCHANGE_SRC.to_owned(),
-    }
-}
-
-amenable_derive::harness! {
-    creusot, VERIFY_RED_TO_GREEN_EXCHANGE_SRC, {
-        /// Same call shape as `amenable_kani::stoplight::Stoplight::
-        /// red_to_green`'s real body — the cycle-closing edge, same
-        /// legitimately trivial claim.
-        #[requires(true)]
-        #[ensures(true)]
-        fn red_to_green(
-            input: Established<Red, RedToken>,
-        ) -> Established<Green, GreenToken> {
-            let token = Green::establish(input.sidecar());
-            Established::new(Green, token)
-        }
-    }
-}
-
-// See `green_to_yellow`'s own registration above for the pattern and
-// rationale.
-#[cfg(not(creusot))]
-::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_creusot::stoplight::red_to_green",
-        verifier: "creusot",
-        describe: || VERIFY_RED_TO_GREEN_EXCHANGE_SRC.to_owned(),
-    }
-}
+// The three per-edge `harness! { .. }` blocks (transition body + verbatim
+// source constant) plus their `#[cfg(not(creusot))]`-gated `ProofRecord`
+// registrations -- generated by `amenable emit-creusot-companions` from
+// `amenable_core::ExchangeEdgeRecord`, not hand-written. See this file's
+// own doc comment for the full mechanism and why hand-copying was
+// dropped. `include!`, not `mod`: these share this file's own scope
+// directly (`Green`/`Yellow`/`Established`/`StoplightError` above,
+// already in scope), no `use super::*;`/explicit imports needed in the
+// generated files themselves. Regenerate with `just generate-creusot`
+// after changing a real Kani-side transition; do not hand-edit the
+// included files.
+include!("generated/green_to_yellow.rs");
+include!("generated/yellow_to_red.rs");
+include!("generated/red_to_green.rs");

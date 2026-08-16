@@ -55,9 +55,6 @@ dependencies = [
  "amenable_derive",
  "creusot-std",
  "inventory",
- "proc-macro2",
- "quote",
- "syn 3.0.3",
 ]
 
 [[package]]

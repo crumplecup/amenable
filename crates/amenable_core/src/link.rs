@@ -104,3 +104,45 @@ pub struct ContractRecord {
 }
 
 inventory::collect!(ContractRecord);
+
+/// A statically-registered fact: a real `Exchange` edge exists, with real
+/// type names and its real transition body's verbatim source. Registered
+/// once per edge by `#[amenable_derive::exchange(..)]`, from whichever
+/// crate owns the real inherent method (currently always `amenable_kani`,
+/// the only backend whose own toolchain can run this macro's generated
+/// code safely — see that macro's own doc comment).
+///
+/// Exists so a *different* verifier backend's own companion can be
+/// generated from the real body without a Cargo dependency on the crate
+/// that owns it (verifier backend crates never depend on each other) and
+/// without embedding an `inventory` call inside a crate a translator-based
+/// backend (Creusot) has to sweep whole — the registering crate
+/// (`amenable_kani`) is ordinary Cargo-built and never translated by
+/// anything, so registering here is safe regardless of what any other
+/// backend's own toolchain can tolerate. A codegen tool (an ordinary,
+/// safely-built binary, e.g. `amenable`'s own CLI) queries this registry
+/// and *writes* a real, checked-in, `inventory`-free companion file for
+/// the target backend — the same shape `amenable::verus_export`'s
+/// `emit-verus-witnesses` already uses for the witness-composition system,
+/// applied to `Exchange` edges specifically.
+pub struct ExchangeEdgeRecord {
+    /// The type the `Exchange` impl is for (`Self`), as written.
+    pub self_ty: &'static str,
+    /// The edge's `Input` type, as written.
+    pub input_ty: &'static str,
+    /// The edge's `Output` type, as written.
+    pub output_ty: &'static str,
+    /// The edge's `Error` type, as written.
+    pub error_ty: &'static str,
+    /// The evidence type this edge establishes, in the same naming
+    /// convention as [`EvidenceLink::name`].
+    pub evidence: &'static str,
+    /// The real inherent method's own name (e.g. `green_to_yellow`).
+    pub method_name: &'static str,
+    /// The real inherent method's own body, verbatim — whitespace and
+    /// all, captured the same way `amenable_derive::harness!` captures a
+    /// harness's own source, so it can never drift from the real logic.
+    pub body: &'static str,
+}
+
+inventory::collect!(ExchangeEdgeRecord);
