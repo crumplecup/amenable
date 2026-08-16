@@ -38,6 +38,7 @@
 // reachable path from the crate root the same way `rust_std`'s carriers
 // already have, or `-D warnings` flags it as dead code.
 pub mod ensures_contract_bound;
+pub mod ensures_macro_generated;
 pub mod evidence_self_referential_root;
 pub mod proof_token_external_trait_bound;
 pub mod stoplight_exchange;
