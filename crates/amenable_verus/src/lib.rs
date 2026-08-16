@@ -43,6 +43,7 @@
 //! demonstrates the real `s@.len()` pattern this crate uses directly).
 
 pub mod derived_witness;
+pub mod exchange_support;
 pub mod gallery;
 pub mod rust_std;
 mod witness_accommodation;

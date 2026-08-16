@@ -39,3 +39,4 @@
 // already have, or `-D warnings` flags it as dead code.
 pub mod evidence_self_referential_root;
 pub mod proof_token_external_trait_bound;
+pub mod stoplight_exchange;
