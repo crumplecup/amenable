@@ -3,6 +3,7 @@ members = [
   "crates/amenable",
   "crates/amenable_core",
   "crates/amenable_derive",
+  "crates/amenable_gaap",
   "crates/amenable_std",
   "crates/amenable_kani",
   "crates/amenable_creusot",
@@ -23,6 +24,7 @@ documentation = "https://docs.rs/amenable"
 amenable = { path = "crates/amenable", version = "0.1.0" }
 amenable_core = { path = "crates/amenable_core", version = "0.1.0" }
 amenable_derive = { path = "crates/amenable_derive", version = "0.1.0" }
+amenable_gaap = { path = "crates/amenable_gaap", version = "0.1.0" }
 amenable_std = { path = "crates/amenable_std", version = "0.1.0" }
 amenable_kani = { path = "crates/amenable_kani", version = "0.1.0" }
 amenable_creusot = { path = "crates/amenable_creusot", version = "0.1.0" }

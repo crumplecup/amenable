@@ -72,6 +72,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "amenable_gaap"
+version = "0.1.0"
+dependencies = [
+ "amenable_core",
+ "amenable_derive",
+ "inventory",
+]
+
+[[package]]
 name = "amenable_kani"
 version = "0.1.0"
 dependencies = [

@@ -1026,3 +1026,41 @@ independent proof-carrying framework.
 Every `Evidence`-bearing claim is backed by either a genuine machine-checked
 proof or an explicit provenance-backed `Standard` certification — never a
 blanket impl that grants trust for free.
+
+### GAAP Ledger
+
+**Document:** [GAAP_LEDGER_PLAN.md](GAAP_LEDGER_PLAN.md)
+
+**Status:** 🔲 Planning — Step 0 done (crate skeleton compiles and is
+tested); Steps 1 onward (the first real proof) not started.
+
+**Description:** The next worked example after `Stoplight`, chosen to
+exercise the one thing the whole Exchange proof derivation lineage has
+never tested on any backend: a genuinely non-trivial, branching
+predicate (every claim proven so far is `result.is_ok()`). Domain:
+double-entry bookkeeping — familiar enough that nobody argues over the
+domain semantics, with one real checkable law (debits must equal
+credits) that is genuinely branching, not incidental. Direct prior art
+in `~/repos/elicitation/crates/elicit_server::ledger` (a typestate
+`Transfer<Pending -> Validated -> Committed>` with real contracts —
+`AmountPositive`, `SufficientFunds`, `AccountsDistinct`,
+`BalancedEntries`) and `elicit_server::gaap::mathematical`
+(`AccountingEquationHolds` and other real ASC-cited identities, versus
+~130 other GAAP props that are citation-only). Confirmed two real
+strengthenings `amenable` has over elicitation's design:
+`Establish<C, V>` structurally requires `C: ProofToken` (private
+fields, only mintable via a prior lawful `establish()` call) where
+elicitation's `ProvableFrom<C>: Prop {}` relies only on `pub(crate)`
+convention; and `amenable_core::cert::{Registry, Certificate}` is a
+real, queryable, iterable audit log where elicitation's ASC citations
+are doc-comment strings only. New crate `amenable_gaap` mirrors
+`amenable_std`'s own real, asymmetric crate-hierarchy shape exactly
+(Creusot content lives inside it behind a `creusot` feature with a
+real optional Cargo dependency; Verus gets export scaffolding only,
+file-path-linked to real proof source in a new
+`amenable_verus::gallery::ledger`; a new `amenable_kani::ledger`
+module depends on `amenable_gaap` rather than the reverse, since
+orphan rules put `Witness<KaniVerifier>` impls wherever `KaniVerifier`
+itself lives). Initial scope is five real contracts (not elicitation's
+full ~150-prop catalog) proven by hand, one backend at a time, before
+any codegen — matching `Stoplight`'s own history exactly.

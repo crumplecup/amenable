@@ -1,0 +1,19 @@
+[package]
+name = "amenable_gaap"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme = "README.md"
+
+description = "GAAP ledger worked example: trait-interface and domain types for double-entry bookkeeping"
+keywords = ["formal-verification", "proof", "gaap", "ledger", "provenance"]
+categories = ["development-tools", "rust-patterns"]
+
+[dependencies]
+amenable_core = { workspace = true }
+amenable_derive = { workspace = true }
+inventory = { workspace = true }
