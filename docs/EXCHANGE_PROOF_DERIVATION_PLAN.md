@@ -1,4 +1,4 @@
-# Exchange Method Proof Derivation Plan (Kani + Creusot First)
+# Exchange Method Proof Derivation Plan (Kani + Creusot)
 
 ## Status
 
@@ -358,19 +358,28 @@ goal; it is not covered by *this* document because it does not yet
 have a real answer, and bolting a weak one on here (an axiom dressed
 up as a proof) would be worse than leaving it explicitly open.
 
-The reason it needs its own separate plan rather than a third column
+The reason it needed its own separate plan rather than a third column
 in this one: Verus cannot check an arbitrary compiled Rust function
 body at all — it only checks code written inside its own `verus! { }`
 macro — so elicitation's Verus path for transitions is `assume_
 specification`/`#[verifier::external]` (an axiom, never checked)
 regardless of whether an invariant predicate is named. Closing that
-for real means either duplicating real transition logic into a
-`verus!{}`-native companion (reintroducing, for executable logic, the
-exact drift risk this session eliminated for descriptive text) or
-requiring transition bodies be Verus-native from the start — neither
-of which is a small extension of the Kani/Creusot design below. Once
-one of those (or a better third option) has a real answer, it gets its
-own plan document and this title stops saying "First."
+for real looked like it would mean either duplicating real transition
+logic into a `verus!{}`-native companion (reintroducing, for executable
+logic, the exact drift risk this session eliminated for descriptive
+text) or requiring transition bodies be Verus-native from the start —
+neither of which is a small extension of the Kani/Creusot design below.
+
+**Resolved.** A real third option neither prediction above considered:
+`#[path]` `mod`-inclusion brings `amenable_core`'s real trait-family
+source into Verus's own single-file-tree compilation verbatim, with no
+Cargo dependency and no duplication — genuinely better than
+elicitation's own most mature Verus pattern (`assume_specification`
+axiomatizes the real body; this checks it directly). See
+[VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md](VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md)
+for the full story, including two real, distinct Verus limitations
+found and fixed along the way and a real methodological mistake caught
+and corrected mid-investigation.
 
 ## Non-goals
 

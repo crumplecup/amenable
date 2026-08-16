@@ -1,0 +1,355 @@
+# Verus Exchange Proof Derivation Plan
+
+## Status
+
+Done and verified: the real, unmodified `amenable_core` trait family —
+`Evidence` (including a genuine self-referential root), `Witness<V>`,
+`ProofToken`, `Sidecar<V>`, `Establish<C, V>`, `Exchange<Input, Output,
+V>` — compiles and verifies under real Verus, with the complete
+`Stoplight` three-edge cycle (`Green -> Yellow -> Red -> Green`) proven
+as a worked example: `verus --crate-type=lib crates/amenable_verus/src/
+lib.rs` reports `385 verified, 0 errors`. Landed in two commits:
+`ce77446` (the two real trait-family fixes plus the permanent gallery
+infrastructure) and `5eb3566` (the full `Stoplight` cycle extension).
+Full workspace `fmt`/`check`/`clippy --all-features -D warnings`/`test`
+clean throughout (62/62), `just check-all-verus` clean, `just
+verify-creusot` unaffected (`Proved (110 files) ✔`).
+
+This closes `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own "Scope" section,
+which explicitly deferred Verus support rather than bolt a weak answer
+onto that plan — see "Motivation" below for what that section predicted
+and how what actually landed differs from (and improves on) both
+predicted paths.
+
+## Motivation
+
+`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own "Scope" section named exactly
+two paths it expected Verus support to need, and rejected building
+either as part of that plan:
+
+> Closing that for real means either duplicating real transition logic
+> into a `verus!{}`-native companion (reintroducing, for executable
+> logic, the exact drift risk this session eliminated for descriptive
+> text) or requiring transition bodies be Verus-native from the start —
+> neither of which is a small extension of the Kani/Creusot design
+> below.
+
+Both predicted paths assumed Verus could only ever check code written
+by hand *inside* a `verus! {}` block — meaning either a duplicated
+companion (drift risk) or committing to Verus-native transition bodies
+from the start (abandoning the real, shared trait family Kani/Creusot
+already use). Neither is what actually landed. A third option neither
+prediction considered: Verus is invoked as a bare compiler over a
+`mod`-linked file tree, with no Cargo dependency resolution at all —
+but `#[path]` `mod` declarations don't need Cargo resolution either.
+`amenable_core`'s trait-family files can be pulled into `amenable_
+verus`'s own compilation *verbatim*, unmodified, as ordinary modules of
+that one crate. The real body Verus checks is the literal same source
+`amenable_kani`/`amenable_creusot` compile — not a companion, not an
+axiom, not a rewrite.
+
+**This is a genuine improvement over elicitation's own most mature
+Verus pattern, not merely a match for it.** `~/repos/elicitation/
+VERUS_FOR_VSMS.md` documents that project's real, production-reference
+Verus integration (its "V13" pattern): a `#[verifier::external]` stub
+plus `assume_specification`, which *axiomatizes* the real production
+function's contract rather than checking the real body against it —
+stated directly in that document: "Verus trusts `assume_specification`
+and proves invariant preservation." The real function is never itself
+inside `verus! {}`; only a hand-written *claim* about it is trusted.
+That's a real, standing gap between "what Verus checked" and "what
+ships" — precisely the kind of gap this whole `EXCHANGE_PROOF_
+DERIVATION_PLAN.md` lineage exists to close for other verifiers.
+`VERUS_FOR_VSMS.md`/`VERUS_GUIDE.md` show no exploration of `#[path]`
+mod-inclusion at all — genuinely new ground, not a documented and
+rejected alternative.
+
+**The concrete claim this plan makes:** every `Stoplight` edge's real
+Kani/Creusot body — `Yellow::establish(input.sidecar()); Ok(Established
+::new(Yellow, token))`, the literal source, not a rewrite — is also
+what Verus checks for the `Green -> Yellow` edge (and the other two,
+symmetrically), with a real `ensures` postcondition, verified
+non-vacuous by injecting a real bug and confirming Verus reports the
+exact failure at the exact line.
+
+## Scope
+
+Reuses the real `amenable_core` trait family unmodified — no parallel
+trait family, matching `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own
+"Non-goals." The worked example is `Stoplight`, mirroring the real
+`amenable_kani::stoplight`/`amenable_creusot::stoplight` shape exactly
+(state names, token names, the same `Established<T, Token>` carrier
+shape, the same three edges), not a simplified stand-in.
+
+## Non-goals
+
+- No duplicated/rewritten transition logic. Every gallery case's
+  `exchange()` body is either the real logic verbatim or, where it
+  can't literally be the same source (see "Open questions" below),
+  documented as such rather than silently presented as equivalent.
+- No weakening of `ProofToken`'s private-field/`establish()`-only
+  construction discipline, matching the Kani/Creusot plan.
+- No macro/codegen layer yet. Everything below is hand-written,
+  matching this whole lineage's "one real example by hand first"
+  discipline (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 1/Step 3
+  split — generalize only once the by-hand shape is proven).
+
+## Design
+
+### Step 0 — confirm the real trait family compiles under Verus at all — done
+
+Before attempting any concrete proof, the open question was purely
+structural: can `#[path]` mod-inclusion bring `amenable_core`'s real
+trait-family files into Verus's single-file-tree compilation at all?
+Five of six files — `evidence.rs`, `verifier.rs`, `provenance.rs`,
+`cert.rs`, `roles.rs`, `exchange.rs` — turned out to already be free of
+`inventory`/proc-macro/external-crate dependencies in their own
+definitions (checked directly, not assumed), confirmed by a real `verus
+--crate-type=lib` run: `340 verified, 0 errors`. `witness.rs` is the
+one exception — it mixes the `Witness<V>` trait's own clean definition
+with `inventory`-based registry/export code in the same file — so
+`witness_accommodation.rs` is a hand-trimmed mirror of just the trait
+mechanics, kept only until `witness.rs` is split for real (see "Open
+questions").
+
+### Step 1 — resolve `Evidence`'s self-referential root — done
+
+`Evidence`'s real, deliberate "a root is its own basis" idiom (`type
+Basis = Self`, stated in the trait's own doc comment) unconditionally
+tripped Verus's static cyclic-self-reference checker
+(`vir::recursive_types::check_recursive_types`, confirmed by reading
+`~/repos/verus/source/vir/src/recursive_types.rs` directly) — no
+per-item escape hatch exists in that code path (`#[verifier::
+external_body]` doesn't apply to trait impls at all; `#[verifier::
+external]` compiles but crashes Verus's own AIR backend with an
+internal panic once one piece of an interlinked trait graph is
+externalized while the rest isn't — both confirmed empirically).
+
+**A real methodological mistake, corrected, not smoothed over.** The
+first fix attempt cfg-gated only `Evidence::chain()`'s recursive
+default method, leaving the `Basis: Evidence` bound itself untouched,
+and looked sufficient in testing. That conclusion was a false
+positive: Verus's own error reporting stops at the *first* cyclic
+definition it finds in a compilation, and every one of those "passing"
+tests still had the real, un-fixed `Evidence` trait present and
+failing *elsewhere* in the same file — masking whatever the thing
+actually under test was doing. Only a fully isolated, single-variable
+re-test (nothing else in the file able to trigger the same class of
+error) caught the mistake and surfaced the real cause: the `Basis:
+Evidence` bound itself, independent of `chain()` entirely. A
+side-by-side probe trait identical in every respect except carrying no
+bound on `Basis` compiled clean in true isolation (`343 verified, 0
+errors`) before this was understood; a dual-declaration version
+(bound + `chain()` in one branch, unbounded/no-`chain()` in the other,
+`#[cfg]`-selected) confirmed the actual, complete fix (`346 verified, 0
+errors`) once the real cause was known.
+
+The landed fix: `amenable_core::evidence` now declares `Evidence`
+twice, `#[cfg(..verus_keep_ghost)]`-exclusive. Verus's own driver
+unconditionally sets `--cfg verus_keep_ghost` (confirmed by reading
+`rust_verify/src/driver.rs` in the real `verus-lang/verus` source), and
+no ordinary Rust toolchain (`cargo check`/`kani`/`creusot`) ever sets
+it, so exactly one declaration compiles in any given build. The
+`not(verus_keep_ghost)` declaration is byte-for-byte what the trait has
+always been — `chain()`'s two real callers (`amenable_kani::tests::
+calculation_test`, `amenable_derive::tests::
+standard_fixture_corpus_test`) see zero change. The `verus_keep_ghost`
+declaration drops `Basis: Evidence` (so a self-referential root no
+longer creates a same-trait cycle) and `chain()` (which only existed to
+walk that now-absent bound). `impl_tuple_evidence!`'s tuple impls
+turned out to be a second, independent contributor to the same class of
+error (`type Basis = (A::Basis, B::Basis)` maps one 2-tuple back onto
+another of the identical structural shape, flagged regardless of
+instantiation) — also load-bearing for ordinary builds
+(`#[calculation]`'s multi-argument `Basis`), so also `#[cfg(not(..))]`-
+gated rather than removed.
+
+### Step 2 — resolve `Sidecar<V>`'s `ProofToken` associated-type-equality bound — done
+
+`Sidecar<V>`'s real generic impl for `Established<T, Token>` bounds
+`Token` on `ProofToken<Proposition = T>` — an associated-type-equality
+bound on an external (mod-included, not `verus! {}`-declared) trait.
+Using an external trait as an ordinary bound only *warns* ("cannot use
+external trait ... as a bound without declaring the trait ... this is
+a warning for now but will eventually be an error"); actually
+*verifying* a function whose signature needs `<Token as ProofToken>::
+Proposition` resolved for a generic `Token` crashed Verus's own AIR
+backend outright — an internal panic
+(`ill-typed AIR code: use of undeclared function proj%%..ProofToken./
+Proposition`), not a clean rejection.
+
+The fix Verus's own warning names — `#[verifier::external_trait_
+specification]`, a companion trait declaring `type
+ExternalTraitSpecificationFor: ProofToken;` plus a mirrored `type
+Proposition: Evidence;` (real syntax confirmed against `vstd::
+std_specs::convert::ExFrom`/`ExInto`, a real shipped example, and
+`rust_verify_test/tests/external_traits.rs`'s `test_trait5`/
+`test_trait_extension`) — took four real, sequential fixes to land, not
+one:
+
+1. `type Proposition;` with no bound was rejected with a real, legible
+   diagnostic ("Mismatched bounds on associated type (3 != 1)"): the
+   mirror's bound has to match the real trait's own declaration
+   exactly.
+2. `ExProofToken` alone still failed: Verus's internal trait-conflict
+   checker (which validates a specification against the real trait by
+   generating synthetic Rust and re-checking it) needs `Evidence` to
+   *also* have its own specification, purely so that checker's own
+   generated code can resolve the name — not because `Evidence` was
+   ever rejected as a bound on its own.
+3. The same requirement cascaded once `Witness<V>` needed a
+   specification too: `Witness<V: Verifier>`'s own bound on `V` meant
+   `Verifier` needed one, for the identical reason.
+4. `Verifier: 'static`'s supertrait bound has to be mirrored on the
+   *specification trait itself* (`trait ExVerifier: 'static { .. }`),
+   not attached to the `ExternalTraitSpecificationFor` associated type
+   the way ordinary bounds are — confirmed against `vstd::std_specs::
+   bits::ExBits`'s real `: Sized + 'static` shape.
+
+Four companion traits later (`ExVerifier`, `ExEvidence`, `ExProofToken`,
+`ExWitness`), the full `Sidecar<V>` generic impl — the exact real
+shape, including its `ProofToken<Proposition = T>` bound — verifies
+clean, with every "cannot use external trait as a bound" warning gone
+too, not just the crash (`361 verified, 0 errors`).
+
+### Step 3 — land as permanent, real gallery infrastructure — done
+
+Per explicit direction, this landed as `amenable_verus::gallery`
+(mirroring `amenable_kani::gallery`'s role: "what does the verifier do
+with this modeling pattern," not "does this claim hold") rather than
+scratch/probe files, with one real, structural adaptation:
+`amenable_kani::gallery` registers cases via `inventory::submit!` and
+gates each proof body behind `#[cfg(kani)]`, so a "false trail" case
+whose expected outcome is a Kani failure can sit permanently in the
+crate — Kani proves harnesses one at a time via `cargo kani --harness
+<name>`, and ordinary `cargo check`/`clippy` never even sees a
+`#[cfg(kani)]`-gated body. `amenable_verus` has no `inventory`
+dependency at all, and `verus --crate-type=lib` verifies the *entire*
+file tree in one pass with no per-case selection — a permanently
+failing or crashing `verus! {}` block would break the tool outright,
+for everyone. So the discipline here is narrower: a case that currently
+*passes* is a real, `pub`-reachable `mod` (matching `rust_std`'s own
+carriers, since nothing here is `#[cfg(kani)]`-shaped and dead-code
+lint applies for real); a case that fails documents the exact
+reproduction in prose rather than staying wired into the default
+compile.
+
+Also landed: `witness_probe.rs` → `witness_accommodation.rs` (its real,
+permanent role, not scratch); `core_probe_*` mod names →
+`amenable_core_*` (they're genuinely the real trait-family files); the
+four `external_trait_specification` companion traits extracted into
+`exchange_support.rs` (real, reusable infrastructure any future
+`Sidecar<V>`-based proof needs) rather than left duplicated inside the
+gallery case that discovered them — confirmed two independently-named
+specifications for the same external trait coexist in one crate without
+conflict (Verus's own "duplicate specification" errors are about
+same-name/same-module redeclaration, not this).
+
+### Step 4 — the full `Stoplight` cycle, real `ensures` clauses — done
+
+Built the real `Stoplight` shape exactly (`Green`/`Yellow`/`Red`,
+`GreenToken`/`YellowToken`/`RedToken`, `Established<T, Token>`,
+`Sidecar<V>`, three `Establish` edges including `Red`'s cycle-back edge
+backing `Green`'s own `Witness` impl — a root still needs one, `Sidecar
+<V>`'s bound applies to every proposition regardless of root-ness) and
+three real `Exchange<Input, Output, V>` impls for `Stoplight`.
+
+**A real, new finding, not assumed to carry over from Kani.** Kani
+0.67.0 cannot place `#[kani::proof_for_contract]` on a trait method
+when the trait itself is generic, forcing the real Kani proofs onto
+plain inherent methods with the trait impl reduced to delegation
+(`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 1). Checked directly rather
+than assumed to apply here too: a real `ensures` clause sits directly
+on `impl Exchange<.., GalleryVerifier> for Stoplight`'s own generic
+`exchange` method, for all three edges, and verifies clean. Kani's
+contracts are a separate, DFCC-checked attribute; Verus's `ensures` is
+ordinary function syntax — different mechanisms, so this genuinely
+needed checking, and turned out not to share Kani's limitation.
+
+**Verified non-vacuous.** A real bug (`Err(())` swapped in for the
+`Green -> Yellow` edge's real `Ok(..)` body) produced a real, precise
+failure — `error: postcondition not satisfied`, pointing at the exact
+`result.is_ok()` clause and the exact `Err(())` line that violates it —
+reverted and re-verified clean afterward. `full_cycle` chains all three
+real `Exchange::exchange` calls together through the actual trait
+method (not a shortcut through the underlying `establish` calls
+directly), matching the real `Stoplight`'s own full cycle, and also
+verifies clean (`385 verified, 0 errors` for the whole crate with this
+case included).
+
+## Open questions
+
+- **Every claim proven so far is legitimately trivial** (`result.
+  is_ok()`), matching the real `Stoplight`'s own trivial-by-design
+  contracts (zero-field state types, no branching that could fail) —
+  the same honest triviality `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+  Step 1 documents for the Kani side. A genuinely non-trivial `ensures`
+  (real branching, a real property to preserve) hasn't been exercised
+  under this design yet — real next step, not started without explicit
+  direction.
+- **The "external trait as a bound" warning is closed only for the
+  four traits given specifications so far** (`Verifier`, `Evidence`,
+  `ProofToken`, `Witness`). Any new trait used as a Verus-side generic
+  bound in future work will need its own `external_trait_specification`
+  — a real, recurring cost this plan doesn't eliminate generically, just
+  pays once per trait as it comes up.
+- **No registry/discoverability mechanism for what's proven.** Kani's
+  `KaniProofRegistration`/`inventory` and Creusot's `harness!`-captured
+  source both give a real, queryable catalog of what's proven; Verus's
+  gallery here has neither — `amenable_verus` structurally can't use
+  `inventory` at all (see Step 0/`lib.rs`'s own doc comment). Whatever
+  Verus-side occupant `Amenable::verus_surface()` eventually gets (see
+  `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 5, currently an honest
+  empty list) will need its own answer to this, not inherited from
+  either existing backend's mechanism.
+- **`witness.rs` is still not split.** `witness_accommodation.rs`
+  remains a hand-trimmed mirror rather than the real file, pending that
+  split — tracked here rather than re-derived from scratch if picked up
+  later.
+- **Extending beyond `Stoplight`** — the same generalization question
+  `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 3 (attribute macro)
+  raises for Kani, not yet explored for Verus at all. Everything here
+  is hand-written, matching this whole lineage's own pacing discipline.
+
+## Known gotchas (found directly in this project, confirmed empirically)
+
+- **Verus stops at the first error found in a compilation.** The single
+  most important methodological trap this plan hit: a "this compiles
+  clean" result is only trustworthy when nothing else able to trigger
+  the *same class* of error coexists in the same compilation unit.
+  Isolate one variable at a time, or a real fix can look like it's
+  working purely because something else failed first and masked it.
+- **`#[verifier::external_body]` doesn't apply to trait impls at all**
+  (real, immediate rejection: "doesn't make sense for this item type").
+- **`#[verifier::external]` on one piece of an interlinked trait graph
+  can compile but crash Verus's own AIR backend** with an internal
+  panic, rather than cleanly rejecting or cleanly accepting — confirmed
+  twice, in two different contexts (a self-referential `Evidence` impl;
+  a `ProofToken`-bounded generic impl). Not a safe escape hatch for
+  this class of problem.
+- **`#[verifier::external_trait_specification]` cascades.** Giving one
+  trait a specification can require giving every trait *it* bounds a
+  specification too, transitively, purely so Verus's own internal
+  trait-conflict checker (which re-validates specifications via
+  synthetic generated Rust) can resolve names in its own generated
+  code — not because the bounded traits were themselves ever rejected.
+  Budget for this chain, not just the one trait that produced the
+  original warning.
+- **Supertrait bounds on an external trait specification go on the
+  specification trait itself**, not on the mirrored
+  `ExternalTraitSpecificationFor` associated type (`unexpected bound in
+  ExternalTraitSpecificationFor` otherwise).
+- **`#[path]` mod-inclusion works for bringing real, unmodified,
+  dependency-free source into Verus's single-file-tree compilation**,
+  with no Cargo dependency and no cross-crate `--extern` resolution
+  needed — confirmed real and load-bearing (`385 verified, 0 errors`
+  for the full real trait family plus a full worked example), not
+  merely "it happens to parse."
+
+## Next step
+
+Steps 0 through 4 are complete. The natural next step is exercising
+this foundation with a genuinely non-trivial `ensures`/`requires`
+clause (real branching, a real property to preserve, not `result.
+is_ok()`) — not started without explicit direction, matching this
+lineage's own pacing throughout.

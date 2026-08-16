@@ -144,7 +144,7 @@ impl where already gated by construction). See
 [PROVABLE_FROM_PLAN.md](PROVABLE_FROM_PLAN.md)'s Resolution section for
 the full site list.
 
-### Exchange Method Proof Derivation (Kani + Creusot First)
+### Exchange Method Proof Derivation (Kani + Creusot)
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
@@ -168,13 +168,11 @@ amenable_creusot` dependency added specifically to keep
 `creusot_surface()` honest. The Creusot mirror genuinely implements
 the real `amenable_core` trait family, corrected from an
 over-flattened first version while starting Step 2. Kani and Creusot
-first, by deliberate sequencing — Verus
-support for
-`Exchange` remains a real goal, just not yet solvable the same way
-(Verus can't check an arbitrary compiled Rust body, only `verus! {}`-
-native code), so it gets its own plan once it has a real answer
-instead of a weak one bolted on
-here.
+first, by deliberate sequencing — Verus support for `Exchange` was
+deferred here rather than bolted on weak (Verus can't check an
+arbitrary compiled Rust body directly, only `verus! {}`-native code),
+and has since landed with a real answer of its own: see "Verus
+Exchange Proof Derivation" below.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the
@@ -451,6 +449,77 @@ both feature configurations, not just that the code compiles. Full
 workspace `fmt`/`check`/`clippy --all-features -D warnings` clean under
 both configurations, `cargo test --workspace` 62/62 (up from 61). Step
 5 is complete -- every step this plan originally scoped now is.
+
+### Verus Exchange Proof Derivation
+
+**Document:** [VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md](VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md)
+
+**Status:** ✅ Steps 0 through 4 done and verified — the real, unmodified
+`amenable_core` trait family (`Evidence` including a genuine
+self-referential root, `Witness<V>`, `ProofToken`, `Sidecar<V>`,
+`Establish<C, V>`, `Exchange<Input, Output, V>`) compiles and verifies
+under real Verus via `#[path]` mod-inclusion, with the complete
+`Stoplight` three-edge cycle proven as a worked example: `verus
+--crate-type=lib` reports `385 verified, 0 errors`. Closes the Verus
+deferral `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own "Scope" section
+left explicitly open, via a third option neither that section nor
+elicitation's own real Verus prior art (`VERUS_FOR_VSMS.md`'s "V13"
+`assume_specification` pattern, which *axiomatizes* the real body
+rather than checking it) considered: real source brought in verbatim,
+not duplicated and not axiomatized.
+
+**Description:** Two real, distinct Verus limitations blocked the real
+trait family before this landed. `Evidence`'s deliberate "a root is its
+own basis" idiom (`type Basis = Self`) unconditionally tripped Verus's
+static cyclic-self-reference checker, with no per-item escape hatch
+(`#[verifier::external_body]` doesn't apply to trait impls at all;
+`#[verifier::external]` compiles but crashes Verus's own AIR backend).
+A real methodological mistake happened and was caught here: an initial
+fix that cfg-gated only `Evidence::chain()`'s recursive default method
+looked sufficient in testing, but was a false positive -- Verus stops
+at the *first* cyclic definition it finds in a compilation, and the
+real, un-fixed trait was still failing elsewhere in the same test file
+the whole time, masking the real signal. Only a fully isolated,
+single-variable re-test caught it: the actual cause is the `type
+Basis: Evidence` bound itself, independent of `chain()`. The real fix:
+`amenable_core::evidence` now declares `Evidence` twice,
+`#[cfg(..verus_keep_ghost)]`-exclusive -- the real, unchanged shape for
+every ordinary toolchain (Verus's own driver unconditionally sets that
+cfg; no ordinary toolchain ever does), an unbounded, `chain()`-free
+variant only under Verus. `Sidecar<V>`'s generic `ProofToken<
+Proposition = T>` associated-type-equality bound separately crashed
+Verus's AIR backend outright (not just a warning) -- fixed via four
+`#[verifier::external_trait_specification]` companion traits
+(`ExVerifier`, `ExEvidence`, `ExProofToken`, `ExWitness`), each needed
+for a distinct, real reason found empirically (a bound mismatch;
+Verus's internal trait-conflict checker needing names resolvable in its
+own generated code, cascading through `Witness<V: Verifier>`'s own
+bound to `Verifier`; and `'static` belonging on the specification trait
+itself, not the mirrored associated type).
+
+Landed as a real, permanent `amenable_verus::gallery` (mirroring
+`amenable_kani::gallery`'s role) rather than scratch files, adapted for
+a real structural difference: Verus verifies the whole file tree in one
+pass with no per-case selection, unlike Kani's per-harness `cargo kani
+--harness` selection, so nothing here is `#[cfg(kani)]`-shaped and
+every case has to stay genuinely `pub`-reachable to avoid real
+dead-code lint errors. Extended to the full `Stoplight` cycle
+(`amenable_kani::stoplight`/`amenable_creusot::stoplight`'s own shape,
+not a simplified stand-in), surfacing a real, new, checked-not-assumed
+finding: Kani 0.67.0 can't place a contract on `Exchange::exchange`
+because the trait is generic, forcing Kani's real proofs onto inherent
+methods with the trait impl reduced to delegation -- that limitation
+does not carry over to Verus, whose `ensures` clauses work directly on
+the real, generic trait method for all three edges. Verified non-vacuous
+via a real injected bug (`Err(())` swapped for a real `Ok(..)` body)
+producing a precise `postcondition not satisfied` failure at the exact
+line, reverted and re-verified clean; `full_cycle` chains all three real
+`Exchange::exchange` calls together, matching the real `Stoplight`'s own
+cycle. Full workspace `fmt`/`check`/`clippy --all-features -D
+warnings`/`test` clean throughout (62/62), `just check-all-verus` clean,
+`just verify-creusot` unaffected (`Proved (110 files) ✔`). Landed in two
+commits: `ce77446` (the two trait-family fixes plus gallery
+infrastructure) and `5eb3566` (the full `Stoplight` cycle).
 
 ### Kani Filesystem Accommodation Model
 
