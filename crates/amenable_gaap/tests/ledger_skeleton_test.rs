@@ -13,14 +13,24 @@ use amenable_gaap::{
 #[test]
 fn transfer_payload_carries_its_two_accounts_and_amount() {
     let payload = TransferPayload::new(
-        AccountId::new("Alice"),
-        AccountId::new("Bob"),
+        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
 
     assert_eq!(payload.from().name(), "Alice");
     assert_eq!(payload.to().name(), "Bob");
     assert_eq!(payload.amount().value(), 50);
+}
+
+#[test]
+fn account_id_equality_compares_the_id_not_the_name() {
+    let alice_again = AccountId::new(uuid::Uuid::from_u128(1), "Alice (checking)");
+    let alice = AccountId::new(uuid::Uuid::from_u128(1), "Alice");
+    let bob = AccountId::new(uuid::Uuid::from_u128(2), "Alice");
+
+    assert_eq!(alice, alice_again, "same id, different name: still equal");
+    assert_ne!(alice, bob, "different id, same name: still distinct");
 }
 
 #[test]

@@ -2,9 +2,13 @@
 
 ## Status
 
-🔲 Planning — Step 0 done. Crate hierarchy, scope, and initial state
-shape are decided; the type-level skeleton compiles and is tested.
-Steps 1 onward (the first real proof) not started.
+🔲 Planning — Steps 0 and 1 done. Crate hierarchy, scope, and initial
+state shape are decided; the type-level skeleton compiles and is
+tested; the first real Kani edge (`Pending -> Validated`, gated on
+`AmountPositive`/`SufficientFunds`/`AccountsDistinct`) is proven via
+genuine `#[kani::ensures]` DFCC contract-checking — `0 of 492 failed`,
+the real, non-trivial biconditional postcondition intact, not weakened
+or dropped. Steps 2 onward not started.
 
 ## Motivation
 
@@ -211,17 +215,111 @@ inspectable root (`is_root()`, `Evidence::chain()`,
 Full workspace `cargo check --workspace`/`cargo fmt --check` clean.
 Step 0 is complete.
 
-### Step 1 — first real Kani edge, by hand — not started
+### Step 1 — first real Kani edge, by hand — done
 
-Pick the single edge with the most payoff for exercising a genuinely
-branching claim: `Pending -> Validated`, gated on `SufficientFunds`
-(and `AmountPositive`, `AccountsDistinct`). Hand-build it directly in
-a new `amenable_kani::ledger` module — `Witness<KaniVerifier>` impls
-for the state markers, a real `#[kani::proof_for_contract]` harness
-proving `SufficientFunds` fails exactly when `balance < amount` —
-matching this whole lineage's "one real example by hand first"
-discipline (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 1/Step 3
-split). No macro, no registry, no codegen yet.
+Hand-built the single edge with the most payoff for exercising a
+genuinely branching claim: `Pending -> Validated`, gated on
+`AmountPositive`/`SufficientFunds`/`AccountsDistinct`, directly in a
+new `amenable_kani::ledger` module — matching this whole lineage's
+"one real example by hand first" discipline
+(`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 1/Step 3 split). No
+macro, no registry, no codegen. `Transfer<S, Token>`/`Sidecar<
+KaniVerifier>` mirror `stoplight.rs`'s own shape, with the first real
+divergence Step 0 anticipated: `Sidecar::Primary` is `TransferPayload`
+(real data), `::Proposition` is the state marker — genuinely different
+types, unlike `Established<T, Token>`'s `T` playing both roles for
+`Stoplight`.
+
+**A real CBMC timeout, fully root-caused, not worked around.** The
+first version of `validate`'s postcondition (`kani_ensures!`,
+biconditional over `amount > 0`, `balance >= amount`, and `payload.
+from() != payload.to()`) timed out under `just verify-kani-contract`
+with `amount`/`balance` symbolic. Root-caused via an extensive gallery
+investigation (`amenable_kani::gallery::ledger_account_id_comparison`,
+21 real experiments — read that module's own doc comment for the full
+blow-by-blow) down to one precise fact: comparing two independently-
+constructed `String`s for equality *inside a `#[kani::ensures]`
+closure* is expensive for CBMC, regardless of content, length, or
+whether the strings are symbolic or concrete — while the identical
+comparison is cheap everywhere else (a bare standalone check, an
+ordinary `if` in `validate`'s own function body). Along the way, two
+real, second-order findings surfaced and were fixed at the shared
+macro level (benefiting `Stoplight` too, not just this edge):
+`#[amenable_derive::exchange]`'s generated `#[kani::ensures]` closure
+used to dereference `result` (`*result`, requiring `Output: Copy`,
+impossible once `Output` carries a `String`) — fixed to `result.
+clone()`, `Clone` being a strict superset of `Copy`.
+
+**What comparisons work inside a `#[kani::ensures]` closure, checked
+directly rather than assumed**, all against `validate`'s exact real
+body: a fixed 2-variant enum (0.12s), a bare `u64` (0.12s), a `[u8;
+16]` UUID-shaped byte array (0.42s), and a `{ id, name }` hybrid with
+`PartialEq` on `id` only (0.83s) all verify fast. A genuinely important
+correction found along the way: a *fixed-capacity* string (`{ bytes:
+[u8; 24], len: u8 }`, stack-allocated, comparing only `bytes[..len]`)
+is exactly as expensive as `String` — still times out. "No heap
+allocation" was never the real dividing line; what matters is whether
+the *comparison itself* has a length fixed at compile time. `len`
+being symbolic makes the fixed-capacity string's comparison just as
+variable-length as `String`'s own, the identical shape this project's
+own catalogued "symbolic-length memcmp" timeout class already names —
+now confirmed to bite specifically inside a `#[kani::ensures]` closure,
+not only in direct iteration.
+
+**The fix**: `amenable_gaap::AccountId` now carries a `Uuid` identity
+(chosen over a bare integer as "a real, dedicated identity type, not a
+proxy repurposing an arbitrary numeric type" — the user's own call) —
+`{ id: Uuid, name: String }`, with `PartialEq`/`Eq`/`Hash`/`Ord` all
+comparing `id` only. The `name` field is unchanged in kind (still a
+real, heap-allocated `String`, still constructed, still carried
+through every transfer) — it's simply never what equality checks.
+`id` is supplied explicitly at construction (`AccountId::new(id,
+name)`), not generated fresh per call: the same real-world account
+referenced twice must compare equal, which only holds if its id is
+stable across reconstructions — the same reason a real chart of
+accounts assigns an id once, at account creation, not per lookup. This
+needed no change to `#[amenable_derive::exchange]`, `kani_ensures!`,
+or any other shared macro — the generated `#[kani::ensures]` wiring
+was never the problem, confirmed across the whole investigation.
+`uuid` landed as a new workspace dependency (`amenable_gaap`,
+`amenable_kani`); the ~52 call sites across `amenable_gaap`'s own
+tests, `amenable_kani::ledger`, its tests, and the gallery
+investigation file were updated mechanically (`AccountId::new("Alice")`
+→ `AccountId::new(uuid::Uuid::from_u128(1), "Alice")`, consistently
+per name, preserving every existing test's same-account/distinct-
+account semantics).
+
+**A second real bug, found only once the timeout stopped masking
+it.** With the CBMC cost gone, `verify_validate_accepts_a_lawful_
+transfer` (`#[kani::proof_for_contract(Ledger::validate)]` composed
+via `#[kani::stub_verified]` over `check_amount_positive`/`check_
+sufficient_funds`) ran to completion in ~110s and reported a genuine
+verification failure — not a timeout. Root cause: `check_amount_
+positive`'s own `#[kani::ensures]` was under-specified (`Err(bad) =>
+*bad == amount`, missing `&& amount <= 0`). A too-weak postcondition
+still passes that function's own isolated `#[kani::proof_for_
+contract]` check trivially (the real body's actual behavior is a
+strict subset of what a weak contract allows), but `#[kani::
+stub_verified]` treats the contract as the *complete* story when
+composing it into a caller — it was free to substitute `Err` even when
+`amount > 0`, breaking `validate`'s own downstream claim that
+`Err(NegativeAmount(amount))` implies `amount <= 0`. Fixed by making
+the `Err` arm a full biconditional. `check_sufficient_funds`'s own
+contract was already tight and needed no change.
+
+**Verified for real, against the actual toolchain, not assumed**: both
+`just verify-kani-contract` harnesses —
+`verify_validate_accepts_a_lawful_transfer` and `verify_validate_
+rejects_the_same_account` — report `VERIFICATION:- SUCCESSFUL`,
+`0 of 492 failed`, in 111s and 122s respectively. The real, non-trivial
+biconditional postcondition is intact throughout — never weakened,
+never dropped, never replaced with a hand-written `assert!`-based
+harness, matching the two hard constraints set for this fix. Full
+workspace `cargo check`/`clippy --all-targets -D warnings`/`fmt
+--check`/`test` clean for `amenable_gaap` and `amenable_kani`; all 4
+functional tests in `tests/ledger_test.rs` and all 6 in `amenable_gaap`'s
+own `ledger_skeleton_test.rs` (including a new one confirming `AccountId`
+equality compares `id`, not `name`) still pass. Step 1 is complete.
 
 ### Step 2 — remaining Kani edges — not started
 
@@ -271,6 +369,6 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 1: hand-build the first real Kani edge (`Pending -> Validated`,
-gated on `SufficientFunds`/`AmountPositive`/`AccountsDistinct`) in a
-new `amenable_kani::ledger` module. Not started.
+Step 2: the remaining Kani edges (`Validated -> Committed`, carrying
+`BalancedEntries`, and the `reject()`/`rollback()` branches to
+`Rejected`). Not started.

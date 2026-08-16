@@ -30,6 +30,7 @@ mod gallery;
 mod hash_collections_model;
 mod hash_model;
 mod io_model;
+mod ledger;
 mod linked_list_extract_model;
 mod mpsc_model;
 mod os_windows_model;
@@ -72,6 +73,7 @@ pub use io_model::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
 };
+pub use ledger::{Ledger, PendingToken, Transfer, TransferError, ValidatedToken};
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
 pub use os_windows_model::{

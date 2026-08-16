@@ -17,3 +17,4 @@ categories = ["development-tools", "rust-patterns"]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 inventory = { workspace = true }
+uuid = { workspace = true }

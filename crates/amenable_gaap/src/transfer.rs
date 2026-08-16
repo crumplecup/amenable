@@ -22,26 +22,85 @@
 //! it belongs with the real transition logic that captures it (Step 1),
 //! not speculated on before any transition exists to need it.
 
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
+
 use amenable_core::{Evidence, MetadataEntry, Provenance};
 use amenable_derive::Standard;
+use uuid::Uuid;
 
-/// Identifies an account by name.
+/// Identifies an account by a stable id, alongside a human-readable
+/// name.
 ///
-/// A bare newtype — no construction-time validation. The whole point of
-/// this design is that checkable properties (like `AccountsDistinct`)
-/// are proven at the `Exchange` edge, not baked into a constructor.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct AccountId(String);
+/// Equality, ordering, and hashing all compare `id` only, never `name`
+/// — `amenable_kani::gallery::ledger_account_id_comparison`'s own
+/// investigation (`GAAP_LEDGER_PLAN.md`'s Step 1) found that comparing
+/// two independently-constructed `String`s for equality inside a
+/// `#[kani::ensures]` closure is expensive for CBMC regardless of
+/// content or length, while comparing a fixed-size value (an integer, a
+/// UUID's 16 bytes) is cheap — and, critically, that a fixed-*capacity*
+/// but still variable-*length* string (a bounded buffer plus a length
+/// field) is exactly as expensive as an unbounded `String`, so
+/// truncating/capping the name would not have helped. A `Uuid` was
+/// chosen over a bare integer because it's a real, dedicated identity
+/// type (globally unique without a central allocator) rather than a
+/// proxy repurposing an arbitrary numeric type.
+///
+/// `id` must be supplied explicitly, not generated fresh on every call:
+/// the same real-world account (e.g. two separate references to
+/// "Alice" in different transfers) must always compare equal, which
+/// only holds if its id is stable across reconstructions — the same
+/// reason a real chart of accounts assigns an id once, at account
+/// creation, rather than re-deriving one per lookup.
+#[derive(Debug, Clone, Default)]
+pub struct AccountId {
+    id: Uuid,
+    name: String,
+}
 
 impl AccountId {
-    /// Wrap an account name.
-    pub fn new(name: impl Into<String>) -> Self {
-        Self(name.into())
+    /// Identify an account by its stable id and a human-readable name.
+    pub fn new(id: Uuid, name: impl Into<String>) -> Self {
+        Self {
+            id,
+            name: name.into(),
+        }
     }
 
-    /// Borrow the account name.
+    /// The account's stable id — what identity checks compare.
+    pub fn id(&self) -> Uuid {
+        self.id
+    }
+
+    /// The account's human-readable name — display only, never compared.
     pub fn name(&self) -> &str {
-        &self.0
+        &self.name
+    }
+}
+
+impl PartialEq for AccountId {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for AccountId {}
+
+impl Hash for AccountId {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl PartialOrd for AccountId {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for AccountId {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.id.cmp(&other.id)
     }
 }
 

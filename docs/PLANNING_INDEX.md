@@ -1031,8 +1031,18 @@ blanket impl that grants trust for free.
 
 **Document:** [GAAP_LEDGER_PLAN.md](GAAP_LEDGER_PLAN.md)
 
-**Status:** 🔲 Planning — Step 0 done (crate skeleton compiles and is
-tested); Steps 1 onward (the first real proof) not started.
+**Status:** 🔲 Planning — Steps 0 and 1 done: the crate skeleton
+compiles and is tested, and the first real Kani edge (`Pending ->
+Validated`) is proven via genuine `#[kani::ensures]` DFCC
+contract-checking (`0 of 492 failed`). A real CBMC timeout on the
+first version — comparing two `String`s for equality inside a
+`#[kani::ensures]` closure is expensive regardless of content or
+length — was root-caused via a 21-experiment gallery investigation and
+fixed by giving `AccountId` a `Uuid` identity (`PartialEq` compares
+`id` only, never the human-readable `name`), not by weakening the
+postcondition. A second real bug (an under-specified helper contract,
+exposed only once the timeout stopped masking it) was also found and
+fixed. Steps 2 onward not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

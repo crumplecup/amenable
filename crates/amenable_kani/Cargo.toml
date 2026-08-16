@@ -16,8 +16,10 @@ categories = ["development-tools"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
+amenable_gaap = { workspace = true }
 amenable_std = { workspace = true }
 inventory = { workspace = true }
+uuid = { workspace = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

@@ -36,10 +36,14 @@
 //! ensures!`, still hand-written, still where the actual predicate is
 //! authored), the DFCC attribute wiring it into the proof site is 100%
 //! mechanical — `|result: &Result<Output, Error>| <Evidence as Ensures<V>>
-//! ::ensures(*result)` needs no information this macro doesn't already
-//! have from `evidence`/the method's own return type. Generating it here
-//! removes three-edges'-worth of copy-pasted boilerplate (and the drift
-//! risk copy-pasting invites) without synthesizing any new claim — the
+//! ::ensures(result.clone())` needs no information this macro doesn't
+//! already have from `evidence`/the method's own return type (`clone()`,
+//! not a `*result` deref-copy: `GAAP_LEDGER_PLAN.md`'s Step 1 found a
+//! real second-user case where `Output` carries a `String`-backed field,
+//! which can never be `Copy` — `Clone` is a strict superset, so this
+//! costs nothing for `Stoplight`'s own already-`Copy` types). Generating
+//! it here removes three-edges'-worth of copy-pasted boilerplate (and the
+//! drift risk copy-pasting invites) without synthesizing any new claim — the
 //! human-authored predicate this attribute calls through to is exactly as
 //! hand-written as it was before, just no longer re-typed at each call
 //! site. A future edge with no meaningful postcondition beyond type safety
@@ -257,7 +261,9 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
             #cfg,
             #cfg::ensures(
                 |result: &::std::result::Result<#output_ty, #error_ty>|
-                    <#evidence as ::amenable_core::Ensures<#verifier>>::ensures(*result)
+                    <#evidence as ::amenable_core::Ensures<#verifier>>::ensures(
+                        ::std::clone::Clone::clone(result)
+                    )
             )
         )]
     });
