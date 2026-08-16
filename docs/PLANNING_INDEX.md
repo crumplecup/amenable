@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ All seven steps (0 through 6) done and verified — Kani and
+**Status:** ✅ All eight steps (0 through 7) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (110 files) ✔`) with a genuine injected-regression check per
@@ -181,7 +181,22 @@ everywhere else, closing the same drift risk one level deeper than
 Step 3 did (the contract's own content, not just its registration/
 delegation machinery). Re-verified via real `cargo kani` on all three
 edges plus the Step 4 composition harness, and a real non-vacuous
-regression check.
+regression check. Step 7, tackled by explicit direction after
+`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 5 ("let's tackle 3
+now"): `#[amenable_derive::exchange(..)]` itself now generates that
+same DFCC `ensures` attribute rather than requiring it hand-typed at
+each call site — the macro clones the parsed method and injects
+`#[cfg_attr(#cfg, #cfg::ensures(..))]`, calling through `<Evidence as
+Ensures<V>>::ensures(*result)` via fully-qualified syntax (no `use
+amenable_core::Ensures;` needed at the call site anymore, so that
+import was removed from `stoplight.rs` along with all three
+hand-written attributes). The human-authored predicate itself didn't
+move — it's still the `kani_ensures!` invocation immediately above
+each macro call — only the fully mechanical wiring did. Verified the
+authoritative way (`cargo expand` can't render Kani's own attribute
+macro output outside the real toolchain): real `cargo kani` on all
+three edges plus the composition harness, and a real non-vacuous
+regression check pointing at the exact generated closure.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the

@@ -75,15 +75,18 @@ pub fn calculation(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Generalizes the by-hand `Exchange` transition pattern proven in
 /// `amenable_kani::stoplight` (see `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
-/// Step 3): given `impl SelfType { fn method(&self, input: Input) ->
-/// Result<Output, Error> { .. } }` — the real inherent method, its
-/// `#[cfg_attr(.., kani::ensures(..))]` contract, and its body left
-/// exactly as authored — generates the `Witness<V>` impl for `evidence`
-/// naming the given harness, the `ProofRecord` registration backing it,
-/// and the `Exchange<Input, Output, V>` impl that delegates to `method`.
-/// Deliberately does not touch or generate the `harness! { .. }`
-/// invocation itself, since that macro's verbatim-source capture only
-/// works when written directly at its own call site.
+/// Step 3 and Step 6): given `impl SelfType { fn method(&self, input:
+/// Input) -> Result<Output, Error> { .. } }` — the real inherent method,
+/// its body left exactly as authored — generates the `Witness<V>` impl for
+/// `evidence` naming the given harness, the `ProofRecord` registration
+/// backing it, the `Exchange<Input, Output, V>` impl that delegates to
+/// `method`, and (Step 6) `method`'s own `#[cfg_attr(.., kani::ensures(..))]`
+/// contract, calling through `evidence`'s own, separately-registered
+/// `Ensures<V>` impl (`kani_ensures!`, still hand-written — the actual
+/// predicate lives there, not here) rather than requiring it re-typed at
+/// every call site. Deliberately does not touch or generate the
+/// `harness! { .. }` invocation itself, since that macro's verbatim-source
+/// capture only works when written directly at its own call site.
 #[proc_macro_attribute]
 pub fn exchange(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(attr as ExchangeArgs);

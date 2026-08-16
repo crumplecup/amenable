@@ -34,8 +34,6 @@
 //! `Stoplight::exchange` must call `input.sidecar()` to obtain a lawful
 //! credential; `input.primary()` doesn't type-check).
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::{
     Amenable, Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
     Witness,
@@ -327,14 +325,15 @@ impl ProofToken for YellowToken {
 // pattern `rust_std`'s own proofs already use throughout (e.g.
 // `RustStdStandard::<char>::ensures(..)`, called directly from inside a
 // plain harness body), just not previously applied to any `Exchange`
-// edge. The DFCC `#[kani::ensures]` closure calls through `Yellow::
-// ensures(..)` rather than restating the boolean inline: the contract
-// type carries the bound, and every proof context that needs to check
-// it -- this closure, and eventually a real (not just trivial) claim's
-// own richer `Input`/`Bound` shape -- calls through the one definition
-// rather than each independently retyping it. `Established<T, Token>`
-// derives `Copy` specifically so the closure's `&Result<..>` can be
-// dereferenced into the owned `Ensures::Input` this needs.
+// edge. `#[amenable_derive::exchange]` generates the DFCC `#[kani::
+// ensures]` attribute on `green_to_yellow` below, calling through
+// `Yellow::ensures(..)` rather than restating the boolean inline (see
+// that macro's own doc comment) -- the contract type carries the bound,
+// and every proof context that needs to check it calls through the one
+// definition rather than each independently retyping it.
+// `Established<T, Token>` derives `Copy` specifically so the generated
+// closure's `&Result<..>` can be dereferenced into the owned `Ensures::
+// Input` this needs.
 kani_ensures!(
     Yellow,
     "amenable_kani::stoplight::Yellow::green_to_yellow_ensures",
@@ -346,10 +345,12 @@ kani_ensures!(
 // Yellow` impl (without it, `Establish<Green, KaniVerifier> for Yellow`
 // below does not compile, so this exchange cannot exist until the
 // transition it claims is proven), the `ProofRecord` registration backing
-// it, and the `Exchange` trait impl delegating to `green_to_yellow` --
-// see that macro's own doc comment for exactly what it generates and,
-// as importantly, does not touch (the contract and the `harness!`
-// invocation below stay hand-written, for reasons documented there).
+// it, the `Exchange` trait impl delegating to `green_to_yellow`, and
+// (per the `kani_ensures!` registration above) `green_to_yellow`'s own
+// DFCC contract -- see that macro's own doc comment for exactly what it
+// generates and, as importantly, does not touch (the method body and the
+// `harness!` invocation below stay hand-written, for reasons documented
+// there).
 #[amenable_derive::exchange(
     cfg = kani,
     verifier = KaniVerifier,
@@ -359,10 +360,6 @@ kani_ensures!(
     harness_const = VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
 )]
 impl Stoplight {
-    #[cfg_attr(
-        kani,
-        kani::ensures(|result: &Result<Established<Yellow, YellowToken>, StoplightError>| Yellow::ensures(*result))
-    )]
     fn green_to_yellow(
         &self,
         input: Established<Green, GreenToken>,
@@ -424,10 +421,6 @@ kani_ensures!(
     harness_const = VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
 )]
 impl Stoplight {
-    #[cfg_attr(
-        kani,
-        kani::ensures(|result: &Result<Established<Red, RedToken>, StoplightError>| Red::ensures(*result))
-    )]
     fn yellow_to_red(
         &self,
         input: Established<Yellow, YellowToken>,
@@ -484,10 +477,6 @@ kani_ensures!(
     harness_const = VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC,
 )]
 impl Stoplight {
-    #[cfg_attr(
-        kani,
-        kani::ensures(|result: &Result<Established<Green, GreenToken>, StoplightError>| Green::ensures(*result))
-    )]
     fn red_to_green(
         &self,
         input: Established<Red, RedToken>,

@@ -11,13 +11,13 @@
 //! generic (`Exchange<Input, Output, V>` is) — the contract and its real
 //! body have to live on a plain inherent method, with the trait impl
 //! reduced to delegation. So this macro attaches to that inherent method's
-//! surrounding `impl SelfType { .. }` block instead, and deliberately does
-//! NOT touch two things that already carry their own real guarantees the
-//! macro must not weaken:
+//! surrounding `impl SelfType { .. }` block instead.
 //!
-//! - The `#[cfg_attr(kani, kani::ensures(..))]` contract itself, and the
-//!   method body: both are real proof content, authored by hand, and stay
-//!   that way.
+//! Two things still carry their own real guarantees this macro must not
+//! weaken, and it still leaves both alone:
+//!
+//! - The method **body**: the real transition logic, authored by hand, and
+//!   re-emitted exactly as written.
 //! - The `amenable_derive::harness! { .. }` invocation: it captures the
 //!   harness function's verbatim source via `Span::source_text()`, which
 //!   only works when the braced item is written directly at the call site
@@ -27,12 +27,33 @@
 //!   So `harness!` stays a separate, hand-written invocation alongside
 //!   this attribute, exactly as it was before Step 3.
 //!
-//! What this macro *does* generate, because none of it carries either
-//! guarantee above and all of it was, before Step 3, identical boilerplate
+//! What changed after Step 3 (see `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+//! Step 6): the `#[cfg_attr(.., kani::ensures(..))]` contract itself is now
+//! **generated**, not hand-written — but this does not weaken the "real
+//! proof content stays authored by hand" guarantee, because Step 6 already
+//! moved the real claim somewhere else. Once `evidence`'s postcondition
+//! lives in a real, separately-registered `Ensures<V>` impl (`kani_
+//! ensures!`, still hand-written, still where the actual predicate is
+//! authored), the DFCC attribute wiring it into the proof site is 100%
+//! mechanical — `|result: &Result<Output, Error>| <Evidence as Ensures<V>>
+//! ::ensures(*result)` needs no information this macro doesn't already
+//! have from `evidence`/the method's own return type. Generating it here
+//! removes three-edges'-worth of copy-pasted boilerplate (and the drift
+//! risk copy-pasting invites) without synthesizing any new claim — the
+//! human-authored predicate this attribute calls through to is exactly as
+//! hand-written as it was before, just no longer re-typed at each call
+//! site. A future edge with no meaningful postcondition beyond type safety
+//! is not this macro's problem to anticipate; every real edge today wants
+//! this, so the bound is unconditional rather than an opt-in flag guessed
+//! in advance of a caller that needs the alternative.
+//!
+//! What this macro generates, all of it either newly-mechanical (the
+//! `ensures` attribute, see above) or, before Step 3, identical boilerplate
 //! repeated once per `Stoplight` edge: the `Witness<V>` impl for the
 //! transition's target evidence (referencing the harness by name), the
-//! `ProofRecord` registration backing it, and the `Exchange<Input, Output,
-//! V>` impl that delegates to the real inherent method.
+//! `ProofRecord` registration backing it, the `Exchange<Input, Output, V>`
+//! impl that delegates to the real inherent method, and the inherent
+//! method's own DFCC `ensures` attribute.
 
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
@@ -203,8 +224,31 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
         None => quote! { concat!(module_path!(), "::", stringify!(#evidence)) },
     };
 
+    // Inject the DFCC contract onto a clone of the method rather than
+    // requiring it hand-written at the call site (see this file's own doc
+    // comment for why this doesn't weaken the "real proof content stays
+    // hand-authored" guarantee: the actual predicate still lives in
+    // `evidence`'s own, separately-registered `Ensures<V>` impl, not here
+    // — this is purely the mechanical call-through). Fully-qualified
+    // (`<#evidence as ::amenable_core::Ensures<#verifier>>::ensures`)
+    // rather than a bare `Evidence::ensures` call so the generated code
+    // needs no `use amenable_core::Ensures;` in scope at the call site.
+    let mut contracted_impl = item_impl.clone();
+    let ImplItem::Fn(contracted_method) = &mut contracted_impl.items[0] else {
+        unreachable!("validated above: exactly one ImplItem::Fn in item_impl.items");
+    };
+    contracted_method.attrs.push(syn::parse_quote! {
+        #[cfg_attr(
+            #cfg,
+            #cfg::ensures(
+                |result: &::std::result::Result<#output_ty, #error_ty>|
+                    <#evidence as ::amenable_core::Ensures<#verifier>>::ensures(*result)
+            )
+        )]
+    });
+
     Ok(quote! {
-        #item_impl
+        #contracted_impl
 
         impl ::amenable_core::Witness<#verifier> for #evidence {
             type SupportingEvidence = Self;

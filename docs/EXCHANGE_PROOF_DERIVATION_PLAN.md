@@ -57,6 +57,12 @@ DFCC `#[kani::ensures(...)]` closures now call through real,
 registered `Ensures<KaniVerifier>` impls (`kani_ensures!`) instead of
 restating the boolean inline, closing the same hand-authored-claim-
 can-drift gap one level deeper than Step 3 did — see Step 6 below.
+Step 7 is also complete: `#[amenable_derive::exchange(..)]` now
+generates that same DFCC `ensures` attribute itself, rather than
+requiring it hand-typed at each of the three call sites — the actual
+predicate stays exactly as hand-authored as before, in the same
+`kani_ensures!` invocation, just no longer re-typed as a closure per
+edge — see Step 7 below.
 
 ## Motivation
 
@@ -918,6 +924,76 @@ written per edge — deliberately not done here, matching this plan's
 "one real example by hand first, generalize later" discipline used at
 every other step.
 
+### Step 7 — generate the DFCC `ensures` attribute from `#[amenable_derive::exchange(..)]` — done
+
+The last piece of "one real example by hand first, generalize later"
+this lineage had left: Step 6 proved the `Ensures<KaniVerifier>`-
+routing pattern by hand at all three call sites; Step 7 moves the
+mechanical half of that pattern into the macro itself, tackled by
+explicit direction after `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+own Step 5 landed the Verus counterpart ("let's tackle 3 now," where 3
+was this step, done deliberately after 2 — see that doc's Status).
+
+**What moved, and why it doesn't weaken "real proof content stays
+hand-authored."** `#[amenable_derive::exchange(..)]`'s own doc comment
+had explicitly listed the DFCC contract as one of two things the macro
+"deliberately does NOT touch," alongside the method body — both named
+as real proof content that must stay hand-authored. That was true when
+written, and is still true of the method body. It stopped being true
+of the *contract attribute* once Step 6 moved the actual predicate
+into a separately-registered `Ensures<KaniVerifier>` impl
+(`kani_ensures!`): the attribute the macro used to require hand-typed
+at each call site --- `#[cfg_attr(kani, kani::ensures(|result: &Result
+<Output, Error>| Evidence::ensures(*result)))]` --- had become 100%
+mechanical, derivable entirely from information the macro already
+parses (`evidence`, the method's own `Result<Output, Error>` return
+type). Generating it doesn't synthesize a new claim; the human-authored
+predicate it calls through to is exactly as hand-written as it was
+before, in exactly the same place (the `kani_ensures!` invocation,
+still directly preceding the macro invocation, still untouched by it).
+
+**Implementation.** `expand_exchange` (`crates/amenable_derive/src/
+exchange.rs`) now clones the parsed `ItemImpl`, locates its one method,
+and pushes the generated `#[cfg_attr(#cfg, #cfg::ensures(..))]`
+attribute onto the clone before re-emitting it — `#cfg` doubles as both
+the `cfg_attr` predicate and the attribute macro's crate path (`kani`
+in both positions), reusing the identical `Ident` already required for
+the `ProofRecord`'s `verifier` field, not a new argument. The generated
+closure uses fully-qualified syntax (`<#evidence as ::amenable_core::
+Ensures<#verifier>>::ensures(*result)`), not a bare `Evidence::ensures`
+call, so the generated code needs no `use amenable_core::Ensures;` in
+scope at the call site at all — `stoplight.rs`'s own `#[cfg(kani)] use
+amenable_core::Ensures;` (added in Step 6) was removed as a result,
+along with all three hand-written `#[cfg_attr(kani, kani::ensures(..))]`
+attributes on `green_to_yellow`/`yellow_to_red`/`red_to_green`.
+Unconditional, not an opt-in flag: every real edge today wants this
+bound, and a hypothetical future edge with no meaningful postcondition
+is not this macro's problem to design around in advance.
+
+**Verified for real**, the same discipline as every other step: `cargo
+expand` can't render the generated `#[kani::ensures(..)]` content
+directly (the real `kani` crate's attribute macro only resolves inside
+the actual Kani toolchain, not plain `cargo expand`), so this was
+checked the authoritative way instead — real `cargo kani` on all three
+edges individually plus the `stub_verified` composition harness, all
+`VERIFICATION:- SUCCESSFUL`. A real, non-vacuous regression check
+(swapping `is_ok()` for `is_err()` inside `green_to_yellow`'s
+`kani_ensures!` invocation) produced a precise failure pointing at the
+exact macro-generated closure body and its real source line, reverted
+and re-verified clean. Full workspace `fmt --check`/`check`/`clippy
+--all-targets --all-features -D warnings` clean, `cargo test
+--workspace` clean (zero failures), `stoplight_mirror_consistency_test`
+still 3/3 (Step 2 unaffected — it only compares the method body,
+untouched here), `stoplight_amenable_test` still 6/6, `just
+verify-creusot` still `Proved (110 files) ✔`. Step 7 is complete.
+
+Left for future direction, not started here: the same generation for
+`Requires<KaniVerifier>` once a real precondition exists to wire; and
+carrying the identical pattern into a hypothetical Verus-side macro
+(`amenable_verus`'s `gallery::stoplight_exchange` is still entirely
+hand-written, no macro involved — `VERUS_EXCHANGE_PROOF_DERIVATION_
+PLAN.md`'s own Non-goals defer all codegen there).
+
 ## Open questions
 
 - **Creusot compilation model — resolved, landed in Step 1.** Not
@@ -1072,23 +1148,22 @@ concluding something in Step 1+ is a novel problem:
 ## Next step
 
 Steps 0 through 5 — every step this plan originally scoped — plus
-Step 6 (added after the fact) are now complete: the `Sidecar<V>`
+Steps 6 and 7 (added after the fact) are now complete: the `Sidecar<V>`
 trait-family fix; real Kani and Creusot bodies for all three
 `Stoplight` edges; a real consistency test keeping the Creusot mirror
 honest against the real Kani source; the by-hand Kani-side pattern
 generalized into `#[amenable_derive::exchange(..)]`; all three edges
 composed into one full-cycle `#[kani::stub_verified]` harness;
 `Stoplight`'s real `Amenable` impl, the first anywhere in the tree;
-and all three edges' DFCC postconditions routed through registered
-`Ensures<KaniVerifier>` contract types instead of restated inline.
-Nothing further is queued — extending this pattern to more `Exchange`
-edges beyond `Stoplight`; building the Step 3 macro out into a full
-attribute-driven pipeline for arbitrary transitions (now including
-Step 6's `kani_ensures!`-wiring pattern, and its Verus counterpart —
-see `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 5, which
-landed the identical `Ensures<V>`-contract-routing pattern for
-`gallery::stoplight_exchange` via `#[verifier::when_used_as_spec]`);
-or wiring `Requires<KaniVerifier>` for a real (non-trivial)
-precondition once one exists are all real future directions, but none
-should be started without explicit new direction, matching this
-plan's pacing throughout.
+all three edges' DFCC postconditions routed through registered
+`Ensures<KaniVerifier>` contract types instead of restated inline; and
+that routing generated by the macro itself rather than hand-typed per
+edge. Nothing further is queued — extending this pattern to more
+`Exchange` edges beyond `Stoplight`; wiring `Requires<KaniVerifier>`
+for a real (non-trivial) precondition once one exists; or carrying
+Step 7's macro-generation pattern into a hypothetical Verus-side macro
+(`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Non-goals still defer
+all Verus codegen — `gallery::stoplight_exchange` remains entirely
+hand-written even after that doc's own Step 5) are all real future
+directions, but none should be started without explicit new direction,
+matching this plan's pacing throughout.
