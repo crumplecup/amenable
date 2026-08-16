@@ -1418,7 +1418,20 @@ registry (mirroring `emit-verus-witnesses`'s own architecture) rather
 than either hand-copying or embedding `inventory` in the translated
 crate itself. On all three backends, only each edge's real transition
 body remains hand-authored; every mechanical piece around it is
-generated.
+generated. `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 8
+closed the last real gap this raised — Verus's `verus_exchange!(..)`
+*call sites* were still hand-typed and hand-copied after Steps 6/7
+generated the macro *definitions* they call, with no drift-guard
+between them and Kani's own real body, the exact class of gap Step 9
+closed for Creusot. A new `amenable::verus_exchange_export`/`emit-
+verus-exchange-companions` (reading the identical `amenable_core::
+ExchangeEdgeRecord` registry `emit-creusot-companions` reads) now
+generates those call sites too — `verus --crate-type=lib` reports
+`419 verified, 0 errors`. Kani was never in scope for this class of
+fix at all: its own scaffold was real proc-macro codegen
+(`#[amenable_derive::exchange(..)]`) from the start, with no
+translator-conflict problem to have caused the friction Steps 8/9
+(Creusot) and Step 8 (Verus) both closed.
 
 Nothing further is queued — extending this pattern to more `Exchange`
 edges beyond `Stoplight`; wiring `Requires<KaniVerifier>`/`Requires<V>`

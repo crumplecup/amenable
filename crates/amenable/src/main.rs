@@ -33,6 +33,11 @@ enum Commands {
     #[cfg(feature = "creusot")]
     #[command(name = "emit-creusot-companions")]
     EmitCreusotCompanions(EmitCreusotCompanionsArgs),
+    /// Materialize derived Verus `Exchange`-edge companions from the
+    /// real registry.
+    #[cfg(feature = "verus")]
+    #[command(name = "emit-verus-exchange-companions")]
+    EmitVerusExchangeCompanions(EmitVerusExchangeCompanionsArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
     Gallery(gallery::GalleryArgs),
     /// Write the full evidence and proof registry as JSON.
@@ -81,6 +86,10 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
         Some(Commands::EmitVerusWitnesses(args)) => run_emit_verus_witnesses(args),
         #[cfg(feature = "creusot")]
         Some(Commands::EmitCreusotCompanions(args)) => run_emit_creusot_companions(args),
+        #[cfg(feature = "verus")]
+        Some(Commands::EmitVerusExchangeCompanions(args)) => {
+            run_emit_verus_exchange_companions(args)
+        }
         Some(Commands::Gallery(args)) => gallery::run(args),
         Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
         Some(Commands::Verify(VerifyArgs {
@@ -186,6 +195,33 @@ fn run_emit_creusot_companions(args: EmitCreusotCompanionsArgs) -> AmenableResul
 #[cfg(feature = "creusot")]
 #[derive(Debug, Args)]
 struct EmitCreusotCompanionsArgs {
+    /// Directory to write generated companion files into.
+    #[arg(long)]
+    root: Option<PathBuf>,
+}
+
+#[cfg(feature = "verus")]
+fn run_emit_verus_exchange_companions(args: EmitVerusExchangeCompanionsArgs) -> AmenableResult<()> {
+    let root = args
+        .root
+        .unwrap_or_else(amenable::paths::verus_exchange_generated_directory);
+    let paths = amenable::write_verus_exchange_companions(&root)?;
+
+    println!(
+        "Wrote {} Verus Exchange-edge companion(s) under {}:",
+        paths.len(),
+        root.display()
+    );
+    for path in &paths {
+        println!("  {}", path.display());
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "verus")]
+#[derive(Debug, Args)]
+struct EmitVerusExchangeCompanionsArgs {
     /// Directory to write generated companion files into.
     #[arg(long)]
     root: Option<PathBuf>,

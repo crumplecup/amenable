@@ -95,7 +95,7 @@ use vstd::prelude::*;
 // for them here at all (unlike the earlier hand-written version, which
 // needed a `#[cfg(verus_keep_ghost)]`-gated `use crate::Ensures;` since
 // plain `cargo clippy` erases `ensures(...)` clause content entirely).
-use crate::exchange_support::{verus_ensures, verus_exchange};
+use crate::exchange_support::verus_ensures;
 // `exchange_support`'s `external_trait_specification`s apply crate-wide
 // once compiled in, via `lib.rs`'s own `pub mod exchange_support;` --
 // no explicit import needed here for Verus to pick them up.
@@ -244,6 +244,19 @@ where
 
 pub struct Stoplight;
 
+/// Sanitized mirror of `amenable_kani::stoplight::StoplightError` --
+/// needed for the same real reason `amenable_creusot::stoplight`'s own
+/// copy is: `verus_exchange!`'s generated bodies below are `#[amenable_
+/// derive::exchange(..)]`'s real, verbatim-captured Kani bodies (`Ok(..)`
+/// wrapper included), not a hand-simplified stand-in, so the surrounding
+/// `Exchange::Error` type has to be the real one, not `()`.
+#[derive(Debug, Clone, Copy)]
+pub enum StoplightError {
+    /// The one variant. Exists so `StoplightError` is an ordinary
+    /// constructible type, not so any edge below constructs it.
+    NotUsed,
+}
+
 /// Chains all three real `Exchange` impls together through the actual
 /// trait methods (not a hand-rolled shortcut) -- the full cycle a real
 /// `Stoplight` runs, proven to round-trip back to a well-formed `Green`.
@@ -256,68 +269,32 @@ pub fn full_cycle(stoplight: &Stoplight, start: Established<Green, GreenToken>) 
 
 } // verus!
 
-// The contract type carries the bound; `verus_exchange!`'s own generated
-// `ensures(...)` clause below calls through it rather than restating it
-// -- the same single-source-of-truth pattern `EXCHANGE_PROOF_DERIVATION_
-// PLAN.md`'s Step 6 wires up for Kani (`kani_ensures!`), confirmed to
-// also work for Verus (not merely `Bound = &'static str` description
-// text, contrary to `amenable_core::contract`'s own doc comment at the
-// time it was written -- see `gallery::ensures_contract_bound` for where
-// that was checked, not assumed). Both calls generated via macro, not
-// hand-written -- see this file's own doc comment for why they sit
-// outside the main `verus! {}` block above rather than inside it, and
-// `gallery::exchange_macro_generated`'s own doc comment for `verus_
-// exchange!`'s real hygiene fix (the generated method's parameter name
-// has to be a macro argument, not hardcoded, for the body below to
-// reference it).
+// The contract type carries the bound; the generated `ensures(...)`
+// clause (via `verus_exchange!`, included below) calls through it rather
+// than restating it -- the same single-source-of-truth pattern
+// `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 6 wires up for Kani (`kani_
+// ensures!`), confirmed to also work for Verus (not merely `Bound =
+// &'static str` description text, contrary to `amenable_core::contract`'s
+// own doc comment at the time it was written -- see `gallery::ensures_
+// contract_bound` for where that was checked, not assumed). Still hand-
+// written: `verus_ensures!` carries the real predicate itself, the same
+// discipline Kani's `kani_ensures!`/Creusot's own generator keep --
+// generation only ever covers the mechanical wiring around a claim, never
+// the claim's own content.
 verus_ensures!(
     Yellow,
     GalleryVerifier,
     yellow_ensures_spec,
-    Result<Established<Yellow, YellowToken>, ()>,
+    Result<Established<Yellow, YellowToken>, StoplightError>,
     |result| result.is_ok()
-);
-
-// Generates `Witness<GalleryVerifier> for Yellow` (without it,
-// `Establish<GreenToken, GalleryVerifier> for Yellow` above does not
-// compile, so this exchange cannot exist until the transition it claims
-// is proven -- the identical reason `#[amenable_derive::exchange]`
-// generates this impl for Kani) and `Exchange<Established<Green,
-// GreenToken>, Established<Yellow, YellowToken>, GalleryVerifier> for
-// Stoplight`, wired to the `Ensures<GalleryVerifier>` impl just
-// registered above. Only this real transition body is hand-authored.
-verus_exchange!(
-    Stoplight,
-    input: Established<Green, GreenToken>,
-    Established<Yellow, YellowToken>,
-    (),
-    Yellow,
-    GalleryVerifier,
-    {
-        let token = Yellow::establish(input.sidecar());
-        Ok(Established::new(Yellow, token))
-    }
 );
 
 verus_ensures!(
     Red,
     GalleryVerifier,
     red_ensures_spec,
-    Result<Established<Red, RedToken>, ()>,
+    Result<Established<Red, RedToken>, StoplightError>,
     |result| result.is_ok()
-);
-
-verus_exchange!(
-    Stoplight,
-    input: Established<Yellow, YellowToken>,
-    Established<Red, RedToken>,
-    (),
-    Red,
-    GalleryVerifier,
-    {
-        let token = Red::establish(input.sidecar());
-        Ok(Established::new(Red, token))
-    }
 );
 
 // Backs the cycle-back edge, same as the real `Stoplight`'s own
@@ -329,19 +306,20 @@ verus_ensures!(
     Green,
     GalleryVerifier,
     green_ensures_spec,
-    Result<Established<Green, GreenToken>, ()>,
+    Result<Established<Green, GreenToken>, StoplightError>,
     |result| result.is_ok()
 );
 
-verus_exchange!(
-    Stoplight,
-    input: Established<Red, RedToken>,
-    Established<Green, GreenToken>,
-    (),
-    Green,
-    GalleryVerifier,
-    {
-        let token = Green::establish(input.sidecar());
-        Ok(Established::new(Green, token))
-    }
-);
+// The three `Witness<GalleryVerifier>`/`Exchange<..>` impls -- generated
+// by `amenable::emit-verus-exchange-companions` from `amenable_core::
+// ExchangeEdgeRecord`, the same registry `emit-creusot-companions`
+// already reads (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 9), not
+// hand-written or hand-copied. `include!`, not `mod`: shares this file's
+// own scope directly (`Green`/`Yellow`/`Established`/`Stoplight`/
+// `StoplightError`/`GalleryVerifier` above, already in scope), matching
+// `amenable_creusot::stoplight`'s identical reason. Regenerate with
+// `just generate-verus-exchange` after changing a real Kani-side
+// transition; do not hand-edit the included files.
+include!("generated/stoplight_exchange/green_to_yellow.rs");
+include!("generated/stoplight_exchange/yellow_to_red.rs");
+include!("generated/stoplight_exchange/red_to_green.rs");

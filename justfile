@@ -118,20 +118,34 @@ verify-creusot:
 emit-verus-witnesses:
     cargo run -p amenable --features verus -- emit-verus-witnesses
 
+# Regenerates `amenable_verus::gallery::stoplight_exchange`'s derived
+# `Exchange`-edge companions from `amenable_core::ExchangeEdgeRecord` --
+# the Verus-side counterpart to `generate-creusot`, same reason: real
+# codegen from a registry read inside the ordinary, never-translated
+# `amenable` binary, not a hand-copied mirror. `cargo fmt` does not
+# discover `include!`d files (only walks the `mod` tree), so `rustfmt`
+# runs directly on the generated files, matching `generate-creusot`.
+generate-verus-exchange:
+    cargo run -p amenable --features verus -- emit-verus-exchange-companions
+    rustfmt crates/amenable_verus/src/gallery/generated/stoplight_exchange/*.rs
+
 check-verus:
     just emit-verus-witnesses
+    just generate-verus-exchange
     cargo check -p amenable_verus
     cargo check -p amenable_std --features verus
     cargo check -p amenable --features verus
 
 clippy-verus:
     just emit-verus-witnesses
+    just generate-verus-exchange
     cargo clippy -p amenable_verus --all-targets -- -D warnings
     cargo clippy -p amenable_std --features verus --all-targets -- -D warnings
     cargo clippy -p amenable --features verus --all-targets -- -D warnings
 
 test-verus:
     just emit-verus-witnesses
+    just generate-verus-exchange
     cargo test -p amenable_std --features verus
     cargo test -p amenable --features verus
 
@@ -148,6 +162,7 @@ check-all-verus:
 # for the reference invocation this mirrors.
 verify-verus:
     just emit-verus-witnesses
+    just generate-verus-exchange
     verus --crate-type=lib crates/amenable_verus/src/lib.rs
 
 # Cross-checks the Windows-gated std paths (std::os::windows, etc.) that

@@ -27,6 +27,8 @@ mod creusot_export;
 mod error;
 pub mod paths;
 #[cfg(feature = "verus")]
+mod verus_exchange_export;
+#[cfg(feature = "verus")]
 mod verus_export;
 
 pub mod assessment;
@@ -39,6 +41,8 @@ pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
 };
+#[cfg(feature = "verus")]
+pub use verus_exchange_export::write_verus_exchange_companions;
 #[cfg(feature = "verus")]
 pub use verus_export::write_verus_witness_modules;
 
