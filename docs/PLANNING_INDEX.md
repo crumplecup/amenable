@@ -1122,30 +1122,42 @@ own real `ensures` before anything downstream could be proven; and
 Verified for real: `verus --crate-type=lib` -- `458 verified, 0
 errors`, plus a real injected-bug regression check. `reject`/`rollback`
 deliberately still not connected on either backend (legitimately
-trivial, no new proof content). Step 5 is done on Kani, not started on
-Creusot/Verus: a standing correction repeated multiple times ("mirrors
-if used must be derived," "contract based bounds... should be derived
-from contract types") closed two gaps. `#[derive(amenable_derive::
-Sidecar)]` (Kani/Creusot) plus a `verus_sidecar!` macro_rules!
-counterpart (Verus, which resolves no proc-macro crate at all) now
-generate the `Established<T, Token>`/`Transfer<S, Token>` carrier shape
-everywhere it appears -- Kani's own real types included, not just
-mirrors -- replacing four hand-written copies. `AmountPositive`/
-`SufficientFunds`/`AccountsDistinct`/`BalancedEntries` (real `Evidence`
-types since Step 0, dead code until now) got real `Ensures<
-KaniVerifier>` impls via the already-generic `kani_ensures!` macro;
-`check_amount_positive`'s/`check_sufficient_funds`'s own contracts and
-`Validated`'s/`Committed`'s combined claims call through them instead
-of restating the arithmetic. A generic composition derive for the
-*outer* match/control-flow shape was considered and rejected -- genuine
-short-circuiting domain logic (`TransferError`'s three variants), not a
-mechanically-derivable pattern. Re-verified for real throughout: 8
-total real `cargo kani` harness checks (all `0 of N failed`), `cargo
-creusot prove` (`Proved 119 files`), `verus --crate-type=lib` (`458
-verified, 0 errors`) -- unchanged from before the retrofit, confirming
-no behavioral drift. Creusot's own `_holds` predicates and the Verus
-`ledger_exchange` predicate still don't call through the contract
-types -- the identical gap, not yet closed there. Step 6+ not started.
+trivial, no new proof content). Step 5 is done, all three backends: a
+standing correction repeated multiple times ("mirrors if used must be
+derived," "contract based bounds... should be derived from contract
+types") closed two gaps everywhere they appeared, not just on Kani.
+`#[derive(amenable_derive::Sidecar)]` (Kani/Creusot) plus a `verus_
+sidecar!` macro_rules! counterpart (Verus, which resolves no proc-macro
+crate at all) now generate the `Established<T, Token>`/`Transfer<S,
+Token>` carrier shape everywhere it appears -- Kani's own real types
+included, not just mirrors -- replacing four hand-written copies.
+`AmountPositive`/`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`
+(real `Evidence` types since Step 0, dead code until now) got real
+per-backend `Ensures<V>` impls: Kani's via the already-generic `kani_
+ensures!` macro (`Bound = bool`, a real checked predicate);
+Creusot's with `Bound = &'static str` (Pearlite has no exec
+representation at all, matching `amenable_core::contract`'s own
+documented fallback -- audit-only, since the real checking already ran
+through the existing `_holds` Pearlite functions and continues to);
+Verus's as real local mirror types (this backend resolves no real
+`amenable_gaap` either) with their own `bool`-checked `verus_ensures!`
+calls. Every atomic check's own contract and `Validated`'s/`Committed`'s
+combined claims, on every backend, now call through these instead of
+restating the arithmetic. A generic composition derive for the *outer*
+match/control-flow shape was considered and rejected, on all three --
+genuine short-circuiting domain logic (`TransferError`'s three
+variants), not a mechanically-derivable pattern. A third real "no
+general patterns" translator gap surfaced finishing the Verus half:
+`SufficientFunds`'s/`AccountsDistinct`'s own `verus_ensures!` calls
+first used destructuring parameters, hit the identical error `Step 4`'s
+own `Ledger::insufficient_funds` already found for a closure parameter,
+fixed the same way (index a plain tuple parameter instead). Re-verified
+for real throughout: 8 total real `cargo kani` harness checks (all `0
+of N failed`), `cargo creusot prove` (`Proved 119 files`, unchanged --
+the new Creusot impls are `#[cfg(not(creusot))]`-only, invisible to
+real translation), `verus --crate-type=lib` (`478 verified, 0 errors`,
+up from 458), plus a second real injected-bug regression check. Step
+6+ not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

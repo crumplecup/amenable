@@ -1,20 +1,20 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 178 8 178 85 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 292 8 292 85 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 179 16 179 45
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 182 16 182 55
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 185 16 185 49
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 176 19 176 23
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 177 18 177 59
-let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 72 19 72 23
-let%span sledger'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 73 18 73 55
-let%span sledger'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 94 19 94 23
-let%span sledger'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 95 18 95 65
-let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 120 19 120 23
-let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 121 18 121 59
-let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 160 16 165 17
-let%span sledger'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 62 24 62 48
-let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 85 24 85 56
-let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 110 24 110 47
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 293 16 293 45
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 296 16 296 55
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 299 16 299 49
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 290 19 290 23
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 291 18 291 59
+let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 94 19 94 23
+let%span sledger'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 95 18 95 55
+let%span sledger'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 156 19 156 23
+let%span sledger'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 157 18 157 65
+let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 208 19 208 23
+let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 209 18 209 59
+let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 274 16 279 17
+let%span sledger'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 24 84 48
+let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 147 24 147 56
+let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 198 24 198 47
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -35,7 +35,7 @@ use creusot.int.UInt64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 61 8 61 72] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 83 8 83 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger'11] outcome = (Int64.to_int amount > 0)
 
 let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
@@ -43,7 +43,7 @@ let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
   {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger'5] amount_positive_holds amount result}
     (! return {result}) ]
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 8 84 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 146 8 146 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#sledger'12] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = any
@@ -51,7 +51,7 @@ let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: 
   {[@stop_split] [@expl:check_sufficient_funds ensures] [%#sledger'7] sufficient_funds_holds balance amount result}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 109 8 109 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 197 8 197 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#sledger'13] outcome = (from <> to')
 
 let rec check_accounts_distinct (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = any
@@ -108,7 +108,7 @@ function cmp_le_log_i64 (x: Int64.t) (y: Int64.t) : ()
 
 axiom cmp_le_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord] Int64.le x y = (cmp_log_i64 x y <> Greater)
 
-predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 158 8 158 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
+predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 272 8 272 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
   [%#sledger'10] match outcome with
     | Ok -> amount_positive_holds amount true /\ accounts_distinct_holds from to' true
     | NegativeAmount bad -> bad = amount /\ Int64.to_int amount <= 0
@@ -120,7 +120,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 178 8 178 85] (balance: Int64.t)
+let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 292 8 292 85] (balance: Int64.t)
   (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (return (x: t_TransferOutcome)) = (! bb0
   [ bb0 = s0
     [ s0 = check_amount_positive [%#sledger] {amount} (fun (_x: bool) -> [ &_11 <- _x ] s1)

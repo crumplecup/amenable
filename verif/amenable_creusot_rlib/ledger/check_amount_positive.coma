@@ -1,22 +1,22 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 74 8 74 53 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 96 8 96 53 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 75 21 75 22
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 72 19 72 23
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 73 18 73 55
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 62 24 62 48
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 97 21 97 22
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 94 19 94 23
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 95 18 95 55
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 24 84 48
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 61 8 61 72] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 83 8 83 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger'2] outcome = (Int64.to_int amount > 0)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_amount_positive [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 74 8 74 53]
+let rec check_amount_positive [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 96 8 96 53]
   (amount: Int64.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int64.gt amount ([%#sledger] (0: Int64.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & amount: Int64.t = amount ])

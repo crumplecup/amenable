@@ -38,10 +38,10 @@ carrier shape is now a real derive (`#[derive(amenable_derive::Sidecar)]`
 for Kani/Creusot, `verus_sidecar!` for Verus) instead of hand-typed per
 backend, and `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
 `BalancedEntries` — real `Evidence` types since Step 0, dead code until
-now — back real `Ensures<KaniVerifier>` impls that `Validated`'s/
-`Committed`'s own claims call through, on Kani so far (see Step 5 below
-for the full account, including a composition-derive design considered
-and rejected).
+now — back real per-backend `Ensures<V>` impls that `Validated`'s/
+`Committed`'s own claims call through, on all three backends (see Step
+5 below for the full account, including a composition-derive design
+considered and rejected).
 
 ## Motivation
 
@@ -712,7 +712,7 @@ Pending>`/`Rejected<Validated>`) -- both are legitimately trivial
 connecting them here would be real, not free, work for no new proof
 content. Left for a future pass.
 
-### Step 5 — derive the carrier shape and the atomic contract bounds, not hand-write them — Kani done, Creusot/Verus not started
+### Step 5 — derive the carrier shape and the atomic contract bounds, not hand-write them — done, all three backends
 
 **A standing correction, not a new request.** Caught directly, a second
 and third time this lineage has needed it: "I have told you multiple
@@ -744,34 +744,48 @@ real gaps this step closes:
    proof (`kani_ensures!`'s `Validated`/`Committed` closures, Creusot's
    `_holds` predicates, the Verus `ledger_exchange` predicate)
    independently re-derived the same claims by name-matching convention
-   only, never touching these types. Wired them into real `Witness<
-   KaniVerifier>`/`Ensures<KaniVerifier>` impls in `amenable_kani::
-   ledger`, reusing the *existing* `kani_ensures!` macro (already generic
-   enough -- no new derive needed here). `Ledger::check_amount_positive`'s/
-   `::check_sufficient_funds`'s own DFCC contracts, and `Validated`'s/
-   `Committed`'s combined claims, now call through these contract
-   types' `ensures()` instead of restating the arithmetic. The outer
-   match/control-flow shape (which `TransferError` variant backs which
-   check) stayed hand-written on purpose -- considered and rejected a
-   generic composition derive for this: the real claim isn't a flat
-   conjunction, it's a short-circuiting match with a genuine, deliberate
-   asymmetry (`Ok` doesn't restate `SufficientFunds`), bespoke domain
-   logic a derive shouldn't guess at, not structural duplication.
+   only, never touching these types. Wired them into real per-backend
+   `Ensures<V>` impls -- Kani: `amenable_kani::ledger`, reusing the
+   *existing* `kani_ensures!` macro (`Bound = bool`, a real checked
+   predicate, already generic enough -- no new derive needed). Creusot:
+   `amenable_creusot::ledger`, `Bound = &'static str` (Pearlite has no
+   exec representation at all, matching `amenable_core::contract`'s own
+   documented fallback for exactly this case) -- purely for audit/
+   registry purposes, since the real checking already ran through the
+   existing `_holds` Pearlite functions directly and continues to.
+   Verus: `gallery::ledger_exchange`, real local mirror marker types
+   (this backend resolves no real `amenable_gaap` at all) with their own
+   `Bound = bool` `verus_ensures!` calls. On every backend, the atomic
+   check's own contract (Kani's `check_amount_positive`/`::check_
+   sufficient_funds`, matching isolated predicates on Creusot) and
+   `Validated`'s/`Committed`'s combined claims now call through these
+   contract types' `ensures()` instead of restating the arithmetic. The
+   outer match/control-flow shape (which `TransferError` variant backs
+   which check) stayed hand-written on purpose, everywhere -- considered
+   and rejected a generic composition derive for this: the real claim
+   isn't a flat conjunction, it's a short-circuiting match with a
+   genuine, deliberate asymmetry (`Ok` doesn't restate `SufficientFunds`),
+   bespoke domain logic a derive shouldn't guess at, not structural
+   duplication.
 
-**Verified for real, both halves, on Kani/Creusot/Verus (the carrier
-shape retrofit reaches all three; the bounds wiring reaches Kani only so
-far)**: 2 real `cargo kani` harness re-verifications for the carrier
-retrofit plus 6 more for the bounds wiring, all `0 of N failed`;
-`cargo creusot prove` -- `Proved (119 files) ✔`; `verus
---crate-type=lib` -- `458 verified, 0 errors`. Full workspace `check`/
-`fmt`/`clippy -D warnings`/`test` clean throughout.
+**A real, third translator gap found finishing the Verus half**:
+`SufficientFunds`'s/`AccountsDistinct`'s own `verus_ensures!` calls
+first used destructuring parameters (`|(balance, amount)| ..`), hitting
+the identical "only variables are supported here, not general patterns"
+error `Ledger::insufficient_funds`'s own doc comment (Step 4) already
+found for a closure parameter -- fixed the same way, indexing a plain
+tuple parameter (`input.0`/`.1`) instead.
 
-**Not yet done**: Creusot's `_holds` predicates and the Verus
-`ledger_exchange` predicate still hand-compose the same claims with no
-connection to the contract types -- the identical gap, one level
-removed. The Kani pattern generalizes directly (a real `Ensures<
-CreusotVerifier>`/`Ensures<VerusVerifier>` impl per contract type, then
-call through it), not yet started.
+**Verified for real, both halves, on all three backends**: 8 real
+`cargo kani` harness re-verifications (2 for the carrier retrofit, 6 for
+the Kani bounds wiring), all `0 of N failed`; `cargo creusot prove` --
+`Proved (119 files) ✔`, unchanged (the new Creusot impls are `#[cfg(
+not(creusot))]`-only, invisible to real translation); `verus
+--crate-type=lib` -- `478 verified, 0 errors` (up from 458 before the
+four new Verus contract-type impls), plus a second real injected-bug
+regression check (`AmountPositive`'s own claim loosened, reverted after
+confirming a precise failure). Full workspace `check`/`fmt`/`clippy -D
+warnings`/`test` clean throughout.
 
 ### Step 6+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
 
@@ -815,8 +829,13 @@ own Verus connection took the other real option instead (a full
 accommodation-model mirror, codegen-driven rather than hand-written) —
 worth weighing against the neutral-crate route once this is actually
 tackled, now that both are proven out for real on at least one backend
-each. Whichever route wins, Step 5's own finding applies here too:
-Creusot's `validated_holds`/`balanced_entries_holds` should call
-through real `Ensures<CreusotVerifier>` impls on `AmountPositive`/
-`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`, not stay
-hand-composed booleans disconnected from those contract types.
+each. Step 5's own contract-bounds retrofit already reaches Creusot's
+`validated_holds`/`balanced_entries_holds` as far as Pearlite allows
+(the real `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
+`BalancedEntries` types now carry real `Ensures<CreusotVerifier>` impls,
+`Bound = &'static str`, for audit purposes — Pearlite predicates have no
+exec representation at all, so the actual checking still flows through
+`amount_positive_holds`/etc. directly, which already composed correctly
+before Step 5, just without touching the real contract types); whatever
+connects `Ledger`/`Transfer<S, Token>` themselves is the one piece Step
+5 didn't touch.

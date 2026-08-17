@@ -41,6 +41,24 @@
 //! check_amount_positive`/`check_sufficient_funds` are isolated on the
 //! Kani side — connecting them to the real `Ledger::validate`/`::commit`
 //! bodies is a separate, later question.
+//!
+//! **`GAAP_LEDGER_PLAN.md`'s Step 5**: `amenable_gaap::contracts::
+//! {AmountPositive, SufficientFunds, AccountsDistinct, BalancedEntries}`
+//! — real `Evidence` types since Step 0, previously dead code here too
+//! (this module's own `_holds` predicates matched their names by
+//! convention only, never touched the real types) — now back real
+//! `Witness<CreusotVerifier>`/`Ensures<CreusotVerifier>` impls, one per
+//! `_holds` predicate, `#[cfg(not(creusot))]`-only (no `#[cfg(creusot)]`
+//! counterpart needed: nothing establishes a token *from* any of these
+//! four, so real translation never needs to see either impl — unlike
+//! `Validated`/`Committed`'s own `Witness<CreusotVerifier>` impls,
+//! further down, which do). `Bound = &'static str`, not `bool`: Pearlite
+//! predicates have no exec representation at all, so `Ensures::ensures`
+//! just exposes the real `_holds` source text for audit purposes — the
+//! actual checking is `amount_positive_holds`/etc. themselves, called
+//! directly from Pearlite composition (inside `check_amount_positive`'s
+//! own `#[ensures(..)]` and `validated_holds`'s own `match`), never
+//! through this trait.
 
 #[cfg(creusot)]
 use amenable_core::Witness;
@@ -51,6 +69,10 @@ use creusot_std::macros::{ensures, logic, requires};
 
 #[cfg(creusot)]
 use crate::CreusotVerifier;
+#[cfg(not(creusot))]
+use crate::CreusotVerifier;
+#[cfg(not(creusot))]
+use amenable_gaap::{AccountsDistinct, AmountPositive, BalancedEntries, SufficientFunds};
 
 amenable_derive::harness! {
     creusot, AMOUNT_POSITIVE_HOLDS_SRC, {
@@ -77,6 +99,46 @@ amenable_derive::harness! {
     }
 }
 
+// Ties the real `amenable_gaap::AmountPositive` contract type to this
+// module's own Pearlite content -- matching `amenable_kani::ledger`'s
+// own `kani_ensures!` wiring for the identical type (`GAAP_LEDGER_
+// PLAN.md`'s Step 5), previously done on Kani only. `Bound = &'static
+// str`, not `bool`: unlike Kani, Pearlite predicates have no exec
+// representation at all, so `amenable_core::contract`'s own doc comment
+// already anticipates this fallback -- a description of the real bound
+// for audit purposes, not a checked value (the actual checking is
+// `amount_positive_holds` itself, called directly from Pearlite
+// composition above and in `validated_holds` below; nothing in the
+// translated proof ever calls through this trait). No `#[cfg(creusot)]`
+// counterpart needed at all, unlike `Validated`/`Committed`'s own
+// `Witness<CreusotVerifier>` impls: nothing establishes a token *from*
+// `AmountPositive` (it's not part of an `Establish<C, V>` chain), so
+// real Creusot translation never needs to see either impl.
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for AmountPositive {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "check_amount_positive".to_owned(),
+                VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+impl amenable_core::Ensures<CreusotVerifier> for AmountPositive {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures((): ()) -> Self::Bound {
+        AMOUNT_POSITIVE_HOLDS_SRC
+    }
+}
+
 amenable_derive::harness! {
     creusot, SUFFICIENT_FUNDS_HOLDS_SRC, {
         /// The `Validated` postcondition's `SufficientFunds` conjunct.
@@ -96,6 +158,32 @@ amenable_derive::harness! {
         fn check_sufficient_funds(balance: i64, amount: i64) -> bool {
             balance >= amount
         }
+    }
+}
+
+// See `AmountPositive`'s own impls, above, for the full rationale.
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for SufficientFunds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "check_sufficient_funds".to_owned(),
+                VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+impl amenable_core::Ensures<CreusotVerifier> for SufficientFunds {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures((): ()) -> Self::Bound {
+        SUFFICIENT_FUNDS_HOLDS_SRC
     }
 }
 
@@ -122,6 +210,32 @@ amenable_derive::harness! {
         fn check_accounts_distinct(from: u64, to: u64) -> bool {
             from != to
         }
+    }
+}
+
+// See `AmountPositive`'s own impls, above, for the full rationale.
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for AccountsDistinct {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "check_accounts_distinct".to_owned(),
+                VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+impl amenable_core::Ensures<CreusotVerifier> for AccountsDistinct {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures((): ()) -> Self::Bound {
+        ACCOUNTS_DISTINCT_HOLDS_SRC
     }
 }
 
@@ -273,6 +387,32 @@ amenable_derive::harness! {
             let credit = amount;
             debit + credit == 0
         }
+    }
+}
+
+// See `AmountPositive`'s own impls, above, for the full rationale.
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for BalancedEntries {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "check_commit_balances".to_owned(),
+                VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+impl amenable_core::Ensures<CreusotVerifier> for BalancedEntries {
+    type Input = ();
+    type Bound = &'static str;
+
+    fn ensures((): ()) -> Self::Bound {
+        BALANCED_ENTRIES_HOLDS_SRC
     }
 }
 

@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 96 8 96 68 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 158 8 158 68 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 94 19 94 23
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 95 18 95 65
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 85 24 85 56
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 156 19 156 23
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 157 18 157 65
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 147 24 147 56
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 8 84 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 146 8 146 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#sledger'1] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_sufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 96 8 96 68]
+let rec check_sufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 158 8 158 68]
   (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int64.ge balance amount ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & balance: Int64.t = balance | & amount: Int64.t = amount ])

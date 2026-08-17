@@ -109,16 +109,34 @@
 //! and an exec fn; `wrapping_neg`/`wrapping_add` fail because `vstd`
 //! carries no specification for either.
 //!
+//! **`GAAP_LEDGER_PLAN.md`'s Step 5, added later.** `Validated`'s/
+//! `Committed`'s own claims originally hand-composed their arithmetic
+//! directly; now they call through real, local `AmountPositive`/
+//! `SufficientFunds`/`AccountsDistinct`/`BalancedEntries` mirror types'
+//! own `Ensures<GalleryVerifier>` impls instead -- the same retrofit
+//! already done on Kani (`amenable_kani::ledger`) and Creusot
+//! (`amenable_creusot::ledger`'s own `_holds` predicates), closing the
+//! identical gap here. A third real "no general patterns" hit building
+//! this: `SufficientFunds`'s/`AccountsDistinct`'s own `verus_ensures!`
+//! calls first used destructuring params (`|(balance, amount)| ..`),
+//! rejected the same way `Ledger::insufficient_funds`'s own doc comment
+//! already documents for a closure parameter -- fixed by indexing a
+//! plain tuple parameter (`input.0`/`.1`) instead, matching that fix
+//! exactly, just one call shape over: a bare parameter to a function
+//! `verus_ensures!` itself generates, not a closure this file writes
+//! directly.
+//!
 //! ## Verified non-vacuous
 //!
 //! `cargo run -p amenable --features verus -- emit-verus-exchange-
 //! companions` then `verus --crate-type=lib crates/amenable_verus/src/
-//! lib.rs`: **458 verified, 0 errors.** A real, injected bug (`Validated`'s
-//! `Ok` arm loosened from `amount > 0` to `amount > 1_000_000`) produced
-//! a precise, real `postcondition not satisfied` failure at the exact
-//! generated `Ok(Transfer::new(..))` return, confirming the claim is
-//! real and checked, not vacuous -- reverted and re-verified clean
-//! afterward.
+//! lib.rs`: **478 verified, 0 errors** (up from 458 before Step 5's four
+//! new contract-type impls). A real, injected bug (`AmountPositive`'s
+//! own claim loosened from `amount > 0` to `amount > 1_000_000`)
+//! produced a precise, real `postcondition not satisfied` failure at
+//! the exact generated `Ok(Transfer::new(..))` return, confirming the
+//! claim is real and checked, not vacuous -- reverted and re-verified
+//! clean afterward.
 
 use verus_builtin_macros::verus;
 #[allow(unused_imports)]
@@ -126,6 +144,16 @@ use vstd::prelude::*;
 
 use crate::exchange_support::{verus_ensures, verus_sidecar};
 use crate::{Establish, Evidence, ProofToken, Sidecar, Verifier, Witness};
+// `#[cfg(verus_keep_ghost)]`-gated, matching `amenable_core::evidence`'s
+// own precedent: `AmountPositive::ensures(..)` (etc., below) resolves
+// fine under ordinary `cargo check`/clippy without this import (`Type::
+// trait_fn()` path syntax doesn't require the trait in scope the way
+// `.method()` calls do), but real `verus`'s own driver -- which
+// unconditionally sets `--cfg verus_keep_ghost` -- needs it, confirmed
+// against the real toolchain: a real "function or associated item
+// `ensures` not found" error without it.
+#[cfg(verus_keep_ghost)]
+use crate::Ensures;
 
 verus! {
 
@@ -149,6 +177,117 @@ impl crate::Provenance for GalleryVerifierMetadata {
     fn metadata(&self) -> Self::MetadataIter {
         Vec::new().into_iter()
     }
+}
+
+/// Local mirrors of `amenable_gaap::contracts::{AmountPositive,
+/// SufficientFunds, AccountsDistinct, BalancedEntries}` -- `verus
+/// --crate-type=lib` resolves no extern crate at all (this crate's own
+/// `lib.rs` doc comment explains why), so, matching every other type in
+/// this file, these can't be the real types either. `GAAP_LEDGER_
+/// PLAN.md`'s Step 5: these four back real `Ensures<GalleryVerifier>`
+/// impls (below, past the `verus! {}` block, next to `Validated`'s/
+/// `Committed`'s own `verus_ensures!` calls, which now call through
+/// them instead of restating the arithmetic) -- the same real gap
+/// closed on Kani and Creusot, previously open here too. `Evidence`/
+/// `Witness<GalleryVerifier>` still needed even though nothing
+/// establishes a token *from* any of these four: `Ensures<V>: Witness<
+/// V>` is a hard supertrait bound, so an `Ensures` impl can't exist
+/// without one, matching `Pending`'s own trivial `Witness` impl right
+/// below for the identical structural reason.
+pub struct AmountPositive;
+
+impl Evidence for AmountPositive {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        AmountPositive
+    }
+
+    fn audit(&self) {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+impl Witness<GalleryVerifier> for AmountPositive {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
+pub struct SufficientFunds;
+
+impl Evidence for SufficientFunds {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        SufficientFunds
+    }
+
+    fn audit(&self) {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+impl Witness<GalleryVerifier> for SufficientFunds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
+pub struct AccountsDistinct;
+
+impl Evidence for AccountsDistinct {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        AccountsDistinct
+    }
+
+    fn audit(&self) {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+impl Witness<GalleryVerifier> for AccountsDistinct {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
+pub struct BalancedEntries;
+
+impl Evidence for BalancedEntries {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        BalancedEntries
+    }
+
+    fn audit(&self) {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
+impl Witness<GalleryVerifier> for BalancedEntries {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
 }
 
 /// The transfer is awaiting validation -- a root state claim, asserted
@@ -454,6 +593,64 @@ impl Ledger {
 // read `.primary` directly.
 verus_sidecar!(Transfer<S, Token>, GalleryVerifier, primary = TransferPayload);
 
+// `GAAP_LEDGER_PLAN.md`'s Step 5: real, atomic `Ensures<GalleryVerifier>`
+// impls for each contract type -- `Validated`'s/`Committed`'s own
+// `verus_ensures!` calls, below, call through these instead of
+// restating the arithmetic, matching the identical retrofit already
+// done on Kani (`amenable_kani::ledger`) and Creusot (`amenable_creusot
+// ::ledger`'s own `_holds` predicates). Each contract type's own
+// `ensures()` states the real claim directly (`amount > 0`, etc.), not
+// wrapped in a `Result` the way `Ledger::check_amount_positive`'s own
+// Kani proof is -- there is no separate "isolated proof function" layer
+// on this backend to mirror the way `check_amount_positive`/`_holds`
+// pairs exist on Kani/Creusot; the `Ensures` impl itself *is* the
+// claim, checked wherever it's called through.
+verus_ensures!(
+    AmountPositive,
+    GalleryVerifier,
+    amount_positive_ensures_spec,
+    i64,
+    |amount| amount > 0
+);
+
+// `input.0`/`.1`, not a destructuring `|(balance, amount)|` -- Verus
+// does not (yet) support a general pattern in this parameter position
+// either (confirmed against the real toolchain: the identical "only
+// variables are supported here" error `Ledger::insufficient_funds`'s
+// own doc comment already found for a closure parameter), so this
+// parameter stays a plain tuple, indexed rather than destructured.
+verus_ensures!(
+    SufficientFunds,
+    GalleryVerifier,
+    sufficient_funds_ensures_spec,
+    (i64, i64),
+    |input| input.0 >= input.1
+);
+
+// `input.0`/`.1`, same real reason as `SufficientFunds`'s own call,
+// above.
+verus_ensures!(
+    AccountsDistinct,
+    GalleryVerifier,
+    accounts_distinct_ensures_spec,
+    (u64, u64),
+    |input| input.0 != input.1
+);
+
+// `i128`-widened, matching `Committed`'s own claim below (see its own
+// comment for the full account of why `int`/`wrapping_*` don't work
+// here).
+verus_ensures!(
+    BalancedEntries,
+    GalleryVerifier,
+    balanced_entries_ensures_spec,
+    i64,
+    |amount| {
+        let amount = amount as i128;
+        (-amount) + amount == 0
+    }
+);
+
 // The contract type carries the bound; the generated `ensures(...)`
 // clause (via `verus_exchange!`, included below) calls through it rather
 // than restating it -- see `stoplight_exchange.rs`'s own doc comment for
@@ -463,7 +660,8 @@ verus_sidecar!(Transfer<S, Token>, GalleryVerifier, primary = TransferPayload);
 // match-arm shape (including the real claim's own asymmetry -- the `Ok`
 // arm doesn't restate `SufficientFunds`, only `AmountPositive`/
 // `AccountsDistinct`) and `amenable_creusot::ledger::validated_holds`'s
-// own Pearlite version of the identical claim.
+// own Pearlite version of the identical claim -- both now call through
+// the same four contract types' own `Ensures<V>` impls too, above.
 verus_ensures!(
     Validated,
     GalleryVerifier,
@@ -471,44 +669,34 @@ verus_ensures!(
     Result<Transfer<Validated, ValidatedToken>, TransferError>,
     |result| match result {
         Ok(validated) =>
-            validated.primary.amount.0 > 0 && validated.primary.from != validated.primary.to,
-        Err(TransferError::NegativeAmount(bad)) => bad <= 0,
-        Err(TransferError::InsufficientFunds { balance, required }) => balance < required,
+            AmountPositive::ensures(validated.primary.amount.0)
+                && AccountsDistinct::ensures((validated.primary.from, validated.primary.to)),
+        Err(TransferError::NegativeAmount(bad)) => !AmountPositive::ensures(bad),
+        Err(TransferError::InsufficientFunds { balance, required }) => {
+            !SufficientFunds::ensures((balance, required))
+        }
         Err(TransferError::SameAccount) => true,
     }
 );
 
 // Matches `amenable_kani::ledger::Committed::commit_ensures`'s claim
 // (`debit + credit == 0`) and `amenable_creusot::ledger::
-// balanced_entries_holds`'s own Pearlite version. Widened to `i128`, not
-// `int`: `verus_ensures!`'s own expansion splices `$expr` into *both* a
-// spec fn (where `int`/`nat` are fine) and the exec `fn ensures(..)`
-// body `#[verifier::when_used_as_spec]` pairs it with (where they are
-// not -- confirmed the hard way: `as int` here produced a real "can only
-// be used in ghost code" error pointing at the exec copy, not the spec
-// one). `wrapping_neg`/`wrapping_add` were tried next and also rejected
-// -- `vstd` carries no specification for either (confirmed against the
-// real toolchain: "core::num::impl&%3::wrapping_neg is not supported"),
-// so Verus can prove nothing about their result at all. `i128` sidesteps
-// both problems while staying in ordinary exec/spec-shared arithmetic:
-// unlike the real Kani/Creusot proofs, which each needed a genuine
-// `amount > 0` precondition to keep a plain `i64` `-amount` from
-// overflow-panicking at `i64::MIN` (Kani's `#[kani::requires]`,
-// Creusot's own `#[requires(amount@ > 0)]` on `check_commit_balances`),
-// widening `amount` to `i128` *before* negating never overflows for any
-// `i64` input, `i64::MIN` included (`i128`'s range is vastly larger than
-// `i64`'s) -- so this claim needs no precondition at all, genuinely
-// stronger than either of its siblings, not merely a workaround.
+// balanced_entries_holds`'s own Pearlite version -- both now call
+// through the same `BalancedEntries::ensures(..)` this does, above. Its
+// own `i128`-widened body is where the real "not `int`, not
+// `wrapping_*`" account lives now; kept here as a pointer rather than
+// duplicated: `int`/`nat` are ghost-only, so `as int` fails once
+// `verus_ensures!`'s `$expr` is spliced into the exec `fn ensures(..)`
+// half of the pair, not just the spec half; `wrapping_neg`/`wrapping_
+// add` fail separately because `vstd` carries no specification for
+// either.
 verus_ensures!(
     Committed,
     GalleryVerifier,
     committed_ensures_spec,
     Result<Transfer<Committed, CommittedToken>, TransferError>,
     |result| match result {
-        Ok(committed) => {
-            let amount = committed.primary.amount.0 as i128;
-            (-amount) + amount == 0
-        }
+        Ok(committed) => BalancedEntries::ensures(committed.primary.amount.0),
         Err(_) => false,
     }
 );
