@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 78 4 78 29 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 75 4 75 29 *)
 
 (* <witness::CreusotVerifier as amenable_core::Verifier> *)
 
-let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 79 8 79 17
+let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 76 8 76 17
 
 use creusot.prelude.Any
 
@@ -10,7 +10,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec name_CreusotVerifier [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 78 4 78 29]
+let rec name_CreusotVerifier [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 75 4 75 29]
   (return (x: string)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#switness] "creusot" ] s1 | s1 = return {_ret} ] ] [ & _ret: string = Any.any_l () ])
   [ return (result: string) -> (! return {result}) ]

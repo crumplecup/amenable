@@ -1,5 +1,3 @@
-#![cfg(feature = "creusot")]
-
 use std::alloc::{Layout, LayoutError, System};
 use std::any::TypeId;
 use std::array::{IntoIter as ArrayIntoIter, TryFromSliceError};

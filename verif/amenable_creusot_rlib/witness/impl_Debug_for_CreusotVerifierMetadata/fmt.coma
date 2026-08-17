@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 9 26 14 *)
 
 (* <witness::CreusotVerifierMetadata as std::fmt::Debug> *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span sfmt = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 8 26 8 30
 let%span sfmt'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/fmt.rs" 7 19 7 23
-let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14
+let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 9 26 14
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any
@@ -37,7 +37,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec fmt_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 9 29 14]
+let rec fmt_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 9 26 14]
   (self: ()) (f: MutBorrow.t t_Formatter) (return (x: t_Result_unit_Error)) =
   {[@stop_split] [@expl:fmt 'f' type invariant] [%#switness] inv_refmut_Formatter f}
   (! bb0

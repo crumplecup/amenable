@@ -14,17 +14,22 @@ together, alongside the default concrete certificate and registry types,
 serving as the canonical gold-standard registrations other crates can
 depend on instead of re-registering the same std types themselves.
 
-This is also where all three verifier backends' witnesses converge: each
-of `amenable_kani`, `amenable_creusot`, and `amenable_verus` is
-architecturally constrained to stay pure proof content (Kani/CBMC's
-symbolic-execution model, `creusot-rustc`'s whole-crate translation pass,
-and Verus's bare-compiler invocation each rule out ordinary bridging
-machinery living alongside the proofs themselves — see each crate's own
-README for the specifics). The bridge from each of those proofs to a
-concrete `RustStdStandard<T>` — the `Witness` impl, the registered
-`ProofRecord` — lives here instead, in `rust_std.rs`,
-`verus_witness.rs` (behind the `verus` feature), and `creusot_witness.rs`
-(behind the `creusot` feature).
+This is also where two of the three verifier backends' witnesses
+converge: `amenable_kani` and `amenable_verus` are each architecturally
+constrained to stay pure proof content (Kani/CBMC's symbolic-execution
+model and Verus's bare-compiler invocation each rule out ordinary
+bridging machinery living alongside the proofs themselves — see each
+crate's own README for the specifics). The bridge from each of those
+proofs to a concrete `RustStdStandard<T>` — the `Witness` impl, the
+registered `ProofRecord` — lives here instead, in `rust_std.rs` and
+`verus_witness.rs` (behind the `verus` feature). Creusot's own bridge
+used to live here too (`creusot_witness.rs`, behind a `creusot`
+feature), but `creusot-rustc`'s translator turns out not to share
+Kani's/Verus's constraint — it only sweeps items *local* to the crate
+it's directly translating, not an ordinary Cargo dependency's own
+items — so that ~90-carrier surface moved wholesale into
+`amenable_creusot::rust_std_witness` instead, a real Cargo dependency
+on this crate rather than the reverse; see that crate's own README.
 
 ## Coverage
 

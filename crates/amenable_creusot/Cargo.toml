@@ -17,6 +17,7 @@ categories = ["development-tools"]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 amenable_gaap = { workspace = true }
+amenable_std = { workspace = true }
 creusot-std = { workspace = true }
 inventory = { workspace = true }
 

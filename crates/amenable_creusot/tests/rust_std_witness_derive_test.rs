@@ -1,13 +1,11 @@
-#![cfg(feature = "creusot")]
-
 mod support;
 
 use amenable_core::{Witness, WitnessSupportSummary};
-use amenable_creusot::{CreusotVerifier, VERIFY_CHAR_ROUNDTRIP_SRC};
+use amenable_creusot::{CheckedProof, CreusotVerifier, VERIFY_CHAR_ROUNDTRIP_SRC};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
-use amenable_std::{CheckedProof, RustStdProvenance, RustStdStandard, RustStdType};
+use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
 use support::derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
     DerivedWitnessGenericEnum as SharedDerivedWitnessGenericEnum,

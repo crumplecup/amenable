@@ -7,7 +7,7 @@ let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledg
 use creusot.prelude.Any
 use creusot.int.UInt64
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 109 8 109 77] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 109 8 109 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#sledger'1] outcome = (from <> to')
 
 meta "compute_max_steps" 1000000

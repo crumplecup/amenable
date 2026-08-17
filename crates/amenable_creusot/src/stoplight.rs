@@ -3,25 +3,55 @@
 //! implementation, and `EXCHANGE_PROOF_DERIVATION_PLAN.md` for the design
 //! discussion this file is the outcome of).
 //!
-//! The state/token/sidecar types here are a minimal accommodation model,
-//! not the real `amenable_kani::stoplight` types — this crate cannot
-//! carry a Cargo dependency on `amenable_kani`/`amenable_std`/`amenable`
-//! at all, and never will: verifier backend crates (`amenable_kani`,
-//! `amenable_creusot`, `amenable_verus`) are independent and never link
-//! to each other directly, full stop. What is *not* off-limits: `amenable_
-//! core`'s own trait family (`Evidence`, `Witness<V>`, `Sidecar<V>`,
-//! `Establish<C, V>`, `ProofToken`) — this crate already has a real,
-//! unconditional Cargo dependency on `amenable_core`, and none of those
-//! trait *definitions* use the specific patterns that actually caused real
+//! **A real, later correction, twice over.** This crate briefly carried a
+//! real Cargo dependency directly on `amenable_kani`, to implement
+//! `Witness<CreusotVerifier>` on the real `Green`/`Yellow`/`Red` types —
+//! confirmed to compile cleanly, no ICE, since `creusot-rustc`'s
+//! translator only sweeps items *local* to the crate it's directly
+//! translating, not an ordinary dependency's own items (`ledger.rs`'s own
+//! doc comment has the full finding). But that dependency itself was
+//! wrong: it reintroduced exactly the backend-depends-on-backend edge the
+//! "verifier backends never depend on each other" rule exists to forbid
+//! (the same rule that got the old `amenable_kani -> amenable_creusot`
+//! edge removed in the first place). The actual fix, matching the split
+//! `amenable_gaap` already uses for `Pending`/`Validated`/`Committed`/
+//! `Rejected<T>`: `Green`/`Yellow`/`Red` now live in `amenable_core` (see
+//! `amenable_core::stoplight`'s own doc comment for why `amenable_core`
+//! specifically, not a new dedicated crate) — a neutral crate both
+//! `amenable_kani` and `amenable_creusot` depend on independently, with
+//! no edge between the two backends at all. This crate's Cargo dependency
+//! on `amenable_kani` has been removed entirely; the `amenable_std`/
+//! `amenable_gaap` dependencies below remain (unrelated to this
+//! correction — see `rust_std_witness.rs`/`ledger.rs` for those).
+//!
+//! **What still can't move, and why the mirror below still exists.** The
+//! real transition bodies (`green_to_yellow`/`yellow_to_red`/
+//! `red_to_green`) construct `Established::new(..)`/`YellowToken(())`/
+//! `RedToken(())` directly — and those constructors are deliberately
+//! *private* in `amenable_kani::stoplight`, the actual mechanism that
+//! guarantees a token can never be disconnected from a real `establish()`
+//! call. Widening them to `pub` so this crate could compile the real
+//! bodies verbatim against the real types would be a genuine, permanent
+//! weakening of that guarantee, not a free cleanup — so the transition
+//! bodies still run against a local accommodation-model mirror
+//! (`Green`/`Yellow`/`Red`/tokens/`Established<T, Token>` below), not the
+//! real types. This is a deliberate, load-bearing split, not an
+//! oversight: audit-only reporting (no construction involved) uses the
+//! real types directly; anything that needs to *construct* a token still
+//! needs its own mirror, matching whatever privacy the real constructors
+//! actually have.
+//!
+//! The mirror types below genuinely implement the real `amenable_core`
+//! trait family (`Evidence`, `Witness<V>`, `Sidecar<V>`, `Establish<C,
+//! V>`, `ProofToken`), gated to `CreusotVerifier`, the same way the Kani
+//! side implements them gated to `KaniVerifier` — `Provenance` stays
+//! left out (this file has no use for it). None of those trait
+//! *definitions* use the specific patterns that actually caused real
 //! `creusot-rustc` translator crashes in this exact codebase (`Provenance`
 //! impls returning `Box<dyn Iterator<..>>`; a return-position `impl
 //! Trait` method; ungated `inventory::collect!`/`inventory::submit!` —
-//! see `amenable_std::creusot_witness`'s doc comment and `amenable_std::
-//! creusot_gallery`'s own confirmed findings). So the state/token/sidecar
-//! types below genuinely implement the real `amenable_core` traits, gated
-//! to `CreusotVerifier`, the same way the Kani side implements them gated
-//! to `KaniVerifier` — `Provenance` stays left out (this file has no use
-//! for it).
+//! see `rust_std_witness.rs`'s doc comment and `amenable_std::
+//! creusot_gallery`'s own confirmed findings).
 //!
 //! **The three per-edge transition bodies are generated, not hand-written
 //! or hand-kept-in-sync.** An earlier version of this file hand-copied
@@ -48,10 +78,10 @@
 //! stable, one-time accommodation-model infrastructure with far lower
 //! drift risk than a transition body's own evolving logic, and (unlike
 //! the transition bodies) not something a different backend's real source
-//! can be captured verbatim *from* in the first place -- Kani's own
-//! `Green`/`Yellow`/`Established<T, Token>` are a different, concrete
-//! type from this file's own, even though both names and shapes match by
-//! convention.
+//! can be captured verbatim *from* in the first place -- `amenable_core`'s
+//! real `Green`/`Yellow` and `amenable_kani`'s real `Established<T,
+//! Token>` are different, concrete types from this file's own mirror,
+//! even though both names and shapes match by convention.
 
 #[cfg(creusot)]
 use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
@@ -60,8 +90,10 @@ use creusot_std::macros::{ensures, requires};
 
 #[cfg(creusot)]
 use crate::CreusotVerifier;
+#[cfg(not(creusot))]
+use crate::CreusotVerifier;
 
-/// Sanitized mirror of `amenable_kani::stoplight::Green`.
+/// Sanitized mirror of `amenable_kani::Green`.
 #[cfg(creusot)]
 pub struct Green;
 
@@ -85,7 +117,7 @@ impl Witness<CreusotVerifier> for Green {
     fn proof() -> Self::ProofArtifact {}
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::Yellow`.
+/// Sanitized mirror of `amenable_kani::Yellow`.
 #[cfg(creusot)]
 pub struct Yellow;
 
@@ -109,7 +141,7 @@ impl Witness<CreusotVerifier> for Yellow {
     fn proof() -> Self::ProofArtifact {}
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::Red`.
+/// Sanitized mirror of `amenable_kani::Red`.
 #[cfg(creusot)]
 pub struct Red;
 
@@ -133,7 +165,7 @@ impl Witness<CreusotVerifier> for Red {
     fn proof() -> Self::ProofArtifact {}
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::GreenToken`.
+/// Sanitized mirror of `amenable_kani::GreenToken`.
 #[cfg(creusot)]
 pub struct GreenToken(());
 
@@ -152,7 +184,7 @@ impl ProofToken for GreenToken {
     type Proposition = Green;
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::YellowToken`.
+/// Sanitized mirror of `amenable_kani::YellowToken`.
 #[cfg(creusot)]
 pub struct YellowToken(());
 
@@ -171,7 +203,7 @@ impl ProofToken for YellowToken {
     type Proposition = Yellow;
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::RedToken`.
+/// Sanitized mirror of `amenable_kani::RedToken`.
 #[cfg(creusot)]
 pub struct RedToken(());
 
@@ -190,7 +222,7 @@ impl ProofToken for RedToken {
     type Proposition = Red;
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::Established<T, Token>`
+/// Sanitized mirror of `amenable_kani::Established<T, Token>`
 /// — genuinely generic and genuinely implements `Sidecar<CreusotVerifier>`,
 /// unlike an earlier, flattened version of this file.
 #[cfg(creusot)]
@@ -252,7 +284,7 @@ impl Establish<RedToken, CreusotVerifier> for Green {
     }
 }
 
-/// Sanitized mirror of `amenable_kani::stoplight::StoplightError` — a
+/// Sanitized mirror of `amenable_kani::StoplightError` — a
 /// real, ordinary, constructible type, matching the real one's own
 /// justification exactly: an uninhabited error type (`std::convert::
 /// Infallible`) is incompatible with the same class of reconstruction
@@ -287,3 +319,101 @@ pub enum StoplightError {
 include!("generated/green_to_yellow.rs");
 include!("generated/yellow_to_red.rs");
 include!("generated/red_to_green.rs");
+
+// Real `Witness<CreusotVerifier>` bridges for the *real* `amenable_core::
+// stoplight::{Green, Yellow, Red}` -- audit/registry only, no
+// construction involved, so (unlike the mirror types above) these don't
+// need their own accommodation model at all. `amenable_core`, not
+// `amenable_kani`: these markers moved there specifically so this file
+// could implement `Witness<CreusotVerifier>` on the real types without a
+// backend-to-backend Cargo edge -- see this file's own doc comment and
+// `amenable_core::stoplight`'s doc comment for the full rationale. The
+// mirror above still exists alongside these (the real transition bodies
+// still need private constructors this crate can't reach).
+// `#[cfg(not(creusot))]`, matching `ledger.rs`'s own `Witness` bridges:
+// the real `MultiCheckProof` artifact carries `Vec`/`String`/`Display`
+// machinery that must never be *local* during actual translation
+// (confirmed the hard way -- see that type's own doc comment).
+// Fully-qualified `amenable_core::` paths, not a `use`, so these names
+// never collide with this file's own `#[cfg(creusot)]`-gated mirror
+// `Green`/`Yellow`/`Red` above -- both exist in the same source, gated to
+// mutually exclusive `cfg(creusot)` branches, so there is never a real
+// naming conflict at any single compilation.
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for amenable_core::Yellow {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "green_to_yellow".to_owned(),
+                VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_core::Yellow",
+        verifier: "creusot",
+        describe: || <amenable_core::Yellow as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    }
+}
+
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for amenable_core::Red {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "yellow_to_red".to_owned(),
+                VERIFY_YELLOW_TO_RED_EXCHANGE_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_core::Red",
+        verifier: "creusot",
+        describe: || <amenable_core::Red as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    }
+}
+
+/// `Green` is a root claim (see `amenable_core::Green`'s own
+/// doc comment), but this workspace's `Stoplight` cycles back to it too
+/// (`red_to_green`), so it still has a real Creusot proof backing the
+/// cycle-back edge -- named `"cycle_back"` matching the real Kani-side
+/// `ProofRecord`'s own `evidence_id` suffix convention for the exact
+/// same distinction (the *root* claim itself stays asserted, not
+/// proven; this is the separate claim that `Red` lawfully cycles back).
+#[cfg(not(creusot))]
+impl amenable_core::Witness<CreusotVerifier> for amenable_core::Green {
+    type SupportingEvidence = Self;
+    type ProofArtifact = crate::witness::MultiCheckProof;
+
+    fn proof() -> Self::ProofArtifact {
+        crate::witness::MultiCheckProof {
+            checks: vec![(
+                "red_to_green".to_owned(),
+                VERIFY_RED_TO_GREEN_EXCHANGE_SRC.to_owned(),
+            )],
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ProofRecord {
+        evidence: "amenable_core::Green::cycle_back",
+        verifier: "creusot",
+        describe: || <amenable_core::Green as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    }
+}

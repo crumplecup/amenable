@@ -9,7 +9,7 @@ use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 61 8 61 68] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 61 8 61 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger'2] outcome = (Int64.to_int amount > 0)
 
 meta "compute_max_steps" 1000000

@@ -5,10 +5,8 @@
 //! `Establish` minted for that transition rather than a token
 //! independently re-minted afterward.
 
-use amenable_core::{Exchange, Sidecar};
-use amenable_kani::{
-    Established, Green, GreenToken, Red, RedToken, Stoplight, StoplightError, Yellow, YellowToken,
-};
+use amenable_core::{Exchange, Green, Red, Sidecar, Yellow};
+use amenable_kani::{Established, GreenToken, RedToken, Stoplight, StoplightError, YellowToken};
 
 #[test]
 fn green_to_yellow_exchange_succeeds() -> Result<(), StoplightError> {

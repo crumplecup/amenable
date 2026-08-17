@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 180 4 180 27 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 212 4 212 27 *)
 
 (* <stoplight::RedToken as std::clone::Clone> *)
 
@@ -10,7 +10,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_RedToken [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 180 4 180 27]
+let rec clone_RedToken [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 212 4 212 27]
   (self: t_RedToken) (return (x: t_RedToken)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- { f0 = _2 } ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_RedToken = Any.any_l () | & _2: () = Any.any_l () ])

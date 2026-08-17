@@ -8,7 +8,7 @@ use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 8 84 83] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 84 8 84 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#sledger'1] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 meta "compute_max_steps" 1000000

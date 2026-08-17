@@ -1,28 +1,34 @@
 //! `CreusotWitness` impls for Rust standard-library carriers.
 //!
-//! This lives here, not alongside the proof functions in `amenable_creusot`,
-//! because `creusot-rustc`'s translator sweeps every local item in a
-//! `creusot-std`-dependent crate — including ones no `#[cfg(creusot)]` gate
-//! protects, since Rust items don't need to *run* to be enumerated. Ordinary
-//! infrastructure that's completely unremarkable to plain `rustc` turned out
-//! to be unsupported there: a return-position `impl Trait` on a local `impl`
-//! panicked its intrinsics-gathering pass outright (a real ICE, not a
-//! hypothetical), and the `static` item `::inventory::submit!` expands to
-//! hit "unsupported definition kind ... Static" the same way. So
-//! `amenable_creusot` stays pure Pearlite proof-function content — the thing
-//! `cargo creusot -- -p amenable_creusot` actually needs to translate — and
-//! everything else about *finding* those proofs (the witness bridge, the
-//! registry) moves to the crate that already owns the types being proved
-//! about.
+//! This file used to live in `amenable_std` itself, implementing `Witness<
+//! CreusotVerifier>` from that side via an *optional* dependency back on
+//! `amenable_creusot` (needed only to name `CreusotVerifier`, the trait's
+//! own type parameter). That optional edge was a real problem: `amenable_
+//! kani` depends on `amenable_std` unconditionally, so any crate wanting to
+//! depend on `amenable_kani` (this one, eventually — see `ledger.rs`'s own
+//! doc comment) would close a real Cargo cycle the moment it also touched
+//! `amenable_std`, confirmed directly by a real `cyclic package dependency`
+//! error. Moved here instead, matching `ledger.rs`'s own precedent for
+//! `amenable_gaap`: `amenable_creusot` takes a real, ordinary, unconditional
+//! Cargo dependency *on* `amenable_std`, and implements `Witness<
+//! CreusotVerifier>` directly on the real `RustStdStandard<T>` from this
+//! side. No accommodation-model mirror needed — confirmed empirically, not
+//! assumed: `creusot-rustc`'s translator only sweeps items *local* to the
+//! crate it's directly translating (`amenable_creusot` itself), not an
+//! ordinary dependency's own items (a return-position `impl Trait` and a
+//! `static`-generating `::inventory::submit!` are real, confirmed ICE
+//! triggers when *local*, per this session's own findings — see `ledger.rs`
+//! for the real counter-example and the fix, which still applies here:
+//! anything `Vec`/`String`/`Display`-heavy stays `#[cfg(not(creusot))]`).
 //!
-//! This is legal under Rust's orphan rule for a reason distinct from every
-//! other verifier backend's bridge (see `amenable_creusot::witness`'s own
-//! doc comment for the usual justification: the verifier marker type is
-//! local): here, `RustStdStandard<T>` — the `Self` type — is local to this
-//! crate instead. The orphan rule only requires *one* of {trait, Self type,
-//! trait's own type parameters} to be local to the implementing crate, not
-//! any particular one, and a real 3-crate test confirmed a Self-type-local
-//! justification compiles exactly the same as a trait-parameter-local one.
+//! Legal under Rust's orphan rule the *usual* way now (see `amenable_
+//! creusot::witness`'s own doc comment): `CreusotVerifier`, the trait's own
+//! type parameter, is local to this crate. `RustStdStandard<T>` being local
+//! to `amenable_std` instead was the *old* file's own justification for the
+//! reverse direction — no longer the mechanism in use, but still confirmed
+//! true and still how `ledger.rs`'s own `Witness<CreusotVerifier> for
+//! Validated`/`Committed` impls stay legal (`Validated`/`Committed` are
+//! local to `amenable_gaap`, not here).
 //!
 //! One block per concrete type: a Creusot-checkable property doesn't
 //! generalize across types the way provenance does, so there is no blanket
@@ -154,8 +160,7 @@ use std::vec::Vec;
 
 use core::panic::{Location, PanicInfo, PanicMessage};
 
-use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
-use amenable_creusot::{
+use crate::{
     A_LESS_THAN_B_HOLDS_SRC, ARGV_EXTRA_HEADROOM_HOLDS_SRC, ARGV_INCLUDES_PROGRAM_PATH_SRC,
     ASCII_BYTE_HOLDS_SRC, ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
     BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_HOLDS_SRC,
@@ -299,8 +304,9 @@ use amenable_creusot::{
     WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
     WRAPPING_I32_ADD_WRAPS_HOLDS_SRC, YIELDS_TWO_VALUES_IN_ORDER_THEN_ENDS_SRC,
 };
+use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 
-use crate::{
+use amenable_std::{
     ArgvIncludesProgramPath, AsciiByte, DrainsTwoValuesInOrderAndEmpties, IndexingAndLength,
     IterYieldsValueOnceThenEnds, NonNulByte, NulOnlyAtTheEndValidates, RustLanguageProvenance,
     RustStdProvenance, RustStdStandard, ValidUnicodeScalar, YieldsTwoValuesInOrderThenEnds,

@@ -6,13 +6,17 @@
 //! which workflows are closed under those exchanges. It is dependency-light
 //! by design and does not depend on any downstream proof-carrying framework.
 //!
-//! This crate holds only the core roles. Traits that must be implemented
-//! directly on foreign standard-library types (which Rust's orphan rules
-//! require to live in the crate that defines the trait) live in dedicated
-//! sibling crates instead — `amenable_std` for `RustStdType`, `amenable_code`
-//! for `Code`. Users should generally depend on the top-level `amenable`
-//! facade crate, which re-exports this crate's family alongside its
-//! siblings, rather than depending on `amenable_core` directly.
+//! This crate holds the core roles, plus one exception: the canonical
+//! `Stoplight` worked example's bare evidence markers (`Green`/`Yellow`/
+//! `Red`, see `stoplight.rs`'s own doc comment for why they live here
+//! rather than in a verifier backend crate). Traits that must be
+//! implemented directly on foreign standard-library types (which Rust's
+//! orphan rules require to live in the crate that defines the trait) live
+//! in dedicated sibling crates instead — `amenable_std` for `RustStdType`,
+//! `amenable_code` for `Code`. Users should generally depend on the
+//! top-level `amenable` facade crate, which re-exports this crate's
+//! family alongside its siblings, rather than depending on `amenable_core`
+//! directly.
 //!
 //! See `docs/AMENABLE_PLAN.md` and `amenable.md` (repository root) for
 //! the full design rationale.
@@ -30,6 +34,7 @@ mod link;
 mod provenance;
 mod roles;
 mod state_machine;
+mod stoplight;
 mod verifier;
 #[cfg(feature = "verus")]
 mod verus_carrier;
@@ -47,6 +52,7 @@ pub use link::{ContractRecord, EvidenceLink, ExchangeEdgeRecord, ProofRecord};
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
 pub use state_machine::{Amenable, StateMachine};
+pub use stoplight::{Green, Red, Yellow};
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]
 pub use verus_carrier::predicate_body as verus_predicate_body;

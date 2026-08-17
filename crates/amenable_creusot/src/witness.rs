@@ -4,13 +4,10 @@ use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
 use creusot_std::macros::trusted;
 
 /// The Creusot verifier, local to this crate: there is only one verifier
-/// Creusot works with — Creusot. Unlike Kani/Verus's own markers, the
-/// per-type `Witness<CreusotVerifier>` bridges for `RustStdStandard<T>`
-/// live in `amenable_std`, not here (see the crate-level doc comment) —
-/// legal there because `RustStdStandard<T>` itself is local to that crate,
-/// not because `CreusotVerifier` is. `CreusotVerifier` still belongs here
-/// rather than `amenable_core`, though: it's what makes each per-type
-/// impl in `amenable_std` a *bridge to Creusot specifically*, not a
+/// Creusot works with — Creusot. `CreusotVerifier` belongs here rather
+/// than `amenable_core`: it's what makes each per-type `Witness<
+/// CreusotVerifier>` impl elsewhere in this crate (`rust_std_witness.rs`,
+/// `ledger.rs`, `stoplight.rs`) a bridge to Creusot specifically, not a
 /// generic one no other verifier could also legally claim.
 pub struct CreusotVerifier;
 
@@ -91,4 +88,49 @@ pub trait CreusotWitness {
 
     /// Identify the Creusot proof artifact for this evidence.
     fn proof() -> Self::ProofArtifact;
+}
+
+/// Proof artifact for a claim that rests on one or more real Creusot
+/// contract functions — used wherever a `Witness<CreusotVerifier>` impl
+/// targets a *real* evidence type directly (no accommodation-model
+/// mirror), naming each backing harness and its own verbatim source.
+/// Owned strings, not `&'static str` — matching `amenable_kani::
+/// CalculationProof`'s own precedent, this crate's proof-artifact
+/// convention, not `rust_std_witness::CheckedProof`'s (which carries an
+/// extra chain-derived `provenance` field specific to `RustStdStandard<T>`
+/// carriers).
+///
+/// `#[cfg(not(creusot))]` on the type itself, not just at each call
+/// site: the `Vec<(String, String)>`/`Display` machinery is exactly the
+/// kind of ordinary Rust infrastructure `creusot-rustc`'s translator
+/// chokes on when it's *local* to the crate being translated — confirmed
+/// the hard way, twice. First building `ledger.rs`'s own `Witness<
+/// CreusotVerifier>` bridge (an ungated `impl Display` there caused a
+/// real internal compiler panic); then again here, the *second* time
+/// around, gating only this struct's re-export in `lib.rs` and not the
+/// struct's own definition — the derived `Clone` for the `Vec<(String,
+/// String)>` field still got swept and panicked (`Cannot handle builtin
+/// implementation of std::clone::Clone for (String, String)`) even
+/// though nothing under `#[cfg(creusot)]` ever constructs one. The gate
+/// has to live at the definition site itself, not downstream of it.
+/// Every caller keeps its `#[cfg(creusot)]`-gated `Witness` impl trivial
+/// (`ProofArtifact = ()`) and only builds one of these on the
+/// `#[cfg(not(creusot))]` side.
+#[cfg(not(creusot))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MultiCheckProof {
+    /// Each real Creusot contract function backing this claim, and its
+    /// own verbatim source.
+    pub checks: Vec<(String, String)>,
+}
+
+#[cfg(not(creusot))]
+impl std::fmt::Display for MultiCheckProof {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (harness, claim) in &self.checks {
+            writeln!(f, "harness: {harness}")?;
+            writeln!(f, "claim: {claim}")?;
+        }
+        Ok(())
+    }
 }

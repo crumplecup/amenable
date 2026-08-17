@@ -148,7 +148,7 @@ the full site list.
 
 **Document:** [EXCHANGE_PROOF_DERIVATION_PLAN.md](EXCHANGE_PROOF_DERIVATION_PLAN.md)
 
-**Status:** ✅ All ten steps (0 through 9) done and verified — Kani and
+**Status:** ✅ All eleven steps (0 through 10) done and verified — Kani and
 Creusot, all three `stoplight.rs` edges, each carrying real,
 tool-confirmed contracts (`cargo kani`, `cargo creusot prove` —
 `Proved (112 files) ✔`) with a genuine injected-regression check per
@@ -297,6 +297,31 @@ own test's doc comment now states precisely rather than overclaiming).
 `just generate-creusot` wired into every Creusot recipe that checks
 anything, matching `emit-verus-witnesses`'s own "regenerate before
 checking" placement exactly.
+
+Step 10, grown out of the GAAP ledger worked example
+(`GAAP_LEDGER_PLAN.md`'s Step 3) rather than a `Stoplight`-specific
+request, but changing `Stoplight`'s own architecture along the way:
+confirming `amenable_creusot -> amenable_gaap` as a real dependency
+worked (zero ICE, `Witness<CreusotVerifier>` directly on real
+`Validated`/`Committed`, no mirror needed) led to trying the same for
+`amenable_kani`, which first hit a genuine Cargo cycle through
+`amenable_std`'s own optional edge back to `amenable_creusot`. Fixed
+by flipping that edge for real -- `amenable_creusot` now depends on
+`amenable_std` unconditionally, and `amenable_std`'s entire
+~90-carrier Creusot witness-bridge surface moved wholesale into
+`amenable_creusot::rust_std_witness` (closing Step 9's own deferred
+migration item). With the cycle gone, `amenable_creusot ->
+amenable_kani` *did* compile clean too -- but adding it was caught
+immediately as violating Step 8's own rule a second time: "what the
+heck are you trying to share from Kani to creusot and why isn't it in
+core?" The real fix: `Green`/`Yellow`/`Red` moved to `amenable_core`,
+a neutral crate both backends already depend on independently,
+matching `amenable_gaap`'s own split exactly. `amenable_creusot`'s
+Cargo dependency on `amenable_kani` was removed entirely. Verified for
+real: full workspace `check`/`fmt`/`clippy -D warnings`/`test --all-
+features` clean, `cargo creusot prove -- -p amenable_creusot` --
+`Proved (119 files) ✔`, `cargo tree -p amenable_creusot` confirms no
+`amenable_kani` edge remains.
 
 **Description:** `Exchange<Input, Output>` proves a Hoare-triple-shaped
 claim over a real method body, not a static structural fact — the
@@ -1063,9 +1088,18 @@ contracts (`AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
 types — a real correction to this plan's original design: `amenable_
 creusot` can take an ordinary Cargo dependency on `amenable_gaap`
 (confirmed empirically, no ICE), so no accommodation-model mirror was
-needed at all, unlike `Stoplight`'s own shape. `Ledger::validate`/
-`::commit` themselves aren't connected to those predicates yet. Steps 4
-onward not started.
+needed at all, unlike `Stoplight`'s own shape. Getting there also
+forced a real, workspace-wide dependency-tree restructuring (see
+"Exchange Method Proof Derivation"'s own Step 10 above): `amenable_std`'s
+optional edge to `amenable_creusot` flipped for real, and `Stoplight`'s
+own `Green`/`Yellow`/`Red` moved from `amenable_kani` to `amenable_core`
+after a real, caught-and-reverted attempt to depend `amenable_creusot`
+directly on `amenable_kani`. `Ledger::validate`/`::commit` themselves
+aren't connected to those four predicates yet, and a direct
+`amenable_creusot -> amenable_kani` dependency is now a settled no
+(same architectural rule, not an open question) rather than the open
+question this status paragraph used to describe. Steps 4 onward not
+started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

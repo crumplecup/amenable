@@ -75,20 +75,20 @@ generate-creusot:
 
 check-creusot:
     just generate-creusot
+    cargo check -p amenable_std
     cargo check -p amenable_creusot
-    cargo check -p amenable_std --features creusot
     cargo check -p amenable --features creusot
 
 clippy-creusot:
     just generate-creusot
+    cargo clippy -p amenable_std --all-targets -- -D warnings
     cargo clippy -p amenable_creusot --all-targets -- -D warnings
-    cargo clippy -p amenable_std --features creusot --all-targets -- -D warnings
     cargo clippy -p amenable --features creusot --all-targets -- -D warnings
 
 test-creusot:
     just generate-creusot
+    cargo test -p amenable_std
     cargo test -p amenable_creusot
-    cargo test -p amenable_std --features creusot
     cargo test -p amenable --features creusot
 
 check-all-creusot:

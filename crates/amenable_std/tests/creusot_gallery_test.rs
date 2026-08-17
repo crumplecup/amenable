@@ -1,5 +1,3 @@
-#![cfg(feature = "creusot")]
-
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]

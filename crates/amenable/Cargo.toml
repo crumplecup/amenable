@@ -40,23 +40,27 @@ workspace = true
 [features]
 default = ["cli"]
 cli = ["dep:miette"]
-# `amenable_creusot` (and the Creusot side of `amenable_std`) is an
-# experimental, still-partial verifier backend, kept out of the default
-# proof-chain surface until it's more complete -- not because it needs
-# anything special to compile (plain stable `cargo check --features
-# creusot` works fine). `dump-registry`'s output only includes Creusot's
-# registered ProofRecords when this feature is on. No `amenable_kani/
-# creusot` here anymore -- that feature (and the `amenable_kani ->
-# amenable_creusot` Cargo dependency it gated) was a real violation of
-# "verifier backend crates never depend on each other," fixed by having
-# `amenable_creusot::stoplight` register its own `ProofRecord`s (`#[cfg(
-# not(creusot))]`-gated) for `Stoplight::creusot_surface()` to query via
-# the shared registry instead. `amenable`'s own binary linking both
-# `amenable_kani` and `amenable_creusot` (via `dep:amenable_creusot`
-# below) is what makes those registrations visible to that query at
-# runtime -- inventory needs no Cargo edge between the two crates
-# themselves, only both being linked into the same final binary.
-creusot = ["dep:amenable_creusot", "amenable_std/creusot"]
+# `amenable_creusot` is an experimental, still-partial verifier backend,
+# kept out of the default proof-chain surface until it's more complete --
+# not because it needs anything special to compile (plain stable `cargo
+# check --features creusot` works fine). `dump-registry`'s output only
+# includes Creusot's registered ProofRecords when this feature is on.
+# No `amenable_std/creusot` here anymore either: `amenable_std`'s own
+# `Witness<CreusotVerifier>` bridge for `RustStdStandard<T>` moved to
+# `amenable_creusot::rust_std_witness` (a real, ordinary, unconditional
+# dependency `amenable_creusot -> amenable_std` now, no feature needed on
+# that side) -- see that module's own doc comment for why: the old
+# `amenable_std -> amenable_creusot` optional edge closed a real Cargo
+# cycle the moment `amenable_creusot` also wanted to depend on
+# `amenable_kani` (which depends on `amenable_std` unconditionally).
+# `amenable`'s own binary linking both `amenable_kani` and
+# `amenable_creusot` (via `dep:amenable_creusot` below) is what makes
+# each backend's own registrations visible to `Amenable::*_surface()`
+# queries at runtime -- inventory needs no Cargo edge between verifier
+# backend crates themselves, only both being linked into the same final
+# binary (see `amenable_creusot::stoplight`'s own `#[cfg(not(creusot))]`
+# -gated `ProofRecord` registrations for the precedent this follows).
+creusot = ["dep:amenable_creusot"]
 # `amenable_verus` itself is never a Cargo dependency of anything (see
 # `amenable_std::verus_witness`'s own doc comment for why: Verus never
 # resolves `Cargo.toml`, so there's no witness/registry machinery to

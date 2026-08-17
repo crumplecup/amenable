@@ -17,7 +17,14 @@ exists to dogfood `amenable`'s own derives. `reject()`/`rollback()`'s
 structural wrinkle (both targeting one flat `Rejected` would collide
 with `#[amenable_derive::exchange]`'s one-`Witness`-impl-per-evidence
 assumption) is resolved by making `Rejected<T>` generic over the state
-it was rejected from.
+it was rejected from. Getting Step 3 to compile also forced a real
+workspace-wide dependency-tree restructuring, recorded in
+`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10: `amenable_std`'s
+optional edge to `amenable_creusot` flipped for real (closing a Cargo
+cycle that blocked `amenable_kani` from being tried as a direct
+dependency too), and `Stoplight`'s `Green`/`Yellow`/`Red` moved from
+`amenable_kani` to `amenable_core` after a real, caught-and-reverted
+attempt to depend `amenable_creusot` directly on `amenable_kani`.
 
 ## Motivation
 
@@ -103,33 +110,45 @@ citation-only placeholders):
 
 ### Crate hierarchy
 
-Mirrors `amenable_std`'s real, asymmetric shape (confirmed against its
-actual `Cargo.toml`/`lib.rs`, not assumed):
+**Superseded by Step 3's own real correction (see below) — this is the
+actual, current shape, not the plan's original sketch.** `amenable_gaap`
+is a genuinely neutral domain crate: both verifier backends depend on
+it, it depends on neither of them, matching how `amenable_core` now
+hosts `Stoplight`'s own `Green`/`Yellow`/`Red` for the identical reason
+(`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10).
 
-- `amenable_gaap` depends on `amenable_core` + `amenable_derive`
-  unconditionally.
-- `amenable_gaap` depends on `amenable_creusot` optionally, behind a
-  `creusot` feature. Creusot-side content lives *inside* `amenable_gaap`
-  under that feature — same as `amenable_std::creusot_witness`/
-  `creusot_gallery`.
+- `amenable_gaap` depends on `amenable_core` + `amenable_derive` +
+  `inventory` + `uuid` unconditionally. **No** dependency on
+  `amenable_creusot`, `amenable_kani`, or `amenable_verus`, optional or
+  otherwise — `amenable_gaap` itself carries no verifier-specific proof
+  content at all, only the evidence markers (`Pending`/`Validated`/
+  `Committed`/`Rejected<T>`) and domain data.
+- `amenable_creusot` depends on `amenable_gaap` unconditionally and
+  implements `Witness<CreusotVerifier>` directly on the real
+  `Validated`/`Committed` types in `amenable_creusot::ledger` — no
+  accommodation-model mirror, confirmed empirically to compile and
+  prove clean (see Step 3 below for the full story of how this
+  displaced the plan's original `creusot`-feature-inside-`amenable_gaap`
+  design).
+- `amenable_kani` depends on `amenable_gaap` unconditionally — the same
+  relationship `amenable_kani` already has with `amenable_std` — and
+  hosts the real `Witness<KaniVerifier>` impls and harnesses directly
+  in `amenable_kani::ledger`, since Rust's orphan rules put them
+  wherever `KaniVerifier` itself lives, not wherever the trait or type
+  is defined.
 - `amenable_gaap` has a `verus` feature for export/witness scaffolding
   only — no Cargo edge to `amenable_verus`. The real Verus proof source
   lives in a new `amenable_verus::gallery::ledger` module,
   `include_str!`-linked by relative path — same as
   `amenable_std::verus_witness`.
-- `amenable_gaap` has **no** dependency on `amenable_kani`. The
-  opposite direction: a new `amenable_kani::ledger` module gains a
-  dependency on `amenable_gaap` — the same relationship `amenable_kani`
-  already has with `amenable_std` — and hosts the real
-  `Witness<KaniVerifier>` impls and harnesses directly, since Rust's
-  orphan rules put them wherever `KaniVerifier` itself lives, not
-  wherever the trait or type is defined.
 
-No new crate-hierarchy pattern is being invented. This is
-`amenable_std`'s exact shape with `amenable_gaap` swapped in for the
-domain content, so every future domain crate (`amenable_db`,
-`amenable_time`, `amenable_ui`, `amenable_gis`) has one proven template
-to follow rather than a fresh decision each time.
+No new crate-hierarchy pattern is being invented. Both backends
+depending independently on one neutral domain crate, with no edge
+between the backends themselves, is the same template `amenable_core`
+now uses for `Stoplight`'s evidence markers — so every future domain
+crate (`amenable_db`, `amenable_time`, `amenable_ui`, `amenable_gis`)
+has one proven template to follow rather than a fresh decision each
+time.
 
 ## Non-goals
 
@@ -492,11 +511,12 @@ shape: hand-written accommodation-model types living *inside*
 was proven (`GAAP_LEDGER_PLAN.md`'s own "Non-goals": "hand-build the
 first real edge for Kani, then Creusot, then Verus, then generalize...
 not before"). Building that revealed the real, better answer instead:
-`Stoplight`'s evidence types live in `amenable_kani`, a crate
-`amenable_creusot` can never depend on (would close a real cycle) — but
 `amenable_gaap`'s evidence types have no dependency back on
-`amenable_creusot` at all, so `amenable_creusot` can take a real,
-ordinary Cargo dependency on `amenable_gaap` and implement `Witness<
+`amenable_creusot` at all (unlike `Stoplight`'s own `Green`/`Yellow`/
+`Red`, which did — `amenable_kani`, where they originally lived,
+depends on `amenable_std`, which at the time optionally depended back
+on `amenable_creusot`), so `amenable_creusot` can take a real, ordinary
+Cargo dependency on `amenable_gaap` and implement `Witness<
 CreusotVerifier>` **directly on the real `Validated`/`Committed` types**
 — no accommodation-model mirror needed, ever, for this pair. Confirmed
 empirically before committing to it, not assumed: `cargo creusot -- -p
@@ -506,7 +526,15 @@ assumption that *any* dependency beyond `amenable_core` risked the same
 translator ICE a *local* item can hit (per `amenable_std::creusot_
 witness`'s own doc comment) turned out not to generalize to an ordinary
 dependency crate's own items — only to items local to whatever crate
-`cargo creusot` is actually translating.
+`cargo creusot` is actually translating. (This same finding later let
+`amenable_std`'s own optional edge back to `amenable_creusot` be
+flipped for real, and even let `amenable_creusot -> amenable_kani`
+compile clean with zero ICE when tried directly — that specific edge
+was still reverted, but for an unrelated, more fundamental reason:
+verifier backend crates never depend on each other, full stop. See
+`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10 for the full account —
+`Stoplight`'s `Green`/`Yellow`/`Red` moved to `amenable_core` instead,
+the same neutral-crate split this section describes for GAAP.)
 
 **A real, load-bearing counter-example found along the way.** The
 `Witness<CreusotVerifier>` impls themselves still have to stay
@@ -575,11 +603,18 @@ functions, living only in `amenable_kani`) are not yet connected to
 these Creusot predicates — the four checks above are proven in
 isolation, the same way `Ledger::check_amount_positive`/`::check_
 sufficient_funds` were proven in isolation before `validate`'s own
-Kani contract was written. Whether `Ledger`/`Transfer<S, Token>` can
-also become a real Cargo dependency of `amenable_creusot` (now that
-this session confirmed dependencies aren't swept by the translator the
-way local items are) or need a different treatment is an open question
-for whenever that connection is actually built.
+Kani contract was written. `Ledger`/`Transfer<S, Token>` becoming a
+real Cargo dependency of `amenable_creusot` is **not** on the table —
+that would be a direct `amenable_creusot -> amenable_kani` edge, ruled
+out on architectural grounds regardless of translator-ICE risk (see
+`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10: this exact edge was
+tried, compiled clean, and was reverted anyway for violating
+"verifier backends never depend on each other"). Whatever connects
+`Ledger::validate`/`::commit` to these predicates will need either its
+own neutral-crate marker types (matching `Stoplight`'s `Green`/
+`Yellow`/`Red` -> `amenable_core` move) or a different mechanism
+entirely — an open question for whenever that connection is actually
+built.
 
 ### Step 4 — Verus — not started
 
@@ -616,9 +651,12 @@ non-trivial predicate exists to expose it for real.
 
 Step 3's remaining piece: connect `Ledger::validate`/`::commit`
 themselves (real functions, living only in `amenable_kani`) to the
-four proven Creusot predicates — including deciding whether
-`amenable_creusot` can also take a real Cargo dependency on
-`amenable_kani` (untested; this step confirmed dependencies aren't
-swept by the translator the way local items are, but `amenable_kani`
-has far more surface area than `amenable_gaap` did) or needs a
-different treatment.
+four proven Creusot predicates. **Not** via a real Cargo dependency
+from `amenable_creusot` to `amenable_kani` — that question is now
+settled, not open: tried directly, compiled clean (translator-ICE risk
+was never the blocker), and reverted anyway for violating "verifier
+backends never depend on each other"
+(`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10). Whatever connects
+`Ledger`/`Transfer<S, Token>` to these predicates needs a different
+treatment — most likely its own neutral-crate marker types, matching
+`Stoplight`'s `Green`/`Yellow`/`Red` -> `amenable_core` move.

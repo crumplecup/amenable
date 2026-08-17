@@ -6,40 +6,52 @@
 
 `CreusotVerifier` and the `CreusotWitness` trait are defined here — there
 is only one verifier Creusot works with, Creusot, so the marker belongs
-with the crate that means it. But unlike Kani and Verus, the impls
-bridging `CreusotWitness`/`Witness<CreusotVerifier>` to concrete std
-carriers (`RustStdStandard<T>`) live in `amenable_std` instead of here.
+with the crate that means it. The impls bridging `CreusotWitness`/
+`Witness<CreusotVerifier>` to concrete std carriers (`RustStdStandard<T>`)
+also live here now, in `rust_std_witness.rs` — that surface used to live
+in `amenable_std` (`creusot_witness.rs`, behind a `creusot` feature) but
+was migrated wholesale once a real, empirically-confirmed finding made
+the old split unnecessary: `creusot-rustc`'s whole-crate translation pass
+only sweeps items *local* to the crate it's directly translating, not an
+ordinary Cargo dependency's own items. `amenable_creusot` now carries a
+real, unconditional Cargo dependency on `amenable_std` (the direction
+used to be reversed, and optional) with no translator conflict, so the
+witness-bridge surface could move to sit alongside the proofs it
+witnesses instead of the other way around.
 
-That split exists because `creusot-rustc`'s whole-crate translation pass
-chokes on ordinary Rust infrastructure that's completely unremarkable to
-plain `rustc`: a return-position `impl Trait` on a local `impl` panicked
-its intrinsics-gathering pass outright (a real ICE, confirmed
+That doesn't mean `creusot-rustc`'s translator has no real constraints —
+it chokes on ordinary Rust infrastructure that's completely unremarkable
+to plain `rustc`: a return-position `impl Trait` on a local `impl`
+panicked its intrinsics-gathering pass outright (a real ICE, confirmed
 empirically, not a hypothetical), `Box<dyn Iterator<..>>` as a concrete
 associated-type value is rejected outright ("forbidden dyn type... dyn
 support is currently minimal"), and `inventory::collect!`/`inventory::
 submit!`'s generated `static` items hit "unsupported definition kind" /
-"unsupported constant value" the same way. All three are avoidable with
-precise `#[cfg(not(creusot))]` gating *in place* — confirmed in an
-isolated probe crate, see `amenable_std::creusot_gallery`'s own
-`cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors`
-case — so the historical fix of relocating *all* witness-bridge/registry
-code to `amenable_std` wasn't the only option, just the one applied at
-the time for the ~90-carrier `rust_std.rs` surface. `stoplight.rs`
-registers its own, much smaller set of `ProofRecord`s directly, gated
-this way, rather than following that same relocation. This crate still
-stays pure Pearlite proof-function content plus its own gated registry
-entries — the thing `cargo creusot -- -p amenable_creusot` actually
-needs to translate — while `rust_std.rs`'s much larger witness-bridge
-surface (the witness bridge, the registry, for ~90 std carriers) still
-lives in `amenable_std` instead, unchanged for now.
+"unsupported constant value" the same way — but only for items *local*
+to this crate. All three are avoidable with precise
+`#[cfg(not(creusot))]` gating *in place*, applied at the actual
+definition site, not just at the point of use — a real, separately
+confirmed ICE hit twice in this crate when only a re-export or a usage
+site was gated, not the struct/impl definition itself.
 
-That split is legal under Rust's orphan rule via a different
-justification than usual: it's `RustStdStandard<T>` (the `Self` type,
-local to `amenable_std`) satisfying the "one local type" requirement
-there, rather than the verifier marker (local here).
-
-`rust_std.rs` holds the actual harness functions; `witness.rs` holds the
-trait/marker definitions `amenable_std` implements against.
+`rust_std.rs`/`rust_std_witness.rs` hold `amenable_std`'s harness
+functions and their witness bridge, respectively; `ledger.rs` holds
+`amenable_gaap`'s real, non-trivial Pearlite predicates (`AmountPositive`/
+`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`), implemented
+directly on the real `Validated`/`Committed` types via a real Cargo
+dependency on `amenable_gaap` — no accommodation-model mirror needed,
+for the same translator-sweep-scope reason as `amenable_std` above.
+`stoplight.rs` is the one exception: `Stoplight`'s tokens/
+`Established<T, Token>`/transition bodies still need a hand-written
+accommodation-model mirror, because the real constructors they'd
+otherwise call (`Established::new`, the token tuple fields) are
+deliberately private to `amenable_kani` — the audit-only half of that
+file, though, implements `Witness<CreusotVerifier>` directly on the
+real `amenable_core::{Green, Yellow, Red}` evidence markers (moved
+there specifically so neither this crate nor `amenable_kani` has to
+depend on the other — verifier backends never depend on each other,
+full stop). `witness.rs` holds the shared trait/marker definitions
+these all implement against.
 
 ## Coverage
 
@@ -54,21 +66,22 @@ coverage it doesn't have.
 
 `std::os::windows::*` types can't even be named here at all —
 `creusot-rustc` has no Windows target, and its whole-crate translator
-can't tolerate the `inventory::submit!`-based witness wiring this crate's
-proof functions need to stay free of regardless (see above). That
-cluster's four harnesses instead prove a law over a synthetic
-`isize`/`u64`/`u32` model — real and fully Creusot-proved, not a
-`#[trusted]` stub — with the evidence hand-linked to the real types'
-registrations by string in `amenable_std::creusot_witness`, mirroring
-`amenable_kani::os_windows_model`'s identical bypass for the identical
-reason (Kani/CBMC don't run on Windows either).
+can't tolerate ordinary `inventory::submit!`-based witness wiring left
+ungated (see above). That cluster's four harnesses instead prove a law
+over a synthetic `isize`/`u64`/`u32` model — real and fully
+Creusot-proved, not a `#[trusted]` stub — with the evidence hand-linked
+to the real types' registrations by string in `rust_std_witness.rs`,
+mirroring `amenable_kani::os_windows_model`'s identical bypass for the
+identical reason (Kani/CBMC don't run on Windows either).
 
 ## See also
 
 - [Root README](../../README.md) for the project-wide overview and
   verifier summary.
-- [`amenable_std`](../amenable_std/README.md) for the registry these
-  witnesses bridge into, and overall coverage across all three verifiers.
+- [`amenable_std`](../amenable_std/README.md) for `RustStdType`'s own
+  registrations, and overall coverage across all three verifiers.
+- [`amenable_gaap`](../amenable_gaap/README.md) for the GAAP ledger's
+  own evidence types this crate's `ledger.rs` proves against.
 - [`amenable_kani`](../amenable_kani/README.md),
   [`amenable_verus`](../amenable_verus/README.md) for the other two
   backends.

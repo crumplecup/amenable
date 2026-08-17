@@ -22,10 +22,7 @@ mod compose_any_length_is_bounded;
 mod compose_array_length_is_fixed;
 mod compose_depth_zero_is_empty;
 mod compose_field_presence_tracks_depth;
-#[cfg(feature = "creusot")]
 mod creusot_gallery;
-#[cfg(feature = "creusot")]
-mod creusot_witness;
 mod drains_two_values_in_order_and_empties;
 mod increment_headroom;
 mod indexing_and_length;
@@ -60,13 +57,10 @@ pub use compose_any_length_is_bounded::ComposeAnyLengthIsBounded;
 pub use compose_array_length_is_fixed::ComposeArrayLengthIsFixed;
 pub use compose_depth_zero_is_empty::ComposeDepthZeroIsEmpty;
 pub use compose_field_presence_tracks_depth::ComposeFieldPresenceTracksDepth;
-#[cfg(feature = "creusot")]
 pub use creusot_gallery::{
     CreusotGalleryCase, CreusotGalleryDisposition, CreusotGalleryExpectation,
     CreusotGalleryRegistration,
 };
-#[cfg(feature = "creusot")]
-pub use creusot_witness::CheckedProof;
 pub use drains_two_values_in_order_and_empties::DrainsTwoValuesInOrderAndEmpties;
 pub use increment_headroom::IncrementHeadroom;
 pub use indexing_and_length::IndexingAndLength;

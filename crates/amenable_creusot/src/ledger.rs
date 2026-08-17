@@ -58,7 +58,7 @@ amenable_derive::harness! {
         /// real, callable Pearlite content, named and reused rather
         /// than restated wherever it's checked.
         #[logic(open)]
-        fn amount_positive_holds(amount: i64, outcome: bool) -> bool {
+        pub fn amount_positive_holds(amount: i64, outcome: bool) -> bool {
             pearlite! { outcome == (amount@ > 0) }
         }
     }
@@ -81,7 +81,7 @@ amenable_derive::harness! {
     creusot, SUFFICIENT_FUNDS_HOLDS_SRC, {
         /// The `Validated` postcondition's `SufficientFunds` conjunct.
         #[logic(open)]
-        fn sufficient_funds_holds(balance: i64, amount: i64, outcome: bool) -> bool {
+        pub fn sufficient_funds_holds(balance: i64, amount: i64, outcome: bool) -> bool {
             pearlite! { outcome == (balance@ >= amount@) }
         }
     }
@@ -106,7 +106,7 @@ amenable_derive::harness! {
         /// AccountId`'s real `Uuid`-backed identity — see this module's
         /// own doc comment for why.
         #[logic(open)]
-        fn accounts_distinct_holds(from: u64, to: u64, outcome: bool) -> bool {
+        pub fn accounts_distinct_holds(from: u64, to: u64, outcome: bool) -> bool {
             pearlite! { outcome == (from != to) }
         }
     }
@@ -125,52 +125,84 @@ amenable_derive::harness! {
     }
 }
 
+amenable_derive::harness! {
+    creusot, TRANSFER_OUTCOME_MIRROR_SRC, {
+        /// Sanitized mirror of `amenable_kani::ledger::TransferError`,
+        /// for the combined claim below — real Rust enum, destructured
+        /// via Pearlite `match`, which needs no `PartialEq`/`Eq` derive
+        /// at all (pattern matching, not an `==` comparison) — dropped
+        /// after a real translation error: `creusot-rustc` requires a
+        /// `DeepModel` impl for any type deriving `PartialEq`, matching
+        /// `CreusotVerifierMetadata`'s own precedent in this crate's
+        /// `witness.rs`.
+        enum TransferOutcome {
+            Ok,
+            NegativeAmount(i64),
+            InsufficientFunds { balance: i64, required: i64 },
+            SameAccount,
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VALIDATED_HOLDS_SRC, {
+        /// The real, combined `Validated` postcondition — matches
+        /// `amenable_kani::ledger::Validated::validate_ensures`'s exact
+        /// match-arm shape (including the real claim's own asymmetry:
+        /// the `Ok` arm doesn't restate `SufficientFunds`, only
+        /// `AmountPositive`/`AccountsDistinct` — `SufficientFunds` gates
+        /// whether `Ok` is reached at all, but isn't re-asserted once
+        /// it has been), composing the four isolated conjuncts above
+        /// rather than restating their content.
+        #[logic(open)]
+        fn validated_holds(amount: i64, from: u64, to: u64, outcome: TransferOutcome) -> bool {
+            pearlite! {
+                match outcome {
+                    TransferOutcome::Ok => amount_positive_holds(amount, true) && accounts_distinct_holds(from, to, true),
+                    TransferOutcome::NegativeAmount(bad) => bad == amount && amount@ <= 0,
+                    TransferOutcome::InsufficientFunds { balance, required } => balance < required,
+                    TransferOutcome::SameAccount => true,
+                }
+            }
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_VALIDATE_SRC, {
+        /// Mirrors `amenable_kani::ledger::Ledger::validate`'s own real
+        /// body -- calls the same three isolated checks in the same
+        /// order, short-circuiting the same way.
+        #[requires(true)]
+        #[ensures(validated_holds(amount, from, to, result))]
+        fn validate(balance: i64, amount: i64, from: u64, to: u64) -> TransferOutcome {
+            if !check_amount_positive(amount) {
+                return TransferOutcome::NegativeAmount(amount);
+            }
+            if !check_sufficient_funds(balance, amount) {
+                return TransferOutcome::InsufficientFunds { balance, required: amount };
+            }
+            if !check_accounts_distinct(from, to) {
+                return TransferOutcome::SameAccount;
+            }
+            TransferOutcome::Ok
+        }
+    }
+}
+
 /// Proof artifact for a `Validated`/`Committed` claim that currently
 /// rests on more than one isolated Creusot check (`Validated` on
 /// `AmountPositive`/`SufficientFunds`/`AccountsDistinct`, each proven
 /// separately — see this module's own doc comment for why there is no
 /// single composed claim yet, matching `Ledger::check_amount_positive`/
 /// `::check_sufficient_funds` being proven separately on the Kani side
-/// too). Owned strings, not `&'static str` — matching `amenable_kani::
-/// CalculationProof`'s own precedent, not `amenable_std::CheckedProof`'s.
-///
-/// `#[cfg(not(creusot))]`, like the `ProofRecord` registrations that
-/// build one — real, confirmed the hard way: an earlier version left
-/// this ungated so the `#[cfg(creusot)]`-gated `Witness<CreusotVerifier>`
-/// impls below could also report it, and `cargo creusot prove` hit a
-/// real internal compiler panic. `creusot-rustc`'s translator sweeps
-/// every *local* item in the crate it's translating regardless of
-/// `#[cfg(creusot)]`'s own condition being satisfied elsewhere — the
-/// `Vec<(String, String)>`/`Display` machinery here is exactly the kind
-/// of ordinary Rust infrastructure `amenable_std::creusot_witness`'s own
-/// doc comment already warns is unsupported there. So the
-/// `#[cfg(creusot)]`-gated `Witness` impls stay trivial (`ProofArtifact
-/// = ()`, matching `stoplight.rs`'s own Green/Yellow/Red precedent
-/// exactly) — their only role during actual translation is satisfying
-/// `Establish`'s `Witness<V>` bound, not reporting anything. The real,
-/// descriptive artifact only ever needs to exist outside that pass.
+/// too). Uses `crate::witness::MultiCheckProof` — see that type's own
+/// doc comment for why it's `#[cfg(not(creusot))]` at its definition
+/// site, not here (a real internal compiler panic, confirmed the hard
+/// way, building this very module).
 #[cfg(not(creusot))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CheckedProof {
-    /// Each real Creusot contract function backing this claim, and its
-    /// own verbatim source.
-    pub checks: Vec<(String, String)>,
-}
-
-#[cfg(not(creusot))]
-impl std::fmt::Display for CheckedProof {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (harness, claim) in &self.checks {
-            writeln!(f, "harness: {harness}")?;
-            writeln!(f, "claim: {claim}")?;
-        }
-        Ok(())
-    }
-}
-
-#[cfg(not(creusot))]
-fn validated_proof() -> CheckedProof {
-    CheckedProof {
+fn validated_proof() -> crate::witness::MultiCheckProof {
+    crate::witness::MultiCheckProof {
         checks: vec![
             (
                 "check_amount_positive".to_owned(),
@@ -222,7 +254,7 @@ amenable_derive::harness! {
         /// negation is not overflow-safe merely because the logical
         /// claim about it is.
         #[logic(open)]
-        fn balanced_entries_holds(debit: i64, credit: i64, outcome: bool) -> bool {
+        pub fn balanced_entries_holds(debit: i64, credit: i64, outcome: bool) -> bool {
             pearlite! { outcome == (debit@ + credit@ == 0) }
         }
     }
@@ -245,8 +277,8 @@ amenable_derive::harness! {
 }
 
 #[cfg(not(creusot))]
-fn committed_proof() -> CheckedProof {
-    CheckedProof {
+fn committed_proof() -> crate::witness::MultiCheckProof {
+    crate::witness::MultiCheckProof {
         checks: vec![(
             "check_commit_balances".to_owned(),
             VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),

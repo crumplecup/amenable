@@ -1237,6 +1237,71 @@ generate for (every real edge today is still trivially `#[requires(
 true)] #[ensures(true)]`, hardcoded in the generator rather than
 designed speculatively for a case that doesn't exist yet).
 
+### Step 10 — dependency-tree restructuring: `amenable_std`/`amenable_creusot` flip, and `Green`/`Yellow`/`Red` move to `amenable_core` — done
+
+Grew out of the GAAP ledger worked example (`GAAP_LEDGER_PLAN.md`'s
+Step 3), not a `Stoplight`-specific request, but it changed
+`Stoplight`'s own architecture along the way, so it's recorded here
+too. Confirmed empirically first: `amenable_creusot` can take a real,
+unconditional Cargo dependency on `amenable_gaap` and implement
+`Witness<CreusotVerifier>` directly on the real `Validated`/`Committed`
+types, zero ICE — Step 9's translator-sweep-scope finding
+([[project_creusot_translator_dependency_scope]]) held for a brand
+new dependency, not just the ones already in place.
+
+**Part A — the `amenable_std`/`amenable_creusot` cycle, closed by
+flipping the edge.** Extending the same real-dependency approach to
+`amenable_kani` first hit a genuine Cargo cyclic-package-dependency
+error: `amenable_kani` depends on `amenable_std`, and `amenable_std`
+optionally depended back on `amenable_creusot` via its own `creusot`
+feature (the surface Step 9 flagged as future work). Fixed by
+reversing that edge for real: `amenable_creusot` now depends on
+`amenable_std` unconditionally, and `amenable_std`'s entire
+~90-carrier Creusot witness-bridge surface (`creusot_witness.rs`, its
+tests, and `creusot_gallery.rs`) moved wholesale into
+`amenable_creusot::rust_std_witness` (`git mv`, then mechanical import
+fixes). `amenable_std` itself no longer has any `creusot` feature at
+all — its Creusot content, once optional, is gone from that crate
+entirely, and the migrated surface's own tests moved with it into
+`amenable_creusot/tests/`.
+
+**Part B — `amenable_kani` still couldn't be depended on directly, for
+a different reason.** With the cycle gone, `amenable_creusot ->
+amenable_kani` *did* compile clean, no ICE — but adding it violated
+[[feedback_verifier_backends_never_depend_on_each_other]]: a real
+Cargo edge from one verifier backend to another, the exact class of
+mistake Step 8 already existed to fix in the other direction. Caught
+immediately: "what the heck are you trying to share from Kani to
+creusot and why isn't it in core?" The actual fix: `Green`/`Yellow`/
+`Red` — `Stoplight`'s bare evidence markers, asserted root claims with
+no proof-bearing content of their own — moved to `amenable_core::
+stoplight`, a neutral crate both `amenable_kani` and `amenable_creusot`
+already depend on independently, exactly mirroring the split
+`amenable_gaap` uses for `Pending`/`Validated`/`Committed`/
+`Rejected<T>`. `amenable_core` earns the exception (not a new
+dedicated crate, unlike GAAP) because these three types are about as
+simple as a worked example gets and `Stoplight` is already
+`amenable_core`'s own canonical teaching example. What stayed in
+`amenable_kani::stoplight`: the tokens, `Established<T, Token>`, the
+real `Stoplight` struct, and the real transition methods — anything
+gated by a constructor `amenable_core` can't reach stays exactly where
+it was. `amenable_creusot`'s Cargo dependency on `amenable_kani` was
+removed entirely; its accommodation-model mirror in `stoplight.rs`
+(the tokens/`Established<T, Token>` half) is unchanged and still
+needed for the same construction-privacy reason Step 9 already
+documented — only the audit-only `Witness<CreusotVerifier>` impls at
+the bottom of that file retarget, from the real `amenable_kani::
+{Green, Yellow, Red}` to the real `amenable_core::{Green, Yellow,
+Red}`.
+
+**Verified for real**: full workspace `cargo check --workspace
+--all-features`/`cargo fmt --all`/`cargo clippy --workspace
+--all-targets --all-features -D warnings`/`cargo test --workspace
+--all-features` all clean; `cargo creusot -- -p amenable_creusot` then
+`cargo creusot prove -- -p amenable_creusot` against the real
+toolchain: `Proved (119 files) ✔`; `cargo tree -p amenable_creusot`
+confirms no `amenable_kani` edge remains. Step 10 is complete.
+
 ## Open questions
 
 - **Creusot compilation model — resolved, landed in Step 1.** Not
@@ -1418,7 +1483,13 @@ registry (mirroring `emit-verus-witnesses`'s own architecture) rather
 than either hand-copying or embedding `inventory` in the translated
 crate itself. On all three backends, only each edge's real transition
 body remains hand-authored; every mechanical piece around it is
-generated. `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 8
+generated. Step 10 then restructured the dependency tree underneath
+all of this: `amenable_std`'s Creusot witness-bridge surface migrated
+into `amenable_creusot` outright (closing Step 9's own deferred
+migration item), and `Stoplight`'s `Green`/`Yellow`/`Red` moved to
+`amenable_core` after a real, caught-and-reverted attempt to depend
+`amenable_creusot` directly on `amenable_kani`.
+`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own Step 8
 closed the last real gap this raised — Verus's `verus_exchange!(..)`
 *call sites* were still hand-typed and hand-copied after Steps 6/7
 generated the macro *definitions* they call, with no drift-guard
@@ -1438,11 +1509,10 @@ edges beyond `Stoplight`; wiring `Requires<KaniVerifier>`/`Requires<V>`
 for a real (non-trivial) precondition once one exists; a `creusot_
 ensures!`-style mechanism for a genuinely non-trivial Pearlite
 predicate (Step 9's own generator still hardcodes a trivial `requires`/
-`ensures` pair, honestly, since nothing non-trivial exists yet);
-migrating `amenable_std::creusot_witness`'s own much larger (~90-
-registration) witness-bridge surface to the same codegen pattern (Step
-8/9's own deferred question, now with a stronger case for it); or
-generating `Evidence`/`ProofToken`/`Establish` themselves, or the
+`ensures` pair, honestly, since nothing non-trivial exists yet)
+(migrating `amenable_std::creusot_witness`'s own ~90-registration
+witness-bridge surface, Step 8/9's own deferred item, is done — Step
+10); or generating `Evidence`/`ProofToken`/`Establish` themselves, or the
 coarser-grained per-state-machine carrier shape (`Established<T,
 Token>`/`Sidecar<V>` on the Verus side; there is no Kani analog since
 `amenable_kani::stoplight`'s own `Established<T, Token>` already plays

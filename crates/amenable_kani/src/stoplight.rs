@@ -35,79 +35,11 @@
 //! credential; `input.primary()` doesn't type-check).
 
 use amenable_core::{
-    Amenable, Establish, Evidence, MetadataEntry, ProofToken, Provenance, Sidecar, StateMachine,
-    Witness,
+    Amenable, Establish, Evidence, Green, ProofToken, Red, Sidecar, StateMachine, Witness, Yellow,
 };
-use amenable_derive::Standard;
 
 use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
-
-/// The light is green — a root state claim, asserted rather than derived
-/// from a prior transition (see `docs/AMENABLE_PLAN.md`, "States Are Roots,
-/// Transitions Are Relations"): the first assertion any running instance
-/// makes is not computed from anything, it's asserted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
-#[cfg_attr(kani, derive(kani::Arbitrary))]
-#[standard(basis = "Self")]
-pub struct Green;
-
-impl Provenance for Green {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, by design convention (power-on default)",
-            )]
-            .into_iter()
-        })
-    }
-}
-
-/// The light is yellow — see [`Green`] for why this is a root claim, not
-/// a derived one, even though in practice a [`Stoplight`] only ever
-/// reaches `Yellow` via a proven `Exchange<Established<Green, GreenToken>,
-/// Established<Yellow, YellowToken>>` transition.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
-#[cfg_attr(kani, derive(kani::Arbitrary))]
-#[standard(basis = "Self")]
-pub struct Yellow;
-
-impl Provenance for Yellow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, reachable only via a proven Green -> Yellow exchange",
-            )]
-            .into_iter()
-        })
-    }
-}
-
-/// The light is red — see [`Green`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
-#[cfg_attr(kani, derive(kani::Arbitrary))]
-#[standard(basis = "Self")]
-pub struct Red;
-
-impl Provenance for Red {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, reachable only via a proven Yellow -> Red exchange",
-            )]
-            .into_iter()
-        })
-    }
-}
 
 /// A three-state traffic light: `Green -> Yellow -> Red -> Green`, and
 /// nothing else. Illegal transitions (`Yellow -> Green` directly, the

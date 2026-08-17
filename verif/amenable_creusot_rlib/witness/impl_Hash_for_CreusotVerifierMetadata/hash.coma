@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 29 29 33 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 29 26 33 *)
 
 (* <witness::CreusotVerifierMetadata as std::hash::Hash> *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
-let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 29 29 33
+let%span switness = "/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 29 26 33
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any
@@ -29,7 +29,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec hash_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 29 29 29 33]
+let rec hash_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 29 26 33]
   (self: ()) (state: MutBorrow.t __H) (return (x: ())) =
   {[@stop_split] [@expl:hash 'state' type invariant] [%#switness] inv_refmut___H state}
   (! bb0
