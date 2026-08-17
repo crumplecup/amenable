@@ -1,18 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 255 4 255 43 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33 *)
 
 (* <stoplight::Established<T, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 256 8 256 26
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 255 16 255 20
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 255 25 255 43
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33
 let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/clone.rs" 14 26 14 30
 
 use creusot.prelude.Any
 
-type t_Token
-
 type t_T
+
+type t_Token
 
 type t_Established_T_Token = { primary: t_T; token: t_Token }
 
@@ -65,12 +63,14 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec sidecar_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 255 4 255 43]
+let rec sidecar_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33]
   (self: t_Established_T_Token) (return (x: t_Token)) =
-  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight'0] inv_ref_Established_T_Token self}
+  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight] inv_ref_Established_T_Token self}
   (! bb0
   [ bb0 = s0
-    [ s0 = clone_Token [%#sstoplight] {self.token} (fun (_x: t_Token) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]
-  [ & _ret: t_Token = Any.any_l () | & self: t_Established_T_Token = self ])
-  [ return (result: t_Token) -> {[@stop_split] [@expl:sidecar result type invariant] [%#sstoplight'1] inv_Token result}
+    [ s0 = [ &_3 <- self.token ] s1
+    | s1 = clone_Token [%#sstoplight] {_3} (fun (_x: t_Token) -> [ &_ret <- _x ] s2)
+    | s2 = return {_ret} ] ]
+  [ & _ret: t_Token = Any.any_l () | & self: t_Established_T_Token = self | & _3: t_Token = Any.any_l () ])
+  [ return (result: t_Token) -> {[@stop_split] [@expl:sidecar result type invariant] [%#sstoplight] inv_Token result}
     (! return {result}) ]

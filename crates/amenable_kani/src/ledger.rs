@@ -60,69 +60,63 @@
 //! `amount <= 0`. Fixed by making the `Err` arm a full biconditional.
 //! See [`Ledger::check_amount_positive`]'s own doc comment.
 
-use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
-use amenable_gaap::{Committed, Pending, Rejected, TransferPayload, Validated};
+use amenable_core::{Establish, Sidecar, Witness};
+// `#[cfg(kani)]`-gated: `Ensures::ensures` associated-function calls
+// resolve fine without this import under ordinary `rustc` (the same
+// "unused import" that appeared and was removed once, confirming it),
+// but real `cargo kani` needed it for `check_amount_positive`'s/
+// `check_sufficient_funds`'s own `#[kani::ensures(..)]` attribute
+// content specifically -- invisible to ordinary `cargo check`/clippy
+// entirely (the same real `#[cfg_attr(kani, ..)]` blind spot this
+// project's own memory already documents), so gating the import itself
+// is the only way to satisfy both without a real, unused import
+// surviving into ordinary builds.
+#[cfg(kani)]
+use amenable_core::Ensures;
+use amenable_gaap::{
+    AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, Pending, Rejected,
+    SufficientFunds, TransferPayload, Validated,
+};
 
 use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
 
 /// A transfer payload bundled with the specific proof token minted for
-/// its current state -- the `Sidecar` shape used throughout this
-/// module. `new` is private: the only lawful ways to produce one are
-/// [`Transfer::pending`] (the entry state: a transfer always starts
-/// `Pending`, asserted rather than derived -- see `Pending`'s own
-/// `Witness<KaniVerifier>` impl below for why it needs one at all) or
-/// `Ledger::validate`, which calls `Establish::establish` on the real
-/// credential it was handed.
+/// its current state -- `amenable_derive::Sidecar` generates the same
+/// `Sidecar<KaniVerifier>` impl this module used to hand-write, matching
+/// `stoplight.rs`'s own `Established<T, Token>`. The lawful ways to
+/// produce one are [`Transfer::pending`] (the entry state: a transfer
+/// always starts `Pending`, asserted rather than derived -- see
+/// `Pending`'s own `Witness<KaniVerifier>` impl below for why it needs
+/// one at all) or `Ledger::validate`, which calls `Establish::establish`
+/// on the real credential it was handed.
 ///
-/// `Clone` (not `Copy`: `TransferPayload` carries an `AccountId`, whose
-/// `Uuid` identity is `Copy` but whose human-readable `name` field is
-/// still a `String`) — needed for the same reason `Established<T,
-/// Token>` derives `Copy` in `stoplight.rs`: the generated `#[kani::
-/// ensures]` closure needs an owned value to hand `Ensures::ensures`,
-/// and this crate's own `Result::clone()` fix (see this module's own
-/// doc comment) only requires `Clone`, not `Copy`.
-#[derive(Debug, Clone)]
+/// `#[derive(Clone)]`, not `Copy`: `TransferPayload` carries an
+/// `AccountId`, whose `Uuid` identity is `Copy` but whose human-readable
+/// `name` field is still a `String` -- the generated `#[kani::ensures]`
+/// closure needs an owned value to hand `Ensures::ensures`, and this
+/// crate's own `Result::clone()` fix (see this module's own doc
+/// comment) only requires `Clone`, not `Copy`.
+// `pub(crate)` constructor, not private: lawful construction still
+// requires a real token (this crate's own `Establish`-minted or
+// `Transfer::pending`'s root case), so external crates still can't
+// disconnect a token from a real `establish()` call the way a fully
+// `pub` constructor would allow. The relaxation from module-private only
+// reaches `amenable_kani::gallery`'s own diagnostic harnesses (see
+// `gallery::ledger_account_id_comparison`'s doc comment for why), not
+// anything outside this crate.
+#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[sidecar(
+    verifier = "KaniVerifier",
+    proposition = "S",
+    constructor = "pub(crate)"
+)]
 pub struct Transfer<S, Token> {
+    #[sidecar(primary)]
     payload: TransferPayload,
+    #[sidecar(token)]
     token: Token,
     _state: std::marker::PhantomData<S>,
-}
-
-impl<S, Token> Transfer<S, Token> {
-    // `pub(crate)`, not private: lawful construction still requires a
-    // real token (this crate's own `Establish`-minted or `Transfer::
-    // pending`'s root case), so external crates still can't disconnect
-    // a token from a real `establish()` call the way a fully `pub`
-    // constructor would allow. The relaxation from module-private only
-    // reaches `amenable_kani::gallery`'s own diagnostic harnesses (see
-    // `gallery::ledger_account_id_comparison`'s doc comment for why),
-    // not anything outside this crate.
-    pub(crate) fn new(payload: TransferPayload, token: Token) -> Self {
-        Self {
-            payload,
-            token,
-            _state: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<S, Token> Sidecar<KaniVerifier> for Transfer<S, Token>
-where
-    S: Evidence + Witness<KaniVerifier>,
-    Token: ProofToken<Proposition = S> + Clone,
-{
-    type Primary = TransferPayload;
-    type Proposition = S;
-    type SidecarToken = Token;
-
-    fn primary(&self) -> &Self::Primary {
-        &self.payload
-    }
-
-    fn sidecar(&self) -> Self::SidecarToken {
-        self.token.clone()
-    }
 }
 
 /// Lawful token asserting a transfer is `Pending` — the entry state,
@@ -217,6 +211,97 @@ pub enum TransferError {
     SameAccount,
 }
 
+// The real, canonical claim each contract type in `amenable_gaap::
+// contracts` names -- previously dead code workspace-wide (real
+// `Evidence` types since `GAAP_LEDGER_PLAN.md`'s Step 0, but nothing
+// anywhere ever imported or referenced them; every proof independently
+// re-derived the same claims by name-matching convention only). Every
+// consumer below -- `check_amount_positive`'s/`check_sufficient_funds`'s
+// own DFCC contracts, and `Validated`'s/`Committed`'s combined
+// `kani_ensures!` claims further down -- calls through these `Ensures<
+// KaniVerifier>` impls now, the same "generation covers the mechanical
+// wiring, the registered impl carries the one real claim" discipline
+// `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 6 already established one
+// level up (`Validated`/`Committed` calling through their own registered
+// impls, instead of restating their bound inline). `AccountsDistinct`/
+// `BalancedEntries` get a trivial `Witness<KaniVerifier>` (matching
+// `Pending`'s own precedent below): neither has its own isolated Kani
+// harness the way `AmountPositive`/`SufficientFunds` do (accounts-
+// distinct is checked inline in `validate`'s own body; balanced-entries
+// inline in `commit`'s), so there's no dedicated proof artifact to
+// honestly report.
+kani_ensures!(
+    AmountPositive,
+    "amenable_gaap::AmountPositive::ensures",
+    i64,
+    |amount| amount > 0
+);
+
+impl Witness<KaniVerifier> for AmountPositive {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_check_amount_positive".to_owned(),
+            claim: VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+        }
+    }
+}
+
+kani_ensures!(
+    SufficientFunds,
+    "amenable_gaap::SufficientFunds::ensures",
+    (i64, i64),
+    |(balance, amount)| balance >= amount
+);
+
+impl Witness<KaniVerifier> for SufficientFunds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof {
+            harness: "verify_check_sufficient_funds".to_owned(),
+            claim: VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+        }
+    }
+}
+
+kani_ensures!(
+    AccountsDistinct,
+    "amenable_gaap::AccountsDistinct::ensures",
+    (AccountId, AccountId),
+    |(from, to)| from != to
+);
+
+impl Witness<KaniVerifier> for AccountsDistinct {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
+// `i128`-widened, matching `gallery::ledger_exchange`'s own Verus
+// predicate: avoids needing any precondition to keep `-amount` from
+// overflow-panicking at `i64::MIN`, since `i128`'s range is vastly
+// larger than `i64`'s -- genuinely stronger than restating the claim in
+// bounded `i64` space the way `Committed`'s own combined claim used to
+// (see that `kani_ensures!` call's own comment).
+kani_ensures!(
+    BalancedEntries,
+    "amenable_gaap::BalancedEntries::ensures",
+    i64,
+    |amount| (-(amount as i128)) + (amount as i128) == 0
+);
+
+impl Witness<KaniVerifier> for BalancedEntries {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
 /// The source account's ledger state a transfer validates against —
 /// carries the real balance `SufficientFunds` checks. Distinct from
 /// `TransferPayload` (the transfer *request*): a ledger's balance is
@@ -250,20 +335,24 @@ impl Ledger {
     /// to.
     ///
     /// The `Err` arm's own claim must be a full biconditional (`*bad ==
-    /// amount && amount <= 0`, not just `*bad == amount`) -- a real bug
-    /// found composing `validate` via `#[kani::stub_verified]`: an
-    /// under-specified `Err` claim still passes this function's own
-    /// isolated `#[kani::proof_for_contract]` check (a weaker contract
-    /// is trivially satisfied by the real body's actual behavior), but
-    /// `stub_verified` treats the contract as the *complete* story --
-    /// it's free to substitute `Err` even when `amount > 0`, since
-    /// nothing here forbade it, which broke `validate`'s own downstream
-    /// claim that `Err(NegativeAmount(amount))` implies `amount <= 0`.
+    /// amount && !AmountPositive::ensures(amount)`, not just `*bad ==
+    /// amount`) -- a real bug found composing `validate` via `#[kani::
+    /// stub_verified]`: an under-specified `Err` claim still passes this
+    /// function's own isolated `#[kani::proof_for_contract]` check (a
+    /// weaker contract is trivially satisfied by the real body's actual
+    /// behavior), but `stub_verified` treats the contract as the
+    /// *complete* story -- it's free to substitute `Err` even when
+    /// `amount > 0`, since nothing here forbade it, which broke
+    /// `validate`'s own downstream claim that `Err(NegativeAmount(
+    /// amount))` implies the amount wasn't positive. Calls through
+    /// `AmountPositive::ensures(..)` rather than restating `amount > 0`
+    /// -- see that contract type's own `kani_ensures!` registration,
+    /// above.
     #[cfg_attr(
         kani,
         kani::ensures(|result: &Result<(), i64>| match result {
-            Ok(()) => amount > 0,
-            Err(bad) => *bad == amount && amount <= 0,
+            Ok(()) => AmountPositive::ensures(amount),
+            Err(bad) => *bad == amount && !AmountPositive::ensures(amount),
         })
     )]
     fn check_amount_positive(amount: i64) -> Result<(), i64> {
@@ -272,11 +361,18 @@ impl Ledger {
 
     /// `SufficientFunds`, isolated: `balance >= amount`. See
     /// [`Ledger::check_amount_positive`] for why this is broken out.
+    /// Calls through `SufficientFunds::ensures(..)` rather than
+    /// restating `self.balance >= amount` -- see that contract type's
+    /// own `kani_ensures!` registration, above.
     #[cfg_attr(
         kani,
         kani::ensures(|result: &Result<(), (i64, i64)>| match result {
-            Ok(()) => self.balance >= amount,
-            Err((balance, required)) => *balance < *required && *balance == self.balance && *required == amount,
+            Ok(()) => SufficientFunds::ensures((self.balance, amount)),
+            Err((balance, required)) => {
+                !SufficientFunds::ensures((self.balance, amount))
+                    && *balance == self.balance
+                    && *required == amount
+            }
         })
     )]
     fn check_sufficient_funds(&self, amount: i64) -> Result<(), (i64, i64)> {
@@ -367,6 +463,13 @@ amenable_derive::harness! {
 // that gallery module's first experiment), imply `validate`'s own
 // `ensures`" -- not exploring the full symbolic-branch/allocation
 // interaction from scratch.
+// Calls through `AmountPositive`/`SufficientFunds`/`AccountsDistinct`'s
+// own registered `Ensures<KaniVerifier>` impls (above) rather than
+// restating their arithmetic inline -- the composite claim's own
+// control flow (which `TransferError` variant backs which check) still
+// stays hand-written: it's genuine, bespoke logic tied to `TransferError`'s
+// real shape, not a mechanically-derivable pattern the way each atomic
+// contract's own bound is.
 kani_ensures!(
     Validated,
     "amenable_kani::ledger::Validated::validate_ensures",
@@ -374,10 +477,13 @@ kani_ensures!(
     |result| match result {
         Ok(validated) => {
             let payload = validated.primary();
-            payload.amount().value() > 0 && payload.from() != payload.to()
+            AmountPositive::ensures(payload.amount().value())
+                && AccountsDistinct::ensures((payload.from().clone(), payload.to().clone()))
         }
-        Err(TransferError::NegativeAmount(amount)) => amount <= 0,
-        Err(TransferError::InsufficientFunds { balance, required }) => balance < required,
+        Err(TransferError::NegativeAmount(amount)) => !AmountPositive::ensures(amount),
+        Err(TransferError::InsufficientFunds { balance, required }) => {
+            !SufficientFunds::ensures((balance, required))
+        }
         Err(TransferError::SameAccount) => true,
     }
 );
@@ -495,21 +601,20 @@ pub struct CommittedToken(());
 // at `i64::MIN`, which real Kani overflow-checking then has to reason
 // about across the whole symbolic range -- expensive enough to time out
 // on its own, independent of everything Step 1 already characterized.
-// `#[kani::requires]` below states the real, true precondition instead
-// of leaving it an artifact of what a harness happens to assume: `commit`
-// is only ever meant to be called on an already-`validate`d transfer,
-// which already established `AmountPositive`.
+// `BalancedEntries::ensures` itself now sidesteps that (see its own
+// `kani_ensures!` registration, above: `i128`-widened, no overflow for
+// any `i64` input) -- `#[kani::requires]` below stays regardless, not
+// merely as an overflow workaround: `commit` is only ever meant to be
+// called on an already-`validate`d transfer, which already established
+// `AmountPositive`, and that's the real, true precondition worth stating
+// rather than leaving it an artifact of what a harness happens to
+// assume.
 kani_ensures!(
     Committed,
     "amenable_kani::ledger::Committed::commit_ensures",
     Result<Transfer<Committed, CommittedToken>, TransferError>,
     |result| match result {
-        Ok(committed) => {
-            let payload = committed.primary();
-            let debit = -payload.amount().value();
-            let credit = payload.amount().value();
-            debit + credit == 0
-        }
+        Ok(committed) => BalancedEntries::ensures(committed.primary().amount().value()),
         Err(_) => false,
     }
 );

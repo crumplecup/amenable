@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 236 4 236 44 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33 *)
 
 (* stoplight::Established<T, Token> *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 236 11 236 18
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 236 23 236 28
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 236 40 236 44
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 242 4 242 11
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 244 4 244 9
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33
 
 use creusot.prelude.Any
 
@@ -27,7 +27,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec new_T [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 236 4 236 44] (primary'0: t_T)
+let rec new_T [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33] (primary'0: t_T)
   (token'0: t_Token) (return (x: t_Established_T_Token)) =
   {[@stop_split] [@expl:new_T requires] ([@stop_split] [@expl:new 'primary' type invariant] [%#sstoplight] inv_T primary'0)
   /\ ([@stop_split] [@expl:new 'token' type invariant] [%#sstoplight'0] inv_Token token'0)}

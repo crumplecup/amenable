@@ -1,9 +1,21 @@
 //! The five real, provable claims this worked example exists to prove —
-//! not citation-only `Standard` placeholders. Each becomes a real
-//! `Requires<V>`/`Ensures<V>` impl per verifier as the later steps of
-//! `GAAP_LEDGER_PLAN.md` land (`Requires<V>`/`Ensures<V>` both require
-//! `Self: Witness<V>`, so none of that can exist yet); this file only
-//! establishes the bare `Evidence` shape each one needs first.
+//! not citation-only `Standard` placeholders. Four of five now have a
+//! real `Ensures<KaniVerifier>` impl (`amenable_kani::ledger`, since
+//! `Requires<V>`/`Ensures<V>` both require `Self: Witness<V>`, which has
+//! to live wherever the verifier marker does — orphan rules, the same
+//! reason `Witness<KaniVerifier>` impls for `Pending`/`Validated`/
+//! `Committed` live there too, not here): `AmountPositive`/
+//! `SufficientFunds`/`AccountsDistinct`/`BalancedEntries` back
+//! `Ledger::check_amount_positive`'s/`::check_sufficient_funds`'s own
+//! DFCC contracts and `Validated`'s/`Committed`'s combined claims —
+//! real code calling through these types now, closing a real gap where
+//! these five sat as dead code workspace-wide since Step 0, referenced
+//! only by doc comments that used their names without ever importing
+//! them. `AccountingEquationHolds` and the Creusot/Verus `Ensures<V>`
+//! impls for the other four are still open (`GAAP_LEDGER_PLAN.md`'s own
+//! "Next step"). This file only establishes the bare `Evidence` shape
+//! each one needs — the verifier-specific `Ensures<V>` impls live with
+//! their own verifier markers, per orphan rules.
 //!
 //! `#[amenable_derive::evidence]`, not `#[derive(Standard)]`: these are
 //! claims that get *proven*, not asserted-and-audited roots, so they

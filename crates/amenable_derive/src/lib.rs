@@ -7,6 +7,7 @@ mod exchange;
 mod harness;
 mod kani_compose;
 mod proof_token;
+mod sidecar;
 mod standard;
 #[cfg(feature = "verus")]
 mod verus_contract;
@@ -29,6 +30,7 @@ use exchange::{ExchangeArgs, expand_exchange};
 use harness::expand_harness;
 use kani_compose::expand_kani_compose;
 use proof_token::expand_proof_token;
+use sidecar::expand_sidecar;
 use standard::expand_standard;
 use witness::expand_witness;
 
@@ -149,6 +151,20 @@ pub fn establish(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemStruct);
 
     match expand_establish(&args, &input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate `impl Sidecar<V> for X { .. }` plus a `new(..)` constructor
+/// from `#[sidecar(verifier = .., proposition = .., constructor = ..)]`
+/// and `#[sidecar(primary)]`/`#[sidecar(token)]` field markers -- see
+/// [`sidecar`]'s own doc comment.
+#[proc_macro_derive(Sidecar, attributes(sidecar))]
+pub fn derive_sidecar(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_sidecar(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 105 4 105 29 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 109 4 109 29 *)
 
 (* <stoplight::Green as amenable_core::Evidence> *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 106 8 106 12
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 110 8 110 12
 
 use creusot.prelude.Any
 
@@ -10,7 +10,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec basis_Green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 105 4 105 29]
+let rec basis_Green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 109 4 109 29]
   (return (x: ())) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#sstoplight] () ] s1 | s1 = return {_ret} ] ] [ & _ret: () = Any.any_l () ])
   [ return (result: ()) -> (! return {result}) ]

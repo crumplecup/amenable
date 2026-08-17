@@ -1122,7 +1122,30 @@ own real `ensures` before anything downstream could be proven; and
 Verified for real: `verus --crate-type=lib` -- `458 verified, 0
 errors`, plus a real injected-bug regression check. `reject`/`rollback`
 deliberately still not connected on either backend (legitimately
-trivial, no new proof content). Steps 5+ not started.
+trivial, no new proof content). Step 5 is done on Kani, not started on
+Creusot/Verus: a standing correction repeated multiple times ("mirrors
+if used must be derived," "contract based bounds... should be derived
+from contract types") closed two gaps. `#[derive(amenable_derive::
+Sidecar)]` (Kani/Creusot) plus a `verus_sidecar!` macro_rules!
+counterpart (Verus, which resolves no proc-macro crate at all) now
+generate the `Established<T, Token>`/`Transfer<S, Token>` carrier shape
+everywhere it appears -- Kani's own real types included, not just
+mirrors -- replacing four hand-written copies. `AmountPositive`/
+`SufficientFunds`/`AccountsDistinct`/`BalancedEntries` (real `Evidence`
+types since Step 0, dead code until now) got real `Ensures<
+KaniVerifier>` impls via the already-generic `kani_ensures!` macro;
+`check_amount_positive`'s/`check_sufficient_funds`'s own contracts and
+`Validated`'s/`Committed`'s combined claims call through them instead
+of restating the arithmetic. A generic composition derive for the
+*outer* match/control-flow shape was considered and rejected -- genuine
+short-circuiting domain logic (`TransferError`'s three variants), not a
+mechanically-derivable pattern. Re-verified for real throughout: 8
+total real `cargo kani` harness checks (all `0 of N failed`), `cargo
+creusot prove` (`Proved 119 files`), `verus --crate-type=lib` (`458
+verified, 0 errors`) -- unchanged from before the retrofit, confirming
+no behavioral drift. Creusot's own `_holds` predicates and the Verus
+`ledger_exchange` predicate still don't call through the contract
+types -- the identical gap, not yet closed there. Step 6+ not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

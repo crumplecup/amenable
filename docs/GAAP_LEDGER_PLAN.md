@@ -31,7 +31,17 @@ optional edge to `amenable_creusot` flipped for real (closing a Cargo
 cycle that blocked `amenable_kani` from being tried as a direct
 dependency too), and `Stoplight`'s `Green`/`Yellow`/`Red` moved from
 `amenable_kani` to `amenable_core` after a real, caught-and-reverted
-attempt to depend `amenable_creusot` directly on `amenable_kani`.
+attempt to depend `amenable_creusot` directly on `amenable_kani`. Step 5
+closed two further standing corrections across all this work, not
+scoped to one step: the `Established<T, Token>`/`Transfer<S, Token>`
+carrier shape is now a real derive (`#[derive(amenable_derive::Sidecar)]`
+for Kani/Creusot, `verus_sidecar!` for Verus) instead of hand-typed per
+backend, and `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
+`BalancedEntries` — real `Evidence` types since Step 0, dead code until
+now — back real `Ensures<KaniVerifier>` impls that `Validated`'s/
+`Committed`'s own claims call through, on Kani so far (see Step 5 below
+for the full account, including a composition-derive design considered
+and rejected).
 
 ## Motivation
 
@@ -702,7 +712,68 @@ Pending>`/`Rejected<Validated>`) -- both are legitimately trivial
 connecting them here would be real, not free, work for no new proof
 content. Left for a future pass.
 
-### Step 5+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
+### Step 5 — derive the carrier shape and the atomic contract bounds, not hand-write them — Kani done, Creusot/Verus not started
+
+**A standing correction, not a new request.** Caught directly, a second
+and third time this lineage has needed it: "I have told you multiple
+times that mirrors if used must be derived you just won't listen," and
+"contract based bounds... should be derived from contract types." Two
+real gaps this step closes:
+
+1. **The carrier/sidecar shape.** `Established<T, Token>`/`Transfer<S,
+   Token>` were hand-typed fresh per worked example per backend (Kani's
+   own real types, Creusot's Stoplight mirror, Verus's Stoplight and
+   Ledger mirrors) despite being the identical shape everywhere. Built
+   `#[derive(amenable_derive::Sidecar)]` -- one proc-macro derive
+   generating the `Sidecar<V>` impl and a `new(..)` constructor from
+   `#[sidecar(verifier=.., proposition=.., constructor=..)]` plus
+   `#[sidecar(primary)]`/`#[sidecar(token)]` field markers, covering
+   both shapes (`proposition` defaults to the primary field's own type;
+   set explicitly when it's a separate phantom parameter instead).
+   Applied to `amenable_kani::stoplight::Established`, `amenable_kani::
+   ledger::Transfer` (the real types, not just mirrors), and
+   `amenable_creusot::stoplight::Established`'s mirror. Verus resolves
+   no extern crate at all under `verus --crate-type=lib`, so a
+   `macro_rules!` counterpart (`verus_sidecar!`, `exchange_support.rs`)
+   generates the struct *and* impl together from one invocation instead,
+   applied to both `gallery::stoplight_exchange::Established` and
+   `gallery::ledger_exchange::Transfer`.
+2. **The bound/predicate.** `amenable_gaap::contracts::{AmountPositive,
+   SufficientFunds, AccountsDistinct, BalancedEntries}` were real
+   `Evidence` types since Step 0, but dead code workspace-wide: every
+   proof (`kani_ensures!`'s `Validated`/`Committed` closures, Creusot's
+   `_holds` predicates, the Verus `ledger_exchange` predicate)
+   independently re-derived the same claims by name-matching convention
+   only, never touching these types. Wired them into real `Witness<
+   KaniVerifier>`/`Ensures<KaniVerifier>` impls in `amenable_kani::
+   ledger`, reusing the *existing* `kani_ensures!` macro (already generic
+   enough -- no new derive needed here). `Ledger::check_amount_positive`'s/
+   `::check_sufficient_funds`'s own DFCC contracts, and `Validated`'s/
+   `Committed`'s combined claims, now call through these contract
+   types' `ensures()` instead of restating the arithmetic. The outer
+   match/control-flow shape (which `TransferError` variant backs which
+   check) stayed hand-written on purpose -- considered and rejected a
+   generic composition derive for this: the real claim isn't a flat
+   conjunction, it's a short-circuiting match with a genuine, deliberate
+   asymmetry (`Ok` doesn't restate `SufficientFunds`), bespoke domain
+   logic a derive shouldn't guess at, not structural duplication.
+
+**Verified for real, both halves, on Kani/Creusot/Verus (the carrier
+shape retrofit reaches all three; the bounds wiring reaches Kani only so
+far)**: 2 real `cargo kani` harness re-verifications for the carrier
+retrofit plus 6 more for the bounds wiring, all `0 of N failed`;
+`cargo creusot prove` -- `Proved (119 files) ✔`; `verus
+--crate-type=lib` -- `458 verified, 0 errors`. Full workspace `check`/
+`fmt`/`clippy -D warnings`/`test` clean throughout.
+
+**Not yet done**: Creusot's `_holds` predicates and the Verus
+`ledger_exchange` predicate still hand-compose the same claims with no
+connection to the contract types -- the identical gap, one level
+removed. The Kani pattern generalizes directly (a real `Ensures<
+CreusotVerifier>`/`Ensures<VerusVerifier>` impl per contract type, then
+call through it), not yet started.
+
+### Step 6+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
 
 Once all three backends prove the same real edges by hand, revisit
 whether/how the existing `ExchangeEdgeRecord`/codegen layer extends to
@@ -744,4 +815,8 @@ own Verus connection took the other real option instead (a full
 accommodation-model mirror, codegen-driven rather than hand-written) —
 worth weighing against the neutral-crate route once this is actually
 tackled, now that both are proven out for real on at least one backend
-each.
+each. Whichever route wins, Step 5's own finding applies here too:
+Creusot's `validated_holds`/`balanced_entries_holds` should call
+through real `Ensures<CreusotVerifier>` impls on `AmountPositive`/
+`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`, not stay
+hand-composed booleans disconnected from those contract types.

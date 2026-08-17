@@ -34,9 +34,7 @@
 //! `Stoplight::exchange` must call `input.sidecar()` to obtain a lawful
 //! credential; `input.primary()` doesn't type-check).
 
-use amenable_core::{
-    Amenable, Establish, Evidence, Green, ProofToken, Red, Sidecar, StateMachine, Witness, Yellow,
-};
+use amenable_core::{Amenable, Establish, Green, Red, Sidecar, StateMachine, Yellow};
 
 use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
@@ -101,34 +99,13 @@ impl StateMachine for Stoplight {
 /// below take — the postcondition closure calls through the registered
 /// contract rather than restating the check inline, so it needs an owned
 /// value to hand it, not just a borrow to read.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, amenable_derive::Sidecar)]
+#[sidecar(verifier = "KaniVerifier", constructor = "")]
 pub struct Established<T, Token> {
+    #[sidecar(primary)]
     primary: T,
+    #[sidecar(token)]
     token: Token,
-}
-
-impl<T, Token> Established<T, Token> {
-    fn new(primary: T, token: Token) -> Self {
-        Self { primary, token }
-    }
-}
-
-impl<T, Token> Sidecar<KaniVerifier> for Established<T, Token>
-where
-    T: Evidence + Witness<KaniVerifier>,
-    Token: ProofToken<Proposition = T> + Clone,
-{
-    type Primary = T;
-    type Proposition = T;
-    type SidecarToken = Token;
-
-    fn primary(&self) -> &Self::Primary {
-        &self.primary
-    }
-
-    fn sidecar(&self) -> Self::SidecarToken {
-        self.token.clone()
-    }
 }
 
 /// Lets Kani reconstruct an `Established<T, Token>` symbolically without

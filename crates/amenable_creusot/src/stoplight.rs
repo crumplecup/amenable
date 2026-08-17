@@ -74,14 +74,18 @@
 //! generate-creusot` after changing a real Kani-side transition; do not
 //! hand-edit `src/generated/*.rs`.
 //!
-//! The state/token/sidecar type definitions below stay hand-written:
-//! stable, one-time accommodation-model infrastructure with far lower
-//! drift risk than a transition body's own evolving logic, and (unlike
-//! the transition bodies) not something a different backend's real source
-//! can be captured verbatim *from* in the first place -- `amenable_core`'s
-//! real `Green`/`Yellow` and `amenable_kani`'s real `Established<T,
-//! Token>` are different, concrete types from this file's own mirror,
-//! even though both names and shapes match by convention.
+//! The state/token type *definitions* below stay hand-written (their own
+//! field layout has no derive to collapse into, and isn't something a
+//! different backend's real source could be captured verbatim *from* in
+//! the first place -- `amenable_core`'s real `Green`/`Yellow` and
+//! `amenable_kani`'s real `Established<T, Token>` are different,
+//! concrete types from this file's own mirror, even though both names
+//! and shapes match by convention). `Established<T, Token>`'s own
+//! `Sidecar<CreusotVerifier>` impl is not hand-written, though --
+//! `#[derive(amenable_derive::Sidecar)]` generates it, the same derive
+//! `amenable_kani::stoplight`'s real `Established<T, Token>` now uses
+//! for the identical shape, closing the hand-mirror duplication that
+//! used to exist between the two.
 
 #[cfg(creusot)]
 use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
@@ -224,37 +228,20 @@ impl ProofToken for RedToken {
 
 /// Sanitized mirror of `amenable_kani::Established<T, Token>`
 /// — genuinely generic and genuinely implements `Sidecar<CreusotVerifier>`,
-/// unlike an earlier, flattened version of this file.
+/// unlike an earlier, flattened version of this file. `amenable_derive::
+/// Sidecar` generates the same impl `amenable_kani::stoplight` now
+/// derives too, rather than hand-writing a second copy of the identical
+/// shape. `#[cfg(creusot)]` on the struct itself still gates the whole
+/// derive along with it: `cfg`-stripping runs before derive expansion,
+/// so the derive is never even invoked outside a real Creusot build.
 #[cfg(creusot)]
+#[derive(amenable_derive::Sidecar)]
+#[sidecar(verifier = "CreusotVerifier", constructor = "")]
 pub struct Established<T, Token> {
+    #[sidecar(primary)]
     primary: T,
+    #[sidecar(token)]
     token: Token,
-}
-
-#[cfg(creusot)]
-impl<T, Token> Established<T, Token> {
-    fn new(primary: T, token: Token) -> Self {
-        Self { primary, token }
-    }
-}
-
-#[cfg(creusot)]
-impl<T, Token> Sidecar<CreusotVerifier> for Established<T, Token>
-where
-    T: Evidence + Witness<CreusotVerifier>,
-    Token: ProofToken<Proposition = T> + Clone,
-{
-    type Primary = T;
-    type Proposition = T;
-    type SidecarToken = Token;
-
-    fn primary(&self) -> &Self::Primary {
-        &self.primary
-    }
-
-    fn sidecar(&self) -> Self::SidecarToken {
-        self.token.clone()
-    }
 }
 
 #[cfg(creusot)]

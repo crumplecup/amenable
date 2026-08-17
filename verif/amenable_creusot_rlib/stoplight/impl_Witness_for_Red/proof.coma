@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 165 4 165 37 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 169 4 169 37 *)
 
 (* <stoplight::Red as amenable_core::Witness<witness::CreusotVerifier>> *)
 
@@ -8,6 +8,6 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec proof_Red [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 165 4 165 37]
+let rec proof_Red [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 169 4 169 37]
   (return (x: ())) = (! bb0
   [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

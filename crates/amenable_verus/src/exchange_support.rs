@@ -143,3 +143,108 @@ macro_rules! verus_exchange {
 }
 
 pub(crate) use verus_exchange;
+
+/// Generates the `Sidecar<$verifier>`-carrier shape every real `Exchange`
+/// edge needs (`Established<T, Token>`-style, where the primary payload
+/// *is* the proposition, and `Transfer<S, Token>`-style, where the
+/// proposition is a separate, phantom generic parameter and the primary
+/// payload is its own concrete type) -- the `macro_rules!` counterpart to
+/// `amenable_derive::Sidecar`, which generates the identical impl for
+/// `amenable_kani`'s and `amenable_creusot`'s own real/mirror carrier
+/// types. A proc-macro derive can't reach here at all (`amenable_verus`
+/// resolves no extern crate under `verus --crate-type=lib`, this crate's
+/// own `lib.rs` doc comment explains why), so this generates the struct
+/// *and* the impl together from one invocation, rather than attaching to
+/// an already-declared struct the way a derive does.
+///
+/// `primary()`/`new()` both carry a real `ensures` clause tying their
+/// result back to the stored/passed field -- not optional polish: a real
+/// `Exchange` edge whose postcondition inspects payload data (`gallery::
+/// ledger_exchange`'s own `Validated`/`Committed` claims) needs both
+/// before anything downstream can be proven at all, confirmed the hard
+/// way building that module (see its own doc comment).
+macro_rules! verus_sidecar {
+    ($name:ident<$t:ident, $token:ident>, $verifier:ty) => {
+        verus_builtin_macros::verus! {
+            pub struct $name<$t, $token> {
+                pub primary: $t,
+                pub token: $token,
+            }
+
+            impl<$t, $token> $name<$t, $token> {
+                pub fn new(primary: $t, token: $token) -> (result: Self)
+                    ensures
+                        result.primary == primary,
+                {
+                    Self { primary, token }
+                }
+            }
+
+            impl<$t, $token> crate::Sidecar<$verifier> for $name<$t, $token>
+            where
+                $t: crate::Evidence + crate::Witness<$verifier>,
+                $token: crate::ProofToken<Proposition = $t> + Clone,
+            {
+                type Primary = $t;
+                type Proposition = $t;
+                type SidecarToken = $token;
+
+                fn primary(&self) -> (result: &Self::Primary)
+                    ensures
+                        result == &self.primary,
+                {
+                    &self.primary
+                }
+
+                fn sidecar(&self) -> Self::SidecarToken {
+                    self.token.clone()
+                }
+            }
+        }
+    };
+    ($name:ident<$s:ident, $token:ident>, $verifier:ty, primary = $primary_ty:ty) => {
+        verus_builtin_macros::verus! {
+            pub struct $name<$s, $token> {
+                pub primary: $primary_ty,
+                pub token: $token,
+                pub _state: ::core::marker::PhantomData<$s>,
+            }
+
+            impl<$s, $token> $name<$s, $token> {
+                pub fn new(primary: $primary_ty, token: $token) -> (result: Self)
+                    ensures
+                        result.primary == primary,
+                {
+                    Self {
+                        primary,
+                        token,
+                        _state: ::core::marker::PhantomData,
+                    }
+                }
+            }
+
+            impl<$s, $token> crate::Sidecar<$verifier> for $name<$s, $token>
+            where
+                $s: crate::Evidence + crate::Witness<$verifier>,
+                $token: crate::ProofToken<Proposition = $s> + Clone,
+            {
+                type Primary = $primary_ty;
+                type Proposition = $s;
+                type SidecarToken = $token;
+
+                fn primary(&self) -> (result: &Self::Primary)
+                    ensures
+                        result == &self.primary,
+                {
+                    &self.primary
+                }
+
+                fn sidecar(&self) -> Self::SidecarToken {
+                    self.token.clone()
+                }
+            }
+        }
+    };
+}
+
+pub(crate) use verus_sidecar;
