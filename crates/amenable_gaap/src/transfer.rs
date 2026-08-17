@@ -250,51 +250,29 @@ impl Provenance for Committed {
 /// impl would either force an artificial unification or silently under-
 /// represent one edge's real guarantee. See `amenable_kani::ledger`'s
 /// `reject`/`rollback` doc comments for the two real proofs this backs.
-// `Debug`/`Clone`/`Copy`/`PartialEq`/`Eq`/`Default` are hand-written, not
-// derived: the built-in derive macros add a `T: Trait` bound for every
-// generic parameter even when it only appears inside `PhantomData<T>`,
-// which is never actually needed (`PhantomData<T>` is `Copy`/`Debug`/../
-// regardless of what `T` itself implements) and would force every
-// concrete `Rejected<T>` instantiation to separately satisfy those
-// bounds on `T` for no real reason.
-//
 // `#[derive(Standard)]` stays real, generic, single-invocation: `bound =
 // "Self: Provenance"` (not a hardcoded `T = Pending | Validated` list)
 // narrows the generated `Standard`/`Evidence` impls to exactly the `T`
 // for which a `Provenance` impl actually exists below -- extensible if
 // a future edge ever targets a third `Rejected<SomeOtherState>`, not a
 // closed enumeration to keep in sync by hand.
-#[derive(Standard)]
+//
+// `Debug`/`Clone`/`Copy`/`PartialEq`/`Eq`/`Default` are plain, ordinary
+// derives too, each conditional on `T: Trait` the way the built-in
+// derive macros always generate for a struct with a generic parameter
+// (even one that, like this one, only ever appears inside `PhantomData
+// <T>`) -- previously hand-written here on the mistaken assumption that
+// this conditional bound was itself the problem. It never was: `Pending`
+// and `Validated` (the only two `T` this type is ever instantiated
+// with) already derive every one of these traits, so the condition is
+// always met in practice. The real gap was `#[derive(Standard)]` itself
+// silently assuming `Self: Clone`/`#basis_ty: Default` inside its own
+// generated impl body with no matching bound in that impl's own
+// where-clause -- fixed at the macro (see its own doc comment), not
+// routed around here.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
 #[standard(basis = "Self", bound = "Self: Provenance")]
 pub struct Rejected<T>(std::marker::PhantomData<T>);
-
-impl<T> std::fmt::Debug for Rejected<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Rejected").finish()
-    }
-}
-
-impl<T> Clone for Rejected<T> {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-impl<T> Copy for Rejected<T> {}
-
-impl<T> PartialEq for Rejected<T> {
-    fn eq(&self, _other: &Self) -> bool {
-        true
-    }
-}
-
-impl<T> Eq for Rejected<T> {}
-
-impl<T> Default for Rejected<T> {
-    fn default() -> Self {
-        Self(std::marker::PhantomData)
-    }
-}
 
 impl Provenance for Rejected<Pending> {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;

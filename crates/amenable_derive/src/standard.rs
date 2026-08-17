@@ -48,8 +48,31 @@ pub fn expand_standard(input: &DeriveInput) -> syn::Result<TokenStream> {
         .unwrap_or_else(|| parse_quote!(<#basis_ty as ::std::default::Default>::default()));
 
     let mut generics = input.generics.clone();
-    if !args.bounds.is_empty() {
+    {
         let where_clause = generics.make_where_clause();
+        // The default `provenance_expr`/`basis_ctor` above call `Clone::
+        // clone(self)`/`Default::default()` unconditionally inside the
+        // generated impl body. For every non-generic `Standard` (every
+        // use before a generic one came along) that's invisible: a
+        // concrete type either has `Clone`/`Default` or it doesn't, and
+        // every one so far does. A *generic* `Standard` exposes the real
+        // gap: without an explicit `Self: Clone`/`#basis_ty: Default`
+        // bound on the generated impl itself, those calls don't
+        // typecheck for any `T` that doesn't happen to make them hold.
+        // So add exactly the bound the chosen default actually needs,
+        // and only when that default is actually used -- a custom
+        // `provenance`/`basis_ctor` expression is the caller's own
+        // responsibility, via `bound = ".."`.
+        if args.provenance.is_none() {
+            where_clause
+                .predicates
+                .push(parse_quote!(Self: ::std::clone::Clone));
+        }
+        if args.basis_ctor.is_none() {
+            where_clause
+                .predicates
+                .push(parse_quote!(#basis_ty: ::std::default::Default));
+        }
         where_clause.predicates.extend(args.bounds.clone());
     }
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();

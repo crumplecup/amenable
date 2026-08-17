@@ -443,6 +443,29 @@ explicit `Output` type annotation. A real, permanent property of this
 design once a state has more than one outgoing edge, not a one-time
 migration cost.
 
+**A real gap found in `#[derive(Standard)]` itself, exactly the kind
+this dogfooding lineage exists to surface.** `Rejected<T>` is the
+first *generic* `Standard` anywhere in the workspace. First attempt:
+plain `#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]`
+failed with `T: Clone`/`T: Default` unsatisfied — misdiagnosed at
+first as "the built-in derives over-constrain a `PhantomData<T>`-only
+parameter" and briefly hand-written around. The real cause was
+narrower and squarely in `amenable_derive::standard`: its generated
+`Evidence`/`Standard` impls call `Clone::clone(self)` (the default
+`provenance_expr`) and `<Self as Default>::default()` (the default
+`basis_ctor`) unconditionally inside the impl body, but never added
+`Self: Clone`/`Self: Default` to that impl's own where-clause. Every
+non-generic `Standard` before `Rejected<T>` made this invisible — a
+concrete type either has `Clone`/`Default` or it doesn't, and every one
+so far does — so the missing bound never bit until a generic type
+actually needed it stated explicitly. Fixed in the macro itself
+(`standard.rs` now adds `Self: Clone`/`#basis_ty: Default` to the
+generated where-clause whenever the corresponding default expression
+is used, a no-op for every existing non-generic call site): `Rejected<
+T>` derives `Debug`/`Clone`/`Copy`/`PartialEq`/`Eq`/`Default` plainly,
+each conditional on `T: Trait` the ordinary way, which the two real
+instantiations (`T = Pending`/`Validated`) already satisfy.
+
 **Verified for real, against the actual toolchain**: `just
 verify-kani-contract ledger::verify_reject_always_succeeds` and
 `ledger::verify_rollback_always_succeeds` both report `VERIFICATION:-
