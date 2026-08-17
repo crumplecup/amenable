@@ -176,7 +176,10 @@ amenable_derive::harness! {
                 amenable_gaap::Amount::new(50),
             );
             let input = amenable_kani::Transfer::pending(payload);
-            let _ = ledger.exchange(input);
+            let _: Result<
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::TransferError,
+            > = ledger.exchange(input);
         }
     }
 }
@@ -214,7 +217,10 @@ amenable_derive::harness! {
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_kani::Transfer::pending(payload);
-            let _ = ledger.exchange(input);
+            let _: Result<
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::TransferError,
+            > = ledger.exchange(input);
         }
     }
 }
@@ -254,7 +260,10 @@ amenable_derive::harness! {
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_kani::Transfer::pending(payload);
-            let _ = ledger.exchange(input);
+            let _: Result<
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::TransferError,
+            > = ledger.exchange(input);
         }
     }
 }

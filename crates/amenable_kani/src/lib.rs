@@ -73,7 +73,10 @@ pub use io_model::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
 };
-pub use ledger::{Ledger, PendingToken, Transfer, TransferError, ValidatedToken};
+pub use ledger::{
+    CommittedToken, Ledger, PendingToken, RejectedFromPendingToken, RejectedFromValidatedToken,
+    Transfer, TransferError, ValidatedToken,
+};
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
 pub use os_windows_model::{

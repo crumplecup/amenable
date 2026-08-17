@@ -228,20 +228,114 @@ impl Provenance for Committed {
     }
 }
 
-/// The transfer was rejected — validation failed, or a validated
-/// transfer was manually rolled back before commit. See [`Pending`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
-#[standard(basis = "Self")]
-pub struct Rejected;
+/// The transfer was rejected — validation failed (`Rejected<Pending>`),
+/// or a validated transfer was manually rolled back before commit
+/// (`Rejected<Validated>`). See [`Pending`] for why this is a root
+/// claim, not a derived one.
+///
+/// Parameterized by the state it was rejected *from*, not flat — a
+/// deliberate divergence from `~/repos/elicitation/crates/
+/// elicit_server::ledger::typestate::Rejected` (flat, with a runtime
+/// `RejectedData { reason }` field distinguishing why). `amenable_kani`'s
+/// `#[amenable_derive::exchange]` mints exactly one `impl Witness<V> for
+/// #evidence` per macro invocation: `reject()` (`Pending -> Rejected`)
+/// and `rollback()` (`Validated -> Rejected`) both targeting a single
+/// flat `Rejected` would be two impls of the same trait for the same
+/// concrete type — a hard `E0119` conflicting-implementation error, not
+/// a style choice to avoid. `Rejected<Pending>`/`Rejected<Validated>`
+/// are genuinely distinct concrete types, so each edge earns its own
+/// honest `Witness` proof for its own real claim — `reject()` mirrors
+/// `validate`'s own failure conditions, `rollback()` doesn't obviously
+/// prove the same thing, so collapsing both into one shared `Witness`
+/// impl would either force an artificial unification or silently under-
+/// represent one edge's real guarantee. See `amenable_kani::ledger`'s
+/// `reject`/`rollback` doc comments for the two real proofs this backs.
+// `Debug`/`Clone`/`Copy`/`PartialEq`/`Eq`/`Default` are hand-written, not
+// derived: the built-in derive macros add a `T: Trait` bound for every
+// generic parameter even when it only appears inside `PhantomData<T>`,
+// which is never actually needed (`PhantomData<T>` is `Copy`/`Debug`/../
+// regardless of what `T` itself implements) and would force every
+// concrete `Rejected<T>` instantiation to separately satisfy those
+// bounds on `T` for no real reason.
+//
+// `#[derive(Standard)]` stays real, generic, single-invocation: `bound =
+// "Self: Provenance"` (not a hardcoded `T = Pending | Validated` list)
+// narrows the generated `Standard`/`Evidence` impls to exactly the `T`
+// for which a `Provenance` impl actually exists below -- extensible if
+// a future edge ever targets a third `Rejected<SomeOtherState>`, not a
+// closed enumeration to keep in sync by hand.
+#[derive(Standard)]
+#[standard(basis = "Self", bound = "Self: Provenance")]
+pub struct Rejected<T>(std::marker::PhantomData<T>);
 
-impl Provenance for Rejected {
+impl<T> std::fmt::Debug for Rejected<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Rejected").finish()
+    }
+}
+
+impl<T> Clone for Rejected<T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<T> Copy for Rejected<T> {}
+
+impl<T> PartialEq for Rejected<T> {
+    fn eq(&self, _other: &Self) -> bool {
+        true
+    }
+}
+
+impl<T> Eq for Rejected<T> {}
+
+impl<T> Default for Rejected<T> {
+    fn default() -> Self {
+        Self(std::marker::PhantomData)
+    }
+}
+
+impl Provenance for Rejected<Pending> {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",
-            "transfer state, reachable from Pending (validation failure) or Validated (manual rollback)",
+            "transfer state, reachable only via a proven Pending -> Rejected exchange (validation failure)",
         )]
         .into_iter()
+    }
+}
+
+impl Provenance for Rejected<Validated> {
+    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
+
+    fn metadata(&self) -> Self::MetadataIter {
+        vec![MetadataEntry::new(
+            "asserted",
+            "transfer state, reachable only via a proven Validated -> Rejected exchange (manual rollback)",
+        )]
+        .into_iter()
+    }
+}
+
+// `#[derive(Standard)]`'s auto `EvidenceLink` registration only covers
+// non-generic roots (a generic basis has no single concrete name to
+// register under) -- manual registration for each concrete
+// instantiation, per that derive's own documented precedent.
+::inventory::submit! {
+    ::amenable_core::EvidenceLink {
+        name: concat!(module_path!(), "::Rejected<Pending>"),
+        basis: concat!(module_path!(), "::Rejected<Pending>"),
+        index: 0,
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::EvidenceLink {
+        name: concat!(module_path!(), "::Rejected<Validated>"),
+        basis: concat!(module_path!(), "::Rejected<Validated>"),
+        index: 0,
     }
 }

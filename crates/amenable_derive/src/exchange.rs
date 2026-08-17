@@ -68,8 +68,19 @@ use syn::{
     punctuated::Punctuated,
 };
 
-/// Parsed `#[exchange(cfg = .., verifier = .., evidence = .., proof_artifact
-/// = .., harness_fn = .., harness_const = .., evidence_id = ..)]` arguments.
+/// Parsed `#[exchange(cfg = .., verifier = "..", evidence = "..",
+/// proof_artifact = .., harness_fn = .., harness_const = .., evidence_id =
+/// ..)]` arguments. `verifier`/`evidence` are string literals, re-parsed as
+/// a `Path` -- matching `#[derive(Standard)]`'s `#[standard(basis = "..")]`
+/// convention and `#[establish(..)]`'s own fields: a generic evidence type
+/// (`Rejected<Pending>`, needed once two edges converge on the same
+/// evidence family -- see `ledger.rs`'s `reject`/`rollback` doc comment)
+/// is genuinely ambiguous as a bare attribute expression (`<`/`>` read as
+/// comparison operators, not generic-argument delimiters). `cfg`/
+/// `proof_artifact`/`harness_fn`/`harness_const`/`evidence_id` stay plain
+/// identifiers (or, for `evidence_id`, a string naming a registry suffix,
+/// unrelated to this): none of them has ever needed to name a generic
+/// type.
 pub struct ExchangeArgs {
     cfg: Ident,
     verifier: Path,
@@ -96,9 +107,9 @@ impl Parse for ExchangeArgs {
             if pair.path.is_ident("cfg") {
                 cfg = Some(expect_ident(&pair.value)?);
             } else if pair.path.is_ident("verifier") {
-                verifier = Some(expect_path(&pair.value)?);
+                verifier = Some(expect_path_lit(&pair.value)?);
             } else if pair.path.is_ident("evidence") {
-                evidence = Some(expect_path(&pair.value)?);
+                evidence = Some(expect_path_lit(&pair.value)?);
             } else if pair.path.is_ident("proof_artifact") {
                 proof_artifact = Some(expect_path(&pair.value)?);
             } else if pair.path.is_ident("harness_fn") {
@@ -152,6 +163,16 @@ fn expect_path(expr: &Expr) -> syn::Result<Path> {
         return Err(Error::new_spanned(expr, "expected a type path"));
     };
     Ok(expr_path.path.clone())
+}
+
+fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
+    let Expr::Lit(expr_lit) = expr else {
+        return Err(Error::new_spanned(expr, "expected a string literal"));
+    };
+    let syn::Lit::Str(lit_str) = &expr_lit.lit else {
+        return Err(Error::new_spanned(expr, "expected a string literal"));
+    };
+    lit_str.parse()
 }
 
 fn expect_lit_str(expr: &Expr) -> syn::Result<LitStr> {

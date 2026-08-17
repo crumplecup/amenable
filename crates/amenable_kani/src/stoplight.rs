@@ -250,7 +250,11 @@ impl kani::Arbitrary for StoplightError {
 #[derive(Debug, Clone, Copy, amenable_derive::ProofToken)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[proof_token(proposition = "Green")]
-#[amenable_derive::establish(credential = RedToken, verifier = KaniVerifier, proposition = Green)]
+#[amenable_derive::establish(
+    credential = "RedToken",
+    verifier = "KaniVerifier",
+    proposition = "Green"
+)]
 pub struct GreenToken(());
 
 impl GreenToken {
@@ -291,9 +295,9 @@ impl Established<Green, GreenToken> {
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[proof_token(proposition = "Yellow")]
 #[amenable_derive::establish(
-    credential = GreenToken,
-    verifier = KaniVerifier,
-    proposition = Yellow,
+    credential = "GreenToken",
+    verifier = "KaniVerifier",
+    proposition = "Yellow"
 )]
 pub struct YellowToken(());
 
@@ -353,8 +357,8 @@ kani_ensures!(
 // there).
 #[amenable_derive::exchange(
     cfg = kani,
-    verifier = KaniVerifier,
-    evidence = Yellow,
+    verifier = "KaniVerifier",
+    evidence = "Yellow",
     proof_artifact = CalculationProof,
     harness_fn = verify_green_transitions_only_to_yellow,
     harness_const = VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
@@ -385,9 +389,9 @@ amenable_derive::harness! {
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[proof_token(proposition = "Red")]
 #[amenable_derive::establish(
-    credential = YellowToken,
-    verifier = KaniVerifier,
-    proposition = Red,
+    credential = "YellowToken",
+    verifier = "KaniVerifier",
+    proposition = "Red"
 )]
 pub struct RedToken(());
 
@@ -408,8 +412,8 @@ kani_ensures!(
 
 #[amenable_derive::exchange(
     cfg = kani,
-    verifier = KaniVerifier,
-    evidence = Red,
+    verifier = "KaniVerifier",
+    evidence = "Red",
     proof_artifact = CalculationProof,
     harness_fn = verify_yellow_transitions_only_to_red,
     harness_const = VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
@@ -455,8 +459,8 @@ kani_ensures!(
 
 #[amenable_derive::exchange(
     cfg = kani,
-    verifier = KaniVerifier,
-    evidence = Green,
+    verifier = "KaniVerifier",
+    evidence = "Green",
     evidence_id = "cycle_back",
     proof_artifact = CalculationProof,
     harness_fn = verify_red_transitions_only_to_green,

@@ -1,7 +1,17 @@
-//! `#[establish(credential = .., verifier = .., proposition = ..)]`
+//! `#[establish(credential = "..", verifier = "..", proposition = "..")]`
 //! attribute macro: generates the trivial-token-minting half of `impl
 //! Establish<C, V> for Y { type Token = Self; fn establish(_credential: C)
 //! -> Self::Token { Self(()) } }`.
+//!
+//! Arguments are string literals, re-parsed as a `Path`, not bare
+//! identifiers — matching `#[derive(Standard)]`'s own `#[standard(basis
+//! = "..")]` convention, for the same reason: `proposition = Rejected<
+//! Pending>` (a generic proposition, needed once two edges converge on
+//! the same evidence family — see `ledger.rs`'s `reject`/`rollback`
+//! doc comment) is genuinely ambiguous as a bare attribute expression
+//! (`<`/`>` read as comparison operators, not generic-argument
+//! delimiters); `"Rejected<Pending>"` parsed fresh as a `Path` has no
+//! such ambiguity.
 //!
 //! Not a `#[derive(..)]`, unlike [`crate::proof_token`], even though it
 //! sits on the same kind of item (a unit-tuple token struct) — a derive's
@@ -35,8 +45,8 @@ use syn::{
     punctuated::Punctuated,
 };
 
-/// Parsed `#[establish(credential = .., verifier = .., proposition = ..)]`
-/// arguments.
+/// Parsed `#[establish(credential = "..", verifier = "..", proposition =
+/// "..")]` arguments.
 pub struct EstablishArgs {
     credential: Path,
     verifier: Path,
@@ -84,10 +94,13 @@ fn require<T>(value: Option<T>, name: &str) -> syn::Result<T> {
 }
 
 fn expect_path(expr: &Expr) -> syn::Result<Path> {
-    let Expr::Path(expr_path) = expr else {
-        return Err(Error::new_spanned(expr, "expected a type path"));
+    let Expr::Lit(expr_lit) = expr else {
+        return Err(Error::new_spanned(expr, "expected a string literal"));
     };
-    Ok(expr_path.path.clone())
+    let syn::Lit::Str(lit_str) = &expr_lit.lit else {
+        return Err(Error::new_spanned(expr, "expected a string literal"));
+    };
+    lit_str.parse()
 }
 
 /// Expand `#[establish(..)]` on `struct TokenName(());`.

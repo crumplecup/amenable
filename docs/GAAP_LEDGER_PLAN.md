@@ -2,17 +2,21 @@
 
 ## Status
 
-🔲 Planning — Steps 0 and 1 done. Step 2's `Validated -> Committed`
-edge (`BalancedEntries`) is proven — `0 of 297 failed`, 122.7s; its own
-real CBMC timeout (unrelated to Step 1's) is root-caused and fixed. The
-`reject()`/`rollback()` branches to `Rejected` are not started yet, and
-have a known, undecided structural wrinkle (see Step 2 below). Along
-the way, two new derive macros — `#[derive(ProofToken)]` and
-`#[amenable_derive::establish(..)]` — were built and retrofitted onto
-every hand-written `ProofToken`/`Establish` impl in both `stoplight.rs`
-and `ledger.rs`, closing a real gap: this whole worked-example lineage
-exists to dogfood `amenable`'s own derives, and these two trivial-but-
-universal shapes had never been derived at all before now.
+🔲 Planning — Steps 0 and 1 done. Step 2 is now fully done: all four
+edges (`validate`, `commit`, `reject`, `rollback`) are proven against
+the real toolchain. `reject()`/`rollback()`'s structural wrinkle
+(both targeting one flat `Rejected` would collide with `#[amenable_
+derive::exchange]`'s one-`Witness`-impl-per-evidence assumption) is
+resolved by making `Rejected<T>` generic over the state it was
+rejected from — `Rejected<Pending>`/`Rejected<Validated>` are genuinely
+distinct evidence types, so each edge earns its own honest `Witness`
+proof. Along the way, two new derive macros — `#[derive(ProofToken)]`
+and `#[amenable_derive::establish(..)]` — were built and retrofitted
+onto every hand-written `ProofToken`/`Establish` impl in both
+`stoplight.rs` and `ledger.rs`, closing a real gap: this whole
+worked-example lineage exists to dogfood `amenable`'s own derives, and
+these two trivial-but-universal shapes had never been derived at all
+before now.
 
 ## Motivation
 
@@ -325,7 +329,7 @@ functional tests in `tests/ledger_test.rs` and all 6 in `amenable_gaap`'s
 own `ledger_skeleton_test.rs` (including a new one confirming `AccountId`
 equality compares `id`, not `name`) still pass. Step 1 is complete.
 
-### Step 2 — remaining Kani edges — `Validated -> Committed` done, `reject()`/`rollback()` not started
+### Step 2 — remaining Kani edges — done
 
 **`Validated -> Committed` (`BalancedEntries`) — done.** Infallible,
 like every `Stoplight` edge: a transfer that already passed `validate`'s
@@ -385,19 +389,73 @@ seven affected Kani harnesses (`verify_green_transitions_only_to_yellow`,
 retrofit, confirming the derive-generated impls are behaviorally
 identical to what they replaced.
 
-**Not started**: the `reject()`/`rollback()` branches to `Rejected`.
-Both edges target the *same* evidence type (`Rejected`), which collides
-with `#[amenable_derive::exchange]`'s current one-invocation-per-
-evidence assumption (it unconditionally generates `impl Witness<
-KaniVerifier> for #evidence`, so a second invocation for the same
-`evidence` would be a duplicate-impl compile error). Needs either a
-macro extension (an opt-out for re-emitting an already-existing
-`Witness` impl) or a different design — not yet decided, not yet
-discussed with the user.
+**`Pending -> Rejected<Pending>` and `Validated -> Rejected<Validated>`
+(`reject()`/`rollback()`) — done.** Both edges target logically the
+same "rejected" outcome, which collides with `#[amenable_derive::
+exchange]`'s one-`Witness`-impl-per-evidence-type assumption if
+`Rejected` stays the flat marker Step 0 gave it: two macro invocations
+naming the same concrete `evidence` would each generate `impl
+Witness<KaniVerifier> for Rejected`, a hard `E0119` conflicting-
+implementation error, not a style choice to avoid. Resolved by making
+`Rejected<T>` generic over the state it was rejected from —
+`amenable_gaap::transfer::Rejected<T>`, parameterized rather than flat.
+A deliberate divergence from `~/repos/elicitation/crates/
+elicit_server::ledger::typestate::Rejected` (flat, with a runtime
+`RejectedData { reason }` field distinguishing why): elicitation has no
+per-evidence-type "exactly one `Witness` impl" constraint, so
+collapsing both edges into one flat state costs it nothing there.
+`amenable` does have that constraint, for a real reason — `Witness<V>`
+means "this state is provably reached, backed by *this specific*
+proof," and `reject()`'s claim (mirrors `validate`'s own failure
+conditions) isn't obviously the same claim as `rollback()`'s (whatever
+it ends up checking post-validation). `Rejected<Pending>`/`Rejected<
+Validated>` being genuinely distinct concrete types means each edge
+earns its own honest proof rather than an artificial unification.
+
+Both edges are infallible, like `commit` — rejecting a still-`Pending`
+or still-`Validated` transfer has no failure mode of its own in this
+worked example, so the real claim is legitimately trivial
+(`result.is_ok()`), matching every `Stoplight` edge; `validate`/`commit`
+are where this worked example's non-trivial claims live. No
+rejection-reason payload (elicitation's `RejectionReason`) is threaded
+through yet — deliberately out of scope for this pass, per this plan's
+own "one real example by hand first" discipline; a future refinement
+could add reason data to `Rejected<T>`'s own state.
+
+A necessary correction along the way, not scope creep: `#[amenable_
+derive::establish(..)]`'s and `#[amenable_derive::exchange]`'s
+`evidence`/`credential`/`verifier`/`proposition` fields moved from bare
+identifiers to string literals re-parsed as a `Path` (matching
+`#[derive(Standard)]`'s own `#[standard(basis = "..")]` convention).
+`proposition = Rejected<Pending>` is genuinely ambiguous as a bare
+attribute expression (`<`/`>` parse as comparison operators, not
+generic-argument delimiters, inside `Expr` position) — the fix applies
+uniformly to every existing call site in `stoplight.rs`/`ledger.rs`,
+not just the two new ones.
+
+`Ledger::exchange`, called generically, becomes ambiguous wherever two
+edges share an input type (`Transfer<Pending, PendingToken>` now goes
+to either `Validated` or `Rejected<Pending>`; `Transfer<Validated,
+ValidatedToken>` now goes to either `Committed` or `Rejected<
+Validated>`) — every existing call site (`ledger_test.rs`, the
+`ledger_account_id_comparison` gallery investigation) needed an
+explicit `Output` type annotation. A real, permanent property of this
+design once a state has more than one outgoing edge, not a one-time
+migration cost.
+
+**Verified for real, against the actual toolchain**: `just
+verify-kani-contract ledger::verify_reject_always_succeeds` and
+`ledger::verify_rollback_always_succeeds` both report `VERIFICATION:-
+SUCCESSFUL`, `0 of 287 failed`, ~57s each. `verify_commit_always_
+balances` and `verify_validate_accepts_a_lawful_transfer` re-verified
+successful after the retrofit (`0 of 297 failed`/`0 of 492 failed`,
+matching prior numbers exactly — no regression from the shared file
+changes), plus a Stoplight spot-check
+(`verify_green_transitions_only_to_yellow`).
 
 Decide then whether `AccountingEquationHolds` belongs on `Committed`
-itself or as a separate period-close edge — deferred until the smaller
-edges are real and proven, not decided speculatively now.
+itself or as a separate period-close edge — deferred until Step 3/4
+give a reason to revisit, not decided speculatively now.
 
 ### Step 3 — Creusot — not started
 
@@ -439,6 +497,5 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 2's remaining piece: design and build the `reject()`/`rollback()`
-branches to `Rejected`, including resolving the `#[amenable_derive::
-exchange]` same-evidence collision noted above.
+Step 3: Creusot, mirroring Steps 1/2 inside `amenable_gaap` itself
+under its `creusot` feature.

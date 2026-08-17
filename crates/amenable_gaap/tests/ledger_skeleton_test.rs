@@ -47,7 +47,8 @@ fn every_transfer_state_is_a_root_standard_claim() {
     assert!(Pending::is_root());
     assert!(Validated::is_root());
     assert!(Committed::is_root());
-    assert!(Rejected::is_root());
+    assert!(Rejected::<Pending>::is_root());
+    assert!(Rejected::<Validated>::is_root());
 }
 
 #[test]
@@ -56,10 +57,19 @@ fn every_transfer_state_carries_an_asserted_provenance_report() {
         Pending.report().to_string(),
         Validated.report().to_string(),
         Committed.report().to_string(),
-        Rejected.report().to_string(),
+        Rejected::<Pending>::default().report().to_string(),
+        Rejected::<Validated>::default().report().to_string(),
     ] {
         assert!(report.contains("asserted:"));
     }
+}
+
+#[test]
+fn rejected_from_pending_and_rejected_from_validated_are_distinct_claims() {
+    assert_ne!(
+        Rejected::<Pending>::default().report().to_string(),
+        Rejected::<Validated>::default().report().to_string(),
+    );
 }
 
 #[test]

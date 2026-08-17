@@ -61,7 +61,7 @@
 //! See [`Ledger::check_amount_positive`]'s own doc comment.
 
 use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
-use amenable_gaap::{Committed, Pending, TransferPayload, Validated};
+use amenable_gaap::{Committed, Pending, Rejected, TransferPayload, Validated};
 
 use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
@@ -170,9 +170,9 @@ impl Transfer<Pending, PendingToken> {
 #[derive(Debug, Clone, amenable_derive::ProofToken)]
 #[proof_token(proposition = "Validated")]
 #[amenable_derive::establish(
-    credential = PendingToken,
-    verifier = KaniVerifier,
-    proposition = Validated,
+    credential = "PendingToken",
+    verifier = "KaniVerifier",
+    proposition = "Validated"
 )]
 pub struct ValidatedToken(());
 
@@ -355,8 +355,8 @@ kani_ensures!(
 
 #[amenable_derive::exchange(
     cfg = kani,
-    verifier = KaniVerifier,
-    evidence = Validated,
+    verifier = "KaniVerifier",
+    evidence = "Validated",
     proof_artifact = CalculationProof,
     harness_fn = verify_validate_accepts_a_lawful_transfer,
     harness_const = VERIFY_VALIDATE_ACCEPTS_A_LAWFUL_TRANSFER_SRC,
@@ -434,9 +434,9 @@ amenable_derive::harness! {
 #[derive(Debug, Clone, amenable_derive::ProofToken)]
 #[proof_token(proposition = "Committed")]
 #[amenable_derive::establish(
-    credential = ValidatedToken,
-    verifier = KaniVerifier,
-    proposition = Committed,
+    credential = "ValidatedToken",
+    verifier = "KaniVerifier",
+    proposition = "Committed"
 )]
 pub struct CommittedToken(());
 
@@ -490,8 +490,8 @@ kani_ensures!(
 
 #[amenable_derive::exchange(
     cfg = kani,
-    verifier = KaniVerifier,
-    evidence = Committed,
+    verifier = "KaniVerifier",
+    evidence = "Committed",
     proof_artifact = CalculationProof,
     harness_fn = verify_commit_always_balances,
     harness_const = VERIFY_COMMIT_ALWAYS_BALANCES_SRC,
@@ -538,6 +538,146 @@ amenable_derive::harness! {
             let validated_token = Validated::establish(credential);
             let validated: Transfer<Validated, ValidatedToken> = Transfer::new(payload, validated_token);
             let _ = ledger.commit(validated);
+        }
+    }
+}
+
+/// Lawful token minted once `Rejected<Pending>` is established from a
+/// proven `Pending` -- validation was never attempted (e.g. an operator
+/// cancelled the request). Distinct from [`RejectedFromValidatedToken`]
+/// even though both back the same logical "rejected" *outcome*:
+/// `ProofToken::Proposition` is an associated type, so one concrete
+/// token type can only ever name one `Proposition` -- a single shared
+/// token can't serve both `Rejected<Pending>` and `Rejected<Validated>`
+/// at once, the same reason `Rejected<T>` itself had to become generic
+/// (see its own doc comment in `amenable_gaap::transfer`).
+#[derive(Debug, Clone, amenable_derive::ProofToken)]
+#[proof_token(proposition = "Rejected<Pending>")]
+#[amenable_derive::establish(
+    credential = "PendingToken",
+    verifier = "KaniVerifier",
+    proposition = "Rejected<Pending>"
+)]
+pub struct RejectedFromPendingToken(());
+
+/// Lawful token minted once `Rejected<Validated>` is established from a
+/// proven `Validated` -- a validated transfer was manually rolled back
+/// before commit. See [`RejectedFromPendingToken`].
+#[derive(Debug, Clone, amenable_derive::ProofToken)]
+#[proof_token(proposition = "Rejected<Validated>")]
+#[amenable_derive::establish(
+    credential = "ValidatedToken",
+    verifier = "KaniVerifier",
+    proposition = "Rejected<Validated>"
+)]
+pub struct RejectedFromValidatedToken(());
+
+// `Pending -> Rejected<Pending>`: infallible, like `commit` -- rejecting
+// a still-pending transfer (an operator cancelling a request, or an
+// external process auto-rejecting it, before validation is ever
+// attempted) has no failure mode of its own. Unlike `~/repos/
+// elicitation/crates/elicit_server::ledger::typestate::Transfer::
+// reject(self, reason: RejectionReason)`, this worked example doesn't
+// thread a rejection-reason payload through `Rejected<T>` -- deliberately
+// out of scope for this pass, matching `GAAP_LEDGER_PLAN.md`'s own "one
+// real example by hand first" discipline (a future refinement could add
+// reason data to `Rejected<T>`'s own state, mirroring elicitation's
+// `RejectedData`). The claim is legitimately trivial (`result.is_ok()`),
+// the same shape every `Stoplight` edge already documents rather than
+// hides -- `validate`/`commit` are where this worked example's real,
+// non-trivial claims live.
+kani_ensures!(
+    Rejected<Pending>,
+    "amenable_kani::ledger::Rejected::reject_ensures",
+    Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError>,
+    |result| result.is_ok()
+);
+
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = "KaniVerifier",
+    evidence = "Rejected<Pending>",
+    proof_artifact = CalculationProof,
+    harness_fn = verify_reject_always_succeeds,
+    harness_const = VERIFY_REJECT_ALWAYS_SUCCEEDS_SRC,
+)]
+impl Ledger {
+    // `pub(crate)`, matching `validate`/`commit`'s own precedent.
+    pub(crate) fn reject(
+        &self,
+        input: Transfer<Pending, PendingToken>,
+    ) -> Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError> {
+        let payload = input.primary().clone();
+        let token = Rejected::<Pending>::establish(input.sidecar());
+        Ok(Transfer::new(payload, token))
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_REJECT_ALWAYS_SUCCEEDS_SRC, {
+        #[kani::proof_for_contract(Ledger::reject)]
+        fn verify_reject_always_succeeds() {
+            let amount: i64 = kani::any();
+            let balance: i64 = kani::any();
+            let ledger = Ledger::new(balance);
+            let payload = TransferPayload::new(
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Amount::new(amount),
+            );
+            let pending = Transfer::pending(payload);
+            let _ = ledger.reject(pending);
+        }
+    }
+}
+
+// `Validated -> Rejected<Validated>`: infallible, like `reject` above --
+// see its own doc comment for why the claim is legitimately trivial and
+// why no rejection-reason payload is threaded through yet.
+kani_ensures!(
+    Rejected<Validated>,
+    "amenable_kani::ledger::Rejected::rollback_ensures",
+    Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError>,
+    |result| result.is_ok()
+);
+
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = "KaniVerifier",
+    evidence = "Rejected<Validated>",
+    proof_artifact = CalculationProof,
+    harness_fn = verify_rollback_always_succeeds,
+    harness_const = VERIFY_ROLLBACK_ALWAYS_SUCCEEDS_SRC,
+)]
+impl Ledger {
+    // `pub(crate)`, matching `validate`/`commit`/`reject`'s own precedent.
+    pub(crate) fn rollback(
+        &self,
+        input: Transfer<Validated, ValidatedToken>,
+    ) -> Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError> {
+        let payload = input.primary().clone();
+        let token = Rejected::<Validated>::establish(input.sidecar());
+        Ok(Transfer::new(payload, token))
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_ROLLBACK_ALWAYS_SUCCEEDS_SRC, {
+        #[kani::proof_for_contract(Ledger::rollback)]
+        fn verify_rollback_always_succeeds() {
+            let amount: i64 = kani::any();
+            let balance: i64 = kani::any();
+            let ledger = Ledger::new(balance);
+            let payload = TransferPayload::new(
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Amount::new(amount),
+            );
+            let pending = Transfer::pending(payload.clone());
+            let credential = amenable_core::Sidecar::sidecar(&pending);
+            let validated_token = Validated::establish(credential);
+            let validated: Transfer<Validated, ValidatedToken> = Transfer::new(payload, validated_token);
+            let _ = ledger.rollback(validated);
         }
     }
 }

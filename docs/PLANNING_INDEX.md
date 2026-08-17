@@ -1050,9 +1050,13 @@ genuine `#[kani::requires]` precondition. Two new derive macros,
 built and retrofitted onto every hand-written `ProofToken`/`Establish`
 impl in both `stoplight.rs` and `ledger.rs` — closing a real gap where
 this dogfooding lineage had never actually derived those two trivial-
-but-universal shapes. `reject()`/`rollback()` to `Rejected` not
-started (has a known, undecided `#[amenable_derive::exchange]`
-same-evidence collision). Steps 3 onward not started.
+but-universal shapes. Step 2 is now fully done: `reject()`/`rollback()`
+to `Rejected` are proven (`0 of 287 failed` each) by making `Rejected<T>`
+generic over the state it was rejected from (`Rejected<Pending>`/
+`Rejected<Validated>`, resolving the same-evidence `#[amenable_derive::
+exchange]` collision by making the two edges target genuinely distinct
+concrete types, a deliberate divergence from elicitation's flat
+`Rejected` + runtime-reason design). Steps 3 onward not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has
