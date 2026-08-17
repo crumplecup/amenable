@@ -68,3 +68,18 @@ fn validate_rejects_the_same_account() {
     let error = ledger.exchange(input).expect_err("same account");
     assert_eq!(error, TransferError::SameAccount);
 }
+
+#[test]
+fn commit_always_succeeds_and_carries_the_same_amount() {
+    let ledger = Ledger::new(100);
+    let payload = TransferPayload::new(
+        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Amount::new(50),
+    );
+    let input = Transfer::pending(payload);
+
+    let validated = ledger.exchange(input).expect("lawful transfer");
+    let committed = ledger.exchange(validated).expect("commit never fails");
+    assert_eq!(committed.primary().amount().value(), 50);
+}

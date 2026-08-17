@@ -247,8 +247,10 @@ impl kani::Arbitrary for StoplightError {
 }
 
 /// Lawful token minted once a [`Stoplight`] is confirmed `Green`.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, amenable_derive::ProofToken)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
+#[proof_token(proposition = "Green")]
+#[amenable_derive::establish(credential = RedToken, verifier = KaniVerifier, proposition = Green)]
 pub struct GreenToken(());
 
 impl GreenToken {
@@ -264,10 +266,6 @@ impl GreenToken {
     pub fn new(_state: Green) -> Self {
         Self(())
     }
-}
-
-impl ProofToken for GreenToken {
-    type Proposition = Green;
 }
 
 impl Established<Green, GreenToken> {
@@ -289,13 +287,15 @@ impl Established<Green, GreenToken> {
 }
 
 /// Lawful token minted once `Yellow` is established from a proven `Green`.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, amenable_derive::ProofToken)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
+#[proof_token(proposition = "Yellow")]
+#[amenable_derive::establish(
+    credential = GreenToken,
+    verifier = KaniVerifier,
+    proposition = Yellow,
+)]
 pub struct YellowToken(());
-
-impl ProofToken for YellowToken {
-    type Proposition = Yellow;
-}
 
 // The real logic and its Kani contract both live on `Stoplight::
 // green_to_yellow`, a plain inherent method, not on the `Exchange` trait
@@ -380,22 +380,16 @@ amenable_derive::harness! {
     }
 }
 
-impl Establish<GreenToken, KaniVerifier> for Yellow {
-    type Token = YellowToken;
-
-    fn establish(_credential: GreenToken) -> Self::Token {
-        YellowToken(())
-    }
-}
-
 /// Lawful token minted once `Red` is established from a proven `Yellow`.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, amenable_derive::ProofToken)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
+#[proof_token(proposition = "Red")]
+#[amenable_derive::establish(
+    credential = YellowToken,
+    verifier = KaniVerifier,
+    proposition = Red,
+)]
 pub struct RedToken(());
-
-impl ProofToken for RedToken {
-    type Proposition = Red;
-}
 
 // See the Green -> Yellow contract above for why the real logic/contract
 // live on a plain inherent method (Kani 0.67.0 can't contract a trait
@@ -438,14 +432,6 @@ amenable_derive::harness! {
             let input = Established::new(Yellow, YellowToken(()));
             let _ = stoplight.yellow_to_red(input);
         }
-    }
-}
-
-impl Establish<YellowToken, KaniVerifier> for Red {
-    type Token = RedToken;
-
-    fn establish(_credential: YellowToken) -> Self::Token {
-        RedToken(())
     }
 }
 
@@ -494,14 +480,6 @@ amenable_derive::harness! {
             let input = Established::new(Red, RedToken(()));
             let _ = stoplight.red_to_green(input);
         }
-    }
-}
-
-impl Establish<RedToken, KaniVerifier> for Green {
-    type Token = GreenToken;
-
-    fn establish(_credential: RedToken) -> Self::Token {
-        GreenToken(())
     }
 }
 

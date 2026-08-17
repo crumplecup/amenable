@@ -1,10 +1,12 @@
 //! Proc macros for the `amenable` constitutional trait family.
 
 mod calculation;
+mod establish;
 mod evidence;
 mod exchange;
 mod harness;
 mod kani_compose;
+mod proof_token;
 mod standard;
 #[cfg(feature = "verus")]
 mod verus_contract;
@@ -16,15 +18,17 @@ use proc_macro::TokenStream;
 
 use quote::{format_ident, quote};
 use syn::{
-    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, Index, ItemFn, ItemImpl, LitStr,
-    Path, Type, Variant, WherePredicate, parse_macro_input, parse_quote,
+    Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields, Index, ItemFn, ItemImpl,
+    ItemStruct, LitStr, Path, Type, Variant, WherePredicate, parse_macro_input, parse_quote,
 };
 
 use calculation::{CalculationArgs, expand_calculation};
+use establish::{EstablishArgs, expand_establish};
 use evidence::expand_evidence;
 use exchange::{ExchangeArgs, expand_exchange};
 use harness::expand_harness;
 use kani_compose::expand_kani_compose;
+use proof_token::expand_proof_token;
 use standard::expand_standard;
 use witness::expand_witness;
 
@@ -117,6 +121,34 @@ pub fn derive_standard(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     match expand_standard(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate `impl ProofToken for X { type Proposition = Y; }` from a
+/// `#[proof_token(proposition = "Y")]` attribute -- see [`proof_token`]'s
+/// own doc comment.
+#[proc_macro_derive(ProofToken, attributes(proof_token))]
+pub fn derive_proof_token(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_proof_token(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate the trivial-token-minting half of `impl Establish<C, V> for Y`
+/// from a `#[establish(credential = .., verifier = .., proposition = ..)]`
+/// attribute on the token struct -- see [`establish`]'s own doc comment
+/// for why this is an attribute macro, not a derive.
+#[proc_macro_attribute]
+pub fn establish(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(attr as EstablishArgs);
+    let input = parse_macro_input!(item as ItemStruct);
+
+    match expand_establish(&args, &input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

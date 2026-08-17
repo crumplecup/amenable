@@ -20,6 +20,7 @@ mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
 mod iter_materialization;
 mod ledger_account_id_comparison;
+mod ledger_commit_contract_timeout;
 mod replace_recommendations;
 mod slice_escape_ascii;
 mod slice_split_position;

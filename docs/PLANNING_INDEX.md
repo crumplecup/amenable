@@ -1042,7 +1042,17 @@ fixed by giving `AccountId` a `Uuid` identity (`PartialEq` compares
 `id` only, never the human-readable `name`), not by weakening the
 postcondition. A second real bug (an under-specified helper contract,
 exposed only once the timeout stopped masking it) was also found and
-fixed. Steps 2 onward not started.
+fixed. Step 2's `Validated -> Committed` edge (`BalancedEntries`) is
+also done (`0 of 297 failed`), with its own, unrelated CBMC timeout
+(symbolic `i64::MIN` negation overflow) root-caused and fixed via a
+genuine `#[kani::requires]` precondition. Two new derive macros,
+`#[derive(ProofToken)]` and `#[amenable_derive::establish(..)]`, were
+built and retrofitted onto every hand-written `ProofToken`/`Establish`
+impl in both `stoplight.rs` and `ledger.rs` — closing a real gap where
+this dogfooding lineage had never actually derived those two trivial-
+but-universal shapes. `reject()`/`rollback()` to `Rejected` not
+started (has a known, undecided `#[amenable_derive::exchange]`
+same-evidence collision). Steps 3 onward not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

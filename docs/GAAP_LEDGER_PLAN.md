@@ -2,13 +2,17 @@
 
 ## Status
 
-🔲 Planning — Steps 0 and 1 done. Crate hierarchy, scope, and initial
-state shape are decided; the type-level skeleton compiles and is
-tested; the first real Kani edge (`Pending -> Validated`, gated on
-`AmountPositive`/`SufficientFunds`/`AccountsDistinct`) is proven via
-genuine `#[kani::ensures]` DFCC contract-checking — `0 of 492 failed`,
-the real, non-trivial biconditional postcondition intact, not weakened
-or dropped. Steps 2 onward not started.
+🔲 Planning — Steps 0 and 1 done. Step 2's `Validated -> Committed`
+edge (`BalancedEntries`) is proven — `0 of 297 failed`, 122.7s; its own
+real CBMC timeout (unrelated to Step 1's) is root-caused and fixed. The
+`reject()`/`rollback()` branches to `Rejected` are not started yet, and
+have a known, undecided structural wrinkle (see Step 2 below). Along
+the way, two new derive macros — `#[derive(ProofToken)]` and
+`#[amenable_derive::establish(..)]` — were built and retrofitted onto
+every hand-written `ProofToken`/`Establish` impl in both `stoplight.rs`
+and `ledger.rs`, closing a real gap: this whole worked-example lineage
+exists to dogfood `amenable`'s own derives, and these two trivial-but-
+universal shapes had never been derived at all before now.
 
 ## Motivation
 
@@ -321,13 +325,79 @@ functional tests in `tests/ledger_test.rs` and all 6 in `amenable_gaap`'s
 own `ledger_skeleton_test.rs` (including a new one confirming `AccountId`
 equality compares `id`, not `name`) still pass. Step 1 is complete.
 
-### Step 2 — remaining Kani edges — not started
+### Step 2 — remaining Kani edges — `Validated -> Committed` done, `reject()`/`rollback()` not started
 
-Extend to `Validated -> Committed` (carrying `BalancedEntries`) and
-the `reject()`/`rollback()` branches to `Rejected`. Decide then
-whether `AccountingEquationHolds` belongs on `Committed` itself or as
-a separate period-close edge — deferred until the smaller edges are
-real and proven, not decided speculatively now.
+**`Validated -> Committed` (`BalancedEntries`) — done.** Infallible,
+like every `Stoplight` edge: a transfer that already passed `validate`'s
+checks has nothing left to reject at commit time (this worked example
+doesn't model concurrent modification between validation and commit).
+`BalancedEntries`'s real claim (`debit + credit == 0`) is honestly
+tautological by construction here (`debit` is literally `-payload.
+amount().value()`) — the same kind of triviality `Stoplight`'s own
+zero-field edges document rather than hide; a future refinement
+building separate debit/credit `JournalEntry` postings from `commit`'s
+own body would make it non-tautological, deliberately deferred.
+
+**A second real CBMC timeout, unrelated to Step 1's, fully root-caused
+via a three-experiment gallery investigation**
+(`amenable_kani::gallery::ledger_commit_contract_timeout`): negating a
+fully unconstrained symbolic `i64` (`-payload.amount().value()`)
+overflows at `i64::MIN`, and Kani's default overflow-checking reasoning
+over the full symbolic range is expensive enough to time out on its
+own — independent of `AccountId`/`Uuid` comparison (not involved here
+at all) and independent of the real `Sidecar`/`Establish`/`Transfer::
+new` construction chain in the harness's own setup code (real, but not
+the bottleneck: a fully-concrete-values control case with that same
+chain passed in 143s). Fixed with a genuine `#[kani::requires(input.
+primary().amount().value() > 0)]` precondition on `commit` itself — the
+real, true precondition (`commit` is only ever meant to be called on an
+already-`validate`d transfer, which already established
+`AmountPositive`), not an artifact of what a harness happens to assume.
+
+**Verified for real**: `just verify-kani-contract
+ledger::verify_commit_always_balances` reports `VERIFICATION:-
+SUCCESSFUL`, `0 of 297 failed`, 122.7s.
+
+**Two new derive macros, built to close a real gap the user flagged
+directly**: every `ProofToken`/`Establish` impl in this worked example
+(and in `stoplight.rs`) was hand-written, despite this whole lineage
+existing specifically to dogfood `amenable`'s own derives (`Standard`/
+`Witness`/`Exchange` all get real exercise; `ProofToken`/`Establish`
+never had a derive to exercise at all). `#[derive(ProofToken)]`
+(`amenable_derive::proof_token`) generates `impl ProofToken for X {
+type Proposition = Y; }` from `#[proof_token(proposition = "Y")]` —
+an ordinary derive, since the impl targets `Self`, matching
+`#[derive(Standard)]`'s own precedent. `#[amenable_derive::establish(
+credential = .., verifier = .., proposition = ..)]` generates the
+trivial-token-minting half of `impl Establish<C, V> for Y` — an
+*attribute* macro, not a derive, because the generated impl targets
+the *proposition* (a different type, usually defined in a different,
+upstream crate) rather than `Self`, matching `#[amenable_derive::
+exchange]`'s own precedent of an attribute wherever the generated impl
+targets something other than the annotated type. Both retrofitted onto
+every existing hand-written impl in `stoplight.rs` and `ledger.rs`; all
+seven affected Kani harnesses (`verify_green_transitions_only_to_yellow`,
+`verify_yellow_transitions_only_to_red`,
+`verify_red_transitions_only_to_green`, `verify_full_cycle_composes`,
+`verify_validate_accepts_a_lawful_transfer`,
+`verify_validate_rejects_the_same_account`,
+`verify_commit_always_balances`) re-verified successful after the
+retrofit, confirming the derive-generated impls are behaviorally
+identical to what they replaced.
+
+**Not started**: the `reject()`/`rollback()` branches to `Rejected`.
+Both edges target the *same* evidence type (`Rejected`), which collides
+with `#[amenable_derive::exchange]`'s current one-invocation-per-
+evidence assumption (it unconditionally generates `impl Witness<
+KaniVerifier> for #evidence`, so a second invocation for the same
+`evidence` would be a duplicate-impl compile error). Needs either a
+macro extension (an opt-out for re-emitting an already-existing
+`Witness` impl) or a different design — not yet decided, not yet
+discussed with the user.
+
+Decide then whether `AccountingEquationHolds` belongs on `Committed`
+itself or as a separate period-close edge — deferred until the smaller
+edges are real and proven, not decided speculatively now.
 
 ### Step 3 — Creusot — not started
 
@@ -369,6 +439,6 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 2: the remaining Kani edges (`Validated -> Committed`, carrying
-`BalancedEntries`, and the `reject()`/`rollback()` branches to
-`Rejected`). Not started.
+Step 2's remaining piece: design and build the `reject()`/`rollback()`
+branches to `Rejected`, including resolving the `#[amenable_derive::
+exchange]` same-evidence collision noted above.

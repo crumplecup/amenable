@@ -61,7 +61,7 @@
 //! See [`Ledger::check_amount_positive`]'s own doc comment.
 
 use amenable_core::{Establish, Evidence, ProofToken, Sidecar, Witness};
-use amenable_gaap::{Pending, TransferPayload, Validated};
+use amenable_gaap::{Committed, Pending, TransferPayload, Validated};
 
 use crate::rust_std::macros::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
@@ -128,18 +128,16 @@ where
 /// Lawful token asserting a transfer is `Pending` — the entry state,
 /// minted without going through `Establish::establish()` the same way
 /// `stoplight::GreenToken::new` doesn't: there is no prior state to
-/// present a credential from.
-#[derive(Debug, Clone)]
+/// present a credential from. No `#[establish(..)]` for the same reason
+/// — a root has no credential type to name.
+#[derive(Debug, Clone, amenable_derive::ProofToken)]
+#[proof_token(proposition = "Pending")]
 pub struct PendingToken(());
 
 impl PendingToken {
     fn new(_state: Pending) -> Self {
         Self(())
     }
-}
-
-impl ProofToken for PendingToken {
-    type Proposition = Pending;
 }
 
 /// `Pending`'s own trivial witness. Unlike `stoplight::Green`, which
@@ -169,18 +167,30 @@ impl Transfer<Pending, PendingToken> {
 
 /// Lawful token minted once `Validated` is established from a proven
 /// `Pending`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, amenable_derive::ProofToken)]
+#[proof_token(proposition = "Validated")]
+#[amenable_derive::establish(
+    credential = PendingToken,
+    verifier = KaniVerifier,
+    proposition = Validated,
+)]
 pub struct ValidatedToken(());
 
-impl ProofToken for ValidatedToken {
-    type Proposition = Validated;
-}
-
-impl Establish<PendingToken, KaniVerifier> for Validated {
-    type Token = ValidatedToken;
-
-    fn establish(_credential: PendingToken) -> Self::Token {
-        ValidatedToken(())
+impl ValidatedToken {
+    // `pub(crate)`, diagnostic only -- see `gallery::
+    // ledger_commit_contract_timeout`'s own doc comment: constructing a
+    // `Transfer<Validated, ValidatedToken>` in a `#[kani::proof_for_
+    // contract]` harness's own setup code via the *lawful* `Sidecar::
+    // sidecar`/`Establish::establish` chain is real, structural CBMC
+    // cost (~143s even with fully concrete values), independent of
+    // `commit`'s own contract content. This bypasses that chain for
+    // harness setup only -- the CONTRACT being checked is `commit`'s
+    // own, unaffected by how the harness's *input* was assembled, the
+    // same reason `Transfer::new`/`Ledger::validate`/`Ledger::commit`
+    // already carry this same `pub(crate)` diagnostic relaxation.
+    #[cfg(kani)]
+    pub(crate) fn diagnostic_only() -> Self {
+        Self(())
     }
 }
 
@@ -415,6 +425,119 @@ amenable_derive::harness! {
             );
             let input = Transfer::pending(payload);
             let _ = ledger.validate(input);
+        }
+    }
+}
+
+/// Lawful token minted once `Committed` is established from a proven
+/// `Validated`.
+#[derive(Debug, Clone, amenable_derive::ProofToken)]
+#[proof_token(proposition = "Committed")]
+#[amenable_derive::establish(
+    credential = ValidatedToken,
+    verifier = KaniVerifier,
+    proposition = Committed,
+)]
+pub struct CommittedToken(());
+
+// `Validated -> Committed`, `GAAP_LEDGER_PLAN.md`'s Step 2: infallible,
+// like every `Stoplight` edge -- a transfer that already passed
+// `validate`'s own checks has nothing left to reject at commit time
+// (this worked example doesn't model concurrent modification between
+// validation and commit, unlike `elicit_server::ledger`'s own "Phase 6"
+// concurrency tests). `TransferError` is reused as the `Error` type
+// rather than minting a new one-variant type (`Stoplight`'s own
+// `StoplightError::NotUsed` pattern) -- no edge here ever constructs
+// it, matching `StoplightError`'s own rationale for why an *inhabited*
+// but never-constructed `Error` is required (`#[kani::stub_verified]`
+// composition needs `E: kani::Arbitrary`, which needs at least one real
+// variant to construct).
+//
+// `BalancedEntries`'s real claim -- `debit + credit == 0` -- is honestly
+// trivial by construction here (`debit` is literally `-credit`), the
+// same kind of triviality `Stoplight`'s own edges document rather than
+// hide (zero-field states, no branching that could fail): naming and
+// checking the claim is still real value (a future refinement building
+// separate debit/credit `JournalEntry` postings from `commit`'s own
+// body, matching `elicit_server::ledger`'s two-DB-row design, would
+// make it non-tautological -- deliberately out of scope for this step,
+// per `GAAP_LEDGER_PLAN.md`'s own "one real example by hand first"
+// discipline).
+//
+// A real, second CBMC finding surfaced building this: negating a fully
+// unconstrained symbolic `i64` (`-payload.amount().value()`) overflows
+// at `i64::MIN`, which real Kani overflow-checking then has to reason
+// about across the whole symbolic range -- expensive enough to time out
+// on its own, independent of everything Step 1 already characterized.
+// `#[kani::requires]` below states the real, true precondition instead
+// of leaving it an artifact of what a harness happens to assume: `commit`
+// is only ever meant to be called on an already-`validate`d transfer,
+// which already established `AmountPositive`.
+kani_ensures!(
+    Committed,
+    "amenable_kani::ledger::Committed::commit_ensures",
+    Result<Transfer<Committed, CommittedToken>, TransferError>,
+    |result| match result {
+        Ok(committed) => {
+            let payload = committed.primary();
+            let debit = -payload.amount().value();
+            let credit = payload.amount().value();
+            debit + credit == 0
+        }
+        Err(_) => false,
+    }
+);
+
+#[amenable_derive::exchange(
+    cfg = kani,
+    verifier = KaniVerifier,
+    evidence = Committed,
+    proof_artifact = CalculationProof,
+    harness_fn = verify_commit_always_balances,
+    harness_const = VERIFY_COMMIT_ALWAYS_BALANCES_SRC,
+)]
+impl Ledger {
+    // `pub(crate)`, matching `validate`'s own precedent: lets
+    // `gallery::ledger_commit_contract_timeout` call this directly for
+    // real diagnostic harnesses. Still invisible outside this crate.
+    //
+    // `#[kani::requires]`: the real precondition, not an artifact of
+    // what a harness happens to assume -- see the `BalancedEntries`
+    // doc comment above (`kani_ensures!`, right above this impl block)
+    // for the real overflow finding this fixes. `#[amenable_derive::
+    // exchange]` only ever generates/appends the `#[kani::ensures]`
+    // attribute; it clones this method's own attributes as written, so
+    // a hand-written `requires` here coexists with the generated
+    // `ensures` cleanly.
+    #[cfg_attr(kani, kani::requires(input.primary().amount().value() > 0))]
+    pub(crate) fn commit(
+        &self,
+        input: Transfer<Validated, ValidatedToken>,
+    ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
+        let payload = input.primary().clone();
+        let token = Committed::establish(input.sidecar());
+        Ok(Transfer::new(payload, token))
+    }
+}
+
+amenable_derive::harness! {
+    kani, VERIFY_COMMIT_ALWAYS_BALANCES_SRC, {
+        #[kani::proof_for_contract(Ledger::commit)]
+        fn verify_commit_always_balances() {
+            let amount: i64 = kani::any();
+            kani::assume(amount > 0);
+            let balance: i64 = kani::any();
+            let ledger = Ledger::new(balance);
+            let payload = TransferPayload::new(
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Amount::new(amount),
+            );
+            let pending = Transfer::pending(payload.clone());
+            let credential = amenable_core::Sidecar::sidecar(&pending);
+            let validated_token = Validated::establish(credential);
+            let validated: Transfer<Validated, ValidatedToken> = Transfer::new(payload, validated_token);
+            let _ = ledger.commit(validated);
         }
     }
 }
