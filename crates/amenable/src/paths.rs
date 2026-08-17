@@ -26,12 +26,12 @@ pub fn creusot_generated_directory() -> PathBuf {
 }
 
 /// The `amenable_verus` gallery's generated Exchange-edge companion
-/// directory, matching the `include!("generated/stoplight_exchange/
-/// {name}.rs")` paths already written into `amenable_verus::gallery::
-/// stoplight_exchange` (relative to that file's own directory, `amenable_
-/// verus/src/gallery/`).
+/// directory -- the parent under which `write_verus_exchange_companions`
+/// writes one subdirectory per `self_ty` group (`stoplight_exchange/`,
+/// `ledger_exchange/`, ...), matching the `include!("generated/
+/// {group}/{name}.rs")` paths already written into each gallery module
+/// (relative to `amenable_verus/src/gallery/`).
 #[must_use]
 pub fn verus_exchange_generated_directory() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../amenable_verus/src/gallery/generated/stoplight_exchange")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src/gallery/generated")
 }

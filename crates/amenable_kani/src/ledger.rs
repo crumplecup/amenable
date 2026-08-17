@@ -286,6 +286,35 @@ impl Ledger {
             Ok(())
         }
     }
+
+    /// A real function, not the bare `TransferError::NegativeAmount`
+    /// tuple-variant constructor -- `validate`'s own `.map_err(..)` call
+    /// below is captured verbatim into a real Verus companion (`gallery::
+    /// ledger_exchange`), and Verus's own translator does not (yet)
+    /// support "using a datatype constructor as a function value"
+    /// (confirmed against the real toolchain, not assumed), even though
+    /// ordinary `rustc`/Kani/Creusot all accept it. A closure (`|bad|
+    /// TransferError::NegativeAmount(bad)`) would dodge that error too,
+    /// but trades it for a real `clippy::redundant_closure` failure this
+    /// project cannot `#[allow]` away -- this wrapper is the one form
+    /// both toolchains accept.
+    fn negative_amount(bad: i64) -> TransferError {
+        TransferError::NegativeAmount(bad)
+    }
+
+    /// Same real reason as [`Ledger::negative_amount`] -- a real function,
+    /// not a destructuring closure (`|(balance, required)| ..`): Verus's
+    /// translator separately does not (yet) support "only variables ..
+    /// not general patterns" in a closure parameter position either
+    /// (confirmed against the real toolchain), so `bad` stays a plain
+    /// tuple parameter, indexed rather than destructured in the
+    /// signature itself.
+    fn insufficient_funds(bad: (i64, i64)) -> TransferError {
+        TransferError::InsufficientFunds {
+            balance: bad.0,
+            required: bad.1,
+        }
+    }
 }
 
 amenable_derive::harness! {
@@ -374,12 +403,9 @@ impl Ledger {
         let payload = input.primary().clone();
         let amount = payload.amount().value();
 
-        Self::check_amount_positive(amount).map_err(TransferError::NegativeAmount)?;
+        Self::check_amount_positive(amount).map_err(Self::negative_amount)?;
         self.check_sufficient_funds(amount)
-            .map_err(|(balance, required)| TransferError::InsufficientFunds {
-                balance,
-                required,
-            })?;
+            .map_err(Self::insufficient_funds)?;
         if payload.from() == payload.to() {
             return Err(TransferError::SameAccount);
         }

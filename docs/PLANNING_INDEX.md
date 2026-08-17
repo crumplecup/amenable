@@ -1095,11 +1095,34 @@ optional edge to `amenable_creusot` flipped for real, and `Stoplight`'s
 own `Green`/`Yellow`/`Red` moved from `amenable_kani` to `amenable_core`
 after a real, caught-and-reverted attempt to depend `amenable_creusot`
 directly on `amenable_kani`. `Ledger::validate`/`::commit` themselves
-aren't connected to those four predicates yet, and a direct
+aren't connected to those four Creusot predicates yet, and a direct
 `amenable_creusot -> amenable_kani` dependency is now a settled no
 (same architectural rule, not an open question) rather than the open
-question this status paragraph used to describe. Steps 4 onward not
-started.
+question this status paragraph used to describe. Step 4 (Verus) is
+done, redirected mid-flight by explicit correction ("by hand is the
+wrong approach, use the derives") before any hand-written proof content
+existed: `amenable_verus::gallery::ledger_exchange` proves the same
+`Validated`/`Committed` biconditionals a third way, with `Ledger::
+validate`'s/`::commit`'s real bodies captured verbatim by the same
+codegen mechanism Creusot's own `Stoplight` companions use, generalized
+to a second `self_ty` group for the first time (`amenable::
+verus_exchange_export` now routes by an explicit `(self_ty,
+method_name)` table, not a single hardcoded directory). Surfaced four
+real, novel findings no `Stoplight` edge ever exercised: a `self`
+mixed-site macro-hygiene gap in `verus_exchange!` (fixed the same way
+`$input_param` was); two real Verus-translator gaps in the captured
+body itself (a bare tuple-variant constructor used as a function value,
+and a destructuring closure parameter) fixed at the source in
+`amenable_kani::ledger` with two small real helper methods, re-verified
+clean against real `cargo kani` afterward; `Result::map_err`'s own
+`vstd` spec requiring every chained accessor/constructor to carry its
+own real `ensures` before anything downstream could be proven; and
+`Committed`'s claim needing `i128` widening (not `int`, not `wrapping_
+*`) to avoid a real overflow obligation with no precondition at all.
+Verified for real: `verus --crate-type=lib` -- `458 verified, 0
+errors`, plus a real injected-bug regression check. `reject`/`rollback`
+deliberately still not connected on either backend (legitimately
+trivial, no new proof content). Steps 5+ not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

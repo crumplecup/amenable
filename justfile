@@ -127,7 +127,7 @@ emit-verus-witnesses:
 # runs directly on the generated files, matching `generate-creusot`.
 generate-verus-exchange:
     cargo run -p amenable --features verus -- emit-verus-exchange-companions
-    rustfmt crates/amenable_verus/src/gallery/generated/stoplight_exchange/*.rs
+    rustfmt crates/amenable_verus/src/gallery/generated/*/*.rs
 
 check-verus:
     just emit-verus-witnesses

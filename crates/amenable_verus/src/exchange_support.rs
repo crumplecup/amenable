@@ -121,7 +121,7 @@ pub(crate) use verus_ensures;
 /// output can't itself contain `spec`/`open`/`ensures` syntax the way a
 /// directly-authored `verus! {}` body can.
 macro_rules! verus_exchange {
-    ($self_ty:ty, $input_param:ident: $input_ty:ty, $output_ty:ty, $error_ty:ty, $evidence:ty, $verifier:ty, $body:block) => {
+    ($self_ty:ty, $self_param:ident, $input_param:ident: $input_ty:ty, $output_ty:ty, $error_ty:ty, $evidence:ty, $verifier:ty, $body:block) => {
         verus_builtin_macros::verus! {
             impl crate::Witness<$verifier> for $evidence {
                 type SupportingEvidence = Self;
@@ -133,7 +133,7 @@ macro_rules! verus_exchange {
             impl crate::Exchange<$input_ty, $output_ty, $verifier> for $self_ty {
                 type Error = $error_ty;
 
-                fn exchange(&self, $input_param: $input_ty) -> (result: ::std::result::Result<$output_ty, $error_ty>)
+                fn exchange(&$self_param, $input_param: $input_ty) -> (result: ::std::result::Result<$output_ty, $error_ty>)
                     ensures
                         <$evidence as crate::Ensures<$verifier>>::ensures(result),
                 $body
