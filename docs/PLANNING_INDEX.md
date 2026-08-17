@@ -1056,7 +1056,16 @@ generic over the state it was rejected from (`Rejected<Pending>`/
 `Rejected<Validated>`, resolving the same-evidence `#[amenable_derive::
 exchange]` collision by making the two edges target genuinely distinct
 concrete types, a deliberate divergence from elicitation's flat
-`Rejected` + runtime-reason design). Steps 3 onward not started.
+`Rejected` + runtime-reason design). Step 3 (Creusot) has all four
+contracts (`AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
+`BalancedEntries`) proven as real, non-trivial Pearlite predicates
+(`Proved (118 files) ✔`) directly on the real `Validated`/`Committed`
+types — a real correction to this plan's original design: `amenable_
+creusot` can take an ordinary Cargo dependency on `amenable_gaap`
+(confirmed empirically, no ICE), so no accommodation-model mirror was
+needed at all, unlike `Stoplight`'s own shape. `Ledger::validate`/
+`::commit` themselves aren't connected to those predicates yet. Steps 4
+onward not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

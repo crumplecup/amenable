@@ -2,21 +2,22 @@
 
 ## Status
 
-🔲 Planning — Steps 0 and 1 done. Step 2 is now fully done: all four
-edges (`validate`, `commit`, `reject`, `rollback`) are proven against
-the real toolchain. `reject()`/`rollback()`'s structural wrinkle
-(both targeting one flat `Rejected` would collide with `#[amenable_
-derive::exchange]`'s one-`Witness`-impl-per-evidence assumption) is
-resolved by making `Rejected<T>` generic over the state it was
-rejected from — `Rejected<Pending>`/`Rejected<Validated>` are genuinely
-distinct evidence types, so each edge earns its own honest `Witness`
-proof. Along the way, two new derive macros — `#[derive(ProofToken)]`
-and `#[amenable_derive::establish(..)]` — were built and retrofitted
-onto every hand-written `ProofToken`/`Establish` impl in both
-`stoplight.rs` and `ledger.rs`, closing a real gap: this whole
-worked-example lineage exists to dogfood `amenable`'s own derives, and
-these two trivial-but-universal shapes had never been derived at all
-before now.
+🔲 Planning — Steps 0, 1, and 2 done. Step 3 (Creusot) has real,
+non-trivial predicates proven for all four contracts (`AmountPositive`/
+`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`, `Proved (118
+files) ✔`), implemented directly on the real `Validated`/`Committed`
+types — no accommodation-model mirror, a real correction to this plan's
+own original design (see Step 3 below). `Ledger::validate`/`::commit`
+themselves aren't connected to those predicates yet. Along the way,
+two new derive macros — `#[derive(ProofToken)]` and `#[amenable_
+derive::establish(..)]` — were built and retrofitted onto every
+hand-written `ProofToken`/`Establish` impl in both `stoplight.rs` and
+`ledger.rs`, closing a real gap: this whole worked-example lineage
+exists to dogfood `amenable`'s own derives. `reject()`/`rollback()`'s
+structural wrinkle (both targeting one flat `Rejected` would collide
+with `#[amenable_derive::exchange]`'s one-`Witness`-impl-per-evidence
+assumption) is resolved by making `Rejected<T>` generic over the state
+it was rejected from.
 
 ## Motivation
 
@@ -480,12 +481,105 @@ Decide then whether `AccountingEquationHolds` belongs on `Committed`
 itself or as a separate period-close edge — deferred until Step 3/4
 give a reason to revisit, not decided speculatively now.
 
-### Step 3 — Creusot — not started
+### Step 3 — Creusot — `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/`BalancedEntries` done, `Ledger::validate`/`::commit` themselves not yet connected
 
-Mirror Steps 1/2 inside `amenable_gaap` itself under its `creusot`
-feature, following `amenable_creusot::stoplight`'s own established
-shape (concrete local mirror types, `harness!`-captured Pearlite
-bodies).
+**A real architectural correction, not the design this plan originally
+sketched.** The plan as first drafted (and this section's own original
+text) assumed GAAP's Creusot content would mirror `Stoplight`'s own
+shape: hand-written accommodation-model types living *inside*
+`amenable_gaap` under a `creusot` feature, with the real `#[requires]`/
+`#[ensures]` Pearlite content generated later, once the by-hand shape
+was proven (`GAAP_LEDGER_PLAN.md`'s own "Non-goals": "hand-build the
+first real edge for Kani, then Creusot, then Verus, then generalize...
+not before"). Building that revealed the real, better answer instead:
+`Stoplight`'s evidence types live in `amenable_kani`, a crate
+`amenable_creusot` can never depend on (would close a real cycle) — but
+`amenable_gaap`'s evidence types have no dependency back on
+`amenable_creusot` at all, so `amenable_creusot` can take a real,
+ordinary Cargo dependency on `amenable_gaap` and implement `Witness<
+CreusotVerifier>` **directly on the real `Validated`/`Committed` types**
+— no accommodation-model mirror needed, ever, for this pair. Confirmed
+empirically before committing to it, not assumed: `cargo creusot -- -p
+amenable_creusot` and `cargo creusot prove -- -p amenable_creusot` both
+succeed with `amenable_gaap` as a real dependency; the earlier
+assumption that *any* dependency beyond `amenable_core` risked the same
+translator ICE a *local* item can hit (per `amenable_std::creusot_
+witness`'s own doc comment) turned out not to generalize to an ordinary
+dependency crate's own items — only to items local to whatever crate
+`cargo creusot` is actually translating.
+
+**A real, load-bearing counter-example found along the way.** The
+`Witness<CreusotVerifier>` impls themselves still have to stay
+`#[cfg(creusot)]`-gated (matching `stoplight.rs`'s own precedent), and
+a first attempt gave them a real, descriptive `ProofArtifact`
+(`Vec<(String, String)>` plus a `Display` impl) left *ungated* so an
+ordinary, non-translated build could also use it — `cargo creusot
+prove` hit a real internal compiler panic (a genuine rustc ICE, not a
+proof failure). `creusot-rustc`'s translator sweeps every *local* item
+regardless of whether `#[cfg(creusot)]`'s own condition is satisfied
+elsewhere in the same crate; the `Vec`/`Display` machinery is exactly
+the kind of ordinary Rust infrastructure the doc comment already warned
+about. Fixed by keeping the `#[cfg(creusot)]`-gated `Witness` impls
+trivial (`ProofArtifact = ()`, matching `Green`/`Yellow`/`Red`'s own
+shape exactly — their only role during actual translation is
+satisfying `Establish`'s `Witness<V>` bound) and moving the real,
+descriptive `CheckedProof` to the `#[cfg(not(creusot))]` side, where
+the `ProofRecord` registration already needed it.
+
+**Four real Pearlite predicates, the first genuinely non-trivial
+Creusot claims anywhere in this workspace** (every `Stoplight` claim is
+`result.is_ok()`) — `amount_positive_holds`, `sufficient_funds_holds`,
+`accounts_distinct_holds`, `balanced_entries_holds`, each backing an
+isolated proof function (`check_amount_positive`, `::check_sufficient_
+funds`, `::check_accounts_distinct`, `::check_commit_balances`),
+mirroring `Ledger::check_amount_positive`/`::check_sufficient_funds`
+being proven separately on the Kani side. The proof functions' own
+signatures are still a sanitized mirror, not a byte-for-byte copy:
+`amount`/`balance` stay plain `i64`; an account identity is mirrored as
+a plain `u64` rather than `AccountId`'s real `Uuid`-backed struct
+(Creusot support for a hand-rolled `Uuid`-backed equality type is
+untested territory, not worth risking for this pass). `check_commit_
+balances` carries the same real `amount@ > 0` precondition Kani's own
+`Ledger::commit` needed (`i64` negation still overflows in the ordinary
+function body even though Pearlite's `@`-lifted `Int` arithmetic in the
+*claim itself* has no such overflow).
+
+**Verified for real, against the actual toolchain, with real
+non-vacuity checks**: `cargo creusot prove -- -p amenable_creusot`
+reports `Proved (118 files) ✔` (up from 110 before this step). Two
+real injected bugs — `check_amount_positive`'s body loosened to
+`amount >= 0`, and `check_commit_balances`'s credit shifted by one —
+each produced a precise, real failure (`vc_check_amount_positive`
+failed, then `vc_check_commit_balances` failed 2/4 goals) before being
+reverted and re-verified clean. `just check-all-creusot` (fmt/clippy/
+test across `amenable_creusot`, `amenable_std`, and `amenable`, each
+with their `creusot` feature) clean; full workspace `cargo check
+--workspace --all-features` clean.
+
+**A real, recurring papercut fixed along the way, not scope creep**:
+`amenable emit-creusot-companions` reads the shared `ExchangeEdgeRecord`
+registry, which `#[amenable_derive::exchange(..)]` populates
+unconditionally — so it was also picking up `amenable_kani::ledger`'s
+own edges (`validate`/`commit`/`reject`/`rollback`) and writing dead,
+uncompilable companion files for them (verbatim-copying the real Kani
+body, which references `Self::check_amount_positive`/`TransferError`/
+etc. that exist in no mirror namespace) every time `just generate-
+creusot` ran. Filtered to `self_ty == "Stoplight"` in `amenable::
+creusot_export`, with a doc comment explaining why — this generator's
+whole model (free function spliced into a matching-named mirror scope,
+hardcoded trivial `#[ensures(true)]`) is specific to `Stoplight`'s own
+shape and doesn't apply to how GAAP's real claims are proven.
+
+**Not yet done**: `Ledger::validate`/`::commit` themselves (the real
+functions, living only in `amenable_kani`) are not yet connected to
+these Creusot predicates — the four checks above are proven in
+isolation, the same way `Ledger::check_amount_positive`/`::check_
+sufficient_funds` were proven in isolation before `validate`'s own
+Kani contract was written. Whether `Ledger`/`Transfer<S, Token>` can
+also become a real Cargo dependency of `amenable_creusot` (now that
+this session confirmed dependencies aren't swept by the translator the
+way local items are) or need a different treatment is an open question
+for whenever that connection is actually built.
 
 ### Step 4 — Verus — not started
 
@@ -520,5 +614,11 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 3: Creusot, mirroring Steps 1/2 inside `amenable_gaap` itself
-under its `creusot` feature.
+Step 3's remaining piece: connect `Ledger::validate`/`::commit`
+themselves (real functions, living only in `amenable_kani`) to the
+four proven Creusot predicates — including deciding whether
+`amenable_creusot` can also take a real Cargo dependency on
+`amenable_kani` (untested; this step confirmed dependencies aren't
+swept by the translator the way local items are, but `amenable_kani`
+has far more surface area than `amenable_gaap` did) or needs a
+different treatment.

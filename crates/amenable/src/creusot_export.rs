@@ -46,10 +46,30 @@ use crate::{AmenableError, AmenableResult};
 /// registered via `amenable_core::ExchangeEdgeRecord`, under `root` (e.g.
 /// `amenable_creusot/src/generated/`). Sorted by method name so
 /// regeneration is deterministic and diffs stay minimal.
+///
+/// Filtered to `self_ty == "Stoplight"`: this generator's whole model
+/// (a free function whose body is `include!`d into a scope that already
+/// has matching-named mirror types, and a hardcoded trivial `#[ensures(
+/// true)]`) is specific to `Stoplight`'s own accommodation-model shape.
+/// `amenable_kani::ledger`'s edges (`validate`/`commit`/`reject`/
+/// `rollback`) also register an `ExchangeEdgeRecord` via the same
+/// `#[amenable_derive::exchange(..)]` macro, but nothing consumes their
+/// companions yet -- `Ledger`/`Transfer<S, Token>` still only exist in
+/// `amenable_kani`, which `amenable_creusot` cannot depend on, and their
+/// real claims are proven directly against `amenable_gaap`'s real
+/// `Validated`/`Committed` types instead (see `amenable_creusot::
+/// ledger`'s own doc comment). Without this filter, `just generate-
+/// creusot` silently wrote four `.rs` files nothing `include!`s and
+/// nothing could compile if it did (the real body references `Self::
+/// check_amount_positive`/`TransferError`/etc., which don't exist in
+/// any mirror namespace) -- confirmed directly, not assumed, before
+/// this filter was added.
 pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<PathBuf>> {
     fs::create_dir_all(root).map_err(|error| AmenableError::io(root, error))?;
 
-    let mut records: Vec<&ExchangeEdgeRecord> = inventory::iter::<ExchangeEdgeRecord>().collect();
+    let mut records: Vec<&ExchangeEdgeRecord> = inventory::iter::<ExchangeEdgeRecord>()
+        .filter(|record| tidy_stringified_type(record.self_ty) == "Stoplight")
+        .collect();
     records.sort_by_key(|record| record.method_name);
 
     let mut written = Vec::with_capacity(records.len());
