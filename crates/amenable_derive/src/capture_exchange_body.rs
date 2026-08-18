@@ -1,4 +1,5 @@
-//! `#[capture_exchange_body(evidence = .., creusot_ensures = ..)]`:
+//! `#[capture_exchange_body(evidence = .., creusot_ensures = ..,
+//! method_generics = .., kani_ensures = .., kani_requires = ..)]`:
 //! registers a real `ExchangeEdgeRecord` for a method that already
 //! carries its own real, backend-specific contract by hand -- unlike
 //! `#[exchange(..)]` (`exchange.rs`), which generates a concrete-
@@ -7,21 +8,46 @@
 //! to a neutral crate (`amenable_gaap`) with a fully generic `Ensures<V>`
 //! bound on each -- there is no single concrete verifier left for that
 //! bundle to name, and each backend now attaches its own proof
-//! separately anyway (Kani: a direct `#[cfg_attr(kani, ..)]` contract,
-//! hand-written on the real method itself; Creusot/Verus: a generated
-//! companion reading this very record, the same as before Step 7).
+//! separately anyway (Kani: a direct `#[cfg_attr(kani, ..)]` contract;
+//! Creusot/Verus: a generated companion reading this very record, the
+//! same as before Step 7).
+//!
+//! **`kani_ensures = "true"` (optional, default `"false"`).**
+//! `GAAP_LEDGER_PLAN.md`'s Step 7's own follow-up ("manual bounds are an
+//! anti-pattern"): once every real edge's own Kani contract was fixed to
+//! call through its target evidence type's registered `Ensures<V>` impl
+//! rather than restating the claim inline, all four (`validate`/
+//! `commit`/`reject`/`rollback`) converged on the *exact* same
+//! mechanical shape -- `|result: &Result<Output, Error>| <Evidence as
+//! Ensures<V>>::ensures(result.clone())` -- differing only in which
+//! `Output`/`Error`/`Evidence` names get substituted, all three of which
+//! this macro already has. So generate it, the same way `#[exchange(..)]`
+//! already mechanically generates its own concrete-verifier contract
+//! (`exchange.rs`'s own doc comment) -- opt-in, not automatic, since a
+//! future caller with a genuinely different Kani contract shape (or none
+//! at all) shouldn't be forced into this one. When set, the real method
+//! must **not** carry its own hand-written `#[cfg_attr(kani, kani::
+//! ensures(..))]` -- this macro injects one onto a clone of the method,
+//! matching `#[exchange(..)]`'s own `contracted_method.attrs.push(..)`
+//! technique.
+//!
+//! **`kani_requires = ".."` (optional, only meaningful alongside
+//! `kani_ensures = "true"`).** A real precondition expression (e.g.
+//! `commit`'s own `input.primary().amount().value() > 0`) isn't
+//! mechanical -- not every edge needs one, and there's no way to derive
+//! *which* condition from the method's own signature -- so this stays a
+//! real, hand-authored string, spliced into `#[cfg_attr(kani, kani::
+//! requires(..))]` verbatim rather than reconstructed.
 //!
 //! Captures the method's own real body verbatim, the identical `Span::
 //! source_text()` technique `#[exchange(..)]` uses (shared via that
 //! module's own `pub(crate)` helpers, not duplicated), and registers the
-//! identical `ExchangeEdgeRecord` shape -- but leaves the method itself
-//! completely untouched (no injected attribute), and generates nothing
-//! else at all.
+//! identical `ExchangeEdgeRecord` shape.
 
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::{
-    Error, FnArg, ImplItem, ItemImpl, LitStr, MetaNameValue, Path, ReturnType, Token,
+    Error, Expr, FnArg, ImplItem, ItemImpl, LitStr, MetaNameValue, Path, ReturnType, Token,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
 };
@@ -29,14 +55,17 @@ use syn::{
 use crate::exchange::{expect_lit_str, expect_path_lit, extract_result_generics, trim_braces};
 
 /// Parsed `#[capture_exchange_body(evidence = "..", creusot_ensures =
+/// "..", method_generics = "..", kani_ensures = "..", kani_requires =
 /// "..")]` arguments -- a narrow subset of `ExchangeArgs`: no `cfg`/
 /// `verifier`/`proof_artifact`/`harness_fn`/`harness_const`/`evidence_id`,
-/// since nothing here generates a contract, a `Witness<V>` impl, or a
-/// `ProofRecord` for any of those to name.
+/// since nothing here generates a `Witness<V>` impl or a `ProofRecord`
+/// for any of those to name.
 pub struct CaptureExchangeBodyArgs {
     evidence: Path,
     creusot_ensures: Option<LitStr>,
     method_generics: Option<LitStr>,
+    kani_ensures: Option<LitStr>,
+    kani_requires: Option<Expr>,
 }
 
 impl Parse for CaptureExchangeBodyArgs {
@@ -44,6 +73,8 @@ impl Parse for CaptureExchangeBodyArgs {
         let mut evidence = None;
         let mut creusot_ensures = None;
         let mut method_generics = None;
+        let mut kani_ensures = None;
+        let mut kani_requires = None;
 
         let pairs = Punctuated::<MetaNameValue, Token![,]>::parse_terminated(input)?;
         for pair in pairs {
@@ -53,6 +84,11 @@ impl Parse for CaptureExchangeBodyArgs {
                 creusot_ensures = Some(expect_lit_str(&pair.value)?);
             } else if pair.path.is_ident("method_generics") {
                 method_generics = Some(expect_lit_str(&pair.value)?);
+            } else if pair.path.is_ident("kani_ensures") {
+                kani_ensures = Some(expect_lit_str(&pair.value)?);
+            } else if pair.path.is_ident("kani_requires") {
+                let lit = expect_lit_str(&pair.value)?;
+                kani_requires = Some(lit.parse()?);
             } else {
                 return Err(Error::new_spanned(
                     &pair.path,
@@ -70,6 +106,8 @@ impl Parse for CaptureExchangeBodyArgs {
             })?,
             creusot_ensures,
             method_generics,
+            kani_ensures,
+            kani_requires,
         })
     }
 }
@@ -133,6 +171,8 @@ pub fn expand_capture_exchange_body(
         evidence,
         creusot_ensures,
         method_generics,
+        kani_ensures,
+        kani_requires,
     } = args;
     let creusot_ensures_lit = creusot_ensures
         .clone()
@@ -140,11 +180,16 @@ pub fn expand_capture_exchange_body(
     let method_generics_lit = method_generics
         .clone()
         .unwrap_or_else(|| LitStr::new("", proc_macro2::Span::call_site()));
+    let generate_kani_ensures = kani_ensures
+        .as_ref()
+        .is_some_and(|flag| flag.value() == "true");
 
     // Verbatim source of the method's own body -- identical technique to
     // `#[exchange(..)]`'s own capture (`exchange.rs`'s own doc comment),
     // shared via `trim_braces`/`extract_result_generics` rather than
-    // duplicated.
+    // duplicated. Captured *before* any attribute injection below --
+    // `Span::source_text()` reads the real file, unaffected by tokens
+    // this macro adds to a cloned copy afterward.
     let body_source = method
         .block
         .brace_token
@@ -154,8 +199,50 @@ pub fn expand_capture_exchange_body(
         .map(|text| trim_braces(&text).to_owned())
         .unwrap_or_else(|| method.block.to_token_stream().to_string());
 
+    // Inject the mechanical Kani contract onto a clone of the method,
+    // the identical `contracted_method.attrs.push(..)` technique
+    // `#[exchange(..)]`'s own `expand_exchange` uses -- see this
+    // module's own doc comment for why this specific shape (delegate to
+    // the target evidence type's own `Ensures<V>` impl) is safe to
+    // generate mechanically now, and why `kani_requires` stays a real,
+    // hand-authored string instead. `#[cfg_attr(kani, kani::requires(
+    // ..))]` is pushed before `#[cfg_attr(kani, kani::ensures(..))]` to
+    // match every hand-written call site's own existing convention
+    // (`Ledger::commit`'s real precedent). The bare identifier `V`
+    // (below) is a real, unchecked assumption -- this macro doesn't
+    // read the method's own generic parameter list, it just names the
+    // one every real caller so far already uses, matching `method_
+    // generics = "V"`'s own identical hardcoded convention; a caller
+    // whose sole generic parameter is spelled differently should write
+    // the contract by hand instead of setting `kani_ensures = "true"`.
+    let contracted_impl = if generate_kani_ensures {
+        let mut contracted_impl = item_impl.clone();
+        let ImplItem::Fn(contracted_method) = &mut contracted_impl.items[0] else {
+            unreachable!("validated above: exactly one ImplItem::Fn in item_impl.items");
+        };
+        if let Some(requires_expr) = kani_requires {
+            contracted_method.attrs.push(syn::parse_quote! {
+                #[cfg_attr(kani, kani::requires(#requires_expr))]
+            });
+        }
+        contracted_method.attrs.push(syn::parse_quote! {
+            #[cfg_attr(
+                kani,
+                kani::ensures(
+                    |result: &::std::result::Result<#output_ty, #error_ty>|
+                        <#evidence as ::amenable_core::Ensures<V>>::ensures(
+                            ::std::clone::Clone::clone(result)
+                        )
+                )
+            )]
+        });
+        contracted_impl
+    } else {
+        item_impl.clone()
+    };
+
     Ok(quote! {
-        #item_impl
+        #contracted_impl
 
         // Always registered, regardless of any `#[cfg]` -- this crate
         // (`amenable_gaap`) is ordinary Cargo-built and never translated

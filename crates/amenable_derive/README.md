@@ -215,35 +215,52 @@ walks the same macros in the order you'd actually reach for them.
   ```
 
 - **`#[amenable_derive::capture_exchange_body(evidence = "..",
-  creusot_ensures = "..", method_generics = "..")]`** — a narrower
-  sibling of `#[exchange(..)]` for a method that's **generic over
-  `V`** and already carries its own real, backend-specific contract by
-  hand (so there's no single concrete verifier for `#[exchange(..)]`'s
-  own bundle to name). Captures the method's body verbatim into an
-  `ExchangeEdgeRecord`, the identical way `#[exchange(..)]` does, but
-  generates *nothing else* — no injected contract, no `Witness<V>`
-  impl, no `Exchange` impl; the method itself is re-emitted completely
-  untouched. `method_generics` (optional, default `""`) names extra
+  creusot_ensures = "..", method_generics = "..", kani_ensures = "..",
+  kani_requires = "..")]`** — a narrower sibling of `#[exchange(..)]`
+  for a method that's **generic over `V`** and has no single concrete
+  verifier for `#[exchange(..)]`'s own bundle to name. Captures the
+  method's body verbatim into an `ExchangeEdgeRecord`, the identical way
+  `#[exchange(..)]` does — no `Witness<V>` impl, no `Exchange` impl,
+  either way. `method_generics` (optional, default `""`) names extra
   generic parameters the real method declares beyond `Self`'s own (e.g.
   `"V"`) as a bare comma-separated list — needed only when the captured
   body itself calls another generic method with an explicit turbofish
   (`Self::helper::<V>(..)`), so a generated companion has something
   named `V` to resolve against.
 
+  `kani_ensures = "true"` (optional, default `"false"`) generates the
+  method's own Kani contract too: `|result: &Result<Output, Error>|
+  <Evidence as Ensures<V>>::ensures(result.clone())` — real once every
+  edge delegates to its target evidence type's own registered claim
+  instead of restating it (see the decision table below), since that
+  collapses every edge onto the identical mechanical shape, differing
+  only in which `Output`/`Error`/`Evidence` names get substituted, all
+  three of which this macro already has. Opt-in, not automatic: a
+  future caller with a genuinely different Kani contract shape (or
+  none) shouldn't be forced into this one. `kani_requires = ".."`
+  (optional) splices a real, hand-authored precondition expression into
+  `#[cfg_attr(kani, kani::requires(..))]` alongside it — not
+  mechanical, since not every edge needs one and there's no way to
+  derive *which* condition from the signature. When `kani_ensures =
+  "true"`, the real method must **not** carry its own hand-written
+  `#[cfg_attr(kani, kani::ensures(..))]` — the macro injects one.
+
   ```rust
   #[amenable_derive::capture_exchange_body(
       evidence = "Committed",
-      creusot_ensures = "match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, }"
+      creusot_ensures = "match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, }",
+      kani_ensures = "true",
+      kani_requires = "input.primary().amount().value() > 0"
   )]
   impl Ledger {
-      #[cfg_attr(kani, kani::requires(input.primary().amount().value() > 0))]
-      #[cfg_attr(kani, kani::ensures(|result| /* .. */))]
       pub fn commit<V: amenable_core::Verifier>(
           &self,
           input: Transfer<Validated, ValidatedToken>,
       ) -> Result<Transfer<Committed, CommittedToken>, TransferError>
       where
-          Committed: amenable_core::Evidence + amenable_core::Witness<V>,
+          Committed: amenable_core::Evidence
+              + amenable_core::Witness<V>
+              + amenable_core::Ensures<V, Input = Result<Transfer<Committed, CommittedToken>, TransferError>, Bound = bool>,
           /* .. */
       {
           let payload = input.primary().clone();
@@ -356,7 +373,8 @@ A few of the macros above look interchangeable at a glance. They aren't:
 | Your carrier/token/edge lives in a **per-backend** crate and names one concrete verifier | the concrete form: `establish`/`Sidecar`'s `verifier = ".."`, `#[exchange(..)]` |
 | Your carrier/token/edge lives in a **neutral** crate (e.g. `amenable_gaap`) usable by every backend | the verifier-less form: `establish`/`Sidecar` with `verifier` omitted, `#[capture_exchange_body(..)]` instead of `#[exchange(..)]` |
 | The method is non-generic and you want the *whole* bundle generated (contract + `Witness<V>` + `Exchange` impl) | `#[exchange(..)]` |
-| The method is generic over `V` and already carries its own hand-written, per-backend contract | `#[capture_exchange_body(..)]` (registers the body only) |
+| The method is generic over `V`, and its contract calls through its target evidence type's own `Ensures<V>` impl | `#[capture_exchange_body(evidence = "..", kani_ensures = "true")]` — generates the Kani contract too |
+| The method is generic over `V` and needs a genuinely different Kani contract shape (or none) | `#[capture_exchange_body(..)]` with `kani_ensures` omitted — registers the body only, contract stays hand-written |
 
 ## Onboarding: building a new worked example
 
@@ -391,17 +409,21 @@ a new evidence chain from scratch, this is the template:
    capture_exchange_body(evidence = "...")]` on a single-method `impl`
    block wrapping each one, so every backend's own codegen can read the
    body verbatim later.
-5. **Per backend**, attach the real contract directly to the method
-   (`#[cfg_attr(kani, kani::ensures(..))]` for Kani — see
-   `amenable_gaap::ledger`'s own methods) or build the accommodation-
-   model mirror + generated companion a whole-crate translator needs
-   (Creusot/Verus — see `amenable_creusot::ledger`/`amenable_verus::
-   gallery::ledger_exchange`, and their own codegen tools in
-   `crates/amenable/src/{creusot_export,verus_exchange_export}.rs`).
-   **A Kani-contracted function's body must never delegate to a
-   separate wrapper function** — attach the contract directly to the
-   real method (see `GAAP_LEDGER_PLAN.md`'s Step 7 for the confirmed
-   Kani 0.67.0 bug this avoids).
+5. **Per backend**, attach the real contract. If it calls through the
+   transition's own target evidence type (the common case — see the
+   decision table above), add `kani_ensures = "true"` to the same
+   `capture_exchange_body(..)` attribute rather than hand-writing it;
+   add `kani_requires = ".."` alongside it for a genuine precondition.
+   Otherwise write `#[cfg_attr(kani, kani::ensures(..))]` directly on
+   the method by hand. Either way, build the accommodation-model
+   mirror plus generated companion a whole-crate translator needs for
+   Creusot/Verus (see `amenable_creusot::ledger`/`amenable_verus::gallery::
+   ledger_exchange`, and their own codegen tools in `crates/amenable/
+   src/{creusot_export,verus_exchange_export}.rs`). **A Kani-contracted
+   function's body must never delegate to a separate wrapper
+   function** — attach the contract directly to the real method (see
+   `GAAP_LEDGER_PLAN.md`'s Step 7 for the confirmed Kani 0.67.0 bug this
+   avoids).
 6. **Wrap every hand-written harness** in `harness!(cfg_name,
    CONST_NAME, { .. })` so its source is captured verbatim and
    discoverable via the CLI.

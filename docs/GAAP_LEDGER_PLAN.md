@@ -1191,6 +1191,32 @@ creusot_ensures`'s own doc comment already explains why), so its own
 source of truth there already, referenced by name rather than
 restated.
 
+**The delegated Kani contract itself, made mechanical.** Once all four
+edges converged on the identical `|result: &Result<Output, Error>|
+<Evidence as Ensures<V>>::ensures(result.clone())` shape above, that
+shape itself became derivable from information `#[capture_exchange_
+body(..)]` already has (`evidence`, the method's own `Output`/`Error`).
+Added `kani_ensures = "true"` (opt-in, not automatic) to the macro:
+generates exactly that attribute onto a clone of the method, the
+identical `contracted_method.attrs.push(..)` technique `#[exchange(..)]`
+already uses for its own concrete-verifier contracts. `commit`'s own
+real precondition (`input.primary().amount().value() > 0`) stays a
+genuine, hand-authored `kani_requires = ".."` string — not mechanical,
+since not every edge needs one and there's no way to derive which
+condition from the signature alone. All four hand-written `#[cfg_attr(
+kani, kani::ensures(..))]`/`#[cfg_attr(kani, kani::requires(..))]`
+attributes on `validate`/`commit`/`reject`/`rollback` are gone from
+`amenable_gaap::ledger.rs` now — generated instead. Confirmed the
+regenerated Creusot/Verus companions are byte-identical after this
+change (`git diff` on `generated/` is empty post-regeneration — body
+capture happens before attribute injection, so the two are fully
+independent), and re-verified all four affected harnesses with real
+`cargo kani`, same check counts as before the swap; a second real
+injected-bug check (identical bug, this time against the macro-
+generated contract) produced the identical precise failure before being
+reverted, confirming the generated attribute isn't vacuously different
+from its hand-written predecessor.
+
 ## Open questions
 
 - Whether `AccountingEquationHolds` attaches to `Committed` directly
