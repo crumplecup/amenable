@@ -1150,6 +1150,47 @@ unaffected (`verify_gaap_reject_always_succeeds`, `0 of 272 failed`).
 Full workspace `cargo check`/`clippy -D warnings`/`fmt --check`/`test`
 all clean.
 
+**Manual composite bounds, revisited: "manual bounds are an
+anti-pattern."** A real, separate finding surfaced by direct
+pushback: `Ledger::validate`'s/`::commit`'s/`::reject`'s/`::rollback`'s
+own direct Kani contracts each *restated* the exact combined claim
+their own target evidence type (`Validated`/`Committed`/`Rejected<
+Pending>`/`Rejected<Validated>`) already states, separately, via its own
+registered `kani_ensures!` call in `amenable_kani::ledger`. Two
+hand-typed copies of the same logic, nothing enforcing they stay in
+sync — the identical single-source-of-truth violation `#[amenable_
+derive::exchange(..)]`'s own generated contracts (`<Evidence as
+Ensures<V>>::ensures(result.clone())`, never restated) always avoided
+for `Stoplight`. Fixed by making all four call through their own target
+evidence type's `Ensures<V>` impl directly, the same way `check_amount_
+positive`/`check_sufficient_funds` already correctly called through
+`AmountPositive`/`SufficientFunds` rather than restating `amount > 0`
+inline — they were never the problem. `validate`'s where-clause
+dropped `AmountPositive`/`SufficientFunds`/`AccountsDistinct`'s own
+`Ensures<V>` bounds (no longer named directly — they're still real,
+still checked, just now *inside* `Validated`'s own registration, not
+restated a second time here) in favor of one `Validated: Ensures<V,
+Input = Result<..>, Bound = bool>` bound; `commit` similarly dropped
+`BalancedEntries` for `Committed`; `reject`/`rollback` gained a real
+bound each for the first time (previously needed none, since `result.
+is_ok()` needs no generic dispatch — but restating even a trivial claim
+in two places was the identical anti-pattern, just with less content to
+drift). Re-verified clean with real Kani, one harness at a time, all
+five affected harnesses (`validate` ×2, `commit`, `reject`, `rollback`)
+`0 of N failed`; a real injected bug in `Validated`'s own registration
+(`amenable_kani::ledger`, the `Err(NegativeAmount(..))` arm's negation
+dropped) produced a precise, real failure through `Ledger::validate`'s
+own delegated contract before being reverted, confirming the
+delegation is real, not vacuous. Full workspace `cargo check`/`clippy
+-D warnings`/`fmt --check`/`test` clean throughout. Creusot's/Verus's
+own `creusot_ensures` string and captured body text are untouched —
+this is a Kani-contract-only fix; Creusot has no equivalent trait-
+dispatch mechanism to delegate through (`ExchangeEdgeRecord::
+creusot_ensures`'s own doc comment already explains why), so its own
+`amount_positive_holds`/etc. Pearlite predicates remain the single
+source of truth there already, referenced by name rather than
+restated.
+
 ## Open questions
 
 - Whether `AccountingEquationHolds` attaches to `Committed` directly

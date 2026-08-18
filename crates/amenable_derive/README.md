@@ -56,19 +56,40 @@ walks the same macros in the order you'd actually reach for them.
   pub struct Pending;
   ```
 
-- **`#[amenable_derive::evidence]`** — the other half of that split: for
-  a claim that gets a **real proof body**, not asserted. Computes
-  `is_root()` for a hand-written `impl Evidence for ...` block from its
-  own `Basis` declaration, purely syntactically (compares `Basis`
-  against the literal `Self` — no `TypeId`, no `'static` bound needed).
+- **`#[derive(Evidence)]`** (attrs: `#[evidence(basis = "..",
+  basis_ctor = "..", bound = "..")]`) — the other half of that split:
+  for a claim that gets a **real proof body**, not asserted. Generates
+  the whole trivial-root `impl Evidence` (`Audit` fixed to `()` — a
+  provable claim has no citation to audit) plus the same `EvidenceLink`
+  auto-registration `#[derive(Standard)]` does for its own root,
+  non-generic case. Same `basis`/`basis_ctor`/`bound` attributes as
+  `#[derive(Standard)]`, minus the `provenance`/`provenance_type` half.
+  This is the common case — reach for it first.
+
+  ```rust
+  #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, amenable_derive::Evidence)]
+  #[evidence(basis = "Self")]
+  pub struct AmountPositive;
+  ```
+
+- **`#[amenable_derive::evidence]`** — the attribute-macro form, for a
+  **hand-written** `impl Evidence for ...` block whose `basis()`/
+  `audit()` bodies are real, non-trivial content (a composite claim
+  built from another `Evidence` type, or an `Audit` richer than `()`).
+  Computes `is_root()` from the block's own `Basis` declaration,
+  purely syntactically (compares `Basis` against the literal `Self` —
+  no `TypeId`, no `'static` bound needed), and nothing else — the rest
+  of the impl stays exactly as authored. Doesn't register `EvidenceLink`
+  the way the derive does; add that by hand if the type needs to be
+  chain-lookup-discoverable.
 
   ```rust
   #[amenable_derive::evidence]
-  impl Evidence for AmountPositive {
-      type Basis = Self;
-      type Audit = ();
-      fn basis() -> Self::Basis { Self }
-      fn audit(&self) {}
+  impl Evidence for SomeCompositeClaim {
+      type Basis = SomeOtherEvidenceType;
+      type Audit = RichAuditReport;
+      fn basis() -> Self::Basis { SomeOtherEvidenceType }
+      fn audit(&self) -> Self::Audit { /* real content */ }
   }
   ```
 
@@ -330,7 +351,8 @@ A few of the macros above look interchangeable at a glance. They aren't:
 | If... | use... |
 | --- | --- |
 | The claim is asserted and cited (a typestate root, a documented law), not proven | `#[derive(Standard)]` |
-| The claim has a real proof body behind it | `#[amenable_derive::evidence]` |
+| The claim has a real proof body, and `Evidence`'s trivial-root shape fits (`Basis = Self`, no real `Audit`) | `#[derive(Evidence)]` — reach for this first |
+| The claim has a real proof body but a non-trivial `Basis`/`Audit` (composite, not a root) | `#[amenable_derive::evidence]` on a hand-written impl |
 | Your carrier/token/edge lives in a **per-backend** crate and names one concrete verifier | the concrete form: `establish`/`Sidecar`'s `verifier = ".."`, `#[exchange(..)]` |
 | Your carrier/token/edge lives in a **neutral** crate (e.g. `amenable_gaap`) usable by every backend | the verifier-less form: `establish`/`Sidecar` with `verifier` omitted, `#[capture_exchange_body(..)]` instead of `#[exchange(..)]` |
 | The method is non-generic and you want the *whole* bundle generated (contract + `Witness<V>` + `Exchange` impl) | `#[exchange(..)]` |
@@ -346,8 +368,11 @@ a new evidence chain from scratch, this is the template:
 1. **Define your evidence types** in a neutral crate (not a per-backend
    one). Typestate roots (states asserted by construction) get
    `#[derive(Standard)] #[standard(basis = "Self")]`. Claims that will
-   get a real proof body get a hand-written `impl Evidence` decorated
-   with `#[amenable_derive::evidence]`.
+   get a real proof body get `#[derive(Evidence)] #[evidence(basis =
+   "Self")]` — no hand-written impl needed for the common trivial-root
+   case; fall back to a hand-written `impl Evidence` plus
+   `#[amenable_derive::evidence]` only for a genuinely non-trivial
+   `Basis`/`Audit`.
 2. **Define your proof tokens**, one per evidence type reachable via a
    transition: `#[derive(ProofToken)] #[proof_token(proposition =
    "...")]`. Give each a real `Establish` impl via

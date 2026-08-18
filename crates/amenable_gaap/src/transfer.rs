@@ -25,7 +25,7 @@
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 use uuid::Uuid;
 
@@ -127,7 +127,8 @@ impl Amount {
 /// `Sidecar<V>::Primary`, once a verifier's impls exist. Distinct from
 /// the state marker itself (`Sidecar<V>::Proposition`): a `Transfer` in
 /// any state still names the same two accounts and amount.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
 pub struct TransferPayload {
     from: AccountId,
     to: AccountId,
@@ -154,18 +155,6 @@ impl TransferPayload {
     pub fn amount(&self) -> Amount {
         self.amount
     }
-}
-
-#[amenable_derive::evidence]
-impl Evidence for TransferPayload {
-    type Basis = Self;
-    type Audit = ();
-
-    fn basis() -> Self::Basis {
-        Self::default()
-    }
-
-    fn audit(&self) {}
 }
 
 /// The transfer is awaiting validation — a root state claim, asserted

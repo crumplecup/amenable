@@ -28,9 +28,9 @@
 use amenable_core::{Establish, Sidecar};
 
 use crate::{
-    AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
-    Pending, PendingToken, Rejected, RejectedFromPendingToken, RejectedFromValidatedToken,
-    SufficientFunds, TransferPayload, Validated, ValidatedToken,
+    AmountPositive, Committed, CommittedToken, Pending, PendingToken, Rejected,
+    RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds, TransferPayload,
+    Validated, ValidatedToken,
 };
 
 /// A transfer payload bundled with the specific proof token minted for
@@ -246,24 +246,27 @@ impl Ledger {
     /// with an explicit turbofish: nothing in either call's own
     /// arguments/return type structurally names `V`, so Rust has no
     /// other way to resolve which instantiation this call targets.
+    ///
+    /// The contract itself calls through `<Validated as Ensures<V>>::
+    /// ensures(result.clone())` rather than restating the combined
+    /// biconditional inline -- manually re-deriving a composite bound
+    /// (`AmountPositive`/`SufficientFunds`/`AccountsDistinct`, each
+    /// named separately) is the same anti-pattern this project already
+    /// rejects everywhere else: `Validated`'s own `Ensures<KaniVerifier>`
+    /// impl (`amenable_kani::ledger`'s `kani_ensures!(Validated, ..)`)
+    /// already IS the one real, registered claim this transition proves
+    /// -- restating it here a second time would be two hand-typed copies
+    /// of the same logic with nothing enforcing they stay in sync,
+    /// exactly what `#[amenable_derive::exchange(..)]`'s own generated
+    /// contracts (`<Evidence as Ensures<V>>::ensures(result.clone())`,
+    /// never restated) always avoided for `Stoplight`. `Validated` here
+    /// plays the identical role `Yellow`/`Red` do there: the evidence a
+    /// transition establishes doubles as its own postcondition's real
+    /// `Ensures<V>` carrier, not a separate, redundant contract type.
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Transfer<Validated, ValidatedToken>, TransferError>| match result {
-            Ok(validated) => {
-                let payload = validated.primary();
-                <AmountPositive as amenable_core::Ensures<V>>::ensures(payload.amount().value())
-                    && <AccountsDistinct as amenable_core::Ensures<V>>::ensures((
-                        payload.from().clone(),
-                        payload.to().clone(),
-                    ))
-            }
-            Err(TransferError::NegativeAmount(amount)) => {
-                !<AmountPositive as amenable_core::Ensures<V>>::ensures(*amount)
-            }
-            Err(TransferError::InsufficientFunds { balance, required }) => {
-                !<SufficientFunds as amenable_core::Ensures<V>>::ensures((*balance, *required))
-            }
-            Err(TransferError::SameAccount) => true,
+        kani::ensures(|result: &Result<Transfer<Validated, ValidatedToken>, TransferError>| {
+            <Validated as amenable_core::Ensures<V>>::ensures(result.clone())
         })
     )]
     pub fn validate<V: amenable_core::Verifier>(
@@ -272,12 +275,17 @@ impl Ledger {
     ) -> Result<Transfer<Validated, ValidatedToken>, TransferError>
     where
         Pending: amenable_core::Evidence + amenable_core::Witness<V>,
-        Validated: amenable_core::Evidence + amenable_core::Witness<V>,
+        Validated: amenable_core::Evidence
+            + amenable_core::Witness<V>
+            + amenable_core::Ensures<
+                V,
+                Input = Result<Transfer<Validated, ValidatedToken>, TransferError>,
+                Bound = bool,
+            >,
         PendingToken: amenable_core::ProofToken<Proposition = Pending> + Clone,
         ValidatedToken: amenable_core::ProofToken<Proposition = Validated> + Clone,
         AmountPositive: amenable_core::Ensures<V, Input = i64, Bound = bool>,
         SufficientFunds: amenable_core::Ensures<V, Input = (i64, i64), Bound = bool>,
-        AccountsDistinct: amenable_core::Ensures<V, Input = (AccountId, AccountId), Bound = bool>,
     {
         let payload = input.primary().clone();
         let amount = payload.amount().value();
@@ -324,21 +332,28 @@ impl Ledger {
     /// Kani 0.67.0 DFCC scaffolding failure (`free.frees.1`), regardless
     /// of the wrapper's shape or the contract's content -- but attaching
     /// the contract directly here, with zero delegation, verifies clean
-    /// (`commit_contract_no_wrapper`, `0 of 287 failed`). `BalancedEntries:
-    /// Ensures<V, ..>` is an extra bound calling through the trait
-    /// generically, never naming a concrete verifier, so this still
-    /// compiles from `amenable_gaap` with no dependency on any backend
-    /// crate -- satisfied at the call site by whichever backend's own
-    /// real `Ensures<V>` impl for `BalancedEntries` already exists there.
-    /// Same `cargo kani`-sets-`--cfg kani`-globally mechanism `TransferError`'s/
+    /// (`commit_contract_no_wrapper`, `0 of 287 failed`).
+    ///
+    /// The contract calls through `<Committed as Ensures<V>>::ensures(
+    /// result.clone())` rather than restating `BalancedEntries`'s own
+    /// claim inline -- see `validate`'s own doc comment for the full
+    /// "manual bounds are an anti-pattern, call through the evidence
+    /// type's own registered claim instead" reasoning; `Committed`'s own
+    /// `Ensures<KaniVerifier>` impl (`amenable_kani::ledger`'s
+    /// `kani_ensures!(Committed, ..)`) already calls through
+    /// `BalancedEntries` itself, so restating that here too would just be
+    /// a second, unsynchronized copy. This still compiles from
+    /// `amenable_gaap` with no dependency on any backend crate --
+    /// satisfied at the call site by whichever backend's own real
+    /// `Ensures<V>` impl for `Committed` already exists there. Same
+    /// `cargo kani`-sets-`--cfg kani`-globally mechanism `TransferError`'s/
     /// `Ledger`'s own `#[cfg_attr(kani, derive(kani::Arbitrary))]` already
     /// relies on.
     #[cfg_attr(kani, kani::requires(input.primary().amount().value() > 0))]
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| match result {
-            Ok(committed) => <BalancedEntries as amenable_core::Ensures<V>>::ensures(committed.primary().amount().value()),
-            Err(_) => false,
+        kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| {
+            <Committed as amenable_core::Ensures<V>>::ensures(result.clone())
         })
     )]
     pub fn commit<V: amenable_core::Verifier>(
@@ -347,10 +362,15 @@ impl Ledger {
     ) -> Result<Transfer<Committed, CommittedToken>, TransferError>
     where
         Validated: amenable_core::Evidence + amenable_core::Witness<V>,
-        Committed: amenable_core::Evidence + amenable_core::Witness<V>,
+        Committed: amenable_core::Evidence
+            + amenable_core::Witness<V>
+            + amenable_core::Ensures<
+                V,
+                Input = Result<Transfer<Committed, CommittedToken>, TransferError>,
+                Bound = bool,
+            >,
         ValidatedToken: amenable_core::ProofToken<Proposition = Validated> + Clone,
         CommittedToken: amenable_core::ProofToken<Proposition = Committed> + Clone,
-        BalancedEntries: amenable_core::Ensures<V, Input = i64, Bound = bool>,
     {
         let payload = input.primary().clone();
         let token = Committed::establish(input.sidecar());
@@ -373,9 +393,19 @@ impl Ledger {
     /// matching every `Stoplight` edge's own identically trivial claim
     /// on Creusot (`green_to_yellow`/etc.), not a real biconditional the
     /// way `validate`'s/`commit`'s own claims need.
+    ///
+    /// Calls through `<Rejected<Pending> as Ensures<V>>::ensures(result.
+    /// clone())` rather than restating `result.is_ok()` inline -- even a
+    /// trivial claim is still a claim `Rejected<Pending>`'s own
+    /// `Ensures<KaniVerifier>` impl already states once (`amenable_kani::
+    /// ledger`'s `kani_ensures!(Rejected<Pending>, ..)`); restating it
+    /// here too is the identical anti-pattern `validate`'s own doc
+    /// comment explains, just with a shorter claim.
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError>| result.is_ok())
+        kani::ensures(|result: &Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError>| {
+            <Rejected<Pending> as amenable_core::Ensures<V>>::ensures(result.clone())
+        })
     )]
     pub fn reject<V: amenable_core::Verifier>(
         &self,
@@ -383,7 +413,16 @@ impl Ledger {
     ) -> Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError>
     where
         Pending: amenable_core::Evidence + amenable_core::Witness<V>,
-        Rejected<Pending>: amenable_core::Evidence + amenable_core::Witness<V>,
+        Rejected<Pending>: amenable_core::Evidence
+            + amenable_core::Witness<V>
+            + amenable_core::Ensures<
+                V,
+                Input = Result<
+                    Transfer<Rejected<Pending>, RejectedFromPendingToken>,
+                    TransferError,
+                >,
+                Bound = bool,
+            >,
         PendingToken: amenable_core::ProofToken<Proposition = Pending> + Clone,
         RejectedFromPendingToken:
             amenable_core::ProofToken<Proposition = Rejected<Pending>> + Clone,
@@ -399,12 +438,16 @@ impl Ledger {
     /// `Validated -> Rejected<Validated>`: infallible, like [`Ledger::
     /// reject`] above -- see its own doc comment for why the claim is
     /// legitimately trivial (including why no `creusot_ensures`
-    /// override). Generic over `V`, direct contract, no delegating
+    /// override, and why the contract calls through `Rejected<
+    /// Validated>`'s own `Ensures<V>` impl rather than restating `result.
+    /// is_ok()` inline). Generic over `V`, direct contract, no delegating
     /// wrapper -- see `commit`'s own doc comment for the confirmed
     /// reasoning.
     #[cfg_attr(
         kani,
-        kani::ensures(|result: &Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError>| result.is_ok())
+        kani::ensures(|result: &Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError>| {
+            <Rejected<Validated> as amenable_core::Ensures<V>>::ensures(result.clone())
+        })
     )]
     pub fn rollback<V: amenable_core::Verifier>(
         &self,
@@ -412,7 +455,16 @@ impl Ledger {
     ) -> Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError>
     where
         Validated: amenable_core::Evidence + amenable_core::Witness<V>,
-        Rejected<Validated>: amenable_core::Evidence + amenable_core::Witness<V>,
+        Rejected<Validated>: amenable_core::Evidence
+            + amenable_core::Witness<V>
+            + amenable_core::Ensures<
+                V,
+                Input = Result<
+                    Transfer<Rejected<Validated>, RejectedFromValidatedToken>,
+                    TransferError,
+                >,
+                Bound = bool,
+            >,
         ValidatedToken: amenable_core::ProofToken<Proposition = Validated> + Clone,
         RejectedFromValidatedToken:
             amenable_core::ProofToken<Proposition = Rejected<Validated>> + Clone,

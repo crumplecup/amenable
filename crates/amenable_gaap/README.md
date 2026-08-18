@@ -47,9 +47,10 @@ own onboarding walkthrough for the general recipe this crate follows):
 2. **[`contracts.rs`](src/contracts.rs)** — `AmountPositive`/
    `SufficientFunds`/`AccountsDistinct`/`BalancedEntries`: the four
    atomic claims `Ledger`'s own methods actually check, each a
-   `#[amenable_derive::evidence]`-decorated root (provable, not
-   asserted — the real split `#[derive(Standard)]` vs. `#[evidence]`
-   exists for). `AccountingEquationHolds` is defined but not yet wired
+   `#[derive(Evidence)] #[evidence(basis = "Self")]` root (provable,
+   not asserted — the real split `#[derive(Standard)]` vs.
+   `#[derive(Evidence)]` exists for). `AccountingEquationHolds` is
+   defined but not yet wired
    to any proof — a deferred, open question (`GAAP_LEDGER_PLAN.md`'s
    own "Open questions" section), not a bug.
 3. **[`tokens.rs`](src/tokens.rs)** — `PendingToken`/`ValidatedToken`/

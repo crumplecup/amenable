@@ -27,7 +27,7 @@ use syn::{
 use calculation::{CalculationArgs, expand_calculation};
 use capture_exchange_body::{CaptureExchangeBodyArgs, expand_capture_exchange_body};
 use establish::{EstablishArgs, expand_establish};
-use evidence::expand_evidence;
+use evidence::{expand_evidence, expand_evidence_derive};
 use exchange::{ExchangeArgs, expand_exchange};
 use harness::expand_harness;
 use kani_compose::expand_kani_compose;
@@ -128,13 +128,33 @@ pub fn capture_exchange_body(attr: TokenStream, item: TokenStream) -> TokenStrea
     }
 }
 
-/// Compute `is_root` for an `impl Evidence` block from its own `Basis`
-/// declaration, at compile time — no `TypeId`, no `'static`.
+/// Compute `is_root` for a hand-written `impl Evidence` block from its own
+/// `Basis` declaration, at compile time — no `TypeId`, no `'static`. For a
+/// hand-written impl with real, non-trivial `basis()`/`audit()` bodies; see
+/// [`derive_evidence`] for the common trivial-root case, which needs no
+/// hand-written impl at all.
 #[proc_macro_attribute]
 pub fn evidence(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemImpl);
 
     match expand_evidence(input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate a real, provable-not-asserted root `Evidence` impl (`Basis` as
+/// named, `Audit = ()`, `is_root()` computed the same way [`evidence`]
+/// does) from a `#[evidence(basis = "..", basis_ctor = "..", bound =
+/// "..")]` attribute, plus the same `EvidenceLink` auto-registration
+/// [`derive_standard`] already does for its own root, non-generic case —
+/// see `evidence.rs`'s own doc comment for the full rationale and the real
+/// duplication (and missing registry entries) this closes.
+#[proc_macro_derive(Evidence, attributes(evidence))]
+pub fn derive_evidence(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_evidence_derive(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }
