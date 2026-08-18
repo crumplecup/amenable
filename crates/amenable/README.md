@@ -42,6 +42,30 @@ option set. Errors surface through `miette`, behind the default `cli`
 feature — the library surface itself (`AmenableError`/`AmenableResult`)
 has no `miette` dependency; only the binary and its tests do.
 
+### Codegen subcommands
+
+Feature-gated (`--features creusot`/`--features verus`), and always run
+through the matching `just generate-*` recipe rather than invoked
+directly — see [`justfile`](../../justfile). Each reads a real
+`inventory`-registered record left by an `amenable_derive` macro (never
+`inventory` itself, which a whole-crate translator like Creusot/Verus
+can't tolerate in its own compiled output) and writes a checked-in,
+proc-macro-free companion file:
+
+- `amenable emit-creusot-companions` — Creusot `Exchange`-edge
+  companions from `amenable_core::ExchangeEdgeRecord` (`just
+  generate-creusot`).
+- `amenable emit-verus-exchange-companions` — the Verus equivalent
+  (`just generate-verus-exchange`).
+- `amenable emit-verus-gaap-tokens` — Verus proof-token companions from
+  `amenable_core::ProofTokenMintRecord` (`just
+  generate-verus-gaap-tokens`).
+- `amenable emit-verus-witnesses` — Verus witness-composition companions
+  (`just emit-verus-witnesses`).
+
+See [`amenable_derive`](../amenable_derive/README.md) for the macros
+that populate these registries in the first place.
+
 ## See also
 
 - [Root README](../../README.md) for the project-wide overview,

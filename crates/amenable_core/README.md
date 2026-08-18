@@ -15,9 +15,11 @@ never a silent third option:
 
 - a genuine machine-checked proof, emitted through `Witness` and consumed
   by a `Verifier` backend (Kani, Creusot, Verus)
-- an explicit `Standard` or `Objective` certification of provenance — a
-  structured, auditable record naming the authority, source, and
-  rationale for a trust decision that cannot be mathematically derived
+- an explicit `Standard` certification of provenance — a structured,
+  auditable record naming the authority, source, and rationale for a
+  trust decision that cannot be mathematically derived, whether that
+  authority is a third-party citation or an asserted local design
+  decision
 
 ## The role family
 
@@ -38,6 +40,13 @@ never a silent third option:
 - `Certificate` / `Registry` / `EvidenceLink` / `ProofRecord` — the
   audit-facing types: how a claim's chain gets recorded and looked back
   up.
+- `ExchangeEdgeRecord` / `ProofTokenMintRecord` / `ContractRecord` — the
+  codegen-facing registry types `amenable_derive`'s macros populate via
+  `inventory::submit!`, and a per-backend codegen tool (`amenable
+  emit-creusot-companions`, and friends — see the top-level `amenable`
+  crate's own README) reads to generate a real, checked-in companion
+  file for a translator-based backend that can't tolerate `inventory`
+  in its own compiled output.
 
 ## Why this split
 

@@ -26,15 +26,16 @@ dependency the wrong way, and any future bridge from `elicitation` into
   drove it, and the planned `amenable_derive` proc-macro crate that will
   host derive support such as `#[derive(Provenance)]`.
 - Core trait family (`Verifier`, `Witness`, `Witnessed`, `Evidence`,
-  `Standard`, `Objective`, `AsStandard`, `AsObjective`, `ProofToken`,
-  `Sidecar`, `Establish`, `Exchange`, `StateMachine`, `Amenable`,
-  `Provenance`, `MetadataEntry`) lives in `amenable_core`, split into focused
-  modules, zero runtime dependencies. The top-level `amenable` facade crate
-  re-exports it (plus `amenable_std`) for user convenience.
-- Current code still carries separate `Standard` and `Objective` root roles,
-  but the next design pass is expected to collapse them into a single
-  `Standard` obligation category whose source distinction lives in
-  `Provenance`, not in sibling root traits.
+  `Standard`, `AsStandard`, `ProofToken`, `Sidecar`, `Establish`,
+  `Exchange`, `StateMachine`, `Amenable`, `Provenance`, `MetadataEntry`)
+  lives in `amenable_core`, split into focused modules, zero runtime
+  dependencies. The top-level `amenable` facade crate re-exports it
+  (plus `amenable_std`) for user convenience.
+- `Standard` and `Objective` were collapsed into a single `Standard`
+  root-obligation category early on (Phase 2, below) — the distinction
+  between an external standard and local design intent lives entirely
+  in `Provenance`, not in a sibling root trait. There is no `Objective`
+  trait anywhere in the current code.
 - `RustStdType` (trait and its full std-lib registrations, necessarily
   together — see Workspace Architecture) lives in `amenable_std`.
 - `amenable_kani`/`amenable_creusot`/`amenable_verus` are scaffolded stub
@@ -177,8 +178,7 @@ The trait family, as designed in [amenable.md](../amenable.md), is implemented:
 
 - `Verifier`
 - `Witness`
-- `Standard`
-- `Objective`
+- `Standard` (collapsed with `Objective`, below)
 - `Evidence`
 - `Sidecar`
 - `Establish`

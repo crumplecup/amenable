@@ -35,21 +35,31 @@ confirmed ICE hit twice in this crate when only a re-export or a usage
 site was gated, not the struct/impl definition itself.
 
 `rust_std.rs`/`rust_std_witness.rs` hold `amenable_std`'s harness
-functions and their witness bridge, respectively; `ledger.rs` holds
-`amenable_gaap`'s real, non-trivial Pearlite predicates (`AmountPositive`/
-`SufficientFunds`/`AccountsDistinct`/`BalancedEntries`), implemented
-directly on the real `Validated`/`Committed` types via a real Cargo
-dependency on `amenable_gaap` — no accommodation-model mirror needed,
-for the same translator-sweep-scope reason as `amenable_std` above.
-`stoplight.rs` is the one exception: `Stoplight`'s tokens/
-`Established<T, Token>`/transition bodies still need a hand-written
-accommodation-model mirror, because the real constructors they'd
-otherwise call (`Established::new`, the token tuple fields) are
-deliberately private to `amenable_kani` — the audit-only half of that
-file, though, implements `Witness<CreusotVerifier>` directly on the
-real `amenable_core::{Green, Yellow, Red}` evidence markers (moved
-there specifically so neither this crate nor `amenable_kani` has to
-depend on the other — verifier backends never depend on each other,
+functions and their witness bridge, respectively. `ledger.rs` is split
+between the two shapes `stoplight.rs` shows separately: its four atomic
+contract predicates (`AmountPositive`/`SufficientFunds`/
+`AccountsDistinct`/`BalancedEntries`) and its `Pending`/`Validated`/
+`Committed`/`Rejected<T>` evidence markers implement `Witness<
+CreusotVerifier>` directly on the real `amenable_gaap` types, via a
+real Cargo dependency — no mirror needed, for the same translator-
+sweep-scope reason as `amenable_std` above. `Ledger`/`Transfer<S,
+Token>`/`TransferError`, though, *do* need a hand-written
+accommodation-model mirror, the identical real reason `stoplight.rs`'s
+own `Established<T, Token>` does: their real constructors
+(`Transfer::new`, the token tuple fields) are deliberately private to
+`amenable_gaap`, so a real dependency alone doesn't let a captured body
+compile against them. Every one of `Ledger`'s six real methods'
+bodies is fed into that mirror by a real generated companion per
+method (`generated/*.rs`, regenerated with `just generate-creusot` from
+`amenable_gaap::ledger`'s own `#[amenable_derive::
+capture_exchange_body(..)]` registrations — never hand-edited).
+`stoplight.rs` needs the identical mirror treatment for `Stoplight`'s
+own tokens/`Established<T, Token>`/transition bodies, for the identical
+reason (`amenable_kani`'s real constructors are private) — its
+audit-only half, though, implements `Witness<CreusotVerifier>` directly
+on the real `amenable_core::{Green, Yellow, Red}` evidence markers
+(moved there specifically so neither this crate nor `amenable_kani` has
+to depend on the other — verifier backends never depend on each other,
 full stop). `witness.rs` holds the shared trait/marker definitions
 these all implement against.
 

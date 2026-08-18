@@ -1158,13 +1158,13 @@ all clean.
   `Standard`-only slice of `amenable_gaap` (no proof, `derive(Standard)`
   only) once the provable core lands — explicitly out of scope for
   this plan, noted for later.
-- Whether `Objective` (described in `amenable.md`'s "Trait Objective"
-  section but not yet implemented anywhere in `amenable_core`) needs
-  to exist before any GAAP claim without a third-party citation shows
-  up. Not expected to matter for this initial scope — every claim here
-  traces to either real math or a real ASC citation — but worth
-  flagging since it's the one described-but-unbuilt piece of the trait
-  family this plan might eventually need.
+- ~~Whether `Objective` needs to exist before any GAAP claim without a
+  third-party citation shows up~~ — resolved: `Objective` and
+  `Standard` were collapsed into one `Standard` trait early in
+  `amenable_core`'s own history (`AMENABLE_PLAN.md`'s Phase 2), with
+  the third-party-citation-vs-local-design-decision distinction carried
+  entirely by `Provenance`. `amenable.md` no longer describes a
+  separate `Objective` trait at all. No open question remains here.
 
 ## Next step
 

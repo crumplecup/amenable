@@ -26,9 +26,11 @@ never a silent third option:
 
 - a genuine machine-checked proof, emitted through `Witness` and consumed by
   a `Verifier` backend (Kani, Creusot, Verus)
-- an explicit `Standard` or `Objective` certification of provenance — a
-  structured, auditable record naming the authority, source, and rationale
-  for a trust decision that cannot be mathematically derived
+- an explicit `Standard` certification of provenance — a structured,
+  auditable record naming the authority, source, and rationale for a
+  trust decision that cannot be mathematically derived, whether that
+  authority is a third-party citation or an asserted local design
+  decision
 
 Three independent verifier backends implement `Witness` against the same
 carriers, so a claim proven under Kani *and* Creusot *and* Verus
@@ -122,11 +124,18 @@ option set.
 | --- | --- |
 | [`amenable`](crates/amenable/README.md) | Top-level facade + the CLI above |
 | [`amenable_core`](crates/amenable_core/README.md) | The constitutional trait family itself — `Verifier`, `Witness`, `Evidence`, `Standard`, `Sidecar`, `Establish`, `Exchange`, `StateMachine`, `Provenance` |
-| [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs (`harness!`, `#[derive(Provenance)]`, `#[calculation]`, ...) |
+| [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs — derives (`Standard`, `ProofToken`, `Sidecar`, `Witness`, ...), attributes (`#[exchange]`, `#[establish]`, `#[calculation]`, ...), and `harness!` |
+| [`amenable_gaap`](crates/amenable_gaap/README.md) | GAAP ledger worked example — a real, backend-neutral evidence chain proven on all three verifiers, doubling as the reference walkthrough for building a new one |
 | [`amenable_std`](crates/amenable_std/README.md) | `RustStdType` + the registry where all three verifiers' witnesses converge |
 | [`amenable_kani`](crates/amenable_kani/README.md) | Kani backend — 419 proof harnesses |
 | [`amenable_creusot`](crates/amenable_creusot/README.md) | Creusot backend — 93 harnesses |
 | [`amenable_verus`](crates/amenable_verus/README.md) | Verus backend — 332 verified proof functions |
+
+Building a new evidence chain (a new worked example, or extending an
+existing one)? [`amenable_derive`'s onboarding
+walkthrough](crates/amenable_derive/README.md#onboarding-building-a-new-worked-example)
+covers the order to reach for these macros in, using `amenable_gaap`'s
+own construction as the worked reference.
 
 ## Verifiers
 
