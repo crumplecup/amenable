@@ -26,6 +26,7 @@ mod env_path_model;
 mod fd_model;
 mod fmt_model;
 mod fs_model;
+mod gaap_ledger;
 mod gallery;
 mod hash_collections_model;
 mod hash_model;
@@ -72,9 +73,6 @@ pub use hash_model::KaniRandomStateObservation;
 pub use io_model::{
     KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
-};
-pub use ledger::{
-    Ledger, RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};

@@ -167,19 +167,17 @@ amenable_derive::harness! {
         /// establish`'s `#[track_caller]` on their own.
         #[kani::proof]
         fn validate_with_concrete_amounts_passes() {
-            use amenable_core::Exchange;
-
-            let ledger = amenable_kani::Ledger::new(100);
+            let ledger = amenable_gaap::Ledger::new(100);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(50),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                amenable_kani::TransferError,
-            > = ledger.exchange(input);
+                amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                amenable_gaap::TransferError,
+            > = ledger.validate::<amenable_kani::KaniVerifier>(input);
         }
     }
 }
@@ -207,20 +205,18 @@ amenable_derive::harness! {
         /// and `balance` symbolic). It's already enough on its own.
         #[kani::proof]
         fn validate_with_one_symbolic_field_times_out() {
-            use amenable_core::Exchange;
-
             let amount: i64 = kani::any();
-            let ledger = amenable_kani::Ledger::new(1_000_000);
+            let ledger = amenable_gaap::Ledger::new(1_000_000);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                amenable_kani::TransferError,
-            > = ledger.exchange(input);
+                amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                amenable_gaap::TransferError,
+            > = ledger.validate::<amenable_kani::KaniVerifier>(input);
         }
     }
 }
@@ -249,21 +245,19 @@ amenable_derive::harness! {
         /// It is: this alone reproduces the original timeout.
         #[kani::proof]
         fn validate_without_dfcc_checking_times_out() {
-            use amenable_core::Exchange;
-
             let amount: i64 = kani::any();
             let balance: i64 = kani::any();
-            let ledger = amenable_kani::Ledger::new(balance);
+            let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                amenable_kani::TransferError,
-            > = ledger.exchange(input);
+                amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                amenable_gaap::TransferError,
+            > = ledger.validate::<amenable_kani::KaniVerifier>(input);
         }
     }
 }
@@ -339,7 +333,7 @@ amenable_derive::harness! {
         /// gap directly.
         #[kani::proof]
         fn symbolic_branch_with_track_caller_and_no_string_passes() {
-            use amenable_core::{Establish, Sidecar};
+            use amenable_core::Sidecar;
 
             // Built unconditionally, outside the symbolic branch below --
             // isolates the `#[track_caller]` call itself, not whether
@@ -349,12 +343,12 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let credential = input.sidecar();
 
             let amount: i64 = kani::any();
             if amount > 0 {
-                let token = amenable_gaap::Validated::establish(credential);
+                let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
                 let _ = token;
             }
         }
@@ -394,14 +388,14 @@ amenable_derive::harness! {
         /// not `Transfer<S, Token>`'s own shape.
         #[kani::proof]
         fn symbolic_branch_constructing_real_transfer_validated_passes() {
-            use amenable_core::{Establish, Sidecar};
+            use amenable_core::Sidecar;
 
             let pending_payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
-            let pending = amenable_kani::Transfer::pending(pending_payload);
+            let pending = amenable_gaap::Transfer::pending(pending_payload);
             let credential = pending.sidecar();
 
             let amount: i64 = kani::any();
@@ -411,9 +405,9 @@ amenable_derive::harness! {
                     amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                     amenable_gaap::Amount::new(amount),
                 );
-                let token = amenable_gaap::Validated::establish(credential);
-                let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
-                    amenable_kani::Transfer::new(payload, token);
+                let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
+                let validated: amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
+                    amenable_gaap::Transfer::diagnostic_new(payload, token);
                 let _ = validated;
             }
         }
@@ -447,25 +441,25 @@ amenable_derive::harness! {
         /// included), cost something that inline construction doesn't?
         #[kani::proof]
         fn returning_real_result_type_from_a_function_passes() {
-            use amenable_core::{Establish, Sidecar};
+            use amenable_core::Sidecar;
 
             fn build(
                 credential: amenable_gaap::PendingToken,
                 amount: i64,
             ) -> Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                amenable_kani::TransferError,
+                amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                amenable_gaap::TransferError,
             > {
                 if amount <= 0 {
-                    return Err(amenable_kani::TransferError::NegativeAmount(amount));
+                    return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                 }
                 let payload = amenable_gaap::TransferPayload::new(
                     amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                     amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                     amenable_gaap::Amount::new(amount),
                 );
-                let token = amenable_gaap::Validated::establish(credential);
-                Ok(amenable_kani::Transfer::new(payload, token))
+                let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
+                Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
             }
 
             let pending_payload = amenable_gaap::TransferPayload::new(
@@ -473,7 +467,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
-            let pending = amenable_kani::Transfer::pending(pending_payload);
+            let pending = amenable_gaap::Transfer::pending(pending_payload);
             let credential = pending.sidecar();
 
             let amount: i64 = kani::any();
@@ -515,7 +509,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let pending = amenable_kani::Transfer::pending(payload);
+            let pending = amenable_gaap::Transfer::pending(payload);
             let extracted = pending.primary().clone();
             let credential = pending.sidecar();
             let _ = (extracted, credential);
@@ -553,7 +547,7 @@ amenable_derive::harness! {
         /// individually-cheap pieces.
         #[kani::proof]
         fn full_combination_inline_without_calling_validate() {
-            use amenable_core::{Establish, Sidecar};
+            use amenable_core::Sidecar;
 
             let amount: i64 = kani::any();
             let balance: i64 = kani::any();
@@ -563,7 +557,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let pending = amenable_kani::Transfer::pending(payload);
+            let pending = amenable_gaap::Transfer::pending(payload);
             let payload = pending.primary().clone();
             let amount = payload.amount().value();
 
@@ -577,9 +571,9 @@ amenable_derive::harness! {
                 return;
             }
 
-            let token = amenable_gaap::Validated::establish(pending.sidecar());
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
-                amenable_kani::Transfer::new(payload, token);
+            let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(pending.sidecar());
+            let validated: amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
+                amenable_gaap::Transfer::diagnostic_new(payload, token);
             let _ = validated;
         }
     }
@@ -611,33 +605,33 @@ amenable_derive::harness! {
         /// from a real function -- this is the one remaining piece.
         #[kani::proof]
         fn three_distinct_error_variants_from_one_function_passes() {
-            use amenable_core::{Establish, Sidecar};
+            use amenable_core::Sidecar;
 
             fn check(
-                pending: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
+                pending: amenable_gaap::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 balance: i64,
             ) -> Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                amenable_kani::TransferError,
+                amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                amenable_gaap::TransferError,
             > {
                 let payload = pending.primary().clone();
                 let amount = payload.amount().value();
 
                 if amount <= 0 {
-                    return Err(amenable_kani::TransferError::NegativeAmount(amount));
+                    return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                 }
                 if balance < amount {
-                    return Err(amenable_kani::TransferError::InsufficientFunds {
+                    return Err(amenable_gaap::TransferError::InsufficientFunds {
                         balance,
                         required: amount,
                     });
                 }
                 if payload.from() == payload.to() {
-                    return Err(amenable_kani::TransferError::SameAccount);
+                    return Err(amenable_gaap::TransferError::SameAccount);
                 }
 
-                let token = amenable_gaap::Validated::establish(pending.sidecar());
-                Ok(amenable_kani::Transfer::new(payload, token))
+                let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(pending.sidecar());
+                Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
             }
 
             let amount: i64 = kani::any();
@@ -647,7 +641,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let pending = amenable_kani::Transfer::pending(payload);
+            let pending = amenable_gaap::Transfer::pending(payload);
             let _ = check(pending, balance);
         }
     }
@@ -684,14 +678,14 @@ amenable_derive::harness! {
         fn calling_ledger_validate_directly_times_out() {
             let amount: i64 = kani::any();
             let balance: i64 = kani::any();
-            let ledger = amenable_kani::Ledger::new(balance);
+            let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
-            let _ = ledger.validate(input);
+            let input = amenable_gaap::Transfer::pending(payload);
+            let _ = ledger.validate::<amenable_kani::KaniVerifier>(input);
         }
     }
 }
@@ -747,29 +741,29 @@ amenable_derive::harness! {
 
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
+                    input: amenable_gaap::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                    amenable_kani::TransferError,
+                    amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                    amenable_gaap::TransferError,
                 > {
-                    use amenable_core::{Establish, Sidecar};
+                    use amenable_core::Sidecar;
 
                     let payload = input.primary().clone();
                     let amount = payload.amount().value();
 
                     Self::check_amount_positive(amount)
-                        .map_err(amenable_kani::TransferError::NegativeAmount)?;
+                        .map_err(amenable_gaap::TransferError::NegativeAmount)?;
                     self.check_sufficient_funds(amount)
-                        .map_err(|(balance, required)| amenable_kani::TransferError::InsufficientFunds {
+                        .map_err(|(balance, required)| amenable_gaap::TransferError::InsufficientFunds {
                             balance,
                             required,
                         })?;
                     if payload.from() == payload.to() {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
 
-                    let token = amenable_gaap::Validated::establish(input.sidecar());
-                    Ok(amenable_kani::Transfer::new(payload, token))
+                    let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(input.sidecar());
+                    Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
                 }
             }
 
@@ -781,7 +775,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _ = ledger.validate(input);
         }
     }
@@ -825,37 +819,37 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                        amenable_kani::TransferError,
+                        amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                        amenable_gaap::TransferError,
                     >| result.is_ok())
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
+                    input: amenable_gaap::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                    amenable_kani::TransferError,
+                    amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                    amenable_gaap::TransferError,
                 > {
-                    use amenable_core::{Establish, Sidecar};
+                    use amenable_core::Sidecar;
 
                     let payload = input.primary().clone();
                     let amount = payload.amount().value();
 
                     if amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                     }
                     if self.balance < amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: amount,
                         });
                     }
                     if payload.from() == payload.to() {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
 
-                    let token = amenable_gaap::Validated::establish(input.sidecar());
-                    Ok(amenable_kani::Transfer::new(payload, token))
+                    let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(input.sidecar());
+                    Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
                 }
             }
 
@@ -867,7 +861,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _ = ledger.validate(input);
         }
     }
@@ -912,8 +906,8 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                        amenable_kani::TransferError,
+                        amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                        amenable_gaap::TransferError,
                     >| match result {
                         Ok(validated) => validated.primary().amount().value() > 0,
                         Err(_) => true,
@@ -921,31 +915,29 @@ amenable_derive::harness! {
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
+                    input: amenable_gaap::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                    amenable_kani::TransferError,
+                    amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                    amenable_gaap::TransferError,
                 > {
-                    use amenable_core::Establish;
-
                     let payload = input.primary().clone();
                     let amount = payload.amount().value();
 
                     if amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                     }
                     if self.balance < amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: amount,
                         });
                     }
                     if payload.from() == payload.to() {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
 
-                    let token = amenable_gaap::Validated::establish(input.sidecar());
-                    Ok(amenable_kani::Transfer::new(payload, token))
+                    let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(input.sidecar());
+                    Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
                 }
             }
 
@@ -957,7 +949,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _ = ledger.validate(input);
         }
     }
@@ -999,8 +991,8 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                        amenable_kani::TransferError,
+                        amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                        amenable_gaap::TransferError,
                     >| match result {
                         Ok(validated) => {
                             let payload = validated.primary();
@@ -1011,31 +1003,29 @@ amenable_derive::harness! {
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
+                    input: amenable_gaap::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
-                    amenable_kani::TransferError,
+                    amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
+                    amenable_gaap::TransferError,
                 > {
-                    use amenable_core::Establish;
-
                     let payload = input.primary().clone();
                     let amount = payload.amount().value();
 
                     if amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                     }
                     if self.balance < amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: amount,
                         });
                     }
                     if payload.from() == payload.to() {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
 
-                    let token = amenable_gaap::Validated::establish(input.sidecar());
-                    Ok(amenable_kani::Transfer::new(payload, token))
+                    let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(input.sidecar());
+                    Ok(amenable_gaap::Transfer::diagnostic_new(payload, token))
                 }
             }
 
@@ -1047,7 +1037,7 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let input = amenable_kani::Transfer::pending(payload);
+            let input = amenable_gaap::Transfer::pending(payload);
             let _ = ledger.validate(input);
         }
     }
@@ -1102,7 +1092,7 @@ amenable_derive::harness! {
             impl EnumIdentityLedger {
                 #[cfg_attr(
                     kani,
-                    kani::ensures(|result: &Result<EnumPayload, amenable_kani::TransferError>| match result {
+                    kani::ensures(|result: &Result<EnumPayload, amenable_gaap::TransferError>| match result {
                         Ok(validated) => validated.amount > 0 && validated.from != validated.to,
                         Err(_) => true,
                     })
@@ -1110,18 +1100,18 @@ amenable_derive::harness! {
                 fn validate(
                     &self,
                     payload: EnumPayload,
-                ) -> Result<EnumPayload, amenable_kani::TransferError> {
+                ) -> Result<EnumPayload, amenable_gaap::TransferError> {
                     if payload.amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(payload.amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(payload.amount));
                     }
                     if self.balance < payload.amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: payload.amount,
                         });
                     }
                     if payload.from == payload.to {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
                     Ok(payload)
                 }
@@ -1180,7 +1170,7 @@ amenable_derive::harness! {
             impl NumericIdentityLedger {
                 #[cfg_attr(
                     kani,
-                    kani::ensures(|result: &Result<NumericPayload, amenable_kani::TransferError>| match result {
+                    kani::ensures(|result: &Result<NumericPayload, amenable_gaap::TransferError>| match result {
                         Ok(validated) => validated.amount > 0 && validated.from != validated.to,
                         Err(_) => true,
                     })
@@ -1188,18 +1178,18 @@ amenable_derive::harness! {
                 fn validate(
                     &self,
                     payload: NumericPayload,
-                ) -> Result<NumericPayload, amenable_kani::TransferError> {
+                ) -> Result<NumericPayload, amenable_gaap::TransferError> {
                     if payload.amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(payload.amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(payload.amount));
                     }
                     if self.balance < payload.amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: payload.amount,
                         });
                     }
                     if payload.from == payload.to {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
                     Ok(payload)
                 }
@@ -1273,7 +1263,7 @@ amenable_derive::harness! {
             impl HybridIdentityLedger {
                 #[cfg_attr(
                     kani,
-                    kani::ensures(|result: &Result<HybridPayload, amenable_kani::TransferError>| match result {
+                    kani::ensures(|result: &Result<HybridPayload, amenable_gaap::TransferError>| match result {
                         Ok(validated) => validated.amount > 0 && validated.from != validated.to,
                         Err(_) => true,
                     })
@@ -1281,18 +1271,18 @@ amenable_derive::harness! {
                 fn validate(
                     &self,
                     payload: HybridPayload,
-                ) -> Result<HybridPayload, amenable_kani::TransferError> {
+                ) -> Result<HybridPayload, amenable_gaap::TransferError> {
                     if payload.amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(payload.amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(payload.amount));
                     }
                     if self.balance < payload.amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: payload.amount,
                         });
                     }
                     if payload.from == payload.to {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
                     Ok(payload)
                 }
@@ -1360,7 +1350,7 @@ amenable_derive::harness! {
             impl UuidIdentityLedger {
                 #[cfg_attr(
                     kani,
-                    kani::ensures(|result: &Result<UuidPayload, amenable_kani::TransferError>| match result {
+                    kani::ensures(|result: &Result<UuidPayload, amenable_gaap::TransferError>| match result {
                         Ok(validated) => validated.amount > 0 && validated.from != validated.to,
                         Err(_) => true,
                     })
@@ -1368,18 +1358,18 @@ amenable_derive::harness! {
                 fn validate(
                     &self,
                     payload: UuidPayload,
-                ) -> Result<UuidPayload, amenable_kani::TransferError> {
+                ) -> Result<UuidPayload, amenable_gaap::TransferError> {
                     if payload.amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(payload.amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(payload.amount));
                     }
                     if self.balance < payload.amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: payload.amount,
                         });
                     }
                     if payload.from == payload.to {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
                     Ok(payload)
                 }
@@ -1466,7 +1456,7 @@ amenable_derive::harness! {
             impl FixedStringIdentityLedger {
                 #[cfg_attr(
                     kani,
-                    kani::ensures(|result: &Result<FixedStringPayload, amenable_kani::TransferError>| match result {
+                    kani::ensures(|result: &Result<FixedStringPayload, amenable_gaap::TransferError>| match result {
                         Ok(validated) => validated.amount > 0 && validated.from != validated.to,
                         Err(_) => true,
                     })
@@ -1474,18 +1464,18 @@ amenable_derive::harness! {
                 fn validate(
                     &self,
                     payload: FixedStringPayload,
-                ) -> Result<FixedStringPayload, amenable_kani::TransferError> {
+                ) -> Result<FixedStringPayload, amenable_gaap::TransferError> {
                     if payload.amount <= 0 {
-                        return Err(amenable_kani::TransferError::NegativeAmount(payload.amount));
+                        return Err(amenable_gaap::TransferError::NegativeAmount(payload.amount));
                     }
                     if self.balance < payload.amount {
-                        return Err(amenable_kani::TransferError::InsufficientFunds {
+                        return Err(amenable_gaap::TransferError::InsufficientFunds {
                             balance: self.balance,
                             required: payload.amount,
                         });
                     }
                     if payload.from == payload.to {
-                        return Err(amenable_kani::TransferError::SameAccount);
+                        return Err(amenable_gaap::TransferError::SameAccount);
                     }
                     Ok(payload)
                 }

@@ -2,7 +2,18 @@
   "profile": [],
   "proofs": {
     "Coma": {
-      "vc_check_amount_positive": { "prover": "alt-ergo", "time": 0.013 }
+      "vc_check_amount_positive_V": {
+        "tactic": "compute_specified",
+        "children": [
+          {
+            "tactic": "split_vc",
+            "children": [
+              { "prover": "alt-ergo", "time": 0.014 },
+              { "prover": "alt-ergo", "time": 0.012 }
+            ]
+          }
+        ]
+      }
     }
   }
 }

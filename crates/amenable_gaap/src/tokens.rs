@@ -30,7 +30,7 @@
 
 use amenable_derive::ProofToken;
 
-use crate::{Committed, Pending, Validated};
+use crate::{Committed, Pending, Rejected, Validated};
 
 /// Lawful token asserting a transfer is [`Pending`] -- the entry state,
 /// minted without going through [`amenable_core::Establish::establish`]
@@ -90,3 +90,25 @@ impl ValidatedToken {
 #[proof_token(proposition = "Committed")]
 #[amenable_derive::establish(credential = "ValidatedToken", proposition = "Committed")]
 pub struct CommittedToken(());
+
+/// Lawful token minted once `Rejected<Pending>` is established from a
+/// proven [`Pending`] -- validation was never attempted (e.g. an operator
+/// cancelled the request). Distinct from [`RejectedFromValidatedToken`]
+/// even though both back the same logical "rejected" *outcome*:
+/// `ProofToken::Proposition` is an associated type, so one concrete token
+/// type can only ever name one `Proposition` -- a single shared token
+/// can't serve both `Rejected<Pending>` and `Rejected<Validated>` at
+/// once, the same reason `Rejected<T>` itself had to become generic (see
+/// its own doc comment in `crate::transfer`).
+#[derive(Debug, Clone, ProofToken)]
+#[proof_token(proposition = "Rejected<Pending>")]
+#[amenable_derive::establish(credential = "PendingToken", proposition = "Rejected<Pending>")]
+pub struct RejectedFromPendingToken(());
+
+/// Lawful token minted once `Rejected<Validated>` is established from a
+/// proven [`Validated`] -- a validated transfer was manually rolled back
+/// before commit. See [`RejectedFromPendingToken`].
+#[derive(Debug, Clone, ProofToken)]
+#[proof_token(proposition = "Rejected<Validated>")]
+#[amenable_derive::establish(credential = "ValidatedToken", proposition = "Rejected<Validated>")]
+pub struct RejectedFromValidatedToken(());

@@ -3,14 +3,13 @@
 //! Kani harnesses. All three refusal reasons -- unlike every `Stoplight`
 //! edge, which can only ever succeed.
 
-use amenable_core::{Exchange, Sidecar};
+use amenable_core::Sidecar;
 use amenable_gaap::{
-    AccountId, Amount, Committed, CommittedToken, Pending, Rejected, TransferPayload, Validated,
-    ValidatedToken,
+    AccountId, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
+    RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError, TransferPayload,
+    Validated, ValidatedToken,
 };
-use amenable_kani::{
-    Ledger, RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError,
-};
+use amenable_kani::KaniVerifier;
 
 #[test]
 fn validate_accepts_a_lawful_transfer() {
@@ -22,8 +21,9 @@ fn validate_accepts_a_lawful_transfer() {
     );
     let input = Transfer::pending(payload);
 
-    let validated: Transfer<Validated, ValidatedToken> =
-        ledger.exchange(input).expect("lawful transfer");
+    let validated: Transfer<Validated, ValidatedToken> = ledger
+        .validate::<KaniVerifier>(input)
+        .expect("lawful transfer");
     assert_eq!(validated.primary().amount().value(), 50);
 }
 
@@ -37,7 +37,8 @@ fn validate_rejects_a_negative_amount() {
     );
     let input = Transfer::pending(payload);
 
-    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> = ledger.exchange(input);
+    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> =
+        ledger.validate::<KaniVerifier>(input);
     let error = result.expect_err("negative amount");
     assert_eq!(error, TransferError::NegativeAmount(-1));
 }
@@ -52,7 +53,8 @@ fn validate_rejects_insufficient_funds() {
     );
     let input = Transfer::pending(payload);
 
-    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> = ledger.exchange(input);
+    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> =
+        ledger.validate::<KaniVerifier>(input);
     let error = result.expect_err("insufficient funds");
     assert_eq!(
         error,
@@ -73,7 +75,8 @@ fn validate_rejects_the_same_account() {
     );
     let input = Transfer::pending(payload);
 
-    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> = ledger.exchange(input);
+    let result: Result<Transfer<Validated, ValidatedToken>, TransferError> =
+        ledger.validate::<KaniVerifier>(input);
     let error = result.expect_err("same account");
     assert_eq!(error, TransferError::SameAccount);
 }
@@ -88,10 +91,12 @@ fn commit_always_succeeds_and_carries_the_same_amount() {
     );
     let input = Transfer::pending(payload);
 
-    let validated: Transfer<Validated, ValidatedToken> =
-        ledger.exchange(input).expect("lawful transfer");
-    let committed: Transfer<Committed, CommittedToken> =
-        ledger.exchange(validated).expect("commit never fails");
+    let validated: Transfer<Validated, ValidatedToken> = ledger
+        .validate::<KaniVerifier>(input)
+        .expect("lawful transfer");
+    let committed: Transfer<Committed, CommittedToken> = ledger
+        .commit::<KaniVerifier>(validated)
+        .expect("commit never fails");
     assert_eq!(committed.primary().amount().value(), 50);
 }
 
@@ -105,8 +110,9 @@ fn reject_always_succeeds_and_preserves_the_payload() {
     );
     let input = Transfer::pending(payload);
 
-    let rejected: Transfer<Rejected<Pending>, RejectedFromPendingToken> =
-        ledger.exchange(input).expect("reject never fails");
+    let rejected: Transfer<Rejected<Pending>, RejectedFromPendingToken> = ledger
+        .reject::<KaniVerifier>(input)
+        .expect("reject never fails");
     assert_eq!(rejected.primary().amount().value(), 50);
 }
 
@@ -120,9 +126,11 @@ fn rollback_always_succeeds_and_preserves_the_payload() {
     );
     let input = Transfer::pending(payload);
 
-    let validated: Transfer<Validated, ValidatedToken> =
-        ledger.exchange(input).expect("lawful transfer");
-    let rolled_back: Transfer<Rejected<Validated>, RejectedFromValidatedToken> =
-        ledger.exchange(validated).expect("rollback never fails");
+    let validated: Transfer<Validated, ValidatedToken> = ledger
+        .validate::<KaniVerifier>(input)
+        .expect("lawful transfer");
+    let rolled_back: Transfer<Rejected<Validated>, RejectedFromValidatedToken> = ledger
+        .rollback::<KaniVerifier>(validated)
+        .expect("rollback never fails");
     assert_eq!(rolled_back.primary().amount().value(), 50);
 }

@@ -48,4 +48,34 @@ impl Establish<ValidatedToken, GalleryVerifier> for Committed {
     }
 }
 
+#[derive(Clone, Copy)]
+pub struct RejectedFromPendingToken;
+
+impl ProofToken for RejectedFromPendingToken {
+    type Proposition = Rejected<Pending>;
+}
+
+impl Establish<PendingToken, GalleryVerifier> for Rejected<Pending> {
+    type Token = RejectedFromPendingToken;
+
+    fn establish(_credential: PendingToken) -> Self::Token {
+        RejectedFromPendingToken
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct RejectedFromValidatedToken;
+
+impl ProofToken for RejectedFromValidatedToken {
+    type Proposition = Rejected<Validated>;
+}
+
+impl Establish<ValidatedToken, GalleryVerifier> for Rejected<Validated> {
+    type Token = RejectedFromValidatedToken;
+
+    fn establish(_credential: ValidatedToken) -> Self::Token {
+        RejectedFromValidatedToken
+    }
+}
+
 } // verus!

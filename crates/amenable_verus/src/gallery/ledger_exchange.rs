@@ -366,6 +366,45 @@ impl Evidence for Committed {
     }
 }
 
+/// The transfer was rejected -- validation failed (`Rejected<Pending>`),
+/// or a validated transfer was manually rolled back before commit
+/// (`Rejected<Validated>`). Matches `amenable_gaap::Rejected<T>`'s own
+/// shape: parameterized by the state it was rejected *from*, not flat
+/// (`reject()`/`rollback()` each need their own distinct concrete
+/// `Witness<GalleryVerifier>` proof for their own real claim -- see the
+/// real type's own doc comment in `amenable_gaap::transfer` for the full
+/// `E0119` account). `GAAP_LEDGER_PLAN.md`'s Step 7, revisited: neither
+/// edge was connected here at first (a real scope call, not a technical
+/// wall), closed once `validate`'s/`commit`'s own connection proved the
+/// underlying mechanism out. A blanket `impl<T> Evidence for Rejected<
+/// T>` (no per-`T` root claim to state, unlike `amenable_gaap`'s own
+/// real `#[derive(Standard)]`-generated impl, which is conditional on
+/// `Self: Provenance` -- this mirror carries no `Provenance` chain at
+/// all, matching `Pending`'s/`Validated`'s/`Committed`'s own mirrors
+/// right above, which skip it too): `Rejected<T>` is a root claim
+/// exactly like every other evidence type in this file, for every `T`
+/// this gallery ever instantiates it with.
+pub struct Rejected<T> {
+    _marker: std::marker::PhantomData<T>,
+}
+
+impl<T> Evidence for Rejected<T> {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        Rejected {
+            _marker: std::marker::PhantomData,
+        }
+    }
+
+    fn audit(&self) {}
+
+    fn is_root() -> bool {
+        true
+    }
+}
+
 // `PendingToken`/`ValidatedToken`/`CommittedToken` and their `ProofToken`/
 // `Establish<_, GalleryVerifier>` impls used to be hand-written here --
 // see `GAAP_LEDGER_PLAN.md`'s Step 8: they're now generated, `include!`d
@@ -487,23 +526,40 @@ impl Ledger {
         Self { balance }
     }
 
-    fn check_amount_positive(amount: i64) -> (result: Result<(), i64>)
+    /// `<V>`: unconstrained, no bound -- exists purely so `validate`'s
+    /// own real captured body (`generated/ledger_exchange/validate.rs`,
+    /// `Self::check_amount_positive::<V>(amount)`) has a generic
+    /// parameter to name. Matches `amenable_creusot::ledger::Ledger::
+    /// check_amount_positive`'s own identical fix and identical
+    /// reasoning (`GAAP_LEDGER_PLAN.md`'s Step 7): the real counterpart's
+    /// own `Ensures<V>` bound doesn't translate to this mirror at all
+    /// (there is no separate isolated `Ensures<GalleryVerifier>` impl
+    /// this helper's own postcondition needs to route through -- the
+    /// `ensures` clause states the claim directly). The body's own
+    /// `let _phantom: PhantomData<V> = ..` line has no verification
+    /// content -- it exists only so `V` is genuinely used, not just
+    /// declared, matching a real clippy lint this project can't
+    /// `#[allow]` away (`clippy::extra_unused_type_parameters`).
+    fn check_amount_positive<V>(amount: i64) -> (result: Result<(), i64>)
         ensures
             match result {
                 Ok(()) => amount > 0,
                 Err(bad) => bad == amount && amount <= 0,
             },
     {
+        let _phantom: core::marker::PhantomData<V> = core::marker::PhantomData;
         if amount <= 0 { Err(amount) } else { Ok(()) }
     }
 
-    fn check_sufficient_funds(&self, amount: i64) -> (result: Result<(), (i64, i64)>)
+    /// `<V>`: see [`Ledger::check_amount_positive`]'s own doc comment.
+    fn check_sufficient_funds<V>(&self, amount: i64) -> (result: Result<(), (i64, i64)>)
         ensures
             match result {
                 Ok(()) => self.balance >= amount,
                 Err((balance, required)) => balance < required && balance == self.balance && required == amount,
             },
     {
+        let _phantom: core::marker::PhantomData<V> = core::marker::PhantomData;
         if self.balance < amount { Err((self.balance, amount)) } else { Ok(()) }
     }
 
@@ -547,6 +603,27 @@ impl Ledger {
 }
 
 } // verus!
+
+// `Ledger::validate`'s own real captured body (`generated/ledger_exchange/
+// validate.rs`, below) calls `Self::check_amount_positive::<V>(amount)`/
+// `self.check_sufficient_funds::<V>(amount)` with an explicit turbofish
+// -- `GAAP_LEDGER_PLAN.md`'s Step 7 made `Ledger`'s real methods generic
+// over `V: amenable_core::Verifier` (`check_amount_positive`/`::check_
+// sufficient_funds` above match that shape, matching `amenable_creusot::
+// ledger`'s own identical fix and identical reasoning), so this captured
+// text needs *something* named `V` in scope to resolve at all. Unlike
+// Creusot's mirror, `fn exchange` itself can't gain a matching generic
+// parameter here -- `Exchange::exchange` is a fixed-arity trait method
+// (`amenable_core::exchange::Exchange::exchange(&self, input) -> ...`,
+// zero generics), and Rust rejects an impl adding one (confirmed against
+// the real toolchain: E0049, "method `exchange` has 1 type parameter but
+// its trait declaration has 0"). A plain alias sidesteps that instead:
+// `V` doesn't need to be a real generic parameter anywhere for the
+// turbofish to resolve, only a nameable type -- `check_amount_positive`/
+// `check_sufficient_funds` stay genuinely generic (called via `::<V>`),
+// bound here to the one concrete verifier this whole gallery module ever
+// uses.
+type V = GalleryVerifier;
 
 // `Transfer<S, Token>` -- generated by `verus_sidecar!`, the same
 // derive-equivalent macro `stoplight_exchange::Established<T, Token>`
@@ -671,6 +748,33 @@ verus_ensures!(
     }
 );
 
+// `reject`'s/`rollback`'s own claims are legitimately trivial (`result.
+// is_ok()`), matching every `Stoplight` edge's own shape and `amenable_
+// kani::ledger::Rejected::reject_ensures`'s/`::rollback_ensures`'s own
+// real Kani claim exactly -- unlike Creusot (`amenable_creusot::ledger`'s
+// own `Rejected<Pending>`/`Rejected<Validated>` `Witness<CreusotVerifier>`
+// impls carry no `Ensures` claim at all, defaulting `creusot_ensures` to
+// a bare `"true"`), `verus_exchange!`'s own template routes every edge's
+// postcondition through `Ensures<V>` unconditionally, with no such
+// default -- so a real, checked (if simple) claim is required here, not
+// optional. `GAAP_LEDGER_PLAN.md`'s Step 7, revisited: connected on
+// Creusot/Verus for the first time.
+verus_ensures!(
+    Rejected<Pending>,
+    GalleryVerifier,
+    rejected_from_pending_ensures_spec,
+    Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, TransferError>,
+    |result| result.is_ok()
+);
+
+verus_ensures!(
+    Rejected<Validated>,
+    GalleryVerifier,
+    rejected_from_validated_ensures_spec,
+    Result<Transfer<Rejected<Validated>, RejectedFromValidatedToken>, TransferError>,
+    |result| result.is_ok()
+);
+
 // `PendingToken`/`ValidatedToken`/`CommittedToken` and their `ProofToken`/
 // `Establish<_, GalleryVerifier>` impls -- generated by `amenable emit-
 // verus-gaap-tokens` from `amenable_core::ProofTokenMintRecord`
@@ -696,13 +800,16 @@ verus_ensures!(
 // changing a real `amenable_gaap` token type; do not hand-edit.
 include!("generated/ledger_tokens.rs");
 
-// The two `Witness<GalleryVerifier>`/`Exchange<..>` impls -- generated by
-// `amenable::emit-verus-exchange-companions` from `amenable_core::
+// The four `Witness<GalleryVerifier>`/`Exchange<..>` impls -- generated
+// by `amenable::emit-verus-exchange-companions` from `amenable_core::
 // ExchangeEdgeRecord`, not hand-written or hand-copied. `include!`, not
 // `mod`: shares this file's own scope directly (`Pending`/`Validated`/
-// `Committed`/`Transfer`/`TransferError`/`Ledger`/`GalleryVerifier`
-// above, already in scope), matching `stoplight_exchange.rs`'s identical
-// reason. Regenerate with `just generate-verus-exchange` after changing
-// a real Kani-side transition; do not hand-edit the included files.
+// `Committed`/`Rejected`/`Transfer`/`TransferError`/`Ledger`/
+// `GalleryVerifier` above, already in scope), matching `stoplight_
+// exchange.rs`'s identical reason. Regenerate with `just generate-verus-
+// exchange` after changing a real Kani-side transition; do not hand-edit
+// the included files.
 include!("generated/ledger_exchange/validate.rs");
 include!("generated/ledger_exchange/commit.rs");
+include!("generated/ledger_exchange/reject.rs");
+include!("generated/ledger_exchange/rollback.rs");

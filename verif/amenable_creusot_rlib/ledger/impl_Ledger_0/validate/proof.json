@@ -7,8 +7,8 @@
         "prover": "alt-ergo",
         "time": 0.015
       },
-      "vc_check_amount_positive": { "prover": "alt-ergo", "time": 0.013 },
-      "vc_check_sufficient_funds": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_check_amount_positive_V": { "prover": "alt-ergo", "time": 0.016 },
+      "vc_check_sufficient_funds_V": { "prover": "alt-ergo", "time": 0.019 },
       "vc_clone_TransferPayload": { "prover": "alt-ergo", "time": 0.015 },
       "vc_elim_Break": { "prover": "alt-ergo", "time": 0.017 },
       "vc_establish_Validated": { "prover": "alt-ergo", "time": 0.024 },
@@ -30,33 +30,7 @@
         "time": 0.018
       },
       "vc_to''0": { "prover": "alt-ergo", "time": 0.017 },
-      "vc_validate": {
-        "tactic": "compute_specified",
-        "children": [
-          {
-            "tactic": "split_vc",
-            "children": [
-              { "prover": "alt-ergo", "time": 0.026 },
-              { "prover": "alt-ergo", "time": 0.029 },
-              { "prover": "alt-ergo", "time": 0.029 },
-              { "prover": "alt-ergo", "time": 0.03 },
-              { "prover": "alt-ergo", "time": 0.026 },
-              { "prover": "z3", "time": 0.01 },
-              { "prover": "alt-ergo", "time": 0.101 },
-              { "prover": "alt-ergo", "time": 0.019 },
-              { "prover": "alt-ergo", "time": 0.03 },
-              { "prover": "alt-ergo", "time": 0.037 },
-              { "prover": "z3", "time": 0.011 },
-              { "prover": "z3", "time": 0.012 },
-              { "prover": "z3", "time": 0.002 },
-              { "prover": "alt-ergo", "time": 0.031 },
-              { "prover": "alt-ergo", "time": 0.352 },
-              { "prover": "alt-ergo", "time": 0.024 },
-              { "prover": "alt-ergo", "time": 0.022 }
-            ]
-          }
-        ]
-      },
+      "vc_validate_V": { "prover": "alt-ergo", "time": 0.107 },
       "vc_value": { "prover": "alt-ergo", "time": 0.019 }
     }
   }

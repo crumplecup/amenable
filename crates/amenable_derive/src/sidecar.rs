@@ -2,6 +2,24 @@
 //! constructor) from a `#[sidecar(verifier = "..")]` attribute and two
 //! field markers (`#[sidecar(primary)]`/`#[sidecar(token)]`).
 //!
+//! `verifier` is optional, matching `#[amenable_derive::establish]`'s own
+//! verifier-less form (see that module's doc comment for the full
+//! rationale). When omitted, this generates one backend-generic `impl<V:
+//! Verifier> Sidecar<V> for X where Proposition: Evidence + Witness<V>` --
+//! `primary()`/`sidecar()`'s own bodies are pure structural glue (`&self.
+//! primary`/`self.token.clone()`), with zero backend-specific content
+//! either way, so unlike `#[establish]`'s trivial mint body this was
+//! *always* possible; it just never had a consumer needing it before a
+//! carrier type itself needed to live in a neutral crate (`GAAP_LEDGER_
+//! PLAN.md`'s Step 9). One real consequence: with `V` generic, there is no
+//! concrete verifier text left to gate `primary_ensures_attr`/`creusot_
+//! ensures_attr` on (`quote!(V).to_string()` is just `"V"`, never `
+//! "CreusotVerifier"`), so neither is ever generated in this mode --
+//! Creusot's own real `#[ensures(..)]` content for `primary()`/`new()`
+//! has to move to an `extern_spec!` written in `amenable_creusot` instead,
+//! the same relocation `#[establish]`'s own verifier-less form already
+//! forced for `establish()`'s real Creusot contract.
+//!
 //! Every carrier type built so far for an `Exchange`-shaped proof
 //! (`amenable_kani::stoplight::Established<T, Token>`,
 //! `amenable_kani::ledger::Transfer<S, Token>`, and their per-backend
@@ -29,7 +47,7 @@ use syn::{
 };
 
 struct SidecarArgs {
-    verifier: Type,
+    verifier: Option<Type>,
     proposition: Option<Type>,
     constructor: Visibility,
 }
@@ -64,9 +82,31 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
         .proposition
         .clone()
         .unwrap_or_else(|| primary_ty.clone());
-    let verifier = &args.verifier;
+
+    // Verifier-less mode adds a fresh generic parameter `V: Verifier`
+    // rather than naming any concrete verifier -- see this module's own
+    // doc comment for why this is possible here (unlike `#[establish]`'s
+    // trivial-mint case, `Sidecar`'s own body was always backend-neutral;
+    // it just never had a caller needing genericity before).
+    let fresh_verifier: Type = parse_quote!(V);
+    let verifier: &Type = args.verifier.as_ref().unwrap_or(&fresh_verifier);
+
+    // `ty_generics` (the `<S, Token>` in `Transfer<S, Token>`'s own type
+    // application) has to come from the struct's *original*, unmodified
+    // generics -- `V`, added below only for the `impl<..>` header and
+    // where-clause, is never one of `Transfer`'s own type parameters, so
+    // splitting a single augmented `Generics` for all three (`impl_
+    // generics`/`ty_generics`/`where_clause` together) would incorrectly
+    // inject `V` into the type application too (`Transfer<S, Token, V>`,
+    // which doesn't exist).
+    let (_, ty_generics, _) = input.generics.split_for_impl();
 
     let mut generics = input.generics.clone();
+    if args.verifier.is_none() {
+        generics
+            .params
+            .push(parse_quote!(V: ::amenable_core::Verifier));
+    }
     let evidence_predicate = evidence_bound(&generics, primary_ty, &proposition_ty, verifier);
     let token_predicate: WherePredicate = parse_quote!(#token_ty: ::amenable_core::ProofToken<Proposition = #proposition_ty> + ::std::clone::Clone);
     {
@@ -74,14 +114,17 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
         where_clause.predicates.push(evidence_predicate);
         where_clause.predicates.push(token_predicate);
     }
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let (impl_generics, _, where_clause) = generics.split_for_impl();
 
     // Gated on `verifier`'s own stringified text, not `#[cfg_attr(
     // creusot, ..)]` -- see `creusot_ensures_attr`'s own doc comment,
     // below, for the real reason (a `cargo creusot` build sets `--cfg
     // creusot` across its whole dependency graph, not just the crate it
-    // translates).
-    let is_creusot = quote!(#verifier).to_string() == "CreusotVerifier";
+    // translates). Always `false` in verifier-less mode: `V` is a bare
+    // generic parameter with no concrete text to compare, by design --
+    // see this module's own doc comment for where Creusot's real content
+    // goes instead.
+    let is_creusot = args.verifier.is_some() && quote!(#verifier).to_string() == "CreusotVerifier";
 
     // Real, not decorative, for the identical reason `creusot_ensures_
     // attr` (below) is: `validate`'s own real body extracts data through
@@ -305,12 +348,7 @@ fn parse_sidecar_args(attrs: &[syn::Attribute]) -> syn::Result<SidecarArgs> {
     }
 
     Ok(SidecarArgs {
-        verifier: verifier.ok_or_else(|| {
-            Error::new(
-                proc_macro2::Span::call_site(),
-                "sidecar requires `verifier = \"...\"`",
-            )
-        })?,
+        verifier,
         proposition,
         constructor: constructor.unwrap_or(Visibility::Public(Default::default())),
     })

@@ -34,22 +34,22 @@ amenable_derive::harness! {
         /// expensive here, or whether the cost is structural to the
         /// `#[kani::proof_for_contract(Ledger::commit)]` setup chain
         /// itself, independent of what's symbolic.
-        #[kani::proof_for_contract(crate::Ledger::commit)]
+        #[kani::proof_for_contract(amenable_gaap::Ledger::commit)]
         fn commit_contract_with_concrete_amounts() {
             use amenable_core::{Establish, Sidecar};
 
-            let ledger = amenable_kani::Ledger::new(100);
+            let ledger = amenable_gaap::Ledger::new(100);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(50),
             );
-            let pending = amenable_kani::Transfer::pending(payload.clone());
+            let pending = amenable_gaap::Transfer::pending(payload.clone());
             let credential = pending.sidecar();
-            let validated_token = amenable_gaap::Validated::establish(credential);
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
-                amenable_kani::Transfer::new(payload, validated_token);
-            let _ = ledger.commit(validated);
+            let validated_token = <amenable_gaap::Validated as Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
+            let validated: amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
+                amenable_gaap::Transfer::diagnostic_new(payload, validated_token);
+            let _ = ledger.commit::<amenable_kani::KaniVerifier>(validated);
         }
     }
 }
@@ -80,20 +80,20 @@ amenable_derive::harness! {
         /// `commit`'s own contract is unaffected either way -- DFCC
         /// only checks `commit`'s body/postcondition, not how the
         /// harness's own input was assembled.
-        #[kani::proof_for_contract(crate::Ledger::commit)]
+        #[kani::proof_for_contract(amenable_gaap::Ledger::commit)]
         fn commit_contract_bypassing_establish_chain() {
             let amount: i64 = kani::any();
             let balance: i64 = kani::any();
-            let ledger = amenable_kani::Ledger::new(balance);
+            let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
-                amenable_kani::Transfer::new(payload, validated_token);
-            let _ = ledger.commit(validated);
+            let validated: amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
+                amenable_gaap::Transfer::diagnostic_new(payload, validated_token);
+            let _ = ledger.commit::<amenable_kani::KaniVerifier>(validated);
         }
     }
 }
@@ -118,21 +118,21 @@ amenable_derive::harness! {
         /// overflows) is the real driver, independent of the
         /// `Establish`/`Sidecar` construction chain (already bypassed
         /// here, same as `commit_contract_bypassing_establish_chain`).
-        #[kani::proof_for_contract(crate::Ledger::commit)]
+        #[kani::proof_for_contract(amenable_gaap::Ledger::commit)]
         fn commit_contract_with_amount_assumed_positive() {
             let amount: i64 = kani::any();
             kani::assume(amount > 0);
             let balance: i64 = kani::any();
-            let ledger = amenable_kani::Ledger::new(balance);
+            let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
-                amenable_kani::Transfer::new(payload, validated_token);
-            let _ = ledger.commit(validated);
+            let validated: amenable_gaap::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
+                amenable_gaap::Transfer::diagnostic_new(payload, validated_token);
+            let _ = ledger.commit::<amenable_kani::KaniVerifier>(validated);
         }
     }
 }

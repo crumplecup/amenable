@@ -170,7 +170,8 @@ fn expect_path(expr: &Expr) -> syn::Result<Path> {
     Ok(expr_path.path.clone())
 }
 
-fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
+/// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim.
+pub(crate) fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
     let Expr::Lit(expr_lit) = expr else {
         return Err(Error::new_spanned(expr, "expected a string literal"));
     };
@@ -180,7 +181,8 @@ fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
     lit_str.parse()
 }
 
-fn expect_lit_str(expr: &Expr) -> syn::Result<LitStr> {
+/// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim.
+pub(crate) fn expect_lit_str(expr: &Expr) -> syn::Result<LitStr> {
     let Expr::Lit(expr_lit) = expr else {
         return Err(Error::new_spanned(expr, "expected a string literal"));
     };
@@ -340,6 +342,14 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
                 method_name: stringify!(#method_ident),
                 body: #body_source,
                 creusot_ensures: #creusot_ensures_lit,
+                // Every `#[exchange(..)]`-decorated edge today is a
+                // non-generic method (`Ledger::validate`/`::commit`
+                // moved to `#[capture_exchange_body(..)]` once they
+                // gained a real `<V: Verifier>` parameter, precisely
+                // because this macro requires a concrete `verifier`
+                // -- see `ExchangeEdgeRecord::method_generics`'s own
+                // doc comment).
+                method_generics: "",
             }
         }
 
@@ -359,7 +369,10 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
 /// Strip the outer `{`/`}` a brace-spanning `source_text()` includes,
 /// along with the whitespace immediately inside them -- the same helper
 /// `harness.rs` defines for its own, structurally identical need.
-fn trim_braces(text: &str) -> &str {
+/// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim rather
+/// than duplicating it -- the identical span-capture technique, applied
+/// to a method with no injected contract/`Witness`/`Exchange` bundle.
+pub(crate) fn trim_braces(text: &str) -> &str {
     text.trim()
         .strip_prefix('{')
         .and_then(|text| text.strip_suffix('}'))
@@ -367,8 +380,9 @@ fn trim_braces(text: &str) -> &str {
         .unwrap_or(text)
 }
 
-/// Extract `(T, E)` from a `Result<T, E>` return type.
-fn extract_result_generics(ty: &Type) -> syn::Result<(Type, Type)> {
+/// Extract `(T, E)` from a `Result<T, E>` return type. `pub(crate)`: see
+/// [`trim_braces`]'s own doc comment.
+pub(crate) fn extract_result_generics(ty: &Type) -> syn::Result<(Type, Type)> {
     let Type::Path(type_path) = ty else {
         return Err(Error::new_spanned(ty, "expected `Result<Output, Error>`"));
     };

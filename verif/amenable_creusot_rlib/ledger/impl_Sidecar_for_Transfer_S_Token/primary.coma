@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 193 9 193 33 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33 *)
 
 (* <ledger::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 193 9 193 33
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 
 use creusot.int.UInt64
@@ -37,7 +37,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec primary_Transfer_S_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 193 9 193 33]
+let rec primary_Transfer_S_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33]
   (self: t_Transfer_S_Token) (return (x: t_TransferPayload)) =
   {[@stop_split] [@expl:primary 'self' type invariant] [%#sledger] inv_ref_Transfer_S_Token self}
   (! bb0

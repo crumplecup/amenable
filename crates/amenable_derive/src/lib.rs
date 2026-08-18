@@ -1,6 +1,7 @@
 //! Proc macros for the `amenable` constitutional trait family.
 
 mod calculation;
+mod capture_exchange_body;
 mod establish;
 mod evidence;
 mod exchange;
@@ -24,6 +25,7 @@ use syn::{
 };
 
 use calculation::{CalculationArgs, expand_calculation};
+use capture_exchange_body::{CaptureExchangeBodyArgs, expand_capture_exchange_body};
 use establish::{EstablishArgs, expand_establish};
 use evidence::expand_evidence;
 use exchange::{ExchangeArgs, expand_exchange};
@@ -99,6 +101,28 @@ pub fn exchange(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemImpl);
 
     match expand_exchange(&args, &input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// `#[capture_exchange_body(evidence = "..", creusot_ensures = "..")]` on
+/// `impl SelfType { fn method(&self, input: Input) -> Result<Output,
+/// Error> { .. } }` — registers a real `ExchangeEdgeRecord` from the
+/// method's own real body, verbatim, leaving the method itself
+/// completely untouched. See `capture_exchange_body.rs`'s own doc
+/// comment for why this is a separate, narrower macro from `#[exchange(
+/// ..)]` rather than a mode of it: `GAAP_LEDGER_PLAN.md`'s Step 7 moved
+/// `Ledger`'s own methods to a neutral crate with a fully generic
+/// `Ensures<V>` bound, so there is no concrete verifier left for
+/// `#[exchange(..)]`'s own contract/`Witness<V>`/`Exchange<..>` bundle to
+/// name.
+#[proc_macro_attribute]
+pub fn capture_exchange_body(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(attr as CaptureExchangeBodyArgs);
+    let input = parse_macro_input!(item as ItemImpl);
+
+    match expand_capture_exchange_body(&args, &input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

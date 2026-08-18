@@ -56,8 +56,17 @@ use crate::{AmenableError, AmenableResult};
 
 /// The tokens this gallery module's generated companion covers -- see
 /// this module's own doc comment for why an explicit table, not every
-/// `ProofTokenMintRecord` in the registry.
-const TOKENS: &[&str] = &["PendingToken", "ValidatedToken", "CommittedToken"];
+/// `ProofTokenMintRecord` in the registry. `RejectedFromPendingToken`/
+/// `RejectedFromValidatedToken` joined in a later pass (`GAAP_LEDGER_
+/// PLAN.md`'s Step 7, revisited), once `reject`/`rollback` themselves
+/// were connected here too.
+const TOKENS: &[&str] = &[
+    "PendingToken",
+    "ValidatedToken",
+    "CommittedToken",
+    "RejectedFromPendingToken",
+    "RejectedFromValidatedToken",
+];
 
 /// One token's real shape, gathered from the registry -- see
 /// [`gather_tokens`].
@@ -163,17 +172,16 @@ fn render_companion(specs: &[&TokenSpec]) -> String {
     );
 
     for spec in specs {
+        let proposition = tidy_stringified_type(spec.proposition);
         out.push_str(&format!(
             "#[derive(Clone, Copy)]\npub struct {token};\n\nimpl ProofToken for {token} {{\n    type Proposition = {proposition};\n}}\n\n",
             token = spec.token,
-            proposition = spec.proposition,
         ));
 
         if let Some(credential) = spec.credential {
             out.push_str(&format!(
                 "impl Establish<{credential}, GalleryVerifier> for {proposition} {{\n    type Token = {token};\n\n    fn establish(_credential: {credential}) -> Self::Token {{\n        {token}\n    }}\n}}\n\n",
                 credential = credential,
-                proposition = spec.proposition,
                 token = spec.token,
             ));
         }
@@ -181,4 +189,39 @@ fn render_companion(specs: &[&TokenSpec]) -> String {
 
     out.push_str("} // verus!\n");
     out
+}
+
+/// `stringify!(#ty)`'s one-space-per-token join (`Rejected < Pending >`)
+/// survives untouched into the generated output otherwise -- the
+/// identical real reason `creusot_export`'s/`verus_exchange_export`'s
+/// own versions of this function document (`rustfmt` doesn't reformat
+/// inside a macro invocation's own token tree, and this file's whole
+/// generated body sits inside one `verus_builtin_macros::verus! { .. }`
+/// call). Every proposition before `Rejected<Pending>`/`Rejected<
+/// Validated>` joined `TOKENS` was a bare identifier (`Pending`/
+/// `Validated`/`Committed`), so this was silently correct-by-coincidence
+/// until a generic one arrived. Byte-for-byte the same fix as the other
+/// two generators' own copies, duplicated rather than shared for the
+/// identical reason theirs are: three structurally different renderers,
+/// each with its own `AmenableResult` plumbing, not worth a shared
+/// module yet.
+fn tidy_stringified_type(stringified: &str) -> String {
+    let mut tidied = String::with_capacity(stringified.len());
+    let mut chars = stringified.chars().peekable();
+
+    while let Some(ch) = chars.next() {
+        match ch {
+            ' ' if chars.peek() == Some(&'<') => {}
+            '<' => {
+                tidied.push(ch);
+                while chars.peek() == Some(&' ') {
+                    chars.next();
+                }
+            }
+            ' ' if matches!(chars.peek(), Some(',') | Some('>')) => {}
+            _ => tidied.push(ch),
+        }
+    }
+
+    tidied
 }

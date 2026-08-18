@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 288 4 288 29 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 312 4 312 29 *)
 
 (* <ledger::TransferPayload as amenable_core::Evidence> *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 292 27 292 28
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 290 18 290 19
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 291 16 291 17
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 316 27 316 28
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 314 18 314 19
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 315 16 315 17
 
 use creusot.int.Int64
 use creusot.int.UInt64
@@ -18,7 +18,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec basis_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 288 4 288 29]
+let rec basis_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 312 4 312 29]
   (return (x: t_TransferPayload)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_1 <- { f0 = ([%#sledger] (0: Int64.t)) } ] s1

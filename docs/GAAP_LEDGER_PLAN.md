@@ -50,7 +50,40 @@ there surfaced four new real Creusot toolchain findings (logic-context
 method-call restriction, a genuine `Result::map_err` contract gap in
 `creusot-std` itself, `cargo creusot`'s global `--cfg creusot` scope,
 and two rounds of proof-transparency visibility requirements) — see
-Step 6 below for the full account.
+Step 6 below for the full account. Step 7 closes the generalization
+question Step 7+ used to leave open, for Kani: `Ledger`/`Transfer`/
+`TransferError` and every one of `Ledger`'s own methods (`validate`/
+`commit`/`reject`/`rollback`/`check_amount_positive`/`check_sufficient_
+funds`) now live in `amenable_gaap` for real, with Kani contracts
+attached directly to the real, generic-over-`V` methods — no per-
+backend duplicate `Ledger` left in `amenable_kani` at all. Getting
+there required root-causing a genuine Kani 0.67.0 DFCC bug (any
+contracted function whose body *delegates* to a separate function —
+free function or associated function, any contract content — fails
+`free.frees.1` at a builtin location; contracting the real method
+directly, with no wrapper, is the confirmed fix), fully characterized
+via four registered `gallery::ledger_gaap_free_function_contract`
+cases. Creusot and Verus are now re-pointed too, via a new, narrower
+`#[amenable_derive::capture_exchange_body(..)]` macro (Kani's contract
+stays hand-written directly on the method; this only re-registers the
+`ExchangeEdgeRecord` the generated companions read). `reject`/
+`rollback` — left unconnected on Creusot/Verus since Step 4/Step 6 as a
+real scope call, not a technical wall — are now connected there too,
+closing the last asymmetry `Stoplight`'s own equally trivial edges
+never had: both needed real new `Rejected<T>`/token mirror scaffolding
+on both backends (only `Pending`/`Validated`/`Committed` were ever
+mirrored before), and Verus's own `verus_exchange!` template turned out
+to need a real, non-optional `Ensures<V>` claim per edge (`result.
+is_ok()`), unlike Creusot's `"true"`-by-default. `cargo creusot prove`
+reports `Proved (142 files) ✔`, `verus --crate-type=lib` reports `491
+verified, 0 errors`, both re-confirmed non-vacuous via a real
+injected-bug regression check at every stage. See Step 7 below for the
+full account, including a real turbofish-resolution wrinkle solved
+differently per backend for `validate` (an unconstrained mirror-side
+`<V>` for Creusot, a module-level `type V = GalleryVerifier;` alias for
+Verus, since `Exchange::exchange`'s fixed trait arity rejects a generic
+parameter there), and a real justfile gap closed along the way
+(`emit-verus-gaap-tokens` had no `just` recipe at all until now).
 
 ## Motivation
 
@@ -635,7 +668,7 @@ mirror plus the existing `ExchangeEdgeRecord` codegen, generalized —
 not a direct `amenable_creusot -> amenable_kani` dependency, which
 stayed a settled no throughout).
 
-### Step 4 — Verus — `Validated`/`Committed` done via the real derives, `reject`/`rollback` deferred
+### Step 4 — Verus — `Validated`/`Committed` done via the real derives, `reject`/`rollback` deferred (connected later, see Step 7)
 
 **A real correction before any of it was written.** This section
 originally planned to mirror Steps 1/2 by hand, following `stoplight_
@@ -712,7 +745,11 @@ warnings`/`test --all-features` all clean too.
 Pending>`/`Rejected<Validated>`) -- both are legitimately trivial
 (`result.is_ok()`) on every backend already proving them, and
 connecting them here would be real, not free, work for no new proof
-content. Left for a future pass.
+content. Left for a future pass. **Revisited and closed in Step 7** (the
+codegen mechanism `validate`/`commit` proved out there made connecting
+these two cheap; the real remaining cost was building `Rejected<T>`
+mirror scaffolding neither backend had, since only `Pending`/
+`Validated`/`Committed` were ever mirrored here).
 
 ### Step 5 — derive the carrier shape and the atomic contract bounds, not hand-write them — done, all three backends
 
@@ -904,14 +941,214 @@ reconfirmed clean too (`478 verified, 0 errors`, unchanged) — the
 shared `#[derive(Sidecar)]` change is verifier-text-gated and produces
 no new tokens for Verus's own `verus_sidecar!` macro_rules! path.
 
-### Step 7+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
+### Step 7 — move `Ledger`'s real methods to `amenable_gaap` — done, all three backends, including `reject`/`rollback`
 
-Once all three backends prove the same real edges by hand, revisit
-whether/how the existing `ExchangeEdgeRecord`/codegen layer extends to
-`amenable_gaap`, and whether the Creusot placeholder-predicate gap
-needs a real fix (informed by, not copied from, elicitation's
-`Prop::*_invariant_fn_name()` pattern) now that a genuinely
-non-trivial predicate exists to expose it for real.
+Prompted by a direct question: `Stoplight`'s own edges already prove
+the shared-model/per-backend-impl split works (real logic in
+`amenable_gaap`/`amenable_core`, a thin per-backend proof registration
+alongside it) — why did `Ledger`'s own methods (`validate`/`commit`/
+`reject`/`rollback`/the two `check_*` helpers) still live entirely in
+`amenable_kani`, duplicated by hand for Creusot (Step 6) and Verus
+(Step 4) instead of following the same pattern? There was no real
+answer — only an unexamined assumption from early in this plan. This
+step does the actual migration for Kani.
+
+**The blocker, root-caused for real.** Rust's inherent-impl locality
+rule (`impl Type { fn method() }` requires `Type` itself to be local to
+the crate writing the impl — no orphan-rule loophole the way trait
+impls get) means `Ledger`'s methods can't stay split across two crates:
+once `Ledger` itself moves to `amenable_gaap`, every one of its methods
+has to move there too, in one pass, not incrementally.
+
+Moving the methods hit a real Kani 0.67.0 DFCC (Dynamic Frame Condition
+Checking) tooling bug immediately: contracting `amenable_gaap::
+Ledger::commit` directly failed CBMC's `free.frees.1` check ("check
+that ptr is freeable") at a generic builtin location, immediately after
+DFCC's own `no_alloc_dealloc_in_ensures`/`single_top_level_call`/
+`no_recursive_call` sanity checks passed — with no diagnostic pointing
+at anything in this codebase's own logic. First response was to try a
+thin `amenable_kani`-side wrapper delegating to the real method (the
+obvious accommodation-model move) — same failure, byte-for-byte
+identical location, regardless of the wrapper's shape (bare free
+function vs. an associated function on a local zero-sized type) or the
+contract's own content (the real claim vs. a trivial `true`). Fully
+characterized via four registered gallery cases (`gallery::
+ledger_gaap_free_function_contract`): three real, confirmed failures
+(`commit_contract_free_function_wrapper`, `commit_contract_local_type_
+wrapper`, `commit_contract_trivial_ensures`) and the confirmed fix
+(`commit_contract_no_wrapper`) — attach the Kani contract *directly* to
+the real, generic method itself, with **zero delegation**, using a
+fully generic `Ensures<V>` where-bound (e.g. `BalancedEntries: amenable_
+core::Ensures<V, Input = i64, Bound = bool>`) rather than naming a
+concrete verifier. This compiles from the neutral `amenable_gaap` crate
+with no backend dependency, and verifies clean (`0 of 287 failed`) —
+the bug is specific to the delegation pattern, not to cross-crate
+generic contracts as such.
+
+Applying this pattern to all six of `Ledger`'s methods required two
+supporting changes:
+
+- `#[derive(amenable_derive::Sidecar)]` gained a verifier-less generic
+  form (mirroring `#[amenable_derive::establish(..)]`'s existing one):
+  `Transfer<S, Token>` derives `impl<V: Verifier> Sidecar<V> for
+  Transfer<S, Token> where S: Evidence + Witness<V>` instead of naming
+  `KaniVerifier` — Creusot's real content for this case would need an
+  `extern_spec!`, not yet built, deferred alongside Step 7's own
+  Creusot/Verus re-pointing.
+- Two new tokens (`RejectedFromPendingToken`/`RejectedFromValidatedToken`)
+  moved to `amenable_gaap::tokens` alongside `PendingToken`/
+  `ValidatedToken`/`CommittedToken`, minted via `#[amenable_derive::
+  establish(..)]`'s own verifier-less form — the same "move the type,
+  mint it generically, gate only on which backend has a registered
+  `Witness<V>`" mechanism Step 5 already established for the other
+  three tokens.
+
+**The production swap.** Once the pattern was proven, `amenable_kani`'s
+own duplicate `Ledger`/`Transfer`/`TransferError`/`RejectedFrom*Token`
+were retired entirely — keeping both would mean the exact duplicate-
+logic anti-pattern this whole lineage exists to eliminate. `amenable_
+kani::ledger` now holds only what's genuinely Kani-specific and can't
+move: each atomic contract type's own `Ensures<KaniVerifier>` impl
+(`kani_ensures!`, a real checked `bool` predicate), and the `Witness<
+KaniVerifier>` impls that used to come "for free" from `#[amenable_
+derive::exchange(..)]` (no longer usable here once the contracted
+methods themselves moved, since that macro requires naming a concrete
+verifier) — now hand-written, referencing the real harnesses in the new
+`amenable_kani::gaap_ledger` module. All affected call sites (`tests/
+ledger_test.rs`, `gallery::ledger_commit_contract_timeout`, `gallery::
+ledger_account_id_comparison`) were repointed at `amenable_gaap`'s
+types, with `::<KaniVerifier>` turbofish added to every real-`Ledger`
+generic method call (the many local, self-contained twin-`Ledger`
+structs those gallery files also define for isolated comparison stay
+untouched — they were never generic). Re-verified clean: all six real
+harnesses pass (`check_amount_positive`, `check_sufficient_funds`,
+`validate` ×2, `commit`, `reject`, `rollback`), full workspace `cargo
+check`/`clippy -D warnings`/`fmt --check`/`test` all clean.
+
+**Creusot/Verus re-pointed too, closing Step 7's own follow-up.** The
+orphaned-provenance gap above is now fixed: a new, narrower attribute
+macro, `#[amenable_derive::capture_exchange_body(evidence = ..,
+creusot_ensures = .., method_generics = ..)]`, registers a real
+`ExchangeEdgeRecord` from a method's own real body verbatim — the same
+`Span::source_text()` capture `#[exchange(..)]` uses (shared via that
+module's own `pub(crate)` helpers), but generating *nothing else at
+all*: no contract, no `Witness<V>` impl, no `Exchange<..>` impl,
+appropriate now that `Ledger::validate`'s/`::commit`'s own Kani contract
+is hand-written directly on the method (this step, above) rather than
+macro-injected, and there is no single concrete verifier left for
+`#[exchange(..)]`'s own bundle to name. `validate`/`commit` each moved
+into their own single-method `impl Ledger { .. }` block in `amenable_
+gaap::ledger.rs` (matching `#[exchange(..)]`'s own long-standing
+"exactly one method, captured at its own call site" requirement) and
+gained this attribute; `just generate-creusot`/`just generate-verus-
+exchange` now regenerate `validate.rs`/`commit.rs` from a live source
+again.
+
+One new, real wrinkle, found empirically: `validate`'s captured body
+calls `Self::check_amount_positive::<V>(amount)`/`self.check_sufficient_
+funds::<V>(amount)` with an explicit turbofish, naming a generic
+parameter (`V`) the real method declares — a generated companion's own
+function needs *something* named `V` in scope for that captured text to
+resolve at all. `ExchangeEdgeRecord` gained a `method_generics: &'static
+str` field for this (`"V"` for `validate`, `""` for every edge without
+such a call). Creusot's fix: the codegen splices `<V>` onto the
+generated function's own signature, and `amenable_creusot::ledger`'s
+mirror `check_amount_positive`/`check_sufficient_funds` gained a
+matching unconstrained `<V>` (no bound — Creusot's own `Ensures<
+CreusotVerifier>` impl has a structurally different shape, `Input = ()`
+not `i64`, so mirroring the real bound here would be a type mismatch,
+not a stronger proof). Verus's fix had to be different: `Exchange::
+exchange` is a fixed-arity trait method, and Rust rejects an impl adding
+a generic parameter to it (confirmed against the real toolchain: E0049)
+— so `amenable_verus::gallery::ledger_exchange` instead declares a
+plain module-level `type V = GalleryVerifier;` alias, binding the name
+without touching `fn exchange`'s own signature at all. Both mirror
+helpers' own `<V>` also needed a trivial `let _phantom: PhantomData<V>
+= PhantomData;` body statement to satisfy a real, un-`#[allow]`-able
+clippy lint (`clippy::extra_unused_type_parameters`) — Creusot's own
+mirror is `#[cfg(creusot)]`-gated and so never reaches ordinary clippy
+at all, but Verus's isn't (`amenable_verus` compiles unconditionally
+under plain `rustc`/clippy, spec clauses erased), so only that side hit
+the lint for real.
+
+Re-verified clean on all three backends: `cargo creusot prove -- -p
+amenable_creusot` reports `Proved (138 files) ✔` (a real injected-bug
+regression check — loosening `amount_positive_holds`'s own claim —
+produced precise `vc_check_amount_positive`/`vc_validate`/`vc_check_
+amount_positive_V` failures before being reverted, confirming the new
+generic-suffixed mirror method is genuinely checked, not vacuous);
+`verus --crate-type=lib` reports `478 verified, 0 errors` (unchanged
+from before this step; an identical injected-bug check on `amenable_
+verus::gallery::ledger_exchange`'s own `AmountPositive` claim produced a
+precise `postcondition not satisfied` failure at the generated
+`validate` companion before being reverted); Kani re-verified
+unaffected by the `amenable_gaap::ledger.rs` restructuring
+(`check_amount_positive`/`validate`/`commit`, spot-checked, all `0 of N
+failed`); full workspace `cargo check`/`clippy -D warnings`/`fmt
+--check`/`test` all clean.
+
+**`reject`/`rollback`, revisited and closed.** Both stayed unconnected
+on Creusot/Verus since Step 4/Step 6 — a real scope call at the time
+(legitimately trivial, no new proof content), not a technical wall, and
+`Stoplight`'s own equally trivial edges were always connected
+everywhere. Once the capture mechanism above was proven out on
+`validate`/`commit`, closing the asymmetry was cheap on the codegen
+side (`reject`/`rollback` both moved into their own single-method `impl
+Ledger { .. }` block in `amenable_gaap::ledger.rs`, each gaining
+`#[capture_exchange_body(evidence = "Rejected<Pending>" | "Rejected<
+Validated>")]`, no `method_generics` needed — neither body calls a
+`::<V>` helper) but required real new scaffolding neither backend had:
+`Rejected<T>` and its two tokens were never mirrored, only `Pending`/
+`Validated`/`Committed` were.
+
+- **Creusot**: `Rejected<T>` is a real `amenable_gaap` type this crate
+  already depends on (no mirror needed, matching `Pending`/`Validated`/
+  `Committed`'s own precedent) — just a trivial `Witness<CreusotVerifier>`
+  impl per instantiation, plus `extern_spec!` entries for `Establish<
+  PendingToken, V> for Rejected<Pending>`/`Establish<ValidatedToken, V>
+  for Rejected<Validated>` (the same external-function gap `Validated`'s/
+  `Committed`'s own entries already close, one layer over). No
+  `creusot_ensures` override — defaults to the standing `"true"`,
+  matching every `Stoplight` edge's own identically trivial claim.
+- **Verus**: needed a real local mirror (`verus --crate-type=lib` can
+  never resolve `amenable_gaap` at all) — a generic `pub struct
+  Rejected<T> { _marker: PhantomData<T> }` with a blanket `impl<T>
+  Evidence for Rejected<T>`, matching `Pending`'s/`Validated`'s/
+  `Committed`'s own root-claim shape (no `Provenance` chain, unlike the
+  real type's own conditional `#[derive(Standard)]`). One real
+  discovery here: unlike Creusot, `verus_exchange!`'s own template
+  routes *every* edge's postcondition through `Ensures<V>`
+  unconditionally, with no `"true"` fallback — so `Rejected<Pending>`/
+  `Rejected<Validated>` needed a real `verus_ensures!(.., |result|
+  result.is_ok())` claim each, not an omission (matching Kani's own real
+  `result.is_ok()` claim for these two edges exactly, closer than
+  Creusot's own weaker default).
+- **Tokens**: `RejectedFromPendingToken`/`RejectedFromValidatedToken`
+  already had real `ProofTokenMintRecord` registrations (from `#[derive(
+  ProofToken)]`/`#[establish(..)]`'s verifier-less form, unconditional
+  since Step 7's own token relocation) — just needed adding to `amenable
+  ::verus_gaap_tokens_export`'s own `TOKENS` allowlist. Surfaced one real
+  latent bug in that generator: it never applied the `stringify!`-
+  spacing cleanup (`tidy_stringified_type`) `creusot_export`'s/`verus_
+  exchange_export`'s own copies already carry, silently correct-by-
+  coincidence until a generic `proposition` (`Rejected<Pending>`)
+  arrived — fixed with the identical, third copy of that helper.
+- **Justfile gap, found and closed along the way**: `emit-verus-gaap-
+  tokens` had no `just` recipe at all since Step 8 first built it —
+  every other codegen tool in this lineage has one. Added `generate-
+  verus-gaap-tokens` (rustfmt-wrapped, matching `generate-verus-
+  exchange`'s own shape) and wired it into `check-verus`/`clippy-verus`/
+  `test-verus`/`verify-verus`.
+
+Re-verified clean on both backends, each with a real injected-bug
+regression check: `cargo creusot prove` reports `Proved (142 files) ✔`
+(up from 138); `verus --crate-type=lib` reports `491 verified, 0
+errors` (up from 478) — a real injected bug (`Rejected<Pending>`'s own
+claim inverted to `result.is_err()`) produced a precise `postcondition
+not satisfied` failure before being reverted. Kani spot-checked
+unaffected (`verify_gaap_reject_always_succeeds`, `0 of 272 failed`).
+Full workspace `cargo check`/`clippy -D warnings`/`fmt --check`/`test`
+all clean.
 
 ## Open questions
 
@@ -931,14 +1168,31 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 6 closed the last unconnected corner (`Ledger::validate`/
-`::commit` now proven against real Creusot predicates too, `Proved
-(143 files) ✔`), via the codegen-driven route Step 4's own Verus
-connection already proved out — not the neutral-crate marker-type
-route this section used to weigh as the alternative. Step 7+ is the
-open item now: whether/how the existing `ExchangeEdgeRecord`/codegen
-layer generalizes beyond this one worked example, and whether the
-`creusot_ensures` string-literal mechanism (necessary because Creusot,
-unlike Kani/Verus, has no mechanical way to route a generated
-postcondition through `Ensures<V>`) is the right long-term shape or a
-stopgap worth revisiting once a third real edge exercises it.
+Step 7 closed the generalization question on all three backends, and
+then closed the one remaining scope boundary too: `Ledger`/`Transfer`/
+`TransferError` and all six of `Ledger`'s own methods (`validate`/
+`commit`/`reject`/`rollback`/`check_amount_positive`/`check_sufficient_
+funds`) now live in `amenable_gaap` for real, with no per-backend
+duplicate left in `amenable_kani`, via a confirmed fix for a real Kani
+0.67.0 DFCC bug (contract the real method directly, never through a
+delegating wrapper). Creusot's/Verus's own generated companions are
+re-pointed at the moved methods for real, via a new, narrower
+`#[amenable_derive::capture_exchange_body(..)]` macro that re-registers
+the `ExchangeEdgeRecord` they read (Kani's own contract stays
+hand-written directly on the method, not generated at all — this macro
+generates nothing else). `ExchangeEdgeRecord`'s codegen layer does now
+generalize to a neutral-crate-hosted, generic-over-`V` method, settling
+that half of Step 7+'s original open question; the `creusot_ensures`
+string-literal mechanism is untouched by this — still the same stopgap
+it always was, now proven to keep working once the captured method
+lives outside the per-backend crate too.
+
+`reject`/`rollback`, revisited by direct request ("time to revisit"),
+are now connected on Creusot and Verus too — the one deliberate,
+standing scope boundary from Step 4/Step 6 is now closed rather than
+left open, with real `Rejected<T>`/token mirror scaffolding built on
+both backends where none existed before. Nothing scoped for this plan
+is open now. Step 7+'s original question (whether the `ExchangeEdgeRecord`/
+codegen layer generalizes beyond `Stoplight`) is answered: yes, twice
+over, on a neutral-crate-hosted method and on every edge shape this
+worked example has (branching, infallible-composed, infallible-trivial).

@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 296 4 296 19 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 320 4 320 19 *)
 
 (* <ledger::TransferPayload as amenable_core::Evidence> *)
 
@@ -14,6 +14,6 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec audit_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 296 4 296 19]
+let rec audit_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 320 4 320 19]
   (self: t_TransferPayload) (return (x: ())) = (! bb0
   [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

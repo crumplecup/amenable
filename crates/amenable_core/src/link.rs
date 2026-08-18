@@ -158,6 +158,22 @@ pub struct ExchangeEdgeRecord {
     /// explicitly, the same way `kani_ensures!`/`verus_ensures!` are
     /// still hand-authored rather than derived.
     pub creusot_ensures: &'static str,
+    /// Extra generic type parameters the real method declares beyond
+    /// `Self`'s own (e.g. `"V"`), as a bare comma-separated list with no
+    /// angle brackets, or `""` for none. `GAAP_LEDGER_PLAN.md`'s Step 7:
+    /// `Ledger::validate`'s real body now calls `Self::check_amount_
+    /// positive::<V>(..)`/`self.check_sufficient_funds::<V>(..)` with an
+    /// explicit turbofish, naming a generic parameter the real method
+    /// itself declares -- a generated companion's own function has to
+    /// declare the identical parameter for that captured text to resolve
+    /// at all, even though the companion never gives it any bound
+    /// (unconstrained is enough: nothing in the captured body needs `V`
+    /// to satisfy any real trait, only to name *some* type the turbofish
+    /// can point at). `""` for every edge with no such call (every
+    /// `Stoplight` edge, `Ledger::commit`) — a codegen consumer splices
+    /// this verbatim between `fn method_name<` and `>` only when
+    /// non-empty, adding no generic parameter list at all otherwise.
+    pub method_generics: &'static str,
 }
 
 inventory::collect!(ExchangeEdgeRecord);

@@ -1,20 +1,20 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 548 8 548 62 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 587 8 587 62 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 546 19 546 23
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 547 18 547 59
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 47
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 585 19 585 23
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 586 18 586 59
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 575 24 575 47
 
 use creusot.prelude.Any
 use creusot.int.UInt64
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 574 8 574 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#sledger'1] outcome = (from <> to')
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_accounts_distinct [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 548 8 548 62]
+let rec check_accounts_distinct [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 587 8 587 62]
   (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- from <> to' ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & from: UInt64.t = from | & to': UInt64.t = to' ])

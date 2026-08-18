@@ -1,0 +1,13 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 868 4 868 37 *)
+
+(* <amenable_gaap::Rejected<amenable_gaap::Validated> as amenable_core::Witness<witness::CreusotVerifier>> *)
+
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec proof_Rejected_Validated [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 868 4 868 37]
+  (return (x: ())) = (! bb0
+  [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

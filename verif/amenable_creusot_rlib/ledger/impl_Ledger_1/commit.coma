@@ -2,11 +2,11 @@
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 193 9 193 33
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 167 21 167 31
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 166 18 166 22
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 218 8 218 13
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 734 24 734 49
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 170 21 170 31
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 169 18 169 22
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 242 8 242 13
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 773 24 773 49
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 91 0 91 87
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 18 30 18 45
@@ -121,7 +121,7 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 733 8 733 58] (amount'0: Int64.t) =
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 772 8 772 58] (amount'0: Int64.t) =
   [%#sledger'3] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
 
 meta "compute_max_steps" 1000000

@@ -129,8 +129,23 @@ generate-verus-exchange:
     cargo run -p amenable --features verus -- emit-verus-exchange-companions
     rustfmt crates/amenable_verus/src/gallery/generated/*/*.rs
 
+# Regenerates `amenable_verus::gallery::ledger_exchange`'s derived
+# proof-token companion (`generated/ledger_tokens.rs`) from `amenable_
+# core::ProofTokenMintRecord` -- the token-layer counterpart to
+# `generate-verus-exchange` (`GAAP_LEDGER_PLAN.md`'s Step 8). Previously
+# only ever run by hand via `cargo run -p amenable --features verus --
+# emit-verus-gaap-tokens`, with no `just` recipe wrapping it at all -- a
+# real gap (`CLAUDE.md`'s own "reference `just` recipes, never raw
+# `cargo` commands" rule), closed here rather than left in place once
+# `reject`'s/`rollback`'s own tokens needed regenerating too (`GAAP_
+# LEDGER_PLAN.md`'s Step 7, revisited).
+generate-verus-gaap-tokens:
+    cargo run -p amenable --features verus -- emit-verus-gaap-tokens
+    rustfmt crates/amenable_verus/src/gallery/generated/ledger_tokens.rs
+
 check-verus:
     just emit-verus-witnesses
+    just generate-verus-gaap-tokens
     just generate-verus-exchange
     cargo check -p amenable_verus
     cargo check -p amenable_std --features verus
@@ -138,6 +153,7 @@ check-verus:
 
 clippy-verus:
     just emit-verus-witnesses
+    just generate-verus-gaap-tokens
     just generate-verus-exchange
     cargo clippy -p amenable_verus --all-targets -- -D warnings
     cargo clippy -p amenable_std --features verus --all-targets -- -D warnings
@@ -145,6 +161,7 @@ clippy-verus:
 
 test-verus:
     just emit-verus-witnesses
+    just generate-verus-gaap-tokens
     just generate-verus-exchange
     cargo test -p amenable_std --features verus
     cargo test -p amenable --features verus
@@ -162,6 +179,7 @@ check-all-verus:
 # for the reference invocation this mirrors.
 verify-verus:
     just emit-verus-witnesses
+    just generate-verus-gaap-tokens
     just generate-verus-exchange
     verus --crate-type=lib crates/amenable_verus/src/lib.rs
 

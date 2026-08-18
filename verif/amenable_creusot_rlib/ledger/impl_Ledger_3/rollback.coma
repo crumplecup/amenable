@@ -1,0 +1,157 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 12 17 158 *)
+
+(* ledger::Ledger *)
+
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 191 21 191 31
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 190 18 190 22
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 242 8 242 13
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 113 0 113 97
+let%span srollback = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 18 30 18 45
+let%span srollback'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 18 30 18 53
+let%span srollback'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 19 61 19 76
+let%span srollback'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 19 28 19 77
+let%span srollback'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 20 19 20 48
+let%span srollback'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 31 17 36
+let%span srollback'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 15 23 15 27
+let%span srollback'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 78 17 158
+let%span srollback'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 16 22 16 26
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_ValidatedToken
+
+type t_Transfer_Validated_ValidatedToken = { payload: t_TransferPayload; token: t_ValidatedToken; _state: () }
+
+predicate inv_ValidatedToken (_1: t_ValidatedToken)
+
+predicate inv_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken x]. inv_Transfer_Validated_ValidatedToken x
+    = inv_ValidatedToken x.token
+
+predicate invariant_ref_Transfer_Validated_ValidatedToken [@inline:trivial] (self: t_Transfer_Validated_ValidatedToken) =
+  [%#sinvariant] inv_Transfer_Validated_ValidatedToken self
+
+meta "rewrite_def" predicate invariant_ref_Transfer_Validated_ValidatedToken
+
+predicate inv_ref_Transfer_Validated_ValidatedToken [@inline:trivial] (_1: t_Transfer_Validated_ValidatedToken) =
+  invariant_ref_Transfer_Validated_ValidatedToken _1
+
+meta "rewrite_def" predicate inv_ref_Transfer_Validated_ValidatedToken
+
+let rec primary_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_TransferPayload)) =
+  {[@stop_split] [@expl:primary 'self' type invariant] [%#sledger] inv_ref_Transfer_Validated_ValidatedToken self}
+  any
+  [ return (result: t_TransferPayload) -> {[@stop_split] [@expl:primary ensures] [%#sledger] result = self.payload}
+    (! return {result}) ]
+
+let rec clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
+  [ return (result: t_TransferPayload) -> (! return {result}) ]
+
+predicate resolve_ValidatedToken (_1: t_ValidatedToken)
+
+predicate resolve_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
+
+axiom resolve_axiom [@rewrite]:
+  forall x: t_Transfer_Validated_ValidatedToken [resolve_Transfer_Validated_ValidatedToken x]. resolve_Transfer_Validated_ValidatedToken x
+    = resolve_ValidatedToken x.token
+
+let rec sidecar_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_ValidatedToken)) =
+  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#sledger] inv_ref_Transfer_Validated_ValidatedToken self}
+  any
+  [ return (result: t_ValidatedToken) ->
+  {[@stop_split] [@expl:sidecar result type invariant] [%#sledger] inv_ValidatedToken result}
+    (! return {result}) ]
+
+type t_RejectedFromValidatedToken
+
+predicate inv_RejectedFromValidatedToken (_1: t_RejectedFromValidatedToken)
+
+let rec establish_Rejected_Validated (credential: t_ValidatedToken) (return (x: t_RejectedFromValidatedToken)) =
+  {[@stop_split] [@expl:establish 'credential' type invariant] [%#sledger'0] inv_ValidatedToken credential}
+  any
+  [ return (result: t_RejectedFromValidatedToken) ->
+  {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_RejectedFromValidatedToken result}
+    (! return {result}) ]
+
+type t_Transfer_Rejected_Validated_RejectedFromValidatedToken = {
+  payload'0: t_TransferPayload;
+  token'0: t_RejectedFromValidatedToken;
+  _state'0: () }
+
+predicate inv_Transfer_Rejected_Validated_RejectedFromValidatedToken (_1: t_Transfer_Rejected_Validated_RejectedFromValidatedToken)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall x: t_Transfer_Rejected_Validated_RejectedFromValidatedToken [inv_Transfer_Rejected_Validated_RejectedFromValidatedToken x]. inv_Transfer_Rejected_Validated_RejectedFromValidatedToken x
+    = inv_RejectedFromValidatedToken x.token'0
+
+let rec new_Rejected_Validated (payload'1: t_TransferPayload) (token'1: t_RejectedFromValidatedToken)
+  (return (x: t_Transfer_Rejected_Validated_RejectedFromValidatedToken)) =
+  {[@stop_split] [@expl:new 'token' type invariant] [%#sledger'2] inv_RejectedFromValidatedToken token'1}
+  any
+  [ return (result: t_Transfer_Rejected_Validated_RejectedFromValidatedToken) ->
+  {[@stop_split] [@expl:new_Rejected_Validated ensures] ([@stop_split] [@expl:new result type invariant] [%#sledger] inv_Transfer_Rejected_Validated_RejectedFromValidatedToken result)
+    /\ ([@stop_split] [@expl:new ensures] [%#sledger] result.payload'0 = payload'1)}
+    (! return {result}) ]
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+type t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError =
+  | Ok t_Transfer_Rejected_Validated_RejectedFromValidatedToken
+  | Err t_TransferError
+
+type t_Ledger = { balance: Int64.t }
+
+predicate inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError (_1: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError [inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError x]. inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError x
+    = match x with
+      | Ok f0'0 -> inv_Transfer_Rejected_Validated_RejectedFromValidatedToken f0'0
+      | Err f0'0 -> true
+      end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec rollback [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 12 17 158]
+  (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)) =
+  {[@stop_split] [@expl:rollback 'input' type invariant] [%#srollback'4] inv_Transfer_Validated_ValidatedToken input}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = primary_Transfer_Validated_ValidatedToken [%#srollback] {input}
+        (fun (_x: t_TransferPayload) -> [ &_7 <- _x ] s1)
+    | s1 = clone_TransferPayload [%#srollback'0] {_7} (fun (_x: t_TransferPayload) -> [ &payload'1 <- _x ] s2)
+    | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_Transfer_Validated_ValidatedToken input} any) ]
+    | s3 = -{resolve_Transfer_Validated_ValidatedToken input}- s4
+    | s4 = sidecar_Transfer_Validated_ValidatedToken [%#srollback'1] {input}
+        (fun (_x: t_ValidatedToken) -> [ &_10 <- _x ] s5)
+    | s5 = establish_Rejected_Validated [%#srollback'2] {_10}
+        (fun (_x: t_RejectedFromValidatedToken) -> [ &token'1 <- _x ] s6)
+    | s6 = new_Rejected_Validated [%#srollback'3] {payload'1} {token'1}
+        (fun (_x: t_Transfer_Rejected_Validated_RejectedFromValidatedToken) -> [ &_12 <- _x ] s7)
+    | s7 = [ &_ret <- Ok _12 ] s8
+    | s8 = return {_ret} ] ]
+  [ & _ret: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError = Any.any_l ()
+  | & input: t_Transfer_Validated_ValidatedToken = input
+  | & payload'1: t_TransferPayload = Any.any_l ()
+  | & _7: t_TransferPayload = Any.any_l ()
+  | & token'1: t_RejectedFromValidatedToken = Any.any_l ()
+  | & _10: t_ValidatedToken = Any.any_l ()
+  | & _12: t_Transfer_Rejected_Validated_RejectedFromValidatedToken = Any.any_l () ])
+  [ return (result: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError) ->
+  {[@stop_split] [@expl:rollback result type invariant] [%#srollback'6] inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError result}
+    (! return {result}) ]

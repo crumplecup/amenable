@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 226 9 226 14 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 250 9 250 14 *)
 
 (* <ledger::Amount as std::clone::Clone> *)
 
@@ -11,7 +11,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_Amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 226 9 226 14] (self: t_Amount)
+let rec clone_Amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 250 9 250 14] (self: t_Amount)
   (return (x: t_Amount)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_Amount = Any.any_l () | & self: t_Amount = self ]) [ return (result: t_Amount) -> (! return {result}) ]
