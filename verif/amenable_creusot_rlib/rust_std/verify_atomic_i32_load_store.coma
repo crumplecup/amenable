@@ -1,5 +1,13 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 705 16 705 90 *)
 
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 126 15 126 59
+let%span sops'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 127 14 127 38
+let%span sops'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 132 14 132 33
+let%span sops'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 137 15 137 31
+let%span sops'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 138 15 138 28
+let%span sops'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 139 14 139 30
+let%span sops'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 144 14 145 104
 let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 706 44 706 68
 let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 707 55 709 21
 let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 707 55 709 21
@@ -45,14 +53,6 @@ let%span scommitter'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c
 let%span scommitter'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 193 14 193 44
 let%span scommitter'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 194 14 194 50
 let%span scommitter'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/committer.rs" 58 8 60 52
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 126 15 126 59
-let%span sops'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 127 14 127 38
-let%span sops'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 132 14 132 33
-let%span sops'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 137 15 137 31
-let%span sops'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 138 15 138 28
-let%span sops'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 139 14 139 30
-let%span sops'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 144 14 145 104
 let%span sperm = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/ghost/perm.rs" 102 8 102 27
 
 use creusot.int.Int32

@@ -76,12 +76,34 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
     }
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
+    // Gated on `verifier`'s own stringified text, not `#[cfg_attr(
+    // creusot, ..)]` -- see `creusot_ensures_attr`'s own doc comment,
+    // below, for the real reason (a `cargo creusot` build sets `--cfg
+    // creusot` across its whole dependency graph, not just the crate it
+    // translates).
+    let is_creusot = quote!(#verifier).to_string() == "CreusotVerifier";
+
+    // Real, not decorative, for the identical reason `creusot_ensures_
+    // attr` (below) is: `validate`'s own real body extracts data through
+    // `input.primary()` before ever reaching a `Transfer::new(..)` this
+    // crate's own `Ensures<CreusotVerifier>` impls need to reason about
+    // -- without this, nothing downstream could learn what `primary()`'s
+    // returned reference actually points at.
+    let primary_ensures_attr = if is_creusot {
+        quote! {
+            #[::creusot_std::macros::ensures(result == &self.#primary_ident)]
+        }
+    } else {
+        TokenStream::new()
+    };
+
     let sidecar_impl = quote! {
         impl #impl_generics ::amenable_core::Sidecar<#verifier> for #name #ty_generics #where_clause {
             type Primary = #primary_ty;
             type Proposition = #proposition_ty;
             type SidecarToken = #token_ty;
 
+            #primary_ensures_attr
             fn primary(&self) -> &Self::Primary {
                 &self.#primary_ident
             }
@@ -100,8 +122,35 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
     let (struct_impl_generics, struct_ty_generics, struct_where_clause) =
         input.generics.split_for_impl();
 
+    // Real, not decorative: ordinary modular verification only exposes
+    // what a function's own `ensures` promises, so without this, nothing
+    // downstream could learn a constructed value's own field back from a
+    // captured `Exchange` body's final `Ok(X::new(..))` return --
+    // confirmed the hard way building `GAAP_LEDGER_PLAN.md`'s Step 6
+    // (`Ledger::validate`'s own real body), the first `#[derive(
+    // Sidecar)]` consumer whose postcondition actually needs to see this
+    // far. Gated on `verifier`'s own *text* being literally
+    // `"CreusotVerifier"`, not a blanket `#[cfg_attr(creusot, ..)]`:
+    // `cargo creusot`'s own build sets `--cfg creusot` across the whole
+    // dependency graph it compiles, not just the crate it translates --
+    // confirmed the hard way, a real `` cannot find `creusot_std` in the
+    // crate root `` error from `amenable_kani` (an ordinary Cargo
+    // dependency of `amenable_creusot`, never itself translated, with no
+    // real dependency on `creusot_std` at all) once this attribute was
+    // unconditional. Comparing `verifier`'s own stringified tokens is
+    // the only signal available at macro-expansion time for which
+    // verifier a given `#[derive(Sidecar)]` invocation actually targets.
+    let creusot_ensures_attr = if is_creusot {
+        quote! {
+            #[::creusot_std::macros::ensures(result.#primary_ident == #primary_ident)]
+        }
+    } else {
+        TokenStream::new()
+    };
+
     let constructor_impl = quote! {
         impl #struct_impl_generics #name #struct_ty_generics #struct_where_clause {
+            #creusot_ensures_attr
             #constructor_vis fn new(#primary_ident: #primary_ty, #token_ident: #token_ty) -> Self {
                 Self {
                     #primary_ident,

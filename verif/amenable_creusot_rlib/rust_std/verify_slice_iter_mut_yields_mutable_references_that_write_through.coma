@@ -1,5 +1,6 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 983 8 988 55 *)
 
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span srust_std = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 991 29 991 44
 let%span srust_std'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 992 39 992 48
 let%span srust_std'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 1000 40 1000 49
@@ -13,7 +14,6 @@ let%span srust_std'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ru
 let%span srust_std'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 981 19 981 23
 let%span srust_std'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 982 18 982 113
 let%span srust_std'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std.rs" 964 16 971 17
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 352 18 352 33
 let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 517 14 517 50
 let%span sslice'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 539 20 539 62

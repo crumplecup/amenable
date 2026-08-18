@@ -48,7 +48,9 @@ let rec primary_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable
   (self: t_Established_T_Token) (return (x: t_T)) =
   {[@stop_split] [@expl:primary 'self' type invariant] [%#sstoplight] inv_ref_Established_T_Token self}
   (! bb0
-  [ bb0 = s0 [ s0 = [ &_2 <- self.primary ] s1 | s1 = [ &_ret <- _2 ] s2 | s2 = return {_ret} ] ]
-  [ & _ret: t_T = Any.any_l () | & self: t_Established_T_Token = self | & _2: t_T = Any.any_l () ])
-  [ return (result: t_T) -> {[@stop_split] [@expl:primary result type invariant] [%#sstoplight] inv_ref_T result}
+  [ bb0 = s0 [ s0 = [ &_4 <- self.primary ] s1 | s1 = [ &_ret <- _4 ] s2 | s2 = return {_ret} ] ]
+  [ & _ret: t_T = Any.any_l () | & self: t_Established_T_Token = self | & _4: t_T = Any.any_l () ])
+  [ return (result: t_T) ->
+  {[@stop_split] [@expl:primary_Established_T_Token ensures] ([@stop_split] [@expl:primary result type invariant] [%#sstoplight] inv_ref_T result)
+    /\ ([@stop_split] [@expl:primary ensures] [%#sstoplight] result = self.primary)}
     (! return {result}) ]

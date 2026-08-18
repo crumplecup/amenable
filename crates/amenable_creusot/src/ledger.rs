@@ -36,11 +36,16 @@
 //! identity type, and Creusot's support for a hand-rolled `Uuid`-backed
 //! equality type is untested territory not worth risking here. `Ledger`/
 //! `Transfer<S, Token>` themselves still live only in `amenable_kani`
-//! (a crate this one still can't depend on), so the checks below stay
-//! isolated predicates over primitive arguments, the same way `Ledger::
-//! check_amount_positive`/`check_sufficient_funds` are isolated on the
-//! Kani side — connecting them to the real `Ledger::validate`/`::commit`
-//! bodies is a separate, later question.
+//! (a crate this one still can't depend on), so the checks in this file
+//! stay isolated predicates over primitive arguments, the same way
+//! `Ledger::check_amount_positive`/`check_sufficient_funds` are isolated
+//! on the Kani side. The `Ledger`/`Transfer<S, Token>`/`TransferError`
+//! mirror types further down (`GAAP_LEDGER_PLAN.md`'s Step 6) connect
+//! `Ledger::validate`'s/`::commit`'s real captured bodies to these same
+//! predicates — not by depending on `amenable_kani`, but via the
+//! `generated/validate.rs`/`generated/commit.rs` companions this file
+//! `include!`s at the bottom, produced by the same `ExchangeEdgeRecord`
+//! codegen Step 4 already used for Verus.
 //!
 //! **`GAAP_LEDGER_PLAN.md`'s Step 5**: `amenable_gaap::contracts::
 //! {AmountPositive, SufficientFunds, AccountsDistinct, BalancedEntries}`
@@ -61,11 +66,13 @@
 //! through this trait.
 
 #[cfg(creusot)]
-use amenable_core::Witness;
+use amenable_core::{Establish, Evidence, Sidecar, Witness};
 #[cfg(creusot)]
-use amenable_gaap::{Committed, Validated};
+use amenable_gaap::{Committed, CommittedToken, Pending, PendingToken, Validated, ValidatedToken};
 #[cfg(creusot)]
-use creusot_std::macros::{ensures, logic, requires};
+use creusot_std::macros::{ensures, extern_spec, logic, requires};
+#[cfg(creusot)]
+use creusot_std::std::ops::FnOnceExt;
 
 #[cfg(creusot)]
 use crate::CreusotVerifier;
@@ -73,6 +80,337 @@ use crate::CreusotVerifier;
 use crate::CreusotVerifier;
 #[cfg(not(creusot))]
 use amenable_gaap::{AccountsDistinct, AmountPositive, BalancedEntries, SufficientFunds};
+
+// A real, confirmed gap in `creusot_std` itself, not this crate's own:
+// `Result::map_err` carries no contract anywhere in `creusot-std`'s own
+// source (confirmed by reading `creusot-std/src/std/result.rs` directly
+// -- `map`/`and`/`or`/`unwrap_or`/etc. are all specified there, `map_err`
+// is not), so calling it with no `extern_spec!` of our own produces a
+// real "calling external function `map_err` with no contract will yield
+// an impossible precondition" warning and a genuine unprovable goal --
+// confirmed against the real toolchain, not assumed: `Ledger::validate`'s
+// own real body captured below (`GAAP_LEDGER_PLAN.md`'s Step 6) is the
+// first proof in this crate to call `.map_err(..)` at all. Modeled
+// directly on `creusot-std`'s own `Option::map`'s real `extern_spec!`
+// entry (`existential postcondition_once`, the same shape every other
+// `FnOnce`-taking `Result`/`Option` method there uses).
+//
+// Plain `//` comments, not `///`: rustdoc doesn't generate documentation
+// for items produced by a macro invocation, so a doc comment here is
+// real, silently-dropped dead weight -- confirmed by `cargo creusot`'s
+// own real "unused doc comment" warning, invisible to ordinary `cargo
+// check`/clippy the same way every `#[cfg(creusot)]`-gated content is.
+#[cfg(creusot)]
+extern_spec! {
+    impl<T, E> Result<T, E> {
+        #[requires(match self {
+            Ok(_) => true,
+            Err(e) => op.precondition((e,)),
+        })]
+        #[ensures(match self {
+            Ok(t) => result == Ok(t),
+            Err(e) => exists<r> result == Err(r) && op.postcondition_once((e,), r),
+        })]
+        fn map_err<F, O: FnOnce(E) -> F>(self, op: O) -> Result<T, F>;
+    }
+}
+
+// `GAAP_LEDGER_PLAN.md`'s Step 7: the same real, confirmed gap as
+// `map_err`'s own extern_spec, above, one layer up. `Establish::
+// establish` now lives in `amenable_gaap` (one real, backend-generic
+// blanket impl, not a per-verifier one hand-written locally here) --
+// `creusot-rustc`'s translator only fully analyzes items *local* to the
+// crate it's translating, so a call through a dependency's impl is
+// "external" to it the same way a std method is, and needs its own
+// explicit contract. Confirmed against the real toolchain: without
+// this, `cargo creusot prove` reports "calling external function
+// `establish` with no contract will yield an impossible precondition"
+// and a genuine unprovable `vc_validate`/`vc_commit` goal.
+//
+// `#[ensures(true)]`, not a richer claim: `establish`'s own real body
+// (every hand-written impl in this workspace, and the blanket impl
+// alike) ignores its credential and mints a bare unit token whose only
+// field is private -- there is no observable postcondition to state
+// about the *result* from Pearlite, matching this project's own
+// "tautological model" precedent (a real, honest `true` for a
+// genuinely content-free claim, not a stand-in for a stronger one this
+// crate is avoiding).
+//
+// `-> ValidatedToken`/`-> CommittedToken`, not `-> Self::Token`:
+// `extern_spec!` real-toolchain-confirmed rejects an associated-type
+// return position ("Cannot use Self here") -- spelled out as the
+// concrete type each blanket impl instantiation actually resolves to
+// instead.
+//
+// `impl<V: Verifier> .. for Validated`, not `impl .. for Validated`
+// fixed to `CreusotVerifier`: `extern_spec!` real-toolchain-confirmed
+// ("extern spec generics don't match") requires matching the *real*
+// item's own generic shape exactly -- the real impl is the one, generic
+// blanket impl in `amenable_gaap` (`impl<V: Verifier> Establish<C, V>
+// for Y where Y: Witness<V>`), not a per-verifier concrete one, so the
+// extern_spec has to be written the same way, `V` and all.
+#[cfg(creusot)]
+extern_spec! {
+    impl<V: amenable_core::Verifier> Establish<PendingToken, V> for Validated
+    where
+        Validated: Witness<V>,
+    {
+        #[ensures(true)]
+        fn establish(credential: PendingToken) -> ValidatedToken;
+    }
+
+    impl<V: amenable_core::Verifier> Establish<ValidatedToken, V> for Committed
+    where
+        Committed: Witness<V>,
+    {
+        #[ensures(true)]
+        fn establish(credential: ValidatedToken) -> CommittedToken;
+    }
+}
+
+/// `GAAP_LEDGER_PLAN.md`'s Step 6: an accommodation-model mirror for
+/// `amenable_kani::ledger::{Ledger, Transfer<S, Token>}` and their tokens
+/// -- needed for the same real reason `amenable_creusot::stoplight`'s own
+/// mirror is, and only now, since `Ledger::validate`'s/`::commit`'s real
+/// bodies are captured verbatim below for the first time (`validate.rs`/
+/// `commit.rs`, generated by `amenable::creusot_export`): `Ledger`/
+/// `Transfer<S, Token>` live only in `amenable_kani`, a crate this one
+/// cannot depend on (verifier backends never depend on each other), and
+/// their real constructors are deliberately private (`Transfer::new` is
+/// `pub(crate)` there), so a real dependency wouldn't let the captured
+/// bodies compile against the real types even if the dependency itself
+/// were legal. Matches `amenable_gaap`'s own real evidence markers
+/// (`Pending`/`Validated`/`Committed`) directly -- no mirror needed for
+/// those, since they're not privacy-gated and this crate already depends
+/// on `amenable_gaap` for real.
+///
+/// `Transfer<S, Token>`'s own `Sidecar<CreusotVerifier>` impl is derived,
+/// not hand-written -- `#[derive(amenable_derive::Sidecar)]`, the same
+/// derive `amenable_kani::ledger::Transfer`'s real definition and
+/// `amenable_creusot::stoplight::Established`'s own mirror both use for
+/// the identical shape (`GAAP_LEDGER_PLAN.md`'s Step 5).
+#[cfg(creusot)]
+#[derive(amenable_derive::Sidecar)]
+#[sidecar(
+    verifier = "CreusotVerifier",
+    proposition = "S",
+    constructor = "pub(crate)"
+)]
+pub struct Transfer<S, Token> {
+    // Fully `pub`, not `pub(crate)`: Creusot's own proof-transparency
+    // check requires an `#[ensures(..)]` clause to only ever reach items
+    // *at least* as visible as the function stating it -- and `Sidecar`'s
+    // own `primary()` method (`amenable_core::Sidecar` is a `pub` trait)
+    // is as visible as the trait impl itself, not merely `pub(crate)`
+    // like `new`'s own constructor. Confirmed the hard way in two steps:
+    // a real "cannot make `.. payload` transparent in `.. new`" error
+    // once `#[derive(amenable_derive::Sidecar)]`'s generated constructor
+    // gained a real `#[ensures(result.payload == payload)]` clause
+    // (`GAAP_LEDGER_PLAN.md`'s Step 6), fixed by widening to `pub(crate)`
+    // -- then the *same* error again, this time naming `Sidecar::
+    // primary()` instead of `new`, once that method *also* gained a real
+    // `ensures` clause. No privacy invariant to protect here either way,
+    // unlike the real `amenable_kani::ledger::Transfer`'s own private
+    // fields.
+    #[sidecar(primary)]
+    pub payload: TransferPayload,
+    #[sidecar(token)]
+    pub token: Token,
+    _state: std::marker::PhantomData<S>,
+}
+
+/// Sanitized mirror of `amenable_gaap::Amount` -- the real captured
+/// `validate`/`commit` bodies call `.amount().value()`, so this needs
+/// the same two-method chain, not just a bare `i64`.
+#[cfg(creusot)]
+#[derive(Clone, Copy)]
+pub struct Amount(i64);
+
+#[cfg(creusot)]
+impl Amount {
+    // `#[ensures(..)]`: ordinary modular verification only exposes what
+    // a function's own `ensures` promises -- without this, nothing
+    // downstream could learn `.value()`'s actual result from `self`'s
+    // own field, the identical real reason every accessor below needs
+    // one too (`GAAP_LEDGER_PLAN.md`'s Step 6, confirmed the hard way:
+    // `validate`'s own success-path postcondition could not be proven
+    // without these, even after `Transfer::new`'s own `#[derive(Sidecar)]`
+    // -generated `ensures` was fixed).
+    #[requires(true)]
+    #[ensures(result == self.0)]
+    fn value(&self) -> i64 {
+        self.0
+    }
+}
+
+/// Sanitized mirror of `amenable_gaap::TransferPayload` -- `from`/`to`
+/// are bare `u64`, matching this file's own existing sanitized-mirror
+/// choice for `check_accounts_distinct`'s own isolated proof, above:
+/// the real claim only needs *some* comparable identity type, and the
+/// real captured body never names `AccountId` as a type, only ever
+/// compares what `.from()`/`.to()` return.
+#[cfg(creusot)]
+#[derive(Clone, Copy)]
+pub struct TransferPayload {
+    from: u64,
+    to: u64,
+    amount: Amount,
+}
+
+#[cfg(creusot)]
+impl TransferPayload {
+    // `#[ensures(..)]` throughout this impl -- same real reason as
+    // [`Amount::value`], above.
+    #[requires(true)]
+    #[ensures(result == self.from)]
+    fn from(&self) -> u64 {
+        self.from
+    }
+
+    #[requires(true)]
+    #[ensures(result == self.to)]
+    fn to(&self) -> u64 {
+        self.to
+    }
+
+    #[requires(true)]
+    #[ensures(result.0 == self.amount.0)]
+    fn amount(&self) -> Amount {
+        self.amount
+    }
+}
+
+#[cfg(creusot)]
+impl Evidence for TransferPayload {
+    type Basis = Self;
+    type Audit = ();
+
+    fn basis() -> Self::Basis {
+        TransferPayload {
+            from: 0,
+            to: 0,
+            amount: Amount(0),
+        }
+    }
+
+    fn audit(&self) {}
+}
+
+/// `GAAP_LEDGER_PLAN.md`'s Step 7: `PendingToken`/`ValidatedToken`/
+/// `CommittedToken` are no longer mirrored here -- they're real,
+/// backend-neutral types imported directly from `amenable_gaap`
+/// (`amenable_creusot` already depends on it for real), each minted via
+/// one backend-generic `impl<V: Verifier> Establish<C, V> for Y where Y:
+/// Witness<V>` living in `amenable_gaap` itself. That blanket impl
+/// becomes a real, usable `Establish<PendingToken, CreusotVerifier> for
+/// Validated` for free, the moment `Validated: Witness<CreusotVerifier>`
+/// holds -- which it already does, further down this file. No token
+/// mirror, no hand-written `Establish` impl, needed here at all anymore.
+///
+/// Trivial, matching `amenable_kani::ledger::Pending`'s own `Witness<
+/// KaniVerifier>` impl exactly (see its own doc comment): nothing in
+/// this worked example's scope ever targets `Pending`, so nothing
+/// generates one -- needed here only because `Transfer<Pending,
+/// PendingToken>: Sidecar<CreusotVerifier>` (`validate`'s own input
+/// type) requires `Pending: Evidence + Witness<CreusotVerifier>`.
+#[cfg(creusot)]
+impl Witness<CreusotVerifier> for Pending {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ();
+
+    fn proof() -> Self::ProofArtifact {}
+}
+
+/// Sanitized mirror of `amenable_kani::ledger::TransferError` -- a
+/// *different*, concrete type from this file's own `TransferOutcome`
+/// (above), which backs the pre-existing isolated `validate` proof
+/// function's own Pearlite claim, unrelated to and unaffected by this
+/// mirror. Real captured bodies below construct `TransferError::
+/// NegativeAmount(..)`/`::InsufficientFunds { .. }`/`::SameAccount`
+/// directly, by name, so the type has to be named exactly this, with
+/// exactly these variants -- no `PartialEq`/`Eq` derive needed, matching
+/// `TransferOutcome`'s own precedent (pattern matching, not `==`).
+#[cfg(creusot)]
+#[derive(Clone, Copy)]
+pub enum TransferError {
+    NegativeAmount(i64),
+    InsufficientFunds { balance: i64, required: i64 },
+    SameAccount,
+}
+
+/// Sanitized mirror of `amenable_kani::ledger::Ledger` -- the real
+/// captured `validate`/`commit` bodies below call `Self::check_amount_
+/// positive`/`self.check_sufficient_funds`/`Self::negative_amount`/
+/// `Self::insufficient_funds`, all as real methods on a real receiver
+/// (the first captured Creusot body to reference `self`/`Self` at all --
+/// `amenable::creusot_export`'s own generator needed a real `&self`
+/// wrapper added for exactly this, `GAAP_LEDGER_PLAN.md`'s Step 6). A
+/// *different*, concrete type from this file's own bare `check_amount_
+/// positive`/`check_sufficient_funds` free functions (above), which back
+/// the pre-existing isolated `validate` proof, unrelated to and
+/// unaffected by this mirror -- both exist in the same module without
+/// conflict, since `Ledger::check_amount_positive`/`self.check_
+/// sufficient_funds` and the bare free-function calls resolve through
+/// entirely different paths.
+#[cfg(creusot)]
+pub struct Ledger {
+    balance: i64,
+}
+
+#[cfg(creusot)]
+impl Ledger {
+    #[requires(true)]
+    #[ensures(match result {
+        Ok(()) => amount_positive_holds(amount, true),
+        Err(bad) => bad == amount && amount_positive_holds(amount, false),
+    })]
+    fn check_amount_positive(amount: i64) -> Result<(), i64> {
+        if amount > 0 { Ok(()) } else { Err(amount) }
+    }
+
+    #[requires(true)]
+    #[ensures(match result {
+        Ok(()) => sufficient_funds_holds(self.balance, amount, true),
+        Err((balance, required)) => balance == self.balance && required == amount && sufficient_funds_holds(self.balance, amount, false),
+    })]
+    fn check_sufficient_funds(&self, amount: i64) -> Result<(), (i64, i64)> {
+        if self.balance < amount {
+            Err((self.balance, amount))
+        } else {
+            Ok(())
+        }
+    }
+
+    /// Matches `amenable_kani::ledger::Ledger::negative_amount`'s own
+    /// doc comment: a real function, not the bare `TransferError::
+    /// NegativeAmount` tuple-variant constructor or a destructuring
+    /// closure -- unlike Verus, Creusot places no such restriction on
+    /// either form, but the real captured body already calls through
+    /// this real method (the Kani source both backends capture from is
+    /// the same, single source of truth), so this mirrors it exactly
+    /// rather than inlining an equivalent that would silently diverge
+    /// from what's actually captured.
+    #[requires(true)]
+    #[ensures(match result {
+        TransferError::NegativeAmount(actual) => actual == bad,
+        _ => false,
+    })]
+    fn negative_amount(bad: i64) -> TransferError {
+        TransferError::NegativeAmount(bad)
+    }
+
+    #[requires(true)]
+    #[ensures(match result {
+        TransferError::InsufficientFunds { balance, required } => balance == bad.0 && required == bad.1,
+        _ => false,
+    })]
+    fn insufficient_funds(bad: (i64, i64)) -> TransferError {
+        TransferError::InsufficientFunds {
+            balance: bad.0,
+            required: bad.1,
+        }
+    }
+}
 
 amenable_derive::harness! {
     creusot, AMOUNT_POSITIVE_HOLDS_SRC, {
@@ -375,6 +713,30 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, COMMITTED_AMOUNT_HOLDS_SRC, {
+        /// Real captured `commit` companion's own postcondition (`GAAP_
+        /// LEDGER_PLAN.md`'s Step 6) -- unlike `check_commit_balances`
+        /// above, whose own `#[requires(amount@ > 0)]` guards its
+        /// *exec* body's real `-amount` negation, the generated
+        /// `commit` companion carries no precondition at all (its real
+        /// body never computes `-amount`, only `check_commit_balances`'s
+        /// own isolated proof does) -- so this needs to be provable for
+        /// *every* `i64`, not just positive ones. `@`-lifts `amount`
+        /// *before* negating, inside this function's own body, rather
+        /// than computing `-amount` at `i64` width at the ensures
+        /// clause's own call site the way `balanced_entries_holds(
+        /// -amount, amount, result)` does above -- confirmed the hard
+        /// way: that shape needs `amount > 0` to avoid a real overflow
+        /// obligation at `i64::MIN`, and this call site has no such
+        /// precondition to rely on.
+        #[logic(open)]
+        pub fn committed_amount_holds(amount: i64) -> bool {
+            pearlite! { (-amount@) + amount@ == 0 }
+        }
+    }
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_CHECK_COMMIT_BALANCES_SRC, {
         /// Mirrors `amenable_kani::ledger::Ledger::commit`'s own claim
         /// -- see the real edge's own doc comment for why `amount > 0`
@@ -442,3 +804,15 @@ impl Witness<CreusotVerifier> for Committed {
         describe: || committed_proof().to_string(),
     }
 }
+
+// `Ledger::validate`'s/`::commit`'s real bodies -- generated by
+// `amenable::creusot_export` from `amenable_core::ExchangeEdgeRecord`,
+// not hand-written or hand-copied, matching `amenable_creusot::
+// stoplight`'s own three edges exactly (`GAAP_LEDGER_PLAN.md`'s Step 6).
+// `include!`, not `mod`: shares this file's own scope directly
+// (`Ledger`/`Transfer`/`TransferError`/`Pending`/`Validated`/`Committed`/
+// tokens above, already in scope). Regenerate with `just generate-
+// creusot` after changing a real Kani-side transition; do not hand-edit
+// the included files.
+include!("generated/validate.rs");
+include!("generated/commit.rs");

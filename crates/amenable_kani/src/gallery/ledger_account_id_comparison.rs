@@ -177,7 +177,7 @@ amenable_derive::harness! {
             );
             let input = amenable_kani::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                 amenable_kani::TransferError,
             > = ledger.exchange(input);
         }
@@ -218,7 +218,7 @@ amenable_derive::harness! {
             );
             let input = amenable_kani::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                 amenable_kani::TransferError,
             > = ledger.exchange(input);
         }
@@ -261,7 +261,7 @@ amenable_derive::harness! {
             );
             let input = amenable_kani::Transfer::pending(payload);
             let _: Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                 amenable_kani::TransferError,
             > = ledger.exchange(input);
         }
@@ -412,7 +412,7 @@ amenable_derive::harness! {
                     amenable_gaap::Amount::new(amount),
                 );
                 let token = amenable_gaap::Validated::establish(credential);
-                let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken> =
+                let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
                     amenable_kani::Transfer::new(payload, token);
                 let _ = validated;
             }
@@ -450,10 +450,10 @@ amenable_derive::harness! {
             use amenable_core::{Establish, Sidecar};
 
             fn build(
-                credential: amenable_kani::PendingToken,
+                credential: amenable_gaap::PendingToken,
                 amount: i64,
             ) -> Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                 amenable_kani::TransferError,
             > {
                 if amount <= 0 {
@@ -578,7 +578,7 @@ amenable_derive::harness! {
             }
 
             let token = amenable_gaap::Validated::establish(pending.sidecar());
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken> =
+            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
                 amenable_kani::Transfer::new(payload, token);
             let _ = validated;
         }
@@ -614,10 +614,10 @@ amenable_derive::harness! {
             use amenable_core::{Establish, Sidecar};
 
             fn check(
-                pending: amenable_kani::Transfer<amenable_gaap::Pending, amenable_kani::PendingToken>,
+                pending: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 balance: i64,
             ) -> Result<
-                amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                 amenable_kani::TransferError,
             > {
                 let payload = pending.primary().clone();
@@ -747,9 +747,9 @@ amenable_derive::harness! {
 
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_kani::PendingToken>,
+                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                     amenable_kani::TransferError,
                 > {
                     use amenable_core::{Establish, Sidecar};
@@ -825,15 +825,15 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                         amenable_kani::TransferError,
                     >| result.is_ok())
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_kani::PendingToken>,
+                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                     amenable_kani::TransferError,
                 > {
                     use amenable_core::{Establish, Sidecar};
@@ -912,7 +912,7 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                         amenable_kani::TransferError,
                     >| match result {
                         Ok(validated) => validated.primary().amount().value() > 0,
@@ -921,9 +921,9 @@ amenable_derive::harness! {
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_kani::PendingToken>,
+                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                     amenable_kani::TransferError,
                 > {
                     use amenable_core::Establish;
@@ -999,7 +999,7 @@ amenable_derive::harness! {
                 #[cfg_attr(
                     kani,
                     kani::ensures(|result: &Result<
-                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                        amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                         amenable_kani::TransferError,
                     >| match result {
                         Ok(validated) => {
@@ -1011,9 +1011,9 @@ amenable_derive::harness! {
                 )]
                 fn validate(
                     &self,
-                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_kani::PendingToken>,
+                    input: amenable_kani::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>,
                 ) -> Result<
-                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken>,
+                    amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>,
                     amenable_kani::TransferError,
                 > {
                     use amenable_core::Establish;

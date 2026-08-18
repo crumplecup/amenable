@@ -1,0 +1,25 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 278 4 278 30 *)
+
+(* ledger::TransferPayload *)
+
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 276 15 276 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 277 14 277 39
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec amount'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 278 4 278 30]
+  (self: t_TransferPayload) (return (x: t_Amount)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- self.amount ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Amount = Any.any_l () | & self: t_TransferPayload = self ])
+  [ return (result: t_Amount) -> {[@stop_split] [@expl:amount ensures] [%#sledger'0] result.f0 = self.amount.f0}
+    (! return {result}) ]

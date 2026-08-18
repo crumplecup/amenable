@@ -38,6 +38,11 @@ enum Commands {
     #[cfg(feature = "verus")]
     #[command(name = "emit-verus-exchange-companions")]
     EmitVerusExchangeCompanions(EmitVerusExchangeCompanionsArgs),
+    /// Materialize the derived Verus ledger proof-token companion from
+    /// the real registry.
+    #[cfg(feature = "verus")]
+    #[command(name = "emit-verus-gaap-tokens")]
+    EmitVerusGaapTokens(EmitVerusGaapTokensArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
     Gallery(gallery::GalleryArgs),
     /// Write the full evidence and proof registry as JSON.
@@ -90,6 +95,8 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
         Some(Commands::EmitVerusExchangeCompanions(args)) => {
             run_emit_verus_exchange_companions(args)
         }
+        #[cfg(feature = "verus")]
+        Some(Commands::EmitVerusGaapTokens(args)) => run_emit_verus_gaap_tokens(args),
         Some(Commands::Gallery(args)) => gallery::run(args),
         Some(Commands::DumpRegistry(args)) => run_dump_registry(args),
         Some(Commands::Verify(VerifyArgs {
@@ -225,6 +232,29 @@ struct EmitVerusExchangeCompanionsArgs {
     /// Directory to write generated companion files into.
     #[arg(long)]
     root: Option<PathBuf>,
+}
+
+#[cfg(feature = "verus")]
+fn run_emit_verus_gaap_tokens(args: EmitVerusGaapTokensArgs) -> AmenableResult<()> {
+    let path = args
+        .path
+        .unwrap_or_else(amenable::paths::verus_gaap_ledger_tokens_path);
+    let written = amenable::write_verus_gaap_token_companion(&path)?;
+
+    println!(
+        "Wrote the Verus ledger proof-token companion to {}",
+        written.display()
+    );
+
+    Ok(())
+}
+
+#[cfg(feature = "verus")]
+#[derive(Debug, Args)]
+struct EmitVerusGaapTokensArgs {
+    /// File to write the generated companion into.
+    #[arg(long)]
+    path: Option<PathBuf>,
 }
 
 #[derive(Debug, Args)]

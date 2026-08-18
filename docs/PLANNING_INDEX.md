@@ -1095,10 +1095,10 @@ optional edge to `amenable_creusot` flipped for real, and `Stoplight`'s
 own `Green`/`Yellow`/`Red` moved from `amenable_kani` to `amenable_core`
 after a real, caught-and-reverted attempt to depend `amenable_creusot`
 directly on `amenable_kani`. `Ledger::validate`/`::commit` themselves
-aren't connected to those four Creusot predicates yet, and a direct
-`amenable_creusot -> amenable_kani` dependency is now a settled no
-(same architectural rule, not an open question) rather than the open
-question this status paragraph used to describe. Step 4 (Verus) is
+were connected to those four Creusot predicates in Step 6 (below) — not
+via a direct `amenable_creusot -> amenable_kani` dependency, which is a
+settled no (same architectural rule, not an open question), but via the
+existing `ExchangeEdgeRecord`/codegen layer, generalized. Step 4 (Verus) is
 done, redirected mid-flight by explicit correction ("by hand is the
 wrong approach, use the derives") before any hand-written proof content
 existed: `amenable_verus::gallery::ledger_exchange` proves the same
@@ -1156,8 +1156,33 @@ for real throughout: 8 total real `cargo kani` harness checks (all `0
 of N failed`), `cargo creusot prove` (`Proved 119 files`, unchanged --
 the new Creusot impls are `#[cfg(not(creusot))]`-only, invisible to
 real translation), `verus --crate-type=lib` (`478 verified, 0 errors`,
-up from 458), plus a second real injected-bug regression check. Step
-6+ not started.
+up from 458), plus a second real injected-bug regression check. Step 6
+connects `Ledger::validate`/`::commit`'s real bodies to genuine Creusot
+predicates too, closing the last unconnected corner across all three
+backends: generalized the existing `emit-creusot-companions` codegen
+(the `self_ty == "Stoplight"` filter widened to an explicit `(self_ty,
+method_name) -> module` table, matching Step 4's own Verus precedent)
+rather than hand-mirroring a third time, and added a new
+`creusot_ensures: &'static str` field to `ExchangeEdgeRecord` — a real
+Pearlite predicate expression spliced into the generated companion's
+own `#[ensures(..)]`, needed because Creusot (unlike Kani/Verus's DFCC-
+style call-through) has no mechanical way to route a postcondition
+through `Ensures<V>`. Surfaced four real, previously unexercised
+Creusot toolchain findings: `#[ensures(..)]` cannot call ordinary
+methods, only `#[logic]` functions or direct field access; `Result::
+map_err` has zero contract anywhere in `creusot-std` itself (confirmed
+by reading the real source), fixed with a real `extern_spec!` block;
+`cargo creusot` sets `--cfg creusot` across its *whole* dependency
+graph, not just the crate it translates (broke `amenable_kani`
+transitively until the `#[derive(Sidecar)]`-generated ensures clauses
+were gated on `verifier`'s own stringified text instead of `cfg_attr`);
+and two rounds of Creusot's proof-transparency visibility check forcing
+private fields to `pub`. `cargo creusot prove` reports `Proved (143
+files) ✔` (up from 119), confirmed non-vacuous via a real injected-bug
+regression check; full workspace check/fmt/clippy/test clean; all
+three real `cargo kani` `Ledger::validate`/`::commit` harnesses
+re-verified clean; `verus --crate-type=lib` reconfirmed clean (`478
+verified, 0 errors`, unchanged). Step 7+ not started.
 
 **Description:** The next worked example after `Stoplight`, chosen to
 exercise the one thing the whole Exchange proof derivation lineage has

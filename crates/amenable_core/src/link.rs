@@ -143,6 +143,58 @@ pub struct ExchangeEdgeRecord {
     /// all, captured the same way `amenable_derive::harness!` captures a
     /// harness's own source, so it can never drift from the real logic.
     pub body: &'static str,
+    /// The real Pearlite predicate expression a generated Creusot
+    /// companion's own `#[ensures(..)]` clause should call through,
+    /// referencing `result` (the generated function's own implicit
+    /// binding, matching every hand-written `#[ensures(..)]` clause
+    /// elsewhere in `amenable_creusot`). Defaults to the literal `"true"`
+    /// for edges with no meaningful postcondition beyond type safety
+    /// (every `Stoplight` edge today) — Creusot's own `Ensures<V>` impls
+    /// carry `Bound = &'static str` (descriptive text, not a checkable
+    /// predicate: Pearlite has no trait-dispatch mechanism at all), so
+    /// unlike Kani's/Verus's `bool`-checked impls, there is no way to
+    /// route a generated companion's `#[ensures(..)]` clause through
+    /// `Ensures<V>` mechanically — the real predicate has to be named
+    /// explicitly, the same way `kani_ensures!`/`verus_ensures!` are
+    /// still hand-authored rather than derived.
+    pub creusot_ensures: &'static str,
 }
 
 inventory::collect!(ExchangeEdgeRecord);
+
+/// A statically-registered fact: a real proof-token type exists, minting a
+/// named proposition from an optional credential. Registered once per
+/// token by `#[derive(amenable_derive::ProofToken)]` (always) and by
+/// `#[amenable_derive::establish(credential = .., proposition = ..)]`'s
+/// *verifier-less* form (only when present, which supersedes the
+/// `ProofToken`-only registration for the same token — see this record's
+/// own `credential` field doc).
+///
+/// Exists for the identical reason [`ExchangeEdgeRecord`] does, applied to
+/// a different capture target: `verus --crate-type=lib` can resolve no
+/// external crate at all, not even a proc-macro one (unlike `cargo
+/// creusot`, which really does resolve ordinary Cargo dependencies) — so
+/// neither the real token type nor its real, backend-generic `Establish`
+/// impl (living in `amenable_gaap`, `GAAP_LEDGER_PLAN.md`'s Step 7) can
+/// ever be named from Verus's own gallery code, and a hand-written local
+/// mirror duplicates the same trivial shape `#[amenable_derive::
+/// establish]` already exists to eliminate. A codegen tool reads this
+/// registry and *writes* a real, checked-in, proc-macro-free companion —
+/// the same shape [`ExchangeEdgeRecord`]'s own consumers use, applied to a
+/// type/impl shape instead of a captured method body.
+pub struct ProofTokenMintRecord {
+    /// The token type's own name, as written (e.g. `"ValidatedToken"`).
+    pub token: &'static str,
+    /// The proposition this token proves, in the same naming convention as
+    /// [`EvidenceLink::name`].
+    pub proposition: &'static str,
+    /// The credential type this token is established from, if any —
+    /// `None` for a root token (no `#[establish(..)]` at all, e.g.
+    /// `PendingToken`: asserted, not derived from a prior credential).
+    /// `Some` registrations (from `#[establish(..)]`) are strictly richer
+    /// than a bare `ProofToken`-only registration for the same `token`
+    /// name — a codegen consumer reading both should keep the `Some` one.
+    pub credential: Option<&'static str>,
+}
+
+inventory::collect!(ProofTokenMintRecord);

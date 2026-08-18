@@ -35,3 +35,14 @@ pub fn creusot_generated_directory() -> PathBuf {
 pub fn verus_exchange_generated_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src/gallery/generated")
 }
+
+/// The single generated Verus ledger proof-token companion file --
+/// `write_verus_gaap_token_companion` writes exactly one file here (not a
+/// directory, unlike `verus_exchange_generated_directory`), matching the
+/// `include!("generated/ledger_tokens.rs")` path written into `gallery::
+/// ledger_exchange` (relative to `amenable_verus/src/gallery/`).
+#[must_use]
+pub fn verus_gaap_ledger_tokens_path() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../amenable_verus/src/gallery/generated/ledger_tokens.rs")
+}

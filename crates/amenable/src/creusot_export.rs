@@ -17,21 +17,24 @@
 //!
 //! Deliberately narrow: generates only the per-edge `harness!`/
 //! `ProofRecord` content, not the surrounding state/token/sidecar type
-//! definitions (`Green`/`Yellow`/... `Established<T, Token>`), which stay
-//! hand-written, stable, one-time accommodation-model infrastructure in
-//! `amenable_creusot/src/stoplight.rs` -- low drift risk (they rarely
-//! change), unlike the transition bodies this replaces hand-copying of.
-//! Written via `include!`, not a `mod`, so the generated file shares
-//! `stoplight.rs`'s own scope directly -- no `use super::*;`/explicit
-//! imports needed for `Green`/`Yellow`/`Established`/etc.
+//! definitions (`Green`/`Yellow`/`Ledger`/`Transfer<S, Token>`/...), which
+//! stay hand-written, stable, one-time accommodation-model infrastructure
+//! in `amenable_creusot/src/{stoplight,ledger}.rs` -- low drift risk (they
+//! rarely change), unlike the transition bodies this replaces hand-copying
+//! of. Written via `include!`, not a `mod`, so each generated file shares
+//! its own module's scope directly -- no `use super::*;`/explicit imports
+//! needed for `Green`/`Yellow`/`Established`/`Ledger`/`Transfer`/etc.
 //!
-//! The `#[requires(true)]`/`#[ensures(true)]` contract is hardcoded for
-//! now: every real edge in the tree today has a legitimately trivial claim
-//! (see `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s own open question). A
-//! genuinely non-trivial Pearlite predicate will need its own real
-//! mechanism (a `creusot_ensures!`-registered fragment, analogous to
-//! `kani_ensures!`/`verus_ensures!`) once one actually exists -- not
-//! designed speculatively here.
+//! `#[requires(true)]` is still hardcoded -- no real edge in the tree
+//! needs a genuine precondition on its *captured* body (`Ledger::commit`'s
+//! own real `#[kani::requires]` guards a helper's exec arithmetic that
+//! `commit`'s own body never runs; see `amenable_creusot::ledger`'s own
+//! doc comment). `#[ensures(..)]` is not: `record.creusot_ensures` (`GAAP_
+//! LEDGER_PLAN.md`'s Step 6) names the real Pearlite predicate to call,
+//! defaulting to `"true"` for edges with no meaningful postcondition
+//! (every `Stoplight` edge) -- see `ExchangeEdgeRecord::creusot_ensures`'s
+//! own doc comment for why this can't route through `Ensures<V>`
+//! mechanically the way Kani's/Verus's DFCC contracts do.
 
 use std::{
     fs,
@@ -42,40 +45,43 @@ use amenable_core::ExchangeEdgeRecord;
 
 use crate::{AmenableError, AmenableResult};
 
-/// Write one generated Creusot companion file per real `Exchange` edge
-/// registered via `amenable_core::ExchangeEdgeRecord`, under `root` (e.g.
-/// `amenable_creusot/src/generated/`). Sorted by method name so
-/// regeneration is deterministic and diffs stay minimal.
+/// Write one generated Creusot companion file per real, explicitly-
+/// allowed `Exchange` edge registered via `amenable_core::
+/// ExchangeEdgeRecord`, under `root` (e.g. `amenable_creusot/src/
+/// generated/`). Sorted by method name so regeneration is deterministic
+/// and diffs stay minimal.
 ///
-/// Filtered to `self_ty == "Stoplight"`: this generator's whole model
-/// (a free function whose body is `include!`d into a scope that already
-/// has matching-named mirror types, and a hardcoded trivial `#[ensures(
-/// true)]`) is specific to `Stoplight`'s own accommodation-model shape.
-/// `amenable_kani::ledger`'s edges (`validate`/`commit`/`reject`/
-/// `rollback`) also register an `ExchangeEdgeRecord` via the same
-/// `#[amenable_derive::exchange(..)]` macro, but nothing consumes their
-/// companions yet -- `Ledger`/`Transfer<S, Token>` still only exist in
-/// `amenable_kani`, which `amenable_creusot` cannot depend on, and their
-/// real claims are proven directly against `amenable_gaap`'s real
-/// `Validated`/`Committed` types instead (see `amenable_creusot::
-/// ledger`'s own doc comment). Without this filter, `just generate-
-/// creusot` silently wrote four `.rs` files nothing `include!`s and
-/// nothing could compile if it did (the real body references `Self::
-/// check_amount_positive`/`TransferError`/etc., which don't exist in
-/// any mirror namespace) -- confirmed directly, not assumed, before
-/// this filter was added.
+/// Filtered to an explicit `(self_ty, method_name)` allowlist -- matching
+/// `amenable::verus_exchange_export`'s own `edge_group`, for the
+/// identical real reason: this generator's whole model (a free function
+/// whose body is `include!`d into a scope that already has matching-named
+/// mirror types) is specific to each module's own accommodation-model
+/// shape, and an edge with no `include!`-target scope ready for it would
+/// be a real dead file nothing compiles -- confirmed directly, not
+/// assumed, before the original `self_ty == "Stoplight"` filter was
+/// added. `Ledger`'s own `reject`/`rollback` edges are left out of the
+/// allowlist deliberately, matching the identical scope decision Step 4
+/// (Verus) and Step 5 already made: both legitimately trivial, no new
+/// proof content from connecting them here yet.
 pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<PathBuf>> {
     fs::create_dir_all(root).map_err(|error| AmenableError::io(root, error))?;
 
     let mut records: Vec<&ExchangeEdgeRecord> = inventory::iter::<ExchangeEdgeRecord>()
-        .filter(|record| tidy_stringified_type(record.self_ty) == "Stoplight")
+        .filter(|record| {
+            edge_module(&tidy_stringified_type(record.self_ty), record.method_name).is_some()
+        })
         .collect();
     records.sort_by_key(|record| record.method_name);
 
     let mut written = Vec::with_capacity(records.len());
     for record in records {
+        let self_ty = tidy_stringified_type(record.self_ty);
+        let Some(module) = edge_module(&self_ty, record.method_name) else {
+            continue;
+        };
+
         let path = root.join(format!("{}.rs", record.method_name));
-        let source = render_companion(record);
+        let source = render_companion(record, module);
         fs::write(&path, source).map_err(|error| AmenableError::io(&path, error))?;
         written.push(path);
     }
@@ -83,9 +89,28 @@ pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<Path
     Ok(written)
 }
 
-fn render_companion(record: &ExchangeEdgeRecord) -> String {
+/// Maps a real `Exchange` edge's `(self_ty, method_name)` to the
+/// `amenable_creusot` module its generated companion `include!`s into
+/// (and whose evidence-registry path it reports under), or `None` if
+/// that edge isn't connected here yet -- see this module's own doc
+/// comment for why this is an explicit table.
+fn edge_module(self_ty: &str, method_name: &str) -> Option<&'static str> {
+    static EDGES: &[(&str, &str, &str)] = &[
+        ("Stoplight", "green_to_yellow", "stoplight"),
+        ("Stoplight", "yellow_to_red", "stoplight"),
+        ("Stoplight", "red_to_green", "stoplight"),
+        ("Ledger", "validate", "ledger"),
+        ("Ledger", "commit", "ledger"),
+    ];
+    EDGES
+        .iter()
+        .find(|(ty, method, _)| *ty == self_ty && *method == method_name)
+        .map(|(_, _, module)| *module)
+}
+
+fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
     let const_name = format!("VERIFY_{}_EXCHANGE_SRC", record.method_name.to_uppercase());
-    let evidence_path = format!("amenable_creusot::stoplight::{}", record.method_name);
+    let evidence_path = format!("amenable_creusot::{module}::{}", record.method_name);
 
     format!(
         "// AUTO-GENERATED by `amenable emit-creusot-companions` -- do not\n\
@@ -94,17 +119,19 @@ fn render_companion(record: &ExchangeEdgeRecord) -> String {
          // by `#[amenable_derive::exchange(..)]` and registered via\n\
          // `amenable_core::ExchangeEdgeRecord` -- see `amenable::\n\
          // creusot_export`'s own doc comment. Plain `//`, not `//!`: this\n\
-         // file is `include!`d mid-file into `stoplight.rs`'s own scope,\n\
+         // file is `include!`d mid-file into its own module's scope,\n\
          // not its own module -- an inner doc comment there is a real\n\
          // compile error (E0753, confirmed against a real build), not\n\
          // just a style choice.\n\
          \n\
          amenable_derive::harness! {{\n\
          \x20\x20\x20\x20creusot, {const_name}, {{\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20#[requires(true)]\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20#[ensures(true)]\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20fn {method_name}(input: {input_ty}) -> Result<{output_ty}, {error_ty}> {{\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20impl {self_ty} {{\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20#[requires(true)]\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20#[ensures({creusot_ensures})]\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20fn {method_name}(&self, input: {input_ty}) -> Result<{output_ty}, {error_ty}> {{\n\
          {body}\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20}}\n\
          \x20\x20\x20\x20\x20\x20\x20\x20}}\n\
          \x20\x20\x20\x20}}\n\
          }}\n\
@@ -123,6 +150,7 @@ fn render_companion(record: &ExchangeEdgeRecord) -> String {
         output_ty = tidy_stringified_type(record.output_ty),
         error_ty = tidy_stringified_type(record.error_ty),
         body = indent_body(record.body),
+        creusot_ensures = record.creusot_ensures,
     )
 }
 
@@ -163,8 +191,8 @@ fn tidy_stringified_type(stringified: &str) -> String {
 }
 
 /// Re-indent a captured method body's own lines to sit correctly nested
-/// inside the generated `harness! { .. { fn .. { <body> } } }` shape.
-/// Two real, confirmed passes, not one: `rustfmt` doesn't reformat
+/// inside the generated `harness! { .. { impl .. { fn .. { <body> } } } }`
+/// shape. Two real, confirmed passes, not one: `rustfmt` doesn't reformat
 /// inside `harness! { .. }`'s own opaque macro invocation (confirmed
 /// directly against a real generated file), so this has to get the
 /// whitespace right itself, not defer to a later `cargo fmt` pass that
@@ -185,8 +213,12 @@ fn tidy_stringified_type(stringified: &str) -> String {
 ///    from all of them, before re-indenting everything uniformly.
 /// 2. **Re-indent.** Once every line starts at a shared, zero baseline,
 ///    prefix each non-empty line with the real target indentation for
-///    this generated shape (12 spaces: inside `harness! { .. { fn .. {`
-///    's own three nesting levels).
+///    this generated shape (16 spaces: inside `harness! { .. { impl .. {
+///    fn .. {` 's own four nesting levels -- widened from three once the
+///    generated `fn` gained a real `impl {self_ty} { .. }` wrapper, `GAAP_
+///    LEDGER_PLAN.md`'s Step 6, so a captured body referencing `self`/
+///    `Self` -- `Ledger::validate`'s own real body, the first captured
+///    body to need this -- has something to resolve against).
 fn indent_body(body: &str) -> String {
     let lines: Vec<&str> = body.lines().collect();
     let dedent_width = lines
@@ -209,7 +241,7 @@ fn indent_body(body: &str) -> String {
             } else {
                 &line[dedent_width.min(line.len())..]
             };
-            format!("            {dedented}")
+            format!("                {dedented}")
         })
         .collect::<Vec<_>>()
         .join("\n")

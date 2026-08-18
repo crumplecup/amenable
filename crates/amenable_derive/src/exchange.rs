@@ -89,6 +89,7 @@ pub struct ExchangeArgs {
     harness_fn: Ident,
     harness_const: Ident,
     evidence_id: Option<LitStr>,
+    creusot_ensures: Option<LitStr>,
 }
 
 impl Parse for ExchangeArgs {
@@ -100,6 +101,7 @@ impl Parse for ExchangeArgs {
         let mut harness_fn = None;
         let mut harness_const = None;
         let mut evidence_id = None;
+        let mut creusot_ensures = None;
 
         let pairs = Punctuated::<MetaNameValue, Token![,]>::parse_terminated(input)?;
 
@@ -118,6 +120,8 @@ impl Parse for ExchangeArgs {
                 harness_const = Some(expect_ident(&pair.value)?);
             } else if pair.path.is_ident("evidence_id") {
                 evidence_id = Some(expect_lit_str(&pair.value)?);
+            } else if pair.path.is_ident("creusot_ensures") {
+                creusot_ensures = Some(expect_lit_str(&pair.value)?);
             } else {
                 return Err(Error::new_spanned(
                     &pair.path,
@@ -134,6 +138,7 @@ impl Parse for ExchangeArgs {
             harness_fn: require(harness_fn, "harness_fn")?,
             harness_const: require(harness_const, "harness_const")?,
             evidence_id,
+            creusot_ensures,
         })
     }
 }
@@ -240,7 +245,13 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
         harness_fn,
         harness_const,
         evidence_id,
+        creusot_ensures,
     } = args;
+
+    let creusot_ensures_lit = match creusot_ensures {
+        Some(lit) => lit.clone(),
+        None => LitStr::new("true", proc_macro2::Span::call_site()),
+    };
 
     let evidence_id_expr = match evidence_id {
         Some(suffix) => {
@@ -328,6 +339,7 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
                 evidence: stringify!(#evidence),
                 method_name: stringify!(#method_ident),
                 body: #body_source,
+                creusot_ensures: #creusot_ensures_lit,
             }
         }
 

@@ -74,8 +74,8 @@ use amenable_core::{Establish, Sidecar, Witness};
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_gaap::{
-    AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, Pending, Rejected,
-    SufficientFunds, TransferPayload, Validated,
+    AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
+    Pending, PendingToken, Rejected, SufficientFunds, TransferPayload, Validated, ValidatedToken,
 };
 
 use crate::rust_std::macros::kani_ensures;
@@ -119,21 +119,6 @@ pub struct Transfer<S, Token> {
     _state: std::marker::PhantomData<S>,
 }
 
-/// Lawful token asserting a transfer is `Pending` — the entry state,
-/// minted without going through `Establish::establish()` the same way
-/// `stoplight::GreenToken::new` doesn't: there is no prior state to
-/// present a credential from. No `#[establish(..)]` for the same reason
-/// — a root has no credential type to name.
-#[derive(Debug, Clone, amenable_derive::ProofToken)]
-#[proof_token(proposition = "Pending")]
-pub struct PendingToken(());
-
-impl PendingToken {
-    fn new(_state: Pending) -> Self {
-        Self(())
-    }
-}
-
 /// `Pending`'s own trivial witness. Unlike `stoplight::Green`, which
 /// gets its `Witness<KaniVerifier>` impl "for free" from the `Red ->
 /// Green` cycle-back edge (`Green` is also an edge *target* in that
@@ -156,35 +141,6 @@ impl Transfer<Pending, PendingToken> {
     #[must_use]
     pub fn pending(payload: TransferPayload) -> Self {
         Self::new(payload, PendingToken::new(Pending))
-    }
-}
-
-/// Lawful token minted once `Validated` is established from a proven
-/// `Pending`.
-#[derive(Debug, Clone, amenable_derive::ProofToken)]
-#[proof_token(proposition = "Validated")]
-#[amenable_derive::establish(
-    credential = "PendingToken",
-    verifier = "KaniVerifier",
-    proposition = "Validated"
-)]
-pub struct ValidatedToken(());
-
-impl ValidatedToken {
-    // `pub(crate)`, diagnostic only -- see `gallery::
-    // ledger_commit_contract_timeout`'s own doc comment: constructing a
-    // `Transfer<Validated, ValidatedToken>` in a `#[kani::proof_for_
-    // contract]` harness's own setup code via the *lawful* `Sidecar::
-    // sidecar`/`Establish::establish` chain is real, structural CBMC
-    // cost (~143s even with fully concrete values), independent of
-    // `commit`'s own contract content. This bypasses that chain for
-    // harness setup only -- the CONTRACT being checked is `commit`'s
-    // own, unaffected by how the harness's *input* was assembled, the
-    // same reason `Transfer::new`/`Ledger::validate`/`Ledger::commit`
-    // already carry this same `pub(crate)` diagnostic relaxation.
-    #[cfg(kani)]
-    pub(crate) fn diagnostic_only() -> Self {
-        Self(())
     }
 }
 
@@ -495,6 +451,13 @@ kani_ensures!(
     proof_artifact = CalculationProof,
     harness_fn = verify_validate_accepts_a_lawful_transfer,
     harness_const = VERIFY_VALIDATE_ACCEPTS_A_LAWFUL_TRANSFER_SRC,
+    creusot_ensures = "match result { \
+        Ok(validated) => amount_positive_holds(validated.payload.amount.0, true) \
+            && accounts_distinct_holds(validated.payload.from, validated.payload.to, true), \
+        Err(TransferError::NegativeAmount(bad)) => amount_positive_holds(bad, false), \
+        Err(TransferError::InsufficientFunds { balance, required }) => sufficient_funds_holds(balance, required, false), \
+        Err(TransferError::SameAccount) => true, \
+    }",
 )]
 impl Ledger {
     // `pub(crate)`, not private: lets `gallery::ledger_account_id_
@@ -561,17 +524,6 @@ amenable_derive::harness! {
     }
 }
 
-/// Lawful token minted once `Committed` is established from a proven
-/// `Validated`.
-#[derive(Debug, Clone, amenable_derive::ProofToken)]
-#[proof_token(proposition = "Committed")]
-#[amenable_derive::establish(
-    credential = "ValidatedToken",
-    verifier = "KaniVerifier",
-    proposition = "Committed"
-)]
-pub struct CommittedToken(());
-
 // `Validated -> Committed`, `GAAP_LEDGER_PLAN.md`'s Step 2: infallible,
 // like every `Stoplight` edge -- a transfer that already passed
 // `validate`'s own checks has nothing left to reject at commit time
@@ -626,6 +578,10 @@ kani_ensures!(
     proof_artifact = CalculationProof,
     harness_fn = verify_commit_always_balances,
     harness_const = VERIFY_COMMIT_ALWAYS_BALANCES_SRC,
+    creusot_ensures = "match result { \
+        Ok(committed) => committed_amount_holds(committed.payload.amount.0), \
+        Err(_) => false, \
+    }",
 )]
 impl Ledger {
     // `pub(crate)`, matching `validate`'s own precedent: lets

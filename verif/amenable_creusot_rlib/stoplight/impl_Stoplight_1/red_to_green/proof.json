@@ -4,7 +4,7 @@
     "Coma": {
       "vc_establish_Green": { "prover": "alt-ergo", "time": 0.019 },
       "vc_new_Green": { "prover": "alt-ergo", "time": 0.017 },
-      "vc_red_to_green": { "prover": "alt-ergo", "time": 0.01 },
+      "vc_red_to_green": { "prover": "alt-ergo", "time": 0.011 },
       "vc_sidecar_Established_Red_RedToken": {
         "prover": "alt-ergo",
         "time": 0.016

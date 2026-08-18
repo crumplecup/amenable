@@ -3,6 +3,32 @@
 //! Establish<C, V> for Y { type Token = Self; fn establish(_credential: C)
 //! -> Self::Token { Self(()) } }`.
 //!
+//! `verifier` is optional. When given, the impl targets exactly that one
+//! concrete verifier -- the original, still-used shape (every existing
+//! call site names one). When omitted, this generates a single **backend-
+//! generic** blanket impl instead: `impl<V: Verifier> Establish<C, V> for Y
+//! where Y: Witness<V> { .. }`. This is the real fix for the mirror-token
+//! cascade `GAAP_LEDGER_PLAN.md`'s Step 6 ran into: `establish()`'s body
+//! has to construct the token's own private field, which forces it to live
+//! in the token's own defining crate -- so as long as the token type (and
+//! its establish impl) lived only in `amenable_kani`, no other backend
+//! could ever mint a *real* one, and each resorted to a separate mirror
+//! token just to have something it was allowed to construct. Moving the
+//! token type (and this blanket impl) into the neutral crate the
+//! proposition already lives in (`amenable_gaap`) removes the need for a
+//! concrete verifier at the impl site at all: orphan-rule legality here
+//! comes from the proposition (`Self`/`Y`) being local to that crate, not
+//! from `V`'s locality, so `V` can stay a bare, unconstrained generic
+//! parameter. The `where Y: Witness<V>` bound is the actual gate --
+//! `Establish<C, V>`'s own supertrait already requires it, restated
+//! explicitly here because a generic impl needs it spelled out to
+//! typecheck -- and it's satisfied per-verifier exactly where each
+//! backend's own real proof lives (`impl Witness<KaniVerifier> for
+//! Validated` in `amenable_kani`, `impl Witness<CreusotVerifier> for
+//! Validated` in `amenable_creusot`, ..., each `#[cfg(..)]`-gated to that
+//! backend already). No new verifier-specific code is needed here at all
+//! when a fourth backend arrives; it only needs its own `Witness<V>` impl.
+//!
 //! Arguments are string literals, re-parsed as a `Path`, not bare
 //! identifiers — matching `#[derive(Standard)]`'s own `#[standard(basis
 //! = "..")]` convention, for the same reason: `proposition = Rejected<
@@ -46,10 +72,11 @@ use syn::{
 };
 
 /// Parsed `#[establish(credential = "..", verifier = "..", proposition =
-/// "..")]` arguments.
+/// "..")]` arguments. `verifier` is optional -- see this module's own doc
+/// comment for what its absence generates.
 pub struct EstablishArgs {
     credential: Path,
-    verifier: Path,
+    verifier: Option<Path>,
     proposition: Path,
 }
 
@@ -78,7 +105,7 @@ impl Parse for EstablishArgs {
 
         Ok(EstablishArgs {
             credential: require(credential, "credential")?,
-            verifier: require(verifier, "verifier")?,
+            verifier,
             proposition: require(proposition, "proposition")?,
         })
     }
@@ -144,15 +171,51 @@ pub fn expand_establish(args: &EstablishArgs, item: &ItemStruct) -> syn::Result<
         proposition,
     } = args;
 
+    let establish_impl = match verifier {
+        Some(verifier) => quote! {
+            impl ::amenable_core::Establish<#credential, #verifier> for #proposition {
+                type Token = #name;
+
+                #[track_caller]
+                fn establish(_credential: #credential) -> Self::Token {
+                    #name(())
+                }
+            }
+        },
+        None => quote! {
+            impl<V: ::amenable_core::Verifier> ::amenable_core::Establish<#credential, V> for #proposition
+            where
+                #proposition: ::amenable_core::Witness<V>,
+            {
+                type Token = #name;
+
+                #[track_caller]
+                fn establish(_credential: #credential) -> Self::Token {
+                    #name(())
+                }
+            }
+
+            // Only the verifier-less (generic, `amenable_gaap`-style) form
+            // registers -- the concrete-verifier form (Stoplight's own
+            // per-backend tokens) has no codegen consumer needing it yet.
+            // Strictly richer than `#[derive(ProofToken)]`'s own
+            // registration for the same token (`credential: Some(..)`, not
+            // `None`): a codegen consumer reading both keeps this one. See
+            // `ProofTokenMintRecord`'s own doc comment for why this exists
+            // at all.
+            ::inventory::submit! {
+                ::amenable_core::ProofTokenMintRecord {
+                    token: stringify!(#name),
+                    proposition: stringify!(#proposition),
+                    credential: Some(stringify!(#credential)),
+                }
+            }
+        },
+    };
+
     Ok(quote! {
         #item
 
-        impl ::amenable_core::Establish<#credential, #verifier> for #proposition {
-            type Token = #name;
-
-            fn establish(_credential: #credential) -> Self::Token {
-                #name(())
-            }
-        }
+        #establish_impl
     })
 }

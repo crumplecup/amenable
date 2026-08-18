@@ -10,9 +10,11 @@
 #![warn(missing_docs)]
 
 mod contracts;
+mod tokens;
 mod transfer;
 
 pub use contracts::{
     AccountingEquationHolds, AccountsDistinct, AmountPositive, BalancedEntries, SufficientFunds,
 };
+pub use tokens::{CommittedToken, PendingToken, ValidatedToken};
 pub use transfer::{AccountId, Amount, Committed, Pending, Rejected, TransferPayload, Validated};

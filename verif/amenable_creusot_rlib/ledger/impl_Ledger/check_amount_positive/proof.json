@@ -1,0 +1,8 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_amount_positive": { "prover": "alt-ergo", "time": 0.013 }
+    }
+  }
+}

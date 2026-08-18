@@ -74,8 +74,7 @@ pub use io_model::{
     KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
 };
 pub use ledger::{
-    CommittedToken, Ledger, PendingToken, RejectedFromPendingToken, RejectedFromValidatedToken,
-    Transfer, TransferError, ValidatedToken,
+    Ledger, RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};

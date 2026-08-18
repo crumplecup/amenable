@@ -1,0 +1,34 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_clone_TransferPayload": { "prover": "alt-ergo", "time": 0.016 },
+      "vc_commit": {
+        "tactic": "compute_specified",
+        "children": [
+          {
+            "tactic": "split_vc",
+            "children": [
+              { "prover": "alt-ergo", "time": 0.025 },
+              { "prover": "alt-ergo", "time": 0.021 },
+              { "prover": "alt-ergo", "time": 0.02 },
+              { "prover": "alt-ergo", "time": 0.026 },
+              { "prover": "alt-ergo", "time": 0.021 },
+              { "prover": "alt-ergo", "time": 0.023 }
+            ]
+          }
+        ]
+      },
+      "vc_establish_Committed": { "prover": "alt-ergo", "time": 0.015 },
+      "vc_new_Committed": { "prover": "alt-ergo", "time": 0.015 },
+      "vc_primary_Transfer_Validated_ValidatedToken": {
+        "prover": "alt-ergo",
+        "time": 0.016
+      },
+      "vc_sidecar_Transfer_Validated_ValidatedToken": {
+        "prover": "alt-ergo",
+        "time": 0.016
+      }
+    }
+  }
+}

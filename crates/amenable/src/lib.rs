@@ -30,6 +30,8 @@ pub mod paths;
 mod verus_exchange_export;
 #[cfg(feature = "verus")]
 mod verus_export;
+#[cfg(feature = "verus")]
+mod verus_gaap_tokens_export;
 
 pub mod assessment;
 pub mod gallery;
@@ -45,16 +47,18 @@ pub use error::{
 pub use verus_exchange_export::write_verus_exchange_companions;
 #[cfg(feature = "verus")]
 pub use verus_export::write_verus_witness_modules;
+#[cfg(feature = "verus")]
+pub use verus_gaap_tokens_export::write_verus_gaap_token_companion;
 
 pub use amenable_core::{
     Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
     ClassifiedWitness, ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange,
     ExchangeEdgeRecord, Green, MetadataEntry, OwnedProvenanceReport, ProofChainReport, ProofRecord,
-    ProofToken, Provenance, ProvenanceReport, Red, Registry, RegistryReport, Requires, Sidecar,
-    Standard, StateMachine, Verifier, Witness, WitnessArtifact, WitnessArtifactMember,
-    WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord,
-    WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, Yellow,
-    proof_chain, proof_chain_for_verifiers, witness_exports,
+    ProofToken, ProofTokenMintRecord, Provenance, ProvenanceReport, Red, Registry, RegistryReport,
+    Requires, Sidecar, Standard, StateMachine, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
+    WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind,
+    WitnessSupportSummary, Yellow, proof_chain, proof_chain_for_verifiers, witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{

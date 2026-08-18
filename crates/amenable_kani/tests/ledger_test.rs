@@ -4,10 +4,12 @@
 //! edge, which can only ever succeed.
 
 use amenable_core::{Exchange, Sidecar};
-use amenable_gaap::{AccountId, Amount, Committed, Pending, Rejected, TransferPayload, Validated};
+use amenable_gaap::{
+    AccountId, Amount, Committed, CommittedToken, Pending, Rejected, TransferPayload, Validated,
+    ValidatedToken,
+};
 use amenable_kani::{
-    CommittedToken, Ledger, RejectedFromPendingToken, RejectedFromValidatedToken, Transfer,
-    TransferError, ValidatedToken,
+    Ledger, RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError,
 };
 
 #[test]

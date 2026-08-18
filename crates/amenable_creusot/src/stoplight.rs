@@ -238,8 +238,14 @@ impl ProofToken for RedToken {
 #[derive(amenable_derive::Sidecar)]
 #[sidecar(verifier = "CreusotVerifier", constructor = "")]
 pub struct Established<T, Token> {
+    // Fully `pub`, not private -- see `ledger::Transfer`'s own fields'
+    // doc comment for the real "less-visible item" transparency error
+    // this avoids: `Sidecar::primary()` (a `pub` trait method) is more
+    // visible than `new`'s own private constructor here, so even though
+    // both derive-generated `ensures` clauses reach these fields, the
+    // *more* visible one (`primary()`) is what sets the real floor.
     #[sidecar(primary)]
-    primary: T,
+    pub primary: T,
     #[sidecar(token)]
     token: Token,
 }
@@ -271,6 +277,18 @@ impl Establish<RedToken, CreusotVerifier> for Green {
     }
 }
 
+/// Sanitized mirror of `amenable_kani::stoplight::Stoplight` — needed
+/// only because the generated companions below (`GAAP_LEDGER_PLAN.md`'s
+/// Step 6) now wrap each edge's captured body in a real `impl Stoplight
+/// { fn ..(&self, ..) }`, not a bare free function: `Ledger::validate`'s
+/// own real body was the first captured body to reference `self`/`Self`
+/// at all, forcing `amenable::creusot_export`'s own generator to add a
+/// real receiver, uniformly, to every edge it generates -- `Stoplight`'s
+/// own three edges never use `self` inside their bodies, but still need
+/// a real type to receive it now that the wrapper is unconditional.
+#[cfg(creusot)]
+pub struct Stoplight;
+
 /// Sanitized mirror of `amenable_kani::StoplightError` — a
 /// real, ordinary, constructible type, matching the real one's own
 /// justification exactly: an uninhabited error type (`std::convert::
@@ -298,8 +316,8 @@ pub enum StoplightError {
 // `amenable_core::ExchangeEdgeRecord`, not hand-written. See this file's
 // own doc comment for the full mechanism and why hand-copying was
 // dropped. `include!`, not `mod`: these share this file's own scope
-// directly (`Green`/`Yellow`/`Established`/`StoplightError` above,
-// already in scope), no `use super::*;`/explicit imports needed in the
+// directly (`Green`/`Yellow`/`Established`/`Stoplight`/`StoplightError`
+// above, already in scope), no `use super::*;`/explicit imports needed in the
 // generated files themselves. Regenerate with `just generate-creusot`
 // after changing a real Kani-side transition; do not hand-edit the
 // included files.

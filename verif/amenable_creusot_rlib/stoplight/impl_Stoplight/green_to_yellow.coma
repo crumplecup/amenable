@@ -1,0 +1,59 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 17 12 17 136 *)
+
+(* stoplight::Stoplight *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33
+let%span sgreen_to_yellow = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 18 46 18 61
+let%span sgreen_to_yellow'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 18 28 18 62
+let%span sgreen_to_yellow'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 19 19 19 50
+let%span sgreen_to_yellow'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 15 23 15 27
+let%span sgreen_to_yellow'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 16 22 16 26
+
+use creusot.prelude.Any
+
+type t_GreenToken = { f0: () }
+
+type t_Established_Green_GreenToken = { primary: (); token: t_GreenToken }
+
+let rec sidecar_Established_Green_GreenToken (self: t_Established_Green_GreenToken) (return (x: t_GreenToken)) = any
+  [ return (result: t_GreenToken) -> (! return {result}) ]
+
+type t_YellowToken = { f0'0: () }
+
+let rec establish_Yellow (_credential: t_GreenToken) (return (x: t_YellowToken)) = any
+  [ return (result: t_YellowToken) -> (! return {result}) ]
+
+type t_Established_Yellow_YellowToken = { primary'0: (); token'0: t_YellowToken }
+
+let rec new_Yellow (primary'1: ()) (token'1: t_YellowToken) (return (x: t_Established_Yellow_YellowToken)) = any
+  [ return (result: t_Established_Yellow_YellowToken) ->
+  {[@stop_split] [@expl:new ensures] [%#sstoplight] result.primary'0 = primary'1}
+    (! return {result}) ]
+
+type t_StoplightError = NotUsed
+
+type t_Result_Established_Yellow_YellowToken_StoplightError = Ok t_Established_Yellow_YellowToken | Err t_StoplightError
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec green_to_yellow
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 17 12 17 136] (self: ())
+  (input: t_Established_Green_GreenToken) (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) = (! bb0
+  [ bb0 = s0
+    [ s0 = sidecar_Established_Green_GreenToken [%#sgreen_to_yellow] {input}
+        (fun (_x: t_GreenToken) -> [ &_6 <- _x ] s1)
+    | s1 = establish_Yellow [%#sgreen_to_yellow'0] {_6} (fun (_x: t_YellowToken) -> [ &token'1 <- _x ] s2)
+    | s2 = [ &_9 <- () ] s3
+    | s3 = new_Yellow [%#sgreen_to_yellow'1] {_9} {token'1}
+        (fun (_x: t_Established_Yellow_YellowToken) -> [ &_8 <- _x ] s4)
+    | s4 = [ &_ret <- Ok _8 ] s5
+    | s5 = return {_ret} ] ]
+  [ & _ret: t_Result_Established_Yellow_YellowToken_StoplightError = Any.any_l ()
+  | & input: t_Established_Green_GreenToken = input
+  | & token'1: t_YellowToken = Any.any_l ()
+  | & _6: t_GreenToken = Any.any_l ()
+  | & _8: t_Established_Yellow_YellowToken = Any.any_l ()
+  | & _9: () = Any.any_l () ])
+  [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) -> (! return {result}) ]

@@ -18,6 +18,12 @@ use syn::{DeriveInput, Error, LitStr, Type};
 
 /// Expand `#[derive(ProofToken)]` for a struct carrying
 /// `#[proof_token(proposition = "...")]`.
+///
+/// Also registers an `amenable_core::ProofTokenMintRecord` unconditionally
+/// -- a codegen consumer (e.g. `amenable::emit-verus-gaap-tokens`, see
+/// that record's own doc comment) filters down to whichever tokens it
+/// actually cares about; every `ProofToken`-derived type in the workspace
+/// registering here costs nothing unused.
 pub fn expand_proof_token(input: &DeriveInput) -> syn::Result<TokenStream> {
     let proposition = parse_proof_token_args(&input.attrs)?;
     let name = &input.ident;
@@ -26,6 +32,14 @@ pub fn expand_proof_token(input: &DeriveInput) -> syn::Result<TokenStream> {
     Ok(quote! {
         impl #impl_generics ::amenable_core::ProofToken for #name #ty_generics #where_clause {
             type Proposition = #proposition;
+        }
+
+        ::inventory::submit! {
+            ::amenable_core::ProofTokenMintRecord {
+                token: stringify!(#name),
+                proposition: stringify!(#proposition),
+                credential: None,
+            }
         }
     })
 }

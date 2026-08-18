@@ -1,0 +1,22 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 241 4 241 26 *)
+
+(* ledger::Amount *)
+
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 239 15 239 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 240 14 240 30
+
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 241 4 241 26] (self: t_Amount)
+  (return (x: Int64.t)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- self.f0 ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: Int64.t = Any.any_l () | & self: t_Amount = self ])
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:value ensures] [%#sledger'0] result = self.f0}
+    (! return {result}) ]

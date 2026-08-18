@@ -41,7 +41,16 @@ backend, and `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
 now — back real per-backend `Ensures<V>` impls that `Validated`'s/
 `Committed`'s own claims call through, on all three backends (see Step
 5 below for the full account, including a composition-derive design
-considered and rejected).
+considered and rejected). Step 6 closes the one remaining unconnected
+corner: `Ledger::validate`'s/`::commit`'s real bodies (`amenable_kani`)
+are now proven against genuine Creusot predicates too, not just Kani
+and Verus — `cargo creusot prove` reports `Proved (143 files) ✔`,
+confirmed non-vacuous via a real injected-bug regression check. Getting
+there surfaced four new real Creusot toolchain findings (logic-context
+method-call restriction, a genuine `Result::map_err` contract gap in
+`creusot-std` itself, `cargo creusot`'s global `--cfg creusot` scope,
+and two rounds of proof-transparency visibility requirements) — see
+Step 6 below for the full account.
 
 ## Motivation
 
@@ -517,7 +526,7 @@ Decide then whether `AccountingEquationHolds` belongs on `Committed`
 itself or as a separate period-close edge — deferred until Step 3/4
 give a reason to revisit, not decided speculatively now.
 
-### Step 3 — Creusot — `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/`BalancedEntries` done, `Ledger::validate`/`::commit` themselves not yet connected
+### Step 3 — Creusot — `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/`BalancedEntries` done; `Ledger::validate`/`::commit` themselves connected in Step 6
 
 **A real architectural correction, not the design this plan originally
 sketched.** The plan as first drafted (and this section's own original
@@ -615,23 +624,16 @@ whole model (free function spliced into a matching-named mirror scope,
 hardcoded trivial `#[ensures(true)]`) is specific to `Stoplight`'s own
 shape and doesn't apply to how GAAP's real claims are proven.
 
-**Not yet done**: `Ledger::validate`/`::commit` themselves (the real
-functions, living only in `amenable_kani`) are not yet connected to
-these Creusot predicates — the four checks above are proven in
-isolation, the same way `Ledger::check_amount_positive`/`::check_
-sufficient_funds` were proven in isolation before `validate`'s own
-Kani contract was written. `Ledger`/`Transfer<S, Token>` becoming a
-real Cargo dependency of `amenable_creusot` is **not** on the table —
-that would be a direct `amenable_creusot -> amenable_kani` edge, ruled
-out on architectural grounds regardless of translator-ICE risk (see
-`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10: this exact edge was
-tried, compiled clean, and was reverted anyway for violating
-"verifier backends never depend on each other"). Whatever connects
-`Ledger::validate`/`::commit` to these predicates will need either its
-own neutral-crate marker types (matching `Stoplight`'s `Green`/
-`Yellow`/`Red` -> `amenable_core` move) or a different mechanism
-entirely — an open question for whenever that connection is actually
-built.
+**Connected in Step 6**: `Ledger::validate`/`::commit` themselves (the
+real functions, living only in `amenable_kani`) were not yet connected
+to these Creusot predicates when this step was first written — the
+four checks above were proven in isolation, the same way `Ledger::
+check_amount_positive`/`::check_sufficient_funds` were proven in
+isolation before `validate`'s own Kani contract was written. See Step
+6 below for how that connection was actually built (a real `Ledger`
+mirror plus the existing `ExchangeEdgeRecord` codegen, generalized —
+not a direct `amenable_creusot -> amenable_kani` dependency, which
+stayed a settled no throughout).
 
 ### Step 4 — Verus — `Validated`/`Committed` done via the real derives, `reject`/`rollback` deferred
 
@@ -787,7 +789,122 @@ regression check (`AmountPositive`'s own claim loosened, reverted after
 confirming a precise failure). Full workspace `check`/`fmt`/`clippy -D
 warnings`/`test` clean throughout.
 
-### Step 6+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
+### Step 6 — connect `Ledger::validate`/`::commit`'s real bodies to Creusot, via the existing codegen — done
+
+Step 3 proved `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
+`BalancedEntries` in isolation. Step 4 (Verus) already captured `Ledger::
+validate`'s/`::commit`'s real bodies verbatim via `amenable::verus_
+exchange_export`'s codegen; Step 6 does the Creusot equivalent, closing
+the last unconnected corner across all three backends.
+
+**Generalized the existing `emit-creusot-companions` codegen instead of
+hand-mirroring a third time.** `amenable::creusot_export`'s filter
+widened from a hardcoded `self_ty == "Stoplight"` check to an explicit
+`(self_ty, method_name) -> module` allowlist (`Ledger::validate` and
+`::commit` added, matching the `edge_group` table Step 4 already built
+for Verus; `reject`/`rollback` deliberately excluded — legitimately
+trivial, no new proof content). The generated companion also gained a
+real `impl {self_ty} { .. }` wrapper (previously bare free functions) —
+`Ledger::validate`'s captured body is the first to reference `self`,
+forcing this; `pub struct Stoplight;` was added to `amenable_creusot::
+stoplight`'s mirror since every edge now uniformly gets the wrapper.
+
+**A new field on `ExchangeEdgeRecord`, not a mechanical call-through.**
+Kani's and Verus's DFCC-style backends can route a generated
+postcondition through `<Evidence as Ensures<V>>::ensures(result)`
+mechanically; Creusot cannot — Pearlite has no trait-dispatch mechanism
+reachable from an `#[ensures(..)]` clause. `ExchangeEdgeRecord` gained
+`creusot_ensures: &'static str` (default `"true"`, so existing
+Stoplight call sites needed no changes), a real Pearlite predicate
+expression spliced verbatim into the generated companion's own
+`#[ensures(..)]` clause. `#[amenable_derive::exchange(...,
+creusot_ensures = "...")]` on `Ledger::validate`/`::commit` in
+`amenable_kani::ledger` supplies the real content — a `match result {
+.. }` over `TransferError`'s three variants, calling the Step 3
+predicates through direct field access into the Creusot mirror's
+`Transfer<S, Token>` (`validated.payload.amount.0`, not a method
+chain — see below for why).
+
+**Four real Creusot toolchain findings, none previously exercised —
+each root-caused against the actual `cargo creusot`/`why3find`
+toolchain, none worked around:**
+
+1. **`#[ensures(..)]` cannot call ordinary Rust methods, only `#[logic]`
+   functions or direct field access.** `.primary()`/`.amount()`/
+   `.value()`/`.from()`/`.to()` chains in a `creusot_ensures` string all
+   produced "called program function `X` in logic context" — unlike
+   Verus, which allows this. Fixed by rewriting every `creusot_ensures`
+   string to use direct field access (`validated.payload.amount.0`)
+   instead.
+2. **`Result::map_err` has zero contract anywhere in `creusot-std`
+   itself.** Confirmed by directly reading the real source
+   (`creusot-std/src/std/result.rs`, a local checkout): `map`/`and`/
+   `or`/`unwrap_or`/etc. are all specified, `map_err` is not. Produced
+   "calling external function `map_err` with no contract will yield an
+   impossible precondition" — a genuine unprovable goal (confirmed via
+   `cargo creusot prove --why3find-arg=-X`, showing the exact failing
+   `vc_validate` subgoal), not a translator quirk. Fixed with a real
+   `extern_spec! { impl<T, E> Result<T, E> { .. fn map_err<F, O:
+   FnOnce(E) -> F>(self, op: O) -> Result<T, F>; } }` block in
+   `amenable_creusot::ledger`, modeled on `creusot-std`'s own `Option::
+   map` extern_spec, requiring a direct `use creusot_std::std::ops::
+   FnOnceExt;` (the trait providing `.precondition()`/`.postcondition_
+   once()` — `creusot_std::prelude` only re-exports it anonymously as
+   `as _`, insufficient here since this file doesn't import the
+   prelude wildcard).
+3. **`cargo creusot` sets `--cfg creusot` across its whole dependency
+   graph, not just the crate it translates.** A blanket `#[cfg_attr(
+   creusot, ::creusot_std::macros::ensures(...))]` on `#[derive(
+   Sidecar)]`'s generated constructor/`primary()` produced a real
+   "cannot find `creusot_std` in the crate root" error inside
+   `amenable_kani` — an ordinary Cargo dependency of `amenable_creusot`,
+   never itself translated, with no dependency on `creusot_std` at all,
+   but still compiled with `cfg(creusot)` = true by `cargo creusot`'s
+   own build. Fixed by gating on `verifier`'s own stringified *text*
+   being literally `"CreusotVerifier"` (`quote!(#verifier).to_string()
+   == "CreusotVerifier"`, checked at macro-expansion time) instead of a
+   `cfg_attr` — the Creusot-specific tokens are then never generated at
+   all for a non-Creusot `#[derive(Sidecar)]` consumer.
+4. **Two rounds of "Cannot make `X` transparent in `Y` as it would call
+   a less-visible item."** Creusot's proof-transparency check requires
+   any item an `#[ensures(..)]` clause references to be at least as
+   visible as the function stating the clause. Round 1: `Transfer::
+   payload` (private) referenced by the derived constructor's ensures
+   (`pub(crate)` visibility) — fixed by widening the field. Round 2
+   (after `Sidecar::primary()` also gained a real ensures clause):
+   the same field needed to be genuinely `pub`, not `pub(crate)`, since
+   `Sidecar::primary()` is a method on the *public* `amenable_core::
+   Sidecar` trait, making the trait-impl method itself fully public
+   regardless of the struct's own constructor visibility.
+
+**The `#[derive(amenable_derive::Sidecar)]` derive itself gained real
+scope**, not just structural output: its generated constructor and
+`primary()` method now carry real, backend-conditional `#[ensures(..)]`
+clauses (finding 3, above) — the first time this derive's output needed
+to carry a checkable postcondition rather than pure boilerplate.
+
+**Verified for real, non-vacuously**: `cargo creusot prove -- -p
+amenable_creusot` reports `Proved (143 files) ✔` (up from 119 before
+this step). A real injected-bug regression check — `Err(TransferError::
+SameAccount) => true` flipped to `false` in `validate`'s own
+`creusot_ensures` string — produced a precise `Goal Coma.vc_validate:
+✘ (9/10)` failure, reverted and reconfirmed `Proved (143 files) ✔`.
+Full workspace `cargo check --workspace --all-features`/`cargo fmt
+--all --check`/`cargo clippy --workspace --all-targets --all-features
+-- -D warnings`/`cargo test --workspace --all-features` clean. Real
+Kani re-verification of all three `Ledger::validate`/`::commit`
+harnesses (`ledger::verify_validate_accepts_a_lawful_transfer`,
+`::verify_validate_rejects_the_same_account`,
+`::verify_commit_always_balances`) confirmed clean (`0 of N failed`
+each) — this step's only Kani-side change was the new
+`creusot_ensures` string-literal metadata parameter, which doesn't
+affect the generated `#[kani::ensures(..)]` DFCC contract at all, but
+re-verified anyway rather than assumed. Real `verus --crate-type=lib`
+reconfirmed clean too (`478 verified, 0 errors`, unchanged) — the
+shared `#[derive(Sidecar)]` change is verifier-text-gated and produces
+no new tokens for Verus's own `verus_sidecar!` macro_rules! path.
+
+### Step 7+ — generalize, only once the by-hand shape is proven — not started, not scoped in detail yet
 
 Once all three backends prove the same real edges by hand, revisit
 whether/how the existing `ExchangeEdgeRecord`/codegen layer extends to
@@ -814,28 +931,14 @@ non-trivial predicate exists to expose it for real.
 
 ## Next step
 
-Step 3's remaining piece: connect `Ledger::validate`/`::commit`
-themselves (real functions, living only in `amenable_kani`) to the
-four proven Creusot predicates. **Not** via a real Cargo dependency
-from `amenable_creusot` to `amenable_kani` — that question is now
-settled, not open: tried directly, compiled clean (translator-ICE risk
-was never the blocker), and reverted anyway for violating "verifier
-backends never depend on each other"
-(`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 10). Whatever connects
-`Ledger`/`Transfer<S, Token>` to these predicates needs a different
-treatment — most likely its own neutral-crate marker types, matching
-`Stoplight`'s `Green`/`Yellow`/`Red` -> `amenable_core` move. Step 4's
-own Verus connection took the other real option instead (a full
-accommodation-model mirror, codegen-driven rather than hand-written) —
-worth weighing against the neutral-crate route once this is actually
-tackled, now that both are proven out for real on at least one backend
-each. Step 5's own contract-bounds retrofit already reaches Creusot's
-`validated_holds`/`balanced_entries_holds` as far as Pearlite allows
-(the real `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
-`BalancedEntries` types now carry real `Ensures<CreusotVerifier>` impls,
-`Bound = &'static str`, for audit purposes — Pearlite predicates have no
-exec representation at all, so the actual checking still flows through
-`amount_positive_holds`/etc. directly, which already composed correctly
-before Step 5, just without touching the real contract types); whatever
-connects `Ledger`/`Transfer<S, Token>` themselves is the one piece Step
-5 didn't touch.
+Step 6 closed the last unconnected corner (`Ledger::validate`/
+`::commit` now proven against real Creusot predicates too, `Proved
+(143 files) ✔`), via the codegen-driven route Step 4's own Verus
+connection already proved out — not the neutral-crate marker-type
+route this section used to weigh as the alternative. Step 7+ is the
+open item now: whether/how the existing `ExchangeEdgeRecord`/codegen
+layer generalizes beyond this one worked example, and whether the
+`creusot_ensures` string-literal mechanism (necessary because Creusot,
+unlike Kani/Verus, has no mechanical way to route a generated
+postcondition through `Ensures<V>`) is the right long-term shape or a
+stopgap worth revisiting once a third real edge exercises it.

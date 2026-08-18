@@ -4,18 +4,20 @@
 // by `#[amenable_derive::exchange(..)]` and registered via
 // `amenable_core::ExchangeEdgeRecord` -- see `amenable::
 // creusot_export`'s own doc comment. Plain `//`, not `//!`: this
-// file is `include!`d mid-file into `stoplight.rs`'s own scope,
+// file is `include!`d mid-file into its own module's scope,
 // not its own module -- an inner doc comment there is a real
 // compile error (E0753, confirmed against a real build), not
 // just a style choice.
 
 amenable_derive::harness! {
     creusot, VERIFY_YELLOW_TO_RED_EXCHANGE_SRC, {
-        #[requires(true)]
-        #[ensures(true)]
-        fn yellow_to_red(input: Established<Yellow, YellowToken>) -> Result<Established<Red, RedToken>, StoplightError> {
-            let token = Red::establish(input.sidecar());
-            Ok(Established::new(Red, token))
+        impl Stoplight {
+            #[requires(true)]
+            #[ensures(true)]
+            fn yellow_to_red(&self, input: Established<Yellow, YellowToken>) -> Result<Established<Red, RedToken>, StoplightError> {
+                let token = Red::establish(input.sidecar());
+                Ok(Established::new(Red, token))
+            }
         }
     }
 }

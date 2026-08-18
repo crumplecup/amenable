@@ -1,0 +1,57 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 12 17 127 *)
+
+(* stoplight::Stoplight *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 9 238 33
+let%span sred_to_green = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 18 45 18 60
+let%span sred_to_green'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 18 28 18 61
+let%span sred_to_green'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 19 19 19 49
+let%span sred_to_green'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 15 23 15 27
+let%span sred_to_green'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 16 22 16 26
+
+use creusot.prelude.Any
+
+type t_RedToken = { f0: () }
+
+type t_Established_Red_RedToken = { primary: (); token: t_RedToken }
+
+let rec sidecar_Established_Red_RedToken (self: t_Established_Red_RedToken) (return (x: t_RedToken)) = any
+  [ return (result: t_RedToken) -> (! return {result}) ]
+
+type t_GreenToken = { f0'0: () }
+
+let rec establish_Green (_credential: t_RedToken) (return (x: t_GreenToken)) = any
+  [ return (result: t_GreenToken) -> (! return {result}) ]
+
+type t_Established_Green_GreenToken = { primary'0: (); token'0: t_GreenToken }
+
+let rec new_Green (primary'1: ()) (token'1: t_GreenToken) (return (x: t_Established_Green_GreenToken)) = any
+  [ return (result: t_Established_Green_GreenToken) ->
+  {[@stop_split] [@expl:new ensures] [%#sstoplight] result.primary'0 = primary'1}
+    (! return {result}) ]
+
+type t_StoplightError = NotUsed
+
+type t_Result_Established_Green_GreenToken_StoplightError = Ok t_Established_Green_GreenToken | Err t_StoplightError
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 12 17 127]
+  (self: ()) (input: t_Established_Red_RedToken) (return (x: t_Result_Established_Green_GreenToken_StoplightError)) =
+  (! bb0
+  [ bb0 = s0
+    [ s0 = sidecar_Established_Red_RedToken [%#sred_to_green] {input} (fun (_x: t_RedToken) -> [ &_6 <- _x ] s1)
+    | s1 = establish_Green [%#sred_to_green'0] {_6} (fun (_x: t_GreenToken) -> [ &token'1 <- _x ] s2)
+    | s2 = [ &_9 <- () ] s3
+    | s3 = new_Green [%#sred_to_green'1] {_9} {token'1} (fun (_x: t_Established_Green_GreenToken) -> [ &_8 <- _x ] s4)
+    | s4 = [ &_ret <- Ok _8 ] s5
+    | s5 = return {_ret} ] ]
+  [ & _ret: t_Result_Established_Green_GreenToken_StoplightError = Any.any_l ()
+  | & input: t_Established_Red_RedToken = input
+  | & token'1: t_GreenToken = Any.any_l ()
+  | & _6: t_RedToken = Any.any_l ()
+  | & _8: t_Established_Green_GreenToken = Any.any_l ()
+  | & _9: () = Any.any_l () ])
+  [ return (result: t_Result_Established_Green_GreenToken_StoplightError) -> (! return {result}) ]

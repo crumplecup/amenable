@@ -47,7 +47,7 @@ amenable_derive::harness! {
             let pending = amenable_kani::Transfer::pending(payload.clone());
             let credential = pending.sidecar();
             let validated_token = amenable_gaap::Validated::establish(credential);
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken> =
+            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
                 amenable_kani::Transfer::new(payload, validated_token);
             let _ = ledger.commit(validated);
         }
@@ -90,8 +90,8 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let validated_token = amenable_kani::ValidatedToken::diagnostic_only();
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken> =
+            let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();
+            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
                 amenable_kani::Transfer::new(payload, validated_token);
             let _ = ledger.commit(validated);
         }
@@ -129,8 +129,8 @@ amenable_derive::harness! {
                 amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
-            let validated_token = amenable_kani::ValidatedToken::diagnostic_only();
-            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_kani::ValidatedToken> =
+            let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();
+            let validated: amenable_kani::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken> =
                 amenable_kani::Transfer::new(payload, validated_token);
             let _ = ledger.commit(validated);
         }

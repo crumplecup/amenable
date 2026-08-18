@@ -1,0 +1,39 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 367 4 367 60 *)
+
+(* ledger::Ledger *)
+
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 368 20 368 21
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 362 15 362 19
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 363 14 366 5
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 422 24 422 48
+
+use creusot.int.Int64
+use creusot.prelude.Any
+use int.Int
+
+type t_Result_unit_i64 = Ok () | Err Int64.t
+
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 421 8 421 72] (amount: Int64.t) (outcome: bool) =
+  [%#sledger'2] outcome = (Int64.to_int amount > 0)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec check_amount_positive [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 367 4 367 60]
+  (amount: Int64.t) (return (x: t_Result_unit_i64)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- Int64.gt amount ([%#sledger] (0: Int64.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_ret <- Ok _7 ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- Err amount ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_unit_i64 = Any.any_l ()
+  | & amount: Int64.t = amount
+  | & _5: bool = Any.any_l ()
+  | & _7: () = Any.any_l () ])
+  [ return (result: t_Result_unit_i64) ->
+  {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger'1] match result with
+      | Ok () -> amount_positive_holds amount true
+      | Err bad -> bad = amount /\ amount_positive_holds amount false
+      end}
+    (! return {result}) ]
