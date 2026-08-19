@@ -10,7 +10,7 @@
 //! real registration, and every real registration for `Stoplight` was
 //! declared, in both directions.
 
-use amenable_core::{ExchangeEdgeRecord, StateMachine, Transition};
+use amenable_core::{ExchangeEdgeRecord, RootEntry, StateMachine, Transition};
 use amenable_kani::{KaniVerifier, Stoplight};
 
 #[test]
@@ -68,6 +68,17 @@ fn audit_surface_reports_real_captured_bodies_for_every_declared_edge() {
         .expect("Red -> Green edge missing from audit surface");
     assert_eq!(green.method_name, "red_to_green");
     assert!(green.body.contains("Green::establish"));
+}
+
+#[test]
+fn root_entries_reports_green_as_the_only_declared_root() {
+    assert_eq!(
+        <Stoplight as StateMachine<KaniVerifier>>::root_entries(),
+        &[RootEntry {
+            state: "Green",
+            constructor: "Established::<Green, GreenToken>::root",
+        }]
+    );
 }
 
 #[test]

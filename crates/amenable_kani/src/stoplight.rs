@@ -57,10 +57,27 @@ use crate::{CalculationProof, KaniVerifier};
 /// written `StateMachine`/`Amenable` impls this file used to carry (the
 /// old `Color` runtime enum and `SequentialCycle` marker, both self-
 /// documented as backing nothing real, are gone along with them).
+///
+/// `Green`'s third `state(..)` argument names its real, lawful,
+/// zero-argument root constructor (`Established::<Green,
+/// GreenToken>::root`, below) — checked at compile time the same flat
+/// way every edge is. Real, not decorative: `Green` is *also* the real
+/// target of the `Red -> Green` cycle-back edge, so a downstream
+/// consumer building a dependency graph purely from `ProofTokenMintRecord`
+/// (which correctly keeps *both* `GreenToken`'s registrations —
+/// `inventory` never overwrites — but has no way to know either one
+/// names a callable root) could easily infer a false `green_to_yellow
+/// -> red_to_green` dependency and miss the real entry point entirely.
+/// `root_entries()` states it directly instead of leaving it to be
+/// reconstructed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, amenable_derive::StateMachine)]
 #[state_machine(
     verifier = "KaniVerifier",
-    state("Green", "Established<Green, GreenToken>"),
+    state(
+        "Green",
+        "Established<Green, GreenToken>",
+        "Established::<Green, GreenToken>::root"
+    ),
     state("Yellow", "Established<Yellow, YellowToken>"),
     state("Red", "Established<Red, RedToken>"),
     edge("Green", "Yellow"),

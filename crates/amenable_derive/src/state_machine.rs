@@ -128,6 +128,15 @@ use syn::{Attribute, DeriveInput, Error, LitStr, Type};
 struct StateDecl {
     name: LitStr,
     carrier: Type,
+    // The parsed path (for the compile-time root-constructor check) and
+    // its original literal text (for `root_entries()`'s `constructor`
+    // string) -- kept as a pair rather than re-stringifying the parsed
+    // `syn::Path` via `quote!`, which normalizes token spacing (e.g.
+    // `Established::<Green, GreenToken>::root` becomes `Established ::
+    // < Green, GreenToken > :: root`) and would hand a downstream reader
+    // a technically-equivalent but uglier string than the one actually
+    // written in the `#[state_machine(..)]` declaration.
+    root: Option<(syn::Path, LitStr)>,
 }
 
 struct EdgeDecl {
@@ -206,15 +215,39 @@ fn expand_block_assertions(
     self_ty: &syn::Ident,
     block: &StateMachineBlock,
 ) -> syn::Result<TokenStream> {
+    // One flat `const` per declared root, not a shared generic checker
+    // -- each root's own carrier type is already fixed by its own
+    // declaration, so there's no genericity to share across states the
+    // way the edge checker shares `In`/`Out`/`T`. Independent of
+    // verifier mode: a root constructor's own signature (`fn() ->
+    // Carrier`) has nothing to do with `V` at all, unlike an edge's
+    // `Exchange` bound. Same flat, no-closure shape regardless: a bare
+    // item reference to a real path, checked by the compiler assigning
+    // it to a precisely-typed `fn() -> Carrier` const -- if the named
+    // path doesn't exist, isn't callable with zero arguments, or
+    // doesn't return exactly the declared carrier, this fails to
+    // compile with a real, precise error, not a silent gap.
+    let root_checks: TokenStream = block
+        .states
+        .iter()
+        .filter_map(|state| {
+            let (root, _) = state.root.as_ref()?;
+            let carrier = &state.carrier;
+            Some(quote! {
+                const _: fn() -> #carrier = #root;
+            })
+        })
+        .collect();
+
     let VerifierMode::Concrete(verifier) = &block.verifier else {
-        // No static assertion here -- see this module's own doc comment
-        // for why a "for every V: Verifier" check is provably too
-        // strong (real edges are only generic over V conditionally,
+        // No edge static assertion here -- see this module's own doc
+        // comment for why a "for every V: Verifier" check is provably
+        // too strong (real edges are only generic over V conditionally,
         // bounded by real Witness/Ensures/Requires impls this derive
         // has no way to know per edge) and why that's fine:
         // capture_exchange_body's own generated impl is already the
-        // real compile-time check.
-        return Ok(quote! {});
+        // real compile-time check. Root checks above still apply.
+        return Ok(root_checks);
     };
 
     let checker_fn = format_ident!(
@@ -245,6 +278,7 @@ fn expand_block_assertions(
         }
 
         #references
+        #root_checks
     })
 }
 
@@ -327,6 +361,35 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
         }
     };
 
+    // Only overrides the trait's own empty default when at least one
+    // state actually declared a root -- most blocks have none, and the
+    // default already says exactly that honestly.
+    let root_entries_states: Vec<&StateDecl> = block
+        .states
+        .iter()
+        .filter(|state| state.root.is_some())
+        .collect();
+    let root_entries = if root_entries_states.is_empty() {
+        quote! {}
+    } else {
+        let entries = root_entries_states.iter().map(|state| {
+            let name = &state.name;
+            let (_, root_str) = state.root.as_ref().expect("filtered by is_some above");
+            quote! {
+                ::amenable_core::RootEntry {
+                    state: #name,
+                    constructor: #root_str,
+                }
+            }
+        });
+
+        quote! {
+            fn root_entries() -> &'static [::amenable_core::RootEntry] {
+                &[#(#entries),*]
+            }
+        }
+    };
+
     quote! {
         impl #impl_generics ::amenable_core::StateMachine<#verifier> for #self_ty {
             fn states() -> &'static [&'static str] {
@@ -338,6 +401,7 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
             }
 
             #audit_surface
+            #root_entries
         }
     }
 }
@@ -428,9 +492,24 @@ fn parse_state_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<StateDecl>
     content.parse::<syn::Token![,]>()?;
     let carrier_lit: LitStr = content.parse()?;
 
+    // Optional third positional arg: the real path to a zero-argument
+    // root constructor for this state (`Established::<Green,
+    // GreenToken>::root`, not a call -- the derive checks and invokes
+    // it, the caller never types `()`). Absent for every state with no
+    // lawful zero-argument root worth declaring this way.
+    let root = if content.peek(syn::Token![,]) {
+        content.parse::<syn::Token![,]>()?;
+        let root_lit: LitStr = content.parse()?;
+        let root_path: syn::Path = root_lit.parse()?;
+        Some((root_path, root_lit))
+    } else {
+        None
+    };
+
     Ok(StateDecl {
         name,
         carrier: carrier_lit.parse()?,
+        root,
     })
 }
 

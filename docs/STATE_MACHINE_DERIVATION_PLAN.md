@@ -8,7 +8,10 @@ on all three backends. Step 4 landed in two parts (Creusot, then Verus
 Step 4, by direct instruction, once Step 3 surfaced the real gap it
 fixes. `KaniCompose` routing for data-bearing carriers (flagged in Step
 5's own account) is a real, deliberate follow-on, not part of this
-plan's original numbered scope. Step 0: `amenable_core::State<V>`
+plan's original numbered scope. So is root-entry support (`RootEntry`/
+`root_entries()`/`state(name, carrier, root)`), a real gap found by a
+downstream consumer dogfooding the design — see its own account below,
+after the numbered steps. Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -693,6 +696,67 @@ depending on it landing first.
   that case, not yet exercised by any auto-generated harness (no such
   generation exists yet; today's Kani contracts on `Ledger`'s methods
   are still hand-authored, per Step 3).
+
+## Follow-on: root entries (root-admissible states)
+
+Real gap found by a downstream consumer dogfooding this design, not
+this plan's original scope. A "homecoming" agent building a liveness/
+dependency graph purely from `StateMachine`'s declared surface plus
+`ProofTokenMintRecord` reported: `Stoplight::Green` is both
+root-enterable (`Established::<Green, GreenToken>::root()`, callable
+with no prior credential at all) *and* the real target of the
+`Red -> Green` cycle-back edge, and nothing in the derived surface says
+so. `inventory` genuinely keeps both of `GreenToken`'s registrations
+(a bare `#[derive(ProofToken)]` one and an `#[establish(..)]` one) —
+not a data-loss bug, contrary to the report's first hypothesis — but
+neither record, nor `states()`/`transitions()`, names a callable
+zero-argument constructor. A consumer reconstructing the graph from
+edges alone could infer a false `green_to_yellow -> red_to_green`
+dependency and miss the real entry point.
+
+Fixed with the narrowest of the three options the report proposed:
+
+- `amenable_core::RootEntry { state, constructor }` (`amenable_core::
+  src/state_machine.rs`) — a state's real, compiler-checked,
+  zero-argument root constructor path.
+- `StateMachine<V>::root_entries() -> &'static [RootEntry]` — new,
+  **default-implemented** as `&[]`, so every existing implementor
+  (`Ledger`, the Creusot/Verus mirrors) stays non-breaking without
+  touching them.
+- `#[state_machine(..)]`'s `state(name, carrier, root)` gained an
+  optional third positional argument, naming a real path parsed as
+  `syn::Path`. Checked at compile time by the same flat, no-closure
+  `const _: fn() -> Carrier = #root;` shape Step 4's Creusot fix
+  already established for edges — confirmed non-vacuous by pointing it
+  at a nonexistent function and observing a precise `E0599` at the
+  declaration site, then reverting. The emitted `RootEntry::constructor`
+  string is the original literal text as written in the declaration,
+  not `quote!`'s re-stringified `syn::Path` (which normalizes token
+  spacing — `Established::<Green, GreenToken>::root` would otherwise
+  render as `Established :: < Green, GreenToken > :: root`); `StateDecl`
+  keeps the parsed `syn::Path` (for the assertion) and the original
+  `LitStr` (for the emitted string) as a pair rather than reconstructing
+  one from the other.
+- Applied to exactly one site: `Green` in `crates/amenable_kani/src/
+  stoplight.rs`, declaring `root = "Established::<Green,
+  GreenToken>::root"`. Re-verified end-to-end: `cargo check`/`clippy -D
+  warnings`/`fmt`/`test` clean on `amenable_core`, `amenable_derive`,
+  `amenable_kani`, and the full workspace (including `amenable_verus`,
+  which has no Cargo dependency on the derive at all but shares
+  `amenable_core::state_machine` via `#[path]`); a real
+  `cargo kani ... --harness
+  stoplight::verify_green_transitions_only_to_yellow` re-run (the
+  harness that itself calls `Established::<Green, GreenToken>::root()`)
+  still verifies clean; a new
+  `root_entries_reports_green_as_the_only_declared_root` test in
+  `stoplight_amenable_test.rs` asserts the exact declared entry.
+
+Deliberately out of scope: `Ledger`'s `Pending` state. Its real
+constructor, `Transfer::pending(payload: TransferPayload) -> Self`,
+takes a real argument — it isn't a zero-argument root the way `Green`'s
+is, and doesn't fit this mechanism. Left as a separate, not-yet-solved
+problem (see `RootEntry`'s and `root_entries()`'s own doc comments in
+`amenable_core::state_machine`), not force-fit into this fix.
 
 ## Open, non-blocking implementation questions
 

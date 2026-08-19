@@ -55,7 +55,7 @@ pub use link::{
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
 pub use state::State;
-pub use state_machine::{StateMachine, Transition, TransitionAudit};
+pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};
 pub use stoplight::{Green, Red, Yellow};
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]

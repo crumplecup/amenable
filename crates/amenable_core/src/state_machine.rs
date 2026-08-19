@@ -51,6 +51,34 @@ pub struct TransitionAudit {
     pub body: &'static str,
 }
 
+/// A declared state's real, lawful, zero-argument root constructor —
+/// the answer to "can this state be entered without a prior credential
+/// at all, and if so, how do I call the real function that does it."
+///
+/// Exists because a state can be *both* root-enterable and the target
+/// of a real transition (`amenable_kani::stoplight::Green`: asserted at
+/// power-on via `Established::<Green, GreenToken>::root()`, but also
+/// the real target of the `Red -> Green` cycle-back edge). Neither fact
+/// alone is discoverable from `ProofTokenMintRecord`: `inventory` never
+/// overwrites, so a token with both a bare `#[derive(ProofToken)]`
+/// registration and an `#[establish(..)]` one carries *two* real
+/// records, not one collapsed record — but even reading both only tells
+/// you "no `#[establish]` was given for this one," never "and here is
+/// the real function that constructs it lawfully with no prior state at
+/// all." `constructor` closes that gap directly: a real path, checked
+/// at compile time (by the same static-assertion mechanism the derive
+/// already uses for edges) to actually be a callable `fn() -> Carrier`
+/// for the declared state's own carrier type, not a hand-typed string
+/// that could drift or silently stop compiling.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RootEntry {
+    /// The state's declared name.
+    pub state: &'static str,
+    /// The real, compiler-checked path to a zero-argument function
+    /// returning that state's own declared carrier type.
+    pub constructor: &'static str,
+}
+
 /// A closed, proof-bearing state machine. Every method here is backed by
 /// data the `#[derive(amenable_derive::StateMachine)]` macro either
 /// echoes directly from its own `#[state_machine(..)]` declarations
@@ -71,4 +99,16 @@ pub trait StateMachine<V: Verifier> {
     /// what the separate declared-vs-registered cross-check (a
     /// runtime/test-time check, not this method) exists to catch.
     fn audit_surface() -> Vec<TransitionAudit>;
+
+    /// Every declared state that can be entered lawfully with no prior
+    /// credential at all, and the real function that does it. Honestly
+    /// empty for a state machine with no zero-argument root constructor
+    /// worth declaring this way — a root needing real external data
+    /// (e.g. `amenable_gaap::Ledger`'s `Pending`, whose own constructor
+    /// takes a real payload) isn't force-fit into this mechanism; see
+    /// `docs/STATE_MACHINE_DERIVATION_PLAN.md` for why that's a
+    /// deliberately separate, not-yet-solved problem.
+    fn root_entries() -> &'static [RootEntry] {
+        &[]
+    }
 }

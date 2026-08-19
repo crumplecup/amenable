@@ -1169,6 +1169,41 @@ confirmed non-vacuous by an injected-bug check producing a precise
 failure at the checker function's own bound, reverted. Step 4 is
 complete, both backends -- every step this plan scoped is now done.
 
+A real follow-on landed after that, outside this plan's original
+scope: a "homecoming" downstream consumer, dogfooding the design,
+reported that `StateMachine`'s surface can't distinguish a state that
+is *only* reachable via a declared edge from one that is also
+root-enterable with no prior credential at all -- `Stoplight::Green` is
+both (root via `Established::<Green, GreenToken>::root()`, and the
+real target of the `Red -> Green` cycle-back edge), and nothing in the
+derived surface said so; a graph built from edges alone could infer a
+false dependency and miss the real entry point. `inventory` genuinely
+keeps both of `GreenToken`'s registrations already (a bare
+`#[derive(ProofToken)]` one and an `#[establish(..)]` one) -- not a
+data-loss bug, contrary to the report's first hypothesis -- but neither
+one names a callable root. Fixed with the narrowest of three proposed
+options: a new `amenable_core::RootEntry { state, constructor }`, a
+new `StateMachine<V>::root_entries()` method (default-implemented as
+`&[]`, non-breaking for every existing implementor), and an optional
+third positional `root` argument on `state(name, carrier, root)`,
+checked at compile time by the same flat `const _: fn() -> Carrier = #root;`
+shape Step 4 already established, confirmed non-vacuous by
+pointing it at a nonexistent function and observing a precise `E0599`,
+then reverted. `StateDecl` keeps the root's parsed `syn::Path` (for the
+assertion) and its original literal text (for the emitted
+`constructor` string) as a pair, rather than re-stringifying the
+parsed path via `quote!`, which normalizes token spacing into an uglier
+string than the one actually written. Applied to exactly one site --
+`Green` in `crates/amenable_kani/src/stoplight.rs` -- with `Ledger`'s
+`Pending` state deliberately left out (its real constructor takes a
+real argument, not a fit for a zero-argument mechanism). Verified for
+real: full workspace check/clippy/fmt/test clean, a real `cargo kani`
+re-run on the harness that itself calls `Established::<Green,
+GreenToken>::root()` still verifies clean, a new test asserts the
+exact declared `root_entries()` entry. See `docs/
+STATE_MACHINE_DERIVATION_PLAN.md`'s own "Follow-on: root entries"
+section for the full account.
+
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own
 hand-written impl already self-documents as a disconnected proxy
