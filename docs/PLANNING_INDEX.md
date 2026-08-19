@@ -1052,6 +1052,37 @@ Every `Evidence`-bearing claim is backed by either a genuine machine-checked
 proof or an explicit provenance-backed `Standard` certification — never a
 blanket impl that grants trust for free.
 
+### State Machine Derivation
+
+**Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
+
+**Status:** 🔲 Planning — design converged through direct discussion,
+nothing implemented yet.
+
+**Description:** Replaces (not extends) `amenable_core::state_machine`'s
+current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own
+hand-written impl already self-documents as a disconnected proxy
+(`Color`/`SequentialCycle` back nothing real, and `creusot_surface()`'s
+hand-typed string filter repeats the exact drift risk the surrounding
+code claims to avoid). New design: a thin, object-safe `State<V>`
+facade (`Evidence + Witness<V>`, via blanket impl — every existing
+state type qualifies for free) and a `#[derive(StateMachine)]` that
+takes explicit `state(name = .., carrier = ..)`/`edge(from = .., to =
+..)` declarations (concrete carrier types are caller-supplied, never
+assumed, since a macro has no type information to infer them) and
+emits compiler-enforced static assertions against real `Exchange`
+impls. Real prior art from `~/repos/elicitation`'s `VerifiedStateMachine`
+/`formal_method`/`KaniVariantState` (read directly, not summarized):
+keeps the per-variant bounded-depth splitting technique (already ported
+as `amenable_derive::KaniCompose`), rejects vacuous Verus contracts and
+`Established::assert()`-style non-lawful proof construction, and
+rejects the two-stage `TokenStream`/`build.rs` codegen architecture in
+favor of `amenable`'s existing direct compile-time macro expansion.
+`Stoplight` is the design canary; `amenable_gaap::Ledger` is the
+planned second worked example, chosen to stress data-bearing carriers
+and multi-edge contract granularity `Stoplight`'s zero-field markers
+can't exercise.
+
 ### GAAP Ledger
 
 **Document:** [GAAP_LEDGER_PLAN.md](GAAP_LEDGER_PLAN.md)

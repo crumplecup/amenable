@@ -1,0 +1,314 @@
+# State Machine Derivation Plan
+
+## Status
+
+🔲 Planning — design converged through direct discussion, nothing
+implemented yet.
+
+## Motivation
+
+`amenable_core::state_machine`'s current `StateMachine`/`Amenable` trait
+pair is not a foundation to build on. `Stoplight`'s own hand-written
+impl — the only implementor anywhere in the tree — self-documents both
+halves as vestigial: `Color` ("purely descriptive: nothing in this
+module derives it from, or checks it against, the real `Exchange`
+graph — that would be exactly the disconnected-proxy mistake this
+module used to make," referring to an already-deleted `next()`
+function) and `SequentialCycle` ("proven one edge at a time by real
+Kani contracts directly on each `Exchange::exchange` body... not, as
+an earlier version of this module did, by a disconnected proxy
+function nothing here actually calls"). `kani_surface()`/
+`creusot_surface()` are also asymmetric in a way that matters: Kani's
+filter is `module_path!()`-derived (compiler-checked, can't drift),
+Creusot's is a hand-typed string literal (`"amenable_creusot::
+stoplight::"`) — the exact drift risk the surrounding doc comments
+claim to avoid. This plan does not extend that design. It replaces it.
+
+**Prior art**: `~/repos/elicitation`'s `#[derive(VerifiedStateMachine)]`
+/ `#[formal_method]` / `#[derive(KaniVariantState)]`, read directly
+before this plan was written. One real technique is kept: per-variant,
+bounded-depth compositional proof construction, avoiding one fully
+symbolic harness CBMC can't bound in reasonable time. It is not ported
+as new machinery — `amenable_derive::KaniCompose` already implements
+the same idea (depth0/1/2/any bounded construction) and this plan
+reuses it directly. Two things are explicitly rejected: vacuous Verus
+companions (`requires true, ensures true`, confirmed in
+`formal_method.rs`'s generated output) and `Established::assert()`-
+style proof-token construction that bypasses the real `Establish`/
+`Sidecar` chain. Also rejected: the two-stage architecture itself
+(derive methods return `Vec<TokenStream>` for a `build.rs` to write to
+a generated file). `amenable` has no such pipeline anywhere and does
+not need one — every derive in this plan expands directly, at compile
+time, the same way `capture_exchange_body`/`harness!`/`#[exchange(..)]`
+already do.
+
+## Design
+
+### `State<V>`: a deliberately thin, object-safe facade
+
+The bound is `Evidence + Witness<V>` — confirmed precise, not
+`Provenance` (a real, distinct trait: `type MetadataIter: Iterator<Item
+= MetadataEntry>; fn metadata(&self) -> Self::MetadataIter;`, already
+carried separately by `Standard::Provenance`). `Sidecar<V>::
+Proposition` is already bounded exactly `Evidence + Witness<V>`, so
+this is not a new requirement invented for this plan — it is naming a
+bound every proposition flowing through a real `Exchange` today already
+satisfies.
+
+Neither `Evidence` nor `Witness<V>` is object-safe as written —
+`Witness::proof()` has no `self` receiver at all, `Evidence::basis()`/
+`chain()` don't either, and both return associated types. A literal
+`trait State<V>: Evidence + Witness<V>` would make `dyn State`
+uncompilable. The fix is a facade, not a fix to the underlying traits:
+
+```rust
+trait State<V: Verifier> {
+    fn metadata(&self) -> Vec<MetadataEntry>;
+    fn evidence_chain(&self) -> Vec<&'static str>;
+    // owned/self-receiver projections of Witness<V>::proof(), etc.
+}
+
+impl<V: Verifier, T: Evidence + Witness<V>> State<V> for T {
+    // projects T's Evidence/Witness<V> methods into State's
+    // owned, vtable-safe surface
+}
+```
+
+`dyn State<V>` becomes constructible for real; heterogeneous
+collections (`Vec<Box<dyn State<V>>>`) work across otherwise-unrelated
+types in the workspace. The blanket impl means every existing state
+type — `Green`/`Yellow`/`Red`, `Pending`/`Validated`/`Committed`/
+`Rejected<..>`, every `amenable_gaap` contract type — satisfies
+`State<V>` the moment the blanket impl exists, with zero new derive
+invocations anywhere.
+
+### `#[derive(StateMachine)]`: explicit declarations, compiler-enforced
+
+A derive macro has no type information and cannot read `inventory`
+registries at expansion time (those are populated and queried at
+runtime, after the macro has already expanded). So it cannot discover
+"which methods are transitions" or infer wrapper/token types from
+context. Every state and edge is declared explicitly, matching this
+codebase's standing preference for explicit args over naming-convention
+inference (`#[evidence(basis = "..")]`, `#[standard(basis = "..")]`) —
+and matching the user's own direction: concrete types are too binding,
+so the macro takes the target as an attribute rather than assuming a
+wrapper shape.
+
+```rust
+#[derive(StateMachine)]
+#[state_machine(
+    verifier = "KaniVerifier",
+    state(name = "Green", carrier = "Established<Green, GreenToken>"),
+    state(name = "Yellow", carrier = "Established<Yellow, YellowToken>"),
+    state(name = "Red", carrier = "Established<Red, RedToken>"),
+    edge(from = "Green", to = "Yellow"),
+    edge(from = "Yellow", to = "Red"),
+    edge(from = "Red", to = "Green"),
+)]
+struct Stoplight;
+```
+
+Each `edge(..)` resolves its `from`/`to` against the declared `state(..)`
+carriers and emits a static assertion:
+
+```rust
+const _: fn() = || {
+    fn assert<T: Exchange<Established<Green, GreenToken>, Established<Yellow, YellowToken>, KaniVerifier>>() {}
+    assert::<Stoplight>();
+};
+```
+
+If the real `impl Exchange<..>` doesn't exist, the compiler squawks —
+no macro-side introspection required, no runtime dependency. Because
+the carrier is an opaque, caller-supplied type expression, the macro
+never needs to know or assume anything about `Established` specifically;
+any `Sidecar<V>` implementation works identically. Repeat the whole
+`#[state_machine(..)]` block once per verifier a machine is proven
+under (Kani, Creusot, Verus) rather than having the macro guess which
+backends apply.
+
+Because `state(..)`/`edge(..)` are macro args, not registry lookups,
+the derive can bake real, static data directly into generated
+aggregate methods for free:
+
+```rust
+impl StateMachine for Stoplight {
+    fn states() -> &'static [&'static str] {
+        &["Green", "Yellow", "Red"]
+    }
+
+    fn transitions() -> &'static [Transition] {
+        &[
+            Transition { from: "Green", to: "Yellow", verifier: "KaniVerifier" },
+            Transition { from: "Yellow", to: "Red", verifier: "KaniVerifier" },
+            Transition { from: "Red", to: "Green", verifier: "KaniVerifier" },
+        ]
+    }
+}
+```
+
+**Nested types compose for free.** If a state's carried type itself
+contains another type needing its own state-worthiness (the user's
+`Green` containing a `BulbKind` enum example), nothing in this derive
+needs to check that recursively — `#[derive(Evidence)]`/
+`#[derive(Standard)]`'s existing basis-chain composition already
+requires every constituent field to satisfy `Evidence` for the outer
+type to compile at all. The `StateMachine` derive only needs the
+top-level carrier to already be `Evidence + Witness<V>`; if it is, its
+own fields already were, transitively, or it wouldn't have compiled in
+the first place.
+
+**Declared vs. real, a complementary check — day one, not deferred.**
+The static assertion proves the declared edge *type-checks*. It doesn't
+prove the declaration is honest — nothing stops someone from declaring
+an edge that happens to type-check against a stale or unintended
+`Exchange` impl. `ExchangeEdgeRecord` (`self_ty`/`input_ty`/`output_ty`/
+`evidence`/`method_name`, populated at runtime by every real
+`capture_exchange_body`/`#[exchange(..)]` call) already carries
+everything needed to cross-check `StateMachine::transitions()`'s static
+list against what was actually registered, catching drift in both
+directions. Originally scoped here as a fast-follow; corrected after
+review — a plan whose own design section argues this check matters
+shouldn't ship the mechanism without it. It's a runtime/test-time check
+(a `#[test]` against `inventory::iter::<ExchangeEdgeRecord>()`), not a
+compile-time gate, but it lands in the same step as `transitions()`
+itself (Step 2), not after.
+
+### Backend auditability and invariant naming, preserved not deferred
+
+Two real, currently-passing test files depend on the trait pair this
+plan deletes: `crates/amenable_kani/tests/stoplight_amenable_test.rs`
+and `crates/amenable/tests/stoplight_creusot_surface_test.rs`, both
+exercising `kani_surface()`/`creusot_surface()`/`verus_surface()`/
+`audit_surface()` for real. Deleting `impl Amenable for Stoplight` with
+the replacement deferred to the separate, still-unresolved `Audit<V>`/
+`Report<V>` design track (see the parallel discussion of `Amenable` as
+a bound-selecting derive) would be a real regression, not a refactor —
+corrected after review.
+
+The fix doesn't require waiting on that other track to resolve. The
+same `state(..)`/`edge(..)` declarations already backing the static
+assertions are exactly the data needed to generate a minimal audit
+surface honestly — scoped by the real declared type names (not the old
+design's `module_path!()`/hand-typed-string-prefix matching, which is
+what made `creusot_surface()` driftable in the first place), and
+verifier-generic (one method taking `V`, querying `ContractRecord`/
+`ProofRecord` filtered by `evidence` and `verifier`) rather than three
+near-duplicate methods repeating the same asymmetry bug. This ships as
+part of Step 2, alongside `states()`/`transitions()`. Both existing
+test files get migrated to call the new generated surface rather than
+deleted — same behavior they check today, mechanically generated and
+correctly scoped instead of hand-written. If/when the `Audit<V>`/
+`Report<V>` design lands, it supersedes this; this isn't blocked on
+that landing first.
+
+Invariant naming survives too, but deliberately thinned to what's
+actually load-bearing: not a declared type (that's exactly the
+`SequentialCycle` disconnected-proxy mistake this plan removes), but an
+optional, purely cosmetic label —
+`#[state_machine(invariant = "SequentialCycle")]` — carried through to
+the generated audit surface as a name only, with no backing type and no
+claim of content. Omittable; nothing currently requires it.
+
+### Proof tokens as contract types
+
+Today `Ensures<V>`/`Requires<V>` are implemented on the Evidence/
+proposition type (`Validated`, `Committed`, `AmountPositive`), per the
+existing `amenable_gaap::ledger.rs` delegation fix. That works because
+every worked example so far has exactly one edge landing on each
+proposition. It doesn't generalize: `Establish<C, V>`'s own signature
+already allows different credential types `C` to mint *different*
+token types for the same target proposition, so a state reachable by
+more than one edge could need a different claim per edge — which a
+contract shared on the proposition type can't express, but a contract
+on the *token* minted by that specific edge can.
+
+The `state(name = .., carrier = "Established<S, SToken>")` declaration
+already names the token explicitly, giving the derive the exact hook
+needed to auto-generate the delegation `capture_exchange_body`'s
+`kani_ensures = "true"` mechanism currently requires hand-adding per
+transition:
+
+```rust
+|result: &Result<Output, Error>| <SToken as Ensures<V>>::ensures(result.clone())
+```
+
+**Fail closed, never vacuous.** If no real claim exists for an edge on
+a given backend, the derive does not synthesize a placeholder
+(rejecting elicitation's `requires true, ensures true` pattern
+outright). It either requires the author to supply one explicitly (the
+same `kani_requires = ".."` escape hatch `capture_exchange_body`
+already has), or leaves that edge's contract unconnected and says so —
+matching `Stoplight`'s own honest-empty `verus_surface()` precedent
+rather than hiding the gap.
+
+### Reusing `KaniCompose` for non-trivial carriers
+
+Every `Stoplight` edge today is a zero-field marker transition — no
+symbolic data, nothing for a splitting strategy to help with. The
+moment a transition's carrier wraps real data (an `amenable_gaap`-style
+payload with symbolic fields), a single fully-symbolic harness risks
+the CBMC blow-up class already catalogued in this project's own Kani
+failure-pattern findings. Elicitation's `KaniVariantState` solves this
+with bounded per-field construction at fixed depths — `amenable_derive::
+KaniCompose` already does the same thing. Auto-generated harnesses for
+data-bearing transitions route through `KaniCompose`'s existing
+depth0/1/2/any construction rather than a new mechanism.
+
+### Deletion scope
+
+`amenable_core::state_machine.rs` (the current `StateMachine`/
+`Amenable` trait pair, `kani_surface`/`creusot_surface`/`verus_surface`/
+`audit_surface`) is deleted, not extended. `Stoplight`'s `Color` enum,
+`SequentialCycle` marker, and both hand-written impls are deleted and
+replaced by applying the new derive to `Stoplight` itself — the design
+canary for this whole plan, per direct instruction.
+
+Explicitly out of scope here: the *full* `Audit<V>`/`Report<V>` trait
+redesign from the parallel `Amenable`-as-bound-selector discussion. A
+minimal, declaration-scoped stand-in ships as part of this plan instead
+(see "Backend auditability and invariant naming" above), so nothing
+currently working regresses while that other design is still being
+decided. `State<V>`/`StateMachine` stand on their own; if/when the
+fuller track lands, it supersedes the stand-in rather than this plan
+depending on it landing first.
+
+## Steps
+
+- **Step 0** — `State<V>` facade trait + blanket impl in
+  `amenable_core`, no behavior change anywhere. A compile-only test
+  confirms every existing state type (`Green`/`Yellow`/`Red`,
+  `Pending`/`Validated`/`Committed`/`Rejected<..>`, every
+  `amenable_gaap` contract type) satisfies it for free.
+- **Step 1** — `#[derive(StateMachine)]` skeleton: parse `state(..)`/
+  `edge(..)`/`verifier = ..` args, emit only the static assertions.
+  Canary: `Stoplight`, Kani only.
+- **Step 2** — Generate `states()`/`transitions()` aggregate methods
+  from the same parsed declarations, the verifier-generic audit-surface
+  method (`ContractRecord`/`ProofRecord` queried by declared `evidence`/
+  `verifier`, replacing `kani_surface`/`creusot_surface`/
+  `verus_surface`/`audit_surface`), and the runtime cross-check against
+  `ExchangeEdgeRecord`. Migrate `stoplight_amenable_test.rs`/
+  `stoplight_creusot_surface_test.rs` to the new surface in the same
+  step — not a later fast-follow, so nothing currently passing goes
+  dark in between.
+- **Step 3** — Extend `capture_exchange_body` with token-carried
+  `Ensures<V>`/`Requires<V>` delegation; wire the derive to
+  auto-generate it for all three `Stoplight` edges, replacing today's
+  hand-invoked `kani_ensures = "true"`.
+- **Step 4** — Extend Creusot and Verus coverage for `Stoplight`
+  (second `verifier = ..` blocks), matching the existing per-backend
+  precedent.
+- **Step 5** — Second worked example: `amenable_gaap::Ledger`. Stresses
+  what `Stoplight` structurally can't — data-bearing carriers
+  (`KaniCompose` routing) and, if a real multi-edge-into-one-state case
+  exists or can be constructed, the token-per-edge contract granularity
+  this plan's design section argues for.
+
+## Open, non-blocking implementation questions
+
+- Exact module for `State<V>`'s blanket impl (`amenable_core`,
+  alongside `Evidence`/`Witness`, is the natural home).
+- Whether Step 4's registry cross-check ships as a `#[test]` or a new
+  `amenable` CLI subcommand.
