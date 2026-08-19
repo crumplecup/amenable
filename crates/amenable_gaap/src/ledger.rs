@@ -308,7 +308,7 @@ impl Ledger {
     evidence = "Committed",
     creusot_ensures = "match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, }",
     kani_ensures = "true",
-    kani_requires = "input.primary().amount().value() > 0"
+    kani_requires_evidence = "Validated"
 )]
 impl Ledger {
     /// `Validated -> Committed`: infallible -- a transfer that already
@@ -338,31 +338,40 @@ impl Ledger {
     /// the contract directly here, with zero delegation, verifies clean
     /// (`commit_contract_no_wrapper`, `0 of 287 failed`).
     ///
-    /// `kani_ensures = "true"`/`kani_requires = ".."` on the attribute
-    /// above generate this method's own contract: a real precondition
-    /// (`input.primary().amount().value() > 0`, hand-authored -- see
-    /// `capture_exchange_body`'s own doc comment for why this one piece
-    /// can't be mechanical) plus `<Committed as Ensures<V>>::ensures(
-    /// result.clone())` rather than restating `BalancedEntries`'s own
-    /// claim inline -- see `validate`'s own doc comment for the full
-    /// "manual bounds are an anti-pattern, call through the evidence
-    /// type's own registered claim instead" reasoning; `Committed`'s own
-    /// `Ensures<KaniVerifier>` impl (`amenable_kani::ledger`'s
-    /// `kani_ensures!(Committed, ..)`) already calls through
-    /// `BalancedEntries` itself, so restating that here too would just be
-    /// a second, unsynchronized copy. This still compiles from
-    /// `amenable_gaap` with no dependency on any backend crate --
-    /// satisfied at the call site by whichever backend's own real
-    /// `Ensures<V>` impl for `Committed` already exists there. Same
-    /// `cargo kani`-sets-`--cfg kani`-globally mechanism `TransferError`'s/
-    /// `Ledger`'s own `#[cfg_attr(kani, derive(kani::Arbitrary))]` already
-    /// relies on.
+    /// `kani_ensures = "true"`/`kani_requires_evidence = "Validated"` on
+    /// the attribute above generate this method's own contract: a real
+    /// precondition, `<Validated as Requires<V>>::requires(input.clone())`,
+    /// plus `<Committed as Ensures<V>>::ensures(result.clone())` rather
+    /// than restating either bound inline -- see `validate`'s own doc
+    /// comment for the full "manual bounds are an anti-pattern, call
+    /// through the evidence type's own registered claim instead"
+    /// reasoning. The precondition itself is not a fresh claim: `Validated`'s
+    /// own `Requires<KaniVerifier>` impl (`amenable_kani::ledger`'s
+    /// `kani_requires!(Validated, ..)`) delegates through the identical
+    /// `AmountPositive` claim `validate`'s own postcondition already
+    /// calls through -- a `Validated`-carrying `Transfer` is exactly the
+    /// value flowing from `validate`'s output position into `commit`'s
+    /// input position, so the same real fact serves both roles instead of
+    /// two independently hand-typed copies (this used to be a raw
+    /// `input.primary().amount().value() > 0` expression, restating what
+    /// `AmountPositive` already states once). `Committed`'s own `Ensures<
+    /// KaniVerifier>` impl (`amenable_kani::ledger`'s `kani_ensures!(
+    /// Committed, ..)`) already calls through `BalancedEntries` itself, so
+    /// restating that here too would just be a second, unsynchronized
+    /// copy. This still compiles from `amenable_gaap` with no dependency
+    /// on any backend crate -- satisfied at the call site by whichever
+    /// backend's own real `Ensures<V>`/`Requires<V>` impls already exist
+    /// there. Same `cargo kani`-sets-`--cfg kani`-globally mechanism
+    /// `TransferError`'s/`Ledger`'s own `#[cfg_attr(kani, derive(kani::
+    /// Arbitrary))]` already relies on.
     pub fn commit<V: amenable_core::Verifier>(
         &self,
         input: Transfer<Validated, ValidatedToken>,
     ) -> Result<Transfer<Committed, CommittedToken>, TransferError>
     where
-        Validated: amenable_core::Evidence + amenable_core::Witness<V>,
+        Validated: amenable_core::Evidence
+            + amenable_core::Witness<V>
+            + amenable_core::Requires<V, Input = Transfer<Validated, ValidatedToken>, Bound = bool>,
         Committed: amenable_core::Evidence
             + amenable_core::Witness<V>
             + amenable_core::Ensures<

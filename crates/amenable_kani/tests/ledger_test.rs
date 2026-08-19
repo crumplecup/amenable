@@ -3,7 +3,7 @@
 //! Kani harnesses. All three refusal reasons -- unlike every `Stoplight`
 //! edge, which can only ever succeed.
 
-use amenable_core::Sidecar;
+use amenable_core::{ContractRecord, Requires, Sidecar};
 use amenable_gaap::{
     AccountId, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
     RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError, TransferPayload,
@@ -133,4 +133,59 @@ fn rollback_always_succeeds_and_preserves_the_payload() {
         .rollback::<KaniVerifier>(validated)
         .expect("rollback never fails");
     assert_eq!(rolled_back.primary().amount().value(), 50);
+}
+
+/// `Validated`'s real `Requires<KaniVerifier>` impl -- `commit`'s own
+/// precondition, sewn to `validate`'s postcondition (`docs/
+/// STATE_MACHINE_DERIVATION_PLAN.md`'s Step 3) rather than an
+/// independently hand-typed copy. Exercised directly, not just through
+/// `commit`'s own DFCC contract (which only Kani itself checks).
+#[test]
+fn validated_requires_holds_for_a_lawfully_validated_transfer() {
+    let ledger = Ledger::new(100);
+    let payload = TransferPayload::new(
+        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Amount::new(50),
+    );
+    let validated: Transfer<Validated, ValidatedToken> = ledger
+        .validate::<KaniVerifier>(Transfer::pending(payload))
+        .expect("lawful transfer");
+
+    assert!(<Validated as Requires<KaniVerifier>>::requires(validated));
+}
+
+/// The real "sewing together" this step is about: `validate`'s
+/// postcondition and `commit`'s precondition are two distinct registered
+/// `ContractRecord`s (different `kind`, different edge), but both
+/// fragments name the identical atomic claim, `AmountPositive` -- not
+/// two independently hand-typed restatements of "amount is positive"
+/// with nothing enforcing they agree.
+#[test]
+fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() {
+    let records: Vec<&ContractRecord> = inventory::iter::<ContractRecord>()
+        .filter(|record| {
+            record.verifier == "kani"
+                && (record.evidence == "amenable_kani::ledger::Validated::validate_ensures"
+                    || record.evidence == "amenable_kani::ledger::Validated::commit_requires")
+        })
+        .collect();
+
+    assert_eq!(
+        records.len(),
+        2,
+        "expected exactly one ensures and one requires record"
+    );
+
+    let ensures = records
+        .iter()
+        .find(|record| record.kind == "ensures")
+        .expect("validate_ensures record missing");
+    let requires = records
+        .iter()
+        .find(|record| record.kind == "requires")
+        .expect("commit_requires record missing");
+
+    assert!((ensures.fragment)().contains("AmountPositive"));
+    assert!((requires.fragment)().contains("AmountPositive"));
 }

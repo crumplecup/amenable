@@ -2,7 +2,7 @@
 
 ## Status
 
-🔲 Planning — Step 0 and Step 1 done. Step 0: `amenable_core::State<V>`
+🔲 Planning — Steps 0-3 done. Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -67,6 +67,82 @@ source) is what's actually derivable honestly.
 untouched — out of scope for this plan, which documents new decisions
 in its own file rather than retroactively rewriting an older one, matching
 this project's standing practice.
+
+Step 3 done too, but not as originally scoped — the first draft
+conflated two things and got corrected twice by direct discussion
+before any code was written. First correction: "token-carried `Ensures`/
+`Requires` delegation... replacing today's hand-invoked `kani_ensures =
+"true"`" was never accurate — `Stoplight` doesn't use that mechanism at
+all (`#[exchange(..)]` already generates its contracts fully), and
+"attach the contract to the token instead of the evidence type for
+multi-edge granularity" has no real, verifiable target anywhere in this
+codebase (every state today is reached by exactly one edge). Second,
+real correction, from direct clarification: the actual idea isn't about
+*where* a contract lives (token vs. evidence type) at all. `Ensures<V>`/
+`Requires<V>` already exist and can already be implemented on anything
+flowing through a `Sidecar` — that part was never new. What's new is
+that a state machine *chains* transitions, so the same declared state is
+simultaneously one edge's output (checked via `Ensures<V>`) and the next
+edge's input (checked via `Requires<V>`) — two different contract
+halves, the same underlying type, connected because the graph guarantees
+it. "Sewing together" means those two halves can rest on the same real,
+registered atomic claim instead of being independently hand-typed and
+silently able to drift apart.
+
+`amenable_gaap::Ledger` is the real canary for this, not `Stoplight` —
+confirmed by checking, not assumed: `Stoplight` has no real `Requires<V>`
+content anywhere (every edge is a trivial `ensures`-only `result.is_ok()`),
+while `Ledger::commit` already had a genuine hand-typed precondition
+(`input.primary().amount().value() > 0`) restating what `validate`'s own
+postcondition already established once via the registered
+`AmountPositive` claim — a real, live instance of exactly the duplication
+this step closes. `Validated` (the shared type between `validate`'s
+output and `commit`'s input) gained a real `Requires<KaniVerifier>` impl,
+via the existing `kani_requires!` macro, delegating through the identical
+`AmountPositive::ensures` call `validate`'s own `Ensures<KaniVerifier>`
+impl already uses — not a fresh claim, the same one serving both roles.
+`capture_exchange_body` gained `kani_requires_evidence = "Type"`
+(mutually exclusive with the existing raw-expression `kani_requires`),
+generating `<Type as Requires<V>>::requires(input.clone())` the same
+mechanical way `kani_ensures = "true"` already generates its own
+delegated postcondition — wired onto `commit` in place of the old raw
+expression, with a matching `Validated: Requires<V, ..>` bound added to
+`commit`'s own `where` clause.
+
+Verified for real, not just compiled: `cargo kani` on `commit`'s own
+contract harness (`verify_gaap_commit_always_balances`) still passes,
+`0 of 297 failed`, with the precondition now routed through the real
+delegated call instead of the inline expression. Two new tests in
+`ledger_test.rs` — one confirming `Validated::requires` holds for a
+real, lawfully-validated transfer; one confirming the "sewing together"
+directly, by querying both `ContractRecord`s (`validate`'s `kind =
+"ensures"`, `commit`'s `kind = "requires"`) and asserting both fragment
+texts name `AmountPositive` — verified non-vacuous by temporarily
+reverting `commit_requires`'s delegation to a hand-typed expression and
+watching the fragment-text assertion fail precisely, reverted. A
+freestanding "contract surface" query function (originally sketched as
+part of this step, keyed by bare state name against `ContractRecord`)
+turned out not to be buildable honestly: `ContractRecord.evidence`
+carries whatever free-form claim-id string each `kani_ensures!`/
+`kani_requires!` call chose to pass (e.g.
+`"amenable_kani::ledger::Validated::commit_requires"`), not a bare state
+name — exact-matching it against a declared state name doesn't work,
+and substring-matching would reintroduce the exact string-prefix
+fragility already fixed once for `audit_surface()`. The two new tests
+demonstrate the real connection directly instead, against the known
+exact evidence-id strings.
+
+Also confirmed, not assumed: `#[derive(StateMachine)]` (Steps 1-2)
+cannot be applied to `Ledger` the way it was to `Stoplight` without
+further work — `Ledger`'s methods are plain generic-over-`V` inherent
+methods registered via `capture_exchange_body`, with no `impl
+Exchange<Input, Output, V> for Ledger` anywhere (deliberately: `#[exchange(..)]`
+requires a concrete verifier, which `Ledger`'s methods don't have).
+The Step 1 static assertion (`T: Exchange<..>`) has nothing to check
+against. Applying the full derive to `Ledger` — and deciding what the
+static-assertion mechanism should check instead for a
+`capture_exchange_body`-shaped edge — stays Step 5's job, not solved
+here.
 
 ## Motivation
 
@@ -356,22 +432,33 @@ depending on it landing first.
   `stoplight_creusot_surface_test.rs` to the new surface in the same
   step — not a later fast-follow, so nothing currently passing goes
   dark in between.
-- **Step 3** — Extend `capture_exchange_body` with token-carried
-  `Ensures<V>`/`Requires<V>` delegation; wire the derive to
-  auto-generate it for all three `Stoplight` edges, replacing today's
-  hand-invoked `kani_ensures = "true"`.
+- **Step 3** — Sew a chained edge's postcondition and the next edge's
+  precondition to the same registered atomic claim, on `Ledger`
+  (`Stoplight` has no real `Requires<V>` content to demonstrate this
+  with). `Validated` gains a real `Requires<KaniVerifier>` impl
+  delegating through the same `AmountPositive` claim `validate`'s own
+  postcondition already uses; `capture_exchange_body` gains
+  `kani_requires_evidence = "Type"`, generating the delegated
+  precondition the same mechanical way `kani_ensures = "true"` already
+  generates the postcondition; wired onto `commit` in place of its old
+  hand-typed inline expression.
 - **Step 4** — Extend Creusot and Verus coverage for `Stoplight`
   (second `verifier = ..` blocks), matching the existing per-backend
   precedent.
-- **Step 5** — Second worked example: `amenable_gaap::Ledger`. Stresses
-  what `Stoplight` structurally can't — data-bearing carriers
-  (`KaniCompose` routing) and, if a real multi-edge-into-one-state case
-  exists or can be constructed, the token-per-edge contract granularity
-  this plan's design section argues for.
+- **Step 5** — Apply `#[derive(StateMachine)]` to `Ledger` itself.
+  Needs real design work Step 3 surfaced: `Ledger`'s methods have no
+  `Exchange` trait impl at all (generic-over-`V`, `#[exchange(..)]`
+  requires a concrete verifier), so Step 1's `T: Exchange<..>` static
+  assertion has nothing to check against — decide what the derive
+  should assert for a `capture_exchange_body`-shaped edge instead.
+  Also stresses `KaniCompose` routing for data-bearing carriers, which
+  `Stoplight`'s zero-field markers never exercise.
 
 ## Open, non-blocking implementation questions
 
 - Exact module for `State<V>`'s blanket impl (`amenable_core`,
-  alongside `Evidence`/`Witness`, is the natural home).
-- Whether Step 4's registry cross-check ships as a `#[test]` or a new
-  `amenable` CLI subcommand.
+  alongside `Evidence`/`Witness`, is the natural home) — resolved:
+  landed in `amenable_core::state.rs`.
+- What `#[derive(StateMachine)]`'s static assertion should check for a
+  `capture_exchange_body`-shaped edge with no `Exchange` impl to name —
+  real, open, blocking Step 5 specifically (see Step 3's account above).

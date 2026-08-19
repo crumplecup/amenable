@@ -1056,7 +1056,7 @@ blanket impl that grants trust for free.
 
 **Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Planning — Steps 0-2 done (see the plan doc's own Status
+**Status:** 🔲 Planning — Steps 0-3 done (see the plan doc's own Status
 section for the full account): `State<V>` facade landed; `#[derive(
 StateMachine)]` generates compiler-enforced static assertions per
 declared edge plus a real `impl StateMachine<V> for Self`
@@ -1069,6 +1069,21 @@ StateMachine` supertrait bound made partial preservation impossible
 once `StateMachine` itself changed shape, so `crates/amenable/tests/
 stoplight_creusot_surface_test.rs` is deleted too; real Creusot-backed
 audit content is Step 4's job, not reintroduced as a stopgap here.
+Step 3, corrected twice by direct discussion before landing: a chained
+edge's postcondition and the next edge's precondition can rest on the
+same registered atomic claim instead of independently hand-typed
+copies — demonstrated on `amenable_gaap::Ledger` (`Stoplight` has no
+real `Requires<V>` content to show this with), giving `Validated` a
+real `Requires<KaniVerifier>` impl that delegates through the same
+`AmountPositive` claim `validate`'s own postcondition already uses,
+wired via a new `capture_exchange_body(kani_requires_evidence = ..)`
+arg onto `commit` in place of its old hand-typed precondition. Verified
+for real: `cargo kani` on `commit`'s own contract harness still passes
+(`0 of 297 failed`), plus two new tests confirmed non-vacuous by
+temporarily breaking the delegation and watching the exact assertion
+fail. Also surfaced a real, deferred-to-Step-5 finding: `Ledger` has no
+`Exchange` trait impl at all, so `#[derive(StateMachine)]` can't apply
+to it the same way it did to `Stoplight` without further design work.
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

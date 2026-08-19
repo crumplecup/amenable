@@ -32,12 +32,31 @@
 //! technique.
 //!
 //! **`kani_requires = ".."` (optional, only meaningful alongside
-//! `kani_ensures = "true"`).** A real precondition expression (e.g.
-//! `commit`'s own `input.primary().amount().value() > 0`) isn't
-//! mechanical -- not every edge needs one, and there's no way to derive
-//! *which* condition from the method's own signature -- so this stays a
-//! real, hand-authored string, spliced into `#[cfg_attr(kani, kani::
-//! requires(..))]` verbatim rather than reconstructed.
+//! `kani_ensures = "true"`).** A real precondition expression isn't
+//! mechanical in general -- not every edge needs one, and there's no way
+//! to derive *which* condition from the method's own signature -- so
+//! this stays a real, hand-authored string, spliced into `#[cfg_attr(
+//! kani, kani::requires(..))]` verbatim rather than reconstructed.
+//!
+//! **`kani_requires_evidence = "Type"` (optional, mutually exclusive
+//! with `kani_requires`, only meaningful alongside `kani_ensures =
+//! "true"`).** For the specific, real case where the precondition is
+//! itself a claim some earlier edge already registered as *its own*
+//! postcondition -- `commit`'s real precedent: a `Validated`-carrying
+//! `Transfer` is exactly the value that flows from `validate`'s output
+//! position into `commit`'s input position, so `commit`'s precondition
+//! and `validate`'s postcondition can rest on the identical registered
+//! `AmountPositive` claim instead of two independently hand-typed copies
+//! with nothing enforcing they agree. Generates `<Type as
+//! ::amenable_core::Requires<V>>::requires(input.clone())` -- the same
+//! "delegate to a registered impl, don't restate" shape `kani_ensures =
+//! "true"` already uses for the postcondition half, just for the
+//! precondition half, and against a caller-named type rather than always
+//! `evidence` (the precondition's real claim may live on a different
+//! type than the postcondition's). Relies on the same real,
+//! unchecked-by-this-macro assumption `kani_ensures = "true"` already
+//! does for the bare `V` identifier: the method's own input parameter is
+//! named `input`, matching every real caller so far.
 //!
 //! Captures the method's own real body verbatim, the identical `Span::
 //! source_text()` technique `#[exchange(..)]` uses (shared via that
@@ -66,6 +85,7 @@ pub struct CaptureExchangeBodyArgs {
     method_generics: Option<LitStr>,
     kani_ensures: Option<LitStr>,
     kani_requires: Option<Expr>,
+    kani_requires_evidence: Option<Path>,
 }
 
 impl Parse for CaptureExchangeBodyArgs {
@@ -75,6 +95,7 @@ impl Parse for CaptureExchangeBodyArgs {
         let mut method_generics = None;
         let mut kani_ensures = None;
         let mut kani_requires = None;
+        let mut kani_requires_evidence = None;
 
         let pairs = Punctuated::<MetaNameValue, Token![,]>::parse_terminated(input)?;
         for pair in pairs {
@@ -89,12 +110,22 @@ impl Parse for CaptureExchangeBodyArgs {
             } else if pair.path.is_ident("kani_requires") {
                 let lit = expect_lit_str(&pair.value)?;
                 kani_requires = Some(lit.parse()?);
+            } else if pair.path.is_ident("kani_requires_evidence") {
+                kani_requires_evidence = Some(expect_path_lit(&pair.value)?);
             } else {
                 return Err(Error::new_spanned(
                     &pair.path,
                     "unsupported capture_exchange_body attribute",
                 ));
             }
+        }
+
+        if kani_requires.is_some() && kani_requires_evidence.is_some() {
+            return Err(Error::new(
+                proc_macro2::Span::call_site(),
+                "capture_exchange_body accepts at most one of `kani_requires`/\
+                 `kani_requires_evidence`, not both",
+            ));
         }
 
         Ok(CaptureExchangeBodyArgs {
@@ -108,6 +139,7 @@ impl Parse for CaptureExchangeBodyArgs {
             method_generics,
             kani_ensures,
             kani_requires,
+            kani_requires_evidence,
         })
     }
 }
@@ -173,6 +205,7 @@ pub fn expand_capture_exchange_body(
         method_generics,
         kani_ensures,
         kani_requires,
+        kani_requires_evidence,
     } = args;
     let creusot_ensures_lit = creusot_ensures
         .clone()
@@ -223,6 +256,18 @@ pub fn expand_capture_exchange_body(
         if let Some(requires_expr) = kani_requires {
             contracted_method.attrs.push(syn::parse_quote! {
                 #[cfg_attr(kani, kani::requires(#requires_expr))]
+            });
+        }
+        if let Some(requires_evidence) = kani_requires_evidence {
+            contracted_method.attrs.push(syn::parse_quote! {
+                #[cfg_attr(
+                    kani,
+                    kani::requires(
+                        <#requires_evidence as ::amenable_core::Requires<V>>::requires(
+                            ::std::clone::Clone::clone(&input)
+                        )
+                    )
+                )]
             });
         }
         contracted_method.attrs.push(syn::parse_quote! {

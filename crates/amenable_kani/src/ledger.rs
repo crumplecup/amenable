@@ -21,7 +21,7 @@
 //! helped. `Uuid`'s 16-byte, fixed-length comparison is cheap in the
 //! identical position.
 
-use amenable_core::{Sidecar, Witness};
+use amenable_core::{Ensures, Sidecar, Witness};
 use amenable_gaap::{
     AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
     Pending, Rejected, RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds,
@@ -31,7 +31,7 @@ use amenable_gaap::{
 use crate::gaap_ledger::{
     VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC, VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC,
 };
-use crate::rust_std::macros::kani_ensures;
+use crate::rust_std::macros::{kani_ensures, kani_requires};
 use crate::{CalculationProof, KaniVerifier};
 
 /// `Pending`'s own trivial witness. Unlike `stoplight::Green`, which
@@ -168,6 +168,27 @@ kani_ensures!(
         }
         Err(TransferError::SameAccount) => true,
     }
+);
+
+// `commit`'s own precondition, sewn to `validate`'s postcondition rather
+// than restated: both ultimately rest on the same real, registered
+// `AmountPositive` claim -- `validate`'s `Ensures<KaniVerifier>` impl
+// above calls through it to check its *output*; this `Requires<
+// KaniVerifier>` impl calls through the identical claim to check
+// `commit`'s *input* -- because a `Validated`-carrying `Transfer` is
+// exactly the value that flows from one edge's output position into the
+// next edge's input position, the same real fact serves both roles, not
+// two independently hand-typed copies with nothing enforcing they agree
+// (`commit`'s own precondition used to be a hand-typed inline expression,
+// `input.primary().amount().value() > 0`, restating what `AmountPositive`
+// already states once). See `amenable_gaap::ledger::Ledger::commit`'s own
+// `#[amenable_derive::capture_exchange_body(kani_requires_evidence =
+// "Validated", ..)]` for where this gets wired in.
+kani_requires!(
+    Validated,
+    "amenable_kani::ledger::Validated::commit_requires",
+    Transfer<Validated, ValidatedToken>,
+    |input| AmountPositive::ensures(input.primary().amount().value())
 );
 
 // `Witness<KaniVerifier>` for `Validated`/`Committed`/`Rejected<Pending>`/
