@@ -67,6 +67,8 @@ mod amenable_core_exchange;
 mod amenable_core_provenance;
 #[path = "../../amenable_core/src/roles.rs"]
 mod amenable_core_roles;
+#[path = "../../amenable_core/src/state_machine.rs"]
+mod amenable_core_state_machine;
 #[path = "../../amenable_core/src/verifier.rs"]
 mod amenable_core_verifier;
 
@@ -78,5 +80,6 @@ pub use amenable_core_provenance::{
     MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport,
 };
 pub use amenable_core_roles::{AsStandard, Standard};
+pub use amenable_core_state_machine::{StateMachine, Transition, TransitionAudit};
 pub use amenable_core_verifier::Verifier;
 pub use witness_accommodation::Witness;

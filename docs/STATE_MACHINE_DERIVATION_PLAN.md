@@ -2,10 +2,13 @@
 
 ## Status
 
-🔲 Planning — Steps 0-3 and 5 done, Step 4 partially done (Creusot
-side landed, Verus still open — see Step 4's own account below; Step 5
-landed out of order, ahead of Step 4, by direct instruction, once Step
-3 surfaced the real gap it fixes). Step 0: `amenable_core::State<V>`
+✅ Steps 0-5, every step this plan scoped, done and verified for real
+on all three backends. Step 4 landed in two parts (Creusot, then Verus
+— see Step 4's own account below); Step 5 landed out of order, ahead of
+Step 4, by direct instruction, once Step 3 surfaced the real gap it
+fixes. `KaniCompose` routing for data-bearing carriers (flagged in Step
+5's own account) is a real, deliberate follow-on, not part of this
+plan's original numbered scope. Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -314,6 +317,55 @@ separately (`amenable_verus` has no dependency on `amenable_derive` or
 crate under any circumstances), it needs a hand-built `macro_rules!`
 equivalent of this derive, not a reuse of it — not started.
 
+Step 4's Verus half done too, landing far more smoothly than Creusot's
+— no ICE, no incorrect first attempt, real on the first try. `verus_
+state_machine!` (`amenable_verus::exchange_support`) is the `macro_
+rules!` counterpart the derive itself can never be here, matching the
+existing `verus_sidecar!`/`verus_ensures!`/`verus_exchange!` family
+exactly. One real, structural difference from the proc-macro derive: a
+`macro_rules!` macro has no way to look up a declared state's carrier
+type by name at expansion time (pattern matching and repetition only,
+no lookup), so `edges` names each carrier explicitly per edge rather
+than resolving it through a separate `states` table the way `#[derive(
+StateMachine)]`'s own `state(..)`/`edge(from, to)` split does —
+`states` itself stays a plain name list, since `states()`'s own report
+needs no carrier information at all. The static-assertion shape (a
+shared top-level generic checker function plus a plain `const _: fn()
+= checker::<..>;` reference per edge) carried the Creusot-side
+correction over directly rather than risking the same class of
+translator trouble a second time — never actually reproduced under
+Verus, confirmed by testing the original closure-nested shape wasn't
+even attempted here. Deliberately not wrapped in a nested `verus_
+builtin_macros::verus! { .. }` invocation the way its three siblings
+all are: everything generated (`StateMachine`'s three methods, the
+checker function, the assertions) is plain, unannotated Rust with no
+`spec`/`open`/`ensures`/named-return-value syntax, so it needs no
+Verus-specific macro treatment at all — that trick exists only for
+output that itself contains Verus-only syntax. `audit_surface()` is
+honestly, permanently empty: `amenable_verus` has no `inventory`-backed
+registry to query, the same real gap `verus_ensures!`'s own doc comment
+already states.
+
+Applying it to the gallery's own `Stoplight` needed one small,
+already-known preparatory step: `amenable_core::state_machine`
+(`StateMachine`/`Transition`/`TransitionAudit`) joined the existing
+`#[path]`-included trait-family file list in `amenable_verus::lib.rs`,
+the same real, unmodified-source-inclusion mechanism every other
+`amenable_core` trait already uses there, needing no Cargo dependency.
+
+Verified for real: `verus --crate-type=lib` reports `491 verified, 0
+errors` (unchanged from before this step — the new code carries no
+`ensures`/`requires` content of its own, matching `states()`/
+`transitions()`/`audit_surface()`'s identical shape on the other two
+backends, so it adds no new verification obligations, just real
+compile-time-checked structure), confirmed non-vacuous by a real
+injected-bug check (swapping one edge's declared `to`-carrier for the
+wrong state) producing a precise `E0277`-style failure pointing at
+`__verus_state_machine_edge_checker`'s own bound, reverted. Full
+workspace `check`/`clippy -D warnings`/`fmt`/`test` clean throughout,
+including `cargo check -p amenable_std --features verus`/`-p amenable
+--features verus`. Step 4 is complete, both backends.
+
 ## Motivation
 
 `amenable_core::state_machine`'s current `StateMachine`/`Amenable` trait
@@ -612,19 +664,19 @@ depending on it landing first.
   precondition the same mechanical way `kani_ensures = "true"` already
   generates the postcondition; wired onto `commit` in place of its old
   hand-typed inline expression.
-- **Step 4** — Extend Creusot and Verus coverage for `Stoplight` (second
-  `verifier = ..` blocks). Creusot half done, out of order, after Step
-  5 surfaced it needed a real `Exchange`-impl fix first (see its own
+- **Step 4** — Extend Creusot and Verus coverage for `Stoplight`. Done,
+  both backends. Creusot half landed out of order, after Step 5
+  surfaced it needed a real `Exchange`-impl fix first (see its own
   account above for the generator fix, the two real toolchain findings
   — a proof-transparency visibility requirement and a genuine
   `creusot-rustc` ICE from the static assertion's original closure-
   nested-function shape — and the `translator_cfg` correction). Verus
-  half not started: confirmed separately that `amenable_verus` cannot
-  use this derive at all (`verus --crate-type=lib` resolves no external
-  crate, proc-macro or otherwise, under any circumstances — the same
-  real constraint `verus_sidecar!`/`verus_ensures!`/`verus_exchange!`
-  already exist to work around), so it needs a hand-built `macro_rules!`
-  equivalent, not a second `verifier = ..` block.
+  half confirmed separately that `amenable_verus` cannot use the derive
+  at all (`verus --crate-type=lib` resolves no external crate, proc-
+  macro or otherwise, under any circumstances), so it's a hand-built
+  `verus_state_machine!` `macro_rules!` macro instead, matching the
+  existing `verus_sidecar!`/`verus_ensures!`/`verus_exchange!` family —
+  landed cleanly on the first real attempt, no ICE.
 - **Step 5** — Apply `#[derive(StateMachine)]` to `Ledger` itself. Done
   out of order, ahead of Step 4, by direct instruction: `Ledger` having
   no `Exchange` impl wasn't a shape for the derive to accommodate, it

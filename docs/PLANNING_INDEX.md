@@ -1056,11 +1056,8 @@ blanket impl that grants trust for free.
 
 **Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Planning — Steps 0-3 and 5 done, Step 4 partially done
-(Creusot side landed, Verus still needs a hand-built `macro_rules!`
-equivalent — `amenable_verus` can never use this derive, confirmed:
-`verus --crate-type=lib` resolves no external crate under any
-circumstances) (see the plan doc's own Status
+**Status:** ✅ Steps 0-5, every step this plan scoped, done and verified
+for real on all three backends (see the plan doc's own Status
 section for the full account): `State<V>` facade landed; `#[derive(
 StateMachine)]` generates compiler-enforced static assertions per
 declared edge plus a real `impl StateMachine<V> for Self`
@@ -1149,10 +1146,28 @@ doesn't already, legitimately, know about it. Verified for real: `cargo
 creusot -- -p amenable_creusot` translates clean, `cargo creusot prove`
 reports `Proved (153 files) ✔` (up from 149, up from 142 before this
 step), full workspace clean, a real Kani spot-check still passing.
-Verus's own half of Step 4 is confirmed separately not reachable this
-way at all (`verus --crate-type=lib` resolves no external crate under
-any circumstances) and remains open, needing a hand-built `macro_rules!`
-equivalent.
+Verus's own half of Step 4 landed too, much more smoothly than
+Creusot's — no ICE, no incorrect first attempt. `verus_state_machine!`
+(`amenable_verus::exchange_support`) is the `macro_rules!` counterpart
+the derive can never be there (`verus --crate-type=lib` resolves no
+external crate under any circumstances), matching the existing `verus_
+sidecar!`/`verus_ensures!`/`verus_exchange!` family. One real
+structural difference: `macro_rules!` can't look up a declared state's
+carrier by name, so `edges` names each carrier explicitly per edge
+rather than through a `states` table; `states` itself stays a plain
+name list. Carried the Creusot-side static-assertion fix (a top-level
+checker function plus plain `const` references, no closure or nesting)
+over directly as a precaution, though the closure-based shape was never
+actually tried under Verus. `amenable_core::state_machine` joined the
+existing `#[path]`-included trait-family file list in `amenable_verus::
+lib.rs`, the same real-source-inclusion mechanism already used for
+every other `amenable_core` trait there. Verified for real: `verus
+--crate-type=lib` reports `491 verified, 0 errors` (unchanged -- the
+new code carries no `ensures`/`requires` content, so it adds no new
+verification obligations, just real compile-time-checked structure),
+confirmed non-vacuous by an injected-bug check producing a precise
+failure at the checker function's own bound, reverted. Step 4 is
+complete, both backends -- every step this plan scoped is now done.
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

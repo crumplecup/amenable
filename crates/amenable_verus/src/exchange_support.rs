@@ -248,3 +248,81 @@ macro_rules! verus_sidecar {
 }
 
 pub(crate) use verus_sidecar;
+
+/// `macro_rules!` counterpart to `amenable_derive::StateMachine`
+/// (`docs/STATE_MACHINE_DERIVATION_PLAN.md`) — a proc-macro derive can
+/// never reach here at all, the identical reason `verus_sidecar!` exists
+/// rather than reusing `#[derive(amenable_derive::Sidecar)]`: `verus
+/// --crate-type=lib` resolves no external crate under any circumstances,
+/// proc-macro or otherwise.
+///
+/// Unlike the proc-macro derive, this can't look up a declared state's
+/// carrier type by name at expansion time — `macro_rules!` has no such
+/// capability, only pattern matching and repetition — so `edges` names
+/// each carrier explicitly per edge rather than through a `states`
+/// table the way the derive's own `state(..)`/`edge(from, to)` split
+/// does. `states` stays a plain name list, since `states()`'s own
+/// report needs no carrier information at all.
+///
+/// No `#[verifier::..]`/`ensures`/`requires` anywhere in the generated
+/// output, and deliberately not wrapped in a nested `verus_builtin_macros
+/// ::verus! { .. }` invocation the way `verus_ensures!`/`verus_exchange!`
+/// /`verus_sidecar!` all are: everything generated here — the checker
+/// function, the static assertions, `StateMachine`'s own three methods
+/// — is plain, unannotated Rust, exactly matching what `#[derive(
+/// amenable_derive::StateMachine)]` generates for the other two
+/// backends. Plain Rust needs no Verus-specific macro treatment; the
+/// nested-`verus!{}` trick exists only for output that itself contains
+/// `spec`/`open`/`ensures`/named-return-value syntax, none of which
+/// appears here.
+///
+/// The static assertion shape (a shared top-level generic checker
+/// function plus a plain `const _: fn() = checker::<..>;` reference per
+/// edge, not a closure wrapping a nested function definition) matches
+/// `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s own Step 4 correction for
+/// Creusot -- carried over here directly rather than risking the same
+/// class of translator trouble a second time, even though it was never
+/// actually reproduced under Verus.
+///
+/// `audit_surface()` is honestly, permanently empty: `amenable_verus`
+/// has no `inventory`-backed registry to query at all (the identical
+/// real gap `verus_ensures!`'s own doc comment already states), so
+/// there is nothing real to report from here, ever.
+macro_rules! verus_state_machine {
+    (
+        $self_ty:ty,
+        $verifier:ty,
+        states: [ $($state_name:literal),+ $(,)? ],
+        edges: [ $(($from:literal, $from_carrier:ty, $to:literal, $to_carrier:ty)),+ $(,)? ] $(,)?
+    ) => {
+        #[doc(hidden)]
+        fn __verus_state_machine_edge_checker<In, Out, T>()
+        where
+            In: crate::Sidecar<$verifier>,
+            Out: crate::Sidecar<$verifier>,
+            T: crate::Exchange<In, Out, $verifier>,
+        {
+        }
+
+        $(
+            const _: fn() =
+                __verus_state_machine_edge_checker::<$from_carrier, $to_carrier, $self_ty>;
+        )+
+
+        impl crate::StateMachine<$verifier> for $self_ty {
+            fn states() -> &'static [&'static str] {
+                &[$($state_name),+]
+            }
+
+            fn transitions() -> &'static [crate::Transition] {
+                &[$(crate::Transition { from: $from, to: $to }),+]
+            }
+
+            fn audit_surface() -> ::std::vec::Vec<crate::TransitionAudit> {
+                ::std::vec::Vec::new()
+            }
+        }
+    };
+}
+
+pub(crate) use verus_state_machine;

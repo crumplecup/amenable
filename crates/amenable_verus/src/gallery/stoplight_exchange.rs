@@ -95,7 +95,7 @@ use vstd::prelude::*;
 // for them here at all (unlike the earlier hand-written version, which
 // needed a `#[cfg(verus_keep_ghost)]`-gated `use crate::Ensures;` since
 // plain `cargo clippy` erases `ensures(...)` clause content entirely).
-use crate::exchange_support::{verus_ensures, verus_sidecar};
+use crate::exchange_support::{verus_ensures, verus_sidecar, verus_state_machine};
 // `exchange_support`'s `external_trait_specification`s apply crate-wide
 // once compiled in, via `lib.rs`'s own `pub mod exchange_support;` --
 // no explicit import needed here for Verus to pick them up.
@@ -303,3 +303,20 @@ verus_ensures!(
 include!("generated/stoplight_exchange/green_to_yellow.rs");
 include!("generated/stoplight_exchange/yellow_to_red.rs");
 include!("generated/stoplight_exchange/red_to_green.rs");
+
+// The Verus half of `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step 4 --
+// works unmodified against this gallery's own `Stoplight` because the
+// three `Exchange` impls above already exist for real (`verus_exchange!`
+// generates them, not a same-named stand-in). See `verus_state_machine!`'s
+// own doc comment for why this is a hand-built `macro_rules!` macro
+// rather than a reuse of `#[derive(amenable_derive::StateMachine)]`.
+verus_state_machine!(
+    Stoplight,
+    GalleryVerifier,
+    states: ["Green", "Yellow", "Red"],
+    edges: [
+        ("Green", Established<Green, GreenToken>, "Yellow", Established<Yellow, YellowToken>),
+        ("Yellow", Established<Yellow, YellowToken>, "Red", Established<Red, RedToken>),
+        ("Red", Established<Red, RedToken>, "Green", Established<Green, GreenToken>),
+    ],
+);
