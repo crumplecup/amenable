@@ -60,12 +60,12 @@ use crate::{CalculationProof, KaniVerifier};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, amenable_derive::StateMachine)]
 #[state_machine(
     verifier = "KaniVerifier",
-    state(name = "Green", carrier = "Established<Green, GreenToken>"),
-    state(name = "Yellow", carrier = "Established<Yellow, YellowToken>"),
-    state(name = "Red", carrier = "Established<Red, RedToken>"),
-    edge(from = "Green", to = "Yellow"),
-    edge(from = "Yellow", to = "Red"),
-    edge(from = "Red", to = "Green")
+    state("Green", "Established<Green, GreenToken>"),
+    state("Yellow", "Established<Yellow, YellowToken>"),
+    state("Red", "Established<Red, RedToken>"),
+    edge("Green", "Yellow"),
+    edge("Yellow", "Red"),
+    edge("Red", "Green")
 )]
 pub struct Stoplight;
 

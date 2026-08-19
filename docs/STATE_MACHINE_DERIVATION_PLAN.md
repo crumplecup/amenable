@@ -2,7 +2,9 @@
 
 ## Status
 
-🔲 Planning — Steps 0-3 done. Step 0: `amenable_core::State<V>`
+🔲 Planning — Steps 0-3 and 5 done, Step 4 not yet started (Step 5
+landed out of order, by direct instruction, once Step 3 surfaced the
+real gap it fixes — see Step 5's own account below). Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -143,6 +145,73 @@ against. Applying the full derive to `Ledger` — and deciding what the
 static-assertion mechanism should check instead for a
 `capture_exchange_body`-shaped edge — stays Step 5's job, not solved
 here.
+
+Step 5 done too, but with a direct, firm correction of the framing
+above: "what should the static assertion check for a `capture_exchange_
+body`-shaped edge" was the wrong question. `Ledger` having no `Exchange`
+impl isn't a shape the derive needs to accommodate — it's exactly the
+gap the derive exists to catch, surfaced correctly. The real fix: teach
+`Ledger`'s methods to actually implement `Exchange`, generically, rather
+than special-case the derive around their absence. `#[capture_exchange_
+body(..)]` now unconditionally generates a real `impl<V: Verifier>
+Exchange<Input, Output, V> for Self` alongside everything it already
+did — copying the real method's own `where` clause verbatim (needed
+since the generated `exchange()` body calls straight through to the
+real method, which needs the identical bounds to resolve), delegating
+via `self.method::<V>(input)`. Requires the method be generic over
+exactly one type parameter named `V` (validated, clear error
+otherwise) — the same hardcoded-name convention `kani_ensures = "true"`
+already relies on. `#[exchange(..)]`'s own concrete-verifier bundle
+still can't apply here (it needs one fixed backend to also generate a
+`Witness<V>` impl and `ProofRecord`); this is additive to
+`capture_exchange_body`, not a replacement for `#[exchange(..)]`.
+Applied automatically to all four of `Ledger`'s methods the moment the
+macro was extended — no per-call-site opt-in, since a missing `Exchange`
+impl was the actual defect, not a feature some callers should be able to
+decline.
+
+This forced `#[derive(StateMachine)]` itself to grow a second mode.
+`Ledger` lives in `amenable_gaap`, a crate that deliberately depends on
+no backend — it can never name a concrete verifier type in its own
+generated code (that code lands in `amenable_gaap` itself, wherever the
+derive was invoked), so the existing `verifier = "KaniVerifier"` mode
+literally cannot apply to it. `#[state_machine(generic_over_verifier,
+..)]` is the new mode: no concrete verifier named anywhere, a single
+blanket `impl<V: Verifier> StateMachine<V> for Self` instead of one per
+verifier. The first attempt at its static assertion tried to prove
+"`Self: Exchange<A, B, V>` holds for every possible `V: Verifier`" via a
+generic function forcing real trait resolution against an unconstrained
+type parameter — the compiler correctly rejected it, real errors, not a
+bug in the check: `Ledger`'s real `Exchange` impl is only generic over
+`V` *conditionally* (bounded by `Witness<V>`/`Ensures<V>`/`Requires<V>`
+on whichever evidence types a given edge touches), never for a truly
+unconstrained hypothetical verifier with no real proof content backing
+it. Resolution: `generic_over_verifier` mode generates no static
+assertion at all — `capture_exchange_body`'s own generated impl is
+already the complete real compile-time check for its own edge;
+declaration-vs-reality correctness (a typo'd or missing edge) is the
+runtime `ExchangeEdgeRecord` cross-check's job, which needs no
+universal-over-`V` provability to be real, and generalized cleanly to
+`Ledger` (proven with the same inject-and-revert check already used for
+`Stoplight`).
+
+One more real, unplanned fix along the way: `state(name = "..", carrier
+= "..")`/`edge(from = "..", to = "..")`'s key-value syntax (Steps 1-2's
+own design) triggers a genuine `clippy::duplicated_attributes` false
+positive — confirmed in isolation before concluding it wasn't fixable by
+reordering fields — for any state with more than one outgoing edge
+(`Ledger`'s `Pending`/`Validated` both have two): the lint compares only
+the first key-value pair of a repeated nested meta item, so two
+`edge(from = "Pending", to = ..)` entries collide regardless of their
+different `to`. Positional syntax (`state("Green", "carrier-type")`,
+`edge("Green", "Yellow")`) doesn't trigger it at all, confirmed the same
+way, so both `Stoplight`'s and `Ledger`'s declarations — and the
+parser — moved to it. A real, external-tooling-forced exception to this
+macro family's usual `key = "value"` convention, not a style choice.
+
+Verified for real throughout: full workspace `check`/`clippy -D
+warnings`/`fmt`/`test` clean; `cargo kani` re-run on `Ledger`'s own
+contract harnesses after the `Exchange` impl addition, still passing.
 
 ## Motivation
 
@@ -445,14 +514,22 @@ depending on it landing first.
 - **Step 4** — Extend Creusot and Verus coverage for `Stoplight`
   (second `verifier = ..` blocks), matching the existing per-backend
   precedent.
-- **Step 5** — Apply `#[derive(StateMachine)]` to `Ledger` itself.
-  Needs real design work Step 3 surfaced: `Ledger`'s methods have no
-  `Exchange` trait impl at all (generic-over-`V`, `#[exchange(..)]`
-  requires a concrete verifier), so Step 1's `T: Exchange<..>` static
-  assertion has nothing to check against — decide what the derive
-  should assert for a `capture_exchange_body`-shaped edge instead.
-  Also stresses `KaniCompose` routing for data-bearing carriers, which
-  `Stoplight`'s zero-field markers never exercise.
+- **Step 5** — Apply `#[derive(StateMachine)]` to `Ledger` itself. Done
+  out of order, ahead of Step 4, by direct instruction: `Ledger` having
+  no `Exchange` impl wasn't a shape for the derive to accommodate, it
+  was the real gap the derive exists to catch. Fixed at the source —
+  `capture_exchange_body` now unconditionally generates a real,
+  verifier-generic `impl<V: Verifier> Exchange<Input, Output, V> for
+  Self` — rather than special-cased in the derive. `#[derive(
+  StateMachine)]` gained a `generic_over_verifier` mode to match (see
+  its own account above for the real, compiler-rejected first attempt
+  at its static assertion, and why the final design generates none).
+  `KaniCompose` routing for data-bearing carriers, which `Stoplight`'s
+  zero-field markers never exercise, is still open — `Ledger`'s own
+  carriers (`Transfer<S, Token>` wrapping a real payload) are exactly
+  that case, not yet exercised by any auto-generated harness (no such
+  generation exists yet; today's Kani contracts on `Ledger`'s methods
+  are still hand-authored, per Step 3).
 
 ## Open, non-blocking implementation questions
 
@@ -461,4 +538,6 @@ depending on it landing first.
   landed in `amenable_core::state.rs`.
 - What `#[derive(StateMachine)]`'s static assertion should check for a
   `capture_exchange_body`-shaped edge with no `Exchange` impl to name —
-  real, open, blocking Step 5 specifically (see Step 3's account above).
+  resolved: the premise was wrong. `capture_exchange_body` now always
+  generates a real `Exchange` impl, so there's nothing left to
+  special-case (see Step 5's own account above).

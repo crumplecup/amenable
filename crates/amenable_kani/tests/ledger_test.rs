@@ -3,7 +3,7 @@
 //! Kani harnesses. All three refusal reasons -- unlike every `Stoplight`
 //! edge, which can only ever succeed.
 
-use amenable_core::{ContractRecord, Requires, Sidecar};
+use amenable_core::{ContractRecord, ExchangeEdgeRecord, Requires, Sidecar, StateMachine};
 use amenable_gaap::{
     AccountId, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
     RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError, TransferPayload,
@@ -188,4 +188,80 @@ fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() {
 
     assert!((ensures.fragment)().contains("AmountPositive"));
     assert!((requires.fragment)().contains("AmountPositive"));
+}
+
+/// `Ledger`'s real `impl<V: Verifier> StateMachine<V> for Ledger` --
+/// `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step 5, unblocked once
+/// `Ledger`'s methods gained real, generic-over-`V` `Exchange` impls
+/// (Step 5's own follow-up correction). Callable against any real
+/// verifier; `KaniVerifier` here is just this crate's own concrete
+/// instantiation, not special.
+#[test]
+fn ledger_states_reports_all_five_declared_states_in_declaration_order() {
+    assert_eq!(
+        <Ledger as StateMachine<KaniVerifier>>::states(),
+        &[
+            "Pending",
+            "Validated",
+            "Committed",
+            "Rejected<Pending>",
+            "Rejected<Validated>"
+        ]
+    );
+}
+
+#[test]
+fn ledger_transitions_reports_all_four_declared_edges_in_declaration_order() {
+    let transitions = <Ledger as StateMachine<KaniVerifier>>::transitions();
+    let pairs: Vec<(&str, &str)> = transitions
+        .iter()
+        .map(|transition| (transition.from, transition.to))
+        .collect();
+
+    assert_eq!(
+        pairs,
+        vec![
+            ("Pending", "Validated"),
+            ("Validated", "Committed"),
+            ("Pending", "Rejected<Pending>"),
+            ("Validated", "Rejected<Validated>"),
+        ]
+    );
+}
+
+/// The same declared-vs-registered cross-check `stoplight_amenable_test.rs`
+/// runs for `Stoplight` -- proof this generalizes past a single-module
+/// worked example, since `Ledger`'s real edges are registered from
+/// `amenable_gaap::ledger.rs` (`capture_exchange_body`), not the same
+/// module `Ledger` itself is declared in.
+#[test]
+fn ledger_declared_transitions_match_real_exchange_edge_registrations_exactly() {
+    // `ExchangeEdgeRecord::evidence` is `stringify!(#evidence)` over a
+    // `quote!`-respliced `Path`, which -- unlike `stringify!` on
+    // directly-written source -- inserts spaces around a generic path's
+    // `<`/`>` (`"Rejected < Pending >"`, not `"Rejected<Pending>"`). Both
+    // name the identical real type; whitespace is the only difference,
+    // so normalizing it away is a real equality check, not a fuzzy one.
+    let normalize = |name: &str| {
+        name.chars()
+            .filter(|c| !c.is_whitespace())
+            .collect::<String>()
+    };
+
+    let mut declared: Vec<String> = <Ledger as StateMachine<KaniVerifier>>::transitions()
+        .iter()
+        .map(|transition| normalize(transition.to))
+        .collect();
+    declared.sort_unstable();
+
+    let mut registered: Vec<String> = inventory::iter::<ExchangeEdgeRecord>()
+        .filter(|record| record.self_ty == "Ledger")
+        .map(|record| normalize(record.evidence))
+        .collect();
+    registered.sort_unstable();
+
+    assert_eq!(
+        declared, registered,
+        "declared Ledger edges and real ExchangeEdgeRecord registrations diverged"
+    );
 }

@@ -1056,7 +1056,9 @@ blanket impl that grants trust for free.
 
 **Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Planning — Steps 0-3 done (see the plan doc's own Status
+**Status:** 🔲 Planning — Steps 0-3 and 5 done (Step 5 out of order, by
+direct instruction, once Step 3 surfaced the real gap it fixes), Step 4
+not started (see the plan doc's own Status
 section for the full account): `State<V>` facade landed; `#[derive(
 StateMachine)]` generates compiler-enforced static assertions per
 declared edge plus a real `impl StateMachine<V> for Self`
@@ -1081,9 +1083,30 @@ arg onto `commit` in place of its old hand-typed precondition. Verified
 for real: `cargo kani` on `commit`'s own contract harness still passes
 (`0 of 297 failed`), plus two new tests confirmed non-vacuous by
 temporarily breaking the delegation and watching the exact assertion
-fail. Also surfaced a real, deferred-to-Step-5 finding: `Ledger` has no
-`Exchange` trait impl at all, so `#[derive(StateMachine)]` can't apply
-to it the same way it did to `Stoplight` without further design work.
+fail. Also surfaced a real finding, resolved directly rather than
+special-cased: `Ledger` had no `Exchange` trait impl at all. Step 5
+fixed it at the source instead of accommodating its absence —
+`capture_exchange_body` now unconditionally generates a real,
+verifier-generic `impl<V: Verifier> Exchange<Input, Output, V> for
+Self` (copying the real method's own `where` clause, delegating via
+`self.method::<V>(input)`), applied automatically to all four of
+`Ledger`'s methods. `#[derive(StateMachine)]` gained a
+`generic_over_verifier` mode to match, since `Ledger` lives in a
+backend-neutral crate that can never name a concrete verifier type; its
+first design (an unconstrained "works for every `V`" static assertion)
+was correctly rejected by the compiler — `Ledger`'s real impl is only
+generic over `V` conditionally, bounded by real `Witness`/`Ensures`/
+`Requires` impls per edge — so the final design generates no static
+assertion in that mode at all, relying on `capture_exchange_body`'s own
+impl as the real compile-time check and the runtime `ExchangeEdgeRecord`
+cross-check for declaration correctness. Also fixed along the way: a
+real `clippy::duplicated_attributes` false positive on the `state(name
+= .., carrier = ..)`/`edge(from = .., to = ..)` key-value syntax
+(triggers on any state with more than one outgoing edge), moved to
+positional `state(name, carrier)`/`edge(from, to)` instead. Verified
+for real: `cargo kani` re-run on `Ledger`'s `validate`/`commit`
+contract harnesses after the `Exchange` impl addition, both still
+passing (`0 of 501`/`297 failed`).
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

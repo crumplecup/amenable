@@ -197,6 +197,25 @@ pub fn expand_capture_exchange_body(
         ));
     };
     let (output_ty, error_ty) = extract_result_generics(return_ty)?;
+    let method_where_clause = &method.sig.generics.where_clause;
+    match method
+        .sig
+        .generics
+        .params
+        .iter()
+        .collect::<Vec<_>>()
+        .as_slice()
+    {
+        [syn::GenericParam::Type(type_param)] if type_param.ident == "V" => {}
+        _ => {
+            return Err(Error::new_spanned(
+                &method.sig.generics,
+                "capture_exchange_body requires a method generic over exactly one type \
+                 parameter, named `V` -- the generated `Exchange<Input, Output, V>` impl below \
+                 assumes that name, matching this macro family's existing convention",
+            ));
+        }
+    }
 
     let self_ty = &item_impl.self_ty;
     let CaptureExchangeBodyArgs {
@@ -288,6 +307,35 @@ pub fn expand_capture_exchange_body(
 
     Ok(quote! {
         #contracted_impl
+
+        // A real `Exchange<Input, Output, V>` impl, generic over `V`
+        // rather than tied to one concrete backend -- unlike `#[exchange(
+        // ..)]`'s own bundle, which needs a concrete verifier because it
+        // also generates a `Witness<V>` impl and `ProofRecord`
+        // registration for one. This method already has everything real
+        // Kani/Creusot/Verus contracts need attached directly (the
+        // `#[cfg_attr(kani, ..)]` contract above; each backend's own
+        // generated companion reading `ExchangeEdgeRecord` below), so the
+        // only thing missing to make this a real, derive-checkable
+        // `Exchange` edge -- the actual trait impl -- is exactly as
+        // mechanical here as it is for `#[exchange(..)]`: delegate to the
+        // real method, generic over the same `V` the method itself
+        // already requires. The method's own `where` clause is copied
+        // verbatim, since `exchange`'s body calling through to it needs
+        // the identical bounds to type-check.
+        impl<V: ::amenable_core::Verifier> ::amenable_core::Exchange<#input_ty, #output_ty, V>
+            for #self_ty
+        #method_where_clause
+        {
+            type Error = #error_ty;
+
+            fn exchange(
+                &self,
+                input: #input_ty,
+            ) -> ::std::result::Result<#output_ty, Self::Error> {
+                self.#method_ident::<V>(input)
+            }
+        }
 
         // Always registered, regardless of any `#[cfg]` -- this crate
         // (`amenable_gaap`) is ordinary Cargo-built and never translated

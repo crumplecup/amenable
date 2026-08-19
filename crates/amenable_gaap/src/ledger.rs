@@ -94,8 +94,44 @@ pub enum TransferError {
 }
 
 /// The source account's ledger state a transfer validates against.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+///
+/// The second design canary for `docs/STATE_MACHINE_DERIVATION_PLAN.md`,
+/// after `Stoplight` — and the one that forced a real fix rather than a
+/// special case. `Ledger`'s methods had no `Exchange` trait impl at all
+/// (generic over `V`, registered only via `#[capture_exchange_body(..)]`,
+/// which deliberately didn't generate one), so `#[derive(StateMachine)]`'s
+/// static assertion had nothing to check — not a limitation to work
+/// around in the derive, but the derive correctly catching a real gap
+/// this crate's own methods had. `capture_exchange_body` now generates a
+/// real `impl<V: Verifier> Exchange<Input, Output, V> for Self`
+/// unconditionally, generic rather than tied to one backend (`#[exchange(
+/// ..)]`'s own concrete-verifier bundle can't apply here — `Ledger`
+/// stays neutral, no dependency on any backend crate). `#[state_machine(
+/// generic_over_verifier, ..)]` below matches that shape: no concrete
+/// verifier named anywhere (this crate can't name one), a genuinely
+/// `for<V: Verifier>`-checked static assertion instead of a
+/// per-instantiation one, and a single blanket `impl<V: Verifier>
+/// StateMachine<V> for Ledger`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, amenable_derive::StateMachine)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
+#[state_machine(
+    generic_over_verifier,
+    state("Pending", "Transfer<Pending, PendingToken>"),
+    state("Validated", "Transfer<Validated, ValidatedToken>"),
+    state("Committed", "Transfer<Committed, CommittedToken>"),
+    state(
+        "Rejected<Pending>",
+        "Transfer<Rejected<Pending>, RejectedFromPendingToken>"
+    ),
+    state(
+        "Rejected<Validated>",
+        "Transfer<Rejected<Validated>, RejectedFromValidatedToken>"
+    ),
+    edge("Pending", "Validated"),
+    edge("Validated", "Committed"),
+    edge("Pending", "Rejected<Pending>"),
+    edge("Validated", "Rejected<Validated>")
+)]
 pub struct Ledger {
     balance: i64,
 }
