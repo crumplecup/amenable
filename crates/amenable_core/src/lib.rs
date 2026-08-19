@@ -33,6 +33,7 @@ mod exchange;
 mod link;
 mod provenance;
 mod roles;
+mod state;
 mod state_machine;
 mod stoplight;
 mod verifier;
@@ -53,6 +54,7 @@ pub use link::{
 };
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
+pub use state::State;
 pub use state_machine::{Amenable, StateMachine};
 pub use stoplight::{Green, Red, Yellow};
 pub use verifier::Verifier;
