@@ -10,6 +10,7 @@ mod kani_compose;
 mod proof_token;
 mod sidecar;
 mod standard;
+mod state_machine;
 #[cfg(feature = "verus")]
 mod verus_contract;
 #[cfg(feature = "verus")]
@@ -34,6 +35,7 @@ use kani_compose::expand_kani_compose;
 use proof_token::expand_proof_token;
 use sidecar::expand_sidecar;
 use standard::expand_standard;
+use state_machine::expand_state_machine;
 use witness::expand_witness;
 
 /// Define a `#[cfg(...)]`-gated proof harness item and, alongside it, an
@@ -209,6 +211,20 @@ pub fn derive_sidecar(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     match expand_sidecar(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// `#[derive(StateMachine)]` -- see [`state_machine`]'s own doc comment
+/// for the full `#[state_machine(verifier = .., state(..), edge(..))]`
+/// syntax. Step 1 of `docs/STATE_MACHINE_DERIVATION_PLAN.md`: emits only
+/// the compiler-enforced static assertions, one per declared edge.
+#[proc_macro_derive(StateMachine, attributes(state_machine))]
+pub fn derive_state_machine(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_state_machine(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

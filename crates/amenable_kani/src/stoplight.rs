@@ -44,7 +44,28 @@ use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
 /// motivating counter-example in `docs/AMENABLE_PLAN.md`) simply have no
 /// `Exchange` impl — there is no runtime check to bypass; the transition
 /// does not exist as code to call.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+///
+/// The design canary for `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step
+/// 1: `#[derive(amenable_derive::StateMachine)]` below emits one
+/// compiler-enforced static assertion per declared edge, each checking
+/// that the real `Exchange<InputCarrier, OutputCarrier, KaniVerifier>`
+/// impl already exists (`green_to_yellow`/`yellow_to_red`/
+/// `red_to_green`'s own `#[amenable_derive::exchange(..)]`-generated
+/// impls, below) — nothing new is generated yet; a stale or missing edge
+/// declaration here is a compile error, not a silent gap. Coexists with
+/// the old, soon-to-be-deleted `impl StateMachine for Stoplight` further
+/// down without conflict: this derive generates no trait impl at all in
+/// Step 1, only inert `const _: fn() = ..;` items.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, amenable_derive::StateMachine)]
+#[state_machine(
+    verifier = "KaniVerifier",
+    state(name = "Green", carrier = "Established<Green, GreenToken>"),
+    state(name = "Yellow", carrier = "Established<Yellow, YellowToken>"),
+    state(name = "Red", carrier = "Established<Red, RedToken>"),
+    edge(from = "Green", to = "Yellow"),
+    edge(from = "Yellow", to = "Red"),
+    edge(from = "Red", to = "Green")
+)]
 pub struct Stoplight;
 
 /// Runtime-inspectable descriptor of which state a [`Stoplight`]
