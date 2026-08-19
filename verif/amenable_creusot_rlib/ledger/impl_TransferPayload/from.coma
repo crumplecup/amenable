@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 290 4 290 25 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 304 4 304 25 *)
 
 (* ledger::TransferPayload *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 288 15 288 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 289 14 289 33
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 302 15 302 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 303 14 303 33
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -17,7 +17,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec from'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 290 4 290 25]
+let rec from'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 304 4 304 25]
   (self: t_TransferPayload) (return (x: UInt64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self.from ] s1 | s1 = return {_ret} ] ]
   [ & _ret: UInt64.t = Any.any_l () | & self: t_TransferPayload = self ])

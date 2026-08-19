@@ -1,0 +1,93 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 54 4 57 102 *)
+
+(* <ledger::Ledger as amenable_core::Exchange<ledger::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, ledger::Transfer<amenable_gaap::Rejected<amenable_gaap::Validated>, amenable_gaap::RejectedFromValidatedToken>, witness::CreusotVerifier>> *)
+
+let%span srollback = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 59 8 59 28
+let%span srollback'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 56 8 56 13
+let%span srollback'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 52 15 52 19
+let%span srollback'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 57 9 57 102
+let%span srollback'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 53 14 53 18
+let%span srollback'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 31 17 36
+let%span srollback'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 15 23 15 27
+let%span srollback'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 17 78 17 158
+let%span srollback'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 16 22 16 26
+
+use creusot.int.Int64
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+type t_Ledger = { balance: Int64.t }
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_ValidatedToken
+
+type t_Transfer_Validated_ValidatedToken = { payload: t_TransferPayload; token: t_ValidatedToken; _state: () }
+
+type t_RejectedFromValidatedToken
+
+type t_Transfer_Rejected_Validated_RejectedFromValidatedToken = {
+  payload'0: t_TransferPayload;
+  token'0: t_RejectedFromValidatedToken;
+  _state'0: () }
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+type t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError =
+  | Ok t_Transfer_Rejected_Validated_RejectedFromValidatedToken
+  | Err t_TransferError
+
+predicate inv_ValidatedToken (_1: t_ValidatedToken)
+
+predicate inv_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken x]. inv_Transfer_Validated_ValidatedToken x
+    = inv_ValidatedToken x.token
+
+predicate inv_RejectedFromValidatedToken (_1: t_RejectedFromValidatedToken)
+
+predicate inv_Transfer_Rejected_Validated_RejectedFromValidatedToken (_1: t_Transfer_Rejected_Validated_RejectedFromValidatedToken)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall x: t_Transfer_Rejected_Validated_RejectedFromValidatedToken [inv_Transfer_Rejected_Validated_RejectedFromValidatedToken x]. inv_Transfer_Rejected_Validated_RejectedFromValidatedToken x
+    = inv_RejectedFromValidatedToken x.token'0
+
+predicate inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError (_1: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError [inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError x]. inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError x
+    = match x with
+      | Ok f0'0 -> inv_Transfer_Rejected_Validated_RejectedFromValidatedToken f0'0
+      | Err f0'0 -> true
+      end
+
+let rec rollback (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)) =
+  {[@stop_split] [@expl:rollback 'input' type invariant] [%#srollback'4] inv_Transfer_Validated_ValidatedToken input}
+  any
+  [ return (result: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError) ->
+  {[@stop_split] [@expl:rollback result type invariant] [%#srollback'6] inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError result}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/rollback.rs" 54 4 57 102]
+  (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)) =
+  {[@stop_split] [@expl:exchange 'input' type invariant] [%#srollback'0] inv_Transfer_Validated_ValidatedToken input}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = rollback [%#srollback] {self} {input}
+        (fun (_x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError = Any.any_l ()
+  | & self: t_Ledger = self
+  | & input: t_Transfer_Validated_ValidatedToken = input ])
+  [ return (result: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError) ->
+  {[@stop_split] [@expl:exchange result type invariant] [%#srollback'2] inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError result}
+    (! return {result}) ]

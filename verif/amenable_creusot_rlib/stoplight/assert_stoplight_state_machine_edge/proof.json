@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc___assert_stoplight_state_machine_edge_In": {
+        "prover": "alt-ergo",
+        "time": 0.01
+      }
+    }
+  }
+}

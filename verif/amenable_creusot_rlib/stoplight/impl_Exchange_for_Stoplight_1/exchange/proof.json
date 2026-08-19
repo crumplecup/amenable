@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_exchange_Stoplight": { "prover": "alt-ergo", "time": 0.011 },
+      "vc_red_to_green": { "prover": "alt-ergo", "time": 0.017 }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38 *)
+
+(* <stoplight::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 309 9 309 16
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 309 18 309 26
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 310 9 310 17
+let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 310 19 310 24
+let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 311 9 311 14
+let%span sstoplight'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 311 16 311 23
+
+use creusot.slice.Slice64
+use creusot.prelude.Any
+
+type t_Transition = { from: string; to': string }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec transitions_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38]
+  (return (x: Slice64.slice t_Transition)) = (! bb0
+  [ bb0 = s0
+    [ s0 = bb0'0
+      [ bb0'0 = s0'0
+        [ s0'0 = [ &_2'0 <- { from = ([%#sstoplight] "Green"); to' = ([%#sstoplight'0] "Yellow") } ] s1'0
+        | s1'0 = [ &_3 <- { from = ([%#sstoplight'1] "Yellow"); to' = ([%#sstoplight'2] "Red") } ] s2'0
+        | s2'0 = [ &_4 <- { from = ([%#sstoplight'3] "Red"); to' = ([%#sstoplight'4] "Green") } ] s3'0
+        | s3'0 = any
+          [ any_ (__arr_temp: Slice64.array t_Transition) -> (! -{Seq.get __arr_temp.Slice64.elts 0 = _2'0
+            /\ Seq.get __arr_temp.Slice64.elts 1 = _3
+            /\ Seq.get __arr_temp.Slice64.elts 2 = _4 /\ Seq.length __arr_temp.Slice64.elts = 3}-
+            [ &_1 <- __arr_temp ] s4) ]
+        | s4 = [ &_ret'0 <- _1 ] s5
+        | s5 = _const_ret {_ret'0} ] ]
+      [ & _ret'0: Slice64.array t_Transition = Any.any_l ()
+      | & _1: Slice64.array t_Transition = Any.any_l ()
+      | & _2'0: t_Transition = Any.any_l ()
+      | & _3: t_Transition = Any.any_l ()
+      | & _4: t_Transition = Any.any_l () ] [ _const_ret (_const: Slice64.array t_Transition) -> [ &_7 <- _const ] s1 ]
+    | s1 = [ &_2 <- _7 ] s2
+    | s2 = [ &_ret <- _2 ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: Slice64.slice t_Transition = Any.any_l ()
+  | & _2: Slice64.array t_Transition = Any.any_l ()
+  | & _7: Slice64.array t_Transition = Any.any_l () ])
+  [ return (result: Slice64.slice t_Transition) -> (! return {result}) ]

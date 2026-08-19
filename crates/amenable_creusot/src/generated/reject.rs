@@ -23,6 +23,43 @@ amenable_derive::harness! {
     }
 }
 
+// A real, concrete `Exchange` impl, not just a same-named
+// method -- delegates to the harness-captured method above, the
+// same mechanical shape `#[amenable_derive::exchange(..)]`
+// already gives every real Kani-side edge. `#[cfg(creusot)]`,
+// matching the mirror types (`Ledger`/carriers) it names,
+// which only exist under that cfg. Carries its own `#[ensures(
+// ..)]`, the identical text the inherent method above has --
+// Creusot has no mechanical call-through the way Kani's/Verus's
+// `Ensures<V>` dispatch does (`ExchangeEdgeRecord::
+// creusot_ensures`'s own doc comment), and Creusot only checks
+// what a function's own contract actually states: a delegating
+// method with no `#[ensures(..)]` of its own is checked for
+// memory/panic safety only, never against the real claim,
+// confirmed the hard way -- a first version omitted this and a
+// real injected bug (swapping the body for a fabricated `Err`)
+// produced no failure at all.
+#[cfg(creusot)]
+impl
+    ::amenable_core::Exchange<
+        Transfer<Pending, PendingToken>,
+        Transfer<Rejected<Pending>, RejectedFromPendingToken>,
+        CreusotVerifier,
+    > for Ledger
+{
+    type Error = TransferError;
+
+    #[requires(true)]
+    #[ensures(true)]
+    fn exchange(
+        &self,
+        input: Transfer<Pending, PendingToken>,
+    ) -> ::std::result::Result<Transfer<Rejected<Pending>, RejectedFromPendingToken>, Self::Error>
+    {
+        self.reject(input)
+    }
+}
+
 #[cfg(not(creusot))]
 ::inventory::submit! {
     ::amenable_core::ProofRecord {

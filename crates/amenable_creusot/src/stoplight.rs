@@ -286,7 +286,30 @@ impl Establish<RedToken, CreusotVerifier> for Green {
 /// real receiver, uniformly, to every edge it generates -- `Stoplight`'s
 /// own three edges never use `self` inside their bodies, but still need
 /// a real type to receive it now that the wrapper is unconditional.
+///
+/// `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step 4: the Creusot half of
+/// the same canary `amenable_kani::Stoplight` already carries. Works
+/// unmodified because `amenable::creusot_export` (this file's own
+/// generated companions, below) now emits a real, concrete `impl
+/// amenable_core::Exchange<Input, Output, CreusotVerifier> for Stoplight`
+/// per edge, not just a same-named inherent method — the exact gap Step
+/// 5 already closed for `capture_exchange_body`, closed here for this
+/// generator instead. `#[derive(..)]` is gated by the same `#[cfg(
+/// creusot)]` the struct itself carries — cfg-stripping removes the
+/// whole item, derive included, before any macro runs, so no separate
+/// `cfg_attr` is needed.
 #[cfg(creusot)]
+#[derive(amenable_derive::StateMachine)]
+#[state_machine(
+    verifier = "CreusotVerifier",
+    translator_cfg = "creusot",
+    state("Green", "Established<Green, GreenToken>"),
+    state("Yellow", "Established<Yellow, YellowToken>"),
+    state("Red", "Established<Red, RedToken>"),
+    edge("Green", "Yellow"),
+    edge("Yellow", "Red"),
+    edge("Red", "Green")
+)]
 pub struct Stoplight;
 
 /// Sanitized mirror of `amenable_kani::StoplightError` — a

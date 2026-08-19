@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 446 4 446 59 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 460 4 460 59 *)
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 441 15 441 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 442 14 445 5
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 455 15 455 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 456 14 459 5
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -16,7 +16,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec insufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 446 4 446 59]
+let rec insufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 460 4 460 59]
   (bad: tup2_i64_i64) (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- InsufficientFunds (bad.f0) (bad.f1) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: tup2_i64_i64 = bad ])

@@ -1,0 +1,43 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 53 4 56 71 *)
+
+(* <stoplight::Stoplight as amenable_core::Exchange<stoplight::Established<stoplight::Yellow, stoplight::YellowToken>, stoplight::Established<stoplight::Red, stoplight::RedToken>, witness::CreusotVerifier>> *)
+
+let%span syellow_to_red = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 57 8 57 33
+let%span syellow_to_red'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 51 15 51 19
+let%span syellow_to_red'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 52 14 52 18
+let%span syellow_to_red'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 15 23 15 27
+let%span syellow_to_red'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 16 22 16 26
+
+use creusot.prelude.Any
+
+type t_YellowToken = { f0: () }
+
+type t_Established_Yellow_YellowToken = { primary: (); token: t_YellowToken }
+
+type t_RedToken = { f0'0: () }
+
+type t_Established_Red_RedToken = { primary'0: (); token'0: t_RedToken }
+
+type t_StoplightError = NotUsed
+
+type t_Result_Established_Red_RedToken_StoplightError = Ok t_Established_Red_RedToken | Err t_StoplightError
+
+let rec yellow_to_red (self: ()) (input: t_Established_Yellow_YellowToken)
+  (return (x: t_Result_Established_Red_RedToken_StoplightError)) = any
+  [ return (result: t_Result_Established_Red_RedToken_StoplightError) -> (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec exchange_Stoplight
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/yellow_to_red.rs" 53 4 56 71] (self: ())
+  (input: t_Established_Yellow_YellowToken) (return (x: t_Result_Established_Red_RedToken_StoplightError)) = (! bb0
+  [ bb0 = s0
+    [ s0 = yellow_to_red [%#syellow_to_red] {self} {input}
+        (fun (_x: t_Result_Established_Red_RedToken_StoplightError) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_Established_Red_RedToken_StoplightError = Any.any_l ()
+  | & self: () = self
+  | & input: t_Established_Yellow_YellowToken = input ])
+  [ return (result: t_Result_Established_Red_RedToken_StoplightError) -> (! return {result}) ]

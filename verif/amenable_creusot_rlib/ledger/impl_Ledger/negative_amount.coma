@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 437 4 437 49 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 451 4 451 49 *)
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 432 15 432 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 433 14 436 5
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 446 15 446 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 447 14 450 5
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -14,7 +14,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec negative_amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 437 4 437 49] (bad: Int64.t)
+let rec negative_amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 451 4 451 49] (bad: Int64.t)
   (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- NegativeAmount bad ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: Int64.t = bad ])

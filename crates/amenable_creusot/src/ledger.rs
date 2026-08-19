@@ -245,10 +245,20 @@ pub struct Transfer<S, Token> {
 
 /// Sanitized mirror of `amenable_gaap::Amount` -- the real captured
 /// `validate`/`commit` bodies call `.amount().value()`, so this needs
-/// the same two-method chain, not just a bare `i64`.
+/// the same two-method chain, not just a bare `i64`. The field is `pub`,
+/// not private: `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step 4 gave
+/// `Ledger`'s edges a real `Exchange` trait impl, whose `exchange()`
+/// method is necessarily as visible as the (public) `Exchange` trait
+/// itself -- more visible than the private inherent method its
+/// `#[ensures(..)]` clause used to sit on alone. Creusot's
+/// proof-transparency check requires everything an `#[ensures(..)]`
+/// clause touches to be at least as visible as the function carrying it
+/// (the same real constraint `GAAP_LEDGER_PLAN.md`'s Step 6 already hit
+/// and fixed the same way, confirmed again here rather than assumed
+/// still true).
 #[cfg(creusot)]
 #[derive(Clone, Copy)]
-pub struct Amount(i64);
+pub struct Amount(pub i64);
 
 #[cfg(creusot)]
 impl Amount {
@@ -272,13 +282,17 @@ impl Amount {
 /// choice for `check_accounts_distinct`'s own isolated proof, above:
 /// the real claim only needs *some* comparable identity type, and the
 /// real captured body never names `AccountId` as a type, only ever
-/// compares what `.from()`/`.to()` return.
+/// compares what `.from()`/`.to()` return. `from`/`to`/`amount` are all
+/// `pub`, not private -- see [`Amount`]'s own doc comment for why: the real
+/// `Exchange::exchange` impl's `#[ensures(..)]` clause (`docs/
+/// STATE_MACHINE_DERIVATION_PLAN.md`'s Step 4) accesses them directly,
+/// and needs to be at least as visible as that (public trait) method.
 #[cfg(creusot)]
 #[derive(Clone, Copy)]
 pub struct TransferPayload {
-    from: u64,
-    to: u64,
-    amount: Amount,
+    pub from: u64,
+    pub to: u64,
+    pub amount: Amount,
 }
 
 #[cfg(creusot)]

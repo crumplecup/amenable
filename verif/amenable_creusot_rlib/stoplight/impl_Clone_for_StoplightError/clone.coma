@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 306 16 306 21 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 329 16 329 21 *)
 
 (* <stoplight::StoplightError as std::clone::Clone> *)
 
@@ -10,7 +10,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_StoplightError [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 306 16 306 21]
+let rec clone_StoplightError [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 329 16 329 21]
   (self: t_StoplightError) (return (x: t_StoplightError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_StoplightError = Any.any_l () | & self: t_StoplightError = self ])

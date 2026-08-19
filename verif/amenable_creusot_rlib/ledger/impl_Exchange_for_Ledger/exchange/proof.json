@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_exchange_Ledger": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_validate_CreusotVerifier": { "prover": "alt-ergo", "time": 0.015 }
+    }
+  }
+}

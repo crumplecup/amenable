@@ -2,9 +2,10 @@
 
 ## Status
 
-🔲 Planning — Steps 0-3 and 5 done, Step 4 not yet started (Step 5
-landed out of order, by direct instruction, once Step 3 surfaced the
-real gap it fixes — see Step 5's own account below). Step 0: `amenable_core::State<V>`
+🔲 Planning — Steps 0-3 and 5 done, Step 4 partially done (Creusot
+side landed, Verus still open — see Step 4's own account below; Step 5
+landed out of order, ahead of Step 4, by direct instruction, once Step
+3 surfaced the real gap it fixes). Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -212,6 +213,106 @@ macro family's usual `key = "value"` convention, not a style choice.
 Verified for real throughout: full workspace `check`/`clippy -D
 warnings`/`fmt`/`test` clean; `cargo kani` re-run on `Ledger`'s own
 contract harnesses after the `Exchange` impl addition, still passing.
+
+Step 4's Creusot half done too, by direct instruction after Step 5:
+"I really don't want creusot to employ any mirrors... macros are how we
+keep the generated code faithful." `amenable::creusot_export` (the
+generator behind `emit-creusot-companions`) used to stop at a
+same-named inherent method — no `Exchange` trait impl at all, the
+identical gap Step 5 closed for `capture_exchange_body`, just in a
+different generator. It now unconditionally emits a real, concrete
+`impl amenable_core::Exchange<Input, Output, CreusotVerifier> for
+{self_ty}` alongside the harness-captured method, delegating to it —
+concrete, not generic over `V` (unlike `capture_exchange_body`'s own
+generated impl for `Ledger`): every edge this generator connects is a
+plain, non-generic method on the Creusot mirror. The mirror *types*
+(`Green`/`Established`/`Stoplight` itself) still can't go away — the
+real transition bodies construct tokens through constructors
+deliberately private to `amenable_kani`, and widening them would be a
+real, permanent weakening, not a free cleanup — but the generated
+`Exchange` impl is now real and faithful, not a lesser same-named
+stand-in.
+
+Two real toolchain findings along the way, neither guessed at, both
+confirmed the hard way:
+
+- **The generated `exchange()` method needed its own `#[ensures(..)]`,
+  not just a body that calls the already-contracted inherent method.**
+  Creusot has no mechanical call-through the way Kani's/Verus's
+  `Ensures<V>` dispatch does, and only checks what a function's own
+  contract actually states — a first version omitted this, and
+  `cargo creusot prove`'s own file count went up as expected (new
+  functions get their own proof obligation regardless of contract
+  content) even with a fabricated `Err(..)` swapped into the body,
+  producing zero failures. The injected-bug check on `Stoplight`
+  specifically was misleading at first too: every `Stoplight` edge's
+  `creusot_ensures` defaults to the literal `"true"`, so a vacuous
+  contract there proves nothing either way — the real check moved to
+  `Ledger::commit`, which has genuine predicate content, and correctly
+  failed (`Goal Coma.vc_exchange_Ledger: ✘`) once the delegation was
+  broken, confirming the fix for real. Creusot's proof-transparency
+  check then required widening three real mirror fields to `pub`
+  (`Amount`'s tuple field, `TransferPayload::from`/`to`/`amount`) — the
+  new trait method is necessarily as visible as the (public) `Exchange`
+  trait itself, more visible than the private inherent method its
+  `#[ensures(..)]` used to sit on alone, the identical constraint
+  `GAAP_LEDGER_PLAN.md`'s Step 6 already hit once before.
+- **Applying `#[derive(StateMachine)]` to Creusot's own mirror
+  `Stoplight` surfaced a real, confirmed `creusot-rustc` ICE** (a
+  compiler panic in `naming.rs`'s `ComaNames::get`, "no entry found for
+  key", during `translate_function` — not a lint), isolated by
+  temporarily emitting only the static assertions with no trait impl
+  (still panicked) and then only the trait impl with no assertions
+  (compiled clean): the closure-nested-generic-function shape Steps 1-3
+  used for the static assertion (`const _: fn() = || { fn assert(..)
+  {} assert::<Self>(); };`) is what `creusot-rustc` can't translate,
+  not `audit_surface()`'s `inventory` call as first assumed. Fixed by
+  restructuring to one shared, top-level generic checker function per
+  block plus a plain `const _: fn() = checker::<In, Out, Self>;`
+  reference per edge — no closure, no nested function definition,
+  still forcing the identical compiler-enforced bound (instantiating
+  the reference requires the bound to hold, the same way a direct call
+  would) without the construct `creusot-rustc` chokes on.
+
+A real, direct correction along the way, not caught before landing: the
+first fix for the ICE (before isolating its real cause) assumed
+`audit_surface()`'s ungated `inventory::iter` call was the problem and
+baked a `#[cfg(not(creusot))]`/`#[cfg(creusot)]` split into the shared
+derive output *unconditionally* — which meant every crate using this
+derive, including `amenable_kani`/`amenable_gaap`, needed `cfg(creusot)`
+added to their own `Cargo.toml` `check-cfg` lists to silence an
+`unexpected_cfgs` warning. Direct pushback: "what the heck is creusot
+doing in the kani crate — we have been over this three times." Real,
+same-class violation as the Cargo-dependency version of this rule
+already caught and reverted twice in `EXCHANGE_PROOF_DERIVATION_PLAN.md`'s
+own history, just restated one level down (a cfg *name*, not a
+dependency edge). `~/repos/elicitation`'s `UNEXPECTED_CFGS.md` was read
+directly at this point — real, relevant prior art (their proc macros
+hit the identical `unexpected_cfgs`-from-macro-output problem,
+solved with an `#[allow(unexpected_cfgs)]`-wrapped `const`/`mod`) but
+solving a broader version of the problem than this one needed: their
+macros unconditionally emit `cfg(kani)`/`cfg(creusot)` into *every*
+caller, so every downstream consumer needs the suppression. This
+derive doesn't have to be that blunt — the fix landed as `translator_cfg
+= "creusot"`, a new, *opt-in* per-block argument: `audit_surface()`'s
+cfg split is only generated for a block that explicitly asks for it
+(only `amenable_creusot`'s own `Stoplight` block does), so no cfg name
+ever reaches a crate that doesn't already, legitimately, know about it
+— zero `Cargo.toml` changes needed anywhere, zero `#[allow]` needed
+anywhere either.
+
+Verified for real: `cargo creusot -- -p amenable_creusot` translates
+clean (both fixes confirmed independently — the ICE gone, no
+`unexpected_cfgs` warnings anywhere in the workspace), `cargo creusot
+prove -- -p amenable_creusot` reports `Proved (153 files) ✔` (up from
+149 right after the `Exchange`-impl addition, up from 142 before this
+step), full workspace `check`/`clippy -D warnings`/`fmt`/`test` clean,
+a real Kani spot-check (`stoplight::verify_green_transitions_only_to_yellow`)
+still passing. Verus's own half of Step 4 is still open — confirmed
+separately (`amenable_verus` has no dependency on `amenable_derive` or
+`inventory` at all, and `verus --crate-type=lib` resolves no external
+crate under any circumstances), it needs a hand-built `macro_rules!`
+equivalent of this derive, not a reuse of it — not started.
 
 ## Motivation
 
@@ -511,9 +612,19 @@ depending on it landing first.
   precondition the same mechanical way `kani_ensures = "true"` already
   generates the postcondition; wired onto `commit` in place of its old
   hand-typed inline expression.
-- **Step 4** — Extend Creusot and Verus coverage for `Stoplight`
-  (second `verifier = ..` blocks), matching the existing per-backend
-  precedent.
+- **Step 4** — Extend Creusot and Verus coverage for `Stoplight` (second
+  `verifier = ..` blocks). Creusot half done, out of order, after Step
+  5 surfaced it needed a real `Exchange`-impl fix first (see its own
+  account above for the generator fix, the two real toolchain findings
+  — a proof-transparency visibility requirement and a genuine
+  `creusot-rustc` ICE from the static assertion's original closure-
+  nested-function shape — and the `translator_cfg` correction). Verus
+  half not started: confirmed separately that `amenable_verus` cannot
+  use this derive at all (`verus --crate-type=lib` resolves no external
+  crate, proc-macro or otherwise, under any circumstances — the same
+  real constraint `verus_sidecar!`/`verus_ensures!`/`verus_exchange!`
+  already exist to work around), so it needs a hand-built `macro_rules!`
+  equivalent, not a second `verifier = ..` block.
 - **Step 5** — Apply `#[derive(StateMachine)]` to `Ledger` itself. Done
   out of order, ahead of Step 4, by direct instruction: `Ledger` having
   no `Exchange` impl wasn't a shape for the derive to accommodate, it

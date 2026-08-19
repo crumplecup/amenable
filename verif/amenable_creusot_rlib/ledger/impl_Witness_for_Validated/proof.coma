@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 719 4 719 37 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 733 4 733 37 *)
 
 (* <amenable_gaap::Validated as amenable_core::Witness<witness::CreusotVerifier>> *)
 
@@ -8,6 +8,6 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec proof_Validated [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 719 4 719 37]
+let rec proof_Validated [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 733 4 733 37]
   (return (x: ())) = (! bb0
   [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

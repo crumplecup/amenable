@@ -1056,9 +1056,11 @@ blanket impl that grants trust for free.
 
 **Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Planning — Steps 0-3 and 5 done (Step 5 out of order, by
-direct instruction, once Step 3 surfaced the real gap it fixes), Step 4
-not started (see the plan doc's own Status
+**Status:** 🔲 Planning — Steps 0-3 and 5 done, Step 4 partially done
+(Creusot side landed, Verus still needs a hand-built `macro_rules!`
+equivalent — `amenable_verus` can never use this derive, confirmed:
+`verus --crate-type=lib` resolves no external crate under any
+circumstances) (see the plan doc's own Status
 section for the full account): `State<V>` facade landed; `#[derive(
 StateMachine)]` generates compiler-enforced static assertions per
 declared edge plus a real `impl StateMachine<V> for Self`
@@ -1107,6 +1109,50 @@ positional `state(name, carrier)`/`edge(from, to)` instead. Verified
 for real: `cargo kani` re-run on `Ledger`'s `validate`/`commit`
 contract harnesses after the `Exchange` impl addition, both still
 passing (`0 of 501`/`297 failed`).
+
+Step 4's Creusot half landed too, by direct instruction: "I really
+don't want creusot to employ any mirrors... macros are how we keep the
+generated code faithful." `amenable::creusot_export` now unconditionally
+emits a real, concrete `impl Exchange<Input, Output, CreusotVerifier>`
+per edge alongside its harness-captured inherent method — the identical
+gap Step 5 closed for `capture_exchange_body`, just in a different
+generator; the mirror *types* still can't go away (real transition
+bodies construct tokens through constructors deliberately private to
+`amenable_kani`), but the generated impl is now real, not a lesser
+same-named stand-in. Two real toolchain findings: the generated
+`exchange()` method needed its own `#[ensures(..)]` (Creusot has no
+mechanical call-through the way Kani's/Verus's `Ensures<V>` dispatch
+does; a first version without one let a fabricated `Err(..)` through
+silently, caught properly once tested against `Ledger::commit`'s real
+predicate rather than `Stoplight`'s vacuous-by-default one), needing
+three real mirror fields widened to `pub` for Creusot's proof-
+transparency check; and applying the derive to Creusot's own mirror
+`Stoplight` hit a genuine `creusot-rustc` ICE (a compiler panic, not a
+lint) from the static assertion's closure-nested-generic-function
+shape, isolated by binary search and fixed by restructuring to a
+top-level shared checker function plus plain `const` references, no
+closure or nesting. A real, direct correction along the way, caught
+immediately: the first ICE fix assumed `audit_surface()`'s `inventory`
+call was the cause and baked a `cfg(creusot)` split unconditionally
+into the shared derive output, leaking `cfg(creusot)` into `amenable_
+kani`/`amenable_gaap`'s own `Cargo.toml` `check-cfg` lists to silence
+the resulting `unexpected_cfgs` warning — "what the heck is creusot
+doing in the kani crate, we have been over this three times," the same
+class of violation as the Cargo-dependency version of this rule already
+caught and reverted twice before, one level down. `~/repos/elicitation`'s
+`UNEXPECTED_CFGS.md` was read directly at this point: real, relevant
+prior art solving a broader version of the same problem (their macros
+unconditionally emit cfg tokens into every caller), but this derive
+didn't need that blunt a fix — landed as `translator_cfg = "creusot"`,
+an opt-in per-block argument, so no cfg name reaches a crate that
+doesn't already, legitimately, know about it. Verified for real: `cargo
+creusot -- -p amenable_creusot` translates clean, `cargo creusot prove`
+reports `Proved (153 files) ✔` (up from 149, up from 142 before this
+step), full workspace clean, a real Kani spot-check still passing.
+Verus's own half of Step 4 is confirmed separately not reachable this
+way at all (`verus --crate-type=lib` resolves no external crate under
+any circumstances) and remains open, needing a hand-built `macro_rules!`
+equivalent.
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

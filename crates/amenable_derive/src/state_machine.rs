@@ -91,9 +91,38 @@
 //! for real captured transition-method source. The runtime cross-check
 //! between declared and registered edges lives in a real test file, not
 //! generated code — see `crates/amenable_kani/tests/stoplight_amenable_test.rs`.
+//!
+//! **`translator_cfg = "creusot"`** (optional; omit unless the derived
+//! type's real `Exchange` impls live *inside* a crate a translator-based
+//! backend actually translates). `audit_surface()`'s `inventory::iter`
+//! call is safe by default — every backend crate this derive was
+//! designed against (`amenable_kani`, `amenable_gaap`) is ordinary
+//! Cargo-built and never translated by anything. `amenable_creusot`
+//! itself is the one real exception: its own `Stoplight` mirror lives
+//! inside the crate `cargo creusot` translates, and a first version of
+//! this derive that always emitted an ungated `inventory::iter` call
+//! there hit a real `creusot-rustc` ICE (a compiler panic, not a lint).
+//! `translator_cfg` splits `audit_surface()` into two `#[cfg(..)]`-gated
+//! definitions (real content when the named cfg is absent, an honestly
+//! empty `Vec::new()` when present — `inventory` genuinely cannot run
+//! under real translation) — but only for the one block that opts in.
+//! This is deliberately **not** unconditional: an earlier version always
+//! emitted the cfg split, which meant every crate using this derive —
+//! including ones with nothing to do with Creusot — needed `cfg(creusot)`
+//! added to their own `Cargo.toml`'s `check-cfg` list to silence an
+//! `unexpected_cfgs` warning, a real, direct correction: leaking
+//! cross-backend cfg awareness into `amenable_kani`/`amenable_gaap` is
+//! exactly the "verifier backends never depend on each other" violation
+//! this codebase has already caught and reverted twice before, just
+//! restated one level down (a cfg *name*, not a Cargo dependency).
+//! `translator_cfg`'s value is spliced in as a bare identifier, not
+//! hardcoded to `creusot` specifically, so a future Verus-side use (a
+//! genuinely different toolchain-resolution problem, likely never
+//! reachable this way at all — see this file's own module for that
+//! finding) isn't blocked by a hardcoded name.
 
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::{Attribute, DeriveInput, Error, LitStr, Type};
 
 struct StateDecl {
@@ -115,6 +144,7 @@ struct StateMachineBlock {
     verifier: VerifierMode,
     states: Vec<StateDecl>,
     edges: Vec<EdgeDecl>,
+    translator_cfg: Option<LitStr>,
 }
 
 /// Expand `#[derive(StateMachine)]` for a type carrying one or more
@@ -154,39 +184,68 @@ fn expand_block(self_ty: &syn::Ident, block: &StateMachineBlock) -> syn::Result<
     })
 }
 
+/// One shared, top-level generic checker function per block, referenced
+/// (never called) once per edge via a plain `const _: fn() = ..;` item —
+/// not the closure-wrapped, per-edge-nested-function shape this used to
+/// generate. A real, confirmed correction: that shape (`const _: fn() =
+/// || { fn assert(..) {} assert::<Self>(); };`) triggered a genuine
+/// `creusot-rustc` ICE (`naming.rs`'s `ComaNames::get`, "no entry found
+/// for key", during `translate_function` -- a compiler panic, not a
+/// lint), isolated by temporarily emitting only the static assertions
+/// with no trait impl (still panicked) and then only the trait impl
+/// with no static assertions (compiled clean), confirming the assertion
+/// shape itself was the cause, not `audit_surface()`'s `inventory` call
+/// as first assumed. A bare item reference (function-item-to-`fn()`-
+/// pointer coercion, no closure, no nested function definition) still
+/// forces the identical compiler-enforced bound check -- instantiating
+/// `#checker_fn::<Input, Output, Self>` as a value requires `Self:
+/// Exchange<Input, Output, Verifier>` to hold, exactly like a direct
+/// call would -- without whatever specific nesting shape `creusot-rustc`
+/// can't translate.
 fn expand_block_assertions(
     self_ty: &syn::Ident,
     block: &StateMachineBlock,
 ) -> syn::Result<TokenStream> {
-    block
+    let VerifierMode::Concrete(verifier) = &block.verifier else {
+        // No static assertion here -- see this module's own doc comment
+        // for why a "for every V: Verifier" check is provably too
+        // strong (real edges are only generic over V conditionally,
+        // bounded by real Witness/Ensures/Requires impls this derive
+        // has no way to know per edge) and why that's fine:
+        // capture_exchange_body's own generated impl is already the
+        // real compile-time check.
+        return Ok(quote! {});
+    };
+
+    let checker_fn = format_ident!(
+        "__assert_{}_state_machine_edge",
+        self_ty.to_string().to_lowercase()
+    );
+    let references = block
         .edges
         .iter()
         .map(|edge| {
             let from_carrier = find_state_carrier(&block.states, &edge.from)?;
             let to_carrier = find_state_carrier(&block.states, &edge.to)?;
 
-            Ok(match &block.verifier {
-                VerifierMode::Concrete(verifier) => quote! {
-                    const _: fn() = || {
-                        fn assert_state_machine_edge<
-                            T: ::amenable_core::Exchange<#from_carrier, #to_carrier, #verifier>,
-                        >() {
-                        }
-
-                        assert_state_machine_edge::<#self_ty>();
-                    };
-                },
-                // No static assertion here -- see this module's own doc
-                // comment for why a "for every V: Verifier" check is
-                // provably too strong (real edges are only generic over
-                // V conditionally, bounded by real Witness/Ensures/
-                // Requires impls this derive has no way to know per
-                // edge) and why that's fine: capture_exchange_body's own
-                // generated impl is already the real compile-time check.
-                VerifierMode::Generic => quote! {},
+            Ok(quote! {
+                const _: fn() = #checker_fn::<#from_carrier, #to_carrier, #self_ty>;
             })
         })
-        .collect()
+        .collect::<syn::Result<TokenStream>>()?;
+
+    Ok(quote! {
+        #[doc(hidden)]
+        fn #checker_fn<In, Out, T>()
+        where
+            In: ::amenable_core::Sidecar<#verifier>,
+            Out: ::amenable_core::Sidecar<#verifier>,
+            T: ::amenable_core::Exchange<In, Out, #verifier>,
+        {
+        }
+
+        #references
+    })
 }
 
 fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlock) -> TokenStream {
@@ -204,6 +263,70 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
         VerifierMode::Generic => (quote! { <V: ::amenable_core::Verifier> }, quote! { V }),
     };
 
+    let audit_surface_body = quote! {
+        let mut audits: ::std::vec::Vec<::amenable_core::TransitionAudit> =
+            ::inventory::iter::<::amenable_core::ExchangeEdgeRecord>()
+                .filter(|record| record.self_ty == #self_ty_str)
+                .map(|record| ::amenable_core::TransitionAudit {
+                    to: record.evidence,
+                    method_name: record.method_name,
+                    body: record.body,
+                })
+                .collect();
+
+        audits.sort_by(|left, right| {
+            (left.to, left.method_name).cmp(&(right.to, right.method_name))
+        });
+
+        audits
+    };
+
+    // `translator_cfg` is opt-in, per block -- not baked unconditionally
+    // into every use of this derive. Only a block whose real `Exchange`
+    // impls live *inside* a crate a translator-based backend (Creusot)
+    // actually translates needs this at all (confirmed the hard way: a
+    // real `creusot-rustc` ICE, compiler panic not a lint, from an
+    // earlier version that always emitted an ungated `inventory::iter`
+    // call here). Every other user of this derive so far (`amenable_
+    // kani`/`amenable_gaap`, neither ever translated by anything) has no
+    // reason to know a cfg named `creusot` exists at all -- baking the
+    // split in unconditionally leaked that knowledge into their own
+    // `Cargo.toml` `check-cfg` lists, a real, direct correction: cfg
+    // awareness belongs only in the one crate that's actually
+    // translated, matching this whole codebase's "verifier backends
+    // never depend on each other, not even a cfg name" discipline.
+    let audit_surface = match &block.translator_cfg {
+        None => quote! {
+            fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
+                #audit_surface_body
+            }
+        },
+        Some(cfg_name) => {
+            let cfg_ident = proc_macro2::Ident::new(&cfg_name.value(), cfg_name.span());
+            quote! {
+                // Two separate item-level `#[cfg(..)]`-gated definitions,
+                // not one body with an inner `#[cfg(..)]` block -- cfg
+                // only applies to items/statements, not arbitrary tail
+                // expressions, and exactly one of these two survives
+                // stripping either way.
+                #[cfg(not(#cfg_ident))]
+                fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
+                    #audit_surface_body
+                }
+
+                // Honest, not aspirational: `inventory` genuinely cannot
+                // run inside real translation, so there is nothing real
+                // to report from here, ever, matching every other real
+                // `#[cfg(not(#cfg_ident))]`-only registry query in this
+                // codebase (e.g. the old `Amenable::verus_surface()`).
+                #[cfg(#cfg_ident)]
+                fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
+                    ::std::vec::Vec::new()
+                }
+            }
+        }
+    };
+
     quote! {
         impl #impl_generics ::amenable_core::StateMachine<#verifier> for #self_ty {
             fn states() -> &'static [&'static str] {
@@ -214,23 +337,7 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
                 &[#(#transitions),*]
             }
 
-            fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
-                let mut audits: ::std::vec::Vec<::amenable_core::TransitionAudit> =
-                    ::inventory::iter::<::amenable_core::ExchangeEdgeRecord>()
-                        .filter(|record| record.self_ty == #self_ty_str)
-                        .map(|record| ::amenable_core::TransitionAudit {
-                            to: record.evidence,
-                            method_name: record.method_name,
-                            body: record.body,
-                        })
-                        .collect();
-
-                audits.sort_by(|left, right| {
-                    (left.to, left.method_name).cmp(&(right.to, right.method_name))
-                });
-
-                audits
-            }
+            #audit_surface
         }
     }
 }
@@ -256,6 +363,7 @@ fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock>
     let mut generic_over_verifier = false;
     let mut states: Vec<StateDecl> = Vec::new();
     let mut edges: Vec<EdgeDecl> = Vec::new();
+    let mut translator_cfg: Option<LitStr> = None;
 
     attr.parse_nested_meta(|meta| {
         if meta.path.is_ident("verifier") {
@@ -276,6 +384,11 @@ fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock>
 
         if meta.path.is_ident("edge") {
             edges.push(parse_edge_decl(&meta)?);
+            return Ok(());
+        }
+
+        if meta.path.is_ident("translator_cfg") {
+            translator_cfg = Some(meta.value()?.parse()?);
             return Ok(());
         }
 
@@ -303,6 +416,7 @@ fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock>
         verifier,
         states,
         edges,
+        translator_cfg,
     })
 }
 
