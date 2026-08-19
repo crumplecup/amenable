@@ -1056,8 +1056,19 @@ blanket impl that grants trust for free.
 
 **Document:** [STATE_MACHINE_DERIVATION_PLAN.md](STATE_MACHINE_DERIVATION_PLAN.md)
 
-**Status:** 🔲 Planning — design converged through direct discussion,
-nothing implemented yet.
+**Status:** 🔲 Planning — Steps 0-2 done (see the plan doc's own Status
+section for the full account): `State<V>` facade landed; `#[derive(
+StateMachine)]` generates compiler-enforced static assertions per
+declared edge plus a real `impl StateMachine<V> for Self`
+(`states()`/`transitions()`/`audit_surface()`), applied to `Stoplight`
+as the canary and confirmed non-vacuous by injected-bug checks in both
+directions (a fabricated edge fails to compile; an undeclared real edge
+fails a runtime cross-check test). The old `Amenable` trait and its
+`Stoplight` impl are deleted, not adapted — a hard `Amenable:
+StateMachine` supertrait bound made partial preservation impossible
+once `StateMachine` itself changed shape, so `crates/amenable/tests/
+stoplight_creusot_surface_test.rs` is deleted too; real Creusot-backed
+audit content is Step 4's job, not reintroduced as a stopgap here.
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

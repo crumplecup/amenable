@@ -27,9 +27,15 @@
 //! anything about `Established` specifically; any `Sidecar<V>`
 //! implementation works identically.
 //!
-//! Generated aggregate methods (`states()`/`transitions()`), the
-//! verifier-generic audit surface, and the runtime cross-check against
-//! `ExchangeEdgeRecord` are Step 2, not this one.
+//! Step 2 adds the real `impl amenable_core::StateMachine<Verifier> for
+//! Self` alongside the static assertions: `states()`/`transitions()`
+//! echo the parsed declarations directly (no registry query needed —
+//! the declaration itself is the source of truth for what was
+//! declared), and `audit_surface()` queries the real
+//! `amenable_core::ExchangeEdgeRecord` registry, filtered by `self_ty`,
+//! for real captured transition-method source. The runtime cross-check
+//! between declared and registered edges lives in a real test file, not
+//! generated code — see `crates/amenable_kani/tests/stoplight_amenable_test.rs`.
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -70,12 +76,22 @@ pub fn expand_state_machine(input: &DeriveInput) -> syn::Result<TokenStream> {
         ));
     }
 
-    let assertions = blocks
+    let expansions = blocks
         .iter()
-        .map(|block| expand_block_assertions(self_ty, block))
+        .map(|block| expand_block(self_ty, block))
         .collect::<syn::Result<Vec<_>>>()?;
 
-    Ok(quote! { #(#assertions)* })
+    Ok(quote! { #(#expansions)* })
+}
+
+fn expand_block(self_ty: &syn::Ident, block: &StateMachineBlock) -> syn::Result<TokenStream> {
+    let assertions = expand_block_assertions(self_ty, block)?;
+    let state_machine_impl = expand_block_state_machine_impl(self_ty, block);
+
+    Ok(quote! {
+        #assertions
+        #state_machine_impl
+    })
 }
 
 fn expand_block_assertions(
@@ -103,6 +119,48 @@ fn expand_block_assertions(
             })
         })
         .collect()
+}
+
+fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlock) -> TokenStream {
+    let verifier = &block.verifier;
+    let self_ty_str = self_ty.to_string();
+
+    let state_names = block.states.iter().map(|state| &state.name);
+    let transitions = block.edges.iter().map(|edge| {
+        let from = &edge.from;
+        let to = &edge.to;
+        quote! { ::amenable_core::Transition { from: #from, to: #to } }
+    });
+
+    quote! {
+        impl ::amenable_core::StateMachine<#verifier> for #self_ty {
+            fn states() -> &'static [&'static str] {
+                &[#(#state_names),*]
+            }
+
+            fn transitions() -> &'static [::amenable_core::Transition] {
+                &[#(#transitions),*]
+            }
+
+            fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
+                let mut audits: ::std::vec::Vec<::amenable_core::TransitionAudit> =
+                    ::inventory::iter::<::amenable_core::ExchangeEdgeRecord>()
+                        .filter(|record| record.self_ty == #self_ty_str)
+                        .map(|record| ::amenable_core::TransitionAudit {
+                            to: record.evidence,
+                            method_name: record.method_name,
+                            body: record.body,
+                        })
+                        .collect();
+
+                audits.sort_by(|left, right| {
+                    (left.to, left.method_name).cmp(&(right.to, right.method_name))
+                });
+
+                audits
+            }
+        }
+    }
 }
 
 fn find_state_carrier<'a>(states: &'a [StateDecl], name: &LitStr) -> syn::Result<&'a Type> {

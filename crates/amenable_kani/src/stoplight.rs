@@ -26,7 +26,7 @@
 //! (`Establish<C, V>: Evidence + Witness<V>` means `impl
 //! Establish<GreenToken, KaniVerifier> for Yellow` cannot exist unless
 //! `Yellow: Witness<KaniVerifier>` also does, so each transition earns a
-//! real (if small) Kani harness proving the `SequentialCycle` invariant it
+//! real (if small) Kani harness proving the sequential-cycle invariant it
 //! claims — `Green` only ever transitions to `Yellow`, never skipping to
 //! `Red` or looping back to itself, and so on around the cycle), and by
 //! `Establish`'s own `C: ProofToken` bound (the credential is the prior
@@ -34,10 +34,10 @@
 //! `Stoplight::exchange` must call `input.sidecar()` to obtain a lawful
 //! credential; `input.primary()` doesn't type-check).
 
-use amenable_core::{Amenable, Establish, Green, Red, Sidecar, StateMachine, Yellow};
+use amenable_core::{Establish, Green, Red, Sidecar, Yellow};
 
 use crate::rust_std::macros::kani_ensures;
-use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
+use crate::{CalculationProof, KaniVerifier};
 
 /// A three-state traffic light: `Green -> Yellow -> Red -> Green`, and
 /// nothing else. Illegal transitions (`Yellow -> Green` directly, the
@@ -45,17 +45,18 @@ use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
 /// `Exchange` impl — there is no runtime check to bypass; the transition
 /// does not exist as code to call.
 ///
-/// The design canary for `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s Step
-/// 1: `#[derive(amenable_derive::StateMachine)]` below emits one
+/// The design canary for `docs/STATE_MACHINE_DERIVATION_PLAN.md`.
+/// `#[derive(amenable_derive::StateMachine)]` below emits one
 /// compiler-enforced static assertion per declared edge, each checking
 /// that the real `Exchange<InputCarrier, OutputCarrier, KaniVerifier>`
 /// impl already exists (`green_to_yellow`/`yellow_to_red`/
 /// `red_to_green`'s own `#[amenable_derive::exchange(..)]`-generated
-/// impls, below) — nothing new is generated yet; a stale or missing edge
-/// declaration here is a compile error, not a silent gap. Coexists with
-/// the old, soon-to-be-deleted `impl StateMachine for Stoplight` further
-/// down without conflict: this derive generates no trait impl at all in
-/// Step 1, only inert `const _: fn() = ..;` items.
+/// impls, below) — a stale or missing edge declaration here is a compile
+/// error, not a silent gap — plus a real `impl amenable_core::
+/// StateMachine<KaniVerifier> for Stoplight`, replacing the old, hand-
+/// written `StateMachine`/`Amenable` impls this file used to carry (the
+/// old `Color` runtime enum and `SequentialCycle` marker, both self-
+/// documented as backing nothing real, are gone along with them).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, amenable_derive::StateMachine)]
 #[state_machine(
     verifier = "KaniVerifier",
@@ -67,43 +68,6 @@ use crate::{CalculationProof, KaniProof, KaniProofRegistration, KaniVerifier};
     edge(from = "Red", to = "Green")
 )]
 pub struct Stoplight;
-
-/// Runtime-inspectable descriptor of which state a [`Stoplight`]
-/// currently occupies — distinct from the zero-sized `Green`/`Yellow`/
-/// `Red` evidence markers `Exchange`'s type parameters use to make
-/// illegal transitions uncompilable. Purely descriptive: nothing in this
-/// module derives it from, or checks it against, the real `Exchange`
-/// graph — that would be exactly the disconnected-proxy mistake this
-/// module used to make (see `git log` on this file for the removed
-/// `next()` function, which existed only to give a since-deleted set of
-/// Kani harnesses something to check that wasn't the real `exchange()`
-/// bodies). Whether this redundancy (a runtime enum alongside
-/// compile-time marker types for the same three states) is worth keeping
-/// at all, now that it backs nothing, is still open — kept only because
-/// removing `StateMachine::State` entirely is a larger question than
-/// Step 1 of `EXCHANGE_PROOF_DERIVATION_PLAN.md` needs to answer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Color {
-    /// The light is green.
-    Green,
-    /// The light is yellow.
-    Yellow,
-    /// The light is red.
-    Red,
-}
-
-/// Governs sequential-cycle traffic light transitions: `Green -> Yellow
-/// -> Red -> Green`, never skipping or reversing a step. Proven one edge
-/// at a time by real Kani contracts directly on each `Exchange::exchange`
-/// body below — not, as an earlier version of this module did, by a
-/// disconnected proxy function nothing here actually calls.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub struct SequentialCycle;
-
-impl StateMachine for Stoplight {
-    type State = Color;
-    type Invariant = SequentialCycle;
-}
 
 /// A primary payload bundled with the specific proof token that was
 /// actually minted for it — the concrete `Sidecar` shape used throughout
@@ -449,88 +413,12 @@ amenable_derive::harness! {
     }
 }
 
-// Step 5 of `EXCHANGE_PROOF_DERIVATION_PLAN.md`: the first real occupant
-// of `Amenable::kani_surface()`/`creusot_surface()`/`verus_surface()`/
-// `audit_surface()` -- grepping the whole tree before this found zero
-// `impl Amenable for` anywhere. Every method below either queries real,
-// already-registered data or references real, compiler-checked items --
-// no hand-typed name that could silently drift from what this module
-// actually proved, matching the whole plan's own discipline.
-impl Amenable for Stoplight {
-    /// A list of proof identifiers -- verifier-agnostic in shape (Kani's
-    /// own `KaniProof.id` format, `crate::module::path::harness_name`),
-    /// reused rather than inventing a second near-identical struct just
-    /// for this trait.
-    type ProofSurface = Vec<String>;
-
-    /// Queries the same real `KaniProofRegistration` inventory `harness!`
-    /// already populates (the exact mechanism `amenable::kani::
-    /// registered_proofs` uses for the CLI's own harness listing),
-    /// filtered to this module's own entries via `module_path!()` --
-    /// evaluated here, in `stoplight.rs`, so it's the same string
-    /// `harness!`'s own `id: concat!(module_path!(), "::", ..)` computed
-    /// when it ran, with no hand-typed module name to drift from either
-    /// side.
-    fn kani_surface() -> Self::ProofSurface {
-        let mut ids: Vec<String> = inventory::iter::<KaniProofRegistration>()
-            .map(|registration| (registration.proof)())
-            .filter(|proof: &KaniProof| proof.id.starts_with(concat!(module_path!(), "::")))
-            .map(|proof| proof.id)
-            .collect();
-        ids.sort_unstable();
-        ids
-    }
-
-    /// Queries the shared `amenable_core::ProofRecord` registry -- the
-    /// same mechanism `kani_surface()` above already uses, not a
-    /// cross-crate import. Verifier backend crates never depend on each
-    /// other (`amenable_kani` has no Cargo dependency on `amenable_
-    /// creusot` at all, and never will): `amenable_creusot::stoplight`
-    /// registers its own `ProofRecord`s for these three edges, `#[cfg(
-    /// not(creusot))]`-gated in place so `cargo creusot`'s translator
-    /// never sees the registration (see that module's own doc comment,
-    /// and `amenable_std::creusot_gallery`'s confirmed finding that
-    /// precise gating avoids the translator errors that used to justify
-    /// routing every registry call through a different crate entirely).
-    /// `inventory` only sees registrations from crates actually linked
-    /// into the binary querying it, so this returns real data when
-    /// something (e.g. `amenable`'s own CLI/tests) links both `amenable_
-    /// kani` and `amenable_creusot`, and an honestly empty list from
-    /// `amenable_kani`'s own test binaries, which never link `amenable_
-    /// creusot` at all -- no `#[cfg(feature = ..)]` branching needed
-    /// either way, unlike the cross-crate-import version this replaced.
-    fn creusot_surface() -> Self::ProofSurface {
-        let mut ids: Vec<String> = inventory::iter::<amenable_core::ProofRecord>()
-            .filter(|record| {
-                record.verifier == "creusot"
-                    && record.evidence.starts_with("amenable_creusot::stoplight::")
-            })
-            .map(|record| record.evidence.to_owned())
-            .collect();
-        ids.sort_unstable();
-        ids
-    }
-
-    /// Honest, not aspirational: a real Verus `Exchange` proof of this
-    /// same `Stoplight` cycle exists now (`amenable_verus::gallery::
-    /// stoplight_exchange`, see `VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`)
-    /// via `#[path]` mod-inclusion of this crate's own trait family, not
-    /// mere axiomatization -- but it lives in a separate crate with no
-    /// `inventory`-backed registry of its own yet (an open question in
-    /// that plan doc), so there is nothing real to query from here.
-    fn verus_surface() -> Self::ProofSurface {
-        Vec::new()
-    }
-
-    /// Real captured verbatim source, not identifiers -- every Kani
-    /// harness in this module, via the same `harness!`-exported constants
-    /// its own contracts already use to keep `Witness::proof()` honest.
-    fn audit_surface() -> &'static [&'static str] {
-        &[
-            VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
-            VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
-            VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC,
-            VERIFY_FULL_CYCLE_COMPOSES_SRC,
-        ]
-    }
-}
+// The real `impl amenable_core::StateMachine<KaniVerifier> for
+// Stoplight` -- `states()`/`transitions()`/`audit_surface()` -- is
+// generated by `#[derive(amenable_derive::StateMachine)]` on the
+// struct definition above, from the real `#[state_machine(..)]`
+// declarations there. See `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s
+// Step 2 for why this replaces the old, hand-written `impl Amenable
+// for Stoplight` that used to live here (`kani_surface()`'s honest
+// `module_path!()` scoping vs. `creusot_surface()`'s hand-typed string
+// prefix -- the exact asymmetry that motivated the replacement).

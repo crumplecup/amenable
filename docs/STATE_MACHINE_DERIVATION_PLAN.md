@@ -2,8 +2,71 @@
 
 ## Status
 
-🔲 Planning — design converged through direct discussion, nothing
-implemented yet.
+🔲 Planning — Step 0 and Step 1 done. Step 0: `amenable_core::State<V>`
+landed exactly as designed — the object-safe facade, blanket-implemented
+over `Evidence + Witness<V>`, confirmed via a compile-only test covering
+every real state type across both worked examples (`Stoplight`,
+`Ledger`), no new impl work needed anywhere. Step 1: `#[derive(
+amenable_derive::StateMachine)]` landed exactly as designed too — parses
+`#[state_machine(verifier = .., state(..), edge(..))]` and emits one
+compiler-enforced static assertion per edge, applied to the real
+`Stoplight` canary, confirmed non-vacuous two ways (a fabricated edge
+fails with a precise `E0277`; an undeclared state name fails with a
+clear macro-level error).
+
+Step 2 done too, with two real corrections found only by implementing,
+not foreseeable from the design discussion alone:
+
+- **The audit surface doesn't back onto `ContractRecord`/`ProofRecord`
+  the way this doc originally said.** Those registries exist, but
+  `ContractRecord.evidence` is a claim-id string (e.g.
+  `"amenable_kani::stoplight::Red::yellow_to_red_ensures"`), not a bare
+  state name, and `ProofRecord.evidence` for Creusot registrations is a
+  fully-qualified function path (e.g.
+  `"amenable_creusot::stoplight::green_to_yellow"`) — neither matches a
+  declared state name (`"Red"`) by exact string equality the way the
+  scoping needed to avoid reintroducing string-prefix fragility.
+  `ExchangeEdgeRecord` does: `self_ty`/`evidence` are exact, bare type
+  names by construction (`stringify!(#self_ty)`/`stringify!(#evidence)`
+  in `#[amenable_derive::exchange(..)]`'s own generated registration).
+  `audit_surface()` queries that instead, real captured transition-
+  method bodies rather than proof-harness source — a different, still
+  real, granularity than the old design's `_SRC` consts.
+- **The old `Amenable` trait couldn't be partially preserved.** It was
+  declared `Amenable: StateMachine` — a hard supertrait bound — so
+  redefining `StateMachine` with a different, generic-over-`V` shape (as
+  designed) makes the old `Amenable` trait itself stop compiling, not
+  just its impl. There is no clean way to keep `Amenable::
+  creusot_surface()` alive for `crates/amenable/tests/
+  stoplight_creusot_surface_test.rs` while reclaiming the `StateMachine`
+  name. Resolution: delete both together now, rather than contort the
+  design to avoid a temporary gap. `ExchangeEdgeRecord` has no
+  `verifier` field at all today (every registration comes from
+  `amenable_kani`, the only crate whose toolchain can run
+  `#[amenable_derive::exchange(..)]`'s generated code safely), so a real
+  Creusot-backed `audit_surface()` needs either a new field there or an
+  equivalent registry for that backend — genuinely Step 4's work, not a
+  Step 2 stopgap. `stoplight_creusot_surface_test.rs` is deleted, not
+  weakened to a stub; real Creusot audit content returns in Step 4.
+
+`states()`/`transitions()` echo the parsed `#[state_machine(..)]`
+declarations directly (no registry query — the declaration itself is
+the source of truth for what was declared). The declared-vs-registered
+cross-check landed as a real test (`declared_transitions_match_real_
+exchange_edge_registrations_exactly` in `stoplight_amenable_test.rs`),
+confirmed non-vacuous by temporarily undeclaring a real edge and
+watching it fail with the exact real/declared set diff, reverted.
+`TransitionAudit` dropped the `from` field the original sketch implied
+`ContractRecord`-backed data would carry — `ExchangeEdgeRecord` has no
+reliable, non-fragile way to recover a bare "from" state name from its
+`input_ty` field (a full carrier type string, not a bare state name),
+so `to`/`method_name`/`body` (all exact matches or real captured
+source) is what's actually derivable honestly.
+
+`docs/AMENABLE_PLAN.md`'s own `StateMachine`/`Amenable` references are
+untouched — out of scope for this plan, which documents new decisions
+in its own file rather than retroactively rewriting an older one, matching
+this project's standing practice.
 
 ## Motivation
 

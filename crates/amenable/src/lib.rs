@@ -51,25 +51,25 @@ pub use verus_export::write_verus_witness_modules;
 pub use verus_gaap_tokens_export::write_verus_gaap_token_companion;
 
 pub use amenable_core::{
-    Amenable, AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
+    AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainGap, ChainNode,
     ClassifiedWitness, ContractRecord, Ensures, Establish, Evidence, EvidenceLink, Exchange,
     ExchangeEdgeRecord, Green, MetadataEntry, OwnedProvenanceReport, ProofChainReport, ProofRecord,
     ProofToken, ProofTokenMintRecord, Provenance, ProvenanceReport, Red, Registry, RegistryReport,
-    Requires, Sidecar, Standard, StateMachine, Verifier, Witness, WitnessArtifact,
-    WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
-    WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind,
-    WitnessSupportSummary, Yellow, proof_chain, proof_chain_for_verifiers, witness_exports,
+    Requires, Sidecar, Standard, State, StateMachine, Transition, TransitionAudit, Verifier,
+    Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape,
+    WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath,
+    WitnessSupportKind, WitnessSupportSummary, Yellow, proof_chain, proof_chain_for_verifiers,
+    witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
 };
 pub use amenable_kani::{
-    AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Color, Credit,
-    Debit, GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition,
-    KaniGalleryExpectation, KaniGalleryRegistration, KaniProof, KaniProofRegistration,
-    KaniVerifier, KaniVerifierMetadata, KaniWitness, NonNegativeFd, RedToken, SequentialCycle,
-    Stoplight, Sum, YellowToken, add,
+    AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Credit, Debit,
+    GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation,
+    KaniGalleryRegistration, KaniProof, KaniProofRegistration, KaniVerifier, KaniVerifierMetadata,
+    KaniWitness, NonNegativeFd, RedToken, Stoplight, Sum, YellowToken, add,
 };
 pub use amenable_std::{
     CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
