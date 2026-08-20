@@ -9,7 +9,7 @@ use support::{
     expected_values, for_each_fixture_type,
 };
 
-fn assert_witness_fixture<F>()
+fn assert_witness_fixture<F>() -> miette::Result<()>
 where
     F: FixtureCase + Witness<FixtureVerifier>,
     <F as Witness<FixtureVerifier>>::ProofArtifact: std::fmt::Display,
@@ -51,10 +51,10 @@ where
     let evidence_nominal_type = std::any::type_name::<F>()
         .split('<')
         .next()
-        .unwrap()
+        .ok_or_else(|| miette::miette!("type_name should split into at least one segment"))?
         .rsplit("::")
         .next()
-        .unwrap();
+        .ok_or_else(|| miette::miette!("type_name segment should rsplit into at least one part"))?;
 
     assert!(
         proof.contains(&format!("evidence: {}", std::any::type_name::<F>())),
@@ -76,6 +76,7 @@ where
             "missing `{fragment}` in:\n{proof}"
         );
     }
+    Ok(())
 }
 
 fn expected_witness_fragments(kind: DeriveFixtureKind) -> &'static [&'static str] {
@@ -201,14 +202,15 @@ struct ShapeOverrideStruct {
 }
 
 #[test]
-fn witness_derive_projects_expected_structure_for_every_fixture() {
+fn witness_derive_projects_expected_structure_for_every_fixture() -> miette::Result<()> {
     macro_rules! assert_fixture {
         ($fixture:ty) => {
-            assert_witness_fixture::<$fixture>();
+            assert_witness_fixture::<$fixture>()?;
         };
     }
 
     for_each_fixture_type!(assert_fixture);
+    Ok(())
 }
 
 #[test]

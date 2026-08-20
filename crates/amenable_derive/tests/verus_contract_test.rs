@@ -295,11 +295,14 @@ fn one_contract_record_is_registered_per_real_clause() {
 }
 
 #[test]
-fn predicate_body_extracts_the_real_shared_predicate_declaration() {
-    let (_, _, item_fn) = amenable_core::verus_find_fn("write_stores_new_value")
-        .expect("write_stores_new_value should be a real, public spec fn");
+fn predicate_body_extracts_the_real_shared_predicate_declaration() -> miette::Result<()> {
+    let (_, _, item_fn) =
+        amenable_core::verus_find_fn("write_stores_new_value").ok_or_else(|| {
+            miette::miette!("write_stores_new_value should be a real, public spec fn")
+        })?;
     let body = amenable_core::verus_predicate_body(&item_fn)
-        .expect("write_stores_new_value's body should be a single trailing expression");
+        .map_err(|error| miette::miette!("write_stores_new_value {error}"))?;
 
     assert_eq!(body, "observed == new_value");
+    Ok(())
 }

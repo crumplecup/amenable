@@ -67,6 +67,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "inventory",
+ "miette",
  "proc-macro2",
  "quote",
  "strum",
