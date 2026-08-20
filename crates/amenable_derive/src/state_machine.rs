@@ -379,17 +379,16 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
     // Only overrides the trait's own empty default when at least one
     // state actually declared a root -- most blocks have none, and the
     // default already says exactly that honestly.
-    let root_entries_states: Vec<&StateDecl> = block
+    let root_entries_states: Vec<(&StateDecl, &RootDecl)> = block
         .states
         .iter()
-        .filter(|state| state.root.is_some())
+        .filter_map(|state| state.root.as_ref().map(|root| (state, root)))
         .collect();
     let root_entries = if root_entries_states.is_empty() {
         quote! {}
     } else {
-        let entries = root_entries_states.iter().map(|state| {
+        let entries = root_entries_states.iter().map(|(state, root_decl)| {
             let name = &state.name;
-            let root_decl = state.root.as_ref().expect("filtered by is_some above");
             let root_str = &root_decl.path_lit;
             let seed_str = match &root_decl.seed {
                 Some((_, seed_lit)) => quote! { #seed_lit },

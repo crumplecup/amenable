@@ -553,7 +553,10 @@ fn expand_proof_fields(fields: &Fields) -> syn::Result<Vec<ProofField>> {
         Fields::Named(fields) => fields
             .named
             .iter()
-            .map(|field| expand_proof_field(field, None, named_proof_field_ident(field)))
+            .map(|field| {
+                let ident = named_proof_field_ident(field)?;
+                expand_proof_field(field, None, ident)
+            })
             .filter_map(Result::transpose)
             .collect(),
         Fields::Unnamed(fields) => fields
@@ -591,11 +594,10 @@ fn expand_proof_field(
     }))
 }
 
-fn named_proof_field_ident(field: &syn::Field) -> syn::Ident {
-    field
-        .ident
-        .clone()
-        .expect("named proof field generation requires identifiers")
+fn named_proof_field_ident(field: &syn::Field) -> syn::Result<syn::Ident> {
+    field.ident.clone().ok_or_else(|| {
+        syn::Error::new_spanned(field, "named proof field generation requires identifiers")
+    })
 }
 
 fn collect_witness_field_types(data: &Data) -> syn::Result<Vec<Type>> {

@@ -155,14 +155,17 @@ fn fields_ctor(
 ) -> syn::Result<TokenStream> {
     match fields {
         Fields::Named(fields) => {
-            let members = fields.named.iter().map(|field| {
-                let ident = field
-                    .ident
-                    .as_ref()
-                    .expect("named-field expansion requires identifiers");
-                let ty = &field.ty;
-                quote!(#ident: <#ty as ::amenable_kani::KaniCompose>::#method())
-            });
+            let members = fields
+                .named
+                .iter()
+                .map(|field| {
+                    let ident = field.ident.as_ref().ok_or_else(|| {
+                        Error::new_spanned(field, "named-field expansion requires identifiers")
+                    })?;
+                    let ty = &field.ty;
+                    Ok(quote!(#ident: <#ty as ::amenable_kani::KaniCompose>::#method()))
+                })
+                .collect::<syn::Result<Vec<TokenStream>>>()?;
             let head = prefix.unwrap_or_else(|| quote!(Self));
             Ok(quote!(#head { #(#members,)* }))
         }

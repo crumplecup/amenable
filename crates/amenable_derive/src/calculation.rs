@@ -72,31 +72,25 @@ pub fn expand_calculation(args: &CalculationArgs, input: &ItemFn) -> syn::Result
         }
     };
 
-    let param_types = inputs
+    let params = inputs
         .iter()
         .map(|arg| match arg {
-            FnArg::Typed(pat_type) => Ok((*pat_type.ty).clone()),
+            FnArg::Typed(pat_type) => Ok(((*pat_type.ty).clone(), (*pat_type.pat).clone())),
             FnArg::Receiver(receiver) => Err(Error::new_spanned(
                 receiver,
                 "calculation does not support methods that take `self`",
             )),
         })
-        .collect::<syn::Result<Vec<Type>>>()?;
+        .collect::<syn::Result<Vec<(Type, Pat)>>>()?;
 
-    if param_types.is_empty() {
+    if params.is_empty() {
         return Err(Error::new_spanned(
             &input.sig,
             "calculation requires at least one argument",
         ));
     }
 
-    let param_idents = inputs
-        .iter()
-        .map(|arg| match arg {
-            FnArg::Typed(pat_type) => (*pat_type.pat).clone(),
-            FnArg::Receiver(_) => unreachable!("receivers rejected above"),
-        })
-        .collect::<Vec<Pat>>();
+    let (param_types, param_idents): (Vec<Type>, Vec<Pat>) = params.into_iter().unzip();
 
     // `Basis` is the tuple of parameter *types themselves*, not whatever
     // those types' own bases happen to be — `AddEvidence`'s prior link is

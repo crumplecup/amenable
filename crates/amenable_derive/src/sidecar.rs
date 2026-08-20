@@ -74,9 +74,15 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
         require_phantom_data(field)?;
     }
 
-    let primary_ident = primary_field.ident.as_ref().expect("named field");
+    let primary_ident = primary_field
+        .ident
+        .as_ref()
+        .ok_or_else(|| Error::new_spanned(primary_field, "named field"))?;
     let primary_ty = &primary_field.ty;
-    let token_ident = token_field.ident.as_ref().expect("named field");
+    let token_ident = token_field
+        .ident
+        .as_ref()
+        .ok_or_else(|| Error::new_spanned(token_field, "named field"))?;
     let token_ty = &token_field.ty;
     let proposition_ty = args
         .proposition
@@ -160,8 +166,13 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
     let constructor_vis = &args.constructor;
     let phantom_idents: Vec<&Ident> = phantom_fields
         .iter()
-        .map(|field| field.ident.as_ref().expect("named field"))
-        .collect();
+        .map(|field| {
+            field
+                .ident
+                .as_ref()
+                .ok_or_else(|| Error::new_spanned(*field, "named field"))
+        })
+        .collect::<syn::Result<Vec<_>>>()?;
     let (struct_impl_generics, struct_ty_generics, struct_where_clause) =
         input.generics.split_for_impl();
 

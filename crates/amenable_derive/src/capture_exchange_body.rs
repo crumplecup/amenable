@@ -269,8 +269,11 @@ pub fn expand_capture_exchange_body(
     // the contract by hand instead of setting `kani_ensures = "true"`.
     let contracted_impl = if generate_kani_ensures {
         let mut contracted_impl = item_impl.clone();
-        let ImplItem::Fn(contracted_method) = &mut contracted_impl.items[0] else {
-            unreachable!("validated above: exactly one ImplItem::Fn in item_impl.items");
+        let Some(ImplItem::Fn(contracted_method)) = contracted_impl.items.first_mut() else {
+            return Err(Error::new_spanned(
+                item_impl,
+                "capture_exchange_body requires exactly one method in the impl block",
+            ));
         };
         if let Some(requires_expr) = kani_requires {
             contracted_method.attrs.push(syn::parse_quote! {

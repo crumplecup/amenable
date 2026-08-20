@@ -432,12 +432,11 @@ fn expand_variant_arm(
                 .named
                 .iter()
                 .map(|field| {
-                    field
-                        .ident
-                        .clone()
-                        .expect("named enum-field expansion requires identifiers")
+                    field.ident.clone().ok_or_else(|| {
+                        Error::new_spanned(field, "named enum-field expansion requires identifiers")
+                    })
                 })
-                .collect::<Vec<_>>();
+                .collect::<syn::Result<Vec<_>>>()?;
             let field_pushes = fields
                 .named
                 .iter()
@@ -447,17 +446,12 @@ fn expand_variant_arm(
                         return Ok(None);
                     }
 
-                    let field_name = field_options.rename.unwrap_or_else(|| {
-                        field
-                            .ident
-                            .as_ref()
-                            .expect("named enum-field expansion requires identifiers")
-                            .to_string()
-                    });
-                    let field_ident = field
-                        .ident
-                        .as_ref()
-                        .expect("named enum-field expansion requires identifiers");
+                    let field_ident = field.ident.as_ref().ok_or_else(|| {
+                        Error::new_spanned(field, "named enum-field expansion requires identifiers")
+                    })?;
+                    let field_name = field_options
+                        .rename
+                        .unwrap_or_else(|| field_ident.to_string());
 
                     Ok(Some(quote! {
                         for entry in ::#crate_path::Provenance::metadata(#field_ident) {
@@ -547,10 +541,9 @@ fn expand_struct_field_pushes(
             .named
             .iter()
             .map(|field| {
-                let field_ident = field
-                    .ident
-                    .as_ref()
-                    .expect("named-field expansion requires field identifiers");
+                let field_ident = field.ident.as_ref().ok_or_else(|| {
+                    Error::new_spanned(field, "named-field expansion requires field identifiers")
+                })?;
                 expand_struct_field_push(crate_path, field, None, quote!(&self.#field_ident))
             })
             .collect(),
@@ -652,14 +645,18 @@ fn collect_field_type(field: &Field) -> syn::Result<Option<Type>> {
 
 fn field_name(field: &Field, position: Option<usize>) -> syn::Result<String> {
     let options = parse_member_options(&field.attrs)?;
+    if let Some(rename) = options.rename {
+        return Ok(rename);
+    }
 
-    Ok(options
-        .rename
-        .unwrap_or_else(|| match (&field.ident, position) {
-            (Some(ident), _) => ident.to_string(),
-            (None, Some(index)) => index.to_string(),
-            (None, None) => unreachable!("tuple fields require an explicit position"),
-        }))
+    match (&field.ident, position) {
+        (Some(ident), _) => Ok(ident.to_string()),
+        (None, Some(index)) => Ok(index.to_string()),
+        (None, None) => Err(Error::new_spanned(
+            field,
+            "tuple fields require an explicit position",
+        )),
+    }
 }
 
 fn parse_provenance_container_options(

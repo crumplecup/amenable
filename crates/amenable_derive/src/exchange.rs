@@ -287,8 +287,11 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
     // rather than a bare `Evidence::ensures` call so the generated code
     // needs no `use amenable_core::Ensures;` in scope at the call site.
     let mut contracted_impl = item_impl.clone();
-    let ImplItem::Fn(contracted_method) = &mut contracted_impl.items[0] else {
-        unreachable!("validated above: exactly one ImplItem::Fn in item_impl.items");
+    let Some(ImplItem::Fn(contracted_method)) = contracted_impl.items.first_mut() else {
+        return Err(Error::new_spanned(
+            item_impl,
+            "exchange requires exactly one method in the impl block",
+        ));
     };
     contracted_method.attrs.push(syn::parse_quote! {
         #[cfg_attr(
