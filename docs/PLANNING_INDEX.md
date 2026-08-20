@@ -79,7 +79,7 @@ with field-level precision), converts the touched structs to owned
 `String` fields, and removes a `#[allow(dead_code)]` policy violation
 along the way.
 
-### Naming Raw Requires/Ensures Bounds (elicit_doc-driven)
+### Naming Raw Requires/Ensures Bounds (cordial-driven)
 
 **Document:** [CONTRACT_BOUND_NAMING_WORKFLOW.md](CONTRACT_BOUND_NAMING_WORKFLOW.md)
 
@@ -90,9 +90,11 @@ mechanism; `amenable_kani` and `amenable_verus` both actively in
 progress, each with many named clusters landed. Per this project's own
 convention (see the linked doc's own "Status" note), backlog counts are
 intentionally not tracked here or in the linked doc — they drift too
-fast to stay trustworthy. Re-run the `elicit_doc quality antipatterns`
-scan before picking up work; treat its live checklist as the only
-source of truth for what remains. A real, crate-wide compile-blocking
+fast to stay trustworthy. `elicit_doc` was renamed/rearchitected into
+`cordial` (`~/repos/cordial`, 2026-08-20) — re-run `cordial quality
+--project /home/erik/repos/amenable` before picking up work; treat its
+live checklist (`~/.cordial/amenable/findings/antipatterns.checklist.md`)
+as the only source of truth for what remains. A real, crate-wide compile-blocking
 bug from this sweep's own past work was found and fixed while
 unrelated `KaniCompose` work needed a real `cargo kani` build to
 verify against (`amenable_kani`'s "State Machine Derivation" entry,
@@ -107,7 +109,7 @@ just `cargo check`/`clippy`.
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
 callable predicate, not a raw expression restated per site.
-`elicit_doc`'s `ANTIPATTERN-UNNAMED-CONTRACT-BOUND-001` rule scans all
+`cordial`'s `ANTIPATTERN-UNNAMED-CONTRACT-BOUND-001` rule scans all
 three verifier backends for raw bounds and groups them into duplicate
 clusters by clause shape, ranked by size, so the highest-leverage
 (most-repeated) bound gets named first. A site is recognized as
@@ -115,7 +117,7 @@ compliant only when its clause is a real call to a registered contract's
 predicate, never by matching clause text against the registered
 fragment's text — the linked document covers why that mattered (a
 coincidental Verus text match was hiding real unnamed debt) alongside
-the contract-type design pattern, the elicit_doc tooling internals, a
+the contract-type design pattern, the cordial tooling internals, a
 step-by-step workflow, and every gotcha hit along the way (associated-
 type uniqueness, `#[cfg(kani)]` import gating, macro/attribute literal
 limitations, `#[logic(open)]` vs `#[logic(opaque)]` visibility rules,

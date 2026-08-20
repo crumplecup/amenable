@@ -85,7 +85,7 @@ until a second backend needs it.
 `amenable_core::ContractRecord` (`{ evidence, verifier, kind, fragment }`)
 is what makes a named bound *discoverable* outside the Rust binary that
 defines it — `amenable dump-registry` dumps every registered record to
-JSON, which `elicit_doc` reads to check real proof-site clauses against.
+JSON, which `cordial` reads to check real proof-site clauses against.
 
 A real proof site is recognized as using a registered contract **only
 when its clause is a real call to it** — never by comparing the clause's
@@ -129,11 +129,22 @@ matter how its text compares to anything. That's not a bug to route
 around; a fragment like that was never really naming a bound, it was
 only passing the old text-equality check by coincidence.
 
-## The elicit_doc tooling
+## The cordial tooling
+
+**`elicit_doc` was renamed and rearchitected into `cordial`
+(2026-08-20), now at `~/repos/cordial`** — a trait-based rewrite
+(loaders/enrichers/probes/assessors/reporters over a shared graph IR),
+not just a rename. The rule and reporting logic below still work the
+same way; only their location and the CLI invocation changed. See
+`reference_cordial_location` (memory) for the fuller account of what
+changed.
 
 ### The rule: `ANTIPATTERN-UNNAMED-CONTRACT-BOUND-001`
 
-Lives in `~/repos/elicit_doc/src/quality/antipatterns/contract_bounds.rs`.
+Lives in `~/repos/cordial/src/etiquettes/antipatterns/contract_bounds/`
+— split per verifier (`kani.rs`/`creusot.rs`/`verus.rs`), with the
+shared `ContractIndex`/`matches_named_call`/`is_trivial` machinery in
+`index.rs` (was one flat `contract_bounds.rs` file under `elicit_doc`).
 Scans `amenable_creusot`/`amenable_verus`/`amenable_kani` only (the only
 crates with a verifier-native raw-bound shape), skips any directory
 literally named `gallery/` (verifier experiments and documented dead
@@ -166,12 +177,13 @@ Per-verifier clause shapes it recognizes:
 
 A bare `true`/`false`/`result`/`result.N`/`result.N is None` clause is
 treated as trivial and never flagged — see `is_trivial`'s doc comment in
-`contract_bounds.rs` for the full reasoning per shape.
+`contract_bounds/index.rs` for the full reasoning per shape.
 
 ### The leverage tool: duplicate-cluster grouping
 
-`write_duplicate_clusters` (in `~/repos/elicit_doc/src/quality/antipatterns/report.rs`)
-groups `UnnamedContractBound001` findings by clause **shape** — every
+`write_duplicate_clusters` (in `~/repos/cordial/src/etiquettes/
+antipatterns/reporter.rs`) groups `UnnamedContractBound001` findings by
+clause **shape** — every
 non-call identifier and every literal blinded to a placeholder token
 (`X`), so `map.is_empty()` and `dq.is_empty()` both collapse to
 `X.is_empty()`. The checklist prints a `**Possible duplicate clusters**`
@@ -202,17 +214,20 @@ shape-clustering is a hint to investigate, not an automatic merge.
    ```bash
    cd /home/erik/repos/amenable
    cargo run -p amenable --features creusot,verus -- dump-registry --out /tmp/dump.json
-   cd /home/erik/repos/elicit_doc
-   ./target/release/elicit_doc quality antipatterns --project /home/erik/repos/amenable
+   cordial quality --project /home/erik/repos/amenable
    ```
 
-   (`elicit_doc quality antipatterns` re-runs `dump-registry` itself into
-   its own cache, so the first command above is really just for a quick
-   manual sanity check of `contract_records` count — the second command
-   is the one that actually regenerates the checklist.)
+   (`cordial quality` re-runs `dump-registry` itself into its own
+   cache, so the first command above is really just for a quick manual
+   sanity check of `contract_records` count — the second command is the
+   one that actually regenerates the checklist, alongside every other
+   quality etiquette in the same pass. `cordial` is installed and
+   runnable directly, no `cd`/`cargo run -p` needed the way `elicit_doc`
+   used to require — never `cd ~/repos/cordial && cargo run` from
+   another repo, see `reference_cordial_location`.)
 
 2. **Read the duplicate-cluster block** at the top of
-   `~/.elicit_doc/amenable/quality/antipatterns.checklist.md`'s
+   `~/.cordial/amenable/findings/antipatterns.checklist.md`'s
    `amenable_kani`/`amenable_creusot`/`amenable_verus` sections. Pick the
    top (largest) cluster — that's "pull from the top of the list" applied
    to leverage, not just file order.
@@ -454,5 +469,5 @@ To resume this work:
    count, note, or memory.
 
 This document intentionally keeps only the durable mechanism, workflow,
-and gotchas. Treat the current `elicit_doc` checklist as the source of
+and gotchas. Treat the current `cordial` checklist as the source of
 truth for live backlog and cluster counts.
