@@ -384,12 +384,14 @@ fn read_file(path: &Path) -> miette::Result<String> {
 fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::Result<()> {
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .expect("system time should be after the Unix epoch")
+        .map_err(|error| miette::miette!("system time should be after the Unix epoch: {error}"))?
         .as_nanos();
     let root = std::env::temp_dir().join(format!("amenable-verus-export-test-{stamp}"));
 
     if root.exists() {
-        fs::remove_dir_all(&root).expect("stale temp directory should be removable");
+        fs::remove_dir_all(&root).map_err(|error| {
+            miette::miette!("stale temp directory should be removable: {error}")
+        })?;
     }
 
     let report = support::library(amenable::write_verus_witness_modules(&root))

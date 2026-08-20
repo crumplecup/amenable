@@ -1,11 +1,14 @@
 use std::process::Command;
 
+use miette::{IntoDiagnostic, WrapErr};
+
 #[test]
-fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
+fn gallery_list_reports_registered_cases_with_disposition_and_expectation() -> miette::Result<()> {
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args(["gallery", "list"])
         .output()
-        .expect("gallery list CLI should start");
+        .into_diagnostic()
+        .wrap_err("gallery list CLI should start")?;
 
     assert!(
         output.status.success(),
@@ -13,7 +16,9 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let stdout = String::from_utf8(output.stdout).expect("gallery list should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("gallery list should be UTF-8")?;
     assert!(stdout.contains(
         "amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass [false_trail / passed]"
     ));
@@ -77,10 +82,11 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() {
     assert!(stdout.contains(
         "amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path [false_trail / timeout]"
     ));
+    Ok(())
 }
 
 #[test]
-fn gallery_run_rejects_unknown_case_before_spawning_kani() {
+fn gallery_run_rejects_unknown_case_before_spawning_kani() -> miette::Result<()> {
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "gallery",
@@ -89,10 +95,13 @@ fn gallery_run_rejects_unknown_case_before_spawning_kani() {
             "amenable_kani::gallery::missing",
         ])
         .output()
-        .expect("gallery run CLI should start");
+        .into_diagnostic()
+        .wrap_err("gallery run CLI should start")?;
 
     assert!(!output.status.success(), "unknown gallery case must fail");
-    let stderr = String::from_utf8(output.stderr).expect("gallery stderr should be UTF-8");
+    let stderr = String::from_utf8(output.stderr)
+        .into_diagnostic()
+        .wrap_err("gallery stderr should be UTF-8")?;
     // Asserted as separate substrings rather than one long string: miette
     // wraps its rendered diagnostic across lines, so a single combined
     // assertion would be brittle against wrap width.
@@ -108,4 +117,5 @@ fn gallery_run_rejects_unknown_case_before_spawning_kani() {
         stderr.contains("amenable_kani::gallery::missing"),
         "stderr: {stderr}"
     );
+    Ok(())
 }

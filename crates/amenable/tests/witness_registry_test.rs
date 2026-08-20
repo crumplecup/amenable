@@ -90,12 +90,12 @@ impl ClassifiedWitness<LocalVerifier> for LocalEvidence {}
 amenable_core::register_witness_exports!(verifier = LocalVerifier; LocalEvidence);
 
 #[test]
-fn witness_exports_include_concrete_local_registrations() {
+fn witness_exports_include_concrete_local_registrations() -> miette::Result<()> {
     let exports = witness_exports();
     let record = exports
         .iter()
         .find(|record| record.evidence == std::any::type_name::<LocalEvidence>())
-        .expect("local witness export should be registered");
+        .ok_or_else(|| miette::miette!("local witness export should be registered"))?;
 
     assert_eq!(record.verifier, "local-verifier");
     assert_eq!(
@@ -115,4 +115,5 @@ fn witness_exports_include_concrete_local_registrations() {
         record.artifact.metadata[0].value(),
         "verify_local_evidence_shape"
     );
+    Ok(())
 }
