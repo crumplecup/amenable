@@ -212,7 +212,7 @@ fn derive_witness_supports_tuple_structs_for_verus() {
 }
 
 #[test]
-fn explicit_verus_witness_exports_register_concrete_instantiations() {
+fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::Result<()> {
     let exports = inventory::iter::<WitnessExportRecord>()
         .filter(|record| (record.verifier)() == "verus")
         .map(|record| {
@@ -235,15 +235,17 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     let enum_export = exports
         .iter()
         .find(|(evidence, _, _, _)| evidence.contains("DerivedWitnessGenericEnum<"))
-        .expect("expected explicit export for the concrete generic enum");
+        .ok_or_else(|| miette::miette!("expected explicit export for the concrete generic enum"))?;
     let struct_export = exports
         .iter()
         .find(|(evidence, _, _, _)| evidence.contains("DerivedWitnessCheckedPlusTrivialStruct<"))
-        .expect("expected explicit export for the checked-plus-trivial struct");
+        .ok_or_else(|| {
+            miette::miette!("expected explicit export for the checked-plus-trivial struct")
+        })?;
     let tuple_export = exports
         .iter()
         .find(|(evidence, _, _, _)| evidence.contains("DerivedWitnessTupleStruct<"))
-        .expect("expected explicit export for the tuple struct");
+        .ok_or_else(|| miette::miette!("expected explicit export for the tuple struct"))?;
 
     assert_eq!(
         enum_export.1,
@@ -302,7 +304,7 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
     let enum_artifact = structured_exports
         .iter()
         .find(|record| record.evidence.contains("DerivedWitnessGenericEnum<"))
-        .expect("expected structured export for the concrete generic enum")
+        .ok_or_else(|| miette::miette!("expected structured export for the concrete generic enum"))?
         .artifact
         .clone();
     let struct_artifact = structured_exports
@@ -312,13 +314,15 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
                 .evidence
                 .contains("DerivedWitnessCheckedPlusTrivialStruct<")
         })
-        .expect("expected structured export for the checked-plus-trivial struct")
+        .ok_or_else(|| {
+            miette::miette!("expected structured export for the checked-plus-trivial struct")
+        })?
         .artifact
         .clone();
     let tuple_artifact = structured_exports
         .iter()
         .find(|record| record.evidence.contains("DerivedWitnessTupleStruct<"))
-        .expect("expected structured export for the tuple struct")
+        .ok_or_else(|| miette::miette!("expected structured export for the tuple struct"))?
         .artifact
         .clone();
 
@@ -330,7 +334,7 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         .variants
         .iter()
         .find(|variant| variant.name == "Balanced")
-        .expect("expected Balanced variant artifact");
+        .ok_or_else(|| miette::miette!("expected Balanced variant artifact"))?;
     assert_eq!(
         balanced_variant.artifact.shape,
         WitnessArtifactShape::NamedVariant
@@ -372,10 +376,11 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() {
         tuple_artifact.members[0].artifact.shape,
         WitnessArtifactShape::Leaf
     );
+    Ok(())
 }
 
 #[test]
-fn live_verus_canary_exports_include_tuple_struct_shape() {
+fn live_verus_canary_exports_include_tuple_struct_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -383,7 +388,7 @@ fn live_verus_canary_exports_include_tuple_struct_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_tuple_struct_witness"
         })
-        .expect("expected library Verus tuple-struct export canary");
+        .ok_or_else(|| miette::miette!("expected library Verus tuple-struct export canary"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::TupleStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
@@ -392,6 +397,7 @@ fn live_verus_canary_exports_include_tuple_struct_shape() {
     assert_eq!(export.artifact.members[0].label, "0");
     assert_eq!(export.artifact.members[1].label, "trusted");
     assert_eq!(export.artifact.members[2].label, "marker");
+    Ok(())
 }
 
 type CanaryEnum = VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExportLeaf>;
@@ -414,7 +420,7 @@ fn verus_export_canary_enum_variants_are_constructible() {
 }
 
 #[test]
-fn live_verus_canary_exports_include_canary_enum_shape() {
+fn live_verus_canary_exports_include_canary_enum_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -422,7 +428,7 @@ fn live_verus_canary_exports_include_canary_enum_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_canary_enum_witness"
         })
-        .expect("expected library Verus canary-enum export");
+        .ok_or_else(|| miette::miette!("expected library Verus canary-enum export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
@@ -443,6 +449,7 @@ fn live_verus_canary_exports_include_canary_enum_shape() {
         export.artifact.variants[2].artifact.shape,
         WitnessArtifactShape::UnitVariant
     );
+    Ok(())
 }
 
 #[test]
@@ -458,7 +465,7 @@ fn verus_export_multi_checked_enum_variants_are_constructible() {
 }
 
 #[test]
-fn live_verus_canary_exports_include_multi_checked_enum_shape() {
+fn live_verus_canary_exports_include_multi_checked_enum_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -466,7 +473,7 @@ fn live_verus_canary_exports_include_multi_checked_enum_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_multi_checked_enum_witness"
         })
-        .expect("expected library Verus multi-checked-enum export");
+        .ok_or_else(|| miette::miette!("expected library Verus multi-checked-enum export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
@@ -490,6 +497,7 @@ fn live_verus_canary_exports_include_multi_checked_enum_shape() {
         export.artifact.variants[1].artifact.shape,
         WitnessArtifactShape::UnitVariant
     );
+    Ok(())
 }
 
 #[test]
@@ -504,7 +512,7 @@ fn requires_verus_export_leaf_is_constructible_and_checked() {
 }
 
 #[test]
-fn live_verus_canary_exports_include_requires_struct_shape() {
+fn live_verus_canary_exports_include_requires_struct_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -512,10 +520,11 @@ fn live_verus_canary_exports_include_requires_struct_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_requires_struct_witness"
         })
-        .expect("expected library Verus requires-struct export");
+        .ok_or_else(|| miette::miette!("expected library Verus requires-struct export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    Ok(())
 }
 
 #[test]
@@ -530,7 +539,7 @@ fn raw_template_verus_export_leaf_is_constructible_and_checked() {
 }
 
 #[test]
-fn live_verus_canary_exports_include_raw_template_struct_shape() {
+fn live_verus_canary_exports_include_raw_template_struct_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -538,14 +547,15 @@ fn live_verus_canary_exports_include_raw_template_struct_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_raw_template_struct_witness"
         })
-        .expect("expected library Verus raw-template-struct export");
+        .ok_or_else(|| miette::miette!("expected library Verus raw-template-struct export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    Ok(())
 }
 
 #[test]
-fn live_verus_canary_exports_include_multi_checked_struct_shape() {
+fn live_verus_canary_exports_include_multi_checked_struct_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -553,17 +563,18 @@ fn live_verus_canary_exports_include_multi_checked_struct_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_multi_checked_struct_witness"
         })
-        .expect("expected library Verus multi-checked-struct export");
+        .ok_or_else(|| miette::miette!("expected library Verus multi-checked-struct export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
     assert_eq!(export.artifact.members.len(), 2);
     assert_eq!(export.artifact.members[0].label, "first");
     assert_eq!(export.artifact.members[1].label, "second");
+    Ok(())
 }
 
 #[test]
-fn live_verus_canary_exports_include_nested_struct_shape() {
+fn live_verus_canary_exports_include_nested_struct_shape() -> miette::Result<()> {
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -571,7 +582,7 @@ fn live_verus_canary_exports_include_nested_struct_shape() {
                 && record.destination_module
                     == "crate::derived_witness::verus_export_nested_struct_witness"
         })
-        .expect("expected library Verus nested-struct export");
+        .ok_or_else(|| miette::miette!("expected library Verus nested-struct export"))?;
 
     assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
     assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
@@ -587,4 +598,5 @@ fn live_verus_canary_exports_include_nested_struct_shape() {
         "checked"
     );
     assert_eq!(export.artifact.members[1].label, "trusted");
+    Ok(())
 }

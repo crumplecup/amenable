@@ -4793,9 +4793,9 @@ fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() 
 }
 
 #[test]
-fn verus_call_shape_is_registered_for_char_roundtrip() {
-    let shape =
-        verus_call_shape("verify_char_roundtrip").expect("expected a registered call shape");
+fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
+    let shape = verus_call_shape("verify_char_roundtrip")
+        .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
     assert_eq!(shape.module_path, "crate::rust_std::char_carrier");
     assert_eq!(shape.name, "verify_char_roundtrip");
@@ -4829,12 +4829,13 @@ fn verus_call_shape_is_registered_for_char_roundtrip() {
             returns: "char".to_owned()
         }
     );
+    Ok(())
 }
 
 #[test]
-fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() {
+fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::Result<()> {
     let shape = verus_call_shape("verify_ref_cell_model_dynamic_borrow_rules")
-        .expect("expected a registered call shape");
+        .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
     assert_eq!(shape.module_path, "crate::rust_std::ref_cell_carrier");
     assert_eq!(shape.params.len(), 2);
@@ -4859,6 +4860,7 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() {
             name: "observed_value_matches_input".to_owned(),
         }]
     );
+    Ok(())
 }
 
 #[test]
