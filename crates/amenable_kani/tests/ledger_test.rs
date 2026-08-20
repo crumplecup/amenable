@@ -3,7 +3,9 @@
 //! Kani harnesses. All three refusal reasons -- unlike every `Stoplight`
 //! edge, which can only ever succeed.
 
-use amenable_core::{ContractRecord, ExchangeEdgeRecord, Requires, Sidecar, StateMachine};
+use amenable_core::{
+    ContractRecord, ExchangeEdgeRecord, Requires, RootEntry, Sidecar, StateMachine,
+};
 use amenable_gaap::{
     AccountId, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
     RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError, TransferPayload,
@@ -226,6 +228,24 @@ fn ledger_transitions_reports_all_four_declared_edges_in_declaration_order() {
             ("Pending", "Rejected<Pending>"),
             ("Validated", "Rejected<Validated>"),
         ]
+    );
+}
+
+/// `Pending`'s root needs a real `TransferPayload` to enter, unlike
+/// `Stoplight::Green`'s zero-argument root -- `RootEntry::seed` reports
+/// the real type it needs instead of `Pending` being silently absent
+/// from the audit surface the way an earlier, zero-argument-only
+/// version of this mechanism would have left it (see `RootEntry::
+/// seed`'s own doc comment in `amenable_core::state_machine`).
+#[test]
+fn ledger_root_entries_reports_pending_and_its_real_seed_type() {
+    assert_eq!(
+        <Ledger as StateMachine<KaniVerifier>>::root_entries(),
+        &[RootEntry {
+            state: "Pending",
+            constructor: "Transfer::pending",
+            seed: "TransferPayload",
+        }]
     );
 }
 

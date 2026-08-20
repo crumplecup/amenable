@@ -6,18 +6,22 @@
 on all three backends. Step 4 landed in two parts (Creusot, then Verus
 — see Step 4's own account below); Step 5 landed out of order, ahead of
 Step 4, by direct instruction, once Step 3 surfaced the real gap it
-fixes. Two real, deliberate follow-ons, neither part of this plan's
-original numbered scope, both done now: root-entry support (`RootEntry`/
-`root_entries()`/`state(name, carrier, root)`), a real gap found by a
-downstream consumer dogfooding the design; and `KaniCompose` routing
-for `Ledger`'s data-bearing carriers (flagged in Step 5's own account)
-— which turned out not to fit the derive at all (a real neutral-crate
-constraint, not foreseeable from the design discussion), landed as
-hand-written `KaniCompose` impls plus rewired existing harnesses
-instead, and surfaced a real, separate, crate-wide Kani/Verus call-
-site ambiguity blocking every `cargo kani --all-features` build, fixed
-first as a precondition. See both follow-ons' own accounts below, after
-the numbered steps. Step 0: `amenable_core::State<V>`
+fixes. Three real, deliberate follow-ons, none part of this plan's
+original numbered scope, all done now, in landing order: root-entry
+support (`RootEntry`/`root_entries()`/`state(name, carrier, root)`), a
+real gap found by a downstream consumer dogfooding the design;
+`KaniCompose` routing for `Ledger`'s data-bearing carriers (flagged in
+Step 5's own account) — which turned out not to fit the derive at all
+(a real neutral-crate constraint, not foreseeable from the design
+discussion), landed as hand-written `KaniCompose` impls plus rewired
+existing harnesses instead, and surfaced a real, separate, crate-wide
+Kani/Verus call-site ambiguity blocking every `cargo kani
+--all-features` build, fixed first as a precondition; and `Seed`,
+extending root entries to constructors that need real input data
+(`Ledger`'s `Pending`), raised by the same downstream consumer's
+follow-up feedback on the first follow-on. See all three follow-ons'
+own accounts below, after the numbered steps. Step 0:
+`amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -757,12 +761,12 @@ Fixed with the narrowest of the three options the report proposed:
   `root_entries_reports_green_as_the_only_declared_root` test in
   `stoplight_amenable_test.rs` asserts the exact declared entry.
 
-Deliberately out of scope: `Ledger`'s `Pending` state. Its real
-constructor, `Transfer::pending(payload: TransferPayload) -> Self`,
-takes a real argument — it isn't a zero-argument root the way `Green`'s
-is, and doesn't fit this mechanism. Left as a separate, not-yet-solved
-problem (see `RootEntry`'s and `root_entries()`'s own doc comments in
-`amenable_core::state_machine`), not force-fit into this fix.
+At the time this landed, `Ledger`'s `Pending` state was deliberately
+left out: its real constructor, `Transfer::pending(payload:
+TransferPayload) -> Self`, takes a real argument — not a zero-argument
+root the way `Green`'s is, and didn't fit this mechanism yet. Closed by
+the `Seed` follow-on, below (after `KaniCompose` routing, landed in
+between chronologically) — not force-fit into this one.
 
 ## Follow-on: `KaniCompose` routing for `Ledger`'s data-bearing carriers
 
@@ -870,6 +874,63 @@ harnesses individually, each a real `cargo kani` run, all clean
 `verify_gaap_reject_always_succeeds`/`verify_gaap_rollback_always_
 succeeds`: `0 of 287 failed` each); full workspace `check`/`clippy -D
 warnings`/`fmt`/`test` clean throughout.
+
+## Follow-on: `Seed` — root constructors that need real input data
+
+Homecoming's own follow-up feedback on the root-entries fix above
+confirmed it worked for zero-argument roots, and named the honest
+remaining gap directly: `Ledger` still declares no root constructor
+for `Pending`, matching `RootEntry`'s own docs that root entries are
+only for zero-argument constructors — "this fully fixes stoplight-class
+machines, but not generic 'root with payload' cases." Raised by direct
+suggestion: an associated type, `Seed`, `()` for stateless roots but a
+real type for constructors that need real arguments.
+
+**A literal Rust associated type can't live on `RootEntry` itself.**
+`root_entries()` returns `&'static [RootEntry]`, a homogeneous runtime
+array read by `amenable dump-registry` (what homecoming actually
+consumes) — the same reason `constructor` is already a stringified
+path rather than a real callable, a real associated type can't appear
+in a homogeneous slice where different roots may need different `Seed`
+types. `Seed` shows up in two places instead, matching that existing
+`constructor` precedent exactly:
+
+- **At the compile-time check, as a real type.** `state(name, carrier,
+  root, seed)` gained an optional fourth positional argument, parsed as
+  a real `syn::Type`. The generated assertion widens from `const _:
+  fn() -> #carrier = #root;` to `const _: fn(#seed) -> #carrier =
+  #root;` when a seed is declared — real, compiler-checked against the
+  named constructor's actual signature, the identical flat, no-closure
+  mechanism every other check in this plan uses. Confirmed non-vacuous
+  by pointing `Ledger`'s new `Pending` seed at the wrong real type
+  (`TransferError` instead of `TransferPayload`) and observing a
+  precise `E0308` ("expected fn pointer `fn(TransferError) ->
+  Transfer<_, _>`, found fn item `fn(TransferPayload) -> Transfer<_,
+  _>`") at the declaration site, then reverting.
+- **At the audit surface, as a stringified field.** `RootEntry` gained
+  `seed: &'static str` — `"()"` for a zero-argument root (every
+  existing 3-arg `state(name, carrier, root)` declaration, including
+  `Stoplight::Green`, keeps compiling unchanged, implicitly `seed =
+  "()"`), otherwise the real seed type's own literal text (kept
+  paired with its parsed `syn::Type` the same way `constructor`
+  already pairs a parsed `syn::Path` with its own literal text, to
+  avoid `quote!`'s token-spacing normalization).
+
+Backward-compatible by construction — no existing `state(..)`
+declaration or `RootEntry` read site needed to change shape, only grow
+one field. Applied to exactly the site homecoming named: `Ledger`'s
+`Pending`, `state("Pending", "Transfer<Pending, PendingToken>",
+"Transfer::pending", "TransferPayload")`. Re-verified end-to-end: full
+workspace `check`/`clippy -D warnings`/`fmt`/`test` clean; two real
+`cargo kani` re-runs (the untouched `stoplight::verify_green_
+transitions_only_to_yellow`, confirming the crate-wide ambiguity fix
+above still holds, and `gaap_ledger::verify_gaap_reject_always_
+succeeds`, which itself calls `Transfer::pending` through
+`KaniCompose`) both still verify clean; `root_entries_reports_green_
+as_the_only_declared_root` updated for the new field, plus a new
+`ledger_root_entries_reports_pending_and_its_real_seed_type` test
+asserting `Ledger`'s exact declared entry (`Pending`, `Transfer::
+pending`, `TransferPayload`).
 
 ## Open, non-blocking implementation questions
 

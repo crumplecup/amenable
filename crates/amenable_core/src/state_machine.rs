@@ -51,9 +51,10 @@ pub struct TransitionAudit {
     pub body: &'static str,
 }
 
-/// A declared state's real, lawful, zero-argument root constructor —
-/// the answer to "can this state be entered without a prior credential
-/// at all, and if so, how do I call the real function that does it."
+/// A declared state's real, lawful root constructor — the answer to
+/// "can this state be entered without a prior credential at all, and
+/// if so, how do I call the real function that does it, and what (if
+/// anything) does it need me to supply."
 ///
 /// Exists because a state can be *both* root-enterable and the target
 /// of a real transition (`amenable_kani::stoplight::Green`: asserted at
@@ -67,16 +68,35 @@ pub struct TransitionAudit {
 /// the real function that constructs it lawfully with no prior state at
 /// all." `constructor` closes that gap directly: a real path, checked
 /// at compile time (by the same static-assertion mechanism the derive
-/// already uses for edges) to actually be a callable `fn() -> Carrier`
-/// for the declared state's own carrier type, not a hand-typed string
-/// that could drift or silently stop compiling.
+/// already uses for edges) to actually be a callable function returning
+/// the declared state's own carrier type, not a hand-typed string that
+/// could drift or silently stop compiling.
+///
+/// **`seed` distinguishes a freely-callable root from one that needs
+/// real external data**, closing the gap a first version of this type
+/// left honestly undeclared rather than force-fit: a root whose real
+/// constructor takes an argument (`amenable_gaap::Transfer::pending`,
+/// needing a real `TransferPayload`) is just as real and lawful as a
+/// zero-argument one (`Established::root()`), but was previously
+/// omitted from `root_entries()` entirely rather than misrepresented as
+/// freely callable. `seed` is `"()"` for a zero-argument root (checked
+/// at compile time as `fn() -> Carrier`); otherwise it names the real
+/// argument type the compile-time check instead requires the real
+/// constructor to accept (`fn(Seed) -> Carrier`) — a single type, the
+/// same way a constructor genuinely needing more than one real value
+/// bundles them into one real struct elsewhere in this codebase
+/// (`TransferPayload` itself bundling `from`/`to`/`amount`) rather than
+/// this mechanism supporting several raw arguments directly.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RootEntry {
     /// The state's declared name.
     pub state: &'static str,
-    /// The real, compiler-checked path to a zero-argument function
-    /// returning that state's own declared carrier type.
+    /// The real, compiler-checked path to the function returning that
+    /// state's own declared carrier type.
     pub constructor: &'static str,
+    /// `"()"` for a root callable with no arguments; otherwise the
+    /// real type `constructor` requires as its one real argument.
+    pub seed: &'static str,
 }
 
 /// A closed, proof-bearing state machine. Every method here is backed by
@@ -101,13 +121,13 @@ pub trait StateMachine<V: Verifier> {
     fn audit_surface() -> Vec<TransitionAudit>;
 
     /// Every declared state that can be entered lawfully with no prior
-    /// credential at all, and the real function that does it. Honestly
-    /// empty for a state machine with no zero-argument root constructor
-    /// worth declaring this way — a root needing real external data
-    /// (e.g. `amenable_gaap::Ledger`'s `Pending`, whose own constructor
-    /// takes a real payload) isn't force-fit into this mechanism; see
-    /// `docs/STATE_MACHINE_DERIVATION_PLAN.md` for why that's a
-    /// deliberately separate, not-yet-solved problem.
+    /// state, the real function that does it, and (via each entry's own
+    /// `seed`) whether that function needs real external data to call.
+    /// Honestly empty for a state machine with no declared root worth
+    /// this way at all, not for one whose only root needs an argument —
+    /// see `RootEntry::seed`'s own doc comment for why a data-needing
+    /// root (`amenable_gaap::Ledger`'s `Pending`) is a real entry here
+    /// too, not a gap.
     fn root_entries() -> &'static [RootEntry] {
         &[]
     }

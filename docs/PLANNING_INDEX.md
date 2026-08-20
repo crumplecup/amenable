@@ -1257,6 +1257,35 @@ check/clippy -D warnings/fmt/test clean throughout. See `docs/
 STATE_MACHINE_DERIVATION_PLAN.md`'s own "Follow-on: `KaniCompose`
 routing" section for the full account.
 
+**A third follow-on landed after that, prompted directly by homecoming's
+own follow-up feedback** on the root-entries fix: it confirmed
+`root_entries()` correctly handles zero-argument roots, and named the
+honest remaining gap directly — `Ledger` still declares no root for
+`Pending`, a "root with payload" case root entries explicitly didn't
+cover. Raised by direct suggestion: an associated type, `Seed`, `()`
+for stateless roots but a real type otherwise. A literal Rust
+associated type can't live on `RootEntry` itself (`root_entries()`
+returns a homogeneous `&'static [RootEntry]`, the same reason
+`constructor` is already a stringified path, not a real callable), so
+`Seed` shows up in two places instead: a real type at the compile-time
+check (`state(name, carrier, root, seed)` gained an optional fourth
+positional argument; the generated assertion widens from `fn() ->
+Carrier` to `fn(Seed) -> Carrier` when declared, confirmed non-vacuous
+by pointing `Ledger`'s new `Pending` seed at the wrong real type
+(`TransferError` instead of `TransferPayload`) and observing a precise
+`E0308`, then reverting), and a stringified `seed: &'static str` field
+on `RootEntry` for the audit surface (`"()"` for every existing
+zero-argument declaration, unchanged and non-breaking). Applied to
+exactly the site homecoming named: `Ledger`'s `Pending`, now declaring
+`Transfer::pending`/`TransferPayload`. Verified for real: full
+workspace check/clippy -D warnings/fmt/test clean; two real `cargo
+kani` re-runs (the untouched `stoplight` harness, confirming the
+crate-wide ambiguity fix above still holds, and a `gaap_ledger` harness
+that itself calls `Transfer::pending`) both still verify clean; a new
+test asserts `Ledger`'s exact declared root entry. See `docs/
+STATE_MACHINE_DERIVATION_PLAN.md`'s own "Follow-on: `Seed`" section
+for the full account.
+
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own
 hand-written impl already self-documents as a disconnected proxy

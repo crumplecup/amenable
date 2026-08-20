@@ -128,15 +128,23 @@ use syn::{Attribute, DeriveInput, Error, LitStr, Type};
 struct StateDecl {
     name: LitStr,
     carrier: Type,
-    // The parsed path (for the compile-time root-constructor check) and
-    // its original literal text (for `root_entries()`'s `constructor`
-    // string) -- kept as a pair rather than re-stringifying the parsed
-    // `syn::Path` via `quote!`, which normalizes token spacing (e.g.
-    // `Established::<Green, GreenToken>::root` becomes `Established ::
-    // < Green, GreenToken > :: root`) and would hand a downstream reader
-    // a technically-equivalent but uglier string than the one actually
-    // written in the `#[state_machine(..)]` declaration.
-    root: Option<(syn::Path, LitStr)>,
+    root: Option<RootDecl>,
+}
+
+/// A declared root constructor: the real, compile-time-checked path
+/// (for the `const _: fn(..) -> Carrier = #path;` assertion), its
+/// original literal text (for `root_entries()`'s `constructor` string
+/// -- kept alongside the parsed `syn::Path` rather than re-stringifying
+/// it via `quote!`, which normalizes token spacing, e.g. `Established::
+/// <Green, GreenToken>::root` becomes `Established :: < Green,
+/// GreenToken > :: root`, a technically-equivalent but uglier string
+/// than the one actually written in the declaration), and an optional
+/// seed: the real argument type a data-needing root's constructor
+/// requires, parsed and stringified the same paired way.
+struct RootDecl {
+    path: syn::Path,
+    path_lit: LitStr,
+    seed: Option<(Type, LitStr)>,
 }
 
 struct EdgeDecl {
@@ -216,25 +224,32 @@ fn expand_block_assertions(
     block: &StateMachineBlock,
 ) -> syn::Result<TokenStream> {
     // One flat `const` per declared root, not a shared generic checker
-    // -- each root's own carrier type is already fixed by its own
-    // declaration, so there's no genericity to share across states the
-    // way the edge checker shares `In`/`Out`/`T`. Independent of
-    // verifier mode: a root constructor's own signature (`fn() ->
-    // Carrier`) has nothing to do with `V` at all, unlike an edge's
-    // `Exchange` bound. Same flat, no-closure shape regardless: a bare
-    // item reference to a real path, checked by the compiler assigning
-    // it to a precisely-typed `fn() -> Carrier` const -- if the named
-    // path doesn't exist, isn't callable with zero arguments, or
-    // doesn't return exactly the declared carrier, this fails to
-    // compile with a real, precise error, not a silent gap.
+    // -- each root's own carrier (and seed, if any) type is already
+    // fixed by its own declaration, so there's no genericity to share
+    // across states the way the edge checker shares `In`/`Out`/`T`.
+    // Independent of verifier mode: a root constructor's own signature
+    // has nothing to do with `V` at all, unlike an edge's `Exchange`
+    // bound. Same flat, no-closure shape regardless: a bare item
+    // reference to a real path, checked by the compiler assigning it to
+    // a precisely-typed `fn(..) -> Carrier` const -- if the named path
+    // doesn't exist, doesn't accept exactly the declared seed (or any
+    // argument at all, for a zero-argument root), or doesn't return
+    // exactly the declared carrier, this fails to compile with a real,
+    // precise error, not a silent gap.
     let root_checks: TokenStream = block
         .states
         .iter()
         .filter_map(|state| {
-            let (root, _) = state.root.as_ref()?;
+            let root_decl = state.root.as_ref()?;
+            let path = &root_decl.path;
             let carrier = &state.carrier;
-            Some(quote! {
-                const _: fn() -> #carrier = #root;
+            Some(match &root_decl.seed {
+                Some((seed_ty, _)) => quote! {
+                    const _: fn(#seed_ty) -> #carrier = #path;
+                },
+                None => quote! {
+                    const _: fn() -> #carrier = #path;
+                },
             })
         })
         .collect();
@@ -374,11 +389,17 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
     } else {
         let entries = root_entries_states.iter().map(|state| {
             let name = &state.name;
-            let (_, root_str) = state.root.as_ref().expect("filtered by is_some above");
+            let root_decl = state.root.as_ref().expect("filtered by is_some above");
+            let root_str = &root_decl.path_lit;
+            let seed_str = match &root_decl.seed {
+                Some((_, seed_lit)) => quote! { #seed_lit },
+                None => quote! { "()" },
+            };
             quote! {
                 ::amenable_core::RootEntry {
                     state: #name,
                     constructor: #root_str,
+                    seed: #seed_str,
                 }
             }
         });
@@ -492,16 +513,35 @@ fn parse_state_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<StateDecl>
     content.parse::<syn::Token![,]>()?;
     let carrier_lit: LitStr = content.parse()?;
 
-    // Optional third positional arg: the real path to a zero-argument
-    // root constructor for this state (`Established::<Green,
-    // GreenToken>::root`, not a call -- the derive checks and invokes
-    // it, the caller never types `()`). Absent for every state with no
-    // lawful zero-argument root worth declaring this way.
+    // Optional third positional arg: the real path to this state's root
+    // constructor (`Established::<Green, GreenToken>::root`, not a call
+    // -- the derive checks and invokes it, the caller never types the
+    // call itself). Absent for every state with no lawful root worth
+    // declaring this way.
     let root = if content.peek(syn::Token![,]) {
         content.parse::<syn::Token![,]>()?;
         let root_lit: LitStr = content.parse()?;
         let root_path: syn::Path = root_lit.parse()?;
-        Some((root_path, root_lit))
+
+        // Optional fourth positional arg: the real seed type a data-
+        // needing root's constructor requires as its one real argument
+        // (`Transfer::pending`'s own `TransferPayload`). Absent for a
+        // zero-argument root -- `RootEntry::seed` reports `"()"` in
+        // that case instead, see its own doc comment.
+        let seed = if content.peek(syn::Token![,]) {
+            content.parse::<syn::Token![,]>()?;
+            let seed_lit: LitStr = content.parse()?;
+            let seed_ty: Type = seed_lit.parse()?;
+            Some((seed_ty, seed_lit))
+        } else {
+            None
+        };
+
+        Some(RootDecl {
+            path: root_path,
+            path_lit: root_lit,
+            seed,
+        })
     } else {
         None
     };

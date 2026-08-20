@@ -112,11 +112,27 @@ pub enum TransferError {
 /// `for<V: Verifier>`-checked static assertion instead of a
 /// per-instantiation one, and a single blanket `impl<V: Verifier>
 /// StateMachine<V> for Ledger`.
+///
+/// `Pending`'s fourth and fifth `state(..)` arguments name its real
+/// root constructor and the real seed type it needs: unlike
+/// `Stoplight`'s `Green` (`Established::<Green, GreenToken>::root()`,
+/// zero arguments), `Transfer::pending` takes a real `TransferPayload`
+/// -- a downstream consumer reading `root_entries()` sees `Pending` is
+/// root-enterable *and* exactly what it needs to supply to enter it,
+/// rather than `Pending` being silently absent from the audit surface
+/// the way an earlier, zero-argument-only version of this mechanism
+/// left it (`RootEntry::seed`'s own doc comment in `amenable_core::
+/// state_machine` has the full account).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, amenable_derive::StateMachine)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[state_machine(
     generic_over_verifier,
-    state("Pending", "Transfer<Pending, PendingToken>"),
+    state(
+        "Pending",
+        "Transfer<Pending, PendingToken>",
+        "Transfer::pending",
+        "TransferPayload"
+    ),
     state("Validated", "Transfer<Validated, ValidatedToken>"),
     state("Committed", "Transfer<Committed, CommittedToken>"),
     state(

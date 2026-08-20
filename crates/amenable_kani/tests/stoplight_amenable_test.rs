@@ -77,6 +77,7 @@ fn root_entries_reports_green_as_the_only_declared_root() {
         &[RootEntry {
             state: "Green",
             constructor: "Established::<Green, GreenToken>::root",
+            seed: "()",
         }]
     );
 }
