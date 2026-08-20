@@ -20,7 +20,7 @@ fn recursive_directory_creation_adds_each_missing_ancestor() {
 }
 
 #[test]
-fn directory_entries_report_their_name_and_full_path() {
+fn directory_entries_report_their_name_and_full_path() -> miette::Result<()> {
     let mut filesystem = KaniFileSystem::new();
     let base = KaniFsPath::root().join(KaniFsLabel::new('b'));
     let path = base.join(KaniFsLabel::new('f'));
@@ -32,10 +32,11 @@ fn directory_entries_report_their_name_and_full_path() {
         .entries(&base)
         .into_iter()
         .find(|entry| entry.file_name() == Some(KaniFsLabel::new('f')))
-        .expect("modeled directory entry should exist");
+        .ok_or_else(|| miette::miette!("modeled directory entry should exist"))?;
 
     assert_eq!(entry.file_name(), Some(KaniFsLabel::new('f')));
     assert_eq!(entry.path(), path);
+    Ok(())
 }
 
 #[test]
