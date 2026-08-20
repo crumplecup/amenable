@@ -244,12 +244,18 @@ impl KaniFmt {
 
     /// Model `DebugList` for the two-entry shape used in this proof queue.
     pub fn debug_list_two_entries(first: &KaniFormatAtom, second: &KaniFormatAtom) -> KaniRendered {
-        Self::render_two_debug_entries(KaniRenderedKind::DebugListTwoEntries, first, second)
+        KaniRendered::DebugListTwoEntries {
+            first_debug_token: first.debug_token(),
+            second_debug_token: second.debug_token(),
+        }
     }
 
     /// Model `DebugSet` for the two-entry shape used in this proof queue.
     pub fn debug_set_two_entries(first: &KaniFormatAtom, second: &KaniFormatAtom) -> KaniRendered {
-        Self::render_two_debug_entries(KaniRenderedKind::DebugSetTwoEntries, first, second)
+        KaniRendered::DebugSetTwoEntries {
+            first_debug_token: first.debug_token(),
+            second_debug_token: second.debug_token(),
+        }
     }
 
     /// Model `DebugMap` for the one-entry shape used in this proof queue.
@@ -260,24 +266,6 @@ impl KaniFmt {
         KaniRendered::DebugMapOneEntry {
             key_debug_label,
             value_debug_token: value.debug_token(),
-        }
-    }
-
-    fn render_two_debug_entries(
-        open: KaniRenderedKind,
-        first: &KaniFormatAtom,
-        second: &KaniFormatAtom,
-    ) -> KaniRendered {
-        match open {
-            KaniRenderedKind::DebugListTwoEntries => KaniRendered::DebugListTwoEntries {
-                first_debug_token: first.debug_token(),
-                second_debug_token: second.debug_token(),
-            },
-            KaniRenderedKind::DebugSetTwoEntries => KaniRendered::DebugSetTwoEntries {
-                first_debug_token: first.debug_token(),
-                second_debug_token: second.debug_token(),
-            },
-            _ => unreachable!("two-entry helper is only defined for list/set"),
         }
     }
 }
