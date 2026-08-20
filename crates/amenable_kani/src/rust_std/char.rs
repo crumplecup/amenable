@@ -66,7 +66,8 @@ amenable_derive::harness! {
         fn verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range() {
             let value: u32 = kani::any();
             let result = char::try_from(value);
-            let is_valid_scalar = ValidUnicodeScalar::ensures(value);
+            let is_valid_scalar =
+                <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures(value);
             if is_valid_scalar {
                 let parsed = result.expect("a valid Unicode scalar value must convert");
                 assert_eq!(

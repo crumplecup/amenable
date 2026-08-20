@@ -6,12 +6,18 @@
 on all three backends. Step 4 landed in two parts (Creusot, then Verus
 — see Step 4's own account below); Step 5 landed out of order, ahead of
 Step 4, by direct instruction, once Step 3 surfaced the real gap it
-fixes. `KaniCompose` routing for data-bearing carriers (flagged in Step
-5's own account) is a real, deliberate follow-on, not part of this
-plan's original numbered scope. So is root-entry support (`RootEntry`/
+fixes. Two real, deliberate follow-ons, neither part of this plan's
+original numbered scope, both done now: root-entry support (`RootEntry`/
 `root_entries()`/`state(name, carrier, root)`), a real gap found by a
-downstream consumer dogfooding the design — see its own account below,
-after the numbered steps. Step 0: `amenable_core::State<V>`
+downstream consumer dogfooding the design; and `KaniCompose` routing
+for `Ledger`'s data-bearing carriers (flagged in Step 5's own account)
+— which turned out not to fit the derive at all (a real neutral-crate
+constraint, not foreseeable from the design discussion), landed as
+hand-written `KaniCompose` impls plus rewired existing harnesses
+instead, and surfaced a real, separate, crate-wide Kani/Verus call-
+site ambiguity blocking every `cargo kani --all-features` build, fixed
+first as a precondition. See both follow-ons' own accounts below, after
+the numbered steps. Step 0: `amenable_core::State<V>`
 landed exactly as designed — the object-safe facade, blanket-implemented
 over `Evidence + Witness<V>`, confirmed via a compile-only test covering
 every real state type across both worked examples (`Stoplight`,
@@ -757,6 +763,113 @@ takes a real argument — it isn't a zero-argument root the way `Green`'s
 is, and doesn't fit this mechanism. Left as a separate, not-yet-solved
 problem (see `RootEntry`'s and `root_entries()`'s own doc comments in
 `amenable_core::state_machine`), not force-fit into this fix.
+
+## Follow-on: `KaniCompose` routing for `Ledger`'s data-bearing carriers
+
+The other real, explicitly-flagged-but-deferred gap this plan's own
+"Reusing `KaniCompose` for non-trivial carriers" design section named
+(`Stoplight`'s zero-field markers never exercised it) and Step 5's own
+account called out directly: "not yet exercised by any auto-generated
+harness (no such generation exists yet; today's Kani contracts on
+`Ledger`'s methods are still hand-authored)."
+
+**Auto-generating the harness itself turned out not to fit the
+derive at all.** `Ledger` is declared `#[state_machine(
+generic_over_verifier, ..)]` (`VerifierMode::Generic`) specifically so
+`amenable_gaap` stays neutral -- no dependency on any backend crate.
+A `#[kani::proof_for_contract(..)]` harness has to name `KaniVerifier`
+concretely, and `KaniVerifier` lives in `amenable_kani`; the derive,
+expanding once on `Ledger` inside `amenable_gaap`, structurally cannot
+emit that harness without forcing the exact neutral-crate violation
+this project has already caught and reverted twice. `Stoplight` never
+surfaced this because it's `Concrete(verifier)` mode with zero-field
+edges that never needed `KaniCompose` in the first place -- the plan's
+original design sketch was never actually tested against the one case
+that needs it. Scoped down, after discussion, to three narrower,
+buildable layers instead of full harness auto-generation:
+
+- **Layer 1 -- real `KaniCompose` coverage for `Ledger`'s domain
+  types.** `#[derive(KaniCompose)]` can't be applied to the struct
+  definitions themselves (`AccountId`/`Amount`/`TransferPayload` live
+  in the neutral `amenable_gaap`; deriving there would force it to
+  depend on `amenable_kani`, where `KaniCompose` lives -- the same
+  violation as above, one level down). Fixed the same way `Ensures<
+  KaniVerifier>`/`Witness<KaniVerifier>` for these same types already
+  is: hand-written `impl KaniCompose for X` blocks living in
+  `amenable_kani::ledger`, field-by-field, the same shape the derive
+  would generate if it could cross the crate boundary. `uuid::Uuid`
+  (foreign type, zero prior coverage) landed in `amenable_kani::
+  compose` instead, alongside the other primitive/foreign-type impls,
+  since it's general-purpose, not `Ledger`-specific.
+- **Layer 1b -- `Transfer<S, Token>` needed hand-written construction,
+  not mechanical derivation, and always will.** A lawful `Transfer`
+  needs a real minted token, not fields conjured structurally --
+  exactly the `Established::assert()`-style bypass this plan's own
+  Motivation section already rejected as prior art. `Transfer<Pending,
+  PendingToken>::kani_*()` calls the real root constructor
+  (`Transfer::pending`); `Transfer<Validated, ValidatedToken>::
+  kani_*()` routes through the real `Sidecar`/`Establish::establish`
+  chain (`#[cfg(kani)]`-only, since it uses `Transfer::diagnostic_new`,
+  which itself only exists under `cfg(kani)`) -- no auto-generation
+  could have skipped this even if the neutral-crate problem above
+  didn't exist.
+- **Layer 2 -- rewire the existing hand-authored harnesses
+  (`amenable_kani::gaap_ledger`)** to call these `KaniCompose` methods
+  instead of `kani::any()` plus two fixed literal accounts ("Alice"/
+  "Bob", `uuid::Uuid::from_u128(1)`/`(2)`) that never varied. Each
+  harness keeps exactly the property it's named for: `validate`'s
+  "accepts a lawful transfer" harness still assumes distinct accounts
+  (now via `kani::assume(from.id() != to.id())` on two independently
+  symbolic `AccountId`s, not by construction); its "rejects the same
+  account" sibling still forces the *same* account (one symbolic
+  `AccountId`, cloned into both `from`/`to`) rather than losing that
+  distinction now that identity is genuinely variable. `reject`/
+  `rollback`, which have no precondition on their input at all,
+  collapsed to a single `Transfer::<S, Token>::kani_any()` call each.
+
+**A real, second CBMC-cost finding, root-caused the same way this
+whole worked example's Step 1 was.** The first `KaniCompose`-routed
+`validate` harness timed out. Isolated by testing exactly one
+hypothesis at a time on the real harness (no scratch probes, no
+`--unwind`): swapping `AccountId::kani_any()` for `AccountId::
+kani_depth0()` (empty `name`, `id: Uuid` still fully symbolic) took it
+from a timeout to `0 of 507 failed` in ~97s, confirming the cost was
+`name: String`'s heap-backed, bounded-loop construction itself -- not
+comparison this time (`AccountId`'s own `PartialEq` never touches
+`name` at all, so this is a distinct finding from the `Uuid`-over-
+`String`-identity lesson `amenable_kani::gallery::
+ledger_account_id_comparison` already recorded). Since `name` has zero
+causal effect on any claim this worked example checks, pinning it to a
+constant empty string at every `KaniCompose` depth (only `id`'s own
+depth still governs real identity variation) is exactly as strong a
+proof as a varying one, not a weakened one -- fixed once, in
+`AccountId`'s own `KaniCompose` impl, rather than by hand-tuning each
+call site.
+
+**A second, unrelated, and much larger blocker surfaced getting a real
+`cargo kani` run at all**: every `cargo kani -p amenable_kani
+--all-features` build was already broken, crate-wide, before any of
+this work started -- see `CONTRACT_BOUND_NAMING_WORKFLOW.md`'s own new
+Gotchas entry for the full account (a bare `Type::requires(..)`/
+`Type::ensures(..)` call becomes ambiguous the moment a second
+verifier registers a competing impl for the same type, ~28 sites
+across ~10 files, present since 2026-08-11, never caught because the
+routine `check-all-package` sweep never runs `cargo kani` at all).
+Fixed first, as a precondition to verifying anything else: every
+ambiguous call qualified with `<Type as Requires<crate::KaniVerifier>>
+::requires(..)` (or `Ensures`), no registration content changed.
+
+Verified for real, in this order: the workspace-wide ambiguity fix
+confirmed via a clean `cargo kani --all-features -Z function-contracts`
+run of the (untouched) `stoplight::verify_green_transitions_only_to_
+yellow` harness (`0 of 38 failed`); then all five rewired `gaap_ledger`
+harnesses individually, each a real `cargo kani` run, all clean
+(`verify_gaap_validate_accepts_a_lawful_transfer`: `0 of 507 failed`;
+`verify_gaap_validate_rejects_the_same_account`: `0 of 501 failed`;
+`verify_gaap_commit_always_balances`: `0 of 297 failed`;
+`verify_gaap_reject_always_succeeds`/`verify_gaap_rollback_always_
+succeeds`: `0 of 287 failed` each); full workspace `check`/`clippy -D
+warnings`/`fmt`/`test` clean throughout.
 
 ## Open, non-blocking implementation questions
 

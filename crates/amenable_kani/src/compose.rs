@@ -170,6 +170,32 @@ impl KaniCompose for String {
     }
 }
 
+/// A foreign type (the `uuid` crate), so this impl can't live anywhere
+/// but here -- neither `KaniCompose` nor `Uuid` is local to any other
+/// crate. `Uuid` has no recursive structure the way `String`/`Vec<T>`
+/// do (it's a flat 128-bit value, not built up from smaller expandable
+/// pieces), so unlike those two, every depth is equally, fully
+/// symbolic -- matching the primitive scalars above (`impl_kani_compose_
+/// symbolic!`), just written out by hand since `Uuid::from_u128` needs
+/// calling.
+impl KaniCompose for uuid::Uuid {
+    fn kani_depth0() -> Self {
+        Self::from_u128(symbolic_any())
+    }
+
+    fn kani_depth1() -> Self {
+        Self::from_u128(symbolic_any())
+    }
+
+    fn kani_depth2() -> Self {
+        Self::from_u128(symbolic_any())
+    }
+
+    fn kani_any() -> Self {
+        Self::from_u128(symbolic_any())
+    }
+}
+
 impl<T> KaniCompose for Vec<T>
 where
     T: KaniCompose,

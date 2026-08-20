@@ -876,7 +876,10 @@ amenable_derive::harness! {
                 "iter yields every pushed element exactly once"
             );
             assert!(
-                RustStdStandard::<BinaryHeap<i32>>::ensures((heap.len(), 2)),
+                <RustStdStandard<BinaryHeap<i32>> as Ensures<crate::KaniVerifier>>::ensures((
+                    heap.len(),
+                    2
+                )),
                 "iteration leaves every heap element in place"
             );
             assert_eq!(heap.pop(), Some(a.max(b)), "iteration preserves the heap maximum");

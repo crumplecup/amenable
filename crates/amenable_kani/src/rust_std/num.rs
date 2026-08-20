@@ -60,7 +60,7 @@ amenable_derive::harness! {
             match NonZero::<i8>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<i8>>::ensures(value),
+                        <RustStdStandard<NonZero<i8>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -70,7 +70,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<i8>>::ensures(value),
+                        !<RustStdStandard<NonZero<i8>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -115,7 +115,7 @@ amenable_derive::harness! {
             match NonZero::<i16>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<i16>>::ensures(value),
+                        <RustStdStandard<NonZero<i16>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -125,7 +125,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<i16>>::ensures(value),
+                        !<RustStdStandard<NonZero<i16>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -170,7 +170,7 @@ amenable_derive::harness! {
             match NonZero::<i32>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<i32>>::ensures(value),
+                        <RustStdStandard<NonZero<i32>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -180,7 +180,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<i32>>::ensures(value),
+                        !<RustStdStandard<NonZero<i32>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -225,7 +225,7 @@ amenable_derive::harness! {
             match NonZero::<i64>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<i64>>::ensures(value),
+                        <RustStdStandard<NonZero<i64>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -235,7 +235,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<i64>>::ensures(value),
+                        !<RustStdStandard<NonZero<i64>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -280,7 +280,7 @@ amenable_derive::harness! {
             match NonZero::<i128>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<i128>>::ensures(value),
+                        <RustStdStandard<NonZero<i128>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -290,7 +290,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<i128>>::ensures(value),
+                        !<RustStdStandard<NonZero<i128>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -335,7 +335,7 @@ amenable_derive::harness! {
             match NonZero::<isize>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<isize>>::ensures(value),
+                        <RustStdStandard<NonZero<isize>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -345,7 +345,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<isize>>::ensures(value),
+                        !<RustStdStandard<NonZero<isize>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -390,7 +390,7 @@ amenable_derive::harness! {
             match NonZero::<u8>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<u8>>::ensures(value),
+                        <RustStdStandard<NonZero<u8>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -400,7 +400,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<u8>>::ensures(value),
+                        !<RustStdStandard<NonZero<u8>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -445,7 +445,7 @@ amenable_derive::harness! {
             match NonZero::<u16>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<u16>>::ensures(value),
+                        <RustStdStandard<NonZero<u16>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -455,7 +455,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<u16>>::ensures(value),
+                        !<RustStdStandard<NonZero<u16>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -500,7 +500,7 @@ amenable_derive::harness! {
             match NonZero::<u32>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<u32>>::ensures(value),
+                        <RustStdStandard<NonZero<u32>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -510,7 +510,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<u32>>::ensures(value),
+                        !<RustStdStandard<NonZero<u32>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -555,7 +555,7 @@ amenable_derive::harness! {
             match NonZero::<u64>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<u64>>::ensures(value),
+                        <RustStdStandard<NonZero<u64>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -565,7 +565,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<u64>>::ensures(value),
+                        !<RustStdStandard<NonZero<u64>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -610,7 +610,7 @@ amenable_derive::harness! {
             match NonZero::<u128>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<u128>>::ensures(value),
+                        <RustStdStandard<NonZero<u128>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -620,7 +620,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<u128>>::ensures(value),
+                        !<RustStdStandard<NonZero<u128>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }
@@ -665,7 +665,7 @@ amenable_derive::harness! {
             match NonZero::<usize>::new(value) {
                 Some(nz) => {
                     assert!(
-                        RustStdStandard::<NonZero<usize>>::ensures(value),
+                        <RustStdStandard<NonZero<usize>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new succeeds only for nonzero values"
                     );
                     assert!(
@@ -675,7 +675,7 @@ amenable_derive::harness! {
                 }
                 None => {
                     assert!(
-                        !RustStdStandard::<NonZero<usize>>::ensures(value),
+                        !<RustStdStandard<NonZero<usize>> as Ensures<crate::KaniVerifier>>::ensures(value),
                         "NonZero::new fails only for zero"
                     );
                 }

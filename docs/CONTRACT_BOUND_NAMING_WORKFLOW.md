@@ -388,6 +388,47 @@ shape-clustering is a hint to investigate, not an automatic merge.
   cast is a bit-reinterpreting bijection — letting one contract type
   cover every variant instead of minting a second type just for the
   odd-width variant.
+- **A bare `Type::requires(..)`/`Type::ensures(..)` call becomes a real
+  compile error, crate-wide, the moment a second verifier registers an
+  impl for the same `Type` -- and this can go unnoticed for a long
+  time, because the routine `just check-all-package`/`check-all` sweep
+  (`fmt`+`clippy`+`test`) never invokes `cargo kani` at all, and the
+  `#[cfg(kani)]`-gated code these bare calls live in is invisible to
+  plain `cargo check`/`clippy`.** Found the hard way, unrelated to any
+  work landed this session: `amenable_std::AsciiByte` has had both
+  `Requires<KaniVerifier>` (`amenable_kani`) and `Requires<VerusVerifier>`
+  (`amenable_std`, unconditional, no feature gate) since 2026-08-07;
+  `str.rs`'s `AsciiByte::requires(byte)` was rewritten from a raw
+  expression to that bare call on 2026-08-11 (`abb9cb8`, this very
+  workflow's own sweep) and was ambiguous from that instant --
+  confirmed by checking that exact commit out in an isolated worktree
+  and reproducing the identical `E0283`/`E0282` failure there (`cargo
+  kani -p amenable_kani --all-features`, no feature flags needed to
+  trigger it, ordinary type inference, nothing DFCC-specific). By the
+  time this was found (2026-08-19), it had spread to ~28 bare call
+  sites across ~10 files in `rust_std/` (`AsciiByte`, several
+  `RustStdStandard<NonZero<T>>` instantiations, `RustStdStandard<char>`/
+  `<str>`/`<Chars<'static>>`/`<AtomicPtr<i32>>`/`<BinaryHeap<i32>>`/
+  `<Cell<i32>>`, `ValidUnicodeScalar`, `NonNulByte`), blocking every
+  single `cargo kani --all-features` build of `amenable_kani`
+  completely -- not a narrow, ignorable gap. **The fix, mechanical and
+  uniform**: qualify every ambiguous bare call with `<Type as
+  Requires<crate::KaniVerifier>>::requires(..)` (or `Ensures`/
+  `::ensures`) -- the same explicit-verifier style already used
+  elsewhere in this codebase (`amenable_kani::ledger`'s `<Validated as
+  amenable_core::Establish<_, KaniVerifier>>::establish(..)`). No
+  registration or `ContractRecord` content changes; this is purely a
+  call-site disambiguation, and the call-shape scanner still recognizes
+  the qualified form the same way (see "`ContractRecord`: call-shape
+  recognition" above -- the scanner strips a turbofish/leading
+  qualification when comparing the type prefix). **Always sanity-check
+  a bare named-contract rewrite with a real `cargo kani --all-features`
+  build of the touched crate before considering it done** -- `cargo
+  check`/`clippy` alone cannot catch this at all, since they never
+  compile `#[cfg(kani)]` code, and per-harness `cargo kani --harness X`
+  still compiles the *whole* crate first, so any single spot-check
+  would have caught this immediately if one had ever been run against
+  the affected files.
 - **`amenable_kani::gallery` is not production code.** Its own module
   doc comment says so explicitly: "Production proofs answer 'does this
   harness establish the intended claim?' The gallery answers a different

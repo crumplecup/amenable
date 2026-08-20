@@ -92,7 +92,17 @@ convention (see the linked doc's own "Status" note), backlog counts are
 intentionally not tracked here or in the linked doc — they drift too
 fast to stay trustworthy. Re-run the `elicit_doc quality antipatterns`
 scan before picking up work; treat its live checklist as the only
-source of truth for what remains.
+source of truth for what remains. A real, crate-wide compile-blocking
+bug from this sweep's own past work was found and fixed while
+unrelated `KaniCompose` work needed a real `cargo kani` build to
+verify against (`amenable_kani`'s "State Machine Derivation" entry,
+below, has the full account) — see the linked doc's own new Gotchas
+entry: bare named-contract calls become ambiguous, silently, the
+moment a second verifier registers a competing impl for the same type,
+and the routine check-all-package sweep can never catch it since it
+never runs `cargo kani` at all. Worth a real `cargo kani --all-features`
+sanity check after any future bare-call rewrite in this sweep, not
+just `cargo check`/`clippy`.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
@@ -1203,6 +1213,49 @@ GreenToken>::root()` still verifies clean, a new test asserts the
 exact declared `root_entries()` entry. See `docs/
 STATE_MACHINE_DERIVATION_PLAN.md`'s own "Follow-on: root entries"
 section for the full account.
+
+**A second follow-on landed after that**: `KaniCompose` routing for
+`Ledger`'s data-bearing carriers, the gap Step 5's own account flagged
+("not yet exercised by any auto-generated harness"). Auto-generating
+the harness itself turned out not to fit the derive at all -- `Ledger`
+is `#[state_machine(generic_over_verifier, ..)]` precisely so
+`amenable_gaap` stays neutral, but a `#[kani::proof_for_contract(..)]`
+harness has to name `KaniVerifier` concretely, which the derive
+expanding inside `amenable_gaap` structurally cannot do without the
+same neutral-crate violation this project has already caught twice.
+Scoped down instead: hand-written `KaniCompose` impls for `AccountId`/
+`Amount`/`TransferPayload`/`Transfer<Pending, PendingToken>`/
+`Transfer<Validated, ValidatedToken>` in `amenable_kani::ledger` (can't
+be `#[derive(KaniCompose)]` on the struct definitions themselves, same
+neutral-crate reason), plus `uuid::Uuid` coverage in `amenable_kani::
+compose`; the existing hand-authored `gaap_ledger` harnesses rewired to
+call them instead of `kani::any()` plus two literal accounts that never
+varied, each harness still holding exactly the property it's named for
+(the "accepts a lawful transfer"/"rejects the same account" pair keep
+their distinct-vs-same-account assumptions; `reject`/`rollback`, with
+no precondition at all, collapsed to one `kani_any()` call each). A
+real second CBMC-cost finding, root-caused the same disciplined way as
+this worked example's Step 1: `AccountId`'s `name: String` field's
+construction itself (not comparison -- `PartialEq` never touches
+`name`) was expensive; fixed by pinning `name` to a constant empty
+string at every `KaniCompose` depth in `AccountId`'s own impl, since
+`name` has zero causal effect on any claim checked here, not a
+weakened proof. A second, much larger, wholly unrelated blocker
+surfaced getting a real `cargo kani` run at all: every `cargo kani -p
+amenable_kani --all-features` build was already broken crate-wide
+(~28 ambiguous bare `Type::requires(..)`/`::ensures(..)` call sites
+across ~10 files, present since 2026-08-11, invisible to the routine
+check-all-package sweep since it never runs `cargo kani`) -- see
+`CONTRACT_BOUND_NAMING_WORKFLOW.md`'s own new Gotchas entry; fixed
+first, as a precondition, by qualifying each with `<Type as
+Requires<crate::KaniVerifier>>::requires(..)` (or `Ensures`). Verified
+for real: the crate-wide fix confirmed via a clean re-run of the
+untouched `stoplight::verify_green_transitions_only_to_yellow` harness
+(`0 of 38 failed`), then all five rewired `gaap_ledger` harnesses
+individually under real `cargo kani`, all clean; full workspace
+check/clippy -D warnings/fmt/test clean throughout. See `docs/
+STATE_MACHINE_DERIVATION_PLAN.md`'s own "Follow-on: `KaniCompose`
+routing" section for the full account.
 
 **Description:** Replaces (not extends) `amenable_core::state_machine`'s
 current `StateMachine`/`Amenable` trait pair, which `Stoplight`'s own

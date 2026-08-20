@@ -61,31 +61,31 @@ amenable_derive::harness! {
             let initial: i32 = kani::any();
             let cell = Cell::new(initial);
             assert!(
-                RustStdStandard::<Cell<i32>>::ensures((cell.get(), initial)),
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((cell.get(), initial)),
                 "new stores the initial value"
             );
 
             let updated: i32 = kani::any();
             cell.set(updated);
             assert!(
-                RustStdStandard::<Cell<i32>>::ensures((cell.get(), updated)),
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((cell.get(), updated)),
                 "set overwrites the stored value"
             );
 
             let replacement: i32 = kani::any();
             let old = cell.replace(replacement);
             assert!(
-                RustStdStandard::<Cell<i32>>::ensures((old, updated)),
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((old, updated)),
                 "replace returns the previous value"
             );
             assert!(
-                RustStdStandard::<Cell<i32>>::ensures((cell.get(), replacement)),
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((cell.get(), replacement)),
                 "replace stores the new value"
             );
 
             let taken = cell.take();
             assert!(
-                RustStdStandard::<Cell<i32>>::ensures((taken, replacement)),
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((taken, replacement)),
                 "take returns the stored value"
             );
             assert_eq!(

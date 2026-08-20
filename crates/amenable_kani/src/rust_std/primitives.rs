@@ -154,7 +154,7 @@ amenable_derive::harness! {
 
             let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
             assert!(
-                RustStdStandard::<char>::ensures((c, c2)),
+                <RustStdStandard<char> as Ensures<crate::KaniVerifier>>::ensures((c, c2)),
                 "char round-trips through u32"
             );
         }
@@ -414,11 +414,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_str_byte_length_and_content() {
             let byte: u8 = kani::any();
-            kani::assume(AsciiByte::requires(byte));
+            kani::assume(<AsciiByte as Requires<crate::KaniVerifier>>::requires(byte));
             let owned = (byte as char).to_string();
             let s: &str = &owned;
             assert!(
-                RustStdStandard::<str>::ensures((s.len(), 1)),
+                <RustStdStandard<str> as Ensures<crate::KaniVerifier>>::ensures((s.len(), 1)),
                 "a single ASCII char is exactly one UTF-8 byte"
             );
             assert_eq!(s.as_bytes()[0], byte);

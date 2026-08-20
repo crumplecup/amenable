@@ -66,7 +66,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_cstr_excludes_the_terminating_nul_from_to_bytes() {
             let byte: u8 = kani::any();
-            kani::assume(NonNulByte::requires(byte));
+            kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let bytes = [byte, 0];
             let cstr = CStr::from_bytes_with_nul(&bytes).unwrap();
             assert_eq!(
@@ -116,7 +116,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_bytes_until_nul_requires_a_nul_byte_somewhere() {
             let byte: u8 = kani::any();
-            kani::assume(NonNulByte::requires(byte));
+            kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let with_nul = [byte, 0, byte];
             assert!(
                 CStr::from_bytes_until_nul(&with_nul).is_ok(),
@@ -164,7 +164,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_bytes_with_nul_requires_the_nul_only_at_the_end() {
             let byte: u8 = kani::any();
-            kani::assume(NonNulByte::requires(byte));
+            kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             assert!(
                 CStr::from_bytes_with_nul(&[byte, 0]).is_ok(),
                 "a nul as the last byte is accepted"

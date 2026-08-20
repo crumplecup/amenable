@@ -780,7 +780,9 @@ amenable_derive::harness! {
             let swapped_in: *mut i32 = &mut swapped_in_slot;
             let previous = atomic.swap(swapped_in, std::sync::atomic::Ordering::SeqCst);
             assert!(
-                RustStdStandard::<AtomicPtr<i32>>::ensures((previous, stored)),
+                <RustStdStandard<AtomicPtr<i32>> as Ensures<crate::KaniVerifier>>::ensures((
+                    previous, stored
+                )),
                 "AtomicPtr::swap returns the value that was there before"
             );
             assert!(
