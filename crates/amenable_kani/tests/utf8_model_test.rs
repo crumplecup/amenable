@@ -1,13 +1,15 @@
 use amenable_kani::{KaniUtf8, KaniUtf8Buffer, KaniUtf8BufferError};
 
 #[test]
-fn classify_owned_accepts_small_valid_utf8() {
-    let valid = KaniUtf8::classify_owned("hi".as_bytes().to_vec()).expect("ascii is valid utf8");
+fn classify_owned_accepts_small_valid_utf8() -> miette::Result<()> {
+    let valid = KaniUtf8::classify_owned("hi".as_bytes().to_vec())
+        .map_err(|error| miette::miette!("{error:?}"))?;
 
     assert_eq!(valid.as_bytes(), b"hi");
     assert_eq!(valid.as_str(), "hi");
     assert_eq!(valid.len(), 2);
     assert!(!valid.is_empty());
+    Ok(())
 }
 
 #[test]
@@ -20,21 +22,25 @@ fn classify_owned_rejects_invalid_utf8_and_recovers_exact_bytes() {
 }
 
 #[test]
-fn compose_representatives_stay_on_the_expected_sides_of_the_boundary() {
-    let valid = KaniUtf8::classify_owned(b"xy".to_vec()).expect("ascii is valid utf8");
+fn compose_representatives_stay_on_the_expected_sides_of_the_boundary() -> miette::Result<()> {
+    let valid =
+        KaniUtf8::classify_owned(b"xy".to_vec()).map_err(|error| miette::miette!("{error:?}"))?;
     let invalid = vec![b'x', b'y', 0xFFu8];
 
     assert!(KaniUtf8::is_valid(valid.as_bytes()));
     assert!(!KaniUtf8::is_valid(&invalid));
+    Ok(())
 }
 
 #[test]
-fn utf8_buffer_accepts_valid_content_and_reports_length() {
-    let buffer = KaniUtf8Buffer::<4>::new([b'h', b'i', 0, 0], 2).expect("ascii is valid utf8");
+fn utf8_buffer_accepts_valid_content_and_reports_length() -> miette::Result<()> {
+    let buffer = KaniUtf8Buffer::<4>::new([b'h', b'i', 0, 0], 2)
+        .map_err(|error| miette::miette!("{error:?}"))?;
 
     assert_eq!(buffer.as_bytes(), b"hi");
     assert_eq!(buffer.len(), 2);
     assert!(!buffer.is_empty());
+    Ok(())
 }
 
 #[test]
@@ -56,9 +62,11 @@ fn utf8_buffer_rejects_a_length_over_capacity() {
 }
 
 #[test]
-fn utf8_buffer_empty_length_is_valid_and_empty() {
-    let buffer = KaniUtf8Buffer::<4>::new([0, 0, 0, 0], 0).expect("empty content is valid utf8");
+fn utf8_buffer_empty_length_is_valid_and_empty() -> miette::Result<()> {
+    let buffer =
+        KaniUtf8Buffer::<4>::new([0, 0, 0, 0], 0).map_err(|error| miette::miette!("{error:?}"))?;
 
     assert!(buffer.is_empty());
     assert_eq!(buffer.as_bytes(), b"");
+    Ok(())
 }

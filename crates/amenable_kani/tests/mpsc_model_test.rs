@@ -1,19 +1,27 @@
 use amenable_kani::{KaniChannel, KaniRecvError, KaniSendError};
 
 #[test]
-fn unbounded_send_then_recv_delivers_the_value() {
+fn unbounded_send_then_recv_delivers_the_value() -> miette::Result<()> {
     let mut channel = KaniChannel::unbounded();
-    channel.send(1).unwrap();
+    channel
+        .send(1)
+        .map_err(|error| miette::miette!("{error:?}"))?;
     assert_eq!(channel.recv(), Ok(1));
+    Ok(())
 }
 
 #[test]
-fn unbounded_channel_preserves_fifo_order() {
+fn unbounded_channel_preserves_fifo_order() -> miette::Result<()> {
     let mut channel = KaniChannel::unbounded();
-    channel.send(1).unwrap();
-    channel.send(2).unwrap();
+    channel
+        .send(1)
+        .map_err(|error| miette::miette!("{error:?}"))?;
+    channel
+        .send(2)
+        .map_err(|error| miette::miette!("{error:?}"))?;
     assert_eq!(channel.recv(), Ok(1));
     assert_eq!(channel.recv(), Ok(2));
+    Ok(())
 }
 
 #[test]
@@ -46,10 +54,15 @@ fn bounded_zero_capacity_try_send_fails_full_and_recovers_the_value() {
 }
 
 #[test]
-fn bounded_channel_accepts_sends_up_to_capacity() {
+fn bounded_channel_accepts_sends_up_to_capacity() -> miette::Result<()> {
     let mut channel = KaniChannel::bounded(1);
-    channel.send(1).unwrap();
+    channel
+        .send(1)
+        .map_err(|error| miette::miette!("{error:?}"))?;
     assert_eq!(channel.try_send(2), Err(KaniSendError::Full(2)));
     assert_eq!(channel.recv(), Ok(1));
-    channel.send(2).unwrap();
+    channel
+        .send(2)
+        .map_err(|error| miette::miette!("{error:?}"))?;
+    Ok(())
 }
