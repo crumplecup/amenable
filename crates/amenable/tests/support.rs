@@ -30,6 +30,13 @@ pub fn library<T>(result: amenable::AmenableResult<T>) -> miette::Result<T> {
     result.map_err(|err| miette::Report::new(TestError(err)))
 }
 
+/// Convert a proof-chain result into a miette result for test functions,
+/// the same way `main.rs`'s `run_audit` wraps it with
+/// [`amenable::AmenableError::chain`].
+pub fn chain<T>(result: Result<T, amenable::ChainError>) -> miette::Result<T> {
+    library(result.map_err(AmenableError::chain))
+}
+
 #[derive(Debug)]
 struct TestError(AmenableError);
 
