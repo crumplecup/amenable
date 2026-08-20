@@ -302,24 +302,17 @@ impl Ledger {
             let proof_id = fields.next().unwrap_or_default();
             let timestamp = fields.next().unwrap_or_default().parse::<u64>().ok();
             let status = fields.next().and_then(ProofStatus::parse);
-            if fields.next().is_some()
-                || proof_id.is_empty()
-                || timestamp.is_none()
-                || status.is_none()
-            {
+            let row_is_malformed = fields.next().is_some() || proof_id.is_empty();
+
+            let (false, Some(timestamp), Some(status)) = (row_is_malformed, timestamp, status)
+            else {
                 return Err(AmenableError::invariant(format!(
                     "invalid Kani result ledger row {} in {}",
                     line_number + 2,
                     path.display()
                 )));
-            }
-            rows.insert(
-                proof_id.to_owned(),
-                LedgerRow {
-                    timestamp: timestamp.expect("validated above"),
-                    status: status.expect("validated above"),
-                },
-            );
+            };
+            rows.insert(proof_id.to_owned(), LedgerRow { timestamp, status });
         }
 
         Ok(Self { rows })

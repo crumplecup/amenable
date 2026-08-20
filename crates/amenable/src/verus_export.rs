@@ -85,15 +85,19 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
 }
 
 fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> AmenableResult<PathBuf> {
-    let module_segments = parse_destination_module(&export.destination_module)?;
-    let output_path = ensure_module_tree(root, &module_segments)?;
-    let source = render_verus_module(export, &module_segments)?;
+    let (parent_segments, final_segment) = parse_destination_module(&export.destination_module)?;
+    let output_path = ensure_module_tree(root, &parent_segments, &final_segment)?;
+    let source = render_verus_module(export, &final_segment)?;
 
     fs::write(&output_path, source).map_err(|error| AmenableError::io(&output_path, error))?;
     Ok(output_path)
 }
 
-fn parse_destination_module(destination_module: &str) -> AmenableResult<Vec<String>> {
+/// Splits a validated `crate::a::b::c` destination into its ancestor
+/// segments (`a`, `b`) and final segment (`c`), so callers that only need
+/// the final segment carry that guarantee in the type instead of
+/// re-deriving it with `.last().expect(...)`.
+fn parse_destination_module(destination_module: &str) -> AmenableResult<(Vec<String>, String)> {
     let mut parts = destination_module.split("::");
     let crate_root = parts.next().ok_or_else(|| {
         AmenableError::invariant(format!(
@@ -107,13 +111,7 @@ fn parse_destination_module(destination_module: &str) -> AmenableResult<Vec<Stri
         )));
     }
 
-    let segments = parts.map(str::to_owned).collect::<Vec<_>>();
-    if segments.is_empty() {
-        return Err(AmenableError::invariant(format!(
-            "invalid Verus destination module {destination_module:?}: missing module segments"
-        )));
-    }
-
+    let mut segments = parts.map(str::to_owned).collect::<Vec<_>>();
     for segment in &segments {
         if !is_valid_module_segment(segment) {
             return Err(AmenableError::invariant(format!(
@@ -122,7 +120,13 @@ fn parse_destination_module(destination_module: &str) -> AmenableResult<Vec<Stri
         }
     }
 
-    Ok(segments)
+    let Some(final_segment) = segments.pop() else {
+        return Err(AmenableError::invariant(format!(
+            "invalid Verus destination module {destination_module:?}: missing module segments"
+        )));
+    };
+
+    Ok((segments, final_segment))
 }
 
 fn is_valid_module_segment(segment: &str) -> bool {
@@ -135,20 +139,21 @@ fn is_valid_module_segment(segment: &str) -> bool {
         && chars.all(|ch| ch == '_' || ch.is_ascii_alphanumeric())
 }
 
-fn ensure_module_tree(root: &Path, module_segments: &[String]) -> AmenableResult<PathBuf> {
+fn ensure_module_tree(
+    root: &Path,
+    parent_segments: &[String],
+    final_segment: &str,
+) -> AmenableResult<PathBuf> {
     let mut current_dir = root.to_path_buf();
     let mut module_file = root.join("lib.rs");
 
-    for segment in &module_segments[..module_segments.len() - 1] {
+    for segment in parent_segments {
         ensure_module_declaration(&module_file, segment)?;
         current_dir.push(segment);
         fs::create_dir_all(&current_dir).map_err(|error| AmenableError::io(&current_dir, error))?;
         module_file = current_dir.join("mod.rs");
     }
 
-    let final_segment = module_segments
-        .last()
-        .expect("module path parsing guarantees at least one segment");
     ensure_module_declaration(&module_file, final_segment)?;
 
     Ok(current_dir.join(format!("{final_segment}.rs")))
@@ -342,11 +347,8 @@ impl NameAllocator {
 
 fn render_verus_module(
     export: &WitnessExportSnapshot,
-    module_segments: &[String],
+    module_name: &str,
 ) -> AmenableResult<String> {
-    let module_name = module_segments
-        .last()
-        .expect("module path parsing guarantees at least one segment");
     let module_stem = normalize_identifier(module_name);
     let mut names = NameAllocator::default();
 

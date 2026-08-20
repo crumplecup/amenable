@@ -270,29 +270,29 @@ impl Ledger {
             let expected = fields.next().and_then(KaniGalleryExpectation::parse);
             let observed = fields.next().and_then(KaniGalleryExpectation::parse);
             let matched = fields.next().and_then(parse_bool);
-            if fields.next().is_some()
+            let row_is_malformed = fields.next().is_some()
                 || case_id.is_empty()
                 || timestamp.is_empty()
-                || disposition.is_empty()
-                || expected.is_none()
-                || observed.is_none()
-                || matched.is_none()
-            {
+                || disposition.is_empty();
+
+            let (false, Some(expected), Some(observed), Some(matched)) =
+                (row_is_malformed, expected, observed, matched)
+            else {
                 return Err(AmenableError::invariant(format!(
                     "invalid Kani proof-gallery ledger row {} in {}",
                     line_number + 2,
                     path.display()
                 )));
-            }
+            };
 
             rows.insert(
                 case_id.to_owned(),
                 LedgerRow {
                     timestamp: timestamp.to_owned(),
                     disposition: disposition.to_owned(),
-                    expected: expected.expect("validated above"),
-                    observed: observed.expect("validated above"),
-                    matched: matched.expect("validated above"),
+                    expected,
+                    observed,
+                    matched,
                 },
             );
         }
