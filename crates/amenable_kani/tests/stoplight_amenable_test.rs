@@ -43,7 +43,7 @@ fn transitions_reports_all_three_declared_edges_in_declaration_order() {
 }
 
 #[test]
-fn audit_surface_reports_real_captured_bodies_for_every_declared_edge() {
+fn audit_surface_reports_real_captured_bodies_for_every_declared_edge() -> miette::Result<()> {
     let surface = <Stoplight as StateMachine<KaniVerifier>>::audit_surface();
 
     assert_eq!(surface.len(), 3);
@@ -51,23 +51,24 @@ fn audit_surface_reports_real_captured_bodies_for_every_declared_edge() {
     let yellow = surface
         .iter()
         .find(|audit| audit.to == "Yellow")
-        .expect("Green -> Yellow edge missing from audit surface");
+        .ok_or_else(|| miette::miette!("Green -> Yellow edge missing from audit surface"))?;
     assert_eq!(yellow.method_name, "green_to_yellow");
     assert!(yellow.body.contains("Yellow::establish"));
 
     let red = surface
         .iter()
         .find(|audit| audit.to == "Red")
-        .expect("Yellow -> Red edge missing from audit surface");
+        .ok_or_else(|| miette::miette!("Yellow -> Red edge missing from audit surface"))?;
     assert_eq!(red.method_name, "yellow_to_red");
     assert!(red.body.contains("Red::establish"));
 
     let green = surface
         .iter()
         .find(|audit| audit.to == "Green")
-        .expect("Red -> Green edge missing from audit surface");
+        .ok_or_else(|| miette::miette!("Red -> Green edge missing from audit surface"))?;
     assert_eq!(green.method_name, "red_to_green");
     assert!(green.body.contains("Green::establish"));
+    Ok(())
 }
 
 #[test]

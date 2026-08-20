@@ -20,13 +20,14 @@ fn argv_keeps_the_program_slot_and_extra_count() {
 }
 
 #[test]
-fn env_paths_join_with_the_modeled_separator() {
+fn env_paths_join_with_the_modeled_separator() -> miette::Result<()> {
     let paths = KaniEnvPathList::from_strings(vec!["one".to_owned(), "two".to_owned()])
-        .expect("separator-free strings are modeled as joinable");
+        .map_err(|error| miette::miette!("{error:?}"))?;
 
     let joined = KaniEnvPaths::join(&paths);
     let expected = if cfg!(windows) { "one;two" } else { "one:two" };
     assert_eq!(joined, expected);
+    Ok(())
 }
 
 #[test]
@@ -39,10 +40,10 @@ fn env_paths_reject_an_unjoinable_string() {
 }
 
 #[test]
-fn split_recovers_a_joined_modeled_path_list() {
+fn split_recovers_a_joined_modeled_path_list() -> miette::Result<()> {
     let paths =
         KaniEnvPathList::from_strings(vec!["one".to_owned(), "two".to_owned(), "three".to_owned()])
-            .expect("separator-free strings are modeled as joinable");
+            .map_err(|error| miette::miette!("{error:?}"))?;
 
     let joined = KaniEnvPaths::join(&paths);
     let split = KaniEnvPaths::split(&joined);
@@ -53,13 +54,14 @@ fn split_recovers_a_joined_modeled_path_list() {
         split.as_strings(),
         vec!["one".to_owned(), "two".to_owned(), "three".to_owned()]
     );
+    Ok(())
 }
 
 #[test]
-fn semantic_join_and_split_round_trip_the_modeled_path_list() {
+fn semantic_join_and_split_round_trip_the_modeled_path_list() -> miette::Result<()> {
     let paths =
         KaniEnvPathList::from_strings(vec!["one".to_owned(), "two".to_owned(), "three".to_owned()])
-            .expect("separator-free strings are modeled as joinable");
+            .map_err(|error| miette::miette!("{error:?}"))?;
 
     let split = KaniEnvPaths::split_semantic(KaniEnvPaths::join_semantic(paths));
 
@@ -67,4 +69,5 @@ fn semantic_join_and_split_round_trip_the_modeled_path_list() {
     assert_eq!(split.paths()[0].as_str(), "one");
     assert_eq!(split.paths()[1].as_str(), "two");
     assert_eq!(split.paths()[2].as_str(), "three");
+    Ok(())
 }
