@@ -5,6 +5,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+use miette::{IntoDiagnostic, WrapErr};
 use serde_json::Value;
 
 const PROOF_ID: &str = "amenable_kani::calculator::add_impl_computes_exact_sum";
@@ -12,15 +13,16 @@ const SECOND_PROOF_ID: &str =
     "amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through";
 const THIRD_PROOF_ID: &str = "amenable_kani::calculator::verify_credit_access_preserves_value";
 
-fn temporary_path(name: &str) -> PathBuf {
+fn temporary_path(name: &str) -> miette::Result<PathBuf> {
     let nonce = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .expect("system time should be after the Unix epoch")
+        .into_diagnostic()
+        .wrap_err("system time should be after the Unix epoch")?
         .as_nanos();
-    std::env::temp_dir().join(format!(
+    Ok(std::env::temp_dir().join(format!(
         "amenable-{name}-{}-{nonce}.jsonl",
         std::process::id()
-    ))
+    )))
 }
 
 fn record(
@@ -30,7 +32,7 @@ fn record(
     recommendation: &str,
     resolution_path: &str,
     comment: &str,
-) {
+) -> miette::Result<()> {
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -58,24 +60,31 @@ fn record(
             "--comment",
             comment,
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(
         output.status.success(),
         "assessment failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
+    Ok(())
 }
 
-fn write_assessment_artifact(path: &Path, contents: &str) {
-    fs::write(path, contents).expect("assessment artifact should be written");
+fn write_assessment_artifact(path: &Path, contents: &str) -> miette::Result<()> {
+    fs::write(path, contents)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be written")
 }
 
-fn write_kani_results_artifact(path: &Path, contents: &str) {
-    fs::write(path, contents).expect("Kani results artifact should be written");
+fn write_kani_results_artifact(path: &Path, contents: &str) -> miette::Result<()> {
+    fs::write(path, contents)
+        .into_diagnostic()
+        .wrap_err("Kani results artifact should be written")
 }
 
 struct AssessmentRecord<'a> {
@@ -112,11 +121,13 @@ fn assessment_record(record: AssessmentRecord<'_>) -> String {
 }
 
 #[test]
-fn assessment_appends_multiline_comment_as_one_json_record() {
-    let path = temporary_path("assessment-record");
-    let comment_path = temporary_path("assessment-comment");
+fn assessment_appends_multiline_comment_as_one_json_record() -> miette::Result<()> {
+    let path = temporary_path("assessment-record")?;
+    let comment_path = temporary_path("assessment-comment")?;
     let comment = "The arithmetic claim is exact under the stated precondition.\nAdd a boundary-focused proof next.";
-    fs::write(&comment_path, comment).expect("comment file should be written");
+    fs::write(&comment_path, comment)
+        .into_diagnostic()
+        .wrap_err("comment file should be written")?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -145,27 +156,32 @@ fn assessment_appends_multiline_comment_as_one_json_record() {
             "--comment-file",
             comment_path
                 .to_str()
-                .expect("temporary path should be UTF-8"),
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(
         output.status.success(),
         "assessment failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let contents = fs::read_to_string(&path).expect("assessment artifact should be written");
+    let contents = fs::read_to_string(&path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be written")?;
     assert_eq!(
         contents.lines().count(),
         1,
         "one assessment is one JSONL line"
     );
 
-    let record: Value =
-        serde_json::from_str(contents.trim()).expect("assessment record should be JSON");
+    let record: Value = serde_json::from_str(contents.trim())
+        .into_diagnostic()
+        .wrap_err("assessment record should be JSON")?;
     assert_eq!(record["version"], "0.1.0");
     assert_eq!(record["proof_id"], PROOF_ID);
     assert!(
@@ -186,13 +202,19 @@ fn assessment_appends_multiline_comment_as_one_json_record() {
         "new records should not emit the legacy timestamp_unix_seconds field"
     );
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
-    fs::remove_file(comment_path).expect("comment file should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    fs::remove_file(comment_path)
+        .into_diagnostic()
+        .wrap_err("comment file should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn report_aggregates_independent_assessments_by_recommendation_and_resolution_path() {
-    let path = temporary_path("assessment-report");
+fn report_aggregates_independent_assessments_by_recommendation_and_resolution_path()
+-> miette::Result<()> {
+    let path = temporary_path("assessment-report")?;
     record(
         &path,
         "reviewer-one",
@@ -200,7 +222,7 @@ fn report_aggregates_independent_assessments_by_recommendation_and_resolution_pa
         "accept",
         "keep_current_proof",
         "Strong, focused proof.",
-    );
+    )?;
     record(
         &path,
         "reviewer-two",
@@ -208,7 +230,7 @@ fn report_aggregates_independent_assessments_by_recommendation_and_resolution_pa
         "strengthen",
         "strengthen_current_proof",
         "The model needs broader boundary coverage.",
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -217,28 +239,35 @@ fn report_aggregates_independent_assessments_by_recommendation_and_resolution_pa
             "--proof",
             PROOF_ID,
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment report CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment report CLI should start")?;
 
     assert!(
         output.status.success(),
         "report failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("report should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("report should be UTF-8")?;
     assert!(stdout.contains("2 assessment(s)"));
     assert!(stdout.contains("claim alignment: mean 3.00; 0:0 1:0 2:1 3:0 4:1"));
     assert!(stdout.contains("recommendations: accept:1 strengthen:1"));
     assert!(stdout.contains("resolution paths: keep_current_proof:1 strengthen_current_proof:1"));
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn summary_counts_assessments_by_recommendation() {
-    let path = temporary_path("assessment-summary");
+fn summary_counts_assessments_by_recommendation() -> miette::Result<()> {
+    let path = temporary_path("assessment-summary")?;
     write_assessment_artifact(
         &path,
         &format!(
@@ -274,24 +303,28 @@ fn summary_counts_assessments_by_recommendation() {
                 comment: "Also replace it.",
             }),
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
             "summary",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment summary CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment summary CLI should start")?;
 
     assert!(
         output.status.success(),
         "summary failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("summary should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("summary should be UTF-8")?;
     assert!(stdout.contains("recommendation"));
     assert!(stdout.contains("accept"));
     assert!(stdout.contains("replace"));
@@ -300,20 +333,23 @@ fn summary_counts_assessments_by_recommendation() {
     let accept_row = stdout
         .lines()
         .find(|line| line.trim_start().starts_with("accept"))
-        .expect("summary should include an accept row");
+        .ok_or_else(|| miette::miette!("summary should include an accept row"))?;
     let replace_row = stdout
         .lines()
         .find(|line| line.trim_start().starts_with("replace"))
-        .expect("summary should include a replace row");
+        .ok_or_else(|| miette::miette!("summary should include a replace row"))?;
     assert!(accept_row.split_whitespace().eq(["accept", "1"]));
     assert!(replace_row.split_whitespace().eq(["replace", "2"]));
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn summary_can_group_by_resolution_path_and_emit_json() {
-    let path = temporary_path("assessment-summary-resolution-path");
+fn summary_can_group_by_resolution_path_and_emit_json() -> miette::Result<()> {
+    let path = temporary_path("assessment-summary-resolution-path")?;
     let legacy_record = format!(
         "{{\"schema_version\":1,\"proof_id\":\"{SECOND_PROOF_ID}\",\"reviewer\":\"legacy-reviewer\",\"timestamp_unix_seconds\":1785357757,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":4,\"adversarial_coverage\":2,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Legacy record.\"}}\n"
     );
@@ -333,7 +369,7 @@ fn summary_can_group_by_resolution_path_and_emit_json() {
             }),
             legacy_record,
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -343,28 +379,37 @@ fn summary_can_group_by_resolution_path_and_emit_json() {
             "resolution_path",
             "--json",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment summary CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment summary CLI should start")?;
 
     assert!(
         output.status.success(),
         "summary failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("summary should be UTF-8");
-    let json: Value = serde_json::from_str(&stdout).expect("summary output should be JSON");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("summary should be UTF-8")?;
+    let json: Value = serde_json::from_str(&stdout)
+        .into_diagnostic()
+        .wrap_err("summary output should be JSON")?;
     assert_eq!(json["by"], "resolution_path");
     assert_eq!(json["counts"]["replace_with_accommodation_model"], 1);
     assert_eq!(json["counts"]["legacy_unspecified"], 1);
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn list_filters_assessments_by_recommendation_and_resolution_path() {
-    let path = temporary_path("assessment-list");
+fn list_filters_assessments_by_recommendation_and_resolution_path() -> miette::Result<()> {
+    let path = temporary_path("assessment-list")?;
     write_assessment_artifact(
         &path,
         &format!(
@@ -390,7 +435,7 @@ fn list_filters_assessments_by_recommendation_and_resolution_path() {
                 comment: "Accepted.",
             }),
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -401,17 +446,21 @@ fn list_filters_assessments_by_recommendation_and_resolution_path() {
             "--resolution-path",
             "replace_with_proof_specific_model",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment list CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment list CLI should start")?;
 
     assert!(
         output.status.success(),
         "list failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("list should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("list should be UTF-8")?;
     assert!(stdout.contains("assessment-1"));
     assert!(stdout.contains("replace"));
     assert!(stdout.contains("replace_with_proof_specific_model"));
@@ -420,12 +469,15 @@ fn list_filters_assessments_by_recommendation_and_resolution_path() {
     assert!(!stdout.contains(SECOND_PROOF_ID));
     assert!(!stdout.contains("\taccept\t"));
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn list_json_emits_full_structured_assessments() {
-    let path = temporary_path("assessment-list-json");
+fn list_json_emits_full_structured_assessments() -> miette::Result<()> {
+    let path = temporary_path("assessment-list-json")?;
     write_assessment_artifact(
         &path,
         &assessment_record(AssessmentRecord {
@@ -438,7 +490,7 @@ fn list_json_emits_full_structured_assessments() {
             resolution_path: "keep_current_proof",
             comment: "Accepted.",
         }),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -446,22 +498,28 @@ fn list_json_emits_full_structured_assessments() {
             "list",
             "--json",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment list CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment list CLI should start")?;
 
     assert!(
         output.status.success(),
         "list failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("list should be UTF-8");
-    let json: Value = serde_json::from_str(&stdout).expect("list output should be JSON");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("list should be UTF-8")?;
+    let json: Value = serde_json::from_str(&stdout)
+        .into_diagnostic()
+        .wrap_err("list output should be JSON")?;
     let entry = json
         .as_array()
         .and_then(|entries| entries.first())
-        .expect("list JSON should contain one entry");
+        .ok_or_else(|| miette::miette!("list JSON should contain one entry"))?;
     assert_eq!(entry["assessment_id"], "assessment-1");
     assert_eq!(entry["version"], "0.1.0");
     assert_eq!(entry["recommendation"], "accept");
@@ -470,35 +528,42 @@ fn list_json_emits_full_structured_assessments() {
     assert_eq!(entry["reviewer"], "one");
     assert_eq!(entry["recorded_at"], "2026-07-29T00:00:00Z");
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn failures_list_nonpassing_latest_kani_results() {
-    let path = temporary_path("assessment-failures");
+fn failures_list_nonpassing_latest_kani_results() -> miette::Result<()> {
+    let path = temporary_path("assessment-failures")?;
     write_kani_results_artifact(
         &path,
         &format!(
             "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,passed\n{THIRD_PROOF_ID},1785290400,timeout\n"
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
             "failures",
             "--results",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment failures CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment failures CLI should start")?;
 
     assert!(
         output.status.success(),
         "failures failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("failures should be UTF-8")?;
     assert!(stdout.contains("failed"));
     assert!(stdout.contains(PROOF_ID));
     assert!(stdout.contains("timeout"));
@@ -506,18 +571,21 @@ fn failures_list_nonpassing_latest_kani_results() {
     assert!(!stdout.contains(SECOND_PROOF_ID));
     assert!(!stdout.contains("\tpassed\t"));
 
-    fs::remove_file(path).expect("Kani results artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("Kani results artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn failures_can_filter_by_status_and_emit_json() {
-    let path = temporary_path("assessment-failures-json");
+fn failures_can_filter_by_status_and_emit_json() -> miette::Result<()> {
+    let path = temporary_path("assessment-failures-json")?;
     write_kani_results_artifact(
         &path,
         &format!(
             "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,passed\n{THIRD_PROOF_ID},1785290400,timeout\n"
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -527,38 +595,49 @@ fn failures_can_filter_by_status_and_emit_json() {
             "timeout",
             "--json",
             "--results",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment failures CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment failures CLI should start")?;
 
     assert!(
         output.status.success(),
         "failures failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
-    let json: Value = serde_json::from_str(&stdout).expect("failures output should be JSON");
-    let entries = json.as_array().expect("failures JSON should be an array");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("failures should be UTF-8")?;
+    let json: Value = serde_json::from_str(&stdout)
+        .into_diagnostic()
+        .wrap_err("failures output should be JSON")?;
+    let entries = json
+        .as_array()
+        .ok_or_else(|| miette::miette!("failures JSON should be an array"))?;
     assert_eq!(entries.len(), 1);
     assert_eq!(entries[0]["proof_id"], THIRD_PROOF_ID);
     assert_eq!(entries[0]["status"], "timeout");
     assert_eq!(entries[0]["timestamp"], 1785290400);
     assert_eq!(entries[0]["recorded_at"], "2026-07-29T02:00:00Z");
 
-    fs::remove_file(path).expect("Kani results artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("Kani results artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() {
-    let results_path = temporary_path("assessment-failures-needs-assessment-results");
-    let assessments_path = temporary_path("assessment-failures-needs-assessment-assessments");
+fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() -> miette::Result<()> {
+    let results_path = temporary_path("assessment-failures-needs-assessment-results")?;
+    let assessments_path = temporary_path("assessment-failures-needs-assessment-assessments")?;
     write_kani_results_artifact(
         &results_path,
         &format!(
             "proof_id,timestamp,status\n{PROOF_ID},1785283200,failed\n{SECOND_PROOF_ID},1785286800,failed\n{THIRD_PROOF_ID},1785290400,timeout\n"
         ),
-    );
+    )?;
     write_assessment_artifact(
         &assessments_path,
         &format!(
@@ -584,7 +663,7 @@ fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() {
                 comment: "Older sweep assessment should not satisfy the queue.",
             })
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -596,32 +675,40 @@ fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() {
             "--results",
             results_path
                 .to_str()
-                .expect("temporary results path should be UTF-8"),
+                .ok_or_else(|| miette::miette!("temporary results path should be UTF-8"))?,
             "--assessments",
             assessments_path
                 .to_str()
-                .expect("temporary assessments path should be UTF-8"),
+                .ok_or_else(|| miette::miette!("temporary assessments path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment failures CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment failures CLI should start")?;
 
     assert!(
         output.status.success(),
         "failures failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("failures should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("failures should be UTF-8")?;
     assert!(!stdout.contains(PROOF_ID));
     assert!(stdout.contains(SECOND_PROOF_ID));
     assert!(stdout.contains(THIRD_PROOF_ID));
 
-    fs::remove_file(results_path).expect("Kani results artifact should be removed");
-    fs::remove_file(assessments_path).expect("assessment artifact should be removed");
+    fs::remove_file(results_path)
+        .into_diagnostic()
+        .wrap_err("Kani results artifact should be removed")?;
+    fs::remove_file(assessments_path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn score_outside_the_rubric_range_is_rejected_before_recording() {
-    let path = temporary_path("assessment-invalid-score");
+fn score_outside_the_rubric_range_is_rejected_before_recording() -> miette::Result<()> {
+    let path = temporary_path("assessment-invalid-score")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -649,21 +736,24 @@ fn score_outside_the_rubric_range_is_rejected_before_recording() {
             "--comment",
             "This should not be recorded.",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(!output.status.success());
     assert!(
         !path.exists(),
         "invalid assessment must not create a record"
     );
+    Ok(())
 }
 
 #[test]
-fn incompatible_resolution_path_is_rejected_before_recording() {
-    let path = temporary_path("assessment-invalid-resolution-path");
+fn incompatible_resolution_path_is_rejected_before_recording() -> miette::Result<()> {
+    let path = temporary_path("assessment-invalid-resolution-path")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -691,21 +781,24 @@ fn incompatible_resolution_path_is_rejected_before_recording() {
             "--comment",
             "This should not be recorded.",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(!output.status.success());
     assert!(
         !path.exists(),
         "invalid assessment must not create a record"
     );
+    Ok(())
 }
 
 #[test]
-fn replace_can_record_an_accommodation_reroute() {
-    let path = temporary_path("assessment-replace-accommodation-reroute");
+fn replace_can_record_an_accommodation_reroute() -> miette::Result<()> {
+    let path = temporary_path("assessment-replace-accommodation-reroute")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -733,10 +826,12 @@ fn replace_can_record_an_accommodation_reroute() {
             "--comment",
             "This failing direct path needs an accommodation-backed replacement.",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(
         output.status.success(),
@@ -744,14 +839,17 @@ fn replace_can_record_an_accommodation_reroute() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let contents = fs::read_to_string(path).expect("recorded assessment should exist");
+    let contents = fs::read_to_string(path)
+        .into_diagnostic()
+        .wrap_err("recorded assessment should exist")?;
     assert!(contents.contains("\"recommendation\":\"replace\""));
     assert!(contents.contains("\"resolution_path\":\"replace_with_accommodation_model\""));
+    Ok(())
 }
 
 #[test]
-fn document_verifier_limitation_is_not_a_valid_resolution_path() {
-    let path = temporary_path("assessment-invalid-documented-limitation");
+fn document_verifier_limitation_is_not_a_valid_resolution_path() -> miette::Result<()> {
+    let path = temporary_path("assessment-invalid-documented-limitation")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
@@ -779,21 +877,25 @@ fn document_verifier_limitation_is_not_a_valid_resolution_path() {
             "--comment",
             "This should not be recorded.",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment CLI should start")?;
 
     assert!(!output.status.success());
     assert!(
         !path.exists(),
         "invalid assessment must not create a record"
     );
+    Ok(())
 }
 
 #[test]
-fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
-    let path = temporary_path("assessment-queue");
+fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() -> miette::Result<()>
+{
+    let path = temporary_path("assessment-queue")?;
     record(
         &path,
         "reviewer",
@@ -801,33 +903,40 @@ fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() {
         "accept",
         "keep_current_proof",
         "This proof has received its first assessment.",
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "assess",
             "queue",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment queue CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment queue CLI should start")?;
 
     assert!(
         output.status.success(),
         "queue failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("queue should be UTF-8")?;
     assert!(stdout.contains("Unassessed proofs:"));
     assert!(!stdout.contains(PROOF_ID));
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() {
-    let path = temporary_path("assessment-queue-since");
+fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() -> miette::Result<()> {
+    let path = temporary_path("assessment-queue-since")?;
     write_assessment_artifact(
         &path,
         &format!(
@@ -853,7 +962,7 @@ fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() {
                 comment: "Fresh assessment.",
             }),
         ),
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -862,26 +971,33 @@ fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() {
             "--since",
             "2026-07-28",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment queue CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment queue CLI should start")?;
 
     assert!(
         output.status.success(),
         "queue failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("queue should be UTF-8")?;
     assert!(stdout.contains(PROOF_ID));
     assert!(!stdout.contains(SECOND_PROOF_ID));
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn queue_json_reports_structured_unassessed_proofs() {
-    let path = temporary_path("assessment-queue-json");
+fn queue_json_reports_structured_unassessed_proofs() -> miette::Result<()> {
+    let path = temporary_path("assessment-queue-json")?;
     record(
         &path,
         "reviewer",
@@ -889,7 +1005,7 @@ fn queue_json_reports_structured_unassessed_proofs() {
         "accept",
         "keep_current_proof",
         "This proof has received its first assessment.",
-    );
+    )?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -897,18 +1013,24 @@ fn queue_json_reports_structured_unassessed_proofs() {
             "queue",
             "--json",
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("assessment queue CLI should start");
+        .into_diagnostic()
+        .wrap_err("assessment queue CLI should start")?;
 
     assert!(
         output.status.success(),
         "queue failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("queue should be UTF-8");
-    let json: Value = serde_json::from_str(&stdout).expect("queue output should be JSON");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("queue should be UTF-8")?;
+    let json: Value = serde_json::from_str(&stdout)
+        .into_diagnostic()
+        .wrap_err("queue output should be JSON")?;
     assert!(json["count"].as_u64().is_some());
     assert!(
         json["proof_ids"]
@@ -916,16 +1038,21 @@ fn queue_json_reports_structured_unassessed_proofs() {
             .is_some_and(|proofs| proofs.iter().all(|proof| proof != PROOF_ID))
     );
 
-    fs::remove_file(path).expect("assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("assessment artifact should be removed")?;
+    Ok(())
 }
 
 #[test]
-fn report_accepts_legacy_assessment_records_for_back_compatibility() {
-    let path = temporary_path("assessment-legacy-report");
+fn report_accepts_legacy_assessment_records_for_back_compatibility() -> miette::Result<()> {
+    let path = temporary_path("assessment-legacy-report")?;
     let legacy_record = format!(
         "{{\"schema_version\":1,\"proof_id\":\"{PROOF_ID}\",\"reviewer\":\"legacy-reviewer\",\"timestamp_unix_seconds\":1785357757,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":4,\"adversarial_coverage\":2,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Legacy record.\"}}\n"
     );
-    fs::write(&path, legacy_record).expect("legacy assessment artifact should be written");
+    fs::write(&path, legacy_record)
+        .into_diagnostic()
+        .wrap_err("legacy assessment artifact should be written")?;
 
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -934,20 +1061,27 @@ fn report_accepts_legacy_assessment_records_for_back_compatibility() {
             "--proof",
             PROOF_ID,
             "--assessments",
-            path.to_str().expect("temporary path should be UTF-8"),
+            path.to_str()
+                .ok_or_else(|| miette::miette!("temporary path should be UTF-8"))?,
         ])
         .output()
-        .expect("legacy assessment report CLI should start");
+        .into_diagnostic()
+        .wrap_err("legacy assessment report CLI should start")?;
 
     assert!(
         output.status.success(),
         "legacy report failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let stdout = String::from_utf8(output.stdout).expect("legacy report should be UTF-8");
+    let stdout = String::from_utf8(output.stdout)
+        .into_diagnostic()
+        .wrap_err("legacy report should be UTF-8")?;
     assert!(stdout.contains("1 assessment(s)"));
     assert!(stdout.contains("recommendations: accept:1"));
     assert!(stdout.contains("resolution paths: legacy_unspecified:1"));
 
-    fs::remove_file(path).expect("legacy assessment artifact should be removed");
+    fs::remove_file(path)
+        .into_diagnostic()
+        .wrap_err("legacy assessment artifact should be removed")?;
+    Ok(())
 }
