@@ -1,89 +1,95 @@
+mod support;
+
 use amenable_core::{Provenance as ProvenanceTrait, Registry, Standard};
 use amenable_std::{
     CertRegistry, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,
 };
+use miette::{IntoDiagnostic, WrapErr};
 use std::path::Path;
 
 #[test]
-fn rust_std_types_emit_derived_provenance_records() {
+fn rust_std_types_emit_derived_provenance_records() -> miette::Result<()> {
     let provenance: RustStdProvenance = <i32 as RustStdType>::provenance();
 
     assert_eq!(
         provenance
             .get("rust.authority")
-            .expect("shared authority fact present")
+            .ok_or_else(|| miette::miette!("shared authority fact present"))?
             .value(),
         "Rust Project Developers"
     );
     assert_eq!(
         provenance
             .get("rust.source_module")
-            .expect("shared source module fact present")
+            .ok_or_else(|| miette::miette!("shared source module fact present"))?
             .value(),
         "core::primitive"
     );
     assert_eq!(
         provenance
             .get("type_name")
-            .expect("type name fact present")
+            .ok_or_else(|| miette::miette!("type name fact present"))?
             .value(),
         "i32"
     );
     assert_eq!(
         provenance
             .get("semantic_summary")
-            .expect("semantic summary fact present")
+            .ok_or_else(|| miette::miette!("semantic summary fact present"))?
             .value(),
         "The signed 32-bit integer carrier stores values in the i32 range defined by Rust."
     );
+    Ok(())
 }
 
 #[test]
-fn fixed_width_integer_types_share_rust_language_provenance_but_vary_type_specific_facts() {
+fn fixed_width_integer_types_share_rust_language_provenance_but_vary_type_specific_facts()
+-> miette::Result<()> {
     let i8_provenance = <i8 as RustStdType>::provenance();
     let i32_provenance = <i32 as RustStdType>::provenance();
 
     assert_eq!(
         i8_provenance
             .get("rust.authority")
-            .expect("i8 shared authority fact present")
+            .ok_or_else(|| miette::miette!("i8 shared authority fact present"))?
             .value(),
         i32_provenance
             .get("rust.authority")
-            .expect("i32 shared authority fact present")
+            .ok_or_else(|| miette::miette!("i32 shared authority fact present"))?
             .value(),
     );
     assert_eq!(
         i8_provenance
             .get("rust.source_crate")
-            .expect("i8 shared crate fact present")
+            .ok_or_else(|| miette::miette!("i8 shared crate fact present"))?
             .value(),
         i32_provenance
             .get("rust.source_crate")
-            .expect("i32 shared crate fact present")
+            .ok_or_else(|| miette::miette!("i32 shared crate fact present"))?
             .value(),
     );
     assert_ne!(
         i8_provenance
             .get("source_url")
-            .expect("i8 source url fact present")
+            .ok_or_else(|| miette::miette!("i8 source url fact present"))?
             .value(),
         i32_provenance
             .get("source_url")
-            .expect("i32 source url fact present")
+            .ok_or_else(|| miette::miette!("i32 source url fact present"))?
             .value(),
     );
     assert_ne!(
         i8_provenance
             .get("type_name")
-            .expect("i8 type name fact present")
+            .ok_or_else(|| miette::miette!("i8 type name fact present"))?
             .value(),
         i32_provenance
             .get("type_name")
-            .expect("i32 type name fact present")
+            .ok_or_else(|| miette::miette!("i32 type name fact present"))?
             .value(),
     );
+    Ok(())
 }
 
 #[test]
@@ -147,16 +153,17 @@ semantic_summary: The signed 32-bit integer carrier stores values in the i32 ran
 }
 
 #[test]
-fn rust_std_certificate_artifacts_are_emitted_to_the_workspace_artifacts_directory() {
+fn rust_std_certificate_artifacts_are_emitted_to_the_workspace_artifacts_directory()
+-> miette::Result<()> {
     let artifact_directory =
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts/std-certificates");
-    let paths =
-        write_rust_std_certificate_artifacts(&artifact_directory).expect("std artifacts emitted");
+    let paths = support::library(write_rust_std_certificate_artifacts(&artifact_directory))?;
 
     assert_eq!(paths.len(), 17);
     assert_eq!(
         std::fs::read_to_string(artifact_directory.join("i32.provenance.txt"))
-            .expect("i32 certificate artifact present"),
+            .into_diagnostic()
+            .wrap_err("i32 certificate artifact present")?,
         "Provenance certificate 5 for i32\n\
 rust.authority_kind: external_standard\n\
 rust.authority: Rust Project Developers\n\
@@ -166,4 +173,5 @@ source_url: https://doc.rust-lang.org/std/primitive.i32.html\n\
 type_name: i32\n\
 semantic_summary: The signed 32-bit integer carrier stores values in the i32 range defined by Rust."
     );
+    Ok(())
 }

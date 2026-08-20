@@ -23,6 +23,9 @@ quote = { workspace = true, optional = true }
 syn = { workspace = true, optional = true }
 verus_syn = { workspace = true, optional = true }
 
+[dev-dependencies]
+miette = { workspace = true }
+
 [features]
 # No `creusot` feature here anymore: this crate's own `Witness<
 # CreusotVerifier>` bridge for `RustStdStandard<T>` used to live here,
