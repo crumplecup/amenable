@@ -44,7 +44,8 @@ mod witness;
 pub use calculation::{Calculation, CarriesToken};
 pub use cert::{Certificate, Registry, RegistryReport};
 pub use chain::{
-    ChainError, ChainGap, ChainNode, ProofChainReport, proof_chain, proof_chain_for_verifiers,
+    ChainError, ChainErrorKind, ChainGap, ChainNode, IncompleteSource, NotFoundSource,
+    ProofChainReport, proof_chain, proof_chain_for_verifiers,
 };
 pub use contract::{Ensures, Requires};
 pub use evidence::Evidence;

@@ -139,56 +139,156 @@ impl Display for ChainGap {
     }
 }
 
-/// Why a proof chain lookup failed.
-#[derive(Debug, Clone)]
-pub enum ChainError {
-    /// No registered [`EvidenceLink`] matched the requested subject at all.
-    NotFound {
-        /// The subject that was searched for.
-        subject: String,
-    },
-    /// The subject was found, but at least one node in its tree has no
-    /// proof registered for at least one of the required verifiers.
-    Incomplete {
-        /// The evidence type name the lookup was rooted at.
-        subject: &'static str,
-        /// Every verifier the chain was required to be complete for.
-        required: Vec<String>,
-        /// Every `(evidence, verifier)` gap found, in tree order.
-        gaps: Vec<ChainGap>,
-    },
+/// No registered [`EvidenceLink`] matched the requested subject at all --
+/// a real, `Error`-implementing leaf, not a bare `String`.
+#[derive(Debug, Clone, PartialEq, Eq, derive_more::Display, derive_more::Error)]
+#[display("no registered evidence link matches {subject:?}")]
+pub struct NotFoundSource {
+    /// The subject that was searched for.
+    #[error(ignore)]
+    pub subject: String,
+    /// Source line of the call site that produced this error.
+    #[error(ignore)]
+    pub line: u32,
+    /// Source file of the call site that produced this error.
+    #[error(ignore)]
+    pub file: &'static str,
 }
 
-impl Display for ChainError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NotFound { subject } => {
-                write!(f, "no registered evidence link matches {subject:?}")
-            }
-            Self::Incomplete {
-                subject,
-                required,
-                gaps,
-            } => {
-                writeln!(
-                    f,
-                    "proof chain for {subject} is incomplete for verifier(s): {}",
-                    required.join(", ")
-                )?;
-                writeln!(f)?;
-                write!(f, "missing proofs:")?;
-
-                for gap in gaps {
-                    write!(f, "\n  {gap}")?;
-                }
-
-                Ok(())
-            }
+impl NotFoundSource {
+    /// Name the subject that was searched for, recording the caller's
+    /// location.
+    #[track_caller]
+    fn new(subject: impl Into<String>) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            subject: subject.into(),
+            line: loc.line(),
+            file: loc.file(),
         }
     }
 }
 
-impl std::error::Error for ChainError {}
+/// The subject was found, but at least one node in its tree has no proof
+/// registered for at least one of the required verifiers.
+#[derive(Debug, Clone, derive_more::Error)]
+pub struct IncompleteSource {
+    /// The evidence type name the lookup was rooted at.
+    #[error(ignore)]
+    pub subject: &'static str,
+    /// Every verifier the chain was required to be complete for.
+    #[error(ignore)]
+    pub required: Vec<String>,
+    /// Every `(evidence, verifier)` gap found, in tree order.
+    #[error(ignore)]
+    pub gaps: Vec<ChainGap>,
+    /// Source line of the call site that produced this error. Public,
+    /// like every other field in this module -- matching this file's
+    /// own established convention (`ChainGap`/`ChainNode`/
+    /// `ProofChainReport` are all plain public-field data types too).
+    #[error(ignore)]
+    pub line: u32,
+    /// Source file of the call site that produced this error.
+    #[error(ignore)]
+    pub file: &'static str,
+}
+
+impl IncompleteSource {
+    /// Name the subject, the required verifiers, and every gap found,
+    /// recording the caller's location.
+    #[track_caller]
+    fn new(subject: &'static str, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            subject,
+            required,
+            gaps,
+            line: loc.line(),
+            file: loc.file(),
+        }
+    }
+}
+
+impl Display for IncompleteSource {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        writeln!(
+            f,
+            "proof chain for {} is incomplete for verifier(s): {}",
+            self.subject,
+            self.required.join(", ")
+        )?;
+        writeln!(f)?;
+        write!(f, "missing proofs:")?;
+
+        for gap in &self.gaps {
+            write!(f, "\n  {gap}")?;
+        }
+
+        Ok(())
+    }
+}
+
+/// Why a proof chain lookup failed. Every variant is a clean 1-tuple
+/// wrapping a real, named, `Error`-implementing source type.
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_more::From)]
+pub enum ChainErrorKind {
+    /// See [`NotFoundSource`].
+    #[display("{_0}")]
+    NotFound(NotFoundSource),
+    /// See [`IncompleteSource`].
+    #[display("{_0}")]
+    Incomplete(IncompleteSource),
+}
+
+/// Proof-chain lookup error, carrying kind + call site location -- the
+/// same `struct` boxing a `*Kind` enum shape `amenable::AmenableError`
+/// uses.
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[display("{kind} at {file}:{line}")]
+pub struct ChainError {
+    /// The specific error kind, boxed to keep `ChainError` itself small.
+    #[error(source)]
+    kind: Box<ChainErrorKind>,
+    /// Source line of the call site that produced this error.
+    line: u32,
+    /// Source file of the call site that produced this error.
+    file: &'static str,
+}
+
+impl ChainError {
+    /// Construct an error from an already-classified kind, recording the
+    /// caller's location.
+    #[track_caller]
+    fn new(kind: ChainErrorKind) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            kind: Box::new(kind),
+            line: loc.line(),
+            file: loc.file(),
+        }
+    }
+
+    /// The specific error kind.
+    pub fn kind(&self) -> &ChainErrorKind {
+        &self.kind
+    }
+
+    /// Construct a [`ChainErrorKind::NotFound`] error naming the subject
+    /// that was searched for.
+    #[track_caller]
+    fn not_found(subject: impl Into<String>) -> Self {
+        Self::new(ChainErrorKind::NotFound(NotFoundSource::new(subject)))
+    }
+
+    /// Construct a [`ChainErrorKind::Incomplete`] error naming the
+    /// subject, the required verifiers, and every gap found.
+    #[track_caller]
+    fn incomplete(subject: &'static str, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
+        Self::new(ChainErrorKind::Incomplete(IncompleteSource::new(
+            subject, required, gaps,
+        )))
+    }
+}
 
 /// Reconstruct the proof tree for the evidence type whose registered
 /// [`EvidenceLink::name`] ends with `subject`, requiring a complete proof
@@ -215,9 +315,7 @@ pub fn proof_chain_for_verifiers(
     let root_name = links
         .iter()
         .find(|link| link.name.ends_with(subject))
-        .ok_or_else(|| ChainError::NotFound {
-            subject: subject.to_owned(),
-        })?
+        .ok_or_else(|| ChainError::not_found(subject))?
         .name;
     let mut visiting = HashSet::new();
     let full_root = build_node(root_name, &links, &mut visiting);
@@ -231,11 +329,7 @@ pub fn proof_chain_for_verifiers(
     collect_gaps(&full_root, &required, &mut gaps);
 
     if !gaps.is_empty() {
-        return Err(ChainError::Incomplete {
-            subject: root_name,
-            required,
-            gaps,
-        });
+        return Err(ChainError::incomplete(root_name, required, gaps));
     }
 
     let root = filter_node(full_root, &required);

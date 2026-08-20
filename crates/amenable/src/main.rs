@@ -147,7 +147,7 @@ fn run_audit(args: AuditArgs) -> AmenableResult<()> {
                 ),
             }
 
-            return Err(amenable::AmenableError::invariant(error.to_string()));
+            return Err(amenable::AmenableError::chain(error));
         }
     };
 

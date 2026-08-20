@@ -64,19 +64,20 @@ impl Diagnostic for CliError {
 
 fn error_kind_code(kind: &AmenableErrorKind) -> &'static str {
     use AmenableErrorKind::{
-        InvalidUtcDate, Invariant, Io, JsonLine, Serde, SystemTime, TimeComponentRange, TimeFormat,
-        TimeFormatDescription, TimeParse,
+        Chain, InvalidUtcDate, Invariant, Io, JsonLine, Serde, SystemTime, TimeComponentRange,
+        TimeFormat, TimeFormatDescription, TimeParse,
     };
     match kind {
-        Io { .. } => "Io",
-        JsonLine { .. } => "JsonLine",
+        Io(_) => "Io",
+        JsonLine(_) => "JsonLine",
         Serde(_) => "Serde",
         SystemTime(_) => "SystemTime",
         TimeFormatDescription(_) => "TimeFormatDescription",
         TimeParse(_) => "TimeParse",
-        InvalidUtcDate { .. } => "InvalidUtcDate",
+        InvalidUtcDate(_) => "InvalidUtcDate",
         TimeComponentRange(_) => "TimeComponentRange",
         TimeFormat(_) => "TimeFormat",
-        Invariant { .. } => "Invariant",
+        Invariant(_) => "Invariant",
+        Chain(_) => "Chain",
     }
 }

@@ -46,12 +46,12 @@ fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() {
     let kind = error
         .source()
         .expect("AmenableError must expose its kind as source (see #[error(source)] on `kind`)");
-    let serde_source = kind
+    let json_line_source = kind
         .source()
-        .expect("AmenableErrorKind::JsonLine must expose the SerdeSource wrapper as source");
-    let json_error = serde_source
+        .expect("AmenableErrorKind::JsonLine must expose the JsonLineSource wrapper as source");
+    let json_error = json_line_source
         .source()
-        .expect("SerdeSource must expose the underlying serde_json::Error as source");
+        .expect("JsonLineSource must expose the underlying serde_json::Error as source");
     assert!(
         json_error.downcast_ref::<serde_json::Error>().is_some(),
         "the deepest source must be the real serde_json::Error, not a stringified copy"

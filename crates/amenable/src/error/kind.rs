@@ -1,13 +1,17 @@
 //! Error kind enumeration for `amenable`'s CLI-facing operations.
 
-use std::path::PathBuf;
-
 use crate::error::sources::{
-    IoSource, SerdeSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
-    TimeFormatSource, TimeParseSource,
+    ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
+    SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource,
+    TimeParseSource,
 };
 
-/// Error kind for `amenable` CLI operations.
+/// Error kind for `amenable` CLI operations. Every variant is a clean
+/// 1-tuple wrapping a real, named, `Error`-implementing source type --
+/// never a bare struct or `String` -- so `AmenableError::source()`'s
+/// chain always reaches a genuine `Error`-implementing value at each
+/// hop, downcastable all the way to the real foreign error, not a
+/// stringified copy or an untyped dead end.
 #[derive(Debug, derive_more::Display, derive_more::Error, derive_more::From)]
 pub enum AmenableErrorKind {
     /// IO error naming the specific artifact path that failed. Not
@@ -15,25 +19,15 @@ pub enum AmenableErrorKind {
     /// (see `wrapper.rs`) because every IO call site in this crate
     /// already has a path in scope worth preserving in the error itself,
     /// not just at the `AmenableError`-level `file`/`line` (which name
-    /// the Rust source, not the data path).
-    #[display("IO error at {}: {}", path.display(), source)]
-    Io {
-        /// The artifact path the failing operation targeted.
-        path: PathBuf,
-        /// The preserved `std::io::Error`.
-        source: IoSource,
-    },
+    /// the Rust source, not the data path) -- [`IoSource`] itself now
+    /// carries that path.
+    #[display("{_0}")]
+    Io(IoSource),
 
-    /// Failed to parse one line of a JSON Lines artifact.
-    #[display("invalid JSON on line {line} in {}: {}", path.display(), source)]
-    JsonLine {
-        /// The JSON Lines artifact path.
-        path: PathBuf,
-        /// The 1-indexed line number that failed to parse.
-        line: usize,
-        /// The preserved `serde_json::Error`.
-        source: SerdeSource,
-    },
+    /// Failed to parse one line of a JSON Lines artifact -- [`JsonLineSource`]
+    /// carries the artifact path and the 1-indexed line that failed.
+    #[display("{_0}")]
+    JsonLine(JsonLineSource),
 
     /// Serde JSON error (assessment/registry-dump serialization).
     #[display("JSON error: {}", _0)]
@@ -55,14 +49,10 @@ pub enum AmenableErrorKind {
     #[from(TimeParseSource)]
     TimeParse(TimeParseSource),
 
-    /// A date string didn't match the expected `YYYY-MM-DD` format.
-    #[display("invalid date {value:?}; expected YYYY-MM-DD: {source}")]
-    InvalidUtcDate {
-        /// The rejected date string, verbatim.
-        value: String,
-        /// The preserved `time::error::Parse`.
-        source: TimeParseSource,
-    },
+    /// A date string didn't match the expected `YYYY-MM-DD` format --
+    /// [`InvalidUtcDateSource`] carries the rejected string.
+    #[display("{_0}")]
+    InvalidUtcDate(InvalidUtcDateSource),
 
     /// A date/time value was out of its valid component range.
     #[display("date/time component range error: {}", _0)]
@@ -75,10 +65,14 @@ pub enum AmenableErrorKind {
     TimeFormat(TimeFormatSource),
 
     /// A business-rule invariant was violated (bad input, unknown ID,
-    /// mismatched counts, and similar non-foreign validation failures).
-    #[display("{detail}")]
-    Invariant {
-        /// Human-readable description of the violated invariant.
-        detail: String,
-    },
+    /// mismatched counts, and similar non-foreign validation failures) --
+    /// [`InvariantSource`] is a real `Error`-implementing leaf, not a
+    /// bare `String`.
+    #[display("{_0}")]
+    Invariant(InvariantSource),
+
+    /// A proof-chain lookup failed (`amenable_core::ChainError::NotFound`/
+    /// `Incomplete`), preserved as the real typed value.
+    #[display("{_0}")]
+    Chain(ChainSource),
 }

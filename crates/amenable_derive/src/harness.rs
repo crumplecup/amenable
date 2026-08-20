@@ -41,11 +41,13 @@ pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
         .unwrap_or_else(|| group.stream().to_string());
     let item = group.stream();
     let kani_record = if cfg_name == "kani" {
-        let harness = syn::parse2::<syn::ItemFn>(item.clone()).map_err(|_| {
-            Error::new_spanned(
+        let harness = syn::parse2::<syn::ItemFn>(item.clone()).map_err(|err| {
+            let mut context = Error::new_spanned(
                 &item,
                 "a `kani` harness! invocation must contain one function item",
-            )
+            );
+            context.combine(err);
+            context
         })?;
         let name = harness.sig.ident;
 

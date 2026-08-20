@@ -1,4 +1,4 @@
-use amenable::ChainError;
+use amenable::{ChainErrorKind, IncompleteSource, NotFoundSource};
 
 fn assert_root_has_kani_and_creusot(report: &amenable::ProofChainReport, expected_suffix: &str) {
     let root = &report.root;
@@ -6957,7 +6957,12 @@ fn mem_discriminant_option_i32_proof_chain_reports_the_kani_and_creusot_harnesse
 #[test]
 fn unregistered_subject_yields_a_not_found_error() {
     match amenable::proof_chain("NoSuchEvidenceType") {
-        Err(ChainError::NotFound { subject }) => assert_eq!(subject, "NoSuchEvidenceType"),
+        Err(error) => match error.kind() {
+            ChainErrorKind::NotFound(NotFoundSource { subject, .. }) => {
+                assert_eq!(subject, "NoSuchEvidenceType");
+            }
+            other => panic!("expected ChainErrorKind::NotFound, got {other:?}"),
+        },
         other => panic!("expected ChainError::NotFound, got {other:?}"),
     }
 }
@@ -7029,23 +7034,29 @@ fn calculation_over_two_arguments_fans_out_into_a_tree_that_bottoms_out_in_std()
 fn calculation_chain_is_incomplete_for_creusot_and_verus() {
     for verifier in ["creusot", "verus"] {
         match amenable::proof_chain_for_verifiers("AddEvidence", Some(&[verifier])) {
-            Err(ChainError::Incomplete {
-                subject,
-                required,
-                gaps,
-            }) => {
-                assert!(subject.ends_with("AddEvidence"));
-                assert_eq!(required, vec![verifier.to_string()]);
+            Err(error) => match error.kind() {
+                ChainErrorKind::Incomplete(IncompleteSource {
+                    subject,
+                    required,
+                    gaps,
+                    ..
+                }) => {
+                    assert!(subject.ends_with("AddEvidence"));
+                    assert_eq!(required, &vec![verifier.to_string()]);
 
-                // AddEvidence, Debit, and Credit all lack a proof for
-                // this verifier; only the RustStdStandard<i64> leaf has
-                // one, so exactly three gaps are expected.
-                assert_eq!(gaps.len(), 3, "gaps for {verifier}: {gaps:?}");
-                assert!(gaps.iter().any(|gap| gap.evidence.ends_with("AddEvidence")));
-                assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Debit")));
-                assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Credit")));
-                assert!(gaps.iter().all(|gap| gap.verifier == verifier));
-            }
+                    // AddEvidence, Debit, and Credit all lack a proof for
+                    // this verifier; only the RustStdStandard<i64> leaf has
+                    // one, so exactly three gaps are expected.
+                    assert_eq!(gaps.len(), 3, "gaps for {verifier}: {gaps:?}");
+                    assert!(gaps.iter().any(|gap| gap.evidence.ends_with("AddEvidence")));
+                    assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Debit")));
+                    assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Credit")));
+                    assert!(gaps.iter().all(|gap| gap.verifier == verifier));
+                }
+                other => {
+                    panic!("expected ChainErrorKind::Incomplete for {verifier}, got {other:?}")
+                }
+            },
             other => panic!("expected ChainError::Incomplete for {verifier}, got {other:?}"),
         }
     }
@@ -7064,12 +7075,15 @@ fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
     // unscoped lookup must refuse to return a report rather than quietly
     // showing a chain that looks uniformly proven.
     match amenable::proof_chain("AddEvidence") {
-        Err(ChainError::Incomplete { required, .. }) => {
-            assert_eq!(required.len(), 3);
-            assert!(required.iter().any(|v| v == "kani"));
-            assert!(required.iter().any(|v| v == "creusot"));
-            assert!(required.iter().any(|v| v == "verus"));
-        }
+        Err(error) => match error.kind() {
+            ChainErrorKind::Incomplete(IncompleteSource { required, .. }) => {
+                assert_eq!(required.len(), 3);
+                assert!(required.iter().any(|v| v == "kani"));
+                assert!(required.iter().any(|v| v == "creusot"));
+                assert!(required.iter().any(|v| v == "verus"));
+            }
+            other => panic!("expected ChainErrorKind::Incomplete, got {other:?}"),
+        },
         other => panic!("expected ChainError::Incomplete, got {other:?}"),
     }
 }

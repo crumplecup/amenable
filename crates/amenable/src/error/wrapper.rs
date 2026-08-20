@@ -10,8 +10,9 @@ use std::path::PathBuf;
 
 use crate::error::kind::AmenableErrorKind;
 use crate::error::sources::{
-    IoSource, SerdeSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
-    TimeFormatSource, TimeParseSource,
+    ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
+    SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource,
+    TimeParseSource,
 };
 
 /// Crate-level result alias.
@@ -21,15 +22,17 @@ pub type AmenableResult<T> = Result<T, AmenableError>;
 #[derive(Debug, derive_more::Display, derive_more::Error)]
 #[display("amenable: {kind} at {file}:{line}")]
 pub struct AmenableError {
-    /// The specific error kind. `derive_more::Error` only auto-detects a
-    /// field literally named `source` on named structs (tuple variants
-    /// get inference; named ones don't) -- without `#[error(source)]`
-    /// here, `AmenableError::source()` would silently return `None` and
-    /// the real io/serde/etc. error would never be reachable through
+    /// The specific error kind, boxed to keep `AmenableError` itself
+    /// small regardless of how large any one `AmenableErrorKind` variant
+    /// grows. `derive_more::Error` only auto-detects a field literally
+    /// named `source` on named structs (tuple variants get inference;
+    /// named ones don't) -- without `#[error(source)]` here,
+    /// `AmenableError::source()` would silently return `None` and the
+    /// real io/serde/etc. error would never be reachable through
     /// `std::error::Error::source()`, breaking the exact chain this
     /// module exists to preserve.
     #[error(source)]
-    pub kind: AmenableErrorKind,
+    pub kind: Box<AmenableErrorKind>,
     /// Source line of the call site that produced this error.
     pub line: u32,
     /// Source file of the call site that produced this error.
@@ -43,7 +46,7 @@ impl AmenableError {
     pub fn new(kind: AmenableErrorKind) -> Self {
         let loc = std::panic::Location::caller();
         Self {
-            kind,
+            kind: Box::new(kind),
             line: loc.line(),
             file: loc.file(),
         }
@@ -52,40 +55,39 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::Invariant`] business-rule error.
     #[track_caller]
     pub fn invariant(detail: impl Into<String>) -> Self {
-        Self::new(AmenableErrorKind::Invariant {
-            detail: detail.into(),
-        })
+        Self::new(AmenableErrorKind::Invariant(InvariantSource::new(detail)))
     }
 
     /// Construct an [`AmenableErrorKind::Io`] error naming the artifact
     /// path that failed.
     #[track_caller]
     pub fn io(path: impl Into<PathBuf>, source: std::io::Error) -> Self {
-        Self::new(AmenableErrorKind::Io {
-            path: path.into(),
-            source: IoSource::from(source),
-        })
+        Self::new(AmenableErrorKind::Io(IoSource::new(source, path)))
     }
 
     /// Construct an [`AmenableErrorKind::JsonLine`] error naming the file
     /// and 1-indexed line that failed to parse.
     #[track_caller]
     pub fn json_line(path: impl Into<PathBuf>, line: usize, source: serde_json::Error) -> Self {
-        Self::new(AmenableErrorKind::JsonLine {
-            path: path.into(),
-            line,
-            source: SerdeSource::from(source),
-        })
+        Self::new(AmenableErrorKind::JsonLine(JsonLineSource::new(
+            source, path, line,
+        )))
     }
 
     /// Construct an [`AmenableErrorKind::InvalidUtcDate`] error naming the
     /// rejected date string.
     #[track_caller]
     pub fn invalid_utc_date(value: impl Into<String>, source: time::error::Parse) -> Self {
-        Self::new(AmenableErrorKind::InvalidUtcDate {
-            value: value.into(),
-            source: TimeParseSource::from(source),
-        })
+        Self::new(AmenableErrorKind::InvalidUtcDate(
+            InvalidUtcDateSource::new(source, value),
+        ))
+    }
+
+    /// Construct an [`AmenableErrorKind::Chain`] error preserving a
+    /// proof-chain lookup failure.
+    #[track_caller]
+    pub fn chain(source: crate::ChainError) -> Self {
+        Self::new(AmenableErrorKind::Chain(ChainSource::new(source)))
     }
 }
 
@@ -103,7 +105,7 @@ macro_rules! bridge_error {
         impl From<$external> for AmenableErrorKind {
             #[track_caller]
             fn from(err: $external) -> Self {
-                <$wrapper>::from(err).into()
+                <$wrapper>::new(err).into()
             }
         }
     };
