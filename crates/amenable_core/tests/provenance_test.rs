@@ -152,7 +152,7 @@ fn verifier_metadata_marker_is_zero_sized() {
 }
 
 #[test]
-fn verifier_metadata_iterates_lazily_generated_entries() {
+fn verifier_metadata_iterates_lazily_generated_entries() -> miette::Result<()> {
     let metadata = ManualVerifier::metadata();
 
     assert!(!metadata.is_empty());
@@ -160,12 +160,13 @@ fn verifier_metadata_iterates_lazily_generated_entries() {
 
     let entry = metadata
         .get("verifier_family")
-        .expect("verifier_family fact present");
+        .ok_or_else(|| miette::miette!("verifier_family fact present"))?;
     assert_eq!(entry.value(), "manual");
 
     assert!(metadata.contains_key("authority"));
     assert!(!metadata.contains_key("nonexistent_key"));
     assert!(metadata.get("nonexistent_key").is_none());
+    Ok(())
 }
 
 #[test]

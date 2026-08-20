@@ -23,6 +23,7 @@ verus_syn = { workspace = true, optional = true }
 
 [dev-dependencies]
 amenable_derive = { workspace = true }
+miette = { workspace = true }
 trybuild = { workspace = true }
 
 [features]

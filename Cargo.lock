@@ -41,6 +41,7 @@ dependencies = [
  "amenable_derive",
  "derive_more",
  "inventory",
+ "miette",
  "proc-macro2",
  "quote",
  "syn 3.0.3",
