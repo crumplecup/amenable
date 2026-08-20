@@ -95,6 +95,7 @@ dependencies = [
  "amenable_gaap",
  "amenable_std",
  "inventory",
+ "miette",
  "uuid",
 ]
 

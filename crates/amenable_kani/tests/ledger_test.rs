@@ -14,7 +14,7 @@ use amenable_gaap::{
 use amenable_kani::KaniVerifier;
 
 #[test]
-fn validate_accepts_a_lawful_transfer() {
+fn validate_accepts_a_lawful_transfer() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
@@ -25,8 +25,9 @@ fn validate_accepts_a_lawful_transfer() {
 
     let validated: Transfer<Validated, ValidatedToken> = ledger
         .validate::<KaniVerifier>(input)
-        .expect("lawful transfer");
+        .map_err(|error| miette::miette!("lawful transfer: {error:?}"))?;
     assert_eq!(validated.primary().amount().value(), 50);
+    Ok(())
 }
 
 #[test]
@@ -84,7 +85,7 @@ fn validate_rejects_the_same_account() {
 }
 
 #[test]
-fn commit_always_succeeds_and_carries_the_same_amount() {
+fn commit_always_succeeds_and_carries_the_same_amount() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
@@ -95,15 +96,17 @@ fn commit_always_succeeds_and_carries_the_same_amount() {
 
     let validated: Transfer<Validated, ValidatedToken> = ledger
         .validate::<KaniVerifier>(input)
-        .expect("lawful transfer");
-    let committed: Transfer<Committed, CommittedToken> = ledger
-        .commit::<KaniVerifier>(validated)
-        .expect("commit never fails");
+        .map_err(|error| miette::miette!("lawful transfer: {error:?}"))?;
+    let committed: Transfer<Committed, CommittedToken> =
+        ledger
+            .commit::<KaniVerifier>(validated)
+            .map_err(|error| miette::miette!("commit never fails: {error:?}"))?;
     assert_eq!(committed.primary().amount().value(), 50);
+    Ok(())
 }
 
 #[test]
-fn reject_always_succeeds_and_preserves_the_payload() {
+fn reject_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
@@ -114,12 +117,13 @@ fn reject_always_succeeds_and_preserves_the_payload() {
 
     let rejected: Transfer<Rejected<Pending>, RejectedFromPendingToken> = ledger
         .reject::<KaniVerifier>(input)
-        .expect("reject never fails");
+        .map_err(|error| miette::miette!("reject never fails: {error:?}"))?;
     assert_eq!(rejected.primary().amount().value(), 50);
+    Ok(())
 }
 
 #[test]
-fn rollback_always_succeeds_and_preserves_the_payload() {
+fn rollback_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
@@ -130,11 +134,12 @@ fn rollback_always_succeeds_and_preserves_the_payload() {
 
     let validated: Transfer<Validated, ValidatedToken> = ledger
         .validate::<KaniVerifier>(input)
-        .expect("lawful transfer");
+        .map_err(|error| miette::miette!("lawful transfer: {error:?}"))?;
     let rolled_back: Transfer<Rejected<Validated>, RejectedFromValidatedToken> = ledger
         .rollback::<KaniVerifier>(validated)
-        .expect("rollback never fails");
+        .map_err(|error| miette::miette!("rollback never fails: {error:?}"))?;
     assert_eq!(rolled_back.primary().amount().value(), 50);
+    Ok(())
 }
 
 /// `Validated`'s real `Requires<KaniVerifier>` impl -- `commit`'s own
@@ -143,7 +148,7 @@ fn rollback_always_succeeds_and_preserves_the_payload() {
 /// independently hand-typed copy. Exercised directly, not just through
 /// `commit`'s own DFCC contract (which only Kani itself checks).
 #[test]
-fn validated_requires_holds_for_a_lawfully_validated_transfer() {
+fn validated_requires_holds_for_a_lawfully_validated_transfer() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
@@ -152,9 +157,10 @@ fn validated_requires_holds_for_a_lawfully_validated_transfer() {
     );
     let validated: Transfer<Validated, ValidatedToken> = ledger
         .validate::<KaniVerifier>(Transfer::pending(payload))
-        .expect("lawful transfer");
+        .map_err(|error| miette::miette!("lawful transfer: {error:?}"))?;
 
     assert!(<Validated as Requires<KaniVerifier>>::requires(validated));
+    Ok(())
 }
 
 /// The real "sewing together" this step is about: `validate`'s
@@ -164,7 +170,7 @@ fn validated_requires_holds_for_a_lawfully_validated_transfer() {
 /// two independently hand-typed restatements of "amount is positive"
 /// with nothing enforcing they agree.
 #[test]
-fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() {
+fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() -> miette::Result<()> {
     let records: Vec<&ContractRecord> = inventory::iter::<ContractRecord>()
         .filter(|record| {
             record.verifier == "kani"
@@ -182,14 +188,15 @@ fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() {
     let ensures = records
         .iter()
         .find(|record| record.kind == "ensures")
-        .expect("validate_ensures record missing");
+        .ok_or_else(|| miette::miette!("validate_ensures record missing"))?;
     let requires = records
         .iter()
         .find(|record| record.kind == "requires")
-        .expect("commit_requires record missing");
+        .ok_or_else(|| miette::miette!("commit_requires record missing"))?;
 
     assert!((ensures.fragment)().contains("AmountPositive"));
     assert!((requires.fragment)().contains("AmountPositive"));
+    Ok(())
 }
 
 /// `Ledger`'s real `impl<V: Verifier> StateMachine<V> for Ledger` --
