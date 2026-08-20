@@ -118,7 +118,14 @@ pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
                 && item_fn.sig.ident == name
                 && matches!(item_fn.vis, verus_syn::Visibility::Public(_))
             {
-                let module_path = module_path_for(&root, &path);
+                // `path` came from walking `root` itself (`rust_files(&root)`
+                // above), so `module_path_for` can only fail here if that
+                // walk is broken -- in which case there's no lawful module
+                // path to report, so keep searching rather than trust an
+                // unreachable branch never to fire.
+                let Ok(module_path) = module_path_for(&root, &path) else {
+                    continue;
+                };
                 return Some((path, module_path, item_fn));
             }
         }
@@ -129,18 +136,15 @@ pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
 
 /// `.../amenable_verus/src/rust_std/char_carrier.rs` (relative to
 /// `root`) to `crate::rust_std::char_carrier`.
-fn module_path_for(root: &Path, path: &Path) -> String {
-    let relative = path
-        .strip_prefix(root)
-        .expect("discovered carrier files are always under carrier_root()")
-        .with_extension("");
+fn module_path_for(root: &Path, path: &Path) -> Result<String, std::path::StripPrefixError> {
+    let relative = path.strip_prefix(root)?.with_extension("");
 
     let segments = relative
         .components()
         .map(|component| component.as_os_str().to_string_lossy().into_owned())
         .collect::<Vec<_>>();
 
-    format!("crate::{}", segments.join("::"))
+    Ok(format!("crate::{}", segments.join("::")))
 }
 
 /// The bound identifier a simple `pat` names, if it's a plain
