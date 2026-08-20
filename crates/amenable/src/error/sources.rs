@@ -336,3 +336,32 @@ impl ChainSource {
         }
     }
 }
+
+/// Preserved `amenable_std::AmenableStdError` source -- `amenable_std`
+/// has its own umbrella error, the same as every other crate ("each
+/// crate gets its own umbrella error, that's how it works"); `amenable`
+/// wraps it here rather than re-deriving a fresh error from its own
+/// `std::io::Error` chain.
+#[derive(Debug, derive_more::Display, derive_more::Error)]
+#[display("{source}")]
+pub struct StdSource {
+    /// The preserved `amenable_std::AmenableStdError`.
+    source: amenable_std::AmenableStdError,
+    /// Source line of the call site that produced this error.
+    line: u32,
+    /// Source file of the call site that produced this error.
+    file: &'static str,
+}
+
+impl StdSource {
+    /// Preserve an `amenable_std` error alongside the caller's location.
+    #[track_caller]
+    pub fn new(source: amenable_std::AmenableStdError) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            source,
+            line: loc.line(),
+            file: loc.file(),
+        }
+    }
+}

@@ -109,7 +109,7 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
 fn run_certify() -> AmenableResult<()> {
     let directory = amenable::paths::artifacts_directory().join("std-certificates");
     let paths = amenable::write_rust_std_certificate_artifacts(&directory)
-        .map_err(|error| amenable::AmenableError::io(&directory, error))?;
+        .map_err(amenable::AmenableError::std)?;
 
     println!(
         "Wrote {} provenance certificate artifact(s) to {}:",

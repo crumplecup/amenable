@@ -102,6 +102,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "amenable_derive",
+ "derive_more",
  "inventory",
  "proc-macro2",
  "quote",

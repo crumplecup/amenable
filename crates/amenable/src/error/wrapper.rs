@@ -11,8 +11,8 @@ use std::path::PathBuf;
 use crate::error::kind::AmenableErrorKind;
 use crate::error::sources::{
     ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
-    SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource,
-    TimeParseSource,
+    StdSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
+    TimeFormatSource, TimeParseSource,
 };
 
 /// Crate-level result alias.
@@ -88,6 +88,13 @@ impl AmenableError {
     #[track_caller]
     pub fn chain(source: crate::ChainError) -> Self {
         Self::new(AmenableErrorKind::Chain(ChainSource::new(source)))
+    }
+
+    /// Construct an [`AmenableErrorKind::Std`] error preserving an
+    /// `amenable_std` operation failure.
+    #[track_caller]
+    pub fn std(source: amenable_std::AmenableStdError) -> Self {
+        Self::new(AmenableErrorKind::Std(StdSource::new(source)))
     }
 }
 

@@ -2,8 +2,8 @@
 
 use crate::error::sources::{
     ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
-    SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource,
-    TimeParseSource,
+    StdSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
+    TimeFormatSource, TimeParseSource,
 };
 
 /// Error kind for `amenable` CLI operations. Every variant is a clean
@@ -75,4 +75,9 @@ pub enum AmenableErrorKind {
     /// `Incomplete`), preserved as the real typed value.
     #[display("{_0}")]
     Chain(ChainSource),
+
+    /// An `amenable_std` operation failed, preserved as the real typed
+    /// `amenable_std::AmenableStdError`.
+    #[display("{_0}")]
+    Std(StdSource),
 }

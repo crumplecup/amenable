@@ -1,17 +1,17 @@
 //! Certificate-artifact writers for the built-in Rust standard-library
 //! type registrations.
 
-use std::{fs, io, path::Path, path::PathBuf};
+use std::{fs, path::Path, path::PathBuf};
 
 use amenable_core::{Registry as _, Standard as _};
 
-use crate::{RustStdStandard, RustStdType};
+use crate::{AmenableStdError, AmenableStdResult, RustStdStandard, RustStdType};
 
 fn write_standard_certificate_artifact<T>(
     directory: &Path,
     registry: &mut crate::CertRegistry,
     file_stem: &str,
-) -> io::Result<PathBuf>
+) -> AmenableStdResult<PathBuf>
 where
     T: RustStdType,
 {
@@ -19,7 +19,8 @@ where
         RustStdStandard::<T>::new().certification(registry, std::any::type_name::<T>());
     let path = directory.join(format!("{file_stem}.provenance.txt"));
 
-    fs::write(&path, certificate.to_string())?;
+    fs::write(&path, certificate.to_string())
+        .map_err(|error| AmenableStdError::io(&path, error))?;
 
     Ok(path)
 }
@@ -27,12 +28,12 @@ where
 /// Emit provenance certificate artifacts for every built-in Rust standard type registration.
 pub fn write_rust_std_certificate_artifacts(
     directory: impl AsRef<Path>,
-) -> io::Result<Vec<PathBuf>> {
+) -> AmenableStdResult<Vec<PathBuf>> {
     let directory = directory.as_ref();
     let mut registry = crate::CertRegistry::new();
     let mut paths = Vec::new();
 
-    fs::create_dir_all(directory)?;
+    fs::create_dir_all(directory).map_err(|error| AmenableStdError::io(directory, error))?;
 
     paths.push(write_standard_certificate_artifact::<bool>(
         directory,
@@ -120,10 +121,9 @@ pub fn write_rust_std_certificate_artifacts(
         "string",
     )?);
 
-    fs::write(
-        directory.join("registry-report.txt"),
-        registry.report().to_string(),
-    )?;
+    let report_path = directory.join("registry-report.txt");
+    fs::write(&report_path, registry.report().to_string())
+        .map_err(|error| AmenableStdError::io(&report_path, error))?;
 
     Ok(paths)
 }
