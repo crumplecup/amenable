@@ -1,3 +1,4 @@
+#[path = "support_reporting.rs"]
 mod support;
 
 use amenable_core::{Provenance as ProvenanceTrait, Registry, Standard};

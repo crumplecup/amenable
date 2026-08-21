@@ -1,6 +1,7 @@
 #![cfg(feature = "verus")]
 
-mod support;
+#[path = "support/derive_witness.rs"]
+mod derive_witness;
 
 use amenable_core::{
     ClassifiedWitness, Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath,
@@ -14,7 +15,7 @@ use amenable_std::{
     RustStdStandard, RustStdType, TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum,
     VerusExportMultiCheckedEnum, VerusVerifier,
 };
-use support::derive_witness::{
+use derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,
     DerivedWitnessGenericEnum as SharedDerivedWitnessGenericEnum,
     DerivedWitnessTupleStruct as SharedDerivedWitnessTupleStruct,

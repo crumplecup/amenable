@@ -1,8 +1,6 @@
 //! Shared miette reporting for integration tests -- see
 //! `crates/amenable/tests/support.rs` for the pattern this mirrors.
 
-pub mod derive_witness;
-
 use amenable_std::AmenableStdError;
 use miette::Diagnostic;
 

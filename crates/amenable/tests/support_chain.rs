@@ -1,8 +1,6 @@
-//! Shared miette reporting for integration tests.
-//!
-//! Library code keeps `AmenableResult`; tests convert at the boundary
-//! with [`library`] so a test function can return `miette::Result<()>`
-//! and use `?` directly, the same way the CLI's own `boundary.rs` does.
+//! Shared miette reporting for integration tests that report proof-chain
+//! results -- see `crates/amenable/tests/support.rs` for the base pattern
+//! this extends with [`chain`].
 
 use amenable::AmenableError;
 use miette::Diagnostic;
@@ -25,9 +23,16 @@ fn ensure_init() {
 }
 
 /// Convert a library result into a miette result for test functions.
-pub fn library<T>(result: amenable::AmenableResult<T>) -> miette::Result<T> {
+fn library<T>(result: amenable::AmenableResult<T>) -> miette::Result<T> {
     ensure_init();
     result.map_err(|err| miette::Report::new(TestError(err)))
+}
+
+/// Convert a proof-chain result into a miette result for test functions,
+/// the same way `main.rs`'s `run_audit` wraps it with
+/// [`amenable::AmenableError::chain`].
+pub fn chain<T>(result: Result<T, amenable::ChainError>) -> miette::Result<T> {
+    library(result.map_err(AmenableError::chain))
 }
 
 #[derive(Debug)]

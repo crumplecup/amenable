@@ -1,3 +1,4 @@
+#[path = "support_chain.rs"]
 mod support;
 
 use amenable::{ChainErrorKind, IncompleteSource, NotFoundSource};
