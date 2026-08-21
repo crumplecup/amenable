@@ -1,4 +1,4 @@
-use amenable_kani::{KaniCompose, KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRenderedKind};
+use amenable_kani::{KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRenderedKind};
 
 #[test]
 fn arguments_render_the_display_atom_verbatim() {
@@ -44,10 +44,8 @@ fn debug_helpers_preserve_expected_punctuation_and_order() {
     assert_eq!(debug_map.value_debug_token(), Some('1'));
 }
 
-#[test]
-fn composed_format_atoms_keep_display_and_debug_views() {
-    let atom = KaniFormatAtom::kani_depth2();
-
-    assert_eq!(atom.display_token(), 'a');
-    assert_eq!(atom.debug_token(), 'A');
-}
+// composed_format_atoms_keep_display_and_debug_views moved to a real
+// #[kani::proof] harness in fmt_model.rs's own `mod proofs`: it was
+// testing KaniCompose's own contract (a Kani-only trait -- see
+// docs/KANI_COMPOSE_PLAN.md's "Scope Correction"), not KaniFormatAtom
+// itself, so it belongs with the other KaniCompose self-tests, not here.

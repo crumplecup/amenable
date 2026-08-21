@@ -1,4 +1,4 @@
-use amenable_kani::{KaniBacktrace, KaniBacktraceStatus, KaniCompose};
+use amenable_kani::{KaniBacktrace, KaniBacktraceStatus};
 
 #[test]
 fn force_capture_always_reports_captured() {
@@ -7,18 +7,8 @@ fn force_capture_always_reports_captured() {
     assert_eq!(backtrace.status(), KaniBacktraceStatus::Captured);
 }
 
-#[test]
-fn composed_statuses_cover_the_modeled_status_space() {
-    assert_eq!(
-        KaniBacktraceStatus::kani_depth0(),
-        KaniBacktraceStatus::Disabled
-    );
-    assert_eq!(
-        KaniBacktraceStatus::kani_depth1(),
-        KaniBacktraceStatus::Captured
-    );
-    assert_eq!(
-        KaniBacktraceStatus::kani_depth2(),
-        KaniBacktraceStatus::Unsupported
-    );
-}
+// composed_statuses_cover_the_modeled_status_space moved to a real
+// #[kani::proof] harness in backtrace_model.rs's own `mod proofs`: it
+// was testing KaniCompose's own contract (a Kani-only trait -- see
+// docs/KANI_COMPOSE_PLAN.md's "Scope Correction"), not KaniBacktraceStatus
+// itself, so it belongs with the other KaniCompose self-tests, not here.

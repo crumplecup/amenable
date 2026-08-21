@@ -96,3 +96,24 @@ impl KaniCompose for KaniBacktrace {
         Self::new(KaniBacktraceStatus::kani_any())
     }
 }
+
+// Self-test of KaniCompose's own contract for KaniBacktraceStatus, not a
+// production proof -- same reasoning as compose.rs's own `mod proofs`:
+// KaniCompose is Kani-only modeling infrastructure (see
+// docs/KANI_COMPOSE_PLAN.md), so a claim about what its depth
+// constructors return belongs here, not in an ordinary #[test].
+#[cfg(kani)]
+mod proofs {
+    use super::{KaniBacktraceStatus, KaniCompose};
+
+    amenable_derive::harness! {
+        kani, VERIFY_KANI_COMPOSE_BACKTRACE_STATUS_DEPTHS_SRC, {
+            #[kani::proof]
+            fn verify_kani_compose_backtrace_status_depths() {
+                assert_eq!(KaniBacktraceStatus::kani_depth0(), KaniBacktraceStatus::Disabled);
+                assert_eq!(KaniBacktraceStatus::kani_depth1(), KaniBacktraceStatus::Captured);
+                assert_eq!(KaniBacktraceStatus::kani_depth2(), KaniBacktraceStatus::Unsupported);
+            }
+        }
+    }
+}

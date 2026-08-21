@@ -305,3 +305,24 @@ impl KaniCompose for KaniFormatLabel {
         Self::new(char::kani_any())
     }
 }
+
+// Self-test of KaniCompose's own contract for KaniFormatAtom, not a
+// production proof -- same reasoning as compose.rs's own `mod proofs`:
+// KaniCompose is Kani-only modeling infrastructure (see
+// docs/KANI_COMPOSE_PLAN.md), so a claim about what its depth
+// constructors return belongs here, not in an ordinary #[test].
+#[cfg(kani)]
+mod proofs {
+    use super::{KaniCompose, KaniFormatAtom};
+
+    amenable_derive::harness! {
+        kani, VERIFY_KANI_COMPOSE_FORMAT_ATOM_DEPTH2_SRC, {
+            #[kani::proof]
+            fn verify_kani_compose_format_atom_depth2() {
+                let atom = KaniFormatAtom::kani_depth2();
+                assert_eq!(atom.display_token(), 'a');
+                assert_eq!(atom.debug_token(), 'A');
+            }
+        }
+    }
+}
