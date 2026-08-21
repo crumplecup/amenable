@@ -12,6 +12,7 @@
 //! - if the real builder/rendering path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+#[cfg(kani)]
 use crate::KaniCompose;
 
 /// Modeled leaf value with opaque display and debug tokens.
@@ -270,6 +271,7 @@ impl KaniFmt {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniFormatAtom {
     fn kani_depth0() -> Self {
         Self::new('0', '0')
@@ -288,6 +290,7 @@ impl KaniCompose for KaniFormatAtom {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniFormatLabel {
     fn kani_depth0() -> Self {
         Self::new('n')

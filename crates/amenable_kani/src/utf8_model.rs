@@ -19,7 +19,9 @@ use amenable_derive::Standard;
 
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
+#[cfg(kani)]
 use crate::KaniCompose;
+#[cfg(kani)]
 use crate::compose::{kani_assume, symbolic_any};
 use crate::rust_std::macros::{kani_ensures, kani_requires};
 use crate::{CalculationProof, KaniVerifier};
@@ -168,6 +170,7 @@ impl KaniFromUtf8Error {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniUtf8String {
     fn kani_depth0() -> Self {
         Self(Vec::new())
@@ -192,6 +195,7 @@ impl KaniCompose for KaniUtf8String {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniFromUtf8Error {
     fn kani_depth0() -> Self {
         Self(vec![0xFFu8])
@@ -557,6 +561,7 @@ impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for KaniUtf8Buffer<2> {
     }
 }
 
+#[cfg(kani)]
 fn symbolic_ascii_byte() -> u8 {
     let byte: u8 = symbolic_any();
     kani_assume(byte < 0x80);

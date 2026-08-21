@@ -54,6 +54,7 @@ mod witness;
 pub use backtrace_model::{KaniBacktrace, KaniBacktraceStatus};
 pub use btree_model::{KaniBTreeMap, KaniBTreeSet};
 pub use calculator::{AddEvidence, AddToken, CalculationProof, Credit, Debit, Sum, add};
+#[cfg(kani)]
 pub use compose::KaniCompose;
 pub use env_model::KaniArgv;
 pub use env_path_model::{

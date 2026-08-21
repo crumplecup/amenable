@@ -25,18 +25,22 @@
 use amenable_core::Establish;
 use amenable_core::{Ensures, Sidecar, Witness};
 use amenable_gaap::{
-    AccountId, AccountsDistinct, Amount, AmountPositive, BalancedEntries, Committed,
-    CommittedToken, Pending, PendingToken, Rejected, RejectedFromPendingToken,
-    RejectedFromValidatedToken, SufficientFunds, Transfer, TransferError, TransferPayload,
-    Validated, ValidatedToken,
+    AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
+    Pending, Rejected, RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds,
+    Transfer, TransferError, Validated, ValidatedToken,
 };
+#[cfg(kani)]
+use amenable_gaap::{Amount, PendingToken, TransferPayload};
+#[cfg(kani)]
 use uuid::Uuid;
 
+#[cfg(kani)]
+use crate::KaniCompose;
 use crate::gaap_ledger::{
     VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC, VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC,
 };
 use crate::rust_std::macros::{kani_ensures, kani_requires};
-use crate::{CalculationProof, KaniCompose, KaniVerifier};
+use crate::{CalculationProof, KaniVerifier};
 
 /// `KaniCompose` for `amenable_gaap`'s real domain types -- can't be a
 /// `#[derive(KaniCompose)]` on the struct definitions themselves, the
@@ -70,6 +74,7 @@ use crate::{CalculationProof, KaniCompose, KaniVerifier};
 /// "Reusing `KaniCompose`" follow-on without reintroducing the
 /// construction cost `AccountId`'s own history already paid once to
 /// avoid.
+#[cfg(kani)]
 impl KaniCompose for AccountId {
     fn kani_depth0() -> Self {
         Self::new(Uuid::kani_depth0(), String::new())
@@ -88,6 +93,7 @@ impl KaniCompose for AccountId {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for Amount {
     fn kani_depth0() -> Self {
         Self::new(i64::kani_depth0())
@@ -106,6 +112,7 @@ impl KaniCompose for Amount {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for TransferPayload {
     fn kani_depth0() -> Self {
         Self::new(
@@ -149,6 +156,7 @@ impl KaniCompose for TransferPayload {
 /// [`Transfer::pending`] *is* the real, lawful root constructor, so
 /// there is no chain to route through at all -- unlike `Validated`
 /// below.
+#[cfg(kani)]
 impl KaniCompose for Transfer<Pending, PendingToken> {
     fn kani_depth0() -> Self {
         Transfer::pending(TransferPayload::kani_depth0())

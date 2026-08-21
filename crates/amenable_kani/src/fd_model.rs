@@ -14,7 +14,9 @@
 use amenable_derive::Standard;
 use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
 
+#[cfg(kani)]
 use crate::KaniCompose;
+#[cfg(kani)]
 use crate::compose::{kani_assume, symbolic_any};
 
 /// Modeled owned Unix file descriptor.
@@ -92,6 +94,7 @@ impl KaniFd {
     }
 
     /// Bounded symbolic live descriptor representative.
+    #[cfg(kani)]
     pub fn kani_live_any() -> Self {
         let raw_fd: u16 = symbolic_any();
         let resource_id: u64 = symbolic_any();
@@ -140,6 +143,7 @@ impl KaniBorrowedFd {
     ///
     /// The duplicate is assumed to stay live and refer to the same underlying
     /// resource, but it may carry a different raw fd value.
+    #[cfg(kani)]
     pub fn duplicate_as_owned_with_raw(&self, duplicated_raw_fd: i32) -> KaniFd {
         assert!(
             self.is_live(),
@@ -178,6 +182,7 @@ impl KaniFile {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniFd {
     fn kani_depth0() -> Self {
         Self::live(0, 0)
@@ -203,6 +208,7 @@ impl KaniCompose for KaniFd {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniFile {
     fn kani_depth0() -> Self {
         Self::from_owned_fd(KaniFd::kani_depth0())

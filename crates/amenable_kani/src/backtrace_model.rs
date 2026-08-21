@@ -11,7 +11,9 @@
 //! - if the real backtrace capture path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+#[cfg(kani)]
 use crate::KaniCompose;
+#[cfg(kani)]
 use crate::compose::{kani_assume, symbolic_any};
 
 /// Modeled backtrace status observed from Rust.
@@ -32,6 +34,7 @@ pub struct KaniBacktrace {
 }
 
 impl KaniBacktraceStatus {
+    #[cfg(kani)]
     fn from_index(index: u8) -> Self {
         match index {
             0 => Self::Disabled,
@@ -59,6 +62,7 @@ impl KaniBacktrace {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniBacktraceStatus {
     fn kani_depth0() -> Self {
         Self::Disabled
@@ -79,6 +83,7 @@ impl KaniCompose for KaniBacktraceStatus {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniBacktrace {
     fn kani_depth0() -> Self {
         Self::new(KaniBacktraceStatus::kani_depth0())

@@ -12,6 +12,7 @@
 //! proof role. It is a Kani-only input-construction discipline.
 
 /// Build verifier-friendly bounded values for Kani harnesses.
+#[cfg(kani)]
 pub trait KaniCompose: Sized {
     /// Smallest meaningful inhabitant of the type.
     fn kani_depth0() -> Self;
@@ -58,47 +59,19 @@ pub trait KaniCompose: Sized {
 }
 
 #[cfg(kani)]
-pub(crate) trait KaniArbitrary: kani::Arbitrary {}
-
-#[cfg(kani)]
-impl<T> KaniArbitrary for T where T: kani::Arbitrary {}
-
-#[cfg(not(kani))]
-pub(crate) trait KaniArbitrary {}
-
-#[cfg(not(kani))]
-impl<T> KaniArbitrary for T {}
-
 pub(crate) fn symbolic_any<T>() -> T
 where
-    T: KaniArbitrary,
+    T: kani::Arbitrary,
 {
-    #[cfg(kani)]
-    {
-        kani::any()
-    }
-
-    #[cfg(not(kani))]
-    {
-        panic!("KaniCompose symbolic construction is only available under cfg(kani)")
-    }
+    kani::any()
 }
 
+#[cfg(kani)]
 pub(crate) fn kani_assume(condition: bool) {
-    #[cfg(kani)]
-    {
-        kani::assume(condition);
-    }
-
-    #[cfg(not(kani))]
-    {
-        assert!(
-            condition,
-            "KaniCompose assumption violated outside cfg(kani)"
-        );
-    }
+    kani::assume(condition);
 }
 
+#[cfg(kani)]
 fn symbolic_ascii_char() -> char {
     let byte: u8 = symbolic_any();
     kani_assume(byte < 128);
@@ -108,6 +81,7 @@ fn symbolic_ascii_char() -> char {
 macro_rules! impl_kani_compose_symbolic {
     ($($ty:ty),* $(,)?) => {
         $(
+            #[cfg(kani)]
             impl KaniCompose for $ty {
                 fn kani_depth0() -> Self {
                     symbolic_any()
@@ -129,6 +103,7 @@ macro_rules! impl_kani_compose_symbolic {
     };
 }
 
+#[cfg(kani)]
 impl KaniCompose for () {
     fn kani_depth0() -> Self {}
 
@@ -143,6 +118,7 @@ impl_kani_compose_symbolic!(
     bool, char, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
 );
 
+#[cfg(kani)]
 impl KaniCompose for String {
     fn kani_depth0() -> Self {
         Self::new()
@@ -178,6 +154,7 @@ impl KaniCompose for String {
 /// symbolic -- matching the primitive scalars above (`impl_kani_compose_
 /// symbolic!`), just written out by hand since `Uuid::from_u128` needs
 /// calling.
+#[cfg(kani)]
 impl KaniCompose for uuid::Uuid {
     fn kani_depth0() -> Self {
         Self::from_u128(symbolic_any())
@@ -196,6 +173,7 @@ impl KaniCompose for uuid::Uuid {
     }
 }
 
+#[cfg(kani)]
 impl<T> KaniCompose for Vec<T>
 where
     T: KaniCompose,
@@ -217,6 +195,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<T, const N: usize> KaniCompose for [T; N]
 where
     T: KaniCompose,
@@ -238,6 +217,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<T> KaniCompose for Option<T>
 where
     T: KaniCompose,
@@ -260,6 +240,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<K, V> KaniCompose for std::collections::BTreeMap<K, V>
 where
     K: KaniCompose + Ord,
@@ -282,6 +263,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<K, V, S> KaniCompose for std::collections::HashMap<K, V, S>
 where
     K: KaniCompose + Eq + std::hash::Hash,
@@ -305,6 +287,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<T> KaniCompose for Box<T>
 where
     T: KaniCompose,
@@ -326,6 +309,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<A, B> KaniCompose for (A, B)
 where
     A: KaniCompose,
@@ -348,6 +332,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<A, B, C> KaniCompose for (A, B, C)
 where
     A: KaniCompose,
@@ -371,6 +356,7 @@ where
     }
 }
 
+#[cfg(kani)]
 impl<A, B, C, D> KaniCompose for (A, B, C, D)
 where
     A: KaniCompose,

@@ -11,7 +11,9 @@
 //! - if the real process argv conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+#[cfg(kani)]
 use crate::KaniCompose;
+#[cfg(kani)]
 use crate::compose::{kani_assume, symbolic_any};
 
 /// Modeled process argv with one guaranteed program slot.
@@ -51,6 +53,7 @@ impl KaniArgv {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniArgv {
     fn kani_depth0() -> Self {
         Self::new(String::new(), 0)

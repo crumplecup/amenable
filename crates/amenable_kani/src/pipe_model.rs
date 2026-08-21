@@ -12,7 +12,9 @@
 //! - if the real std/libc path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
+#[cfg(kani)]
 use crate::KaniCompose;
+#[cfg(kani)]
 use crate::compose::{kani_assume, symbolic_any};
 use crate::fd_model::KaniFd;
 
@@ -84,6 +86,7 @@ impl KaniPipe {
     }
 
     /// Construct a fresh open reader/writer pair backed by one modeled resource.
+    #[cfg(kani)]
     pub fn fresh() -> Self {
         let resource_id: u64 = symbolic_any();
         let reader_raw: u16 = symbolic_any();
@@ -196,6 +199,7 @@ impl KaniPipe {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniPipeReader {
     fn kani_depth0() -> Self {
         KaniPipe::kani_depth0().reader()
@@ -214,6 +218,7 @@ impl KaniCompose for KaniPipeReader {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniPipeWriter {
     fn kani_depth0() -> Self {
         KaniPipe::kani_depth0().writer()
@@ -232,6 +237,7 @@ impl KaniCompose for KaniPipeWriter {
     }
 }
 
+#[cfg(kani)]
 impl KaniCompose for KaniPipe {
     fn kani_depth0() -> Self {
         Self::minimal()

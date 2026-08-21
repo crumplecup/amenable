@@ -67,3 +67,10 @@ creusot = ["dep:amenable_creusot"]
 # depend on there at all) -- this only toggles `amenable_std/verus`, which
 # `include_str!`s `amenable_verus`'s real proof source by relative path.
 verus = ["amenable_std/verus"]
+
+[lints.rust]
+# `cfg(kani)`: real, set by `cargo kani`'s own toolchain, never by
+# `cargo check`/`cargo build`/`cargo test` -- gates the re-export of
+# amenable_kani::KaniCompose, which is Kani-only modeling infrastructure
+# (see docs/KANI_COMPOSE_PLAN.md).
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

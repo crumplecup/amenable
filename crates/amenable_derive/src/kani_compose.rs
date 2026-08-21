@@ -41,6 +41,7 @@ pub fn expand_kani_compose(input: &DeriveInput) -> syn::Result<TokenStream> {
     };
 
     Ok(quote! {
+        #[cfg(kani)]
         impl #impl_generics ::amenable_kani::KaniCompose for #name #ty_generics #where_clause {
             fn kani_depth0() -> Self {
                 #depth0
@@ -115,17 +116,7 @@ fn enum_ctor(data: &DataEnum, method: syn::Ident, fixed_variant: bool) -> syn::R
     let variant_count = variants.len();
 
     Ok(quote! {{
-        let selector: usize = {
-            #[cfg(kani)]
-            {
-                kani::any()
-            }
-            #[cfg(not(kani))]
-            {
-                panic!("KaniCompose enum construction is only available under cfg(kani)")
-            }
-        };
-        #[cfg(kani)]
+        let selector: usize = kani::any();
         kani::assume(selector < #variant_count);
 
         match selector {

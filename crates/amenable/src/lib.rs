@@ -65,9 +65,11 @@ pub use amenable_core::{
 pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
 };
+#[cfg(kani)]
+pub use amenable_kani::KaniCompose;
 pub use amenable_kani::{
     AddEvidence, AddToken, CalculationProof, CheckedProof as KaniCheckedProof, Credit, Debit,
-    GreenToken, KaniCompose, KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation,
+    GreenToken, KaniGalleryCase, KaniGalleryDisposition, KaniGalleryExpectation,
     KaniGalleryRegistration, KaniProof, KaniProofRegistration, KaniVerifier, KaniVerifierMetadata,
     KaniWitness, NonNegativeFd, RedToken, Stoplight, Sum, YellowToken, add,
 };
