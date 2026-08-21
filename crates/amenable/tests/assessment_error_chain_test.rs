@@ -44,17 +44,23 @@ fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() -> miett
     // the actual thing this whole error-handling pass exists to prove:
     // `.source()` isn't None, and isn't just another opaque AmenableError,
     // it's the genuine foreign error, still downcastable.
-    let kind = error
-        .source()
-        .expect("AmenableError must expose its kind as source (see #[error(source)] on `kind`)");
-    let json_line_source = kind
-        .source()
-        .expect("AmenableErrorKind::JsonLine must expose the JsonLineSource wrapper as source");
-    let json_error = json_line_source
-        .source()
-        .expect("JsonLineSource must expose the underlying serde_json::Error as source");
+    let kind = error.source();
     assert!(
-        json_error.downcast_ref::<serde_json::Error>().is_some(),
+        kind.is_some(),
+        "AmenableError must expose its kind as source (see #[error(source)] on `kind`)"
+    );
+    let json_line_source = kind.and_then(std::error::Error::source);
+    assert!(
+        json_line_source.is_some(),
+        "AmenableErrorKind::JsonLine must expose the JsonLineSource wrapper as source"
+    );
+    let json_error = json_line_source.and_then(std::error::Error::source);
+    assert!(
+        json_error.is_some(),
+        "JsonLineSource must expose the underlying serde_json::Error as source"
+    );
+    assert!(
+        json_error.is_some_and(|error| error.downcast_ref::<serde_json::Error>().is_some()),
         "the deepest source must be the real serde_json::Error, not a stringified copy"
     );
 
