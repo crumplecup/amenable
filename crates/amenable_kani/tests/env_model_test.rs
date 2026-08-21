@@ -1,8 +1,13 @@
-use amenable_kani::{KaniArgv, KaniCompose, KaniEnvPath, KaniEnvPathList, KaniEnvPaths};
+use amenable_kani::{KaniArgv, KaniEnvPath, KaniEnvPathList, KaniEnvPaths};
 
 #[test]
 fn argv_always_counts_the_program_slot() {
-    let argv = KaniArgv::kani_depth0();
+    // Not KaniArgv::kani_depth0(): this test is about KaniArgv's own
+    // accounting, not about KaniCompose (a Kani-only trait -- see
+    // docs/KANI_COMPOSE_PLAN.md's "Scope Correction"), so it builds the
+    // same zero-extra-args shape through KaniArgv's own public
+    // constructor instead of reaching into Kani-only infrastructure.
+    let argv = KaniArgv::new(String::new(), 0);
 
     assert_eq!(argv.args_count(), 1);
     assert_eq!(argv.args_os_count(), 1);

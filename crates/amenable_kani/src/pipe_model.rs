@@ -69,6 +69,20 @@ impl KaniPipeWriter {
 }
 
 impl KaniPipe {
+    /// Construct a fixed, deterministic open reader/writer pair backed by
+    /// resource id 0 -- unlike [`Self::fresh`], no non-deterministic
+    /// construction, so (unlike `fresh`) this has nothing Kani-specific
+    /// about it and stays available outside `cfg(kani)`.
+    pub fn minimal() -> Self {
+        Self {
+            reader: KaniPipeReader(KaniFd::live(0, 0)),
+            writer: KaniPipeWriter(KaniFd::live(1, 0)),
+            buffered: Vec::new(),
+            reader_open: true,
+            writer_open: true,
+        }
+    }
+
     /// Construct a fresh open reader/writer pair backed by one modeled resource.
     pub fn fresh() -> Self {
         let resource_id: u64 = symbolic_any();
@@ -220,13 +234,7 @@ impl KaniCompose for KaniPipeWriter {
 
 impl KaniCompose for KaniPipe {
     fn kani_depth0() -> Self {
-        Self {
-            reader: KaniPipeReader(KaniFd::live(0, 0)),
-            writer: KaniPipeWriter(KaniFd::live(1, 0)),
-            buffered: Vec::new(),
-            reader_open: true,
-            writer_open: true,
-        }
+        Self::minimal()
     }
 
     fn kani_depth1() -> Self {

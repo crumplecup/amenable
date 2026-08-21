@@ -1,8 +1,13 @@
-use amenable_kani::{KaniCompose, KaniPipe};
+use amenable_kani::KaniPipe;
 
 #[test]
 fn fresh_pipe_shares_one_resource_across_distinct_endpoints() {
-    let pipe = KaniPipe::kani_depth0();
+    // Not KaniPipe::kani_depth0(): these tests are about KaniPipe's own
+    // reader/writer/buffer behavior, not about KaniCompose (a Kani-only
+    // trait -- see docs/KANI_COMPOSE_PLAN.md's "Scope Correction"), so
+    // they build the same fixed shape through KaniPipe's own public
+    // constructor instead of reaching into Kani-only infrastructure.
+    let pipe = KaniPipe::minimal();
     let reader = pipe.reader();
     let writer = pipe.writer();
 
@@ -16,7 +21,7 @@ fn fresh_pipe_shares_one_resource_across_distinct_endpoints() {
 
 #[test]
 fn write_close_read_round_trips_buffered_bytes() {
-    let mut pipe = KaniPipe::kani_depth0();
+    let mut pipe = KaniPipe::minimal();
     let reader = pipe.reader();
     let writer = pipe.writer();
 
