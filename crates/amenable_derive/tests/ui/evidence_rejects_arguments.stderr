@@ -1,0 +1,5 @@
+error: unexpected token
+  --> tests/ui/evidence_rejects_arguments.rs:10:29
+   |
+10 | #[amenable_derive::evidence(basis = "Self")]
+   |                             ^^^^^

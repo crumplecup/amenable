@@ -135,8 +135,15 @@ pub fn capture_exchange_body(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// hand-written impl with real, non-trivial `basis()`/`audit()` bodies; see
 /// [`derive_evidence`] for the common trivial-root case, which needs no
 /// hand-written impl at all.
+///
+/// Takes no arguments -- rejected with a real compile error rather than
+/// silently ignored, since `#[derive(Evidence)]`'s own, separate helper
+/// attribute shares this exact name with real arguments (`#[evidence(
+/// basis = "..", ..)]`), a realistic mistake to make on this macro's own
+/// bare `#[evidence]` form.
 #[proc_macro_attribute]
-pub fn evidence(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn evidence(attr: TokenStream, item: TokenStream) -> TokenStream {
+    parse_macro_input!(attr as syn::parse::Nothing);
     let input = parse_macro_input!(item as ItemImpl);
 
     match expand_evidence(input) {
