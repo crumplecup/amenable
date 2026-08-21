@@ -11,12 +11,16 @@ where
     F: FixtureCase,
 {
     let type_name = std::any::type_name::<F>();
-    let link = inventory::iter::<EvidenceLink>()
+    let basis = inventory::iter::<EvidenceLink>()
         .into_iter()
         .find(|link| link.name == type_name)
-        .unwrap_or_else(|| panic!("{type_name} should register an evidence link"));
+        .map(|link| link.basis);
 
-    assert_eq!(link.basis, type_name);
+    assert_eq!(
+        basis,
+        Some(type_name),
+        "{type_name} should register an evidence link with a matching basis"
+    );
 }
 
 fn assert_standard_fixture<F>()
