@@ -325,12 +325,16 @@ pub fn literal_clauses(item_fn: &verus_syn::ItemFn, ensures: bool) -> Vec<String
 }
 
 /// Why [`predicate_body`] couldn't extract a real predicate's own body as
-/// a single literal claim. Both callers fold this straight into their
-/// own richer diagnostic (the macro caller already has the predicate's
-/// name and span; the test caller already has the predicate's name), so
-/// this stays a plain `Display`-only enum with no location tracking of
-/// its own -- unlike `ChainError`, nothing here would use it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_more::Display, derive_more::Error)]
+/// a single literal claim. Deliberately *not* a `std::error::Error`
+/// citizen (no `derive_more::Error`, just `Display`): neither caller
+/// ever holds, matches, or propagates this value as an error -- both
+/// `map_err` it away immediately into their own real error (`syn::
+/// Error`, `miette::Report`), touching it only through `Display`. It's
+/// a descriptive reason consumed at one call site, not chainable data
+/// like `ChainErrorKind`'s variants (which real callers hold, match on,
+/// and need real location for) -- so it doesn't need `ChainError`'s
+/// source-wrapping + location-tracking shape either.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_more::Display)]
 pub enum PredicateBodyError {
     /// The predicate's body has no statements at all.
     #[display("has an empty body")]

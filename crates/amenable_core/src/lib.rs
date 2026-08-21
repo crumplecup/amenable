@@ -60,9 +60,9 @@ pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};
 pub use stoplight::{Green, Red, Yellow};
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]
-pub use verus_carrier::predicate_body as verus_predicate_body;
-#[cfg(feature = "verus")]
 pub use verus_carrier::PredicateBodyError;
+#[cfg(feature = "verus")]
+pub use verus_carrier::predicate_body as verus_predicate_body;
 #[cfg(feature = "verus")]
 pub use verus_carrier::{find_fn as verus_find_fn, literal_clauses as verus_literal_clauses};
 #[cfg(feature = "verus")]
