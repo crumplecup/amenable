@@ -45,14 +45,28 @@ impl KaniAssumedUtf8Validity {
     /// Decide validity for the given bytes: assumed symbolically
     /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
     /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
-    /// before this assumption had a name.
+    /// before this assumption had a name. Two `#[cfg]`-gated definitions,
+    /// not one with a single shared parameter name, since `bytes` is
+    /// genuinely read under `not(kani)` but genuinely unused under
+    /// `kani` -- no single name is honest for both.
+    #[cfg(kani)]
     #[must_use]
     pub fn decide(_bytes: &[u8]) -> Self {
-        #[cfg(kani)]
         let valid: bool = kani::any();
-        #[cfg(not(kani))]
-        let valid = is_valid_utf8(_bytes);
+        Self { valid }
+    }
 
+    /// Decide validity for the given bytes: assumed symbolically
+    /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
+    /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
+    /// before this assumption had a name. Two `#[cfg]`-gated definitions,
+    /// not one with a single shared parameter name, since `bytes` is
+    /// genuinely read under `not(kani)` but genuinely unused under
+    /// `kani` -- no single name is honest for both.
+    #[cfg(not(kani))]
+    #[must_use]
+    pub fn decide(bytes: &[u8]) -> Self {
+        let valid = is_valid_utf8(bytes);
         Self { valid }
     }
 
