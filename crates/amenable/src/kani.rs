@@ -176,7 +176,10 @@ fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
     }
 }
 
-fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
+/// Build the `cargo kani` invocation for one registered proof, applying
+/// Kani's own native `--harness-timeout` rather than an outer process
+/// timeout.
+pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
     command.args([
         "kani",
@@ -195,14 +198,19 @@ fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     command
 }
 
-fn is_kani_timeout(diagnostics: &str) -> bool {
+/// Whether `cargo kani`'s combined stdout/stderr names a verification
+/// timeout rather than a genuine proof failure.
+pub fn is_kani_timeout(diagnostics: &str) -> bool {
     let diagnostics = diagnostics.to_ascii_lowercase();
     diagnostics.contains("verification timed out")
         || diagnostics.contains("harness timed out")
         || diagnostics.contains("timed out")
 }
 
-fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
+/// The first `error`-prefixed line in `cargo kani`'s combined output, or
+/// (failing that) the first non-empty line -- preferred over whatever
+/// Kani's own startup banner printed first.
+pub fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
     diagnostics
         .lines()
         .map(str::trim)
@@ -216,11 +224,15 @@ fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
         .map(ToOwned::to_owned)
 }
 
+/// Outcome recorded in the Kani result ledger for one proof.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, ValueEnum)]
 #[serde(rename_all = "snake_case")]
-pub(super) enum ProofStatus {
+pub enum ProofStatus {
+    /// The proof verified successfully.
     Passed,
+    /// The proof failed (a real assertion violation, not a timeout).
     Failed,
+    /// The proof did not finish within its harness timeout.
     Timeout,
 }
 
@@ -262,7 +274,8 @@ struct LedgerRow {
     status: ProofStatus,
 }
 
-struct Ledger {
+/// Persisted CSV record of the latest verification result per proof ID.
+pub struct Ledger {
     rows: BTreeMap<String, LedgerRow>,
 }
 
@@ -274,7 +287,24 @@ pub(super) struct VerificationResult {
 }
 
 impl Ledger {
-    fn load(path: &Path) -> AmenableResult<Self> {
+    /// Number of proofs with a recorded result.
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    /// Whether the ledger has no recorded results.
+    pub fn is_empty(&self) -> bool {
+        self.rows.is_empty()
+    }
+
+    /// The latest recorded status for `proof_id`, if any.
+    pub fn status_for(&self, proof_id: &str) -> Option<ProofStatus> {
+        self.rows.get(proof_id).map(|row| row.status)
+    }
+
+    /// Load the ledger from `path`, or an empty ledger if it doesn't
+    /// exist yet.
+    pub fn load(path: &Path) -> AmenableResult<Self> {
         if !path.exists() {
             return Ok(Self {
                 rows: BTreeMap::new(),
@@ -318,14 +348,17 @@ impl Ledger {
         Ok(Self { rows })
     }
 
-    fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> AmenableResult<()> {
+    /// Record `status` as the latest result for `proof_id`, timestamped
+    /// now, replacing any previous entry.
+    pub fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> AmenableResult<()> {
         let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         self.rows
             .insert(proof_id.to_owned(), LedgerRow { timestamp, status });
         Ok(())
     }
 
-    fn persist(&self, path: &Path) -> AmenableResult<()> {
+    /// Write the ledger to `path` atomically (write, then rename).
+    pub fn persist(&self, path: &Path) -> AmenableResult<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
         }
@@ -354,84 +387,5 @@ impl Ledger {
                 status: row.status,
             })
             .collect()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
-        let record = KaniProof {
-            id: "amenable_kani::calculator::verify_debit_access_preserves_value".to_owned(),
-            harness: "calculator::verify_debit_access_preserves_value".to_owned(),
-            package: "amenable_kani".to_owned(),
-        };
-
-        let command = kani_command(&record, "3m");
-        let arguments: Vec<_> = command
-            .get_args()
-            .map(|argument| argument.to_string_lossy().into_owned())
-            .collect();
-
-        assert_eq!(command.get_program(), "cargo");
-        assert_eq!(
-            arguments,
-            [
-                "kani",
-                "-p",
-                "amenable_kani",
-                "--lib",
-                "--all-features",
-                "--exact",
-                "--harness",
-                "calculator::verify_debit_access_preserves_value",
-                "-Z",
-                "unstable-options",
-                "--harness-timeout",
-                "3m",
-            ]
-        );
-        assert!(!arguments.iter().any(|argument| argument == "timeout"));
-    }
-
-    #[test]
-    fn ledger_replaces_a_previous_result_for_the_same_proof() {
-        let path =
-            std::env::temp_dir().join(format!("amenable-kani-ledger-{}.csv", std::process::id()));
-        let mut ledger = Ledger {
-            rows: BTreeMap::new(),
-        };
-        ledger.upsert("proof::one", ProofStatus::Failed).unwrap();
-        ledger.persist(&path).unwrap();
-
-        let mut ledger = Ledger::load(&path).unwrap();
-        ledger.upsert("proof::one", ProofStatus::Passed).unwrap();
-        ledger.persist(&path).unwrap();
-
-        let reloaded = Ledger::load(&path).unwrap();
-        assert_eq!(reloaded.rows.len(), 1);
-        assert_eq!(reloaded.rows["proof::one"].status, ProofStatus::Passed);
-        fs::remove_file(path).unwrap();
-    }
-
-    #[test]
-    fn native_timeout_diagnostics_are_distinct_from_failure() {
-        assert!(is_kani_timeout(
-            "VERIFICATION:- SUCCESSFUL\nverification timed out"
-        ));
-        assert!(!is_kani_timeout("error: assertion failed"));
-    }
-
-    #[test]
-    fn diagnostics_prefer_the_first_error_over_kani_startup_output() {
-        let diagnostics =
-            "Kani Rust Verifier 0.67\nCompiling amenable_kani\nerror[E0433]: missing type\n";
-
-        assert_eq!(
-            first_diagnostic_line(diagnostics).as_deref(),
-            Some("error[E0433]: missing type")
-        );
     }
 }
