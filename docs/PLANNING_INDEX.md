@@ -985,16 +985,17 @@ for canonical scoped validation.
 
 **Document:** [KANI_COMPOSE_PLAN.md](KANI_COMPOSE_PLAN.md)
 
-**Status:** ✅ Initial scope done (trait, ~30 built-in impls, `#[derive(
-KaniCompose)]`, hand-written `Ledger`/`AccountId`/etc. impls, all landed
-across several follow-ons tracked elsewhere in this index) — 🔲 Planning
-on a scope correction: the trait's own doc always called it Kani-only,
-but `symbolic_any`/`kani_assume` still carry a `#[cfg(not(kani))]` panic
-branch, kept alive only because four ordinary `#[test]`s reach into
-`kani_depth0/1/2()` for convenience. Making the trait genuinely
-`#[cfg(kani)]`-only (no panic branch anywhere in the chain, including the
-derive's own generated impls and `amenable/src/lib.rs`'s re-export) is
-the new "Scope Correction" section in the doc.
+**Status:** ✅ Done, including the scope correction. Initial scope (trait,
+~30 built-in impls, `#[derive(KaniCompose)]`, hand-written `Ledger`/
+`AccountId`/etc. impls) landed across several follow-ons tracked
+elsewhere in this index. The trait's own doc always called it Kani-only,
+but `symbolic_any`/`kani_assume` carried a `#[cfg(not(kani))]` panic
+branch, kept alive only because four ordinary `#[test]`s reached into
+`kani_depth0/1/2()` for convenience -- fixed by rewriting those tests
+(commits `c4b0fad`/`362cd75`) and then gating the trait, all ~30 impls,
+the derive's generated impl, and `amenable/src/lib.rs`'s re-export as
+genuinely `#[cfg(kani)]`-only, no panic branch anywhere in the chain
+(commit `5ecae3b`). See the doc's "Scope Correction" section.
 
 **Description:** Introduce a Kani-specific bounded-construction trait and
 derive support so Amenable can model heap-backed and recursive carriers without

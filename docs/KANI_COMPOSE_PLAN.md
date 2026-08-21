@@ -62,7 +62,16 @@ building verifier-friendly inputs inside harnesses.
 
 ## Scope Correction: `#[cfg(kani)]`-Only
 
-**Status:** 🔲 Planning.
+**Status:** ✅ Done. Steps 1-2 landed as `c4b0fad`/`362cd75`; steps 3-6
+landed together as `5ecae3b` (the compiler forced them to happen in one
+pass -- gating the trait immediately surfaced the derive-codegen and
+re-export sites, plus 4 inherent-method call sites step 3's own grep
+missed). Step 7 verified via `cargo check/clippy/test --workspace
+--all-features` (clean) and 7 real `cargo kani` runs spanning every
+category of change, all `VERIFICATION:- SUCCESSFUL`. Acceptance
+criteria confirmed: cordial's panics scan finds zero findings anywhere
+in `amenable_kani::compose` (not exempted -- absent), `cargo build -p
+amenable` and `cargo test --workspace` both still pass unconditionally.
 
 This doc said it from the start (line 11-12 above): `KaniCompose` is a
 "modeling aid for building verifier-friendly inputs inside harnesses" --
