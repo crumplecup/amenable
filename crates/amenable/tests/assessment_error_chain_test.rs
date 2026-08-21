@@ -6,6 +6,7 @@
 
 mod support;
 
+use miette::IntoDiagnostic;
 use std::error::Error as _;
 use std::path::PathBuf;
 
@@ -25,9 +26,9 @@ fn load_on_a_missing_artifact_returns_an_empty_list() -> miette::Result<()> {
 }
 
 #[test]
-fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() {
+fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() -> miette::Result<()> {
     let path = temporary_path("malformed");
-    std::fs::write(&path, "{not valid json\n").expect("write fixture");
+    std::fs::write(&path, "{not valid json\n").into_diagnostic()?;
 
     let error = amenable::assessment::load(&path).expect_err("malformed JSON must fail");
 
@@ -58,4 +59,5 @@ fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() {
     );
 
     std::fs::remove_file(&path).ok();
+    Ok(())
 }
