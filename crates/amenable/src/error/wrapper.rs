@@ -36,7 +36,7 @@ pub struct AmenableError {
     /// Source line of the call site that produced this error.
     pub line: u32,
     /// Source file of the call site that produced this error.
-    pub file: &'static str,
+    pub file: String,
 }
 
 impl AmenableError {
@@ -48,7 +48,7 @@ impl AmenableError {
         Self {
             kind: Box::new(kind),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 

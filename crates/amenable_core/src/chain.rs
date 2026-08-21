@@ -152,7 +152,7 @@ pub struct NotFoundSource {
     pub line: u32,
     /// Source file of the call site that produced this error.
     #[error(ignore)]
-    pub file: &'static str,
+    pub file: String,
 }
 
 impl NotFoundSource {
@@ -164,7 +164,7 @@ impl NotFoundSource {
         Self {
             subject: subject.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -190,7 +190,7 @@ pub struct IncompleteSource {
     pub line: u32,
     /// Source file of the call site that produced this error.
     #[error(ignore)]
-    pub file: &'static str,
+    pub file: String,
 }
 
 impl IncompleteSource {
@@ -204,7 +204,7 @@ impl IncompleteSource {
             required,
             gaps,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -252,7 +252,7 @@ pub struct ChainError {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl ChainError {
@@ -264,7 +264,7 @@ impl ChainError {
         Self {
             kind: Box::new(kind),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 

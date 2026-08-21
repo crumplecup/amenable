@@ -25,7 +25,7 @@ pub struct IoSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl IoSource {
@@ -36,7 +36,7 @@ impl IoSource {
             source,
             path: path.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -65,7 +65,7 @@ pub struct AmenableStdError {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl AmenableStdError {
@@ -75,7 +75,7 @@ impl AmenableStdError {
         Self {
             kind: Box::new(kind),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 

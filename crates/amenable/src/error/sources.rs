@@ -32,7 +32,7 @@ pub struct IoSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl IoSource {
@@ -45,7 +45,7 @@ impl IoSource {
             source,
             path: path.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -59,7 +59,7 @@ pub struct SerdeSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl SerdeSource {
@@ -70,7 +70,7 @@ impl SerdeSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -93,7 +93,7 @@ pub struct JsonLineSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl JsonLineSource {
@@ -107,7 +107,7 @@ impl JsonLineSource {
             path: path.into(),
             json_line,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -121,7 +121,7 @@ pub struct SystemTimeSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl SystemTimeSource {
@@ -132,7 +132,7 @@ impl SystemTimeSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -146,7 +146,7 @@ pub struct TimeFormatDescriptionSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl TimeFormatDescriptionSource {
@@ -158,7 +158,7 @@ impl TimeFormatDescriptionSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -172,7 +172,7 @@ pub struct TimeParseSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl TimeParseSource {
@@ -183,7 +183,7 @@ impl TimeParseSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -203,7 +203,7 @@ pub struct InvalidUtcDateSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl InvalidUtcDateSource {
@@ -216,7 +216,7 @@ impl InvalidUtcDateSource {
             source,
             value: value.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -230,7 +230,7 @@ pub struct TimeComponentRangeSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl TimeComponentRangeSource {
@@ -242,7 +242,7 @@ impl TimeComponentRangeSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -256,7 +256,7 @@ pub struct TimeFormatSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl TimeFormatSource {
@@ -267,7 +267,7 @@ impl TimeFormatSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -289,7 +289,7 @@ pub struct InvariantSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl InvariantSource {
@@ -301,7 +301,7 @@ impl InvariantSource {
         Self {
             detail: detail.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -320,7 +320,7 @@ pub struct ChainSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl ChainSource {
@@ -332,7 +332,7 @@ impl ChainSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -350,7 +350,7 @@ pub struct StdSource {
     /// Source line of the call site that produced this error.
     line: u32,
     /// Source file of the call site that produced this error.
-    file: &'static str,
+    file: String,
 }
 
 impl StdSource {
@@ -361,7 +361,7 @@ impl StdSource {
         Self {
             source,
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }

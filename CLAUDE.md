@@ -270,7 +270,7 @@ Wrapper (error + location):
 pub struct StorageError {
     pub kind: StorageErrorKind,
     pub line: u32,
-    pub file: &'static str,  // ✅ &'static str, not String
+    pub file: String,  // ✅ owned -- errors aren't a hot path, don't borrow
 }
 ```
 
@@ -294,7 +294,7 @@ Audit checklist:
 - ✅ No manual `impl std::fmt::Display`
 - ✅ No manual `impl std::error::Error`
 - ✅ All constructors use `#[track_caller]`
-- ✅ Error `file` fields use `&'static str`
+- ✅ Error `file` fields are owned `String` (errors aren't a hot path; don't borrow to save an allocation)
 
 ### Pattern 1: Simple Error (message + location)
 
@@ -304,7 +304,7 @@ Audit checklist:
 pub struct HttpError {
     pub message: String,
     pub line: u32,
-    pub file: &'static str,
+    pub file: String,
 }
 
 impl HttpError {
@@ -314,7 +314,7 @@ impl HttpError {
         Self {
             message: message.into(),
             line: loc.line(),
-            file: loc.file(),
+            file: loc.file().to_string(),
         }
     }
 }
@@ -341,14 +341,14 @@ pub enum StorageErrorKind {
 pub struct StorageError {
     pub kind: StorageErrorKind,
     pub line: u32,
-    pub file: &'static str,
+    pub file: String,
 }
 
 impl StorageError {
     #[track_caller]
     pub fn new(kind: StorageErrorKind) -> Self {
         let loc = std::panic::Location::caller();
-        Self { kind, line: loc.line(), file: loc.file() }
+        Self { kind, line: loc.line(), file: loc.file().to_string() }
     }
 }
 ```
