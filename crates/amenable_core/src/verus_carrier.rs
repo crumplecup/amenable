@@ -324,6 +324,22 @@ pub fn literal_clauses(item_fn: &verus_syn::ItemFn, ensures: bool) -> Vec<String
     .unwrap_or_default()
 }
 
+/// Why [`predicate_body`] couldn't extract a real predicate's own body as
+/// a single literal claim. Both callers fold this straight into their
+/// own richer diagnostic (the macro caller already has the predicate's
+/// name and span; the test caller already has the predicate's name), so
+/// this stays a plain `Display`-only enum with no location tracking of
+/// its own -- unlike `ChainError`, nothing here would use it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_more::Display, derive_more::Error)]
+pub enum PredicateBodyError {
+    /// The predicate's body has no statements at all.
+    #[display("has an empty body")]
+    Empty,
+    /// The predicate's body isn't exactly one trailing expression.
+    #[display("has a body that isn't a single trailing expression")]
+    NotASingleExpression,
+}
+
 /// Extract a real `pub open spec fn NAME(...) -> bool { EXPR }`
 /// predicate's own body as literal text -- its real, canonical
 /// declaration, not any one caller's argument-substituted instance of
@@ -332,14 +348,14 @@ pub fn literal_clauses(item_fn: &verus_syn::ItemFn, ensures: bool) -> Vec<String
 /// this codebase; a body with intermediate `let`s or other statements
 /// would need a human decision about which part *is* the claim, which
 /// this deliberately doesn't guess at).
-pub fn predicate_body(item_fn: &verus_syn::ItemFn) -> Result<String, &'static str> {
+pub fn predicate_body(item_fn: &verus_syn::ItemFn) -> Result<String, PredicateBodyError> {
     match item_fn.block.stmts.as_slice() {
         [verus_syn::Stmt::Expr(expr, None)] => Ok(walk_tokens(
             quote::quote!(#expr),
             &HashSet::new(),
             &mut Vec::new(),
         )),
-        [] => Err("has an empty body"),
-        _ => Err("has a body that isn't a single trailing expression"),
+        [] => Err(PredicateBodyError::Empty),
+        _ => Err(PredicateBodyError::NotASingleExpression),
     }
 }
