@@ -158,7 +158,7 @@ impl kani::Arbitrary for StoplightError {
 }
 
 /// Lawful token minted once a [`Stoplight`] is confirmed `Green`.
-#[derive(Debug, Clone, Copy, amenable_derive::ProofToken)]
+#[derive(Debug, Clone, Copy, Default, amenable_derive::ProofToken)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[proof_token(proposition = "Green")]
 #[amenable_derive::establish(
@@ -178,7 +178,12 @@ impl GreenToken {
     /// KaniVerifier>` requires `Green: Witness<KaniVerifier>` to exist at
     /// all (it does, unconditionally, for any `Sidecar` proposition) — see
     /// [`Established::root`] for how that's satisfied here.
-    pub fn new(_state: Green) -> Self {
+    /// Takes no `Green` argument: `Green` is a bare, freely constructible
+    /// unit struct, so a `_state: Green` parameter here would gate
+    /// nothing -- the one real call site just built one fresh at the
+    /// call, confirmed via a full grep of every `GreenToken::new` call
+    /// before removing it.
+    pub fn new() -> Self {
         Self(())
     }
 }
@@ -197,7 +202,7 @@ impl Established<Green, GreenToken> {
     /// it was: `Provenance`-backed, not model-checked.
     #[must_use]
     pub fn root() -> Self {
-        Self::new(Green, GreenToken::new(Green))
+        Self::new(Green, GreenToken::new())
     }
 }
 

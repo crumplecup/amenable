@@ -72,7 +72,7 @@ impl Transfer<Pending, PendingToken> {
     /// than reached via any transition.
     #[must_use]
     pub fn pending(payload: TransferPayload) -> Self {
-        Self::new(payload, PendingToken::new(Pending))
+        Self::new(payload, PendingToken::new())
     }
 }
 

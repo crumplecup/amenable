@@ -36,7 +36,7 @@ use crate::{Committed, Pending, Rejected, Validated};
 /// minted without going through [`amenable_core::Establish::establish`]
 /// the same way a root evidence type has no credential to present one
 /// from.
-#[derive(Debug, Clone, ProofToken)]
+#[derive(Debug, Clone, Default, ProofToken)]
 #[proof_token(proposition = "Pending")]
 pub struct PendingToken(());
 
@@ -44,9 +44,13 @@ impl PendingToken {
     /// Mint the root token. Public, not privacy-gated: every transfer
     /// starts `Pending`, asserted rather than derived, so there is no
     /// lawfulness condition to enforce here -- see this module's own doc
-    /// comment.
+    /// comment. Takes no `Pending` argument: `Pending` is a bare, freely
+    /// constructible unit struct (`#[derive(Default)]`, no fields), so a
+    /// `_state: Pending` parameter here would gate nothing -- every real
+    /// call site just built one fresh at the call, confirmed via a full
+    /// grep of every `PendingToken::new` call before removing it.
     #[must_use]
-    pub fn new(_state: Pending) -> Self {
+    pub fn new() -> Self {
         Self(())
     }
 }
