@@ -13,6 +13,7 @@ use amenable::{
     WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
     WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 struct LocalVerusVerifier;
@@ -364,7 +365,8 @@ amenable_core::register_witness_exports!(
 
 fn read_file(path: &Path) -> miette::Result<String> {
     fs::read_to_string(path)
-        .map_err(|error| miette::miette!("failed to read {}: {error}", path.display()))
+        .into_diagnostic()
+        .wrap_err_with(|| format!("failed to read {}", path.display()))
 }
 
 /// `LocalEnumEvidence` (registered alongside `LocalLeafEvidence` above)
@@ -389,9 +391,9 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
     let root = std::env::temp_dir().join(format!("amenable-verus-export-test-{stamp}"));
 
     if root.exists() {
-        fs::remove_dir_all(&root).map_err(|error| {
-            miette::miette!("stale temp directory should be removable: {error}")
-        })?;
+        fs::remove_dir_all(&root)
+            .into_diagnostic()
+            .wrap_err("stale temp directory should be removable")?;
     }
 
     let report = support::library(amenable::write_verus_witness_modules(&root))
@@ -482,6 +484,7 @@ fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::
     );
 
     fs::remove_dir_all(&root)
-        .map_err(|error| miette::miette!("failed to remove {}: {error}", root.display()))?;
+        .into_diagnostic()
+        .wrap_err_with(|| format!("failed to remove {}", root.display()))?;
     Ok(())
 }
