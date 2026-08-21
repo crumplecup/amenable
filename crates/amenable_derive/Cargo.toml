@@ -27,7 +27,7 @@ verus_syn = { workspace = true, optional = true }
 amenable_core = { workspace = true }
 inventory = { workspace = true }
 miette = { workspace = true }
-strum = { version = "0.27", features = ["derive"] }
+strum = { workspace = true }
 trybuild = { workspace = true }
 
 [features]
