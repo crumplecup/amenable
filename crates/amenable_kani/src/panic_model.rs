@@ -80,26 +80,28 @@ impl Provenance for KaniCallerLocationObservation {
 }
 
 /// Observable result of a panic hook capturing the panic's own payload text.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::message(\"captured panic message\")"
 )]
 pub struct KaniPanicHookObservation {
-    message: &'static str,
+    message: String,
 }
 
 impl KaniPanicHookObservation {
     /// Model a panic hook that captured the panic payload message.
     #[must_use]
-    pub fn message(message: &'static str) -> Self {
-        Self { message }
+    pub fn message(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
     }
 
     /// Report the panic payload message.
     #[must_use]
-    pub fn captured_message(&self) -> &'static str {
-        self.message
+    pub fn captured_message(&self) -> &str {
+        &self.message
     }
 }
 
@@ -117,7 +119,7 @@ impl Provenance for KaniPanicHookObservation {
                 "rationale",
                 "the direct panic-hook path reaches Kani's unsupported catch_unwind boundary before the payload check can complete",
             ),
-            MetadataEntry::new("message", self.message),
+            MetadataEntry::new("message", self.message.clone()),
         ]
         .into_iter()
         })

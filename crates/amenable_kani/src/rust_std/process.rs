@@ -501,7 +501,7 @@ amenable_derive::harness! {
         /// observation instance that actually demonstrated argument order.
         #[kani::proof]
         fn verify_command_args_reports_the_configured_arguments() {
-            let observation = KaniCommandArgsObservation::configured(["a", "b"]);
+            let observation = KaniCommandArgsObservation::configured("a", "b");
             let demonstration = observation.demonstrate_configured_arguments(["a", "b"]);
 
             let _token = RustStdStandard::<CommandArgs<'static>>::establish(demonstration);

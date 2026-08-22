@@ -10,29 +10,29 @@ use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of rendering a valid UTF-8 path through `Display`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(basis = "Self", basis_ctor = "Self::utf8(\"/a/b.txt\")")]
 pub struct KaniPathDisplayObservation {
-    text: &'static str,
+    text: String,
 }
 
 impl KaniPathDisplayObservation {
     /// Model a valid UTF-8 path whose `Display` output should be verbatim.
     #[must_use]
-    pub fn utf8(text: &'static str) -> Self {
-        Self { text }
+    pub fn utf8(text: impl Into<String>) -> Self {
+        Self { text: text.into() }
     }
 
     /// Report the modeled source text.
     #[must_use]
-    pub fn source_text(&self) -> &'static str {
-        self.text
+    pub fn source_text(&self) -> &str {
+        &self.text
     }
 
     /// Report the modeled `Display` rendering.
     #[must_use]
-    pub fn display_text(&self) -> &'static str {
-        self.text
+    pub fn display_text(&self) -> &str {
+        &self.text
     }
 }
 
@@ -50,7 +50,7 @@ impl Provenance for KaniPathDisplayObservation {
                 "rationale",
                 "the direct Path::display formatting path times out under Kani even for a fully concrete UTF-8 literal path",
             ),
-            MetadataEntry::new("text", self.text),
+            MetadataEntry::new("text", self.text.clone()),
         ]
         .into_iter()
         })
@@ -58,27 +58,27 @@ impl Provenance for KaniPathDisplayObservation {
 }
 
 /// Observable result of parsing a Windows drive-letter prefix component.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(basis = "Self", basis_ctor = "Self::disk(\"C:\\\\\", b'C')")]
 pub struct KaniWindowsPrefixObservation {
-    raw_text: &'static str,
+    raw_text: String,
     drive_letter: u8,
 }
 
 impl KaniWindowsPrefixObservation {
     /// Model a Windows `Disk` prefix component.
     #[must_use]
-    pub fn disk(raw_text: &'static str, drive_letter: u8) -> Self {
+    pub fn disk(raw_text: impl Into<String>, drive_letter: u8) -> Self {
         Self {
-            raw_text,
+            raw_text: raw_text.into(),
             drive_letter,
         }
     }
 
     /// Report the raw prefix text.
     #[must_use]
-    pub fn raw_text(&self) -> &'static str {
-        self.raw_text
+    pub fn raw_text(&self) -> &str {
+        &self.raw_text
     }
 
     /// Report the parsed drive letter.
@@ -102,7 +102,7 @@ impl Provenance for KaniWindowsPrefixObservation {
                 "rationale",
                 "direct std::path prefix parsing is host-platform-specific, so the Windows-only path is not executable on this Linux verifier host",
             ),
-            MetadataEntry::new("raw_text", self.raw_text),
+            MetadataEntry::new("raw_text", self.raw_text.clone()),
             MetadataEntry::new("drive_letter", char::from(self.drive_letter).to_string()),
         ]
         .into_iter()

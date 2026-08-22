@@ -27,7 +27,7 @@ fn child_stream_observations_keep_modeled_text() {
 
 #[test]
 fn command_observations_keep_args_and_env_overrides() {
-    let args = KaniCommandArgsObservation::configured(["a", "b"]);
+    let args = KaniCommandArgsObservation::configured("a", "b");
     let visible_env = KaniCommandEnvObservation::visible_override(
         "AMENABLE_TEST_VAR",
         "configured-value",

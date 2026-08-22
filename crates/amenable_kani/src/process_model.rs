@@ -62,36 +62,36 @@ impl Provenance for KaniChildObservation {
 }
 
 /// Observable result of capturing one child's stderr independently of stdout.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::captured(\"\", \"error message\\n\")"
 )]
 pub struct KaniChildStderrObservation {
-    stdout_text: &'static str,
-    stderr_text: &'static str,
+    stdout_text: String,
+    stderr_text: String,
 }
 
 impl KaniChildStderrObservation {
     /// Model one child whose stderr was piped and captured.
     #[must_use]
-    pub fn captured(stdout_text: &'static str, stderr_text: &'static str) -> Self {
+    pub fn captured(stdout_text: impl Into<String>, stderr_text: impl Into<String>) -> Self {
         Self {
-            stdout_text,
-            stderr_text,
+            stdout_text: stdout_text.into(),
+            stderr_text: stderr_text.into(),
         }
     }
 
     /// Report the modeled stdout text.
     #[must_use]
-    pub fn stdout_text(&self) -> &'static str {
-        self.stdout_text
+    pub fn stdout_text(&self) -> &str {
+        &self.stdout_text
     }
 
     /// Report the modeled stderr text.
     #[must_use]
-    pub fn stderr_text(&self) -> &'static str {
-        self.stderr_text
+    pub fn stderr_text(&self) -> &str {
+        &self.stderr_text
     }
 }
 
@@ -109,8 +109,8 @@ impl Provenance for KaniChildStderrObservation {
                 "rationale",
                 "the direct piped-child stderr path reaches unsupported stdio pipe machinery under Kani",
             ),
-            MetadataEntry::new("stdout_text", self.stdout_text),
-            MetadataEntry::new("stderr_text", self.stderr_text),
+            MetadataEntry::new("stdout_text", self.stdout_text.clone()),
+            MetadataEntry::new("stderr_text", self.stderr_text.clone()),
         ]
         .into_iter()
         })
@@ -118,36 +118,36 @@ impl Provenance for KaniChildStderrObservation {
 }
 
 /// Observable result of writing text to one child's stdin and reading it back.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::echo(\"hello, child\\n\", \"hello, child\\n\")"
 )]
 pub struct KaniChildStdinObservation {
-    input_text: &'static str,
-    echoed_stdout: &'static str,
+    input_text: String,
+    echoed_stdout: String,
 }
 
 impl KaniChildStdinObservation {
     /// Model one child that echoes stdin back on stdout.
     #[must_use]
-    pub fn echo(input_text: &'static str, echoed_stdout: &'static str) -> Self {
+    pub fn echo(input_text: impl Into<String>, echoed_stdout: impl Into<String>) -> Self {
         Self {
-            input_text,
-            echoed_stdout,
+            input_text: input_text.into(),
+            echoed_stdout: echoed_stdout.into(),
         }
     }
 
     /// Report the modeled stdin text written to the child.
     #[must_use]
-    pub fn input_text(&self) -> &'static str {
-        self.input_text
+    pub fn input_text(&self) -> &str {
+        &self.input_text
     }
 
     /// Report the modeled stdout echo from the child.
     #[must_use]
-    pub fn echoed_stdout(&self) -> &'static str {
-        self.echoed_stdout
+    pub fn echoed_stdout(&self) -> &str {
+        &self.echoed_stdout
     }
 }
 
@@ -165,8 +165,8 @@ impl Provenance for KaniChildStdinObservation {
                 "rationale",
                 "the direct piped-child stdin path reaches the unsupported pipe2 boundary under Kani",
             ),
-            MetadataEntry::new("input_text", self.input_text),
-            MetadataEntry::new("echoed_stdout", self.echoed_stdout),
+            MetadataEntry::new("input_text", self.input_text.clone()),
+            MetadataEntry::new("echoed_stdout", self.echoed_stdout.clone()),
         ]
         .into_iter()
         })
@@ -174,23 +174,25 @@ impl Provenance for KaniChildStdinObservation {
 }
 
 /// Observable result of capturing one child's stdout.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(basis = "Self", basis_ctor = "Self::captured(\"hello\\n\")")]
 pub struct KaniChildStdoutObservation {
-    stdout_text: &'static str,
+    stdout_text: String,
 }
 
 impl KaniChildStdoutObservation {
     /// Model one child whose stdout was piped and captured.
     #[must_use]
-    pub fn captured(stdout_text: &'static str) -> Self {
-        Self { stdout_text }
+    pub fn captured(stdout_text: impl Into<String>) -> Self {
+        Self {
+            stdout_text: stdout_text.into(),
+        }
     }
 
     /// Report the modeled stdout text.
     #[must_use]
-    pub fn stdout_text(&self) -> &'static str {
-        self.stdout_text
+    pub fn stdout_text(&self) -> &str {
+        &self.stdout_text
     }
 }
 
@@ -208,7 +210,7 @@ impl Provenance for KaniChildStdoutObservation {
                 "rationale",
                 "the direct piped-child stdout path reaches the unsupported pipe2 boundary under Kani",
             ),
-            MetadataEntry::new("stdout_text", self.stdout_text),
+            MetadataEntry::new("stdout_text", self.stdout_text.clone()),
         ]
         .into_iter()
         })
@@ -216,23 +218,25 @@ impl Provenance for KaniChildStdoutObservation {
 }
 
 /// Observable result of reading back the configured command arguments.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
-#[standard(basis = "Self", basis_ctor = "Self::configured([\"a\", \"b\"])")]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[standard(basis = "Self", basis_ctor = "Self::configured(\"a\", \"b\")")]
 pub struct KaniCommandArgsObservation {
-    args: [&'static str; 2],
+    args: [String; 2],
 }
 
 impl KaniCommandArgsObservation {
     /// Model two configured command arguments in order.
     #[must_use]
-    pub fn configured(args: [&'static str; 2]) -> Self {
-        Self { args }
+    pub fn configured(first: impl Into<String>, second: impl Into<String>) -> Self {
+        Self {
+            args: [first.into(), second.into()],
+        }
     }
 
     /// Report the modeled configured arguments.
     #[must_use]
-    pub fn args(&self) -> [&'static str; 2] {
-        self.args
+    pub fn args(&self) -> [&str; 2] {
+        [self.args[0].as_str(), self.args[1].as_str()]
     }
 }
 
@@ -250,8 +254,8 @@ impl Provenance for KaniCommandArgsObservation {
                 "rationale",
                 "even direct Command construction reaches an unsupported CString strlen boundary under Kani",
             ),
-            MetadataEntry::new("first_arg", self.args[0]),
-            MetadataEntry::new("second_arg", self.args[1]),
+            MetadataEntry::new("first_arg", self.args[0].clone()),
+            MetadataEntry::new("second_arg", self.args[1].clone()),
         ]
         .into_iter()
         })
@@ -259,48 +263,48 @@ impl Provenance for KaniCommandArgsObservation {
 }
 
 /// Observable result of one environment override being visible to a spawned command.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::visible_override(\"AMENABLE_TEST_VAR\", \"configured-value\", \"configured-value\")"
 )]
 pub struct KaniCommandEnvObservation {
-    key: &'static str,
-    value: &'static str,
-    visible_stdout: &'static str,
+    key: String,
+    value: String,
+    visible_stdout: String,
 }
 
 impl KaniCommandEnvObservation {
     /// Model one command environment override that is visible in child output.
     #[must_use]
     pub fn visible_override(
-        key: &'static str,
-        value: &'static str,
-        visible_stdout: &'static str,
+        key: impl Into<String>,
+        value: impl Into<String>,
+        visible_stdout: impl Into<String>,
     ) -> Self {
         Self {
-            key,
-            value,
-            visible_stdout,
+            key: key.into(),
+            value: value.into(),
+            visible_stdout: visible_stdout.into(),
         }
     }
 
     /// Report the modeled override key.
     #[must_use]
-    pub fn key(&self) -> &'static str {
-        self.key
+    pub fn key(&self) -> &str {
+        &self.key
     }
 
     /// Report the modeled override value.
     #[must_use]
-    pub fn value(&self) -> &'static str {
-        self.value
+    pub fn value(&self) -> &str {
+        &self.value
     }
 
     /// Report the modeled child-visible stdout text.
     #[must_use]
-    pub fn visible_stdout(&self) -> &'static str {
-        self.visible_stdout
+    pub fn visible_stdout(&self) -> &str {
+        &self.visible_stdout
     }
 }
 
@@ -318,9 +322,9 @@ impl Provenance for KaniCommandEnvObservation {
                 "rationale",
                 "the direct env-plus-spawn path combines unsupported command construction and real spawn boundaries under Kani",
             ),
-            MetadataEntry::new("key", self.key),
-            MetadataEntry::new("value", self.value),
-            MetadataEntry::new("visible_stdout", self.visible_stdout),
+            MetadataEntry::new("key", self.key.clone()),
+            MetadataEntry::new("value", self.value.clone()),
+            MetadataEntry::new("visible_stdout", self.visible_stdout.clone()),
         ]
         .into_iter()
         })
@@ -328,33 +332,36 @@ impl Provenance for KaniCommandEnvObservation {
 }
 
 /// Observable result of reading back one configured environment override.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::configured_override(\"SOME_KEY\", \"some_value\")"
 )]
 pub struct KaniCommandEnvsObservation {
-    key: &'static str,
-    value: &'static str,
+    key: String,
+    value: String,
 }
 
 impl KaniCommandEnvsObservation {
     /// Model one configured environment override stored on a command builder.
     #[must_use]
-    pub fn configured_override(key: &'static str, value: &'static str) -> Self {
-        Self { key, value }
+    pub fn configured_override(key: impl Into<String>, value: impl Into<String>) -> Self {
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
     }
 
     /// Report the modeled override key.
     #[must_use]
-    pub fn key(&self) -> &'static str {
-        self.key
+    pub fn key(&self) -> &str {
+        &self.key
     }
 
     /// Report the modeled override value.
     #[must_use]
-    pub fn value(&self) -> &'static str {
-        self.value
+    pub fn value(&self) -> &str {
+        &self.value
     }
 }
 
@@ -372,8 +379,8 @@ impl Provenance for KaniCommandEnvsObservation {
                 "rationale",
                 "direct Command environment introspection still times out under Kani before the override law can be checked",
             ),
-            MetadataEntry::new("key", self.key),
-            MetadataEntry::new("value", self.value),
+            MetadataEntry::new("key", self.key.clone()),
+            MetadataEntry::new("value", self.value.clone()),
         ]
         .into_iter()
         })
@@ -429,20 +436,20 @@ impl Provenance for KaniExitStatusObservation {
 }
 
 /// Observable result of collecting one command's output bundle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(basis = "Self", basis_ctor = "Self::captured(0, \"hello\\n\")")]
 pub struct KaniOutputObservation {
     exit_code: i32,
-    stdout_text: &'static str,
+    stdout_text: String,
 }
 
 impl KaniOutputObservation {
     /// Model one completed output bundle with its stdout text.
     #[must_use]
-    pub fn captured(exit_code: i32, stdout_text: &'static str) -> Self {
+    pub fn captured(exit_code: i32, stdout_text: impl Into<String>) -> Self {
         Self {
             exit_code,
-            stdout_text,
+            stdout_text: stdout_text.into(),
         }
     }
 
@@ -460,8 +467,8 @@ impl KaniOutputObservation {
 
     /// Report the modeled stdout text.
     #[must_use]
-    pub fn stdout_text(&self) -> &'static str {
-        self.stdout_text
+    pub fn stdout_text(&self) -> &str {
+        &self.stdout_text
     }
 }
 
@@ -480,7 +487,7 @@ impl Provenance for KaniOutputObservation {
                 "the direct Command::output path reaches unsupported Stdio conversion machinery under Kani",
             ),
             MetadataEntry::new("exit_code", self.exit_code.to_string()),
-            MetadataEntry::new("stdout_text", self.stdout_text),
+            MetadataEntry::new("stdout_text", self.stdout_text.clone()),
         ]
         .into_iter()
         })

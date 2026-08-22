@@ -9,24 +9,27 @@ use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of hashing the same input twice through one `RandomState`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard)]
 #[standard(basis = "Self", basis_ctor = "Self::same_input(\"some value\", 7)")]
 pub struct KaniRandomStateObservation {
-    input: &'static str,
+    input: String,
     digest: u64,
 }
 
 impl KaniRandomStateObservation {
     /// Model two hashers built from the same `RandomState` on one shared input.
     #[must_use]
-    pub fn same_input(input: &'static str, digest: u64) -> Self {
-        Self { input, digest }
+    pub fn same_input(input: impl Into<String>, digest: u64) -> Self {
+        Self {
+            input: input.into(),
+            digest,
+        }
     }
 
     /// Report the shared input both hashers saw.
     #[must_use]
-    pub fn input(&self) -> &'static str {
-        self.input
+    pub fn input(&self) -> &str {
+        &self.input
     }
 
     /// Report the first observed hash digest.
@@ -62,7 +65,7 @@ impl Provenance for KaniRandomStateObservation {
                 "rationale",
                 "the direct RandomState::new path reaches an unsupported OS entropy-source boundary under Kani",
             ),
-            MetadataEntry::new("input", self.input),
+            MetadataEntry::new("input", self.input.clone()),
             MetadataEntry::new("digest", self.digest.to_string()),
         ]
         .into_iter()
