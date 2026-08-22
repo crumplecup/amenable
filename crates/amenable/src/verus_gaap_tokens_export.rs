@@ -71,9 +71,9 @@ const TOKENS: &[&str] = &[
 /// One token's real shape, gathered from the registry -- see
 /// [`gather_tokens`].
 struct TokenSpec {
-    token: &'static str,
-    proposition: &'static str,
-    credential: Option<&'static str>,
+    token: String,
+    proposition: String,
+    credential: Option<String>,
 }
 
 /// Write one generated Verus token companion, covering every token named
@@ -123,9 +123,9 @@ fn gather_tokens() -> BTreeMap<&'static str, TokenSpec> {
             gathered.insert(
                 token,
                 TokenSpec {
-                    token,
-                    proposition,
-                    credential,
+                    token: token.to_string(),
+                    proposition: proposition.to_string(),
+                    credential: credential.map(str::to_string),
                 },
             );
         }
@@ -172,13 +172,13 @@ fn render_companion(specs: &[&TokenSpec]) -> String {
     );
 
     for spec in specs {
-        let proposition = tidy_stringified_type(spec.proposition);
+        let proposition = tidy_stringified_type(&spec.proposition);
         out.push_str(&format!(
             "#[derive(Clone, Copy)]\npub struct {token};\n\nimpl ProofToken for {token} {{\n    type Proposition = {proposition};\n}}\n\n",
             token = spec.token,
         ));
 
-        if let Some(credential) = spec.credential {
+        if let Some(credential) = &spec.credential {
             out.push_str(&format!(
                 "impl Establish<{credential}, GalleryVerifier> for {proposition} {{\n    type Token = {token};\n\n    fn establish(_credential: {credential}) -> Self::Token {{\n        {token}\n    }}\n}}\n\n",
                 credential = credential,
