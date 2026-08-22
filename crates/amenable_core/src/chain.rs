@@ -36,9 +36,9 @@ use crate::{EvidenceLink, ProofRecord};
 #[derive(Debug, Clone)]
 pub struct ChainNode {
     /// This node's evidence type name.
-    pub evidence: &'static str,
+    pub evidence: String,
     /// Registered proofs for this node, as `(verifier, description)` pairs.
-    pub proofs: Vec<(&'static str, String)>,
+    pub proofs: Vec<(String, String)>,
     /// The node for each basis this evidence rests on — empty at a root.
     pub bases: Vec<ChainNode>,
 }
@@ -55,7 +55,7 @@ impl ChainNode {
 #[derive(Debug, Clone)]
 pub struct ProofChainReport {
     /// The evidence type name the report was built from.
-    pub subject: &'static str,
+    pub subject: String,
     /// Every verifier this report is complete for — each node in `root`
     /// is guaranteed to carry a proof for all of them.
     pub verifiers: Vec<String>,
@@ -98,7 +98,7 @@ fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Res
         let names = node
             .bases
             .iter()
-            .map(|basis| basis.evidence)
+            .map(|basis| basis.evidence.as_str())
             .collect::<Vec<_>>()
             .join(", ");
         writeln!(f, "{indent}  basis: {names}")?;
@@ -124,7 +124,7 @@ fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Res
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChainGap {
     /// The evidence type name missing a proof.
-    pub evidence: &'static str,
+    pub evidence: String,
     /// The verifier it has no proof registered for.
     pub verifier: String,
 }
@@ -175,7 +175,7 @@ impl NotFoundSource {
 pub struct IncompleteSource {
     /// The evidence type name the lookup was rooted at.
     #[error(ignore)]
-    pub subject: &'static str,
+    pub subject: String,
     /// Every verifier the chain was required to be complete for.
     #[error(ignore)]
     pub required: Vec<String>,
@@ -197,10 +197,10 @@ impl IncompleteSource {
     /// Name the subject, the required verifiers, and every gap found,
     /// recording the caller's location.
     #[track_caller]
-    fn new(subject: &'static str, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
+    fn new(subject: impl Into<String>, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
-            subject,
+            subject: subject.into(),
             required,
             gaps,
             line: loc.line(),
@@ -283,7 +283,7 @@ impl ChainError {
     /// Construct a [`ChainErrorKind::Incomplete`] error naming the
     /// subject, the required verifiers, and every gap found.
     #[track_caller]
-    fn incomplete(subject: &'static str, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
+    fn incomplete(subject: impl Into<String>, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
         Self::new(ChainErrorKind::Incomplete(IncompleteSource::new(
             subject, required, gaps,
         )))
@@ -335,7 +335,7 @@ pub fn proof_chain_for_verifiers(
     let root = filter_node(full_root, &required);
 
     Ok(ProofChainReport {
-        subject: root_name,
+        subject: root_name.to_string(),
         verifiers: required,
         root,
     })
@@ -367,7 +367,7 @@ fn build_node(
 ) -> ChainNode {
     let proofs = inventory::iter::<ProofRecord>()
         .filter(|record| record.evidence == name)
-        .map(|record| (record.verifier, (record.describe)()))
+        .map(|record| (record.verifier.to_string(), (record.describe)()))
         .collect();
 
     let mut bases = Vec::new();
@@ -391,7 +391,7 @@ fn build_node(
     }
 
     ChainNode {
-        evidence: name,
+        evidence: name.to_string(),
         proofs,
         bases,
     }
@@ -420,7 +420,7 @@ fn collect_gaps(node: &ChainNode, required: &[String], gaps: &mut Vec<ChainGap>)
     for verifier in required {
         if !node.proofs.iter().any(|(v, _)| v == verifier) {
             gaps.push(ChainGap {
-                evidence: node.evidence,
+                evidence: node.evidence.clone(),
                 verifier: verifier.clone(),
             });
         }

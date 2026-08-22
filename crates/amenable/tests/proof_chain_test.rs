@@ -8,7 +8,7 @@ fn assert_root_has_kani_and_creusot(report: &amenable::ProofChainReport, expecte
     assert!(root.evidence.ends_with(expected_suffix));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
 }
@@ -46,7 +46,7 @@ fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() -> miette::
     assert_eq!(root.proofs.len(), 3);
     assert_eq!(report.verifiers.len(), 3);
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     assert!(verifiers.contains(&"verus"));
@@ -1357,7 +1357,7 @@ fn chunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1378,7 +1378,7 @@ fn chunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1399,7 +1399,7 @@ fn chunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1420,7 +1420,7 @@ fn chunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1441,7 +1441,7 @@ fn windows_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1462,7 +1462,7 @@ fn rchunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1483,7 +1483,7 @@ fn rchunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1504,7 +1504,7 @@ fn rchunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miet
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1525,7 +1525,7 @@ fn rchunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1546,7 +1546,7 @@ fn chunk_by_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1567,7 +1567,7 @@ fn chunk_by_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1588,7 +1588,7 @@ fn rsplit_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1609,7 +1609,7 @@ fn rsplit_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1630,7 +1630,7 @@ fn rsplit_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1651,7 +1651,7 @@ fn rsplit_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1672,7 +1672,7 @@ fn split_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<(
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1694,7 +1694,7 @@ fn split_inclusive_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1715,7 +1715,7 @@ fn split_inclusive_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> mi
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1736,7 +1736,7 @@ fn split_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1757,7 +1757,7 @@ fn split_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1778,7 +1778,7 @@ fn split_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1799,7 +1799,7 @@ fn escape_ascii_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1821,7 +1821,7 @@ fn get_disjoint_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() ->
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -1982,7 +1982,7 @@ fn pin_box_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     assert!(root.evidence.ends_with("RustStdStandard<Pin<Box<i32>>>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2000,7 +2000,7 @@ fn non_null_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     assert!(root.evidence.ends_with("RustStdStandard<NonNull<i32>>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2103,7 +2103,7 @@ fn location_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2124,7 +2124,7 @@ fn panic_info_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2145,7 +2145,7 @@ fn panic_message_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2377,7 +2377,7 @@ fn borrow_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     assert!(root.evidence.ends_with("RustStdStandard<BorrowError>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -2392,7 +2392,7 @@ fn borrow_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
     assert!(root.evidence.ends_with("RustStdStandard<BorrowMutError>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -5248,7 +5248,7 @@ fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs()
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -5412,7 +5412,7 @@ fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     );
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -5492,7 +5492,7 @@ fn fmt_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     assert!(root.evidence.ends_with("RustStdStandard<std::fmt::Error>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -7155,7 +7155,7 @@ fn marker_phantom_data_i32_proof_chain_registers_the_kani_and_creusot_proofs() -
     assert!(root.evidence.ends_with("RustStdStandard<PhantomData<i32>>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
@@ -7173,7 +7173,7 @@ fn marker_phantom_pinned_proof_chain_registers_the_kani_and_creusot_proofs() -> 
     assert!(root.evidence.ends_with("RustStdStandard<PhantomPinned>"));
     assert!(root.is_root());
 
-    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| *verifier).collect();
+    let verifiers: Vec<&str> = root.proofs.iter().map(|(verifier, _)| verifier.as_str()).collect();
     assert!(verifiers.contains(&"kani"));
     assert!(verifiers.contains(&"creusot"));
     Ok(())
