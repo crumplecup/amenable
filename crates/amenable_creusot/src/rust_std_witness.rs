@@ -674,10 +674,10 @@ bridge_creusot_witness!(RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>>
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckedProof {
     /// The Creusot contract function that checks this carrier's invariant.
-    pub harness: &'static str,
+    pub harness: String,
     /// The contract's own source — what it actually requires/ensures,
     /// verbatim.
-    pub claim: &'static str,
+    pub claim: String,
     /// The chain-derived provenance this claim still rests on.
     pub provenance: RustStdProvenance,
 }
@@ -696,8 +696,8 @@ impl CreusotWitness for RustStdStandard<char> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_char_roundtrip",
-            claim: VERIFY_CHAR_ROUNDTRIP_SRC,
+            harness: "verify_char_roundtrip".to_string(),
+            claim: VERIFY_CHAR_ROUNDTRIP_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -746,8 +746,8 @@ impl CreusotWitness for ValidUnicodeScalar {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_char_roundtrip",
-            claim: VERIFY_CHAR_ROUNDTRIP_SRC,
+            harness: "verify_char_roundtrip".to_string(),
+            claim: VERIFY_CHAR_ROUNDTRIP_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -791,8 +791,8 @@ impl CreusotWitness for RustStdStandard<String> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_string_roundtrip",
-            claim: VERIFY_STRING_ROUNDTRIP_SRC,
+            harness: "verify_string_roundtrip".to_string(),
+            claim: VERIFY_STRING_ROUNDTRIP_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -839,8 +839,8 @@ macro_rules! impl_creusot_atomic_checked_witness {
 
             fn proof() -> Self::ProofArtifact {
                 CheckedProof {
-                    harness: $harness,
-                    claim: $claim,
+                    harness: $harness.to_string(),
+                    claim: $claim.to_string(),
                     provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
                 }
             }
@@ -923,8 +923,8 @@ impl CreusotWitness for RustStdStandard<AtomicOrdering> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_relaxed_ordering_still_makes_a_store_observable",
-            claim: VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC,
+            harness: "verify_relaxed_ordering_still_makes_a_store_observable".to_string(),
+            claim: VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -970,8 +970,8 @@ impl CreusotWitness for RustStdStandard<System> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_system_allocates_and_deallocates_a_layout",
-            claim: VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC,
+            harness: "verify_system_allocates_and_deallocates_a_layout".to_string(),
+            claim: VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1018,8 +1018,8 @@ impl CreusotWitness for RustStdStandard<Backtrace> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_backtrace_force_capture_always_actually_captures",
-            claim: VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC,
+            harness: "verify_backtrace_force_capture_always_actually_captures".to_string(),
+            claim: VERIFY_BACKTRACE_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1041,8 +1041,8 @@ impl CreusotWitness for RustStdStandard<BacktraceStatus> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_backtrace_status_reports_captured_after_force_capture",
-            claim: VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC,
+            harness: "verify_backtrace_status_reports_captured_after_force_capture".to_string(),
+            claim: VERIFY_BACKTRACE_STATUS_REPORTS_CAPTURED_AFTER_FORCE_CAPTURE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1064,8 +1064,8 @@ impl CreusotWitness for RustStdStandard<SeekFrom> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_seek_from_round_trips_each_variants_offset",
-            claim: VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC,
+            harness: "verify_seek_from_round_trips_each_variants_offset".to_string(),
+            claim: VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1109,8 +1109,8 @@ impl CreusotWitness for RustStdStandard<Shutdown> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_shutdown_write_prevents_further_writes",
-            claim: VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC,
+            harness: "verify_shutdown_write_prevents_further_writes".to_string(),
+            claim: VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1132,8 +1132,8 @@ impl CreusotWitness for RustStdStandard<DefaultHasher> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_default_hasher_is_deterministic_across_fresh_instances",
-            claim: VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC,
+            harness: "verify_default_hasher_is_deterministic_across_fresh_instances".to_string(),
+            claim: VERIFY_DEFAULT_HASHER_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1155,8 +1155,8 @@ impl CreusotWitness for RustStdStandard<RandomState> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_random_state_gives_the_same_hasher_seed_across_calls",
-            claim: VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC,
+            harness: "verify_random_state_gives_the_same_hasher_seed_across_calls".to_string(),
+            claim: VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1178,8 +1178,8 @@ impl CreusotWitness for RustStdStandard<HashMap<i32, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_hash_map_insert_then_get_recovers_the_value",
-            claim: VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC,
+            harness: "verify_hash_map_insert_then_get_recovers_the_value".to_string(),
+            claim: VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1223,8 +1223,8 @@ impl CreusotWitness for RustStdStandard<HashSet<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_hash_set_insert_then_contains_reports_membership",
-            claim: VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC,
+            harness: "verify_hash_set_insert_then_contains_reports_membership".to_string(),
+            claim: VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1275,8 +1275,8 @@ impl CreusotWitness for RustStdStandard<[i32; 3]> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_array_indexing_and_length",
-            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+            harness: "verify_array_indexing_and_length".to_string(),
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1298,8 +1298,8 @@ impl CreusotWitness for RustStdStandard<[i32]> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_slice_indexing_and_length",
-            claim: VERIFY_SLICE_INDEXING_AND_LENGTH_SRC,
+            harness: "verify_slice_indexing_and_length".to_string(),
+            claim: VERIFY_SLICE_INDEXING_AND_LENGTH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1325,8 +1325,8 @@ impl CreusotWitness for IndexingAndLength {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_array_indexing_and_length",
-            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC,
+            harness: "verify_array_indexing_and_length".to_string(),
+            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1364,8 +1364,8 @@ impl CreusotWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_slice_iter_yields_shared_references_in_order",
-            claim: VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_slice_iter_yields_shared_references_in_order".to_string(),
+            claim: VERIFY_SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1410,8 +1410,8 @@ impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_slice_iter_mut_yields_mutable_references_that_write_through",
-            claim: VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC,
+            harness: "verify_slice_iter_mut_yields_mutable_references_that_write_through".to_string(),
+            claim: VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1460,8 +1460,8 @@ impl CreusotWitness for RustStdStandard<str> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_str_byte_length_and_content",
-            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC,
+            harness: "verify_str_byte_length_and_content".to_string(),
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1508,8 +1508,8 @@ impl CreusotWitness for AsciiByte {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_str_byte_length_and_content",
-            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC,
+            harness: "verify_str_byte_length_and_content".to_string(),
+            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1545,8 +1545,8 @@ impl CreusotWitness for RustStdStandard<(i32, i32)> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_tuple_field_access",
-            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC,
+            harness: "verify_tuple_field_access".to_string(),
+            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1590,8 +1590,8 @@ impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_fn_pointer_calls_the_underlying_function",
-            claim: VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC,
+            harness: "verify_fn_pointer_calls_the_underlying_function".to_string(),
+            claim: VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1635,8 +1635,8 @@ impl CreusotWitness for RustStdStandard<*const i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_const_pointer_cast_preserves_the_address",
-            claim: VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
+            harness: "verify_const_pointer_cast_preserves_the_address".to_string(),
+            claim: VERIFY_CONST_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1658,8 +1658,8 @@ impl CreusotWitness for RustStdStandard<*mut i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_mut_pointer_cast_preserves_the_address",
-            claim: VERIFY_MUT_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC,
+            harness: "verify_mut_pointer_cast_preserves_the_address".to_string(),
+            claim: VERIFY_MUT_POINTER_CAST_PRESERVES_THE_ADDRESS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1681,8 +1681,8 @@ impl CreusotWitness for RustStdStandard<AssertUnwindSafe<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_assert_unwind_safe_derefs_transparently",
-            claim: VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC,
+            harness: "verify_assert_unwind_safe_derefs_transparently".to_string(),
+            claim: VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1726,8 +1726,8 @@ impl CreusotWitness for RustStdStandard<&'static i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_shared_reference_dereferences_to_the_referent",
-            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC,
+            harness: "verify_shared_reference_dereferences_to_the_referent".to_string(),
+            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1772,8 +1772,8 @@ impl CreusotWitness for RustStdStandard<&'static mut i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent",
-            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC,
+            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_string(),
+            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1823,8 +1823,8 @@ impl CreusotWitness for RustStdStandard<Cow<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cow_destructure_recovers_the_wrapped_value",
-            claim: VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_cow_destructure_recovers_the_wrapped_value".to_string(),
+            claim: VERIFY_COW_DESTRUCTURE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1869,8 +1869,8 @@ impl CreusotWitness for RustStdStandard<BTreeMap<i32, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_btree_map_iterates_in_key_order",
-            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC,
+            harness: "verify_btree_map_iterates_in_key_order".to_string(),
+            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1934,8 +1934,8 @@ impl CreusotWitness for RustStdStandard<BTreeSet<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_btree_set_iterates_in_sorted_order",
-            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC,
+            harness: "verify_btree_set_iterates_in_sorted_order".to_string(),
+            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2000,8 +2000,8 @@ impl CreusotWitness for RustStdStandard<BinaryHeap<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_pop_yields_the_maximum_first",
-            claim: VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC,
+            harness: "verify_binary_heap_pop_yields_the_maximum_first".to_string(),
+            claim: VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2046,8 +2046,8 @@ impl CreusotWitness for RustStdStandard<BinaryHeapDrain<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_drain_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_drain_yields_every_pushed_element_once".to_string(),
+            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2093,8 +2093,8 @@ impl CreusotWitness for RustStdStandard<BinaryHeapIntoIter<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_into_iter_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_into_iter_yields_every_pushed_element_once".to_string(),
+            claim: VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2140,8 +2140,8 @@ impl CreusotWitness for RustStdStandard<BinaryHeapIter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_iter_yields_every_pushed_element_once",
-            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC,
+            harness: "verify_binary_heap_iter_yields_every_pushed_element_once".to_string(),
+            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2187,8 +2187,8 @@ impl CreusotWitness for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_binary_heap_peek_mut_exposes_the_maximum",
-            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC,
+            harness: "verify_binary_heap_peek_mut_exposes_the_maximum".to_string(),
+            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2255,8 +2255,8 @@ impl CreusotWitness for RustStdStandard<LinkedList<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_is_fifo_through_back_and_front",
-            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+            harness: "verify_linked_list_is_fifo_through_back_and_front".to_string(),
+            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2282,8 +2282,8 @@ impl CreusotWitness for DrainsTwoValuesInOrderAndEmpties {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_is_fifo_through_back_and_front",
-            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC,
+            harness: "verify_linked_list_is_fifo_through_back_and_front".to_string(),
+            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2321,8 +2321,8 @@ impl CreusotWitness for RustStdStandard<LinkedListIter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_iter_yields_references_in_order",
-            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_linked_list_iter_yields_references_in_order".to_string(),
+            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2367,8 +2367,8 @@ impl CreusotWitness for RustStdStandard<LinkedListIterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_iter_mut_writes_through",
-            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC,
+            harness: "verify_linked_list_iter_mut_writes_through".to_string(),
+            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2413,8 +2413,8 @@ impl CreusotWitness for RustStdStandard<LinkedListIntoIter<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_linked_list_into_iter_yields_owned_values_in_order".to_string(),
+            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2440,8 +2440,8 @@ impl CreusotWitness for YieldsTwoValuesInOrderThenEnds {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_linked_list_into_iter_yields_owned_values_in_order".to_string(),
+            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2479,8 +2479,8 @@ impl CreusotWitness for RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mu
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_linked_list_extract_if_partitions_by_the_predicate",
-            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC,
+            harness: "verify_linked_list_extract_if_partitions_by_the_predicate".to_string(),
+            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2532,8 +2532,8 @@ impl CreusotWitness for RustStdStandard<TryReserveError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_try_reserve_rejects_an_impossible_capacity",
-            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC,
+            harness: "verify_try_reserve_rejects_an_impossible_capacity".to_string(),
+            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2578,8 +2578,8 @@ impl CreusotWitness for RustStdStandard<VecDeque<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_pushes_and_pops_from_both_ends",
-            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC,
+            harness: "verify_vec_deque_pushes_and_pops_from_both_ends".to_string(),
+            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2624,8 +2624,8 @@ impl CreusotWitness for RustStdStandard<VecDequeIntoIter<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order",
-            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC,
+            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order".to_string(),
+            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2647,8 +2647,8 @@ impl CreusotWitness for RustStdStandard<VecDequeDrain<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_drain_removes_and_yields_in_order",
-            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC,
+            harness: "verify_vec_deque_drain_removes_and_yields_in_order".to_string(),
+            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2670,8 +2670,8 @@ impl CreusotWitness for RustStdStandard<VecDequeIter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_iter_yields_references_in_order",
-            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC,
+            harness: "verify_vec_deque_iter_yields_references_in_order".to_string(),
+            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2716,8 +2716,8 @@ impl CreusotWitness for RustStdStandard<VecDequeIterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_vec_deque_iter_mut_writes_through",
-            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC,
+            harness: "verify_vec_deque_iter_mut_writes_through".to_string(),
+            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2762,8 +2762,8 @@ impl CreusotWitness for RustStdStandard<Args> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_args_reports_at_least_the_program_path",
-            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            harness: "verify_args_reports_at_least_the_program_path".to_string(),
+            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2785,8 +2785,8 @@ impl CreusotWitness for RustStdStandard<ArgsOs> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_args_os_reports_at_least_the_program_path",
-            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            harness: "verify_args_os_reports_at_least_the_program_path".to_string(),
+            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2812,8 +2812,8 @@ impl CreusotWitness for ArgvIncludesProgramPath {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_args_reports_at_least_the_program_path",
-            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC,
+            harness: "verify_args_reports_at_least_the_program_path".to_string(),
+            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2871,8 +2871,8 @@ impl CreusotWitness for RustStdStandard<JoinPathsError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_join_paths_error_reports_an_unjoinable_path",
-            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC,
+            harness: "verify_join_paths_error_reports_an_unjoinable_path".to_string(),
+            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2894,8 +2894,8 @@ impl CreusotWitness for RustStdStandard<SplitPaths<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_split_paths_recovers_paths_joined_by_join_paths",
-            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
+            harness: "verify_split_paths_recovers_paths_joined_by_join_paths".to_string(),
+            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -2917,8 +2917,8 @@ impl CreusotWitness for RustStdStandard<VarError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_var_error_distinguishes_not_present_from_not_unicode",
-            claim: VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
+            harness: "verify_var_error_distinguishes_not_present_from_not_unicode".to_string(),
+            claim: VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3001,8 +3001,8 @@ impl CreusotWitness for RustStdStandard<OsStr> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str",
-            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC,
+            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str".to_string(),
+            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3047,8 +3047,8 @@ impl CreusotWitness for RustStdStandard<OsString> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_os_string_push_appends_to_the_existing_content",
-            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC,
+            harness: "verify_os_string_push_appends_to_the_existing_content".to_string(),
+            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3070,8 +3070,8 @@ impl CreusotWitness for RustStdStandard<OsStrDisplay<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_os_str_display_renders_valid_utf8_content_unchanged",
-            claim: VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC,
+            harness: "verify_os_str_display_renders_valid_utf8_content_unchanged".to_string(),
+            claim: VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3093,8 +3093,8 @@ impl CreusotWitness for RustStdStandard<CString> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul",
-            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC,
+            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_string(),
+            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3140,8 +3140,8 @@ impl CreusotWitness for RustStdStandard<FromVecWithNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
-            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_string(),
+            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3163,8 +3163,8 @@ impl CreusotWitness for RustStdStandard<IntoStringError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_into_string_error_recovers_the_original_cstring",
-            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC,
+            harness: "verify_into_string_error_recovers_the_original_cstring".to_string(),
+            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3210,8 +3210,8 @@ impl CreusotWitness for RustStdStandard<NulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nul_error_reports_the_interior_nuls_position",
-            claim: VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC,
+            harness: "verify_nul_error_reports_the_interior_nuls_position".to_string(),
+            claim: VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3256,8 +3256,8 @@ impl CreusotWitness for RustStdStandard<CStr> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
-            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_string(),
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3306,8 +3306,8 @@ impl CreusotWitness for NonNulByte {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes",
-            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC,
+            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_string(),
+            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3348,8 +3348,8 @@ impl CreusotWitness for NulOnlyAtTheEndValidates {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end",
-            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_string(),
+            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3388,8 +3388,8 @@ impl CreusotWitness for RustStdStandard<FromBytesUntilNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere",
-            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC,
+            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_string(),
+            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3436,8 +3436,8 @@ impl CreusotWitness for RustStdStandard<FromBytesWithNulError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end",
-            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC,
+            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_string(),
+            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3460,8 +3460,8 @@ impl CreusotWitness for RustStdStandard<Box<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_box_new_preserves_the_wrapped_value",
-            claim: VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_box_new_preserves_the_wrapped_value".to_string(),
+            claim: VERIFY_BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3505,8 +3505,8 @@ impl CreusotWitness for RustStdStandard<Duration> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_duration_new_normalizes_nanos_and_carries_into_secs",
-            claim: VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC,
+            harness: "verify_duration_new_normalizes_nanos_and_carries_into_secs".to_string(),
+            claim: VERIFY_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3569,8 +3569,8 @@ impl CreusotWitness for RustStdStandard<RangeTo<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_range_to_contains_matches_bound",
-            claim: VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC,
+            harness: "verify_range_to_contains_matches_bound".to_string(),
+            claim: VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3614,8 +3614,8 @@ impl CreusotWitness for RustStdStandard<RangeFull> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_range_full_contains_everything",
-            claim: VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC,
+            harness: "verify_range_full_contains_everything".to_string(),
+            claim: VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3637,8 +3637,8 @@ impl CreusotWitness for RustStdStandard<Bound<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_bound_round_trips_its_endpoint",
-            claim: VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC,
+            harness: "verify_bound_round_trips_its_endpoint".to_string(),
+            claim: VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3682,8 +3682,8 @@ impl CreusotWitness for RustStdStandard<ControlFlow<i32, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_control_flow_continue_and_break_are_disjoint",
-            claim: VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC,
+            harness: "verify_control_flow_continue_and_break_are_disjoint".to_string(),
+            claim: VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3731,8 +3731,8 @@ impl CreusotWitness for RustStdStandard<NonZero<i16>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_nonzero_i16_roundtrips",
-            claim: VERIFY_NONZERO_I16_ROUNDTRIPS_SRC,
+            harness: "verify_nonzero_i16_roundtrips".to_string(),
+            claim: VERIFY_NONZERO_I16_ROUNDTRIPS_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3794,8 +3794,8 @@ impl CreusotWitness for RustStdStandard<std::cmp::Ordering> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ordering_reverse_swaps_less_and_greater",
-            claim: VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC,
+            harness: "verify_ordering_reverse_swaps_less_and_greater".to_string(),
+            claim: VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3840,8 +3840,8 @@ impl CreusotWitness for RustStdStandard<Wrapping<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_wrapping_i32_add_wraps",
-            claim: VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC,
+            harness: "verify_wrapping_i32_add_wraps".to_string(),
+            claim: VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3885,8 +3885,8 @@ impl CreusotWitness for RustStdStandard<Saturating<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_saturating_i32_add_clamps",
-            claim: VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC,
+            harness: "verify_saturating_i32_add_clamps".to_string(),
+            claim: VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3934,8 +3934,8 @@ impl CreusotWitness for RustStdStandard<core::num::IntErrorKind> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_int_error_kind_classifies_parse_failures",
-            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC,
+            harness: "verify_int_error_kind_classifies_parse_failures".to_string(),
+            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -3984,8 +3984,8 @@ impl CreusotWitness for RustStdStandard<core::num::TryFromIntError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range",
-            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC,
+            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_string(),
+            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4038,8 +4038,8 @@ impl CreusotWitness for RustStdStandard<core::num::ParseIntError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_parse_int_error_reports_the_kind_of_the_failure",
-            claim: VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC,
+            harness: "verify_parse_int_error_reports_the_kind_of_the_failure".to_string(),
+            claim: VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4098,8 +4098,8 @@ impl CreusotWitness for RustStdStandard<core::num::FpCategory> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_fp_category_matches_the_value_it_classifies",
-            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC,
+            harness: "verify_fp_category_matches_the_value_it_classifies".to_string(),
+            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4156,8 +4156,8 @@ impl CreusotWitness for RustStdStandard<core::num::ParseFloatError> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_parse_float_error_occurs_only_for_unparseable_input",
-            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC,
+            harness: "verify_parse_float_error_occurs_only_for_unparseable_input".to_string(),
+            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4210,8 +4210,8 @@ impl CreusotWitness for RustStdStandard<Reverse<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_reverse_inverts_comparison",
-            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC,
+            harness: "verify_reverse_inverts_comparison".to_string(),
+            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4258,8 +4258,8 @@ impl CreusotWitness for RustStdStandard<Option<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_option_some_and_none_are_disjoint",
-            claim: VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC,
+            harness: "verify_option_some_and_none_are_disjoint".to_string(),
+            claim: VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4307,8 +4307,8 @@ impl CreusotWitness for RustStdStandard<Result<i32, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_result_ok_and_err_are_disjoint",
-            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC,
+            harness: "verify_result_ok_and_err_are_disjoint".to_string(),
+            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4354,8 +4354,8 @@ impl CreusotWitness for RustStdStandard<core::option::Iter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_option_iter_yields_zero_or_one_reference",
-            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
+            harness: "verify_option_iter_yields_zero_or_one_reference".to_string(),
+            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4380,8 +4380,8 @@ impl CreusotWitness for RustStdStandard<core::option::IterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_option_iter_mut_writes_through_to_the_option",
-            claim: VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC,
+            harness: "verify_option_iter_mut_writes_through_to_the_option".to_string(),
+            claim: VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4406,8 +4406,8 @@ impl CreusotWitness for RustStdStandard<core::result::Iter<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_result_iter_yields_a_reference_to_the_ok_value",
-            claim: VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC,
+            harness: "verify_result_iter_yields_a_reference_to_the_ok_value".to_string(),
+            claim: VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4432,8 +4432,8 @@ impl CreusotWitness for RustStdStandard<core::result::IterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_result_iter_mut_writes_through_to_the_result",
-            claim: VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC,
+            harness: "verify_result_iter_mut_writes_through_to_the_result".to_string(),
+            claim: VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4460,8 +4460,8 @@ impl CreusotWitness for IterYieldsValueOnceThenEnds {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_option_iter_yields_zero_or_one_reference",
-            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC,
+            harness: "verify_option_iter_yields_zero_or_one_reference".to_string(),
+            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4518,8 +4518,8 @@ impl CreusotWitness for RustStdStandard<Pending<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_pending_never_resolves",
-            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC,
+            harness: "verify_pending_never_resolves".to_string(),
+            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4565,8 +4565,8 @@ impl CreusotWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_poll_fn_dispatches_through_to_its_closure",
-            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC,
+            harness: "verify_poll_fn_dispatches_through_to_its_closure".to_string(),
+            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4616,8 +4616,8 @@ impl CreusotWitness for RustStdStandard<Ready<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_ready_resolves_immediately_with_its_value",
-            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC,
+            harness: "verify_ready_resolves_immediately_with_its_value".to_string(),
+            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4664,8 +4664,8 @@ impl CreusotWitness for RustStdStandard<Context<'static>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_context_from_waker_exposes_the_same_waker",
-            claim: VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC,
+            harness: "verify_context_from_waker_exposes_the_same_waker".to_string(),
+            claim: VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4689,8 +4689,8 @@ impl CreusotWitness for RustStdStandard<Poll<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_poll_ready_and_pending_are_disjoint",
-            claim: VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC,
+            harness: "verify_poll_ready_and_pending_are_disjoint".to_string(),
+            claim: VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4740,8 +4740,8 @@ impl CreusotWitness for RustStdStandard<Waker> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_waker_wake_by_ref_invokes_the_wake_impl",
-            claim: VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC,
+            harness: "verify_waker_wake_by_ref_invokes_the_wake_impl".to_string(),
+            claim: VERIFY_WAKER_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4789,8 +4789,8 @@ impl CreusotWitness for RustStdStandard<ManuallyDrop<i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_manually_drop_derefs_and_into_inner_round_trip",
-            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC,
+            harness: "verify_manually_drop_derefs_and_into_inner_round_trip".to_string(),
+            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC.to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -4875,8 +4875,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value",
-            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_string(),
+            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedHandle.html",
@@ -4893,8 +4893,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value",
-            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_string(),
+            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedHandle.html",
@@ -4911,8 +4911,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel",
-            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC,
+            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_string(),
+            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.HandleOrInvalid.html",
@@ -4929,8 +4929,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value",
-            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_string(),
+            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedSocket.html",
@@ -4947,8 +4947,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value",
-            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC,
+            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_string(),
+            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedSocket.html",
@@ -4965,8 +4965,8 @@ fn windows_provenance(
         evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
         verifier: "creusot",
         describe: || CheckedProof {
-            harness: "verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit",
-            claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_SRC,
+            harness: "verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit".to_string(),
+            claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_SRC.to_string(),
             provenance: windows_provenance(
                 "std::os::windows::ffi",
                 "https://doc.rust-lang.org/std/os/windows/ffi/struct.EncodeWide.html",
