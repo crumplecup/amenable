@@ -44,11 +44,11 @@ pub struct Transition {
 pub struct TransitionAudit {
     /// The target state's declared name — the evidence type this
     /// transition establishes.
-    pub to: &'static str,
+    pub to: String,
     /// The real inherent method's own name.
-    pub method_name: &'static str,
+    pub method_name: String,
     /// The real inherent method's own body, verbatim.
-    pub body: &'static str,
+    pub body: String,
 }
 
 /// A declared state's real, lawful root constructor — the answer to

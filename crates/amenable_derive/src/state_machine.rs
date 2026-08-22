@@ -317,14 +317,14 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
             ::inventory::iter::<::amenable_core::ExchangeEdgeRecord>()
                 .filter(|record| record.self_ty == #self_ty_str)
                 .map(|record| ::amenable_core::TransitionAudit {
-                    to: record.evidence,
-                    method_name: record.method_name,
-                    body: record.body,
+                    to: record.evidence.to_string(),
+                    method_name: record.method_name.to_string(),
+                    body: record.body.to_string(),
                 })
                 .collect();
 
         audits.sort_by(|left, right| {
-            (left.to, left.method_name).cmp(&(right.to, right.method_name))
+            (&left.to, &left.method_name).cmp(&(&right.to, &right.method_name))
         });
 
         audits
