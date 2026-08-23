@@ -3,6 +3,7 @@ use amenable_kani::{
     KaniFileTimesObservation, KaniFileTypeObservation, KaniFsLabel, KaniFsPath,
     KaniLockObservation, KaniPermissionsObservation, KaniReadDirObservation,
 };
+use miette::IntoDiagnostic;
 
 #[test]
 fn recursive_directory_creation_adds_each_missing_ancestor() {
@@ -74,15 +75,16 @@ fn file_times_round_trips_the_set_modification_time() {
 }
 
 #[test]
-fn create_new_rejects_an_existing_path_and_accepts_a_fresh_one() {
+fn create_new_rejects_an_existing_path_and_accepts_a_fresh_one() -> miette::Result<()> {
     let mut existing_file = KaniCreateNewObservation::existing_file();
     let mut existing_directory = KaniCreateNewObservation::existing_directory();
     let mut fresh = KaniCreateNewObservation::missing();
 
     assert!(existing_file.create_new().is_err());
     assert!(existing_directory.create_new().is_err());
-    assert!(fresh.create_new().is_ok());
+    fresh.create_new().into_diagnostic()?;
     assert!(fresh.is_file());
+    Ok(())
 }
 
 #[test]
@@ -110,9 +112,10 @@ fn read_dir_observation_reports_both_created_entries_in_order() {
 }
 
 #[test]
-fn lock_observation_rejects_a_second_try_lock_while_held() {
+fn lock_observation_rejects_a_second_try_lock_while_held() -> miette::Result<()> {
     let mut observation = KaniLockObservation::new();
 
-    assert!(observation.try_lock().is_ok());
+    observation.try_lock().into_diagnostic()?;
     assert!(observation.try_lock().is_err());
+    Ok(())
 }

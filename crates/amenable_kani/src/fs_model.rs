@@ -682,7 +682,8 @@ impl Provenance for KaniCreateNewObservation {
 }
 
 /// Modeled error for `create_new` against a path that already has a file.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_more::Display, derive_more::Error)]
+#[display("the modeled path already exists")]
 pub struct KaniAlreadyExists;
 
 impl KaniCreateNewObservation {
@@ -890,7 +891,8 @@ impl Provenance for KaniLockObservation {
 }
 
 /// Modeled error for a second `try_lock` while the modeled lock is held.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_more::Display, derive_more::Error)]
+#[display("the modeled lock is already held")]
 pub struct KaniAlreadyLocked;
 
 impl KaniLockObservation {

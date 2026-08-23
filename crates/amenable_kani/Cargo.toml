@@ -18,6 +18,7 @@ amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
 amenable_gaap = { workspace = true }
 amenable_std = { workspace = true }
+derive_more = { workspace = true }
 inventory = { workspace = true }
 uuid = { workspace = true }
 

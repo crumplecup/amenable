@@ -94,6 +94,7 @@ dependencies = [
  "amenable_derive",
  "amenable_gaap",
  "amenable_std",
+ "derive_more",
  "inventory",
  "miette",
  "uuid",
