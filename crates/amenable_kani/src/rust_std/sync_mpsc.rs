@@ -54,10 +54,22 @@ impl KaniChannel<i32> {
     /// it unchanged. Consumes `self`: the only way to obtain the token is
     /// to actually run the send/recv pair being claimed, not to assert it
     /// independently of a real channel instance.
+    ///
+    /// Asserts on the whole `Result`, not `.unwrap()`/`.expect()`: a
+    /// `#[kani::proof]` harness can't propagate a `Result` any further --
+    /// confirmed empirically (`probe_result_err_harness_behavior`, this
+    /// session) that Kani reports `VERIFICATION:- SUCCESSFUL` for a
+    /// harness that unconditionally returns `Err`, so a propagated
+    /// failure would silently pass instead of failing the proof. An
+    /// explicit `assert_eq!` is a real, CBMC-checked assertion either
+    /// way.
     #[track_caller]
-    #[must_use]
     pub fn demonstrate_delivery(mut self, value: i32) -> KaniChannelDeliveryToken {
-        self.send(value).unwrap();
+        assert_eq!(
+            self.send(value),
+            Ok(()),
+            "a fresh channel's send must succeed"
+        );
         assert_eq!(self.recv(), Ok(value), "the sent value is receivable");
         KaniChannelDeliveryToken(())
     }
@@ -293,10 +305,16 @@ impl KaniChannel<i32> {
     /// Send `value`, drop the sender, then assert `.recv()` yields the
     /// value once and `None`-equivalent thereafter. Consumes `self` for
     /// the same reason [`KaniChannel::demonstrate_delivery`] does.
+    ///
+    /// Asserts on the whole `Result`, not `.unwrap()`, the same reason
+    /// [`KaniChannel::demonstrate_delivery`] does.
     #[track_caller]
-    #[must_use]
     pub fn demonstrate_yield_then_stop(mut self, value: i32) -> KaniChannelYieldThenStopToken {
-        self.send(value).unwrap();
+        assert_eq!(
+            self.send(value),
+            Ok(()),
+            "a fresh channel's send must succeed"
+        );
         self.drop_sender();
         assert_eq!(self.recv().ok(), Some(value));
         assert_eq!(self.recv().ok(), None);
@@ -546,7 +564,7 @@ impl KaniChannel<i32> {
     #[must_use]
     pub fn demonstrate_recv_disconnected(mut self) -> KaniChannelRecvDisconnectedToken {
         self.drop_sender();
-        assert_eq!(self.recv().unwrap_err(), crate::KaniRecvError::Disconnected);
+        assert_eq!(self.recv(), Err(crate::KaniRecvError::Disconnected));
         KaniChannelRecvDisconnectedToken(())
     }
 }
@@ -735,10 +753,9 @@ impl KaniChannel<i32> {
         value: i32,
     ) -> KaniChannelSendErrorToken {
         self.drop_receiver();
-        let err = self.send(value).unwrap_err();
         assert_eq!(
-            err,
-            crate::KaniSendError::Disconnected(value),
+            self.send(value),
+            Err(crate::KaniSendError::Disconnected(value)),
             "the unsent value is recoverable from the error"
         );
         KaniChannelSendErrorToken(())
@@ -919,13 +936,10 @@ impl KaniChannel<i32> {
     /// [`KaniChannel::demonstrate_delivery`] does.
     #[must_use]
     pub fn demonstrate_try_recv_distinguishes_disconnect(mut self) -> KaniChannelTryRecvToken {
-        assert_eq!(self.try_recv().unwrap_err(), crate::KaniRecvError::Empty);
+        assert_eq!(self.try_recv(), Err(crate::KaniRecvError::Empty));
 
         self.drop_sender();
-        assert_eq!(
-            self.try_recv().unwrap_err(),
-            crate::KaniRecvError::Disconnected
-        );
+        assert_eq!(self.try_recv(), Err(crate::KaniRecvError::Disconnected));
 
         KaniChannelTryRecvToken(())
     }
