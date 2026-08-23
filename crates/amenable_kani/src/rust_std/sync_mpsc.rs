@@ -846,12 +846,11 @@ impl KaniChannel<i32> {
         mut self,
         value: i32,
     ) -> KaniChannelTrySendFullToken {
-        match self.try_send(value) {
-            Err(crate::KaniSendError::Full(v)) => {
-                assert_eq!(v, value, "the unsent value is recoverable from Full");
-            }
-            other => panic!("expected Full, got {other:?}"),
-        }
+        assert_eq!(
+            self.try_send(value),
+            Err(crate::KaniSendError::Full(value)),
+            "the unsent value is recoverable from Full"
+        );
         KaniChannelTrySendFullToken(())
     }
 }
