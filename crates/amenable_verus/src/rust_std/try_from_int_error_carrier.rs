@@ -20,7 +20,10 @@
 //! it and switching to relying on `vstd`'s existing spec, which fixed it.
 
 use verus_builtin_macros::verus;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "vstd::prelude::* is unused under plain rustc (verus! {} erases real spec content); needed only when the real verus toolchain parses this file directly"
+)]
 use vstd::prelude::*;
 
 verus! {

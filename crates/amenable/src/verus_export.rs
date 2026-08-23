@@ -447,7 +447,9 @@ fn write_module_header(
         export.evidence
     ));
     source.push_str("use verus_builtin_macros::verus;\n");
-    source.push_str("#[allow(unused_imports)]\n");
+    source.push_str(
+        "#[allow(\n    unused_imports,\n    reason = \"vstd::prelude::* is unused under plain rustc (verus! {} erases real spec content); needed only when the real verus toolchain parses this file directly\"\n)]\n",
+    );
     source.push_str("use vstd::prelude::*;\n");
 
     let predicate_imports = predicate_import_lines(imports);

@@ -18,7 +18,10 @@
 //! confirms independently, for the identical rule.
 
 use verus_builtin_macros::verus;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "vstd::prelude::* is unused under plain rustc (verus! {} erases real spec content); needed only when the real verus toolchain parses this file directly"
+)]
 use vstd::prelude::*;
 
 // The shared write-through postcondition `amenable_std::verus_witness`
