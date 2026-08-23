@@ -36,7 +36,7 @@ pub fn verify_try_from_int_error_occurs_exactly_when_out_of_range(value: i32) ->
         result,
 {
     match <u8 as std::convert::TryFrom<i32>>::try_from(value) {
-        Ok(converted) => (0 <= value && value <= u8::MAX as i32) && converted == value as u8,
+        Ok(converted) => (0 <= value && value <= u8::MAX as i32) && converted as i32 == value,
         Err(_) => value < 0 || value > u8::MAX as i32,
     }
 }
