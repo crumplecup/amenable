@@ -115,7 +115,18 @@ unchecked_time_subtraction = "warn"
 
 # Don't Fail Silently - prevent dropped futures and swallowed errors
 let_underscore_future = "warn"
-let_underscore_must_use = "warn"
+# Left off after a real recon pass: all 7 hits were `let _ = ...;`
+# discarding a Result whose "why is this safe to discard" reasoning was
+# already sitting right next to it -- a Verus `ensures result` clause
+# stating the outcome is irrelevant by design, a doc comment already
+# saying "install once per test process" (repeat-call failure expected
+# and fine), the true outermost main() error-reporting boundary with
+# nowhere further to propagate to, and a standard best-effort test
+# tempfile cleanup. Renaming `let _ =` to `let _named =` at each site
+# (clippy's own escape hatch) added no real information -- same
+# lint-shape-only substance objection as the unwrap-to-expect mistake
+# this session already corrected once.
+# let_underscore_must_use = "warn"
 unused_result_ok = "warn"
 map_err_ignore = "warn"
 assertions_on_result_states = "warn"
