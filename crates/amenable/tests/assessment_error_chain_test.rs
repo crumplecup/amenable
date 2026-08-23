@@ -64,6 +64,6 @@ fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() -> miett
         "the deepest source must be the real serde_json::Error, not a stringified copy"
     );
 
-    std::fs::remove_file(&path).ok();
+    let _ = std::fs::remove_file(&path);
     Ok(())
 }
