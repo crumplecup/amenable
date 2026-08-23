@@ -19,10 +19,5 @@ amenable_derive = { workspace = true }
 inventory = { workspace = true }
 uuid = { workspace = true }
 
-[lints.rust]
-# `cfg(kani)`: real, set by `cargo kani` across its whole dependency
-# graph (not just the crate it's asked to verify) -- `tokens.rs`'s own
-# `ValidatedToken::diagnostic_only` needs this to gate a Kani-only
-# escape hatch now that the token itself lives here, not in
-# `amenable_kani` (`GAAP_LEDGER_PLAN.md`'s Step 7).
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }
+[lints]
+workspace = true

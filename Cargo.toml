@@ -47,3 +47,127 @@ uuid = "1"
 verus_builtin_macros = "0.0.0-2026-05-31-0205"
 verus_syn = "0.0.0-2026-08-02-0125"
 vstd = "0.0.0-2026-05-31-0205"
+
+# Union of every crate-specific `unexpected_cfgs` check-cfg list this
+# workspace used to carry per-crate. Cargo doesn't allow `[lints]
+# workspace = true` (needed so every crate picks up the shared clippy
+# list below) to coexist with a crate-local `[lints.rust]` override in
+# the same manifest -- since check-cfg only ever widens what's silently
+# accepted, not narrows it, unioning is safe: a crate accepting a cfg
+# name it never actually uses can't hide a real bug in that name's own
+# gated code, only in principle let a *misplaced* use of another
+# backend's cfg name go unflagged (e.g. an accidental `#[cfg(creusot)]`
+# copy-pasted into `amenable_kani`) -- a real, if minor, precision loss
+# versus the old per-crate lists, not eliminated here.
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  "cfg(kani)",
+  "cfg(creusot)",
+  "cfg(verus)",
+  "cfg(verus_verify_core)",
+  "cfg(verus_keep_ghost)",
+] }
+
+# Stricter-than-default clippy config, per
+# https://emschwartz.me/your-clippy-config-should-be-stricter/ -- selective
+# opt-in of specific lints, not the blanket `pedantic`/`restriction` groups,
+# matching this repo's own "never #[allow], fix the root cause" policy
+# (CLAUDE.md). Every lint here is a real "warn" under this workspace's
+# existing `-D warnings` clippy gate, so a lint enabled here is enforced,
+# not aspirational.
+[workspace.lints.clippy]
+# Don't Panic - prevent panics from unwraps and unsafe slicing or indexing
+string_slice = "warn"
+# Left off after a real recon pass: every one of the 65 hits was in
+# amenable_verus's rust_std carrier corpus, indexing a small fixed-size
+# array/slice (`arr[0]`, `v[1]`) whose length is a compile-time literal,
+# not runtime-variable -- `.get(n)` there just relocates the panic
+# without adding real safety, at real ceremony cost. Revisit if this
+# codebase starts indexing variable-length/untrusted data.
+# indexing_slicing = "warn"
+unwrap_used = "warn"
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+unreachable = "warn"
+get_unwrap = "warn"
+unwrap_in_result = "warn"
+unchecked_time_subtraction = "warn"
+# Left off after a real recon pass: 359 of ~910 total warnings, and every
+# sampled hit was `assert!`/`assert_eq!` inside `#[test] fn foo() ->
+# miette::Result<()> { ..; Ok(()) }` -- this workspace's own standard
+# test idiom (CLAUDE.md: tests live in `tests/`, use `?` for setup,
+# assert macros for the actual check). This lint exists to catch a
+# library function panicking instead of propagating `Result` to its
+# caller; it fires on the opposite case here. Unlike cordial (which can
+# discriminate test vs lib code directly), clippy has no config knob
+# that scopes this lint by context, only a blanket enable/disable.
+# panic_in_result_fn = "warn"
+# Left off on purpose: amenable_kani's proof harnesses use .expect(..) on
+# symbolic Kani values deliberately, not as a shortcut.
+# expect_used = "warn"
+# Left off after a real recon pass: 117 hits, sampled two dozen -- all
+# loop counters (`i += 1`), UTF-8 continuation-byte decode math in Kani
+# model code, and small literal offsets in test fixtures (`a + 10`).
+# Matches this lint's own well-known ~85% false-positive rate; no
+# evidence of real overflow/underflow risk on untrusted input here.
+# arithmetic_side_effects = "warn"
+
+# Don't Fail Silently - prevent dropped futures and swallowed errors
+let_underscore_future = "warn"
+let_underscore_must_use = "warn"
+unused_result_ok = "warn"
+map_err_ignore = "warn"
+assertions_on_result_states = "warn"
+
+# Don't Do Bad Async Stuff - prevent deadlocks and concurrency bugs
+await_holding_lock = "warn"
+await_holding_refcell_ref = "warn"
+if_let_mutex = "warn"
+large_futures = "warn"
+
+# Don't Do Unsafe Things with Memory
+mem_forget = "warn"
+undocumented_unsafe_blocks = "warn"
+multiple_unsafe_ops_per_block = "warn"
+unnecessary_safety_doc = "warn"
+unnecessary_safety_comment = "warn"
+
+# Don't Do Potentially Incorrect Things with Numbers
+float_cmp = "warn"
+float_cmp_const = "warn"
+lossy_float_literal = "warn"
+cast_sign_loss = "warn"
+invalid_upcast_comparisons = "warn"
+# Optional - these effectively force you to document numeric invariants
+# cast_possible_wrap = "warn"
+# cast_precision_loss = "warn"
+# cast_possible_truncation = "warn"
+
+# Don't Do Bad Things That are Easy to Avoid
+rc_mutex = "warn"
+debug_assert_with_mut_call = "warn"
+iter_not_returning_iterator = "warn"
+expl_impl_clone_on_copy = "warn"
+infallible_try_from = "warn"
+dbg_macro = "warn"
+
+# Don't `allow` Your Way Around These Lints
+# `allow_attributes` itself left off: cordial's own antipatterns scanner
+# is the better-fitted tool for policing whether an `#[allow]` should
+# exist at all (it already understands proc-macro-ABI/Creusot-opaque-
+# stub/cfg-sibling exemptions cordial-side, which clippy has no way to
+# express) -- confirmed by a real recon pass that every one of 145 hits
+# was the same `#[allow(unused_imports)]` above `use vstd::prelude::*;`
+# across amenable_verus/src/{rust_std,gallery,derived_witness}/*.rs,
+# genuinely necessary (amenable_verus compiles under plain stable by
+# design, `verus! { .. }` expanding to inert plain Rust with all real
+# spec content erased; the import only matters when the same source is
+# fed to the real `verus` binary directly, which never resolves
+# Cargo.toml/sets a custom --cfg the way `cargo kani`/`cargo creusot` do,
+# so there's no structural gate available). `allow_attributes_without_
+# reason` stays on: it costs nothing to document *why* each of those
+# `#[allow]`s exists at its own site, and every one of the 145 (146
+# counting fp_category_carrier.rs's second import) now does.
+# allow_attributes = "warn"
+allow_attributes_without_reason = "warn"

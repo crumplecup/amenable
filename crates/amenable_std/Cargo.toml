@@ -63,3 +63,6 @@ verus = [
   "dep:syn",
   "dep:verus_syn",
 ]
+
+[lints]
+workspace = true

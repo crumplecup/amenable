@@ -38,3 +38,6 @@ trybuild = { workspace = true }
 # optional since every OTHER macro this crate exports has nothing to do
 # with Verus and shouldn't pull either dependency in unconditionally.
 verus = ["dep:amenable_core", "amenable_core/verus", "dep:verus_syn"]
+
+[lints]
+workspace = true

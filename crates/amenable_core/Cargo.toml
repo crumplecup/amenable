@@ -36,9 +36,5 @@ trybuild = { workspace = true }
 # both call the same one implementation.
 verus = ["dep:proc-macro2", "dep:quote", "dep:syn", "dep:verus_syn"]
 
-[lints.rust]
-# `cfg(verus_keep_ghost)`: real, set unconditionally by Verus's own
-# driver (never by `cargo check`/`cargo kani`/`cargo creusot`) -- see
-# `evidence.rs`'s own doc comment on `Evidence::chain()` for why it's
-# gated on this.
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)", "cfg(verus_keep_ghost)"] }
+[lints]
+workspace = true
