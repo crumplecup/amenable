@@ -1410,8 +1410,10 @@ impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_slice_iter_mut_yields_mutable_references_that_write_through".to_string(),
-            claim: VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC.to_string(),
+            harness: "verify_slice_iter_mut_yields_mutable_references_that_write_through"
+                .to_string(),
+            claim: VERIFY_SLICE_ITER_MUT_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC
+                .to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
@@ -1772,8 +1774,10 @@ impl CreusotWitness for RustStdStandard<&'static mut i32> {
 
     fn proof() -> Self::ProofArtifact {
         CheckedProof {
-            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_string(),
-            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_string(),
+            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent"
+                .to_string(),
+            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC
+                .to_string(),
             provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
         }
     }
