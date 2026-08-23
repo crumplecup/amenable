@@ -506,11 +506,9 @@ fn default_assessment_path() -> PathBuf {
 }
 
 fn parse_score(value: &str) -> AmenableResult<u8> {
-    let score: u8 = value.parse().map_err(|_| {
-        AmenableError::invariant(format!(
-            "invalid score {value:?}; expected an integer from 0 to 4"
-        ))
-    })?;
+    let score: u8 = value
+        .parse()
+        .map_err(|error| AmenableError::invalid_score(value, error))?;
     if score > 4 {
         return Err(AmenableError::invariant(format!(
             "invalid score {score}; expected an integer from 0 to 4"
@@ -1015,19 +1013,12 @@ fn assessment_id() -> AmenableResult<String> {
 
 fn start_of_utc_date_timestamp(date: Date) -> AmenableResult<u64> {
     let timestamp = date.midnight().assume_utc().unix_timestamp();
-    u64::try_from(timestamp).map_err(|_| {
-        AmenableError::invariant(format!(
-            "date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01"
-        ))
-    })
+    u64::try_from(timestamp).map_err(|error| AmenableError::pre_epoch_date(date.to_string(), error))
 }
 
 fn format_timestamp(timestamp: u64) -> AmenableResult<String> {
-    let seconds = i64::try_from(timestamp).map_err(|_| {
-        AmenableError::invariant(format!(
-            "assessment timestamp {timestamp} is too large to format"
-        ))
-    })?;
+    let seconds = i64::try_from(timestamp)
+        .map_err(|error| AmenableError::timestamp_too_large(timestamp, error))?;
     let recorded_at = OffsetDateTime::from_unix_timestamp(seconds)?;
     Ok(recorded_at.format(&Rfc3339)?)
 }

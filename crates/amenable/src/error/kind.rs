@@ -1,9 +1,10 @@
 //! Error kind enumeration for `amenable`'s CLI-facing operations.
 
 use crate::error::sources::{
-    ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
-    StdSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
-    TimeFormatSource, TimeParseSource,
+    ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource, IoSource,
+    JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
+    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
+    TimestampTooLargeSource,
 };
 
 /// Error kind for `amenable` CLI operations. Every variant is a clean
@@ -80,4 +81,16 @@ pub enum AmenableErrorKind {
     /// `amenable_std::AmenableStdError`.
     #[display("{_0}")]
     Std(StdSource),
+
+    /// A `--score` argument failed to parse as an integer.
+    #[display("{_0}")]
+    InvalidScore(InvalidScoreSource),
+
+    /// A `--since` date's Unix timestamp is negative (before the epoch).
+    #[display("{_0}")]
+    PreEpochDate(PreEpochDateSource),
+
+    /// An assessment timestamp is too large to format.
+    #[display("{_0}")]
+    TimestampTooLarge(TimestampTooLargeSource),
 }

@@ -10,9 +10,10 @@ use std::path::PathBuf;
 
 use crate::error::kind::AmenableErrorKind;
 use crate::error::sources::{
-    ChainSource, InvalidUtcDateSource, InvariantSource, IoSource, JsonLineSource, SerdeSource,
-    StdSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
-    TimeFormatSource, TimeParseSource,
+    ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource, IoSource,
+    JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
+    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
+    TimestampTooLargeSource,
 };
 
 /// Crate-level result alias.
@@ -95,6 +96,33 @@ impl AmenableError {
     #[track_caller]
     pub fn std(source: amenable_std::AmenableStdError) -> Self {
         Self::new(AmenableErrorKind::Std(StdSource::new(source)))
+    }
+
+    /// Construct an [`AmenableErrorKind::InvalidScore`] error naming the
+    /// rejected score string.
+    #[track_caller]
+    pub fn invalid_score(value: impl Into<String>, source: std::num::ParseIntError) -> Self {
+        Self::new(AmenableErrorKind::InvalidScore(InvalidScoreSource::new(
+            source, value,
+        )))
+    }
+
+    /// Construct an [`AmenableErrorKind::PreEpochDate`] error naming the
+    /// rejected date.
+    #[track_caller]
+    pub fn pre_epoch_date(date: impl Into<String>, source: std::num::TryFromIntError) -> Self {
+        Self::new(AmenableErrorKind::PreEpochDate(PreEpochDateSource::new(
+            source, date,
+        )))
+    }
+
+    /// Construct an [`AmenableErrorKind::TimestampTooLarge`] error naming
+    /// the rejected timestamp.
+    #[track_caller]
+    pub fn timestamp_too_large(timestamp: u64, source: std::num::TryFromIntError) -> Self {
+        Self::new(AmenableErrorKind::TimestampTooLarge(
+            TimestampTooLargeSource::new(source, timestamp),
+        ))
     }
 }
 

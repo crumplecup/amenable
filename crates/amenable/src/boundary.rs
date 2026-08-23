@@ -64,8 +64,9 @@ impl Diagnostic for CliError {
 
 fn error_kind_code(kind: &AmenableErrorKind) -> &'static str {
     use AmenableErrorKind::{
-        Chain, InvalidUtcDate, Invariant, Io, JsonLine, Serde, Std, SystemTime, TimeComponentRange,
-        TimeFormat, TimeFormatDescription, TimeParse,
+        Chain, InvalidScore, InvalidUtcDate, Invariant, Io, JsonLine, PreEpochDate, Serde, Std,
+        SystemTime, TimeComponentRange, TimeFormat, TimeFormatDescription, TimeParse,
+        TimestampTooLarge,
     };
     match kind {
         Io(_) => "Io",
@@ -80,5 +81,8 @@ fn error_kind_code(kind: &AmenableErrorKind) -> &'static str {
         Invariant(_) => "Invariant",
         Chain(_) => "Chain",
         Std(_) => "Std",
+        InvalidScore(_) => "InvalidScore",
+        PreEpochDate(_) => "PreEpochDate",
+        TimestampTooLarge(_) => "TimestampTooLarge",
     }
 }
