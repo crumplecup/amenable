@@ -240,10 +240,23 @@ fn indent_body(body: &str) -> String {
             let dedented = if index == 0 {
                 *line
             } else {
-                &line[dedent_width.min(line.len())..]
+                dedent_line(line, dedent_width)
             };
             format!("        {dedented}")
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+/// Strip `dedent_width` bytes off `line`'s start, rounding down to the
+/// nearest real `char` boundary at or before that byte offset -- see
+/// `creusot_export`'s own version of this function for why a plain
+/// `&line[dedent_width..]` isn't unconditionally safe here.
+fn dedent_line(line: &str, dedent_width: usize) -> &str {
+    let target = dedent_width.min(line.len());
+    let boundary = (0..=target)
+        .rev()
+        .find(|&i| line.is_char_boundary(i))
+        .unwrap_or(0);
+    line.get(boundary..).unwrap_or(line)
 }
