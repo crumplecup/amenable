@@ -168,7 +168,7 @@ pub fn verify_cstr_excludes_the_terminating_nul_from_to_bytes(byte: u8) -> (resu
     let with_nul: &[u8] = &[byte, 0];
     let cstr_result = CStr::from_bytes_with_nul(with_nul);
     assert(cstr_result is Ok);
-    let cstr = cstr_result.unwrap();
+    let cstr = cstr_result.expect("proven Ok by the assert immediately above");
 
     let bytes = cstr.to_bytes();
     assert(bytes@.len() == 1);

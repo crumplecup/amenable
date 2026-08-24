@@ -28,7 +28,7 @@ pub fn verify_option_unwrap_returns_the_wrapped_value(some: Option<i32>, _value:
     ensures
         result == _value,
 {
-    some.unwrap()
+    some.expect("requires guarantees some is Some")
 }
 
 /// `unwrap_or` falls back to the supplied default exactly when the

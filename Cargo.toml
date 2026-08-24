@@ -89,7 +89,22 @@ unwrap_used = "warn"
 panic = "warn"
 todo = "warn"
 unimplemented = "warn"
-unreachable = "warn"
+# Left off after a real recon pass: every `unreachable!()` clippy can
+# actually see (all others are either behind #[cfg(kani)], invisible to
+# clippy the same way expect_used's Kani harnesses are, or inside
+# amenable_derive's own quote!{} codegen templates, not real source at
+# the definition site) is amenable_verus's own `#[cfg(verus_keep_ghost)]
+# Ok(_) => unreached() / #[cfg(not(verus_keep_ghost))] Ok(_) =>
+# unreachable!()` split: the real, SMT-proven branch under the real
+# `verus` toolchain, with `unreachable!()` only the plain-rustc fallback
+# `unreached()` needs vstd to avoid. cordial's panics etiquette now
+# detects this exact ghost/exec pairing and exempts it structurally
+# (verus_ir::VerusPanicSite::proven_unreachable_by_ghost_sibling), while
+# still flagging any other `unreachable!()` as an open checklist item --
+# cordial is the enforcement mechanism for this lint going forward, not
+# clippy's blanket restriction. Not yet wired into CI; until it is, this
+# category has no automated gate.
+# unreachable = "warn"
 get_unwrap = "warn"
 unwrap_in_result = "warn"
 unchecked_time_subtraction = "warn"

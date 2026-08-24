@@ -80,12 +80,22 @@ pub fn verify_into_string_error_recovers_the_original_cstring(bytes: Vec<u8>) ->
     }
     let new_result = CString::new(bytes);
     assert(new_result is Ok);
-    let invalid = new_result.unwrap();
+    let invalid = new_result.expect("proven Ok by the assert immediately above");
     let ghost original_view: Seq<u8> = cstring_bytes_spec(invalid);
 
     let into_string_result = invalid.into_string();
     assert(into_string_result is Err);
-    let err = into_string_result.unwrap_err();
+    // vstd has no spec for Result::expect_err (unlike expect, which it
+    // does cover), so this falls back to the same real-verus-vs-plain-
+    // rustc split int_error_kind_carrier.rs uses for its own proven-
+    // impossible branches.
+    let err = match into_string_result {
+        Err(value) => value,
+        #[cfg(verus_keep_ghost)]
+        Ok(_) => unreached(),
+        #[cfg(not(verus_keep_ghost))]
+        Ok(_) => unreachable!(),
+    };
 
     let recovered = err.into_cstring();
     let _recovered_bytes = recovered.as_bytes();

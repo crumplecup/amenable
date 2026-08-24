@@ -56,7 +56,7 @@ pub fn verify_try_from_slice_rejects_a_length_mismatch(matching: &[i32], mismatc
 {
     let converted = <[i32; 2]>::try_from(matching);
     assert(converted is Ok);
-    let arr = converted.unwrap();
+    let arr = converted.expect("proven Ok by the assert immediately above");
     let round_trips = arr[0] == matching[0] && arr[1] == matching[1];
 
     let rejected_result = <[i32; 2]>::try_from(mismatched);

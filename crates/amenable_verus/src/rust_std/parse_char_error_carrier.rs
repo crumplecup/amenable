@@ -55,7 +55,7 @@ pub fn verify_parse_char_error_occurs_for_empty_or_multi_character_strings(empty
 
     let single_result = <char as std::str::FromStr>::from_str("a");
     assert(single_result is Ok);
-    let single_char = single_result.unwrap();
+    let single_char = single_result.expect("proven Ok by the assert immediately above");
     let single_accepted = single_char == 'a';
 
     (empty_rejected, multi_rejected, single_accepted)

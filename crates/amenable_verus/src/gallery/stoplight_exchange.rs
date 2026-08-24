@@ -236,9 +236,15 @@ pub enum StoplightError {
 /// `Stoplight` runs, proven to round-trip back to a well-formed `Green`.
 pub fn full_cycle(stoplight: &Stoplight, start: Established<Green, GreenToken>) -> (result: Established<Green, GreenToken>)
 {
-    let yellow = stoplight.exchange(start).unwrap();
-    let red = stoplight.exchange(yellow).unwrap();
-    stoplight.exchange(red).unwrap()
+    let yellow = stoplight
+        .exchange(start)
+        .expect("exchange's own ensures clause guarantees Ok");
+    let red = stoplight
+        .exchange(yellow)
+        .expect("exchange's own ensures clause guarantees Ok");
+    stoplight
+        .exchange(red)
+        .expect("exchange's own ensures clause guarantees Ok")
 }
 
 } // verus!
