@@ -23,6 +23,7 @@ mod calculator;
 mod compose;
 mod env_model;
 mod env_path_model;
+mod error;
 mod fd_model;
 mod fmt_model;
 mod fs_model;
@@ -60,6 +61,7 @@ pub use env_model::KaniArgv;
 pub use env_path_model::{
     KaniEnvPath, KaniEnvPathList, KaniEnvPaths, KaniJoinPathsError, KaniJoinedEnvPaths,
 };
+pub use error::{KaniModelError, KaniModelErrorKind};
 pub use fd_model::{KaniBorrowedFd, KaniFd, KaniFile, NonNegativeFd};
 pub use fmt_model::{KaniFmt, KaniFormatAtom, KaniFormatLabel, KaniRendered, KaniRenderedKind};
 pub use fs_model::{

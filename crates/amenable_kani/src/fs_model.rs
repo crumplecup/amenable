@@ -346,7 +346,7 @@ impl KaniFileSystem {
     /// existing node, mirroring `OpenOptions::create_new(true)`.
     pub fn create_new_file(&mut self, path: &KaniFsPath) -> Result<(), KaniAlreadyExists> {
         if self.node_index(path).is_some() {
-            Err(KaniAlreadyExists)
+            Err(KaniAlreadyExists::new())
         } else {
             self.create_file(path);
             Ok(())
@@ -682,20 +682,51 @@ impl Provenance for KaniCreateNewObservation {
 }
 
 /// Modeled error for `create_new` against a path that already has a file.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    derive_more::Display,
-    derive_more::Error,
-)]
+/// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking
+/// makes comparison confusing (this workspace's own error-type
+/// exception, `CLAUDE.md`), and not `Copy`: owned `file` is a `String`.
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
 #[display("the modeled path already exists")]
-pub struct KaniAlreadyExists;
+pub struct KaniAlreadyExists {
+    /// Source line of the call site that produced this error.
+    pub line: u32,
+    /// Source file of the call site that produced this error.
+    pub file: String,
+}
+
+impl KaniAlreadyExists {
+    /// Construct the error, recording the caller's location.
+    ///
+    /// `Location::caller()` is itself an unsupported construct under
+    /// Kani (confirmed via a real `cargo kani` run: every harness
+    /// reaching this constructor failed on it directly), the same wall
+    /// `panic_model::KaniCallerLocationObservation`'s own doc comment
+    /// already documents. Real location tracking only has genuine value
+    /// on the ordinary-`cargo test` path anyway (`fs_model_test.rs`'s
+    /// `.into_diagnostic()?`, never Kani-executed) -- a Kani-reachable
+    /// panic is its own failure signal regardless of what file/line this
+    /// carries, the same reasoning `kani_reach` already applies on the
+    /// cordial side to a Kani harness's own panic site.
+    #[track_caller]
+    #[must_use]
+    pub fn new() -> Self {
+        #[cfg(kani)]
+        let (line, file) = (0, String::new());
+        #[cfg(not(kani))]
+        let (line, file) = {
+            let loc = std::panic::Location::caller();
+            (loc.line(), loc.file().to_string())
+        };
+        Self { line, file }
+    }
+}
+
+impl Default for KaniAlreadyExists {
+    #[track_caller]
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl KaniCreateNewObservation {
     /// Model a genuinely fresh path.
@@ -728,7 +759,7 @@ impl KaniCreateNewObservation {
     /// existing node, mirroring `ErrorKind::AlreadyExists`.
     pub fn create_new(&mut self) -> Result<(), KaniAlreadyExists> {
         if self.kind.is_some() {
-            Err(KaniAlreadyExists)
+            Err(KaniAlreadyExists::new())
         } else {
             self.kind = Some(KaniFsNodeKind::File);
             Ok(())
@@ -902,20 +933,51 @@ impl Provenance for KaniLockObservation {
 }
 
 /// Modeled error for a second `try_lock` while the modeled lock is held.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    derive_more::Display,
-    derive_more::Error,
-)]
+/// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking
+/// makes comparison confusing (this workspace's own error-type
+/// exception, `CLAUDE.md`), and not `Copy`: owned `file` is a `String`.
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
 #[display("the modeled lock is already held")]
-pub struct KaniAlreadyLocked;
+pub struct KaniAlreadyLocked {
+    /// Source line of the call site that produced this error.
+    pub line: u32,
+    /// Source file of the call site that produced this error.
+    pub file: String,
+}
+
+impl KaniAlreadyLocked {
+    /// Construct the error, recording the caller's location.
+    ///
+    /// `Location::caller()` is itself an unsupported construct under
+    /// Kani (confirmed via a real `cargo kani` run: every harness
+    /// reaching this constructor failed on it directly), the same wall
+    /// `panic_model::KaniCallerLocationObservation`'s own doc comment
+    /// already documents. Real location tracking only has genuine value
+    /// on the ordinary-`cargo test` path anyway (`fs_model_test.rs`'s
+    /// `.into_diagnostic()?`, never Kani-executed) -- a Kani-reachable
+    /// panic is its own failure signal regardless of what file/line this
+    /// carries, the same reasoning `kani_reach` already applies on the
+    /// cordial side to a Kani harness's own panic site.
+    #[track_caller]
+    #[must_use]
+    pub fn new() -> Self {
+        #[cfg(kani)]
+        let (line, file) = (0, String::new());
+        #[cfg(not(kani))]
+        let (line, file) = {
+            let loc = std::panic::Location::caller();
+            (loc.line(), loc.file().to_string())
+        };
+        Self { line, file }
+    }
+}
+
+impl Default for KaniAlreadyLocked {
+    #[track_caller]
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl KaniLockObservation {
     /// Model a fresh, unlocked file.
@@ -932,7 +994,7 @@ impl KaniLockObservation {
     /// locked, mirroring `TryLockError::WouldBlock`.
     pub fn try_lock(&mut self) -> Result<(), KaniAlreadyLocked> {
         if self.locked {
-            Err(KaniAlreadyLocked)
+            Err(KaniAlreadyLocked::new())
         } else {
             self.locked = true;
             Ok(())
