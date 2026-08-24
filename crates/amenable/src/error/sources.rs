@@ -258,7 +258,9 @@ impl InvalidScoreSource {
 /// negative): the two variants this backs are genuinely different claims,
 /// the same reason `InvalidUtcDateSource`/`TimeParseSource` stay separate.
 #[derive(Debug, derive_more::Display, derive_more::Error)]
-#[display("date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01: {source}")]
+#[display(
+    "date {date} is before the Unix epoch; expected YYYY-MM-DD on or after 1970-01-01: {source}"
+)]
 pub struct PreEpochDateSource {
     /// The preserved `std::num::TryFromIntError`.
     source: std::num::TryFromIntError,
