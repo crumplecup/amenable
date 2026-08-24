@@ -234,17 +234,21 @@ pub enum StoplightError {
 /// Chains all three real `Exchange` impls together through the actual
 /// trait methods (not a hand-rolled shortcut) -- the full cycle a real
 /// `Stoplight` runs, proven to round-trip back to a well-formed `Green`.
-pub fn full_cycle(stoplight: &Stoplight, start: Established<Green, GreenToken>) -> (result: Established<Green, GreenToken>)
+///
+/// Returns the aggregate `Result`, not the unwrapped value: each edge's
+/// own `ensures` clause only proves `result.is_ok()` for *that* edge --
+/// discarding the `Result` locally via `.expect(..)` would throw that
+/// guarantee away at exactly the point it's most useful, instead of
+/// composing all three into one claim a further caller could build on.
+/// `full_cycle`'s own `ensures` clause is that composition: the SMT
+/// solver, not a runtime message, is what backs it.
+pub fn full_cycle(stoplight: &Stoplight, start: Established<Green, GreenToken>) -> (result: Result<Established<Green, GreenToken>, StoplightError>)
+    ensures
+        result.is_ok(),
 {
-    let yellow = stoplight
-        .exchange(start)
-        .expect("exchange's own ensures clause guarantees Ok");
-    let red = stoplight
-        .exchange(yellow)
-        .expect("exchange's own ensures clause guarantees Ok");
-    stoplight
-        .exchange(red)
-        .expect("exchange's own ensures clause guarantees Ok")
+    let yellow = stoplight.exchange(start)?;
+    let red = stoplight.exchange(yellow)?;
+    stoplight.exchange(red)
 }
 
 } // verus!
