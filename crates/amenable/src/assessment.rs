@@ -903,8 +903,8 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
             .iter()
             .map(|entry| entry.rubric.values()[index].1)
             .collect();
-        let mean =
-            scores.iter().map(|score| u32::from(*score)).sum::<u32>() as f64 / scores.len() as f64;
+        let mean = f64::from(scores.iter().map(|score| u32::from(*score)).sum::<u32>())
+            / f64::from(u32::try_from(scores.len()).expect("assessment count fits in u32"));
         let distribution = (0..=4)
             .map(|score| {
                 let count = scores.iter().filter(|entry| **entry == score).count();

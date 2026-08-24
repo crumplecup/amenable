@@ -148,7 +148,7 @@ impl KaniWindowsSocket {
 /// encodes to exactly one `u16` equal to the code point.
 #[must_use]
 pub fn kani_encode_wide_bmp_char(c: char) -> u16 {
-    c as u32 as u16
+    u16::try_from(u32::from(c)).expect("c is a BMP scalar value by this fn's own precondition")
 }
 
 /// Build the `RustStdProvenance` for a real, `#[cfg(windows)]`-only

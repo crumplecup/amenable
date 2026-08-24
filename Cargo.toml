@@ -165,10 +165,18 @@ float_cmp_const = "warn"
 lossy_float_literal = "warn"
 cast_sign_loss = "warn"
 invalid_upcast_comparisons = "warn"
-# Optional - these effectively force you to document numeric invariants
-# cast_possible_wrap = "warn"
-# cast_precision_loss = "warn"
-# cast_possible_truncation = "warn"
+# Real recon pass (not the article's own "optional" hedge): 2 total hits
+# workspace-wide, 0 for cast_possible_wrap -- nothing close to the
+# hundreds-of-hits false-positive profile the other disabled lints in
+# this file have. Both were real: os_windows_model.rs's
+# kani_encode_wide_bmp_char had an undocumented-in-the-type-system BMP
+# precondition backed only by a caller's kani::assume, and
+# assessment.rs's mean calculation cast a u32 sum/usize len to f64 with
+# no stated bound. Both fixed with real try_from/From conversions
+# instead of `as`, not suppressed.
+cast_possible_wrap = "warn"
+cast_precision_loss = "warn"
+cast_possible_truncation = "warn"
 
 # Don't Do Bad Things That are Easy to Avoid
 rc_mutex = "warn"
