@@ -819,7 +819,7 @@ fn report(args: AssessmentReportArgs) -> AmenableResult<()> {
     }
 
     for (proof_id, entries) in by_proof {
-        print_summary(&proof_id, &entries);
+        print_summary(&proof_id, &entries)?;
     }
     Ok(())
 }
@@ -895,7 +895,7 @@ fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> b
     }
 }
 
-fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
+fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<()> {
     println!("{proof_id}: {} assessment(s)", entries.len());
 
     for (index, (name, _)) in entries[0].rubric.values().into_iter().enumerate() {
@@ -904,7 +904,10 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
             .map(|entry| entry.rubric.values()[index].1)
             .collect();
         let mean = f64::from(scores.iter().map(|score| u32::from(*score)).sum::<u32>())
-            / f64::from(u32::try_from(scores.len()).expect("assessment count fits in u32"));
+            / f64::from(
+                u32::try_from(scores.len())
+                    .map_err(|error| AmenableError::assessment_count(scores.len(), error))?,
+            );
         let distribution = (0..=4)
             .map(|score| {
                 let count = scores.iter().filter(|entry| **entry == score).count();
@@ -941,6 +944,7 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) {
         .collect::<Vec<_>>()
         .join(" ");
     println!("  resolution paths: {resolution_paths}");
+    Ok(())
 }
 
 /// One entry in the cross-verifier assessable-proof catalog -- something a

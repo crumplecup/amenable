@@ -10,8 +10,8 @@ use std::path::PathBuf;
 
 use crate::error::kind::AmenableErrorKind;
 use crate::error::sources::{
-    ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource, IoSource,
-    JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
+    AssessmentCountSource, ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource,
+    IoSource, JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
     TimestampTooLargeSource,
 };
@@ -122,6 +122,15 @@ impl AmenableError {
     pub fn timestamp_too_large(timestamp: u64, source: std::num::TryFromIntError) -> Self {
         Self::new(AmenableErrorKind::TimestampTooLarge(
             TimestampTooLargeSource::new(source, timestamp),
+        ))
+    }
+
+    /// Construct an [`AmenableErrorKind::AssessmentCount`] error naming
+    /// the rejected count.
+    #[track_caller]
+    pub fn assessment_count(count: usize, source: std::num::TryFromIntError) -> Self {
+        Self::new(AmenableErrorKind::AssessmentCount(
+            AssessmentCountSource::new(source, count),
         ))
     }
 }

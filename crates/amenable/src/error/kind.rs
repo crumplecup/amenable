@@ -1,8 +1,8 @@
 //! Error kind enumeration for `amenable`'s CLI-facing operations.
 
 use crate::error::sources::{
-    ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource, IoSource,
-    JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
+    AssessmentCountSource, ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource,
+    IoSource, JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
     TimestampTooLargeSource,
 };
@@ -93,4 +93,8 @@ pub enum AmenableErrorKind {
     /// An assessment timestamp is too large to format.
     #[display("{_0}")]
     TimestampTooLarge(TimestampTooLargeSource),
+
+    /// An assessment count is too large to convert to `u32`.
+    #[display("{_0}")]
+    AssessmentCount(AssessmentCountSource),
 }

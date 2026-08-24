@@ -318,6 +318,38 @@ impl TimestampTooLargeSource {
     }
 }
 
+/// Preserved `std::num::TryFromIntError` source for an assessment count
+/// too large to convert to `u32` when computing a rubric score mean.
+/// See [`PreEpochDateSource`]'s own doc comment for why this stays a
+/// separate type rather than a shared one.
+#[derive(Debug, derive_more::Display, derive_more::Error)]
+#[display("assessment count {count} does not fit in u32: {source}")]
+pub struct AssessmentCountSource {
+    /// The preserved `std::num::TryFromIntError`.
+    source: std::num::TryFromIntError,
+    /// The rejected assessment count.
+    count: usize,
+    /// Source line of the call site that produced this error.
+    line: u32,
+    /// Source file of the call site that produced this error.
+    file: String,
+}
+
+impl AssessmentCountSource {
+    /// Preserve an int-conversion error alongside the rejected count and
+    /// the caller's location.
+    #[track_caller]
+    pub fn new(source: std::num::TryFromIntError, count: usize) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            source,
+            count,
+            line: loc.line(),
+            file: loc.file().to_string(),
+        }
+    }
+}
+
 /// Preserved `time::error::ComponentRange` source.
 #[derive(Debug, derive_more::Display, derive_more::Error)]
 #[display("{source}")]
