@@ -20,11 +20,11 @@ impl KaniWitness for RustStdStandard<Box<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_box_derefs_and_writes_through".to_owned(),
-            claim: VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_box_derefs_and_writes_through".to_owned(),
+            VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

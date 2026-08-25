@@ -20,11 +20,11 @@ impl KaniWitness for RustStdStandard<TryFromSliceError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
-            claim: VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
+            VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -76,11 +76,11 @@ impl KaniWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_array_into_iter_yields_elements_in_order".to_owned(),
-            claim: VERIFY_ARRAY_INTO_ITER_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_array_into_iter_yields_elements_in_order".to_owned(),
+            VERIFY_ARRAY_INTO_ITER_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -16,11 +16,11 @@ impl KaniWitness for RustStdStandard<System> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_system_allocates_and_deallocates_a_layout".to_owned(),
-            claim: VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_system_allocates_and_deallocates_a_layout".to_owned(),
+            VERIFY_SYSTEM_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

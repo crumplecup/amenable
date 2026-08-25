@@ -19,11 +19,11 @@ impl KaniWitness for RustStdStandard<OsStr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_os_str_valid_utf8_content_round_trips_through_to_str".to_owned(),
-            claim: VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_os_str_valid_utf8_content_round_trips_through_to_str".to_owned(),
+            VERIFY_OS_STR_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -132,11 +132,11 @@ impl KaniWitness for RustStdStandard<OsString> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_os_string_push_appends_to_the_existing_content".to_owned(),
-            claim: VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_os_string_push_appends_to_the_existing_content".to_owned(),
+            VERIFY_OS_STRING_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -168,11 +168,11 @@ impl KaniWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_os_str_display_renders_valid_utf8_content_unchanged".to_owned(),
-            claim: VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_os_str_display_renders_valid_utf8_content_unchanged".to_owned(),
+            VERIFY_OS_STR_DISPLAY_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -14,11 +14,11 @@ impl KaniWitness for RustStdStandard<core::ascii::EscapeDefault> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_escape_default_escapes_a_control_byte".to_owned(),
-            claim: VERIFY_ESCAPE_DEFAULT_ESCAPES_A_CONTROL_BYTE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_escape_default_escapes_a_control_byte".to_owned(),
+            VERIFY_ESCAPE_DEFAULT_ESCAPES_A_CONTROL_BYTE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

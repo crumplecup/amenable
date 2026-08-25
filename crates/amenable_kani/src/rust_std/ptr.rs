@@ -14,11 +14,11 @@ impl KaniWitness for RustStdStandard<NonNull<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_non_null_rejects_the_null_pointer".to_owned(),
-            claim: VERIFY_NON_NULL_REJECTS_THE_NULL_POINTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_non_null_rejects_the_null_pointer".to_owned(),
+            VERIFY_NON_NULL_REJECTS_THE_NULL_POINTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -26,11 +26,11 @@ impl KaniWitness for RustStdStandard<AssertUnwindSafe<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_assert_unwind_safe_derefs_transparently".to_owned(),
-            claim: VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_assert_unwind_safe_derefs_transparently".to_owned(),
+            VERIFY_ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -72,11 +72,11 @@ impl KaniWitness for RustStdStandard<Location<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_location_caller_reflects_the_immediate_call_site".to_owned(),
-            claim: VERIFY_LOCATION_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_location_caller_reflects_the_immediate_call_site".to_owned(),
+            VERIFY_LOCATION_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

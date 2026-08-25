@@ -27,11 +27,11 @@ impl KaniWitness for RustStdStandard<Vec<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_push_pop_round_trips".to_owned(),
-            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_push_pop_round_trips".to_owned(),
+            VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -89,11 +89,11 @@ impl KaniWitness for VecLengthTracksPushesAndPops {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_push_pop_round_trips".to_owned(),
-            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_push_pop_round_trips".to_owned(),
+            VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -169,11 +169,11 @@ impl KaniWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_drain_removes_and_yields_in_order".to_owned(),
-            claim: VERIFY_VEC_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_drain_removes_and_yields_in_order".to_owned(),
+            VERIFY_VEC_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -249,11 +249,11 @@ impl KaniWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_into_iter_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_VEC_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_into_iter_yields_owned_values_in_order".to_owned(),
+            VERIFY_VEC_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -319,11 +319,11 @@ impl KaniWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_extract_if_partitions_by_the_predicate".to_owned(),
-            claim: VERIFY_VEC_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_extract_if_partitions_by_the_predicate".to_owned(),
+            VERIFY_VEC_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -389,11 +389,11 @@ impl KaniWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIte
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_splice_replaces_a_range_and_yields_what_it_removed".to_owned(),
-            claim: VERIFY_SPLICE_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_splice_replaces_a_range_and_yields_what_it_removed".to_owned(),
+            VERIFY_SPLICE_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

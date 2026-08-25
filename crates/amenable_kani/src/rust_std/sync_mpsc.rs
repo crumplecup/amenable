@@ -21,11 +21,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Sender<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_sender_delivers_to_the_paired_receiver".to_owned(),
-            claim: VERIFY_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_sender_delivers_to_the_paired_receiver".to_owned(),
+            VERIFY_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -126,11 +126,11 @@ impl KaniWitness for RustStdStandard<SyncSender<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_sync_sender_delivers_to_the_paired_receiver".to_owned(),
-            claim: VERIFY_SYNC_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_sync_sender_delivers_to_the_paired_receiver".to_owned(),
+            VERIFY_SYNC_SENDER_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -186,11 +186,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_receiver_fails_once_every_sender_is_dropped".to_owned(),
-            claim: VERIFY_RECEIVER_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_receiver_fails_once_every_sender_is_dropped".to_owned(),
+            VERIFY_RECEIVER_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -274,11 +274,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::IntoIter<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_into_iter_yields_sent_values_then_stops".to_owned(),
-            claim: VERIFY_INTO_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_into_iter_yields_sent_values_then_stops".to_owned(),
+            VERIFY_INTO_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -373,11 +373,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Iter<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_iter_yields_sent_values_then_stops".to_owned(),
-            claim: VERIFY_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_iter_yields_sent_values_then_stops".to_owned(),
+            VERIFY_ITER_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -439,11 +439,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_iter_does_not_block_on_an_empty_open_channel".to_owned(),
-            claim: VERIFY_TRY_ITER_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_iter_does_not_block_on_an_empty_open_channel".to_owned(),
+            VERIFY_TRY_ITER_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -530,11 +530,11 @@ impl KaniWitness for RustStdStandard<RecvError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_recv_error_on_an_empty_disconnected_channel".to_owned(),
-            claim: VERIFY_RECV_ERROR_ON_AN_EMPTY_DISCONNECTED_CHANNEL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_recv_error_on_an_empty_disconnected_channel".to_owned(),
+            VERIFY_RECV_ERROR_ON_AN_EMPTY_DISCONNECTED_CHANNEL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -612,11 +612,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::RecvTimeoutError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_recv_timeout_error_distinguishes_timeout_from_disconnected".to_owned(),
-            claim: VERIFY_RECV_TIMEOUT_ERROR_DISTINGUISHES_TIMEOUT_FROM_DISCONNECTED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_recv_timeout_error_distinguishes_timeout_from_disconnected".to_owned(),
+            VERIFY_RECV_TIMEOUT_ERROR_DISTINGUISHES_TIMEOUT_FROM_DISCONNECTED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -715,11 +715,11 @@ impl KaniWitness for RustStdStandard<SendError<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_send_error_recovers_the_unsent_value".to_owned(),
-            claim: VERIFY_SEND_ERROR_RECOVERS_THE_UNSENT_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_send_error_recovers_the_unsent_value".to_owned(),
+            VERIFY_SEND_ERROR_RECOVERS_THE_UNSENT_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -809,11 +809,11 @@ impl KaniWitness for RustStdStandard<TrySendError<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_send_error_full_recovers_the_unsent_value".to_owned(),
-            claim: VERIFY_TRY_SEND_ERROR_FULL_RECOVERS_THE_UNSENT_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_send_error_full_recovers_the_unsent_value".to_owned(),
+            VERIFY_TRY_SEND_ERROR_FULL_RECOVERS_THE_UNSENT_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -901,11 +901,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::TryRecvError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_recv_error_distinguishes_empty_from_disconnected".to_owned(),
-            claim: VERIFY_TRY_RECV_ERROR_DISTINGUISHES_EMPTY_FROM_DISCONNECTED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_recv_error_distinguishes_empty_from_disconnected".to_owned(),
+            VERIFY_TRY_RECV_ERROR_DISTINGUISHES_EMPTY_FROM_DISCONNECTED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

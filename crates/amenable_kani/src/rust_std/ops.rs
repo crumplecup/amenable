@@ -16,11 +16,11 @@ impl KaniWitness for RustStdStandard<std::ops::Range<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_contains_matches_bounds".to_owned(),
-            claim: VERIFY_RANGE_CONTAINS_MATCHES_BOUNDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_contains_matches_bounds".to_owned(),
+            VERIFY_RANGE_CONTAINS_MATCHES_BOUNDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -66,11 +66,11 @@ impl KaniWitness for RustStdStandard<std::ops::RangeFrom<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_from_contains_matches_bound".to_owned(),
-            claim: VERIFY_RANGE_FROM_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_from_contains_matches_bound".to_owned(),
+            VERIFY_RANGE_FROM_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -108,11 +108,11 @@ impl KaniWitness for RustStdStandard<RangeTo<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_to_contains_matches_bound".to_owned(),
-            claim: VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_to_contains_matches_bound".to_owned(),
+            VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -150,11 +150,11 @@ impl KaniWitness for RustStdStandard<std::ops::RangeToInclusive<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_to_inclusive_contains_matches_bound".to_owned(),
-            claim: VERIFY_RANGE_TO_INCLUSIVE_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_to_inclusive_contains_matches_bound".to_owned(),
+            VERIFY_RANGE_TO_INCLUSIVE_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -192,11 +192,11 @@ impl KaniWitness for RustStdStandard<std::ops::RangeInclusive<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_inclusive_contains_and_emptiness".to_owned(),
-            claim: VERIFY_RANGE_INCLUSIVE_CONTAINS_AND_EMPTINESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_inclusive_contains_and_emptiness".to_owned(),
+            VERIFY_RANGE_INCLUSIVE_CONTAINS_AND_EMPTINESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -243,11 +243,11 @@ impl KaniWitness for RustStdStandard<std::ops::RangeFull> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_range_full_contains_everything".to_owned(),
-            claim: VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_range_full_contains_everything".to_owned(),
+            VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -281,11 +281,11 @@ impl KaniWitness for RustStdStandard<Bound<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_bound_round_trips_its_endpoint".to_owned(),
-            claim: VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_bound_round_trips_its_endpoint".to_owned(),
+            VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -352,11 +352,11 @@ impl KaniWitness for RustStdStandard<ControlFlow<i32, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_control_flow_continue_and_break_are_disjoint".to_owned(),
-            claim: VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_control_flow_continue_and_break_are_disjoint".to_owned(),
+            VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

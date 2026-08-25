@@ -35,13 +35,11 @@ impl KaniWitness for RustStdStandard<CharTryFromError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
-                .to_owned(),
-            claim: VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),
+            VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -93,13 +91,11 @@ impl KaniWitness for ValidUnicodeScalar {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
-                .to_owned(),
-            claim: VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),
+            VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -125,11 +121,11 @@ impl KaniWitness for RustStdStandard<TryFromCharError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_from_char_error_occurs_exactly_when_out_of_range".to_owned(),
-            claim: VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_from_char_error_occurs_exactly_when_out_of_range".to_owned(),
+            VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -173,11 +169,11 @@ impl KaniWitness for RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> 
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_decode_utf16_round_trips_a_bmp_code_unit".to_owned(),
-            claim: VERIFY_DECODE_UTF16_ROUND_TRIPS_A_BMP_CODE_UNIT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_decode_utf16_round_trips_a_bmp_code_unit".to_owned(),
+            VERIFY_DECODE_UTF16_ROUND_TRIPS_A_BMP_CODE_UNIT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -220,11 +216,11 @@ impl KaniWitness for RustStdStandard<DecodeUtf16Error> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_decode_utf16_error_reports_the_unpaired_surrogate".to_owned(),
-            claim: VERIFY_DECODE_UTF16_ERROR_REPORTS_THE_UNPAIRED_SURROGATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_decode_utf16_error_reports_the_unpaired_surrogate".to_owned(),
+            VERIFY_DECODE_UTF16_ERROR_REPORTS_THE_UNPAIRED_SURROGATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -264,13 +260,11 @@ impl KaniWitness for RustStdStandard<ParseCharError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_parse_char_error_occurs_for_empty_or_multi_character_strings"
-                .to_owned(),
-            claim: VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_parse_char_error_occurs_for_empty_or_multi_character_strings".to_owned(),
+            VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -313,11 +307,11 @@ impl KaniWitness for RustStdStandard<ToLowercase> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_to_lowercase_maps_an_uppercase_ascii_letter".to_owned(),
-            claim: VERIFY_TO_LOWERCASE_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_to_lowercase_maps_an_uppercase_ascii_letter".to_owned(),
+            VERIFY_TO_LOWERCASE_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -358,11 +352,11 @@ impl KaniWitness for RustStdStandard<ToUppercase> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_to_uppercase_maps_a_lowercase_ascii_letter".to_owned(),
-            claim: VERIFY_TO_UPPERCASE_MAPS_A_LOWERCASE_ASCII_LETTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_to_uppercase_maps_a_lowercase_ascii_letter".to_owned(),
+            VERIFY_TO_UPPERCASE_MAPS_A_LOWERCASE_ASCII_LETTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -403,11 +397,11 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDebug> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_escape_debug_escapes_a_newline".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_DEBUG_ESCAPES_A_NEWLINE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_escape_debug_escapes_a_newline".to_owned(),
+            VERIFY_CHAR_ESCAPE_DEBUG_ESCAPES_A_NEWLINE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -448,11 +442,11 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDefault> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_escape_default_escapes_a_newline".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_DEFAULT_ESCAPES_A_NEWLINE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_escape_default_escapes_a_newline".to_owned(),
+            VERIFY_CHAR_ESCAPE_DEFAULT_ESCAPES_A_NEWLINE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -494,11 +488,11 @@ impl KaniWitness for RustStdStandard<core::char::EscapeUnicode> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_escape_unicode_renders_the_codepoint_escape".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_escape_unicode_renders_the_codepoint_escape".to_owned(),
+            VERIFY_CHAR_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

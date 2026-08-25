@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<Pin<Box<i32>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_pin_derefs_and_get_mut_round_trip".to_owned(),
-            claim: VERIFY_PIN_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_pin_derefs_and_get_mut_round_trip".to_owned(),
+            VERIFY_PIN_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

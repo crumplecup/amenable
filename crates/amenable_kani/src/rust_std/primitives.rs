@@ -107,11 +107,11 @@ impl KaniWitness for RustStdStandard<char> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_unicode_scalar".to_owned(),
-            claim: VERIFY_CHAR_UNICODE_SCALAR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_unicode_scalar".to_owned(),
+            VERIFY_CHAR_UNICODE_SCALAR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -166,11 +166,11 @@ impl KaniWitness for RustStdStandard<String> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_string_utf8_valid".to_owned(),
-            claim: VERIFY_STRING_UTF8_VALID_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_string_utf8_valid".to_owned(),
+            VERIFY_STRING_UTF8_VALID_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -263,11 +263,11 @@ impl KaniWitness for RustStdStandard<[i32; 3]> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_array_indexing_and_length".to_owned(),
-            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_array_indexing_and_length".to_owned(),
+            VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -315,11 +315,11 @@ impl KaniWitness for RustStdStandard<[i32]> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_slice_indexing_and_length".to_owned(),
-            claim: VERIFY_SLICE_INDEXING_AND_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_slice_indexing_and_length".to_owned(),
+            VERIFY_SLICE_INDEXING_AND_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -372,11 +372,11 @@ impl KaniWitness for RustStdStandard<str> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_str_byte_length_and_content".to_owned(),
-            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_str_byte_length_and_content".to_owned(),
+            VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -434,11 +434,11 @@ impl KaniWitness for AsciiByte {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_str_byte_length_and_content".to_owned(),
-            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_str_byte_length_and_content".to_owned(),
+            VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -474,11 +474,11 @@ impl KaniWitness for FourBytesAreEachAscii {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_str_byte_length_and_content".to_owned(),
-            claim: VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_str_byte_length_and_content".to_owned(),
+            VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -504,11 +504,11 @@ impl KaniWitness for RustStdStandard<(i32, i32)> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_tuple_field_access".to_owned(),
-            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_tuple_field_access".to_owned(),
+            VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -542,11 +542,11 @@ impl KaniWitness for RustStdStandard<fn(i32) -> i32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_fn_pointer_calls_the_underlying_function".to_owned(),
-            claim: VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_fn_pointer_calls_the_underlying_function".to_owned(),
+            VERIFY_FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -581,11 +581,11 @@ impl KaniWitness for RustStdStandard<*const i32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_const_pointer_cast_is_reproducible".to_owned(),
-            claim: VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_const_pointer_cast_is_reproducible".to_owned(),
+            VERIFY_CONST_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -630,11 +630,11 @@ impl KaniWitness for RustStdStandard<*mut i32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_mut_pointer_cast_is_reproducible".to_owned(),
-            claim: VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_mut_pointer_cast_is_reproducible".to_owned(),
+            VERIFY_MUT_POINTER_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -678,11 +678,11 @@ impl KaniWitness for RustStdStandard<&'static i32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_shared_reference_dereferences_to_the_referent".to_owned(),
-            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_shared_reference_dereferences_to_the_referent".to_owned(),
+            VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -766,11 +766,11 @@ impl<T> KaniWitness for DerefReflectsTheStoredValue<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_shared_reference_dereferences_to_the_referent".to_owned(),
-            claim: VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_shared_reference_dereferences_to_the_referent".to_owned(),
+            VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -860,11 +860,11 @@ impl<T> KaniWitness for IndexRecoversTheStoredElement<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_array_indexing_and_length".to_owned(),
-            claim: VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_array_indexing_and_length".to_owned(),
+            VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -953,11 +953,11 @@ impl<T> KaniWitness for FieldAccessRecoversTheStoredValue<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_tuple_field_access".to_owned(),
-            claim: VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_tuple_field_access".to_owned(),
+            VERIFY_TUPLE_FIELD_ACCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1003,11 +1003,11 @@ impl KaniWitness for RustStdStandard<&'static mut i32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_owned(),
-            claim: VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_owned(),
+            VERIFY_MUTABLE_REFERENCE_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

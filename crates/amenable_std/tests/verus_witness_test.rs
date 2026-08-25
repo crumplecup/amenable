@@ -28,8 +28,8 @@ fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
 fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<char> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_char_roundtrip");
-    assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_char_roundtrip");
+    assert_eq!(*proof.provenance(), <char as RustStdType>::provenance());
     assert_eq!(
         <RustStdStandard<char> as Witness<VerusVerifier>>::support(),
         WitnessSupportSummary::checked_leaf()
@@ -40,8 +40,8 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
     let proof = <ValidUnicodeScalar as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_char_roundtrip");
-    assert_eq!(proof.provenance, <char as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_char_roundtrip");
+    assert_eq!(*proof.provenance(), <char as RustStdType>::provenance());
     assert_eq!(
         <ValidUnicodeScalar as Ensures<VerusVerifier>>::ensures(()),
         ["char_is_valid_unicode_scalar(c)"]
@@ -52,8 +52,8 @@ fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
 fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<String> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_string_roundtrip");
-    assert_eq!(proof.provenance, <String as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_string_roundtrip");
+    assert_eq!(*proof.provenance(), <String as RustStdType>::provenance());
 }
 
 #[test]
@@ -61,11 +61,11 @@ fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cmp::Ordering> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordering_reverse_swaps_less_and_greater"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cmp::Ordering as RustStdType>::provenance()
     );
 }
@@ -75,19 +75,22 @@ fn option_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Option<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_option_unwrap_returns_the_wrapped_value"
     );
-    assert_eq!(proof.provenance, <Option<i32> as RustStdType>::provenance());
+    assert_eq!(
+        *proof.provenance(),
+        <Option<i32> as RustStdType>::provenance()
+    );
 }
 
 #[test]
 fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Result<i32, i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_result_unwrap_returns_the_ok_value");
+    assert_eq!(proof.harness(), "verify_result_unwrap_returns_the_ok_value");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <Result<i32, i32> as RustStdType>::provenance()
     );
 }
@@ -97,11 +100,11 @@ fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::num::Wrapping<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_wrapping_field_roundtrips_the_constructed_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::num::Wrapping<i32> as RustStdType>::provenance()
     );
 }
@@ -111,11 +114,11 @@ fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::num::Saturating<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_saturating_field_roundtrips_the_constructed_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::num::Saturating<i32> as RustStdType>::provenance()
     );
 }
@@ -125,11 +128,11 @@ fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cmp::Reverse<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_reverse_field_roundtrips_the_constructed_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cmp::Reverse<i32> as RustStdType>::provenance()
     );
 }
@@ -139,11 +142,11 @@ fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<std::mem::ManuallyDrop<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_manually_drop_derefs_and_into_inner_round_trip"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::mem::ManuallyDrop<i32> as RustStdType>::provenance()
     );
 }
@@ -153,11 +156,11 @@ fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::num::FpCategory> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_fp_category_matches_the_value_it_classifies"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::num::FpCategory as RustStdType>::provenance()
     );
 }
@@ -167,11 +170,11 @@ fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<core::num::IntErrorKind> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_int_error_kind_classifies_parse_failures"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::num::IntErrorKind as RustStdType>::provenance()
     );
 }
@@ -181,11 +184,11 @@ fn parse_int_error_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<core::num::ParseIntError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_parse_int_error_model_reports_the_kind_of_the_failure"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::num::ParseIntError as RustStdType>::provenance()
     );
 }
@@ -195,11 +198,11 @@ fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<core::num::ParseFloatError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_parse_float_error_occurs_only_for_unparseable_input"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::num::ParseFloatError as RustStdType>::provenance()
     );
 }
@@ -209,11 +212,11 @@ fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provena
     let proof = <RustStdStandard<core::num::TryFromIntError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_from_int_error_occurs_exactly_when_out_of_range"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::num::TryFromIntError as RustStdType>::provenance()
     );
 }
@@ -222,8 +225,8 @@ fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provena
 fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Box<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_box_derefs_and_writes_through");
-    assert_eq!(proof.provenance, <Box<i32> as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_box_derefs_and_writes_through");
+    assert_eq!(*proof.provenance(), <Box<i32> as RustStdType>::provenance());
 }
 
 #[test]
@@ -239,11 +242,11 @@ fn layout_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::alloc::Layout> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::alloc::Layout as RustStdType>::provenance()
     );
 }
@@ -253,11 +256,11 @@ fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<core::alloc::LayoutError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::alloc::LayoutError as RustStdType>::provenance()
     );
 }
@@ -266,8 +269,8 @@ fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() 
 fn vec_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<Vec<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_vec_push_pop_round_trips");
-    assert_eq!(proof.provenance, <Vec<i32> as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_vec_push_pop_round_trips");
+    assert_eq!(*proof.provenance(), <Vec<i32> as RustStdType>::provenance());
 }
 
 #[test]
@@ -275,11 +278,11 @@ fn char_try_from_error_witness_is_checked_and_still_carries_chain_derived_proven
     let proof = <RustStdStandard<core::char::CharTryFromError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::char::CharTryFromError as RustStdType>::provenance()
     );
 }
@@ -289,11 +292,11 @@ fn try_from_char_error_witness_is_checked_and_still_carries_chain_derived_proven
     let proof = <RustStdStandard<core::char::TryFromCharError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_from_char_error_occurs_exactly_when_out_of_range"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::char::TryFromCharError as RustStdType>::provenance()
     );
 }
@@ -367,11 +370,11 @@ fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::any::TypeId> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_type_id_is_reflexive_and_distinguishes_distinct_types"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::any::TypeId as RustStdType>::provenance()
     );
 }
@@ -381,11 +384,11 @@ fn try_from_slice_error_witness_is_checked_and_still_carries_chain_derived_prove
     let proof = <RustStdStandard<std::array::TryFromSliceError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_from_slice_rejects_a_length_mismatch"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::array::TryFromSliceError as RustStdType>::provenance()
     );
 }
@@ -394,9 +397,12 @@ fn try_from_slice_error_witness_is_checked_and_still_carries_chain_derived_prove
 fn from_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::string::FromUtf16Error> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_from_utf16_rejects_a_lone_surrogate");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_from_utf16_rejects_a_lone_surrogate"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::string::FromUtf16Error as RustStdType>::provenance()
     );
 }
@@ -406,11 +412,11 @@ fn cstring_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ffi::CString> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::CString as RustStdType>::provenance()
     );
 }
@@ -420,11 +426,11 @@ fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ffi::NulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cstring_excludes_the_terminator_and_rejects_interior_nul"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::NulError as RustStdType>::provenance()
     );
 }
@@ -434,11 +440,11 @@ fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_pr
     let proof = <RustStdStandard<std::ffi::FromVecWithNulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_vec_with_nul_requires_the_nul_only_at_the_end"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::FromVecWithNulError as RustStdType>::provenance()
     );
 }
@@ -448,11 +454,11 @@ fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenanc
     let proof = <RustStdStandard<core::char::ParseCharError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_parse_char_error_occurs_for_empty_or_multi_character_strings"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::char::ParseCharError as RustStdType>::provenance()
     );
 }
@@ -461,9 +467,9 @@ fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenanc
 fn rc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::rc::Rc<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_rc_derefs_to_the_wrapped_value");
+    assert_eq!(proof.harness(), "verify_rc_derefs_to_the_wrapped_value");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::rc::Rc<i32> as RustStdType>::provenance()
     );
 }
@@ -472,9 +478,9 @@ fn rc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn arc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::Arc<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_arc_derefs_to_the_wrapped_value");
+    assert_eq!(proof.harness(), "verify_arc_derefs_to_the_wrapped_value");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::Arc<i32> as RustStdType>::provenance()
     );
 }
@@ -484,11 +490,11 @@ fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<std::ffi::IntoStringError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_into_string_error_recovers_the_original_cstring"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::IntoStringError as RustStdType>::provenance()
     );
 }
@@ -499,11 +505,11 @@ fn from_bytes_until_nul_error_witness_is_checked_and_still_carries_chain_derived
         <RustStdStandard<core::ffi::FromBytesUntilNulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::ffi::FromBytesUntilNulError as RustStdType>::provenance()
     );
 }
@@ -514,11 +520,11 @@ fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_
         <RustStdStandard<core::ffi::FromBytesWithNulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::ffi::FromBytesWithNulError as RustStdType>::provenance()
     );
 }
@@ -530,11 +536,11 @@ fn build_hasher_default_witness_is_checked_and_still_carries_chain_derived_prove
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_build_hasher_default_produces_consistent_hashers"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::hash::BuildHasherDefault<
             std::collections::hash_map::DefaultHasher,
         > as RustStdType>::provenance()
@@ -550,11 +556,11 @@ fn sip_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::hash::SipHasher> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_sip_hasher_produces_consistent_hashes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::hash::SipHasher as RustStdType>::provenance()
     );
 }
@@ -565,11 +571,11 @@ fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::borrow::Cow<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cow_borrowed_and_owned_agree_on_their_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::borrow::Cow<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -580,11 +586,11 @@ fn btree_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_btree_map_insert_get_remove_round_trips"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::BTreeMap<i32, i32> as RustStdType>::provenance()
     );
 }
@@ -595,11 +601,11 @@ fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::collections::BTreeSet<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_btree_set_insert_contains_remove_round_trips"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::BTreeSet<i32> as RustStdType>::provenance()
     );
 }
@@ -610,11 +616,11 @@ fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::collections::VecDeque<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_deque_pushes_and_pops_from_both_ends"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::VecDeque<i32> as RustStdType>::provenance()
     );
 }
@@ -625,11 +631,11 @@ fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenan
         <RustStdStandard<std::collections::TryReserveError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_reserve_preserves_vec_contents_regardless_of_outcome"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::TryReserveError as RustStdType>::provenance()
     );
 }
@@ -639,11 +645,11 @@ fn vec_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::vec::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_into_iter_round_trips_via_collect"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::vec::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -655,11 +661,11 @@ fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_deque_iter_round_trips_via_collect"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::vec_deque::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -668,9 +674,9 @@ fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
 fn chars_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::str::Chars<'static>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_chars_yields_characters_in_order");
+    assert_eq!(proof.harness(), "verify_chars_yields_characters_in_order");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Chars<'static> as RustStdType>::provenance()
     );
 }
@@ -680,9 +686,12 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::collections::BinaryHeap<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_max_heap_pair_pops_the_maximum_first");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_max_heap_pair_pops_the_maximum_first"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::collections::BinaryHeap<i32> as RustStdType>::provenance()
     );
 }
@@ -695,11 +704,11 @@ fn iter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_map_model_applies_its_closure_to_each_item"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32> as RustStdType>::provenance()
     );
 }
@@ -711,11 +720,11 @@ fn iter_filter_witness_is_checked_and_still_carries_chain_derived_provenance() {
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_filter_model_yields_only_items_matching_the_predicate"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -727,11 +736,11 @@ fn iter_filter_map_witness_is_checked_and_still_carries_chain_derived_provenance
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_filter_map_model_applies_and_filters_in_one_step"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -743,11 +752,11 @@ fn iter_map_while_witness_is_checked_and_still_carries_chain_derived_provenance(
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_map_while_model_maps_items_while_the_closure_returns_some"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -759,11 +768,11 @@ fn iter_cloned_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cloned_model_clones_each_referenced_item"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Cloned<std::slice::Iter<'static, i32>> as RustStdType>::provenance()
     );
 }
@@ -775,11 +784,11 @@ fn iter_copied_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_copied_model_copies_each_referenced_item"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Copied<std::slice::Iter<'static, i32>> as RustStdType>::provenance()
     );
 }
@@ -791,11 +800,11 @@ fn iter_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chain_model_sequences_two_iterators_end_to_end"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -808,11 +817,11 @@ fn iter_zip_witness_is_checked_and_still_carries_chain_derived_provenance() {
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_zip_model_pairs_items_from_two_iterators"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -824,11 +833,11 @@ fn iter_enumerate_witness_is_checked_and_still_carries_chain_derived_provenance(
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_enumerate_model_pairs_each_item_with_its_index"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Enumerate<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -838,9 +847,9 @@ fn iter_rev_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_rev_model_reverses_iteration_order");
+    assert_eq!(proof.harness(), "verify_rev_model_reverses_iteration_order");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Rev<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -851,11 +860,11 @@ fn iter_skip_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_skip_model_discards_the_first_n_items"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Skip<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -867,11 +876,11 @@ fn iter_skip_while_witness_is_checked_and_still_carries_chain_derived_provenance
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_skip_while_model_discards_items_while_the_predicate_holds"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -882,9 +891,12 @@ fn iter_step_by_witness_is_checked_and_still_carries_chain_derived_provenance() 
         VerusVerifier,
     >>::proof();
 
-    assert_eq!(proof.harness, "verify_step_by_model_yields_every_nth_item");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_step_by_model_yields_every_nth_item"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::iter::StepBy<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -894,9 +906,9 @@ fn iter_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::iter::Take<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_take_model_yields_at_most_n_items");
+    assert_eq!(proof.harness(), "verify_take_model_yields_at_most_n_items");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Take<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -908,11 +920,11 @@ fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_take_while_model_yields_items_while_the_predicate_holds"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -921,9 +933,12 @@ fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance
 fn iter_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::iter::Once<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_once_model_yields_exactly_one_value");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_once_model_yields_exactly_one_value"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::iter::Once<i32> as RustStdType>::provenance()
     );
 }
@@ -934,11 +949,11 @@ fn iter_once_with_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<std::iter::OnceWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_once_with_model_calls_its_closure_exactly_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::OnceWith<fn() -> i32> as RustStdType>::provenance()
     );
 }
@@ -948,11 +963,11 @@ fn iter_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::iter::Repeat<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_repeat_model_yields_the_same_value_forever"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Repeat<i32> as RustStdType>::provenance()
     );
 }
@@ -963,11 +978,11 @@ fn iter_repeat_with_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::iter::RepeatWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_repeat_with_model_calls_its_closure_once_per_item"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::RepeatWith<fn() -> i32> as RustStdType>::provenance()
     );
 }
@@ -977,11 +992,11 @@ fn iter_repeat_n_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::iter::RepeatN<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_repeat_n_model_yields_the_value_exactly_n_times"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::RepeatN<i32> as RustStdType>::provenance()
     );
 }
@@ -990,9 +1005,9 @@ fn iter_repeat_n_witness_is_checked_and_still_carries_chain_derived_provenance()
 fn iter_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::iter::Empty<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_empty_model_yields_nothing");
+    assert_eq!(proof.harness(), "verify_empty_model_yields_nothing");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Empty<i32> as RustStdType>::provenance()
     );
 }
@@ -1004,11 +1019,11 @@ fn iter_cycle_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cycle_model_repeats_its_sequence_forever"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Cycle<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -1019,11 +1034,11 @@ fn iter_fuse_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_fuse_model_keeps_returning_none_once_exhausted"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Fuse<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -1035,11 +1050,11 @@ fn iter_inspect_witness_is_checked_and_still_carries_chain_derived_provenance() 
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_inspect_model_calls_once_per_item_without_changing_values"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Inspect<std::ops::Range<i32>, fn(&i32)> as RustStdType>::provenance()
     );
 }
@@ -1050,9 +1065,12 @@ fn iter_peekable_witness_is_checked_and_still_carries_chain_derived_provenance()
         VerusVerifier,
     >>::proof();
 
-    assert_eq!(proof.harness, "verify_peekable_model_peek_does_not_consume");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_peekable_model_peek_does_not_consume"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::iter::Peekable<std::ops::Range<i32>> as RustStdType>::provenance()
     );
 }
@@ -1064,11 +1082,11 @@ fn iter_scan_witness_is_checked_and_still_carries_chain_derived_provenance() {
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_scan_model_threads_state_through_its_closure"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -1084,11 +1102,11 @@ fn iter_flat_map_witness_is_checked_and_still_carries_chain_derived_provenance()
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_flat_map_model_flattens_each_generated_iterator"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::FlatMap<
             std::array::IntoIter<i32, 1>,
             std::ops::Range<i32>,
@@ -1104,11 +1122,11 @@ fn iter_flatten_witness_is_checked_and_still_carries_chain_derived_provenance() 
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_flatten_model_concatenates_the_inner_iterators"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>> as RustStdType>::provenance()
     );
 }
@@ -1120,11 +1138,11 @@ fn iter_successors_witness_is_checked_and_still_carries_chain_derived_provenance
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_successors_model_generates_from_the_previous_item"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::Successors<i32, fn(&i32) -> Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -1136,11 +1154,11 @@ fn iter_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() 
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_fn_model_yields_until_the_closure_returns_none"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::iter::FromFn<fn() -> Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -1150,11 +1168,11 @@ fn fmt_alignment_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::fmt::Alignment> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_alignment_model_reaches_the_formatter_from_the_format_spec"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::Alignment as RustStdType>::provenance()
     );
 }
@@ -1164,11 +1182,11 @@ fn fmt_formatter_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::fmt::Formatter<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_formatter_model_exposes_the_parsed_width_and_precision"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::Formatter<'static> as RustStdType>::provenance()
     );
 }
@@ -1178,11 +1196,11 @@ fn fmt_arguments_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::fmt::Arguments<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_arguments_model_renders_the_same_as_the_value_itself"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::Arguments<'static> as RustStdType>::provenance()
     );
 }
@@ -1194,11 +1212,11 @@ fn fmt_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_fn_model_forwards_display_to_the_supplied_closure"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result> as RustStdType>::provenance()
     );
 }
@@ -1210,11 +1228,11 @@ fn fmt_debug_struct_witness_is_checked_and_still_carries_chain_derived_provenanc
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_debug_struct_model_renders_named_fields"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::DebugStruct<'static, 'static> as RustStdType>::provenance()
     );
 }
@@ -1226,11 +1244,11 @@ fn fmt_debug_tuple_witness_is_checked_and_still_carries_chain_derived_provenance
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_debug_tuple_model_renders_positional_fields"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::DebugTuple<'static, 'static> as RustStdType>::provenance()
     );
 }
@@ -1241,11 +1259,11 @@ fn fmt_debug_list_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<std::fmt::DebugList<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_debug_list_model_renders_entries_in_brackets"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::DebugList<'static, 'static> as RustStdType>::provenance()
     );
 }
@@ -1256,11 +1274,11 @@ fn fmt_debug_set_witness_is_checked_and_still_carries_chain_derived_provenance()
         <RustStdStandard<std::fmt::DebugSet<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_debug_set_model_renders_entries_in_braces"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::DebugSet<'static, 'static> as RustStdType>::provenance()
     );
 }
@@ -1271,11 +1289,11 @@ fn fmt_debug_map_witness_is_checked_and_still_carries_chain_derived_provenance()
         <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_debug_map_model_renders_key_value_pairs"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fmt::DebugMap<'static, 'static> as RustStdType>::provenance()
     );
 }
@@ -1287,9 +1305,9 @@ macro_rules! non_zero_witness_test {
             let proof =
                 <RustStdStandard<std::num::NonZero<$ty>> as Witness<VerusVerifier>>::proof();
 
-            assert_eq!(proof.harness, $harness);
+            assert_eq!(proof.harness(), $harness);
             assert_eq!(
-                proof.provenance,
+                *proof.provenance(),
                 <std::num::NonZero<$ty> as RustStdType>::provenance()
             );
         }
@@ -1363,11 +1381,11 @@ fn slice_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::slice::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_iter_model_yields_shared_references_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1378,11 +1396,11 @@ fn slice_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<std::slice::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_iter_mut_model_yields_mutable_references_that_write_through"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::IterMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1391,9 +1409,9 @@ fn slice_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance(
 fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::Ipv4Addr> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_ipv4_addr_model_octets_round_trip");
+    assert_eq!(proof.harness(), "verify_ipv4_addr_model_octets_round_trip");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::Ipv4Addr as RustStdType>::provenance()
     );
 }
@@ -1402,9 +1420,12 @@ fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn ipv6_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::Ipv6Addr> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_ipv6_addr_model_segments_round_trip");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_ipv6_addr_model_segments_round_trip"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::net::Ipv6Addr as RustStdType>::provenance()
     );
 }
@@ -1414,11 +1435,11 @@ fn ip_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::IpAddr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ip_addr_model_variant_matches_its_kind"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::IpAddr as RustStdType>::provenance()
     );
 }
@@ -1428,11 +1449,11 @@ fn socket_addr_v4_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::net::SocketAddrV4> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_socket_addr_v4_model_round_trips_ip_and_port"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::SocketAddrV4 as RustStdType>::provenance()
     );
 }
@@ -1442,11 +1463,11 @@ fn socket_addr_v6_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::net::SocketAddrV6> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_socket_addr_v6_model_round_trips_all_fields"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::SocketAddrV6 as RustStdType>::provenance()
     );
 }
@@ -1456,11 +1477,11 @@ fn socket_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::SocketAddr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_socket_addr_model_variant_matches_its_kind"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::SocketAddr as RustStdType>::provenance()
     );
 }
@@ -1471,11 +1492,11 @@ fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::mem::Discriminant<Option<i32>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_discriminant_model_identifies_variant_not_payload"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::mem::Discriminant<Option<i32>> as RustStdType>::provenance()
     );
 }
@@ -1488,11 +1509,11 @@ fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance(
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_extract_if_model_partitions_by_the_predicate"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -1504,11 +1525,11 @@ fn linked_list_extract_if_witness_is_checked_and_still_carries_chain_derived_pro
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_extract_if_model_partitions_by_the_predicate"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -1520,11 +1541,11 @@ fn vec_splice_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_splice_model_replaces_a_range_and_yields_what_it_removed"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::vec::Splice<'static, std::vec::IntoIter<i32>> as RustStdType>::provenance()
     );
 }
@@ -1534,11 +1555,11 @@ fn string_drain_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::string::Drain<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::string::Drain<'static> as RustStdType>::provenance()
     );
 }
@@ -1550,9 +1571,12 @@ fn binary_heap_peek_mut_witness_is_checked_and_still_carries_chain_derived_prove
             VerusVerifier,
         >>::proof();
 
-    assert_eq!(proof.harness, "verify_max_heap_pair_pops_the_maximum_first");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_max_heap_pair_pops_the_maximum_first"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::collections::binary_heap::PeekMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1562,9 +1586,9 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof =
         <RustStdStandard<std::collections::LinkedList<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_fifo_queue_pair_pops_in_push_order");
+    assert_eq!(proof.harness(), "verify_fifo_queue_pair_pops_in_push_order");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::LinkedList<i32> as RustStdType>::provenance()
     );
 }
@@ -1574,11 +1598,11 @@ fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Cell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cell_model_get_set_replace_round_trip"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::Cell<i32> as RustStdType>::provenance()
     );
 }
@@ -1588,11 +1612,11 @@ fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::array::IntoIter<i32, 3>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_array_into_iter_model_yields_elements_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::array::IntoIter<i32, 3> as RustStdType>::provenance()
     );
 }
@@ -1601,9 +1625,12 @@ fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance
 fn ref_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::RefCell<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_ref_cell_model_dynamic_borrow_rules");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_ref_cell_model_dynamic_borrow_rules"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::cell::RefCell<i32> as RustStdType>::provenance()
     );
 }
@@ -1613,11 +1640,11 @@ fn once_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::OnceCell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_once_cell_model_initializes_exactly_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::OnceCell<i32> as RustStdType>::provenance()
     );
 }
@@ -1627,11 +1654,11 @@ fn unsafe_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::UnsafeCell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_unsafe_cell_model_get_mut_and_into_inner_round_trip"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::UnsafeCell<i32> as RustStdType>::provenance()
     );
 }
@@ -1642,11 +1669,11 @@ fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_lazy_cell_model_caches_its_initializer_result"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::LazyCell<i32, fn() -> i32> as RustStdType>::provenance()
     );
 }
@@ -1657,11 +1684,11 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_lazy_cell_model_caches_its_initializer_result"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::LazyLock<i32, fn() -> i32> as RustStdType>::provenance()
     );
 }
@@ -1671,11 +1698,11 @@ fn vec_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::vec::Drain<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::vec::Drain<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1687,11 +1714,11 @@ fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_proven
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::vec_deque::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -1703,11 +1730,11 @@ fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::linked_list::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -1719,11 +1746,11 @@ fn binary_heap_drain_witness_is_checked_and_still_carries_chain_derived_provenan
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_unordered_pair_model_yields_every_element_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::binary_heap::Drain<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1735,11 +1762,11 @@ fn binary_heap_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_unordered_pair_model_yields_every_element_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::binary_heap::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -1751,11 +1778,11 @@ fn binary_heap_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_unordered_pair_model_yields_every_element_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::binary_heap::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1767,11 +1794,11 @@ fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_into_iter_model_yields_owned_values_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::linked_list::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1783,11 +1810,11 @@ fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provena
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_iter_mut_model_writes_through_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::vec_deque::IterMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1800,11 +1827,11 @@ fn linked_list_iter_mut_witness_is_checked_and_still_carries_chain_derived_prove
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ordered_pair_iter_mut_model_writes_through_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::linked_list::IterMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1814,11 +1841,11 @@ fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<core::ffi::CStr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cstr_excludes_the_terminating_nul_from_to_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::ffi::CStr as RustStdType>::provenance()
     );
 }
@@ -1828,11 +1855,11 @@ fn ascii_escape_default_witness_is_checked_and_still_carries_chain_derived_prove
     let proof = <RustStdStandard<core::ascii::EscapeDefault> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_escape_default_model_escapes_a_control_byte"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::ascii::EscapeDefault as RustStdType>::provenance()
     );
 }
@@ -1842,11 +1869,11 @@ fn from_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::string::FromUtf8Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_from_utf8_error_model_recovers_the_original_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::string::FromUtf8Error as RustStdType>::provenance()
     );
 }
@@ -1856,11 +1883,11 @@ fn rc_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::rc::Weak<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::rc::Weak<i32> as RustStdType>::provenance()
     );
 }
@@ -1870,11 +1897,11 @@ fn sync_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::Weak<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::Weak<i32> as RustStdType>::provenance()
     );
 }
@@ -1884,11 +1911,11 @@ fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ref_model_derefs_to_the_borrowed_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::Ref<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1899,11 +1926,11 @@ fn ref_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::cell::RefMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ref_mut_model_derefs_and_writes_through_to_the_cell"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::cell::RefMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -1916,11 +1943,11 @@ fn decode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() 
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::DecodeUtf16<std::array::IntoIter<u16, 1>> as RustStdType>::provenance()
     );
 }
@@ -1930,11 +1957,11 @@ fn decode_utf16_error_witness_is_checked_and_still_carries_chain_derived_provena
     let proof = <RustStdStandard<std::char::DecodeUtf16Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::DecodeUtf16Error as RustStdType>::provenance()
     );
 }
@@ -1944,11 +1971,11 @@ fn to_lowercase_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::char::ToLowercase> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_to_lowercase_model_maps_an_uppercase_ascii_letter"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::ToLowercase as RustStdType>::provenance()
     );
 }
@@ -1958,11 +1985,11 @@ fn to_uppercase_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::char::ToUppercase> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_to_uppercase_model_maps_a_lowercase_ascii_letter"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::ToUppercase as RustStdType>::provenance()
     );
 }
@@ -1972,11 +1999,11 @@ fn escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::char::EscapeDebug> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_char_escape_debug_model_escapes_a_newline"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::EscapeDebug as RustStdType>::provenance()
     );
 }
@@ -1986,11 +2013,11 @@ fn escape_default_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::char::EscapeDefault> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_char_escape_default_model_escapes_a_newline"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::EscapeDefault as RustStdType>::provenance()
     );
 }
@@ -2000,11 +2027,11 @@ fn escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::char::EscapeUnicode> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_char_escape_unicode_model_renders_the_codepoint_escape"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::char::EscapeUnicode as RustStdType>::provenance()
     );
 }
@@ -2015,11 +2042,11 @@ fn slice_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::slice::Chunks<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunks_model_yields_non_overlapping_groups_with_a_short_last_chunk"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::Chunks<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2030,11 +2057,11 @@ fn slice_chunks_exact_witness_is_checked_and_still_carries_chain_derived_provena
         <RustStdStandard<std::slice::ChunksExact<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunks_exact_model_discards_a_short_remainder"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::ChunksExact<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2045,11 +2072,11 @@ fn slice_chunks_mut_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::slice::ChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunks_mut_model_writes_through_every_chunk"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::ChunksMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2061,11 +2088,11 @@ fn slice_chunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_pro
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunks_exact_mut_model_leaves_the_remainder_untouched"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::ChunksExactMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2075,9 +2102,9 @@ fn slice_rchunks_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof =
         <RustStdStandard<std::slice::RChunks<'static, i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_rchunks_model_groups_from_the_back");
+    assert_eq!(proof.harness(), "verify_rchunks_model_groups_from_the_back");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RChunks<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2089,11 +2116,11 @@ fn slice_rchunks_exact_witness_is_checked_and_still_carries_chain_derived_proven
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rchunks_exact_model_discards_a_short_remainder_at_the_front"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RChunksExact<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2105,11 +2132,11 @@ fn slice_rchunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_pr
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rchunks_exact_mut_model_leaves_the_front_remainder_untouched"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RChunksExactMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2120,11 +2147,11 @@ fn slice_rchunks_mut_witness_is_checked_and_still_carries_chain_derived_provenan
         <RustStdStandard<std::slice::RChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rchunks_mut_model_writes_through_every_chunk"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RChunksMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2135,11 +2162,11 @@ fn slice_windows_witness_is_checked_and_still_carries_chain_derived_provenance()
         <RustStdStandard<std::slice::Windows<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_windows_model_yields_overlapping_slices"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::Windows<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -2152,11 +2179,11 @@ fn slice_chunk_by_witness_is_checked_and_still_carries_chain_derived_provenance(
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2168,11 +2195,11 @@ fn slice_chunk_by_mut_witness_is_checked_and_still_carries_chain_derived_provena
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2184,11 +2211,11 @@ fn slice_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_model_yields_subslices_between_matches"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::Split<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2201,11 +2228,11 @@ fn slice_split_mut_witness_is_checked_and_still_carries_chain_derived_provenance
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_mut_model_writes_through_the_first_piece"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::SplitMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2218,11 +2245,11 @@ fn slice_split_inclusive_witness_is_checked_and_still_carries_chain_derived_prov
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_inclusive_model_keeps_the_match_at_the_end_of_each_piece"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2234,11 +2261,11 @@ fn slice_split_inclusive_mut_witness_is_checked_and_still_carries_chain_derived_
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::SplitInclusiveMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance(
         )
     );
@@ -2251,11 +2278,11 @@ fn slice_split_n_witness_is_checked_and_still_carries_chain_derived_provenance()
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_n_model_caps_the_number_of_pieces"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::SplitN<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2268,11 +2295,11 @@ fn slice_split_n_mut_witness_is_checked_and_still_carries_chain_derived_provenan
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_n_model_caps_the_number_of_pieces"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::SplitNMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2284,11 +2311,11 @@ fn slice_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() 
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rsplit_model_yields_subslices_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RSplit<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2301,11 +2328,11 @@ fn slice_rsplit_mut_witness_is_checked_and_still_carries_chain_derived_provenanc
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rsplit_mut_model_writes_through_the_rearmost_piece"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RSplitMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2317,11 +2344,11 @@ fn slice_rsplit_n_witness_is_checked_and_still_carries_chain_derived_provenance(
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RSplitN<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2334,11 +2361,11 @@ fn slice_rsplit_n_mut_witness_is_checked_and_still_carries_chain_derived_provena
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::RSplitNMut<'static, i32, fn(&i32) -> bool> as RustStdType>::provenance()
     );
 }
@@ -2349,11 +2376,11 @@ fn slice_escape_ascii_witness_is_checked_and_still_carries_chain_derived_provena
         <RustStdStandard<std::slice::EscapeAscii<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_escape_ascii_model_leaves_printable_bytes_unescaped"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::EscapeAscii<'static> as RustStdType>::provenance()
     );
 }
@@ -2364,11 +2391,11 @@ fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_deriv
         <RustStdStandard<std::slice::GetDisjointMutError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::slice::GetDisjointMutError as RustStdType>::provenance()
     );
 }
@@ -2377,9 +2404,12 @@ fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_deriv
 fn str_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::str::Bytes<'static>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_bytes_model_yields_the_utf8_encoding");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_bytes_model_yields_the_utf8_encoding"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::str::Bytes<'static> as RustStdType>::provenance()
     );
 }
@@ -2390,11 +2420,11 @@ fn str_char_indices_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::str::CharIndices<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_char_indices_model_pairs_each_char_with_its_byte_offset"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::CharIndices<'static> as RustStdType>::provenance()
     );
 }
@@ -2405,11 +2435,11 @@ fn str_encode_utf16_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::str::EncodeUtf16<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_encode_utf16_model_yields_utf16_code_units"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::EncodeUtf16<'static> as RustStdType>::provenance()
     );
 }
@@ -2420,11 +2450,11 @@ fn str_escape_debug_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::str::EscapeDebug<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_escape_debug_model_escapes_control_characters"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::EscapeDebug<'static> as RustStdType>::provenance()
     );
 }
@@ -2435,11 +2465,11 @@ fn str_escape_default_witness_is_checked_and_still_carries_chain_derived_provena
         <RustStdStandard<std::str::EscapeDefault<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_escape_default_model_escapes_control_characters"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::EscapeDefault<'static> as RustStdType>::provenance()
     );
 }
@@ -2450,11 +2480,11 @@ fn str_escape_unicode_witness_is_checked_and_still_carries_chain_derived_provena
         <RustStdStandard<std::str::EscapeUnicode<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_escape_unicode_model_renders_the_codepoint_escape"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::EscapeUnicode<'static> as RustStdType>::provenance()
     );
 }
@@ -2463,9 +2493,9 @@ fn str_escape_unicode_witness_is_checked_and_still_carries_chain_derived_provena
 fn str_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::str::Lines<'static>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_lines_model_splits_on_line_endings");
+    assert_eq!(proof.harness(), "verify_lines_model_splits_on_line_endings");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Lines<'static> as RustStdType>::provenance()
     );
 }
@@ -2475,11 +2505,11 @@ fn str_lines_any_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<LinesAnyStatic> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_lines_any_model_splits_on_any_line_ending"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <LinesAnyStatic as RustStdType>::provenance()
     );
 }
@@ -2491,11 +2521,11 @@ fn str_split_ascii_whitespace_witness_is_checked_and_still_carries_chain_derived
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_ascii_whitespace_model_collapses_runs_of_whitespace"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::SplitAsciiWhitespace<'static> as RustStdType>::provenance()
     );
 }
@@ -2506,11 +2536,11 @@ fn str_split_whitespace_witness_is_checked_and_still_carries_chain_derived_prove
         <RustStdStandard<std::str::SplitWhitespace<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_whitespace_model_collapses_runs_of_whitespace"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::SplitWhitespace<'static> as RustStdType>::provenance()
     );
 }
@@ -2520,11 +2550,11 @@ fn str_utf8_chunks_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::str::Utf8Chunks<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_utf8_chunks_model_yields_one_chunk_for_wholly_valid_input"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Utf8Chunks<'static> as RustStdType>::provenance()
     );
 }
@@ -2534,11 +2564,11 @@ fn str_utf8_chunk_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::str::Utf8Chunk<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_utf8_chunk_model_separates_the_valid_prefix_from_invalid_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Utf8Chunk<'static> as RustStdType>::provenance()
     );
 }
@@ -2548,11 +2578,11 @@ fn str_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::str::Utf8Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_utf8_error_model_reports_the_valid_prefix_length_and_error_span"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Utf8Error as RustStdType>::provenance()
     );
 }
@@ -2563,11 +2593,11 @@ fn str_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::str::Split<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_split_model_yields_substrings_between_pattern_matches"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Split<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2578,11 +2608,11 @@ fn str_splitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::str::SplitN<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_splitn_model_limits_to_n_substrings"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::SplitN<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2594,11 +2624,11 @@ fn str_split_inclusive_witness_is_checked_and_still_carries_chain_derived_proven
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_split_inclusive_model_keeps_the_delimiter_attached"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::SplitInclusive<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2609,11 +2639,11 @@ fn str_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::str::RSplit<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_rsplit_model_yields_substrings_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::RSplit<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2624,11 +2654,11 @@ fn str_rsplitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::str::RSplitN<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::RSplitN<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2640,11 +2670,11 @@ fn str_split_terminator_witness_is_checked_and_still_carries_chain_derived_prove
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::SplitTerminator<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2656,11 +2686,11 @@ fn str_rsplit_terminator_witness_is_checked_and_still_carries_chain_derived_prov
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::RSplitTerminator<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2671,11 +2701,11 @@ fn str_matches_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::str::Matches<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_matches_model_yields_every_non_overlapping_occurrence"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::Matches<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2686,11 +2716,11 @@ fn str_rmatches_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::str::RMatches<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_matches_model_yields_every_non_overlapping_occurrence"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::RMatches<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2701,11 +2731,11 @@ fn str_match_indices_witness_is_checked_and_still_carries_chain_derived_provenan
         <RustStdStandard<std::str::MatchIndices<'static, char>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::MatchIndices<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2717,11 +2747,11 @@ fn str_rmatch_indices_witness_is_checked_and_still_carries_chain_derived_provena
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::str::RMatchIndices<'static, char> as RustStdType>::provenance()
     );
 }
@@ -2780,11 +2810,11 @@ fn buf_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::io::BufReader<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_buf_reader_model_reads_the_underlying_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::BufReader<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -2794,11 +2824,11 @@ fn buf_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::BufWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_buf_writer_model_flushes_to_the_underlying_writer"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::BufWriter<Vec<u8>> as RustStdType>::provenance()
     );
 }
@@ -2808,11 +2838,11 @@ fn io_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Bytes<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_bytes_model_yields_one_byte_at_a_time"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Bytes<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -2825,11 +2855,11 @@ fn into_inner_error_witness_is_checked_and_still_carries_chain_derived_provenanc
         >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_into_inner_error_model_recovers_the_writer_and_the_flush_error"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>> as RustStdType>::provenance()
     );
 }
@@ -2839,11 +2869,11 @@ fn line_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::LineWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_line_writer_model_flushes_on_a_newline_but_not_before_one"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::LineWriter<Vec<u8>> as RustStdType>::provenance()
     );
 }
@@ -2853,11 +2883,11 @@ fn io_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Lines<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_lines_model_splits_on_newlines_and_drops_the_terminator"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Lines<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -2867,11 +2897,11 @@ fn pipe_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::PipeReader> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_pipe_model_delivers_written_bytes_to_the_paired_reader"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::PipeReader as RustStdType>::provenance()
     );
 }
@@ -2881,11 +2911,11 @@ fn pipe_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::PipeWriter> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_pipe_model_delivers_written_bytes_to_the_paired_reader"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::PipeWriter as RustStdType>::provenance()
     );
 }
@@ -2895,11 +2925,11 @@ fn io_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Split<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_model_segments_on_the_given_byte_and_drops_it"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Split<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -2909,11 +2939,11 @@ fn writer_panicked_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::io::WriterPanicked> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_writer_panicked_model_recovers_the_buffered_data"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::WriterPanicked as RustStdType>::provenance()
     );
 }
@@ -2922,9 +2952,12 @@ fn writer_panicked_witness_is_checked_and_still_carries_chain_derived_provenance
 fn io_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Empty> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_empty_model_read_reports_end_of_file");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_empty_model_read_reports_end_of_file"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::io::Empty as RustStdType>::provenance()
     );
 }
@@ -2934,11 +2967,11 @@ fn io_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Repeat> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_repeat_model_fills_the_buffer_with_the_given_byte"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Repeat as RustStdType>::provenance()
     );
 }
@@ -2948,11 +2981,11 @@ fn io_sink_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Sink> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_sink_model_write_reports_full_length_and_discards_content"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Sink as RustStdType>::provenance()
     );
 }
@@ -2962,11 +2995,11 @@ fn seek_from_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::SeekFrom> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_seek_from_model_round_trips_each_variants_offset"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::SeekFrom as RustStdType>::provenance()
     );
 }
@@ -2978,11 +3011,11 @@ fn io_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_chain_model_reads_the_first_source_then_the_second"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Chain<&'static [u8], &'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -2993,11 +3026,11 @@ fn io_cursor_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::io::Cursor<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_cursor_model_read_advances_position_and_seek_repositions_it"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Cursor<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -3007,11 +3040,11 @@ fn io_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_error_model_from_error_kind_preserves_the_kind"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Error as RustStdType>::provenance()
     );
 }
@@ -3021,11 +3054,11 @@ fn io_slice_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::IoSlice<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_io_slice_model_derefs_to_the_wrapped_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::IoSlice<'static> as RustStdType>::provenance()
     );
 }
@@ -3035,11 +3068,11 @@ fn io_slice_mut_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::io::IoSliceMut<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::IoSliceMut<'static> as RustStdType>::provenance()
     );
 }
@@ -3049,11 +3082,11 @@ fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::io::Take<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_take_model_caps_reads_at_the_remaining_limit"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::io::Take<&'static [u8]> as RustStdType>::provenance()
     );
 }
@@ -3062,9 +3095,9 @@ fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_bool_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicBool> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_bool_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_bool_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicBool as RustStdType>::provenance()
     );
 }
@@ -3073,9 +3106,9 @@ fn atomic_bool_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_i8_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicI8> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_i8_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_i8_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicI8 as RustStdType>::provenance()
     );
 }
@@ -3084,9 +3117,9 @@ fn atomic_i8_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicI16> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_i16_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_i16_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicI16 as RustStdType>::provenance()
     );
 }
@@ -3095,9 +3128,9 @@ fn atomic_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicI32> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_i32_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_i32_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicI32 as RustStdType>::provenance()
     );
 }
@@ -3106,9 +3139,9 @@ fn atomic_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_i64_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicI64> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_i64_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_i64_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicI64 as RustStdType>::provenance()
     );
 }
@@ -3118,9 +3151,9 @@ fn atomic_isize_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof =
         <RustStdStandard<std::sync::atomic::AtomicIsize> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_isize_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_isize_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicIsize as RustStdType>::provenance()
     );
 }
@@ -3129,9 +3162,9 @@ fn atomic_isize_witness_is_checked_and_still_carries_chain_derived_provenance() 
 fn atomic_u8_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicU8> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_u8_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_u8_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicU8 as RustStdType>::provenance()
     );
 }
@@ -3140,9 +3173,9 @@ fn atomic_u8_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_u16_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicU16> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_u16_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_u16_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicU16 as RustStdType>::provenance()
     );
 }
@@ -3151,9 +3184,9 @@ fn atomic_u16_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_u32_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicU32> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_u32_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_u32_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicU32 as RustStdType>::provenance()
     );
 }
@@ -3162,9 +3195,9 @@ fn atomic_u32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn atomic_u64_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::atomic::AtomicU64> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_u64_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_u64_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicU64 as RustStdType>::provenance()
     );
 }
@@ -3174,9 +3207,9 @@ fn atomic_usize_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof =
         <RustStdStandard<std::sync::atomic::AtomicUsize> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_atomic_usize_model_load_store");
+    assert_eq!(proof.harness(), "verify_atomic_usize_model_load_store");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicUsize as RustStdType>::provenance()
     );
 }
@@ -3187,11 +3220,11 @@ fn atomic_ptr_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_atomic_ptr_model_load_store_swap_and_compare_exchange"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::AtomicPtr<i32> as RustStdType>::provenance()
     );
 }
@@ -3201,11 +3234,11 @@ fn atomic_ordering_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::sync::atomic::Ordering> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_atomic_ordering_model_relaxed_store_is_observable"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::atomic::Ordering as RustStdType>::provenance()
     );
 }
@@ -3223,11 +3256,11 @@ fn process_child_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<std::process::Child> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_child_model_has_a_process_id_and_can_be_waited_on"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::Child as RustStdType>::provenance()
     );
 }
@@ -3237,11 +3270,11 @@ fn child_stderr_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::process::ChildStderr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::ChildStderr as RustStdType>::provenance()
     );
 }
@@ -3251,11 +3284,11 @@ fn child_stdin_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::process::ChildStdin> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_child_stdin_model_is_readable_by_the_child_process"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::ChildStdin as RustStdType>::provenance()
     );
 }
@@ -3265,11 +3298,11 @@ fn child_stdout_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::process::ChildStdout> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::ChildStdout as RustStdType>::provenance()
     );
 }
@@ -3279,11 +3312,11 @@ fn process_command_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<std::process::Command> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_command_model_env_override_is_visible_to_the_spawned_process"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::Command as RustStdType>::provenance()
     );
 }
@@ -3294,11 +3327,11 @@ fn command_args_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::process::CommandArgs<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_command_args_model_reports_the_configured_arguments"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::CommandArgs<'static> as RustStdType>::provenance()
     );
 }
@@ -3309,11 +3342,11 @@ fn command_envs_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::process::CommandEnvs<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_command_envs_model_reports_the_configured_overrides"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::CommandEnvs<'static> as RustStdType>::provenance()
     );
 }
@@ -3323,11 +3356,11 @@ fn exit_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::process::ExitStatus> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_exit_status_model_reports_a_nonzero_exit_code"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::ExitStatus as RustStdType>::provenance()
     );
 }
@@ -3337,11 +3370,11 @@ fn process_output_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::process::Output> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_output_model_captures_stdout_and_the_exit_status"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::Output as RustStdType>::provenance()
     );
 }
@@ -3351,11 +3384,11 @@ fn stdio_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::process::Stdio> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_stdio_model_null_discards_the_childs_output_handle"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::process::Stdio as RustStdType>::provenance()
     );
 }
@@ -3365,11 +3398,11 @@ fn ancestors_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::path::Ancestors<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ancestors_model_yields_self_then_each_parent_up_to_root"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Ancestors<'static> as RustStdType>::provenance()
     );
 }
@@ -3379,11 +3412,11 @@ fn path_component_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::path::Component<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_component_model_distinguishes_root_from_normal_segments"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Component<'static> as RustStdType>::provenance()
     );
 }
@@ -3394,11 +3427,11 @@ fn path_components_witness_is_checked_and_still_carries_chain_derived_provenance
         <RustStdStandard<std::path::Components<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_components_model_yields_root_then_named_segments_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Components<'static> as RustStdType>::provenance()
     );
 }
@@ -3407,9 +3440,12 @@ fn path_components_witness_is_checked_and_still_carries_chain_derived_provenance
 fn path_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::path::Iter<'static>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_iter_model_yields_the_named_segments");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_iter_model_yields_the_named_segments"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::path::Iter<'static> as RustStdType>::provenance()
     );
 }
@@ -3419,11 +3455,11 @@ fn path_display_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::path::Display<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_display_model_renders_a_valid_utf8_path_verbatim"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Display<'static> as RustStdType>::provenance()
     );
 }
@@ -3433,11 +3469,11 @@ fn path_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::path::Path> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_path_model_derives_extension_file_name_and_parent"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Path as RustStdType>::provenance()
     );
 }
@@ -3447,11 +3483,11 @@ fn path_buf_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::path::PathBuf> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_path_buf_model_push_pop_and_join_build_the_expected_path"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::PathBuf as RustStdType>::provenance()
     );
 }
@@ -3461,11 +3497,11 @@ fn prefix_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::path::Prefix<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_prefix_model_disk_identifies_the_drive_letter"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::Prefix<'static> as RustStdType>::provenance()
     );
 }
@@ -3476,11 +3512,11 @@ fn prefix_component_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::path::PrefixComponent<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_prefix_component_model_pairs_raw_text_with_parsed_prefix"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::PrefixComponent<'static> as RustStdType>::provenance()
     );
 }
@@ -3490,11 +3526,11 @@ fn strip_prefix_error_witness_is_checked_and_still_carries_chain_derived_provena
     let proof = <RustStdStandard<std::path::StripPrefixError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_strip_prefix_error_model_reports_a_non_matching_prefix"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::path::StripPrefixError as RustStdType>::provenance()
     );
 }
@@ -3504,11 +3540,11 @@ fn dir_builder_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::DirBuilder> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_dir_builder_model_creates_nested_directories_recursively"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::DirBuilder as RustStdType>::provenance()
     );
 }
@@ -3518,11 +3554,11 @@ fn dir_entry_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::DirEntry> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_dir_entry_model_reports_the_created_files_name_and_path"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::DirEntry as RustStdType>::provenance()
     );
 }
@@ -3532,11 +3568,11 @@ fn read_dir_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::ReadDir> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_read_dir_model_iterates_every_entry_in_the_directory"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::ReadDir as RustStdType>::provenance()
     );
 }
@@ -3546,11 +3582,11 @@ fn fs_file_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::File> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_file_model_write_then_read_round_trips_the_bytes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::File as RustStdType>::provenance()
     );
 }
@@ -3560,11 +3596,11 @@ fn file_times_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::FileTimes> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_file_times_model_sets_the_recorded_modification_time"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::FileTimes as RustStdType>::provenance()
     );
 }
@@ -3574,11 +3610,11 @@ fn fs_metadata_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::Metadata> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_metadata_model_reports_the_written_length"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::Metadata as RustStdType>::provenance()
     );
 }
@@ -3588,11 +3624,11 @@ fn file_type_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::fs::FileType> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_file_type_model_distinguishes_files_from_directories"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::FileType as RustStdType>::provenance()
     );
 }
@@ -3602,11 +3638,11 @@ fn open_options_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::fs::OpenOptions> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_open_options_model_create_new_rejects_an_existing_file"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::OpenOptions as RustStdType>::provenance()
     );
 }
@@ -3616,11 +3652,11 @@ fn fs_permissions_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::fs::Permissions> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_permissions_model_readonly_round_trips_through_set_permissions"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::Permissions as RustStdType>::provenance()
     );
 }
@@ -3630,11 +3666,11 @@ fn fs_try_lock_error_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<std::fs::TryLockError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_lock_error_model_reports_a_lock_already_held"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::fs::TryLockError as RustStdType>::provenance()
     );
 }
@@ -3688,11 +3724,11 @@ fn local_key_witness_is_checked_and_still_carries_chain_derived_provenance() {
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_local_key_model_with_reads_the_initialized_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::thread::LocalKey<std::cell::Cell<i32>> as RustStdType>::provenance()
     );
 }
@@ -3702,11 +3738,11 @@ fn thread_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::thread::Thread> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_thread_current_model_is_stable_across_repeated_calls"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::thread::Thread as RustStdType>::provenance()
     );
 }
@@ -3716,11 +3752,11 @@ fn thread_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::thread::ThreadId> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_thread_current_model_is_stable_across_repeated_calls"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::thread::ThreadId as RustStdType>::provenance()
     );
 }
@@ -3754,11 +3790,11 @@ fn env_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::env::Args> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_args_model_reports_at_least_the_program_path"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::env::Args as RustStdType>::provenance()
     );
 }
@@ -3768,11 +3804,11 @@ fn env_args_os_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::env::ArgsOs> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_args_model_reports_at_least_the_program_path"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::env::ArgsOs as RustStdType>::provenance()
     );
 }
@@ -3782,11 +3818,11 @@ fn join_paths_error_witness_is_checked_and_still_carries_chain_derived_provenanc
     let proof = <RustStdStandard<std::env::JoinPathsError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_join_paths_error_model_reports_an_unjoinable_path"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::env::JoinPathsError as RustStdType>::provenance()
     );
 }
@@ -3796,11 +3832,11 @@ fn split_paths_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::env::SplitPaths<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_split_paths_model_recovers_paths_joined_by_join_paths"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::env::SplitPaths<'static> as RustStdType>::provenance()
     );
 }
@@ -3810,11 +3846,11 @@ fn mpsc_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::mpsc::Sender<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_channel_model_delivers_to_the_paired_receiver"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::Sender<i32> as RustStdType>::provenance()
     );
 }
@@ -3825,11 +3861,11 @@ fn mpsc_sync_sender_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::sync::mpsc::SyncSender<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_channel_model_delivers_to_the_paired_receiver"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::SyncSender<i32> as RustStdType>::provenance()
     );
 }
@@ -3840,11 +3876,11 @@ fn mpsc_receiver_witness_is_checked_and_still_carries_chain_derived_provenance()
         <RustStdStandard<std::sync::mpsc::Receiver<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_receiver_model_fails_once_every_sender_is_dropped"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::Receiver<i32> as RustStdType>::provenance()
     );
 }
@@ -3855,11 +3891,11 @@ fn mpsc_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_channel_iter_model_yields_sent_values_then_stops"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -3870,11 +3906,11 @@ fn mpsc_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_channel_iter_model_yields_sent_values_then_stops"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -3886,11 +3922,11 @@ fn mpsc_try_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_try_iter_model_does_not_block_on_an_empty_open_channel"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::mpsc::TryIter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -3900,11 +3936,11 @@ fn sync_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::Once> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_once_model_runs_its_closure_exactly_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::Once as RustStdType>::provenance()
     );
 }
@@ -3914,11 +3950,11 @@ fn once_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::OnceState> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_once_state_model_reports_not_poisoned_on_a_clean_run"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::OnceState as RustStdType>::provenance()
     );
 }
@@ -3928,11 +3964,11 @@ fn once_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::OnceLock<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_once_lock_model_initializes_exactly_once"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::OnceLock<i32> as RustStdType>::provenance()
     );
 }
@@ -3942,11 +3978,11 @@ fn barrier_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::sync::Barrier> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_barrier_model_of_one_is_its_own_leader"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::Barrier as RustStdType>::provenance()
     );
 }
@@ -3956,11 +3992,11 @@ fn barrier_wait_result_witness_is_checked_and_still_carries_chain_derived_proven
     let proof = <RustStdStandard<std::sync::BarrierWaitResult> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_barrier_model_of_one_is_its_own_leader"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::BarrierWaitResult as RustStdType>::provenance()
     );
 }
@@ -3970,11 +4006,11 @@ fn wait_timeout_result_witness_is_checked_and_still_carries_chain_derived_proven
     let proof = <RustStdStandard<std::sync::WaitTimeoutResult> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_wait_timeout_result_model_reports_timed_out"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::sync::WaitTimeoutResult as RustStdType>::provenance()
     );
 }
@@ -3984,11 +4020,11 @@ fn incoming_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::Incoming<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_incoming_model_yields_an_already_queued_connection"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::Incoming<'static> as RustStdType>::provenance()
     );
 }
@@ -3998,11 +4034,11 @@ fn shutdown_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::Shutdown> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_shutdown_model_write_prevents_further_writes"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::Shutdown as RustStdType>::provenance()
     );
 }
@@ -4012,11 +4048,11 @@ fn tcp_listener_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::net::TcpListener> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_tcp_listener_model_accepts_a_connecting_stream"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::TcpListener as RustStdType>::provenance()
     );
 }
@@ -4026,11 +4062,11 @@ fn tcp_stream_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::TcpStream> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::TcpStream as RustStdType>::provenance()
     );
 }
@@ -4040,11 +4076,11 @@ fn udp_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::net::UdpSocket> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::net::UdpSocket as RustStdType>::provenance()
     );
 }
@@ -4070,11 +4106,11 @@ fn task_context_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::task::Context<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_context_model_from_waker_exposes_the_same_waker"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::task::Context<'static> as RustStdType>::provenance()
     );
 }
@@ -4084,11 +4120,11 @@ fn poll_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::task::Poll<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_poll_model_ready_and_pending_are_disjoint"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::task::Poll<i32> as RustStdType>::provenance()
     );
 }
@@ -4098,11 +4134,11 @@ fn waker_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::task::Waker> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_waker_model_wake_by_ref_invokes_the_wake_impl"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::task::Waker as RustStdType>::provenance()
     );
 }
@@ -4129,11 +4165,11 @@ fn assert_unwind_safe_witness_is_checked_and_still_carries_chain_derived_provena
         <RustStdStandard<std::panic::AssertUnwindSafe<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_assert_unwind_safe_model_derefs_transparently"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::panic::AssertUnwindSafe<i32> as RustStdType>::provenance()
     );
 }
@@ -4144,11 +4180,11 @@ fn panic_location_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<core::panic::Location<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_location_model_caller_reflects_the_immediate_call_site"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::panic::Location<'static> as RustStdType>::provenance()
     );
 }
@@ -4158,11 +4194,11 @@ fn range_to_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ops::RangeTo<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_range_to_model_contains_matches_bound"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ops::RangeTo<i32> as RustStdType>::provenance()
     );
 }
@@ -4171,9 +4207,12 @@ fn range_to_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ops::RangeFull> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_range_full_model_contains_everything");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_range_full_model_contains_everything"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::ops::RangeFull as RustStdType>::provenance()
     );
 }
@@ -4182,9 +4221,12 @@ fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
 fn bound_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ops::Bound<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_bound_model_round_trips_its_endpoint");
     assert_eq!(
-        proof.provenance,
+        proof.harness(),
+        "verify_bound_model_round_trips_its_endpoint"
+    );
+    assert_eq!(
+        *proof.provenance(),
         <std::ops::Bound<i32> as RustStdType>::provenance()
     );
 }
@@ -4195,11 +4237,11 @@ fn control_flow_witness_is_checked_and_still_carries_chain_derived_provenance() 
         <RustStdStandard<std::ops::ControlFlow<i32, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_control_flow_model_continue_and_break_are_disjoint"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ops::ControlFlow<i32, i32> as RustStdType>::provenance()
     );
 }
@@ -4217,11 +4259,11 @@ fn instant_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::time::Instant> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_instant_model_is_monotonically_nondecreasing"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::time::Instant as RustStdType>::provenance()
     );
 }
@@ -4231,11 +4273,11 @@ fn system_time_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::time::SystemTime> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_system_time_model_duration_since_computes_the_elapsed_span"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::time::SystemTime as RustStdType>::provenance()
     );
 }
@@ -4245,11 +4287,11 @@ fn system_time_error_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<std::time::SystemTimeError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_system_time_error_model_recovers_how_far_backward_it_went"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::time::SystemTimeError as RustStdType>::provenance()
     );
 }
@@ -4259,11 +4301,11 @@ fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::time::Duration> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_duration_model_new_normalizes_nanos_and_carries_into_secs"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::time::Duration as RustStdType>::provenance()
     );
 }
@@ -4273,11 +4315,11 @@ fn option_into_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
     let proof = <RustStdStandard<core::option::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_into_iter_model_yields_zero_or_one_owned_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::option::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -4287,11 +4329,11 @@ fn result_into_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
     let proof = <RustStdStandard<core::result::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_into_iter_model_yields_zero_or_one_owned_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::result::IntoIter<i32> as RustStdType>::provenance()
     );
 }
@@ -4302,11 +4344,11 @@ fn option_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<core::option::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_iter_model_yields_zero_or_one_reference"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::option::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -4317,11 +4359,11 @@ fn result_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<core::result::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_iter_model_yields_zero_or_one_reference"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::result::Iter<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -4331,9 +4373,9 @@ fn option_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof =
         <RustStdStandard<core::option::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_iter_mut_model_writes_through");
+    assert_eq!(proof.harness(), "verify_iter_mut_model_writes_through");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::option::IterMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -4343,9 +4385,9 @@ fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof =
         <RustStdStandard<core::result::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_iter_mut_model_writes_through");
+    assert_eq!(proof.harness(), "verify_iter_mut_model_writes_through");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <core::result::IterMut<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -4354,9 +4396,9 @@ fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
 fn pending_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::future::Pending<i32>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_pending_model_never_resolves");
+    assert_eq!(proof.harness(), "verify_pending_model_never_resolves");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::future::Pending<i32> as RustStdType>::provenance()
     );
 }
@@ -4366,11 +4408,11 @@ fn ready_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::future::Ready<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_ready_model_resolves_immediately_with_its_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::future::Ready<i32> as RustStdType>::provenance()
     );
 }
@@ -4382,11 +4424,11 @@ fn poll_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
     > as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_poll_fn_model_dispatches_through_to_its_closure"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>> as RustStdType>::provenance()
     );
 }
@@ -4403,32 +4445,35 @@ fn unit_witness_is_trusted_and_carries_chain_derived_provenance() {
 fn array_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<[i32; 3]> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_array_model_indexing_and_length");
-    assert_eq!(proof.provenance, <[i32; 3] as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_array_model_indexing_and_length");
+    assert_eq!(*proof.provenance(), <[i32; 3] as RustStdType>::provenance());
 }
 
 #[test]
 fn slice_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<[i32]> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_slice_model_indexing_and_length");
-    assert_eq!(proof.provenance, <[i32] as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_slice_model_indexing_and_length");
+    assert_eq!(*proof.provenance(), <[i32] as RustStdType>::provenance());
 }
 
 #[test]
 fn str_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<str> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_str_model_byte_length_and_content");
-    assert_eq!(proof.provenance, <str as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_str_model_byte_length_and_content");
+    assert_eq!(*proof.provenance(), <str as RustStdType>::provenance());
 }
 
 #[test]
 fn tuple_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<(i32, i32)> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "verify_tuple_model_field_access");
-    assert_eq!(proof.provenance, <(i32, i32) as RustStdType>::provenance());
+    assert_eq!(proof.harness(), "verify_tuple_model_field_access");
+    assert_eq!(
+        *proof.provenance(),
+        <(i32, i32) as RustStdType>::provenance()
+    );
 }
 
 #[test]
@@ -4436,11 +4481,11 @@ fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<fn(i32) -> i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_fn_pointer_model_calls_the_underlying_function"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <fn(i32) -> i32 as RustStdType>::provenance()
     );
 }
@@ -4450,10 +4495,13 @@ fn const_pointer_witness_is_checked_and_still_carries_chain_derived_provenance()
     let proof = <RustStdStandard<*const i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_const_pointer_model_cast_is_reproducible"
     );
-    assert_eq!(proof.provenance, <*const i32 as RustStdType>::provenance());
+    assert_eq!(
+        *proof.provenance(),
+        <*const i32 as RustStdType>::provenance()
+    );
 }
 
 #[test]
@@ -4461,10 +4509,10 @@ fn mut_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<*mut i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_mut_pointer_model_cast_is_reproducible"
     );
-    assert_eq!(proof.provenance, <*mut i32 as RustStdType>::provenance());
+    assert_eq!(*proof.provenance(), <*mut i32 as RustStdType>::provenance());
 }
 
 #[test]
@@ -4472,11 +4520,11 @@ fn shared_reference_witness_is_checked_and_still_carries_chain_derived_provenanc
     let proof = <RustStdStandard<&'static i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_shared_reference_model_dereferences_to_the_referent"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <&'static i32 as RustStdType>::provenance()
     );
 }
@@ -4486,11 +4534,11 @@ fn mutable_reference_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<&'static mut i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_mutable_reference_model_dereferences_to_and_updates_the_referent"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <&'static mut i32 as RustStdType>::provenance()
     );
 }
@@ -4500,11 +4548,11 @@ fn default_hasher_witness_is_checked_and_still_carries_chain_derived_provenance(
     let proof = <RustStdStandard<std::hash::DefaultHasher> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_default_hasher_model_is_deterministic_across_fresh_instances"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::hash::DefaultHasher as RustStdType>::provenance()
     );
 }
@@ -4514,11 +4562,11 @@ fn random_state_witness_is_checked_and_still_carries_chain_derived_provenance() 
     let proof = <RustStdStandard<std::hash::RandomState> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_random_state_model_gives_the_same_hasher_seed_across_calls"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::hash::RandomState as RustStdType>::provenance()
     );
 }
@@ -4528,11 +4576,11 @@ fn os_str_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ffi::OsStr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_os_str_model_valid_utf8_content_round_trips_through_to_str"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::OsStr as RustStdType>::provenance()
     );
 }
@@ -4542,11 +4590,11 @@ fn os_string_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ffi::OsString> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_os_string_model_push_appends_to_the_existing_content"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::OsString as RustStdType>::provenance()
     );
 }
@@ -4557,11 +4605,11 @@ fn os_str_display_witness_is_checked_and_still_carries_chain_derived_provenance(
         <RustStdStandard<std::ffi::os_str::Display<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_os_str_display_model_renders_valid_utf8_content_unchanged"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ffi::os_str::Display<'static> as RustStdType>::provenance()
     );
 }
@@ -4572,11 +4620,11 @@ fn hash_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::collections::HashMap<i32, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_hash_map_model_insert_then_get_recovers_the_value"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::HashMap<i32, i32> as RustStdType>::provenance()
     );
 }
@@ -4587,11 +4635,11 @@ fn hash_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
         <RustStdStandard<std::collections::HashSet<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_hash_set_model_insert_then_contains_reports_membership"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::HashSet<i32> as RustStdType>::provenance()
     );
 }
@@ -4601,11 +4649,11 @@ fn pin_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::pin::Pin<Box<i32>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_pin_model_derefs_and_get_mut_round_trip"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::pin::Pin<Box<i32>> as RustStdType>::provenance()
     );
 }
@@ -4615,11 +4663,11 @@ fn non_null_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::ptr::NonNull<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_non_null_model_rejects_the_null_pointer"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::ptr::NonNull<i32> as RustStdType>::provenance()
     );
 }
@@ -4629,11 +4677,11 @@ fn system_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::alloc::System> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_system_model_allocates_and_deallocates_a_layout"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::alloc::System as RustStdType>::provenance()
     );
 }
@@ -4643,11 +4691,11 @@ fn backtrace_witness_is_checked_and_still_carries_chain_derived_provenance() {
     let proof = <RustStdStandard<std::backtrace::Backtrace> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_backtrace_model_force_capture_always_actually_captures"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::backtrace::Backtrace as RustStdType>::provenance()
     );
 }
@@ -4658,11 +4706,11 @@ fn backtrace_status_witness_is_checked_and_still_carries_chain_derived_provenanc
         <RustStdStandard<std::backtrace::BacktraceStatus> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_backtrace_model_force_capture_always_actually_captures"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::backtrace::BacktraceStatus as RustStdType>::provenance()
     );
 }
@@ -4673,11 +4721,11 @@ fn panic_hook_info_witness_is_checked_and_still_carries_chain_derived_provenance
         <RustStdStandard<std::panic::PanicHookInfo<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_panic_hook_info_model_reports_the_panics_own_message"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::panic::PanicHookInfo<'static> as RustStdType>::provenance()
     );
 }
@@ -4689,11 +4737,11 @@ fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance
     >>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "verify_vec_deque_drain_model_removes_and_yields_in_order"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <std::collections::vec_deque::Drain<'static, i32> as RustStdType>::provenance()
     );
 }
@@ -4712,9 +4760,9 @@ fn encode_wide_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
     let proof = <RustStdStandard<EncodeWide<'static>> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "<EncodeWide<'_> as Iterator>::next");
+    assert_eq!(proof.harness(), "<EncodeWide<'_> as Iterator>::next");
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <EncodeWide<'static> as RustStdType>::provenance()
     );
 }
@@ -4727,11 +4775,11 @@ fn borrowed_handle_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<BorrowedHandle<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <BorrowedHandle<'static> as RustStdType>::provenance()
     );
 }
@@ -4744,11 +4792,11 @@ fn borrowed_socket_witness_is_checked_and_still_carries_chain_derived_provenance
     let proof = <RustStdStandard<BorrowedSocket<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <BorrowedSocket<'static> as RustStdType>::provenance()
     );
 }
@@ -4761,11 +4809,11 @@ fn handle_or_invalid_witness_is_checked_and_still_carries_chain_derived_provenan
     let proof = <RustStdStandard<HandleOrInvalid> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
-        proof.harness,
+        proof.harness(),
         "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from"
     );
     assert_eq!(
-        proof.provenance,
+        *proof.provenance(),
         <HandleOrInvalid as RustStdType>::provenance()
     );
 }
@@ -4777,8 +4825,14 @@ fn owned_handle_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
     let proof = <RustStdStandard<OwnedHandle> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "<OwnedHandle as AsRawHandle>::as_raw_handle");
-    assert_eq!(proof.provenance, <OwnedHandle as RustStdType>::provenance());
+    assert_eq!(
+        proof.harness(),
+        "<OwnedHandle as AsRawHandle>::as_raw_handle"
+    );
+    assert_eq!(
+        *proof.provenance(),
+        <OwnedHandle as RustStdType>::provenance()
+    );
 }
 
 #[cfg(windows)]
@@ -4788,8 +4842,14 @@ fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
     let proof = <RustStdStandard<OwnedSocket> as Witness<VerusVerifier>>::proof();
 
-    assert_eq!(proof.harness, "<OwnedSocket as AsRawSocket>::as_raw_socket");
-    assert_eq!(proof.provenance, <OwnedSocket as RustStdType>::provenance());
+    assert_eq!(
+        proof.harness(),
+        "<OwnedSocket as AsRawSocket>::as_raw_socket"
+    );
+    assert_eq!(
+        *proof.provenance(),
+        <OwnedSocket as RustStdType>::provenance()
+    );
 }
 
 #[test]

@@ -125,14 +125,14 @@ pub(crate) use {bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, ka
 /// Proof artifact for a carrier with a real, machine-checked Kani harness:
 /// names the harness, carries its verbatim source as `claim`, and still
 /// rests on the chain-derived provenance.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct CheckedProof {
     /// The Kani harness that checks this carrier's invariant.
-    pub harness: String,
+    harness: String,
     /// The harness's own source — what it actually asserts, verbatim.
-    pub claim: String,
+    claim: String,
     /// The chain-derived provenance this claim still rests on.
-    pub provenance: RustStdProvenance,
+    provenance: RustStdProvenance,
 }
 
 impl std::fmt::Display for CheckedProof {

@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<Cow<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),
-            claim: VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),
+            VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

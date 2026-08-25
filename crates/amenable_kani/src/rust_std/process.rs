@@ -28,11 +28,11 @@ impl KaniWitness for RustStdStandard<Child> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_child_has_a_process_id_and_can_be_waited_on".to_owned(),
-            claim: VERIFY_CHILD_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_child_has_a_process_id_and_can_be_waited_on".to_owned(),
+            VERIFY_CHILD_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -109,11 +109,11 @@ impl KaniWitness for RustStdStandard<ChildStderr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_child_stderr_captures_what_the_child_wrote_to_stderr".to_owned(),
-            claim: VERIFY_CHILD_STDERR_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_child_stderr_captures_what_the_child_wrote_to_stderr".to_owned(),
+            VERIFY_CHILD_STDERR_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -189,11 +189,11 @@ impl KaniWitness for RustStdStandard<ChildStdin> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_child_stdin_is_readable_by_the_child_process".to_owned(),
-            claim: VERIFY_CHILD_STDIN_IS_READABLE_BY_THE_CHILD_PROCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_child_stdin_is_readable_by_the_child_process".to_owned(),
+            VERIFY_CHILD_STDIN_IS_READABLE_BY_THE_CHILD_PROCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -268,11 +268,11 @@ impl KaniWitness for RustStdStandard<ChildStdout> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_child_stdout_captures_what_the_child_wrote_to_stdout".to_owned(),
-            claim: VERIFY_CHILD_STDOUT_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_child_stdout_captures_what_the_child_wrote_to_stdout".to_owned(),
+            VERIFY_CHILD_STDOUT_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -345,11 +345,11 @@ impl KaniWitness for RustStdStandard<Command> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_command_env_override_is_visible_to_the_spawned_process".to_owned(),
-            claim: VERIFY_COMMAND_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_command_env_override_is_visible_to_the_spawned_process".to_owned(),
+            VERIFY_COMMAND_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -429,11 +429,11 @@ impl KaniWitness for RustStdStandard<CommandArgs<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_command_args_reports_the_configured_arguments".to_owned(),
-            claim: VERIFY_COMMAND_ARGS_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_command_args_reports_the_configured_arguments".to_owned(),
+            VERIFY_COMMAND_ARGS_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -514,11 +514,11 @@ impl KaniWitness for RustStdStandard<CommandEnvs<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_command_envs_reports_the_configured_overrides".to_owned(),
-            claim: VERIFY_COMMAND_ENVS_REPORTS_THE_CONFIGURED_OVERRIDES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_command_envs_reports_the_configured_overrides".to_owned(),
+            VERIFY_COMMAND_ENVS_REPORTS_THE_CONFIGURED_OVERRIDES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -603,11 +603,11 @@ impl KaniWitness for RustStdStandard<ExitStatus> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_exit_status_reports_a_nonzero_exit_code".to_owned(),
-            claim: VERIFY_EXIT_STATUS_REPORTS_A_NONZERO_EXIT_CODE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_exit_status_reports_a_nonzero_exit_code".to_owned(),
+            VERIFY_EXIT_STATUS_REPORTS_A_NONZERO_EXIT_CODE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -684,11 +684,11 @@ impl KaniWitness for RustStdStandard<Output> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_output_captures_stdout_and_the_exit_status".to_owned(),
-            claim: VERIFY_OUTPUT_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_output_captures_stdout_and_the_exit_status".to_owned(),
+            VERIFY_OUTPUT_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -765,11 +765,11 @@ impl KaniWitness for RustStdStandard<Stdio> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_stdio_null_discards_the_childs_output_handle".to_owned(),
-            claim: VERIFY_STDIO_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_stdio_null_discards_the_childs_output_handle".to_owned(),
+            VERIFY_STDIO_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<Layout> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_layout_new_reports_the_types_size_and_alignment".to_owned(),
-            claim: VERIFY_LAYOUT_NEW_REPORTS_THE_TYPES_SIZE_AND_ALIGNMENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_layout_new_reports_the_types_size_and_alignment".to_owned(),
+            VERIFY_LAYOUT_NEW_REPORTS_THE_TYPES_SIZE_AND_ALIGNMENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -53,13 +53,11 @@ impl KaniWitness for RustStdStandard<LayoutError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
-                .to_owned(),
-            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),
+            VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

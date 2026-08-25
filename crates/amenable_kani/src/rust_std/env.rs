@@ -22,11 +22,11 @@ impl KaniWitness for RustStdStandard<Args> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_args_reports_at_least_the_program_path".to_owned(),
-            claim: VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_args_reports_at_least_the_program_path".to_owned(),
+            VERIFY_ARGS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -61,11 +61,11 @@ impl KaniWitness for RustStdStandard<ArgsOs> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_args_os_reports_at_least_the_program_path".to_owned(),
-            claim: VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_args_os_reports_at_least_the_program_path".to_owned(),
+            VERIFY_ARGS_OS_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -96,11 +96,11 @@ impl KaniWitness for RustStdStandard<JoinPathsError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_join_paths_error_reports_an_unjoinable_path".to_owned(),
-            claim: VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_join_paths_error_reports_an_unjoinable_path".to_owned(),
+            VERIFY_JOIN_PATHS_ERROR_REPORTS_AN_UNJOINABLE_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -135,11 +135,11 @@ impl KaniWitness for RustStdStandard<SplitPaths<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_paths_recovers_paths_joined_by_join_paths".to_owned(),
-            claim: VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_paths_recovers_paths_joined_by_join_paths".to_owned(),
+            VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -36,11 +36,11 @@ impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_mutex_excludes_a_second_lock_while_held".to_owned(),
-            claim: VERIFY_MUTEX_EXCLUDES_A_SECOND_LOCK_WHILE_HELD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_mutex_excludes_a_second_lock_while_held".to_owned(),
+            VERIFY_MUTEX_EXCLUDES_A_SECOND_LOCK_WHILE_HELD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -128,11 +128,11 @@ impl KaniWitness for RustStdStandard<std::sync::MutexGuard<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_mutex_guard_writes_through".to_owned(),
-            claim: VERIFY_MUTEX_GUARD_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_mutex_guard_writes_through".to_owned(),
+            VERIFY_MUTEX_GUARD_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -175,11 +175,11 @@ impl KaniWitness for RustStdStandard<std::sync::RwLock<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rwlock_allows_concurrent_reads_but_not_a_write".to_owned(),
-            claim: VERIFY_RWLOCK_ALLOWS_CONCURRENT_READS_BUT_NOT_A_WRITE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rwlock_allows_concurrent_reads_but_not_a_write".to_owned(),
+            VERIFY_RWLOCK_ALLOWS_CONCURRENT_READS_BUT_NOT_A_WRITE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -228,11 +228,11 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rwlock_read_guard_derefs_to_the_value".to_owned(),
-            claim: VERIFY_RWLOCK_READ_GUARD_DEREFS_TO_THE_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rwlock_read_guard_derefs_to_the_value".to_owned(),
+            VERIFY_RWLOCK_READ_GUARD_DEREFS_TO_THE_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -265,11 +265,11 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> 
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rwlock_write_guard_writes_through".to_owned(),
-            claim: VERIFY_RWLOCK_WRITE_GUARD_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rwlock_write_guard_writes_through".to_owned(),
+            VERIFY_RWLOCK_WRITE_GUARD_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -308,11 +308,11 @@ impl KaniWitness for RustStdStandard<std::sync::Once> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_once_runs_its_closure_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_once_runs_its_closure_exactly_once".to_owned(),
+            VERIFY_ONCE_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -356,11 +356,11 @@ impl KaniWitness for RustStdStandard<OnceState> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_once_state_reports_not_poisoned_on_a_clean_run".to_owned(),
-            claim: VERIFY_ONCE_STATE_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_once_state_reports_not_poisoned_on_a_clean_run".to_owned(),
+            VERIFY_ONCE_STATE_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -394,11 +394,11 @@ impl KaniWitness for RustStdStandard<OnceLock<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_once_lock_initializes_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_LOCK_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_once_lock_initializes_exactly_once".to_owned(),
+            VERIFY_ONCE_LOCK_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -441,11 +441,11 @@ impl KaniWitness for RustStdStandard<LazyLock<i32, fn() -> i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_lazy_lock_caches_its_initializer_result".to_owned(),
-            claim: VERIFY_LAZY_LOCK_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_lazy_lock_caches_its_initializer_result".to_owned(),
+            VERIFY_LAZY_LOCK_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -495,11 +495,11 @@ impl KaniWitness for RustStdStandard<Barrier> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_barrier_of_one_is_its_own_leader".to_owned(),
-            claim: VERIFY_BARRIER_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_barrier_of_one_is_its_own_leader".to_owned(),
+            VERIFY_BARRIER_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -577,11 +577,11 @@ impl KaniWitness for RustStdStandard<BarrierWaitResult> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_barrier_wait_result_reports_the_sole_participant_as_leader".to_owned(),
-            claim: VERIFY_BARRIER_WAIT_RESULT_REPORTS_THE_SOLE_PARTICIPANT_AS_LEADER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_barrier_wait_result_reports_the_sole_participant_as_leader".to_owned(),
+            VERIFY_BARRIER_WAIT_RESULT_REPORTS_THE_SOLE_PARTICIPANT_AS_LEADER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -636,11 +636,11 @@ impl KaniWitness for RustStdStandard<std::sync::Condvar> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_condvar_wait_timeout_reports_timing_out".to_owned(),
-            claim: VERIFY_CONDVAR_WAIT_TIMEOUT_REPORTS_TIMING_OUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_condvar_wait_timeout_reports_timing_out".to_owned(),
+            VERIFY_CONDVAR_WAIT_TIMEOUT_REPORTS_TIMING_OUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -718,11 +718,11 @@ impl KaniWitness for RustStdStandard<PoisonError<MutexGuard<'static, i32>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_poison_error_still_recovers_the_guards_value".to_owned(),
-            claim: VERIFY_POISON_ERROR_STILL_RECOVERS_THE_GUARDS_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_poison_error_still_recovers_the_guards_value".to_owned(),
+            VERIFY_POISON_ERROR_STILL_RECOVERS_THE_GUARDS_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -814,11 +814,11 @@ impl KaniWitness for RustStdStandard<std::sync::TryLockError<MutexGuard<'static,
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_lock_error_distinguishes_poisoned_from_would_block".to_owned(),
-            claim: VERIFY_TRY_LOCK_ERROR_DISTINGUISHES_POISONED_FROM_WOULD_BLOCK_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_lock_error_distinguishes_poisoned_from_would_block".to_owned(),
+            VERIFY_TRY_LOCK_ERROR_DISTINGUISHES_POISONED_FROM_WOULD_BLOCK_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -929,11 +929,11 @@ impl KaniWitness for RustStdStandard<WaitTimeoutResult> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_wait_timeout_result_reports_timed_out".to_owned(),
-            claim: VERIFY_WAIT_TIMEOUT_RESULT_REPORTS_TIMED_OUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_wait_timeout_result_reports_timed_out".to_owned(),
+            VERIFY_WAIT_TIMEOUT_RESULT_REPORTS_TIMED_OUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

@@ -139,14 +139,10 @@ fn derive_witness_supports_concrete_generic_enums_for_creusot() {
         WitnessSupportSummary::trivial_leaf()
     );
 
-    let CheckedProof {
-        harness,
-        claim,
-        provenance,
-    } = proof.variant_balanced.checked;
-    assert_eq!(harness, "verify_char_roundtrip");
-    assert_eq!(claim, VERIFY_CHAR_ROUNDTRIP_SRC);
-    assert_eq!(provenance, <char as RustStdType>::provenance());
+    let checked = proof.variant_balanced.checked;
+    assert_eq!(checked.harness(), "verify_char_roundtrip");
+    assert_eq!(checked.claim(), VERIFY_CHAR_ROUNDTRIP_SRC);
+    assert_eq!(*checked.provenance(), <char as RustStdType>::provenance());
     assert_eq!(
         proof.variant_balanced.trusted,
         <bool as RustStdType>::provenance()

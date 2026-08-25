@@ -64,6 +64,8 @@ dependencies = [
  "amenable_gaap",
  "amenable_std",
  "creusot-std",
+ "derive-getters",
+ "derive-new",
  "inventory",
 ]
 

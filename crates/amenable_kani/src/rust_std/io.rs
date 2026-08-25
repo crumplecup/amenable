@@ -45,11 +45,11 @@ impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_buf_reader_reads_the_underlying_bytes".to_owned(),
-            claim: VERIFY_BUF_READER_READS_THE_UNDERLYING_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_buf_reader_reads_the_underlying_bytes".to_owned(),
+            VERIFY_BUF_READER_READS_THE_UNDERLYING_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -130,11 +130,11 @@ impl KaniWitness for RustStdStandard<BufWriter<Vec<u8>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_buf_writer_flushes_to_the_underlying_writer".to_owned(),
-            claim: VERIFY_BUF_WRITER_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_buf_writer_flushes_to_the_underlying_writer".to_owned(),
+            VERIFY_BUF_WRITER_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -172,11 +172,11 @@ impl KaniWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_bytes_yields_one_byte_at_a_time".to_owned(),
-            claim: VERIFY_BYTES_YIELDS_ONE_BYTE_AT_A_TIME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_bytes_yields_one_byte_at_a_time".to_owned(),
+            VERIFY_BYTES_YIELDS_ONE_BYTE_AT_A_TIME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -209,11 +209,11 @@ impl KaniWitness for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_into_inner_error_recovers_the_writer_and_the_flush_error".to_owned(),
-            claim: VERIFY_INTO_INNER_ERROR_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_into_inner_error_recovers_the_writer_and_the_flush_error".to_owned(),
+            VERIFY_INTO_INNER_ERROR_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -296,11 +296,11 @@ impl KaniWitness for RustStdStandard<LineWriter<Vec<u8>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
-            claim: VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
+            VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -389,11 +389,11 @@ impl KaniWitness for ByteIsDistinctFromTheMarker {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
-            claim: VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
+            VERIFY_LINE_WRITER_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -445,11 +445,11 @@ impl KaniWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),
-            claim: VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),
+            VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -533,11 +533,11 @@ impl KaniWitness for RustStdStandard<PipeReader> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_pipe_reader_reads_what_the_paired_writer_wrote".to_owned(),
-            claim: VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_pipe_reader_reads_what_the_paired_writer_wrote".to_owned(),
+            VERIFY_PIPE_READER_READS_WHAT_THE_PAIRED_WRITER_WROTE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -587,11 +587,11 @@ impl KaniWitness for RustStdStandard<PipeWriter> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_pipe_writer_writes_arrive_at_the_paired_reader".to_owned(),
-            claim: VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_pipe_writer_writes_arrive_at_the_paired_reader".to_owned(),
+            VERIFY_PIPE_WRITER_WRITES_ARRIVE_AT_THE_PAIRED_READER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -643,11 +643,11 @@ impl KaniWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_segments_on_the_given_byte_and_drops_it".to_owned(),
-            claim: VERIFY_SPLIT_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_segments_on_the_given_byte_and_drops_it".to_owned(),
+            VERIFY_SPLIT_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -747,11 +747,11 @@ impl KaniWitness for RustStdStandard<WriterPanicked> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_writer_panicked_recovers_the_buffered_data".to_owned(),
-            claim: VERIFY_WRITER_PANICKED_RECOVERS_THE_BUFFERED_DATA_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_writer_panicked_recovers_the_buffered_data".to_owned(),
+            VERIFY_WRITER_PANICKED_RECOVERS_THE_BUFFERED_DATA_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -831,11 +831,11 @@ impl KaniWitness for RustStdStandard<std::io::Empty> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_empty_read_reports_end_of_file".to_owned(),
-            claim: VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_empty_read_reports_end_of_file".to_owned(),
+            VERIFY_EMPTY_READ_REPORTS_END_OF_FILE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -880,11 +880,11 @@ impl KaniWitness for RustStdStandard<std::io::Repeat> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_repeat_fills_the_buffer_with_the_given_byte".to_owned(),
-            claim: VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_repeat_fills_the_buffer_with_the_given_byte".to_owned(),
+            VERIFY_REPEAT_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -936,11 +936,11 @@ impl KaniWitness for RustStdStandard<SeekFrom> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_seek_from_round_trips_each_variants_offset".to_owned(),
-            claim: VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_seek_from_round_trips_each_variants_offset".to_owned(),
+            VERIFY_SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1009,11 +1009,11 @@ impl KaniWitness for RustStdStandard<std::io::Sink> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_sink_write_reports_full_length_and_discards_content".to_owned(),
-            claim: VERIFY_SINK_WRITE_REPORTS_FULL_LENGTH_AND_DISCARDS_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_sink_write_reports_full_length_and_discards_content".to_owned(),
+            VERIFY_SINK_WRITE_REPORTS_FULL_LENGTH_AND_DISCARDS_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1052,11 +1052,11 @@ impl KaniWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_chain_reads_the_first_source_then_the_second".to_owned(),
-            claim: VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_chain_reads_the_first_source_then_the_second".to_owned(),
+            VERIFY_CHAIN_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1127,11 +1127,11 @@ impl KaniWitness for RustStdStandard<Cursor<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cursor_read_advances_position_and_seek_repositions_it".to_owned(),
-            claim: VERIFY_CURSOR_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cursor_read_advances_position_and_seek_repositions_it".to_owned(),
+            VERIFY_CURSOR_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1192,11 +1192,11 @@ impl KaniWitness for RustStdStandard<std::io::Error> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_error_from_error_kind_preserves_the_kind".to_owned(),
-            claim: VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_error_from_error_kind_preserves_the_kind".to_owned(),
+            VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1246,11 +1246,11 @@ impl KaniWitness for RustStdStandard<IoSlice<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_io_slice_derefs_to_the_wrapped_bytes".to_owned(),
-            claim: VERIFY_IO_SLICE_DEREFS_TO_THE_WRAPPED_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_io_slice_derefs_to_the_wrapped_bytes".to_owned(),
+            VERIFY_IO_SLICE_DEREFS_TO_THE_WRAPPED_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1282,13 +1282,11 @@ impl KaniWitness for RustStdStandard<IoSliceMut<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes"
-                .to_owned(),
-            claim: VERIFY_IO_SLICE_MUT_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes".to_owned(),
+            VERIFY_IO_SLICE_MUT_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1330,11 +1328,11 @@ impl KaniWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_take_caps_reads_at_the_remaining_limit".to_owned(),
-            claim: VERIFY_TAKE_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_take_caps_reads_at_the_remaining_limit".to_owned(),
+            VERIFY_TAKE_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

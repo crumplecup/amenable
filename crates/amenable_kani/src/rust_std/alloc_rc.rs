@@ -42,11 +42,11 @@ impl KaniWitness for StrongCountTracksLiveReferences {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rc_strong_count_tracks_clones".to_owned(),
-            claim: VERIFY_RC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rc_strong_count_tracks_clones".to_owned(),
+            VERIFY_RC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -72,11 +72,11 @@ impl KaniWitness for RustStdStandard<Rc<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rc_strong_count_tracks_clones".to_owned(),
-            claim: VERIFY_RC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rc_strong_count_tracks_clones".to_owned(),
+            VERIFY_RC_STRONG_COUNT_TRACKS_CLONES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -182,11 +182,11 @@ impl KaniWitness for WeakUpgradeReturnsNone {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
-            claim: VERIFY_RC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            VERIFY_RC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -212,11 +212,11 @@ impl KaniWitness for RustStdStandard<std::rc::Weak<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
-            claim: VERIFY_RC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            VERIFY_RC_WEAK_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

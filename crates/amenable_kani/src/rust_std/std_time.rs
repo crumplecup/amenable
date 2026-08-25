@@ -21,11 +21,11 @@ impl KaniWitness for RustStdStandard<Instant> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_instant_is_monotonically_nondecreasing".to_owned(),
-            claim: VERIFY_INSTANT_IS_MONOTONICALLY_NONDECREASING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_instant_is_monotonically_nondecreasing".to_owned(),
+            VERIFY_INSTANT_IS_MONOTONICALLY_NONDECREASING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -107,11 +107,11 @@ impl KaniWitness for RustStdStandard<SystemTime> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_system_time_duration_since_computes_the_elapsed_span".to_owned(),
-            claim: VERIFY_SYSTEM_TIME_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_system_time_duration_since_computes_the_elapsed_span".to_owned(),
+            VERIFY_SYSTEM_TIME_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -146,11 +146,11 @@ impl KaniWitness for RustStdStandard<SystemTimeError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_system_time_error_recovers_how_far_backward_it_went".to_owned(),
-            claim: VERIFY_SYSTEM_TIME_ERROR_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_system_time_error_recovers_how_far_backward_it_went".to_owned(),
+            VERIFY_SYSTEM_TIME_ERROR_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

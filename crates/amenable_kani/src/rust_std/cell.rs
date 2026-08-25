@@ -23,11 +23,11 @@ impl KaniWitness for RustStdStandard<Cell<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
-            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -107,11 +107,11 @@ impl KaniWitness for RustStdStandard<Cell<u32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
-            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -132,11 +132,11 @@ impl KaniWitness for RustStdStandard<Cell<usize>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cell_get_set_replace_take_round_trip".to_owned(),
-            claim: VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cell_get_set_replace_take_round_trip".to_owned(),
+            VERIFY_CELL_GET_SET_REPLACE_TAKE_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -154,11 +154,11 @@ impl KaniWitness for RustStdStandard<RefCell<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ref_cell_dynamic_borrow_rules".to_owned(),
-            claim: VERIFY_REF_CELL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ref_cell_dynamic_borrow_rules".to_owned(),
+            VERIFY_REF_CELL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -228,11 +228,11 @@ impl KaniWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ref_derefs_to_the_borrowed_value".to_owned(),
-            claim: VERIFY_REF_DEREFS_TO_THE_BORROWED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ref_derefs_to_the_borrowed_value".to_owned(),
+            VERIFY_REF_DEREFS_TO_THE_BORROWED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -270,11 +270,11 @@ impl KaniWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ref_mut_derefs_and_writes_through_to_the_cell".to_owned(),
-            claim: VERIFY_REF_MUT_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ref_mut_derefs_and_writes_through_to_the_cell".to_owned(),
+            VERIFY_REF_MUT_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -362,11 +362,11 @@ impl<T> KaniWitness for GetterRecoversTheStoredReference<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_once_cell_initializes_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_once_cell_initializes_exactly_once".to_owned(),
+            VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -412,11 +412,11 @@ impl KaniWitness for RustStdStandard<OnceCell<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_once_cell_initializes_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_once_cell_initializes_exactly_once".to_owned(),
+            VERIFY_ONCE_CELL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -463,11 +463,11 @@ impl KaniWitness for RustStdStandard<UnsafeCell<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_unsafe_cell_get_mut_and_into_inner_round_trip".to_owned(),
-            claim: VERIFY_UNSAFE_CELL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_unsafe_cell_get_mut_and_into_inner_round_trip".to_owned(),
+            VERIFY_UNSAFE_CELL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -510,11 +510,11 @@ impl KaniWitness for RustStdStandard<LazyCell<i32, fn() -> i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_lazy_cell_caches_its_initializer_result".to_owned(),
-            claim: VERIFY_LAZY_CELL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_lazy_cell_caches_its_initializer_result".to_owned(),
+            VERIFY_LAZY_CELL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

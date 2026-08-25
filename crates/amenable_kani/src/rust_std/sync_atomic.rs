@@ -27,11 +27,11 @@ impl KaniWitness for RustStdStandard<AtomicBool> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_bool".to_owned(),
-            claim: VERIFY_ATOMIC_BOOL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_bool".to_owned(),
+            VERIFY_ATOMIC_BOOL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -133,11 +133,11 @@ impl<T> KaniWitness for AtomicLoadReflectsTheLastWrite<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_bool".to_owned(),
-            claim: VERIFY_ATOMIC_BOOL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_bool".to_owned(),
+            VERIFY_ATOMIC_BOOL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -183,11 +183,11 @@ impl KaniWitness for RustStdStandard<AtomicI8> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_i8".to_owned(),
-            claim: VERIFY_ATOMIC_I8_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_i8".to_owned(),
+            VERIFY_ATOMIC_I8_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -235,11 +235,11 @@ impl KaniWitness for RustStdStandard<AtomicI16> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_i16".to_owned(),
-            claim: VERIFY_ATOMIC_I16_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_i16".to_owned(),
+            VERIFY_ATOMIC_I16_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -287,11 +287,11 @@ impl KaniWitness for RustStdStandard<AtomicI32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_i32".to_owned(),
-            claim: VERIFY_ATOMIC_I32_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_i32".to_owned(),
+            VERIFY_ATOMIC_I32_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -339,11 +339,11 @@ impl KaniWitness for RustStdStandard<AtomicI64> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_i64".to_owned(),
-            claim: VERIFY_ATOMIC_I64_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_i64".to_owned(),
+            VERIFY_ATOMIC_I64_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -391,11 +391,11 @@ impl KaniWitness for RustStdStandard<AtomicIsize> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_isize".to_owned(),
-            claim: VERIFY_ATOMIC_ISIZE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_isize".to_owned(),
+            VERIFY_ATOMIC_ISIZE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -443,11 +443,11 @@ impl KaniWitness for RustStdStandard<AtomicU8> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_u8".to_owned(),
-            claim: VERIFY_ATOMIC_U8_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_u8".to_owned(),
+            VERIFY_ATOMIC_U8_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -495,11 +495,11 @@ impl KaniWitness for RustStdStandard<AtomicU16> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_u16".to_owned(),
-            claim: VERIFY_ATOMIC_U16_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_u16".to_owned(),
+            VERIFY_ATOMIC_U16_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -547,11 +547,11 @@ impl KaniWitness for RustStdStandard<AtomicU32> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_u32".to_owned(),
-            claim: VERIFY_ATOMIC_U32_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_u32".to_owned(),
+            VERIFY_ATOMIC_U32_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -599,11 +599,11 @@ impl KaniWitness for RustStdStandard<AtomicU64> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_u64".to_owned(),
-            claim: VERIFY_ATOMIC_U64_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_u64".to_owned(),
+            VERIFY_ATOMIC_U64_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -651,11 +651,11 @@ impl KaniWitness for RustStdStandard<AtomicUsize> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_usize".to_owned(),
-            claim: VERIFY_ATOMIC_USIZE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_usize".to_owned(),
+            VERIFY_ATOMIC_USIZE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -703,11 +703,11 @@ impl KaniWitness for RustStdStandard<AtomicPtr<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_atomic_ptr_load_store_swap_and_compare_exchange".to_owned(),
-            claim: VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_atomic_ptr_load_store_swap_and_compare_exchange".to_owned(),
+            VERIFY_ATOMIC_PTR_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -821,11 +821,11 @@ impl KaniWitness for RustStdStandard<std::sync::atomic::Ordering> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_relaxed_ordering_still_makes_a_store_observable".to_owned(),
-            claim: VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_relaxed_ordering_still_makes_a_store_observable".to_owned(),
+            VERIFY_RELAXED_ORDERING_STILL_MAKES_A_STORE_OBSERVABLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

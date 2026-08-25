@@ -69,11 +69,11 @@ impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_bytes_yields_the_utf8_encoding".to_owned(),
-            claim: VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_bytes_yields_the_utf8_encoding".to_owned(),
+            VERIFY_BYTES_YIELDS_THE_UTF8_ENCODING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -119,11 +119,11 @@ impl KaniWitness for RustStdStandard<CharIndices<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_char_indices_pairs_each_char_with_its_byte_offset".to_owned(),
-            claim: VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_char_indices_pairs_each_char_with_its_byte_offset".to_owned(),
+            VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -159,11 +159,11 @@ impl KaniWitness for RustStdStandard<Chars<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_chars_yields_the_str_characters".to_owned(),
-            claim: VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_chars_yields_the_str_characters".to_owned(),
+            VERIFY_CHARS_YIELDS_THE_STR_CHARACTERS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -213,11 +213,11 @@ impl KaniWitness for RustStdStandard<EncodeUtf16<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_encode_utf16_yields_utf16_code_units".to_owned(),
-            claim: VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_encode_utf16_yields_utf16_code_units".to_owned(),
+            VERIFY_ENCODE_UTF16_YIELDS_UTF16_CODE_UNITS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -257,11 +257,11 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDebug<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_escape_debug_escapes_control_characters".to_owned(),
-            claim: VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_escape_debug_escapes_control_characters".to_owned(),
+            VERIFY_ESCAPE_DEBUG_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -303,11 +303,11 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDefault<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_escape_default_escapes_control_characters".to_owned(),
-            claim: VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_escape_default_escapes_control_characters".to_owned(),
+            VERIFY_ESCAPE_DEFAULT_ESCAPES_CONTROL_CHARACTERS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -349,11 +349,11 @@ impl KaniWitness for RustStdStandard<std::str::EscapeUnicode<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_escape_unicode_renders_the_codepoint_escape".to_owned(),
-            claim: VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_escape_unicode_renders_the_codepoint_escape".to_owned(),
+            VERIFY_ESCAPE_UNICODE_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -395,11 +395,11 @@ impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_lines_splits_on_line_endings".to_owned(),
-            claim: VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_lines_splits_on_line_endings".to_owned(),
+            VERIFY_LINES_SPLITS_ON_LINE_ENDINGS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -482,11 +482,11 @@ impl<T> KaniWitness for CollectedSequenceMatchesExpected<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
-            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
+            VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -532,11 +532,11 @@ impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
-            claim: VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
+            VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -572,11 +572,11 @@ impl KaniWitness for RustStdStandard<SplitWhitespace<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_whitespace_collapses_runs_of_whitespace".to_owned(),
-            claim: VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_whitespace_collapses_runs_of_whitespace".to_owned(),
+            VERIFY_SPLIT_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -612,11 +612,11 @@ impl KaniWitness for RustStdStandard<Utf8Chunks<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input".to_owned(),
-            claim: VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input".to_owned(),
+            VERIFY_UTF8_CHUNKS_YIELDS_ONE_CHUNK_FOR_WHOLLY_VALID_INPUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -651,11 +651,11 @@ impl KaniWitness for RustStdStandard<Utf8Chunk<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
-            claim: VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
+            VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -690,11 +690,11 @@ impl KaniWitness for RustStdStandard<Utf8Error> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_utf8_error_reports_the_valid_prefix_length_and_error_span".to_owned(),
-            claim: VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_utf8_error_reports_the_valid_prefix_length_and_error_span".to_owned(),
+            VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -755,11 +755,11 @@ impl KaniWitness for RustStdStandard<LinesAnyStatic> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_lines_any_splits_on_any_line_ending".to_owned(),
-            claim: VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_lines_any_splits_on_any_line_ending".to_owned(),
+            VERIFY_LINES_ANY_SPLITS_ON_ANY_LINE_ENDING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -809,11 +809,11 @@ impl KaniWitness for RustStdStandard<Split<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_yields_substrings_between_pattern_matches".to_owned(),
-            claim: VERIFY_SPLIT_YIELDS_SUBSTRINGS_BETWEEN_PATTERN_MATCHES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_yields_substrings_between_pattern_matches".to_owned(),
+            VERIFY_SPLIT_YIELDS_SUBSTRINGS_BETWEEN_PATTERN_MATCHES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -844,11 +844,11 @@ impl KaniWitness for RustStdStandard<SplitN<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_splitn_limits_to_n_substrings".to_owned(),
-            claim: VERIFY_SPLITN_LIMITS_TO_N_SUBSTRINGS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_splitn_limits_to_n_substrings".to_owned(),
+            VERIFY_SPLITN_LIMITS_TO_N_SUBSTRINGS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -882,11 +882,11 @@ impl KaniWitness for RustStdStandard<SplitInclusive<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_inclusive_keeps_the_delimiter_attached".to_owned(),
-            claim: VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_DELIMITER_ATTACHED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_inclusive_keeps_the_delimiter_attached".to_owned(),
+            VERIFY_SPLIT_INCLUSIVE_KEEPS_THE_DELIMITER_ATTACHED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -918,11 +918,11 @@ impl KaniWitness for RustStdStandard<RSplit<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rsplit_yields_substrings_from_the_back".to_owned(),
-            claim: VERIFY_RSPLIT_YIELDS_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rsplit_yields_substrings_from_the_back".to_owned(),
+            VERIFY_RSPLIT_YIELDS_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -974,11 +974,11 @@ impl KaniWitness for RustStdStandard<RSplitN<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rsplitn_limits_to_n_substrings_from_the_back".to_owned(),
-            claim: VERIFY_RSPLITN_LIMITS_TO_N_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rsplitn_limits_to_n_substrings_from_the_back".to_owned(),
+            VERIFY_RSPLITN_LIMITS_TO_N_SUBSTRINGS_FROM_THE_BACK_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1033,11 +1033,11 @@ impl KaniWitness for RustStdStandard<SplitTerminator<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_split_terminator_suppresses_a_trailing_empty_substring".to_owned(),
-            claim: VERIFY_SPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_split_terminator_suppresses_a_trailing_empty_substring".to_owned(),
+            VERIFY_SPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1092,13 +1092,13 @@ impl KaniWitness for RustStdStandard<RSplitTerminator<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rsplit_terminator_suppresses_a_trailing_empty_substring_from_the_back"
+        CheckedProof::new(
+            "verify_rsplit_terminator_suppresses_a_trailing_empty_substring_from_the_back"
                 .to_owned(),
-            claim: VERIFY_RSPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_FROM_THE_BACK_SRC
+            VERIFY_RSPLIT_TERMINATOR_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_FROM_THE_BACK_SRC
                 .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1146,11 +1146,11 @@ impl KaniWitness for RustStdStandard<Matches<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_matches_yields_every_non_overlapping_occurrence".to_owned(),
-            claim: VERIFY_MATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_matches_yields_every_non_overlapping_occurrence".to_owned(),
+            VERIFY_MATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1204,11 +1204,11 @@ impl KaniWitness for RustStdStandard<RMatches<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rmatches_yields_every_non_overlapping_occurrence".to_owned(),
-            claim: VERIFY_RMATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_rmatches_yields_every_non_overlapping_occurrence".to_owned(),
+            VERIFY_RMATCHES_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1257,11 +1257,11 @@ impl KaniWitness for RustStdStandard<MatchIndices<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_match_indices_pairs_each_match_with_its_byte_offset".to_owned(),
-            claim: VERIFY_MATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_match_indices_pairs_each_match_with_its_byte_offset".to_owned(),
+            VERIFY_MATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1311,13 +1311,12 @@ impl KaniWitness for RustStdStandard<RMatchIndices<'static, char>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_rmatch_indices_pairs_each_match_with_its_byte_offset_from_the_back"
+        CheckedProof::new(
+            "verify_rmatch_indices_pairs_each_match_with_its_byte_offset_from_the_back".to_owned(),
+            VERIFY_RMATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC
                 .to_owned(),
-            claim: VERIFY_RMATCH_INDICES_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

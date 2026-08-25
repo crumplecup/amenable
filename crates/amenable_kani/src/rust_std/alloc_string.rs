@@ -26,11 +26,11 @@ impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_string_drain_removes_and_yields_the_content".to_owned(),
-            claim: VERIFY_STRING_DRAIN_REMOVES_AND_YIELDS_THE_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_string_drain_removes_and_yields_the_content".to_owned(),
+            VERIFY_STRING_DRAIN_REMOVES_AND_YIELDS_THE_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -157,11 +157,11 @@ impl KaniWitness for RustStdStandard<FromUtf16Error> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
-            claim: VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
+            VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -206,11 +206,11 @@ impl KaniWitness for RustStdStandard<FromUtf8Error> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_from_utf8_error_recovers_the_original_bytes".to_owned(),
-            claim: VERIFY_FROM_UTF8_ERROR_RECOVERS_THE_ORIGINAL_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_from_utf8_error_recovers_the_original_bytes".to_owned(),
+            VERIFY_FROM_UTF8_ERROR_RECOVERS_THE_ORIGINAL_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

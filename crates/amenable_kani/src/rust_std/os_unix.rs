@@ -27,11 +27,11 @@ impl KaniWitness for RustStdStandard<BorrowedFd<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),
-            claim: VERIFY_BORROWED_FD_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),
+            VERIFY_BORROWED_FD_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -76,11 +76,11 @@ impl KaniWitness for NonNegativeFd {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),
-            claim: VERIFY_BORROWED_FD_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),
+            VERIFY_BORROWED_FD_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -106,11 +106,11 @@ impl KaniWitness for RustStdStandard<OwnedFd> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_owned_fd_preserves_the_raw_value_across_conversion".to_owned(),
-            claim: VERIFY_OWNED_FD_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_owned_fd_preserves_the_raw_value_across_conversion".to_owned(),
+            VERIFY_OWNED_FD_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

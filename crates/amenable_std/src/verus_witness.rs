@@ -260,19 +260,19 @@ impl WitnessArtifact for RustStdProvenance {
 /// Proof artifact for a carrier with a real, machine-checked Verus spec:
 /// names the spec function, carries its verbatim source as `claim`, and
 /// still rests on the chain-derived provenance.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct VerusCheckedProof {
     /// The Verus spec function that checks this carrier's invariant.
-    pub harness: String,
+    harness: String,
     /// The spec's own source — the whole file it lives in, verbatim
     /// (`include_str!`, not a per-function extraction — Verus proof files
     /// in `amenable_verus` are kept to one carrier's spec function(s) each
     /// so this stays a tight, accurate claim, the same one-claim-per-
     /// carrier granularity `amenable_derive::harness!` gives Kani/Creusot
     /// by capturing one function at a time).
-    pub claim: String,
+    claim: String,
     /// The chain-derived provenance this claim still rests on.
-    pub provenance: RustStdProvenance,
+    provenance: RustStdProvenance,
 }
 
 impl VerusProofArtifactSupport for VerusCheckedProof {
@@ -518,11 +518,11 @@ impl VerusWitness for RustStdStandard<char> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_roundtrip".to_owned(),
-            claim: VERIFY_CHAR_ROUNDTRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_roundtrip".to_owned(),
+            VERIFY_CHAR_ROUNDTRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -550,11 +550,11 @@ impl VerusWitness for ValidUnicodeScalar {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_roundtrip".to_owned(),
-            claim: VERIFY_CHAR_ROUNDTRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_roundtrip".to_owned(),
+            VERIFY_CHAR_ROUNDTRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -585,11 +585,11 @@ impl VerusWitness for RustStdStandard<String> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_string_roundtrip".to_owned(),
-            claim: VERIFY_STRING_ROUNDTRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_string_roundtrip".to_owned(),
+            VERIFY_STRING_ROUNDTRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -611,11 +611,11 @@ impl VerusWitness for RustStdStandard<std::cmp::Ordering> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordering_reverse_swaps_less_and_greater".to_owned(),
-            claim: VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordering_reverse_swaps_less_and_greater".to_owned(),
+            VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -639,11 +639,11 @@ impl VerusWitness for RustStdStandard<Option<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_option_unwrap_returns_the_wrapped_value".to_owned(),
-            claim: VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_option_unwrap_returns_the_wrapped_value".to_owned(),
+            VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -665,11 +665,11 @@ impl VerusWitness for RustStdStandard<Result<i32, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_result_unwrap_returns_the_ok_value".to_owned(),
-            claim: VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_result_unwrap_returns_the_ok_value".to_owned(),
+            VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -693,11 +693,11 @@ impl VerusWitness for RustStdStandard<std::num::Wrapping<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_wrapping_field_roundtrips_the_constructed_value".to_owned(),
-            claim: VERIFY_WRAPPING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_wrapping_field_roundtrips_the_constructed_value".to_owned(),
+            VERIFY_WRAPPING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -721,11 +721,11 @@ impl VerusWitness for RustStdStandard<std::num::Saturating<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_saturating_field_roundtrips_the_constructed_value".to_owned(),
-            claim: VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_saturating_field_roundtrips_the_constructed_value".to_owned(),
+            VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -749,11 +749,11 @@ impl VerusWitness for RustStdStandard<std::cmp::Reverse<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_reverse_field_roundtrips_the_constructed_value".to_owned(),
-            claim: VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_reverse_field_roundtrips_the_constructed_value".to_owned(),
+            VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -777,11 +777,11 @@ impl VerusWitness for RustStdStandard<std::mem::ManuallyDrop<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_manually_drop_derefs_and_into_inner_round_trip".to_owned(),
-            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_manually_drop_derefs_and_into_inner_round_trip".to_owned(),
+            VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -820,11 +820,11 @@ impl VerusWitness for RustStdStandard<core::num::FpCategory> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_fp_category_matches_the_value_it_classifies".to_owned(),
-            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_fp_category_matches_the_value_it_classifies".to_owned(),
+            VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -875,11 +875,11 @@ impl VerusWitness for RustStdStandard<core::num::IntErrorKind> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_int_error_kind_classifies_parse_failures".to_owned(),
-            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_int_error_kind_classifies_parse_failures".to_owned(),
+            VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -903,11 +903,11 @@ impl VerusWitness for RustStdStandard<core::num::ParseIntError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_parse_int_error_model_reports_the_kind_of_the_failure".to_owned(),
-            claim: VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_parse_int_error_model_reports_the_kind_of_the_failure".to_owned(),
+            VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -931,11 +931,11 @@ impl VerusWitness for RustStdStandard<core::num::ParseFloatError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),
-            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),
+            VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -959,11 +959,11 @@ impl VerusWitness for RustStdStandard<core::num::TryFromIntError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
-            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
+            VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -987,11 +987,11 @@ impl VerusWitness for RustStdStandard<Box<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_box_derefs_and_writes_through".to_owned(),
-            claim: VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_box_derefs_and_writes_through".to_owned(),
+            VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1019,13 +1019,11 @@ impl VerusWitness for RustStdStandard<core::alloc::Layout> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
-                .to_owned(),
-            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),
+            VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1044,13 +1042,11 @@ impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment"
-                .to_owned(),
-            claim: VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),
+            VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1074,11 +1070,11 @@ impl VerusWitness for RustStdStandard<Vec<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_push_pop_round_trips".to_owned(),
-            claim: VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_push_pop_round_trips".to_owned(),
+            VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1118,13 +1114,11 @@ impl VerusWitness for RustStdStandard<core::char::CharTryFromError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range"
-                .to_owned(),
-            claim: VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),
+            VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1193,11 +1187,11 @@ impl VerusWitness for RustStdStandard<core::char::TryFromCharError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_from_char_error_occurs_exactly_when_out_of_range".to_owned(),
-            claim: VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_from_char_error_occurs_exactly_when_out_of_range".to_owned(),
+            VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1248,11 +1242,11 @@ impl VerusWitness for RustStdStandard<core::any::TypeId> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_type_id_is_reflexive_and_distinguishes_distinct_types".to_owned(),
-            claim: VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_type_id_is_reflexive_and_distinguishes_distinct_types".to_owned(),
+            VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1274,11 +1268,11 @@ impl VerusWitness for RustStdStandard<std::array::TryFromSliceError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
-            claim: VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
+            VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1325,11 +1319,11 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf16Error> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
-            claim: VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
+            VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1393,11 +1387,11 @@ impl VerusWitness for RustStdStandard<std::ffi::CString> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
-            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
+            VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1440,11 +1434,11 @@ impl VerusWitness for RustStdStandard<std::ffi::NulError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
-            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
+            VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1501,11 +1495,11 @@ impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
-            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
+            VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1544,13 +1538,11 @@ impl VerusWitness for RustStdStandard<core::char::ParseCharError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_parse_char_error_occurs_for_empty_or_multi_character_strings"
-                .to_owned(),
-            claim: VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_parse_char_error_occurs_for_empty_or_multi_character_strings".to_owned(),
+            VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1574,11 +1566,11 @@ impl VerusWitness for RustStdStandard<std::rc::Rc<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_rc_derefs_to_the_wrapped_value".to_owned(),
-            claim: VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_rc_derefs_to_the_wrapped_value".to_owned(),
+            VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1600,11 +1592,11 @@ impl VerusWitness for RustStdStandard<std::sync::Arc<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_arc_derefs_to_the_wrapped_value".to_owned(),
-            claim: VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_arc_derefs_to_the_wrapped_value".to_owned(),
+            VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1626,11 +1618,11 @@ impl VerusWitness for RustStdStandard<std::ffi::IntoStringError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_into_string_error_recovers_the_original_cstring".to_owned(),
-            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_into_string_error_recovers_the_original_cstring".to_owned(),
+            VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1662,11 +1654,11 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_owned(),
-            claim: VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_owned(),
+            VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1716,11 +1708,11 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesWithNulError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_owned(),
-            claim: VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_owned(),
+            VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1755,11 +1747,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_build_hasher_default_produces_consistent_hashers".to_owned(),
-            claim: VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_build_hasher_default_produces_consistent_hashers".to_owned(),
+            VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1788,11 +1780,11 @@ impl VerusWitness for RustStdStandard<std::hash::SipHasher> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_sip_hasher_produces_consistent_hashes".to_owned(),
-            claim: VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_sip_hasher_produces_consistent_hashes".to_owned(),
+            VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1830,11 +1822,11 @@ impl VerusWitness for RustStdStandard<std::borrow::Cow<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),
-            claim: VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),
+            VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1876,11 +1868,11 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_btree_map_insert_get_remove_round_trips".to_owned(),
-            claim: VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_btree_map_insert_get_remove_round_trips".to_owned(),
+            VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1917,11 +1909,11 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_btree_set_insert_contains_remove_round_trips".to_owned(),
-            claim: VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_btree_set_insert_contains_remove_round_trips".to_owned(),
+            VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1957,11 +1949,11 @@ impl VerusWitness for RustStdStandard<std::collections::VecDeque<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
-            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
+            VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1985,11 +1977,11 @@ impl VerusWitness for RustStdStandard<std::collections::TryReserveError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_reserve_preserves_vec_contents_regardless_of_outcome".to_owned(),
-            claim: VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_reserve_preserves_vec_contents_regardless_of_outcome".to_owned(),
+            VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2013,11 +2005,11 @@ impl VerusWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_into_iter_round_trips_via_collect".to_owned(),
-            claim: VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_into_iter_round_trips_via_collect".to_owned(),
+            VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2041,11 +2033,11 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Iter<'static,
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_deque_iter_round_trips_via_collect".to_owned(),
-            claim: VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_deque_iter_round_trips_via_collect".to_owned(),
+            VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2070,11 +2062,11 @@ impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_chars_yields_characters_in_order".to_owned(),
-            claim: VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_chars_yields_characters_in_order".to_owned(),
+            VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2128,11 +2120,11 @@ impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_max_heap_pair_pops_the_maximum_first".to_owned(),
-            claim: VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_max_heap_pair_pops_the_maximum_first".to_owned(),
+            VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2180,11 +2172,11 @@ impl VerusWitness for RustStdStandard<std::collections::LinkedList<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_fifo_queue_pair_pops_in_push_order".to_owned(),
-            claim: VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_fifo_queue_pair_pops_in_push_order".to_owned(),
+            VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2218,11 +2210,11 @@ impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cell_model_get_set_replace_round_trip".to_owned(),
-            claim: VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cell_model_get_set_replace_round_trip".to_owned(),
+            VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2279,11 +2271,11 @@ impl VerusWitness for WriteStoresNewValue {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cell_model_get_set_replace_round_trip".to_owned(),
-            claim: VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cell_model_get_set_replace_round_trip".to_owned(),
+            VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2315,11 +2307,11 @@ impl VerusWitness for ArrayIntoIterStartsAtFirstPosition {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
-            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
+            VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2339,11 +2331,11 @@ impl VerusWitness for ArrayIntoIterAdvanceMatchesPosition {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
-            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
+            VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2363,11 +2355,11 @@ impl VerusWitness for YieldsThreeValuesInOrderThenEnds {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
-            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
+            VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2384,11 +2376,11 @@ impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
-            claim: VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
+            VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2428,11 +2420,11 @@ impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
-            claim: VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
+            VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2462,11 +2454,11 @@ impl VerusWitness for RustStdStandard<std::cell::OnceCell<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_cell_model_initializes_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_cell_model_initializes_exactly_once".to_owned(),
+            VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2490,11 +2482,11 @@ impl VerusWitness for RustStdStandard<std::cell::UnsafeCell<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_unsafe_cell_model_get_mut_and_into_inner_round_trip".to_owned(),
-            claim: VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_unsafe_cell_model_get_mut_and_into_inner_round_trip".to_owned(),
+            VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2524,11 +2516,11 @@ impl VerusWitness for RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),
-            claim: VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),
+            VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2550,11 +2542,11 @@ impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),
-            claim: VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),
+            VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2579,11 +2571,11 @@ impl VerusWitness for RustStdStandard<std::rc::Weak<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
-            claim: VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2604,11 +2596,11 @@ impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
-            claim: VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
+            VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2651,11 +2643,11 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_utf8_error_model_recovers_the_original_bytes".to_owned(),
-            claim: VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_utf8_error_model_recovers_the_original_bytes".to_owned(),
+            VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2706,11 +2698,11 @@ impl VerusWitness for RustStdStandard<core::ascii::EscapeDefault> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_escape_default_model_escapes_a_control_byte".to_owned(),
-            claim: VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_escape_default_model_escapes_a_control_byte".to_owned(),
+            VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2738,11 +2730,11 @@ impl VerusWitness for RustStdStandard<core::ffi::CStr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
-            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
+            VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2775,11 +2767,11 @@ impl VerusWitness for NonNulByte {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
-            claim: VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
+            VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2799,11 +2791,11 @@ impl VerusWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2824,11 +2816,11 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2850,11 +2842,11 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IntoIter<i3
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2876,11 +2868,11 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'stati
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2902,11 +2894,11 @@ impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2930,11 +2922,11 @@ impl VerusWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut 
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),
-            claim: VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),
+            VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2960,11 +2952,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),
-            claim: VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),
+            VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -2991,11 +2983,11 @@ impl VerusWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIt
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_splice_model_replaces_a_range_and_yields_what_it_removed".to_owned(),
-            claim: VERIFY_SPLICE_MODEL_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_splice_model_replaces_a_range_and_yields_what_it_removed".to_owned(),
+            VERIFY_SPLICE_MODEL_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3020,11 +3012,11 @@ impl VerusWitness for RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i3
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_map_model_applies_its_closure_to_each_item".to_owned(),
-            claim: VERIFY_MAP_MODEL_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_map_model_applies_its_closure_to_each_item".to_owned(),
+            VERIFY_MAP_MODEL_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3051,11 +3043,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_filter_model_yields_only_items_matching_the_predicate".to_owned(),
-            claim: VERIFY_FILTER_MODEL_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_filter_model_yields_only_items_matching_the_predicate".to_owned(),
+            VERIFY_FILTER_MODEL_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3084,11 +3076,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_filter_map_model_applies_and_filters_in_one_step".to_owned(),
-            claim: VERIFY_FILTER_MAP_MODEL_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_filter_map_model_applies_and_filters_in_one_step".to_owned(),
+            VERIFY_FILTER_MAP_MODEL_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3117,11 +3109,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_map_while_model_maps_items_while_the_closure_returns_some".to_owned(),
-            claim: VERIFY_MAP_WHILE_MODEL_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_map_while_model_maps_items_while_the_closure_returns_some".to_owned(),
+            VERIFY_MAP_WHILE_MODEL_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3148,11 +3140,11 @@ impl VerusWitness for RustStdStandard<std::iter::Cloned<std::slice::Iter<'static
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cloned_model_clones_each_referenced_item".to_owned(),
-            claim: VERIFY_CLONED_MODEL_CLONES_EACH_REFERENCED_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cloned_model_clones_each_referenced_item".to_owned(),
+            VERIFY_CLONED_MODEL_CLONES_EACH_REFERENCED_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3177,11 +3169,11 @@ impl VerusWitness for RustStdStandard<std::iter::Copied<std::slice::Iter<'static
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_copied_model_copies_each_referenced_item".to_owned(),
-            claim: VERIFY_COPIED_MODEL_COPIES_EACH_REFERENCED_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_copied_model_copies_each_referenced_item".to_owned(),
+            VERIFY_COPIED_MODEL_COPIES_EACH_REFERENCED_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3208,11 +3200,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_chain_model_sequences_two_iterators_end_to_end".to_owned(),
-            claim: VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_chain_model_sequences_two_iterators_end_to_end".to_owned(),
+            VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3239,11 +3231,11 @@ impl VerusWitness for RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_zip_model_pairs_items_from_two_iterators".to_owned(),
-            claim: VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_zip_model_pairs_items_from_two_iterators".to_owned(),
+            VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3268,11 +3260,11 @@ impl VerusWitness for RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),
-            claim: VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),
+            VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3300,11 +3292,11 @@ impl VerusWitness for IncrementHeadroom {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),
-            claim: VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),
+            VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3347,11 +3339,11 @@ impl VerusWitness for ValueUnchanged {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
-            claim: VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
+            VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3372,11 +3364,11 @@ impl VerusWitness for ObservedValueMatchesInput {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),
-            claim: VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),
+            VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3408,11 +3400,11 @@ impl VerusWitness for ObservedOptionMatchesInput {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_model_yields_exactly_one_value".to_owned(),
-            claim: VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_model_yields_exactly_one_value".to_owned(),
+            VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3433,11 +3425,11 @@ impl VerusWitness for ObservedPairMatchesInput {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_atomic_bool_model_load_store".to_owned(),
-            claim: VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_atomic_bool_model_load_store".to_owned(),
+            VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3457,11 +3449,11 @@ impl VerusWitness for RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_rev_model_reverses_iteration_order".to_owned(),
-            claim: VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_rev_model_reverses_iteration_order".to_owned(),
+            VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3486,11 +3478,11 @@ impl VerusWitness for RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_skip_model_discards_the_first_n_items".to_owned(),
-            claim: VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_skip_model_discards_the_first_n_items".to_owned(),
+            VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3517,11 +3509,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_skip_while_model_discards_items_while_the_predicate_holds".to_owned(),
-            claim: VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_skip_while_model_discards_items_while_the_predicate_holds".to_owned(),
+            VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3548,11 +3540,11 @@ impl VerusWitness for RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_step_by_model_yields_every_nth_item".to_owned(),
-            claim: VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_step_by_model_yields_every_nth_item".to_owned(),
+            VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3577,11 +3569,11 @@ impl VerusWitness for RustStdStandard<std::iter::Take<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_take_model_yields_at_most_n_items".to_owned(),
-            claim: VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_take_model_yields_at_most_n_items".to_owned(),
+            VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3608,11 +3600,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_take_while_model_yields_items_while_the_predicate_holds".to_owned(),
-            claim: VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_take_while_model_yields_items_while_the_predicate_holds".to_owned(),
+            VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3639,11 +3631,11 @@ impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_model_yields_exactly_one_value".to_owned(),
-            claim: VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_model_yields_exactly_one_value".to_owned(),
+            VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3667,11 +3659,11 @@ impl VerusWitness for RustStdStandard<std::iter::OnceWith<fn() -> i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_with_model_calls_its_closure_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_with_model_calls_its_closure_exactly_once".to_owned(),
+            VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3695,11 +3687,11 @@ impl VerusWitness for RustStdStandard<std::iter::Repeat<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_repeat_model_yields_the_same_value_forever".to_owned(),
-            claim: VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_repeat_model_yields_the_same_value_forever".to_owned(),
+            VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3723,11 +3715,11 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatWith<fn() -> i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_repeat_with_model_calls_its_closure_once_per_item".to_owned(),
-            claim: VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_repeat_with_model_calls_its_closure_once_per_item".to_owned(),
+            VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3751,11 +3743,11 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatN<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_repeat_n_model_yields_the_value_exactly_n_times".to_owned(),
-            claim: VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_repeat_n_model_yields_the_value_exactly_n_times".to_owned(),
+            VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3779,11 +3771,11 @@ impl VerusWitness for RustStdStandard<std::iter::Empty<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_empty_model_yields_nothing".to_owned(),
-            claim: VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_empty_model_yields_nothing".to_owned(),
+            VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3807,11 +3799,11 @@ impl VerusWitness for RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cycle_model_repeats_its_sequence_forever".to_owned(),
-            claim: VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cycle_model_repeats_its_sequence_forever".to_owned(),
+            VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3836,11 +3828,11 @@ impl VerusWitness for RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_fuse_model_keeps_returning_none_once_exhausted".to_owned(),
-            claim: VERIFY_FUSE_MODEL_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_fuse_model_keeps_returning_none_once_exhausted".to_owned(),
+            VERIFY_FUSE_MODEL_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3865,11 +3857,11 @@ impl VerusWitness for RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, f
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_inspect_model_calls_once_per_item_without_changing_values".to_owned(),
-            claim: VERIFY_INSPECT_MODEL_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_inspect_model_calls_once_per_item_without_changing_values".to_owned(),
+            VERIFY_INSPECT_MODEL_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3894,11 +3886,11 @@ impl VerusWitness for RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_peekable_model_peek_does_not_consume".to_owned(),
-            claim: VERIFY_PEEKABLE_MODEL_PEEK_DOES_NOT_CONSUME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_peekable_model_peek_does_not_consume".to_owned(),
+            VERIFY_PEEKABLE_MODEL_PEEK_DOES_NOT_CONSUME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3927,11 +3919,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_scan_model_threads_state_through_its_closure".to_owned(),
-            claim: VERIFY_SCAN_MODEL_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_scan_model_threads_state_through_its_closure".to_owned(),
+            VERIFY_SCAN_MODEL_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -3966,11 +3958,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_flat_map_model_flattens_each_generated_iterator".to_owned(),
-            claim: VERIFY_FLAT_MAP_MODEL_FLATTENS_EACH_GENERATED_ITERATOR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_flat_map_model_flattens_each_generated_iterator".to_owned(),
+            VERIFY_FLAT_MAP_MODEL_FLATTENS_EACH_GENERATED_ITERATOR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4005,11 +3997,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_flatten_model_concatenates_the_inner_iterators".to_owned(),
-            claim: VERIFY_FLATTEN_MODEL_CONCATENATES_THE_INNER_ITERATORS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_flatten_model_concatenates_the_inner_iterators".to_owned(),
+            VERIFY_FLATTEN_MODEL_CONCATENATES_THE_INNER_ITERATORS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4036,11 +4028,11 @@ impl VerusWitness for RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Opt
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_successors_model_generates_from_the_previous_item".to_owned(),
-            claim: VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_successors_model_generates_from_the_previous_item".to_owned(),
+            VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4065,11 +4057,11 @@ impl VerusWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_fn_model_yields_until_the_closure_returns_none".to_owned(),
-            claim: VERIFY_FROM_FN_MODEL_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_fn_model_yields_until_the_closure_returns_none".to_owned(),
+            VERIFY_FROM_FN_MODEL_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4094,11 +4086,11 @@ impl VerusWitness for RustStdStandard<std::fmt::Alignment> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_alignment_model_reaches_the_formatter_from_the_format_spec".to_owned(),
-            claim: VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_alignment_model_reaches_the_formatter_from_the_format_spec".to_owned(),
+            VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4122,11 +4114,11 @@ impl VerusWitness for RustStdStandard<std::fmt::Formatter<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_formatter_model_exposes_the_parsed_width_and_precision".to_owned(),
-            claim: VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_formatter_model_exposes_the_parsed_width_and_precision".to_owned(),
+            VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4192,11 +4184,11 @@ impl VerusWitness for RustStdStandard<std::fmt::Arguments<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_arguments_model_renders_the_same_as_the_value_itself".to_owned(),
-            claim: VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_arguments_model_renders_the_same_as_the_value_itself".to_owned(),
+            VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4231,11 +4223,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_from_fn_model_forwards_display_to_the_supplied_closure".to_owned(),
-            claim: VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_from_fn_model_forwards_display_to_the_supplied_closure".to_owned(),
+            VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4271,11 +4263,11 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugStruct<'static, 'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_debug_struct_model_renders_named_fields".to_owned(),
-            claim: VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_debug_struct_model_renders_named_fields".to_owned(),
+            VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4309,11 +4301,11 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugTuple<'static, 'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_debug_tuple_model_renders_positional_fields".to_owned(),
-            claim: VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_debug_tuple_model_renders_positional_fields".to_owned(),
+            VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4347,11 +4339,11 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugList<'static, 'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_debug_list_model_renders_entries_in_brackets".to_owned(),
-            claim: VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_debug_list_model_renders_entries_in_brackets".to_owned(),
+            VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4385,11 +4377,11 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugSet<'static, 'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_debug_set_model_renders_entries_in_braces".to_owned(),
-            claim: VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_debug_set_model_renders_entries_in_braces".to_owned(),
+            VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4423,11 +4415,11 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugMap<'static, 'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_debug_map_model_renders_key_value_pairs".to_owned(),
-            claim: VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_debug_map_model_renders_key_value_pairs".to_owned(),
+            VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4461,11 +4453,11 @@ impl VerusWitness for RustStdStandard<std::mem::Discriminant<Option<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_discriminant_model_identifies_variant_not_payload".to_owned(),
-            claim: VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_discriminant_model_identifies_variant_not_payload".to_owned(),
+            VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4501,11 +4493,11 @@ macro_rules! impl_non_zero_verus_witness {
                 type ProofArtifact = VerusCheckedProof;
 
                 fn proof() -> Self::ProofArtifact {
-                    VerusCheckedProof {
-                        harness: $harness.to_owned(),
-                        claim: include_str!("../../amenable_verus/src/rust_std/non_zero_carrier.rs").to_owned(),
-                        provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                    }
+                    VerusCheckedProof::new(
+                        $harness.to_owned(),
+                        include_str!("../../amenable_verus/src/rust_std/non_zero_carrier.rs").to_owned(),
+                        <Self::SupportingEvidence as Evidence>::basis().audit(),
+                    )
                 }
             }
 
@@ -4536,11 +4528,11 @@ impl VerusWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_iter_model_yields_shared_references_in_order".to_owned(),
-            claim: VERIFY_ITER_MODEL_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_iter_model_yields_shared_references_in_order".to_owned(),
+            VERIFY_ITER_MODEL_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4564,13 +4556,11 @@ impl VerusWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_iter_mut_model_yields_mutable_references_that_write_through"
-                .to_owned(),
-            claim: VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_iter_mut_model_yields_mutable_references_that_write_through".to_owned(),
+            VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4595,11 +4585,11 @@ impl VerusWitness for RustStdStandard<std::net::Ipv4Addr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ipv4_addr_model_octets_round_trip".to_owned(),
-            claim: VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ipv4_addr_model_octets_round_trip".to_owned(),
+            VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4623,11 +4613,11 @@ impl VerusWitness for RustStdStandard<std::net::Ipv6Addr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ipv6_addr_model_segments_round_trip".to_owned(),
-            claim: VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ipv6_addr_model_segments_round_trip".to_owned(),
+            VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4651,11 +4641,11 @@ impl VerusWitness for RustStdStandard<std::net::IpAddr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ip_addr_model_variant_matches_its_kind".to_owned(),
-            claim: VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ip_addr_model_variant_matches_its_kind".to_owned(),
+            VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4679,11 +4669,11 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV4> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_socket_addr_v4_model_round_trips_ip_and_port".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_socket_addr_v4_model_round_trips_ip_and_port".to_owned(),
+            VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4707,11 +4697,11 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV6> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_socket_addr_v6_model_round_trips_all_fields".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_socket_addr_v6_model_round_trips_all_fields".to_owned(),
+            VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4735,11 +4725,11 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_socket_addr_model_variant_matches_its_kind".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_socket_addr_model_variant_matches_its_kind".to_owned(),
+            VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4778,11 +4768,11 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stat
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4804,11 +4794,11 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IterMut<'st
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),
-            claim: VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),
+            VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4833,11 +4823,11 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Drain<'stat
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_unordered_pair_model_yields_every_element_once".to_owned(),
-            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_unordered_pair_model_yields_every_element_once".to_owned(),
+            VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4859,11 +4849,11 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i3
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_unordered_pair_model_yields_every_element_once".to_owned(),
-            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_unordered_pair_model_yields_every_element_once".to_owned(),
+            VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4885,11 +4875,11 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Iter<'stati
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_unordered_pair_model_yields_every_element_once".to_owned(),
-            claim: VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_unordered_pair_model_yields_every_element_once".to_owned(),
+            VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4911,11 +4901,11 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'st
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_max_heap_pair_pops_the_maximum_first".to_owned(),
-            claim: VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_max_heap_pair_pops_the_maximum_first".to_owned(),
+            VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4940,11 +4930,11 @@ impl VerusWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ref_model_derefs_to_the_borrowed_value".to_owned(),
-            claim: VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ref_model_derefs_to_the_borrowed_value".to_owned(),
+            VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -4968,11 +4958,11 @@ impl VerusWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ref_mut_model_derefs_and_writes_through_to_the_cell".to_owned(),
-            claim: VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ref_mut_model_derefs_and_writes_through_to_the_cell".to_owned(),
+            VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5016,11 +5006,11 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIte
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
-            claim: VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
+            VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5084,11 +5074,11 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
-            claim: VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
+            VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5154,11 +5144,11 @@ impl VerusWitness for RustStdStandard<std::char::ToLowercase> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_to_lowercase_model_maps_an_uppercase_ascii_letter".to_owned(),
-            claim: VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_to_lowercase_model_maps_an_uppercase_ascii_letter".to_owned(),
+            VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5182,11 +5172,11 @@ impl VerusWitness for RustStdStandard<std::char::ToUppercase> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_to_uppercase_model_maps_a_lowercase_ascii_letter".to_owned(),
-            claim: VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_to_uppercase_model_maps_a_lowercase_ascii_letter".to_owned(),
+            VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5210,11 +5200,11 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDebug> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_escape_debug_model_escapes_a_newline".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_escape_debug_model_escapes_a_newline".to_owned(),
+            VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5238,11 +5228,11 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDefault> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_escape_default_model_escapes_a_newline".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_escape_default_model_escapes_a_newline".to_owned(),
+            VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5266,11 +5256,11 @@ impl VerusWitness for RustStdStandard<std::char::EscapeUnicode> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_char_escape_unicode_model_renders_the_codepoint_escape".to_owned(),
-            claim: VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_char_escape_unicode_model_renders_the_codepoint_escape".to_owned(),
+            VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5296,11 +5286,11 @@ macro_rules! impl_slice_chunks_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5398,15 +5388,13 @@ macro_rules! impl_chunk_by_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness:
-                        "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
-                            .to_owned(),
-                    claim:
-                        VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC
-                            .to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate"
+                        .to_owned(),
+                    VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC
+                        .to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5435,11 +5423,11 @@ macro_rules! impl_slice_split_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5530,11 +5518,11 @@ impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_escape_ascii_model_leaves_printable_bytes_unescaped".to_owned(),
-            claim: VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_escape_ascii_model_leaves_printable_bytes_unescaped".to_owned(),
+            VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5576,11 +5564,11 @@ impl VerusWitness for RustStdStandard<std::slice::GetDisjointMutError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds".to_owned(),
-            claim: VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds".to_owned(),
+            VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5606,11 +5594,11 @@ macro_rules! impl_str_ascii_iter_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5652,11 +5640,11 @@ macro_rules! impl_str_escape_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5696,11 +5684,11 @@ impl VerusWitness for RustStdStandard<std::str::Lines<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_lines_model_splits_on_line_endings".to_owned(),
-            claim: VERIFY_LINES_MODEL_SPLITS_ON_LINE_ENDINGS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_lines_model_splits_on_line_endings".to_owned(),
+            VERIFY_LINES_MODEL_SPLITS_ON_LINE_ENDINGS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5724,11 +5712,11 @@ impl VerusWitness for RustStdStandard<std::str::LinesAny<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_lines_any_model_splits_on_any_line_ending".to_owned(),
-            claim: VERIFY_LINES_ANY_MODEL_SPLITS_ON_ANY_LINE_ENDING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_lines_any_model_splits_on_any_line_ending".to_owned(),
+            VERIFY_LINES_ANY_MODEL_SPLITS_ON_ANY_LINE_ENDING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -5754,11 +5742,11 @@ macro_rules! impl_str_whitespace_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5795,11 +5783,11 @@ macro_rules! impl_str_utf8_chunks_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5841,11 +5829,11 @@ macro_rules! impl_str_pattern_split_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5887,11 +5875,11 @@ macro_rules! impl_str_pattern_reverse_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5928,11 +5916,11 @@ macro_rules! impl_str_pattern_terminator_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -5969,13 +5957,11 @@ macro_rules! impl_str_matches_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_str_matches_model_yields_every_non_overlapping_occurrence"
-                        .to_owned(),
-                    claim: VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC
-                        .to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_str_matches_model_yields_every_non_overlapping_occurrence".to_owned(),
+                    VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -6012,11 +5998,11 @@ impl VerusWitness for AsciiByte {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_str_matches_model_yields_every_non_overlapping_occurrence".to_owned(),
-            claim: VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_str_matches_model_yields_every_non_overlapping_occurrence".to_owned(),
+            VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6032,13 +6018,11 @@ impl VerusWitness for RustStdStandard<std::str::MatchIndices<'static, char>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset"
-                .to_owned(),
-            claim: VERIFY_STR_MATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset".to_owned(),
+            VERIFY_STR_MATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6063,11 +6047,13 @@ impl VerusWitness for RustStdStandard<std::str::RMatchIndices<'static, char>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back".to_owned(),
-            claim: VERIFY_STR_RMATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back"
+                .to_owned(),
+            VERIFY_STR_RMATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC
+                .to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6092,11 +6078,11 @@ impl VerusWitness for RustStdStandard<std::io::BufReader<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_buf_reader_model_reads_the_underlying_bytes".to_owned(),
-            claim: VERIFY_BUF_READER_MODEL_READS_THE_UNDERLYING_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_buf_reader_model_reads_the_underlying_bytes".to_owned(),
+            VERIFY_BUF_READER_MODEL_READS_THE_UNDERLYING_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6121,11 +6107,11 @@ impl VerusWitness for RustStdStandard<std::io::BufWriter<Vec<u8>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_buf_writer_model_flushes_to_the_underlying_writer".to_owned(),
-            claim: VERIFY_BUF_WRITER_MODEL_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_buf_writer_model_flushes_to_the_underlying_writer".to_owned(),
+            VERIFY_BUF_WRITER_MODEL_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6149,11 +6135,11 @@ impl VerusWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_bytes_model_yields_one_byte_at_a_time".to_owned(),
-            claim: VERIFY_BYTES_MODEL_YIELDS_ONE_BYTE_AT_A_TIME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_bytes_model_yields_one_byte_at_a_time".to_owned(),
+            VERIFY_BYTES_MODEL_YIELDS_ONE_BYTE_AT_A_TIME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6177,13 +6163,11 @@ impl VerusWitness for RustStdStandard<std::io::IntoInnerError<std::io::BufWriter
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_into_inner_error_model_recovers_the_writer_and_the_flush_error"
-                .to_owned(),
-            claim: VERIFY_INTO_INNER_ERROR_MODEL_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_into_inner_error_model_recovers_the_writer_and_the_flush_error".to_owned(),
+            VERIFY_INTO_INNER_ERROR_MODEL_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6208,11 +6192,11 @@ impl VerusWitness for RustStdStandard<std::io::LineWriter<Vec<u8>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_line_writer_model_flushes_on_a_newline_but_not_before_one".to_owned(),
-            claim: VERIFY_LINE_WRITER_MODEL_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_line_writer_model_flushes_on_a_newline_but_not_before_one".to_owned(),
+            VERIFY_LINE_WRITER_MODEL_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6236,11 +6220,11 @@ impl VerusWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_lines_model_splits_on_newlines_and_drops_the_terminator".to_owned(),
-            claim: VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_lines_model_splits_on_newlines_and_drops_the_terminator".to_owned(),
+            VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6266,13 +6250,11 @@ macro_rules! impl_io_pipe_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_pipe_model_delivers_written_bytes_to_the_paired_reader"
-                        .to_owned(),
-                    claim: VERIFY_PIPE_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_PAIRED_READER_SRC
-                        .to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_pipe_model_delivers_written_bytes_to_the_paired_reader".to_owned(),
+                    VERIFY_PIPE_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_PAIRED_READER_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -6299,11 +6281,11 @@ impl VerusWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_split_model_segments_on_the_given_byte_and_drops_it".to_owned(),
-            claim: VERIFY_SPLIT_MODEL_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_split_model_segments_on_the_given_byte_and_drops_it".to_owned(),
+            VERIFY_SPLIT_MODEL_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6327,11 +6309,11 @@ impl VerusWitness for RustStdStandard<std::io::WriterPanicked> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_writer_panicked_model_recovers_the_buffered_data".to_owned(),
-            claim: VERIFY_WRITER_PANICKED_MODEL_RECOVERS_THE_BUFFERED_DATA_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_writer_panicked_model_recovers_the_buffered_data".to_owned(),
+            VERIFY_WRITER_PANICKED_MODEL_RECOVERS_THE_BUFFERED_DATA_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6357,11 +6339,11 @@ macro_rules! impl_io_empty_repeat_sink_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -6401,11 +6383,11 @@ impl VerusWitness for RustStdStandard<std::io::SeekFrom> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_seek_from_model_round_trips_each_variants_offset".to_owned(),
-            claim: VERIFY_SEEK_FROM_MODEL_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_seek_from_model_round_trips_each_variants_offset".to_owned(),
+            VERIFY_SEEK_FROM_MODEL_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6429,11 +6411,11 @@ impl VerusWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_chain_model_reads_the_first_source_then_the_second".to_owned(),
-            claim: VERIFY_CHAIN_MODEL_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_chain_model_reads_the_first_source_then_the_second".to_owned(),
+            VERIFY_CHAIN_MODEL_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6458,13 +6440,11 @@ impl VerusWitness for RustStdStandard<std::io::Cursor<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_cursor_model_read_advances_position_and_seek_repositions_it"
-                .to_owned(),
-            claim: VERIFY_CURSOR_MODEL_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_cursor_model_read_advances_position_and_seek_repositions_it".to_owned(),
+            VERIFY_CURSOR_MODEL_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6488,11 +6468,11 @@ impl VerusWitness for RustStdStandard<std::io::Error> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_error_model_from_error_kind_preserves_the_kind".to_owned(),
-            claim: VERIFY_ERROR_MODEL_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_error_model_from_error_kind_preserves_the_kind".to_owned(),
+            VERIFY_ERROR_MODEL_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6516,11 +6496,11 @@ impl VerusWitness for RustStdStandard<std::io::IoSlice<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_io_slice_model_derefs_to_the_wrapped_bytes".to_owned(),
-            claim: VERIFY_IO_SLICE_MODEL_DEREFS_TO_THE_WRAPPED_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_io_slice_model_derefs_to_the_wrapped_bytes".to_owned(),
+            VERIFY_IO_SLICE_MODEL_DEREFS_TO_THE_WRAPPED_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6544,13 +6524,12 @@ impl VerusWitness for RustStdStandard<std::io::IoSliceMut<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes"
+        VerusCheckedProof::new(
+            "verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes".to_owned(),
+            VERIFY_IO_SLICE_MUT_MODEL_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC
                 .to_owned(),
-            claim: VERIFY_IO_SLICE_MUT_MODEL_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6574,11 +6553,11 @@ impl VerusWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_take_model_caps_reads_at_the_remaining_limit".to_owned(),
-            claim: VERIFY_TAKE_MODEL_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_take_model_caps_reads_at_the_remaining_limit".to_owned(),
+            VERIFY_TAKE_MODEL_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6611,11 +6590,11 @@ macro_rules! impl_sync_atomic_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: $harness.to_owned(),
-                    claim: $const_name.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    $harness.to_owned(),
+                    $const_name.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -6725,11 +6704,11 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_atomic_ptr_model_load_store_swap_and_compare_exchange".to_owned(),
-            claim: VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_atomic_ptr_model_load_store_swap_and_compare_exchange".to_owned(),
+            VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6774,11 +6753,11 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::Ordering> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_atomic_ordering_model_relaxed_store_is_observable".to_owned(),
-            claim: VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_atomic_ordering_model_relaxed_store_is_observable".to_owned(),
+            VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6802,11 +6781,11 @@ impl VerusWitness for RustStdStandard<std::process::Child> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_child_model_has_a_process_id_and_can_be_waited_on".to_owned(),
-            claim: VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_child_model_has_a_process_id_and_can_be_waited_on".to_owned(),
+            VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6830,11 +6809,11 @@ impl VerusWitness for RustStdStandard<std::process::ChildStderr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr".to_owned(),
-            claim: VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr".to_owned(),
+            VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6858,11 +6837,11 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdin> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_child_stdin_model_is_readable_by_the_child_process".to_owned(),
-            claim: VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_child_stdin_model_is_readable_by_the_child_process".to_owned(),
+            VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6886,11 +6865,11 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdout> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout".to_owned(),
-            claim: VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout".to_owned(),
+            VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6914,13 +6893,11 @@ impl VerusWitness for RustStdStandard<std::process::Command> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_command_model_env_override_is_visible_to_the_spawned_process"
-                .to_owned(),
-            claim: VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_command_model_env_override_is_visible_to_the_spawned_process".to_owned(),
+            VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6944,11 +6921,11 @@ impl VerusWitness for RustStdStandard<std::process::CommandArgs<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_command_args_model_reports_the_configured_arguments".to_owned(),
-            claim: VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_command_args_model_reports_the_configured_arguments".to_owned(),
+            VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -6973,11 +6950,11 @@ impl VerusWitness for RustStdStandard<std::process::CommandEnvs<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_command_envs_model_reports_the_configured_overrides".to_owned(),
-            claim: VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_command_envs_model_reports_the_configured_overrides".to_owned(),
+            VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7002,11 +6979,11 @@ impl VerusWitness for RustStdStandard<std::process::ExitStatus> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_exit_status_model_reports_a_nonzero_exit_code".to_owned(),
-            claim: VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_exit_status_model_reports_a_nonzero_exit_code".to_owned(),
+            VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7030,11 +7007,11 @@ impl VerusWitness for RustStdStandard<std::process::Output> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_output_model_captures_stdout_and_the_exit_status".to_owned(),
-            claim: VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_output_model_captures_stdout_and_the_exit_status".to_owned(),
+            VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7058,11 +7035,11 @@ impl VerusWitness for RustStdStandard<std::process::Stdio> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_stdio_model_null_discards_the_childs_output_handle".to_owned(),
-            claim: VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_stdio_model_null_discards_the_childs_output_handle".to_owned(),
+            VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7086,11 +7063,11 @@ impl VerusWitness for RustStdStandard<std::path::Ancestors<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ancestors_model_yields_self_then_each_parent_up_to_root".to_owned(),
-            claim: VERIFY_ANCESTORS_MODEL_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ancestors_model_yields_self_then_each_parent_up_to_root".to_owned(),
+            VERIFY_ANCESTORS_MODEL_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7114,11 +7091,11 @@ impl VerusWitness for RustStdStandard<std::path::Component<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_component_model_distinguishes_root_from_normal_segments".to_owned(),
-            claim: VERIFY_COMPONENT_MODEL_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_component_model_distinguishes_root_from_normal_segments".to_owned(),
+            VERIFY_COMPONENT_MODEL_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7142,11 +7119,11 @@ impl VerusWitness for RustStdStandard<std::path::Components<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_components_model_yields_root_then_named_segments_in_order".to_owned(),
-            claim: VERIFY_COMPONENTS_MODEL_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_components_model_yields_root_then_named_segments_in_order".to_owned(),
+            VERIFY_COMPONENTS_MODEL_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7170,11 +7147,11 @@ impl VerusWitness for RustStdStandard<std::path::Iter<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_iter_model_yields_the_named_segments".to_owned(),
-            claim: VERIFY_ITER_MODEL_YIELDS_THE_NAMED_SEGMENTS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_iter_model_yields_the_named_segments".to_owned(),
+            VERIFY_ITER_MODEL_YIELDS_THE_NAMED_SEGMENTS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7198,11 +7175,11 @@ impl VerusWitness for RustStdStandard<std::path::Display<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_display_model_renders_a_valid_utf8_path_verbatim".to_owned(),
-            claim: VERIFY_DISPLAY_MODEL_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_display_model_renders_a_valid_utf8_path_verbatim".to_owned(),
+            VERIFY_DISPLAY_MODEL_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7226,11 +7203,11 @@ impl VerusWitness for RustStdStandard<std::path::Path> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_path_model_derives_extension_file_name_and_parent".to_owned(),
-            claim: VERIFY_PATH_MODEL_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_path_model_derives_extension_file_name_and_parent".to_owned(),
+            VERIFY_PATH_MODEL_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7254,11 +7231,11 @@ impl VerusWitness for RustStdStandard<std::path::PathBuf> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_path_buf_model_push_pop_and_join_build_the_expected_path".to_owned(),
-            claim: VERIFY_PATH_BUF_MODEL_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_path_buf_model_push_pop_and_join_build_the_expected_path".to_owned(),
+            VERIFY_PATH_BUF_MODEL_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7282,11 +7259,11 @@ impl VerusWitness for RustStdStandard<std::path::Prefix<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_prefix_model_disk_identifies_the_drive_letter".to_owned(),
-            claim: VERIFY_PREFIX_MODEL_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_prefix_model_disk_identifies_the_drive_letter".to_owned(),
+            VERIFY_PREFIX_MODEL_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7310,11 +7287,11 @@ impl VerusWitness for RustStdStandard<std::path::PrefixComponent<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_prefix_component_model_pairs_raw_text_with_parsed_prefix".to_owned(),
-            claim: VERIFY_PREFIX_COMPONENT_MODEL_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_prefix_component_model_pairs_raw_text_with_parsed_prefix".to_owned(),
+            VERIFY_PREFIX_COMPONENT_MODEL_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7339,11 +7316,11 @@ impl VerusWitness for RustStdStandard<std::path::StripPrefixError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_strip_prefix_error_model_reports_a_non_matching_prefix".to_owned(),
-            claim: VERIFY_STRIP_PREFIX_ERROR_MODEL_REPORTS_A_NON_MATCHING_PREFIX_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_strip_prefix_error_model_reports_a_non_matching_prefix".to_owned(),
+            VERIFY_STRIP_PREFIX_ERROR_MODEL_REPORTS_A_NON_MATCHING_PREFIX_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7378,11 +7355,11 @@ impl VerusWitness for RustStdStandard<std::fs::DirBuilder> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_dir_builder_model_creates_nested_directories_recursively".to_owned(),
-            claim: VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_dir_builder_model_creates_nested_directories_recursively".to_owned(),
+            VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7424,11 +7401,11 @@ impl VerusWitness for RustStdStandard<std::fs::DirEntry> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_dir_entry_model_reports_the_created_files_name_and_path".to_owned(),
-            claim: VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_dir_entry_model_reports_the_created_files_name_and_path".to_owned(),
+            VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7471,11 +7448,11 @@ impl VerusWitness for RustStdStandard<std::fs::ReadDir> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_read_dir_model_iterates_every_entry_in_the_directory".to_owned(),
-            claim: VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_read_dir_model_iterates_every_entry_in_the_directory".to_owned(),
+            VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7518,11 +7495,11 @@ impl VerusWitness for RustStdStandard<std::fs::File> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_file_model_write_then_read_round_trips_the_bytes".to_owned(),
-            claim: VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_file_model_write_then_read_round_trips_the_bytes".to_owned(),
+            VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7560,11 +7537,11 @@ impl VerusWitness for RustStdStandard<std::fs::FileTimes> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_file_times_model_sets_the_recorded_modification_time".to_owned(),
-            claim: VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_file_times_model_sets_the_recorded_modification_time".to_owned(),
+            VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7605,11 +7582,11 @@ impl VerusWitness for RustStdStandard<std::fs::Metadata> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_metadata_model_reports_the_written_length".to_owned(),
-            claim: VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_metadata_model_reports_the_written_length".to_owned(),
+            VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7642,11 +7619,11 @@ impl VerusWitness for RustStdStandard<std::fs::FileType> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_file_type_model_distinguishes_files_from_directories".to_owned(),
-            claim: VERIFY_FILE_TYPE_MODEL_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_file_type_model_distinguishes_files_from_directories".to_owned(),
+            VERIFY_FILE_TYPE_MODEL_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7670,11 +7647,11 @@ impl VerusWitness for RustStdStandard<std::fs::OpenOptions> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_open_options_model_create_new_rejects_an_existing_file".to_owned(),
-            claim: VERIFY_OPEN_OPTIONS_MODEL_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_open_options_model_create_new_rejects_an_existing_file".to_owned(),
+            VERIFY_OPEN_OPTIONS_MODEL_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7698,13 +7675,11 @@ impl VerusWitness for RustStdStandard<std::fs::Permissions> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_permissions_model_readonly_round_trips_through_set_permissions"
-                .to_owned(),
-            claim: VERIFY_PERMISSIONS_MODEL_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_permissions_model_readonly_round_trips_through_set_permissions".to_owned(),
+            VERIFY_PERMISSIONS_MODEL_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7728,11 +7703,11 @@ impl VerusWitness for RustStdStandard<std::fs::TryLockError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_lock_error_model_reports_a_lock_already_held".to_owned(),
-            claim: VERIFY_TRY_LOCK_ERROR_MODEL_REPORTS_A_LOCK_ALREADY_HELD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_lock_error_model_reports_a_lock_already_held".to_owned(),
+            VERIFY_TRY_LOCK_ERROR_MODEL_REPORTS_A_LOCK_ALREADY_HELD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7756,11 +7731,11 @@ impl VerusWitness for RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_local_key_model_with_reads_the_initialized_value".to_owned(),
-            claim: VERIFY_LOCAL_KEY_MODEL_WITH_READS_THE_INITIALIZED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_local_key_model_with_reads_the_initialized_value".to_owned(),
+            VERIFY_LOCAL_KEY_MODEL_WITH_READS_THE_INITIALIZED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7785,11 +7760,11 @@ impl VerusWitness for RustStdStandard<std::thread::Thread> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
-            claim: VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
+            VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7810,11 +7785,11 @@ impl VerusWitness for RustStdStandard<std::thread::ThreadId> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
-            claim: VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
+            VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7847,11 +7822,11 @@ macro_rules! impl_env_args_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_args_model_reports_at_least_the_program_path".to_owned(),
-                    claim: VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_args_model_reports_at_least_the_program_path".to_owned(),
+                    VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -7887,11 +7862,11 @@ impl VerusWitness for RustStdStandard<std::env::JoinPathsError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_join_paths_error_model_reports_an_unjoinable_path".to_owned(),
-            claim: VERIFY_JOIN_PATHS_ERROR_MODEL_REPORTS_AN_UNJOINABLE_PATH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_join_paths_error_model_reports_an_unjoinable_path".to_owned(),
+            VERIFY_JOIN_PATHS_ERROR_MODEL_REPORTS_AN_UNJOINABLE_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7915,11 +7890,11 @@ impl VerusWitness for RustStdStandard<std::env::SplitPaths<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_split_paths_model_recovers_paths_joined_by_join_paths".to_owned(),
-            claim: VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_split_paths_model_recovers_paths_joined_by_join_paths".to_owned(),
+            VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -7945,11 +7920,11 @@ macro_rules! impl_mpsc_channel_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_channel_model_delivers_to_the_paired_receiver".to_owned(),
-                    claim: VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_channel_model_delivers_to_the_paired_receiver".to_owned(),
+                    VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -7976,11 +7951,11 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_receiver_model_fails_once_every_sender_is_dropped".to_owned(),
-            claim: VERIFY_RECEIVER_MODEL_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_receiver_model_fails_once_every_sender_is_dropped".to_owned(),
+            VERIFY_RECEIVER_MODEL_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8006,11 +7981,11 @@ macro_rules! impl_mpsc_iter_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_channel_iter_model_yields_sent_values_then_stops".to_owned(),
-                    claim: VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_channel_iter_model_yields_sent_values_then_stops".to_owned(),
+                    VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -8037,11 +8012,11 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_try_iter_model_does_not_block_on_an_empty_open_channel".to_owned(),
-            claim: VERIFY_TRY_ITER_MODEL_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_try_iter_model_does_not_block_on_an_empty_open_channel".to_owned(),
+            VERIFY_TRY_ITER_MODEL_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8066,11 +8041,11 @@ impl VerusWitness for RustStdStandard<std::sync::Once> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_model_runs_its_closure_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_model_runs_its_closure_exactly_once".to_owned(),
+            VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8092,11 +8067,11 @@ impl VerusWitness for RustStdStandard<std::sync::OnceState> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_state_model_reports_not_poisoned_on_a_clean_run".to_owned(),
-            claim: VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_state_model_reports_not_poisoned_on_a_clean_run".to_owned(),
+            VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8120,11 +8095,11 @@ impl VerusWitness for RustStdStandard<std::sync::OnceLock<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_once_lock_model_initializes_exactly_once".to_owned(),
-            claim: VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_once_lock_model_initializes_exactly_once".to_owned(),
+            VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8148,11 +8123,11 @@ impl VerusWitness for RustStdStandard<std::sync::Barrier> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
-            claim: VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
+            VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8173,11 +8148,11 @@ impl VerusWitness for RustStdStandard<std::sync::BarrierWaitResult> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
-            claim: VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
+            VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8201,11 +8176,11 @@ impl VerusWitness for RustStdStandard<std::sync::WaitTimeoutResult> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_wait_timeout_result_model_reports_timed_out".to_owned(),
-            claim: VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_wait_timeout_result_model_reports_timed_out".to_owned(),
+            VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8229,11 +8204,11 @@ impl VerusWitness for RustStdStandard<std::net::Incoming<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_incoming_model_yields_an_already_queued_connection".to_owned(),
-            claim: VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_incoming_model_yields_an_already_queued_connection".to_owned(),
+            VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8257,11 +8232,11 @@ impl VerusWitness for RustStdStandard<std::net::Shutdown> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_shutdown_model_write_prevents_further_writes".to_owned(),
-            claim: VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_shutdown_model_write_prevents_further_writes".to_owned(),
+            VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8285,11 +8260,11 @@ impl VerusWitness for RustStdStandard<std::net::TcpListener> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_tcp_listener_model_accepts_a_connecting_stream".to_owned(),
-            claim: VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_tcp_listener_model_accepts_a_connecting_stream".to_owned(),
+            VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8313,13 +8288,11 @@ impl VerusWitness for RustStdStandard<std::net::TcpStream> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer"
-                .to_owned(),
-            claim: VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer".to_owned(),
+            VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8343,11 +8316,11 @@ impl VerusWitness for RustStdStandard<std::net::UdpSocket> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram".to_owned(),
-            claim: VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram".to_owned(),
+            VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8371,11 +8344,11 @@ impl VerusWitness for RustStdStandard<std::task::Context<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_context_model_from_waker_exposes_the_same_waker".to_owned(),
-            claim: VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_context_model_from_waker_exposes_the_same_waker".to_owned(),
+            VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8399,11 +8372,11 @@ impl VerusWitness for RustStdStandard<std::task::Poll<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_poll_model_ready_and_pending_are_disjoint".to_owned(),
-            claim: VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_poll_model_ready_and_pending_are_disjoint".to_owned(),
+            VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8427,11 +8400,11 @@ impl VerusWitness for RustStdStandard<std::task::Waker> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_waker_model_wake_by_ref_invokes_the_wake_impl".to_owned(),
-            claim: VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_waker_model_wake_by_ref_invokes_the_wake_impl".to_owned(),
+            VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8455,11 +8428,11 @@ impl VerusWitness for RustStdStandard<std::panic::AssertUnwindSafe<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_assert_unwind_safe_model_derefs_transparently".to_owned(),
-            claim: VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_assert_unwind_safe_model_derefs_transparently".to_owned(),
+            VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8484,11 +8457,11 @@ impl VerusWitness for RustStdStandard<core::panic::Location<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_location_model_caller_reflects_the_immediate_call_site".to_owned(),
-            claim: VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_location_model_caller_reflects_the_immediate_call_site".to_owned(),
+            VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8512,11 +8485,11 @@ impl VerusWitness for RustStdStandard<std::ops::RangeTo<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_range_to_model_contains_matches_bound".to_owned(),
-            claim: VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_range_to_model_contains_matches_bound".to_owned(),
+            VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8540,11 +8513,11 @@ impl VerusWitness for RustStdStandard<std::ops::RangeFull> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_range_full_model_contains_everything".to_owned(),
-            claim: VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_range_full_model_contains_everything".to_owned(),
+            VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8568,11 +8541,11 @@ impl VerusWitness for RustStdStandard<std::ops::Bound<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_bound_model_round_trips_its_endpoint".to_owned(),
-            claim: VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_bound_model_round_trips_its_endpoint".to_owned(),
+            VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8596,11 +8569,11 @@ impl VerusWitness for RustStdStandard<std::ops::ControlFlow<i32, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_control_flow_model_continue_and_break_are_disjoint".to_owned(),
-            claim: VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_control_flow_model_continue_and_break_are_disjoint".to_owned(),
+            VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8624,11 +8597,11 @@ impl VerusWitness for RustStdStandard<std::time::Instant> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_instant_model_is_monotonically_nondecreasing".to_owned(),
-            claim: VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_instant_model_is_monotonically_nondecreasing".to_owned(),
+            VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8652,11 +8625,11 @@ impl VerusWitness for RustStdStandard<std::time::SystemTime> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_system_time_model_duration_since_computes_the_elapsed_span".to_owned(),
-            claim: VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_system_time_model_duration_since_computes_the_elapsed_span".to_owned(),
+            VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8680,11 +8653,11 @@ impl VerusWitness for RustStdStandard<std::time::SystemTimeError> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_system_time_error_model_recovers_how_far_backward_it_went".to_owned(),
-            claim: VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_system_time_error_model_recovers_how_far_backward_it_went".to_owned(),
+            VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8708,11 +8681,11 @@ impl VerusWitness for RustStdStandard<std::time::Duration> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_duration_model_new_normalizes_nanos_and_carries_into_secs".to_owned(),
-            claim: VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_duration_model_new_normalizes_nanos_and_carries_into_secs".to_owned(),
+            VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8738,11 +8711,11 @@ macro_rules! impl_option_result_into_iter_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_into_iter_model_yields_zero_or_one_owned_value".to_owned(),
-                    claim: VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_into_iter_model_yields_zero_or_one_owned_value".to_owned(),
+                    VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -8771,11 +8744,11 @@ macro_rules! impl_option_result_iter_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_iter_model_yields_zero_or_one_reference".to_owned(),
-                    claim: VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_iter_model_yields_zero_or_one_reference".to_owned(),
+                    VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -8804,11 +8777,11 @@ macro_rules! impl_option_result_iter_mut_verus_witness {
             type ProofArtifact = VerusCheckedProof;
 
             fn proof() -> Self::ProofArtifact {
-                VerusCheckedProof {
-                    harness: "verify_iter_mut_model_writes_through".to_owned(),
-                    claim: VERIFY_ITER_MUT_MODEL_WRITES_THROUGH_SRC.to_owned(),
-                    provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-                }
+                VerusCheckedProof::new(
+                    "verify_iter_mut_model_writes_through".to_owned(),
+                    VERIFY_ITER_MUT_MODEL_WRITES_THROUGH_SRC.to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
             }
         }
 
@@ -8835,11 +8808,11 @@ impl VerusWitness for RustStdStandard<std::future::Pending<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_pending_model_never_resolves".to_owned(),
-            claim: VERIFY_PENDING_MODEL_NEVER_RESOLVES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_pending_model_never_resolves".to_owned(),
+            VERIFY_PENDING_MODEL_NEVER_RESOLVES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8863,11 +8836,11 @@ impl VerusWitness for RustStdStandard<std::future::Ready<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_ready_model_resolves_immediately_with_its_value".to_owned(),
-            claim: VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_ready_model_resolves_immediately_with_its_value".to_owned(),
+            VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8895,11 +8868,11 @@ impl VerusWitness
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_poll_fn_model_dispatches_through_to_its_closure".to_owned(),
-            claim: VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_poll_fn_model_dispatches_through_to_its_closure".to_owned(),
+            VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8929,11 +8902,11 @@ impl VerusWitness for RustStdStandard<[i32; 3]> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_array_model_indexing_and_length".to_owned(),
-            claim: VERIFY_ARRAY_MODEL_INDEXING_AND_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_array_model_indexing_and_length".to_owned(),
+            VERIFY_ARRAY_MODEL_INDEXING_AND_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8955,11 +8928,11 @@ impl VerusWitness for RustStdStandard<[i32]> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_slice_model_indexing_and_length".to_owned(),
-            claim: VERIFY_SLICE_MODEL_INDEXING_AND_LENGTH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_slice_model_indexing_and_length".to_owned(),
+            VERIFY_SLICE_MODEL_INDEXING_AND_LENGTH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -8981,11 +8954,11 @@ impl VerusWitness for RustStdStandard<str> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_str_model_byte_length_and_content".to_owned(),
-            claim: VERIFY_STR_MODEL_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_str_model_byte_length_and_content".to_owned(),
+            VERIFY_STR_MODEL_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9016,11 +8989,11 @@ impl VerusWitness for RustStdStandard<(i32, i32)> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_tuple_model_field_access".to_owned(),
-            claim: VERIFY_TUPLE_MODEL_FIELD_ACCESS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_tuple_model_field_access".to_owned(),
+            VERIFY_TUPLE_MODEL_FIELD_ACCESS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9042,11 +9015,11 @@ impl VerusWitness for RustStdStandard<fn(i32) -> i32> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_fn_pointer_model_calls_the_underlying_function".to_owned(),
-            claim: VERIFY_FN_POINTER_MODEL_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_fn_pointer_model_calls_the_underlying_function".to_owned(),
+            VERIFY_FN_POINTER_MODEL_CALLS_THE_UNDERLYING_FUNCTION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9068,11 +9041,11 @@ impl VerusWitness for RustStdStandard<*const i32> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_const_pointer_model_cast_is_reproducible".to_owned(),
-            claim: VERIFY_CONST_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_const_pointer_model_cast_is_reproducible".to_owned(),
+            VERIFY_CONST_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9094,11 +9067,11 @@ impl VerusWitness for RustStdStandard<*mut i32> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_mut_pointer_model_cast_is_reproducible".to_owned(),
-            claim: VERIFY_MUT_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_mut_pointer_model_cast_is_reproducible".to_owned(),
+            VERIFY_MUT_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9117,11 +9090,11 @@ impl VerusWitness for RustStdStandard<&'static i32> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),
-            claim: VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),
+            VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9143,13 +9116,11 @@ impl VerusWitness for RustStdStandard<&'static mut i32> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_mutable_reference_model_dereferences_to_and_updates_the_referent"
-                .to_owned(),
-            claim: VERIFY_MUTABLE_REFERENCE_MODEL_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_mutable_reference_model_dereferences_to_and_updates_the_referent".to_owned(),
+            VERIFY_MUTABLE_REFERENCE_MODEL_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9171,13 +9142,11 @@ impl VerusWitness for RustStdStandard<std::hash::DefaultHasher> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_default_hasher_model_is_deterministic_across_fresh_instances"
-                .to_owned(),
-            claim: VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_default_hasher_model_is_deterministic_across_fresh_instances".to_owned(),
+            VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9201,11 +9170,11 @@ impl VerusWitness for RustStdStandard<std::hash::RandomState> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_random_state_model_gives_the_same_hasher_seed_across_calls".to_owned(),
-            claim: VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_random_state_model_gives_the_same_hasher_seed_across_calls".to_owned(),
+            VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9229,11 +9198,11 @@ impl VerusWitness for RustStdStandard<std::ffi::OsStr> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_os_str_model_valid_utf8_content_round_trips_through_to_str".to_owned(),
-            claim: VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_os_str_model_valid_utf8_content_round_trips_through_to_str".to_owned(),
+            VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9255,11 +9224,11 @@ impl VerusWitness for RustStdStandard<std::ffi::OsString> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_os_string_model_push_appends_to_the_existing_content".to_owned(),
-            claim: VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_os_string_model_push_appends_to_the_existing_content".to_owned(),
+            VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9283,11 +9252,11 @@ impl VerusWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_os_str_display_model_renders_valid_utf8_content_unchanged".to_owned(),
-            claim: VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_os_str_display_model_renders_valid_utf8_content_unchanged".to_owned(),
+            VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9312,11 +9281,11 @@ impl VerusWitness for RustStdStandard<std::collections::HashMap<i32, i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_hash_map_model_insert_then_get_recovers_the_value".to_owned(),
-            claim: VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_hash_map_model_insert_then_get_recovers_the_value".to_owned(),
+            VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9341,11 +9310,11 @@ impl VerusWitness for RustStdStandard<std::collections::HashSet<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_hash_set_model_insert_then_contains_reports_membership".to_owned(),
-            claim: VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_hash_set_model_insert_then_contains_reports_membership".to_owned(),
+            VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9369,11 +9338,11 @@ impl VerusWitness for RustStdStandard<std::pin::Pin<Box<i32>>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_pin_model_derefs_and_get_mut_round_trip".to_owned(),
-            claim: VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_pin_model_derefs_and_get_mut_round_trip".to_owned(),
+            VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9397,11 +9366,11 @@ impl VerusWitness for RustStdStandard<std::ptr::NonNull<i32>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_non_null_model_rejects_the_null_pointer".to_owned(),
-            claim: VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_non_null_model_rejects_the_null_pointer".to_owned(),
+            VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9425,11 +9394,11 @@ impl VerusWitness for RustStdStandard<std::alloc::System> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_system_model_allocates_and_deallocates_a_layout".to_owned(),
-            claim: VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_system_model_allocates_and_deallocates_a_layout".to_owned(),
+            VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9451,11 +9420,11 @@ impl VerusWitness for RustStdStandard<std::backtrace::Backtrace> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
-            claim: VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
+            VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9476,11 +9445,11 @@ impl VerusWitness for RustStdStandard<std::backtrace::BacktraceStatus> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
-            claim: VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
+            VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9504,11 +9473,11 @@ impl VerusWitness for RustStdStandard<std::panic::PanicHookInfo<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_panic_hook_info_model_reports_the_panics_own_message".to_owned(),
-            claim: VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_panic_hook_info_model_reports_the_panics_own_message".to_owned(),
+            VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9533,11 +9502,11 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Drain<'static
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "verify_vec_deque_drain_model_removes_and_yields_in_order".to_owned(),
-            claim: VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "verify_vec_deque_drain_model_removes_and_yields_in_order".to_owned(),
+            VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9573,11 +9542,11 @@ impl VerusWitness for RustStdStandard<EncodeWide<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<EncodeWide<'_> as Iterator>::next".to_owned(),
-            claim: VERIFY_ENCODE_WIDE_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<EncodeWide<'_> as Iterator>::next".to_owned(),
+            VERIFY_ENCODE_WIDE_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9603,11 +9572,11 @@ impl VerusWitness for RustStdStandard<BorrowedHandle<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle".to_owned(),
-            claim: VERIFY_BORROWED_HANDLE_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle".to_owned(),
+            VERIFY_BORROWED_HANDLE_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9633,11 +9602,11 @@ impl VerusWitness for RustStdStandard<BorrowedSocket<'static>> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket".to_owned(),
-            claim: VERIFY_BORROWED_SOCKET_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket".to_owned(),
+            VERIFY_BORROWED_SOCKET_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9663,11 +9632,11 @@ impl VerusWitness for RustStdStandard<HandleOrInvalid> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from".to_owned(),
-            claim: VERIFY_HANDLE_OR_INVALID_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from".to_owned(),
+            VERIFY_HANDLE_OR_INVALID_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9693,11 +9662,11 @@ impl VerusWitness for RustStdStandard<OwnedHandle> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<OwnedHandle as AsRawHandle>::as_raw_handle".to_owned(),
-            claim: VERIFY_OWNED_HANDLE_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<OwnedHandle as AsRawHandle>::as_raw_handle".to_owned(),
+            VERIFY_OWNED_HANDLE_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -9723,11 +9692,11 @@ impl VerusWitness for RustStdStandard<OwnedSocket> {
     type ProofArtifact = VerusCheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof {
-            harness: "<OwnedSocket as AsRawSocket>::as_raw_socket".to_owned(),
-            claim: VERIFY_OWNED_SOCKET_AXIOM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        VerusCheckedProof::new(
+            "<OwnedSocket as AsRawSocket>::as_raw_socket".to_owned(),
+            VERIFY_OWNED_SOCKET_AXIOM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

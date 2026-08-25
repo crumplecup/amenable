@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<Ipv4Addr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ipv4_addr_octets_round_trip".to_owned(),
-            claim: VERIFY_IPV4_ADDR_OCTETS_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ipv4_addr_octets_round_trip".to_owned(),
+            VERIFY_IPV4_ADDR_OCTETS_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -60,11 +60,11 @@ impl KaniWitness for RustStdStandard<Ipv6Addr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ipv6_addr_segments_round_trip".to_owned(),
-            claim: VERIFY_IPV6_ADDR_SEGMENTS_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ipv6_addr_segments_round_trip".to_owned(),
+            VERIFY_IPV6_ADDR_SEGMENTS_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -107,11 +107,11 @@ impl KaniWitness for RustStdStandard<IpAddr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ip_addr_variant_matches_its_kind".to_owned(),
-            claim: VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ip_addr_variant_matches_its_kind".to_owned(),
+            VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -188,11 +188,11 @@ impl KaniWitness for RustStdStandard<SocketAddrV4> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_socket_addr_v4_round_trips_ip_and_port".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_V4_ROUND_TRIPS_IP_AND_PORT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_socket_addr_v4_round_trips_ip_and_port".to_owned(),
+            VERIFY_SOCKET_ADDR_V4_ROUND_TRIPS_IP_AND_PORT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -234,11 +234,11 @@ impl KaniWitness for RustStdStandard<SocketAddrV6> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_socket_addr_v6_round_trips_all_fields".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_V6_ROUND_TRIPS_ALL_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_socket_addr_v6_round_trips_all_fields".to_owned(),
+            VERIFY_SOCKET_ADDR_V6_ROUND_TRIPS_ALL_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -290,11 +290,11 @@ impl KaniWitness for RustStdStandard<SocketAddr> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_socket_addr_variant_matches_its_kind".to_owned(),
-            claim: VERIFY_SOCKET_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_socket_addr_variant_matches_its_kind".to_owned(),
+            VERIFY_SOCKET_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

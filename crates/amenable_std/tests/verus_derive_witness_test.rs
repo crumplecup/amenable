@@ -158,17 +158,13 @@ fn derive_witness_supports_concrete_generic_enums_for_verus() {
         WitnessSupportSummary::trivial_leaf()
     );
 
-    let VerusCheckedProof {
-        harness,
-        claim,
-        provenance,
-    } = proof.variant_balanced.checked;
-    assert_eq!(harness, "verify_char_roundtrip");
+    let checked = proof.variant_balanced.checked;
+    assert_eq!(checked.harness(), "verify_char_roundtrip");
     assert_eq!(
-        claim,
+        checked.claim(),
         include_str!("../../amenable_verus/src/rust_std/char_carrier.rs")
     );
-    assert_eq!(provenance, <char as RustStdType>::provenance());
+    assert_eq!(*checked.provenance(), <char as RustStdType>::provenance());
     assert_eq!(
         proof.variant_balanced.trusted,
         <bool as RustStdType>::provenance()

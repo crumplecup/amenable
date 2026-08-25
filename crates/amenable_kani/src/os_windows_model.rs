@@ -188,16 +188,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
         "kani",
-        || CheckedProof {
-            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
-            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
+            VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedHandle.html",
                 "std::os::windows::io::BorrowedHandle<'static>",
                 "The BorrowedHandle carrier borrows a raw Windows HANDLE without taking ownership of it.",
             ),
-        }
+        )
         .to_string(),
     )
 }
@@ -206,16 +206,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
         "kani",
-        || CheckedProof {
-            harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
-            claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
+            VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedHandle.html",
                 "std::os::windows::io::OwnedHandle",
                 "The OwnedHandle carrier owns a raw Windows HANDLE, closing it on drop.",
             ),
-        }
+        )
         .to_string(),
     )
 }
@@ -229,11 +229,11 @@ impl KaniWitness for WindowsHandleOrInvalidRejectsOnlyTheSentinel {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
-            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
+            VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -281,16 +281,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
         "kani",
-        || CheckedProof {
-            harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
-            claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
+            VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.HandleOrInvalid.html",
                 "std::os::windows::io::HandleOrInvalid",
                 "The HandleOrInvalid carrier owns a Windows HANDLE that may be the sentinel INVALID_HANDLE_VALUE, deferring that check to conversion time.",
             ),
-        }
+        )
         .to_string(),
     )
 }
@@ -312,16 +312,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
         "kani",
-        || CheckedProof {
-            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
-            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
+            VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.BorrowedSocket.html",
                 "std::os::windows::io::BorrowedSocket<'static>",
                 "The BorrowedSocket carrier borrows a raw Windows SOCKET without taking ownership of it.",
             ),
-        }
+        )
         .to_string(),
     )
 }
@@ -330,16 +330,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
         "kani",
-        || CheckedProof {
-            harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
-            claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
+            VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::io",
                 "https://doc.rust-lang.org/std/os/windows/io/struct.OwnedSocket.html",
                 "std::os::windows::io::OwnedSocket",
                 "The OwnedSocket carrier owns a raw Windows SOCKET, closing it on drop.",
             ),
-        }
+        )
         .to_string(),
     )
 }
@@ -366,16 +366,16 @@ amenable_derive::harness! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
         "kani",
-        || CheckedProof {
-            harness: "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
-            claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CHAR_AS_ONE_CODE_UNIT_SRC.to_owned(),
-            provenance: windows_provenance(
+        || CheckedProof::new(
+            "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
+            VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CHAR_AS_ONE_CODE_UNIT_SRC.to_owned(),
+            windows_provenance(
                 "std::os::windows::ffi",
                 "https://doc.rust-lang.org/std/os/windows/ffi/struct.EncodeWide.html",
                 "std::os::windows::ffi::EncodeWide<'static>",
                 "The EncodeWide carrier lazily encodes an OsStr as UTF-16 code units, as Windows APIs expect.",
             ),
-        }
+        )
         .to_string(),
     )
 }

@@ -22,11 +22,11 @@ impl KaniWitness for RustStdStandard<HashMap<i32, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_hash_map_insert_then_get_recovers_the_value".to_owned(),
-            claim: VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_hash_map_insert_then_get_recovers_the_value".to_owned(),
+            VERIFY_HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -62,11 +62,11 @@ impl KaniWitness for RustStdStandard<HashSet<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_hash_set_insert_then_contains_reports_membership".to_owned(),
-            claim: VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_hash_set_insert_then_contains_reports_membership".to_owned(),
+            VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

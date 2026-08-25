@@ -21,11 +21,11 @@ impl KaniWitness for RustStdStandard<Option<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_option_some_and_none_are_disjoint".to_owned(),
-            claim: VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_option_some_and_none_are_disjoint".to_owned(),
+            VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -86,11 +86,11 @@ impl KaniWitness for FallibleOperationReportsFailure {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_result_ok_and_err_are_disjoint".to_owned(),
-            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_result_ok_and_err_are_disjoint".to_owned(),
+            VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -116,11 +116,11 @@ impl KaniWitness for RustStdStandard<Result<i32, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_result_ok_and_err_are_disjoint".to_owned(),
-            claim: VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_result_ok_and_err_are_disjoint".to_owned(),
+            VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -158,11 +158,11 @@ impl KaniWitness for RustStdStandard<core::option::IntoIter<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_option_into_iter_yields_zero_or_one_owned_value".to_owned(),
-            claim: VERIFY_OPTION_INTO_ITER_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_option_into_iter_yields_zero_or_one_owned_value".to_owned(),
+            VERIFY_OPTION_INTO_ITER_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -208,11 +208,11 @@ impl KaniWitness for RustStdStandard<core::option::Iter<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_option_iter_yields_zero_or_one_reference".to_owned(),
-            claim: VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_option_iter_yields_zero_or_one_reference".to_owned(),
+            VERIFY_OPTION_ITER_YIELDS_ZERO_OR_ONE_REFERENCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -247,11 +247,11 @@ impl KaniWitness for RustStdStandard<core::option::IterMut<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_option_iter_mut_writes_through_to_the_option".to_owned(),
-            claim: VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_option_iter_mut_writes_through_to_the_option".to_owned(),
+            VERIFY_OPTION_ITER_MUT_WRITES_THROUGH_TO_THE_OPTION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -293,11 +293,11 @@ impl KaniWitness for RustStdStandard<core::result::IntoIter<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_result_into_iter_yields_the_ok_value_only".to_owned(),
-            claim: VERIFY_RESULT_INTO_ITER_YIELDS_THE_OK_VALUE_ONLY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_result_into_iter_yields_the_ok_value_only".to_owned(),
+            VERIFY_RESULT_INTO_ITER_YIELDS_THE_OK_VALUE_ONLY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -345,11 +345,11 @@ impl KaniWitness for RustStdStandard<core::result::Iter<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_result_iter_yields_a_reference_to_the_ok_value".to_owned(),
-            claim: VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_result_iter_yields_a_reference_to_the_ok_value".to_owned(),
+            VERIFY_RESULT_ITER_YIELDS_A_REFERENCE_TO_THE_OK_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -384,11 +384,11 @@ impl KaniWitness for RustStdStandard<core::result::IterMut<'static, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_result_iter_mut_writes_through_to_the_result".to_owned(),
-            claim: VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_result_iter_mut_writes_through_to_the_result".to_owned(),
+            VERIFY_RESULT_ITER_MUT_WRITES_THROUGH_TO_THE_RESULT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

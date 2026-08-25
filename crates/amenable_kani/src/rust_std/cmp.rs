@@ -14,11 +14,11 @@ impl KaniWitness for RustStdStandard<std::cmp::Ordering> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ordering_reverse_involution".to_owned(),
-            claim: VERIFY_ORDERING_REVERSE_INVOLUTION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ordering_reverse_involution".to_owned(),
+            VERIFY_ORDERING_REVERSE_INVOLUTION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -71,11 +71,11 @@ impl KaniWitness for RustStdStandard<Reverse<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_reverse_inverts_comparison".to_owned(),
-            claim: VERIFY_REVERSE_INVERTS_COMPARISON_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_reverse_inverts_comparison".to_owned(),
+            VERIFY_REVERSE_INVERTS_COMPARISON_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

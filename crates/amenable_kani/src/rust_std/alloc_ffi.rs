@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<CString> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
-            claim: VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
+            VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -67,11 +67,11 @@ impl KaniWitness for RustStdStandard<FromVecWithNulError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
-            claim: VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
+            VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -115,11 +115,11 @@ impl KaniWitness for RustStdStandard<IntoStringError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_into_string_error_recovers_the_original_cstring".to_owned(),
-            claim: VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_into_string_error_recovers_the_original_cstring".to_owned(),
+            VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -157,11 +157,11 @@ impl KaniWitness for RustStdStandard<NulError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nul_error_reports_the_interior_nuls_position".to_owned(),
-            claim: VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nul_error_reports_the_interior_nuls_position".to_owned(),
+            VERIFY_NUL_ERROR_REPORTS_THE_INTERIOR_NULS_POSITION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

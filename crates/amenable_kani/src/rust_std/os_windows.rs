@@ -29,11 +29,11 @@ impl KaniWitness for RustStdStandard<EncodeWide<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_encode_wide_maps_ascii_to_matching_utf16_units".to_owned(),
-            claim: VERIFY_ENCODE_WIDE_MAPS_ASCII_TO_MATCHING_UTF16_UNITS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_encode_wide_maps_ascii_to_matching_utf16_units".to_owned(),
+            VERIFY_ENCODE_WIDE_MAPS_ASCII_TO_MATCHING_UTF16_UNITS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -66,11 +66,11 @@ impl KaniWitness for RustStdStandard<BorrowedHandle<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_borrowed_handle_reports_the_same_raw_value_as_the_owner".to_owned(),
-            claim: VERIFY_BORROWED_HANDLE_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_borrowed_handle_reports_the_same_raw_value_as_the_owner".to_owned(),
+            VERIFY_BORROWED_HANDLE_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -113,11 +113,11 @@ impl KaniWitness for RustStdStandard<BorrowedSocket<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_borrowed_socket_reports_the_same_raw_value_as_the_owner".to_owned(),
-            claim: VERIFY_BORROWED_SOCKET_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_borrowed_socket_reports_the_same_raw_value_as_the_owner".to_owned(),
+            VERIFY_BORROWED_SOCKET_REPORTS_THE_SAME_RAW_VALUE_AS_THE_OWNER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -152,13 +152,11 @@ impl KaniWitness for RustStdStandard<HandleOrInvalid> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel"
-                .to_owned(),
-            claim: VERIFY_HANDLE_OR_INVALID_DISTINGUISHES_A_REAL_HANDLE_FROM_THE_SENTINEL_SRC
-                .to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel".to_owned(),
+            VERIFY_HANDLE_OR_INVALID_DISTINGUISHES_A_REAL_HANDLE_FROM_THE_SENTINEL_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -207,11 +205,11 @@ impl KaniWitness for RustStdStandard<OwnedHandle> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_owned_handle_preserves_the_raw_value_across_conversion".to_owned(),
-            claim: VERIFY_OWNED_HANDLE_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_owned_handle_preserves_the_raw_value_across_conversion".to_owned(),
+            VERIFY_OWNED_HANDLE_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -255,11 +253,11 @@ impl KaniWitness for RustStdStandard<OwnedSocket> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_owned_socket_preserves_the_raw_value_across_conversion".to_owned(),
-            claim: VERIFY_OWNED_SOCKET_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_owned_socket_preserves_the_raw_value_across_conversion".to_owned(),
+            VERIFY_OWNED_SOCKET_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

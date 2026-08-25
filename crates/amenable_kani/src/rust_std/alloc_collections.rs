@@ -59,11 +59,11 @@ impl KaniWitness for FirstValueIsLessThanTheSecond {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
-            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_btree_map_iterates_in_key_order".to_owned(),
+            VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -89,11 +89,11 @@ impl KaniWitness for RustStdStandard<BTreeMap<i32, i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
-            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_btree_map_iterates_in_key_order".to_owned(),
+            VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -179,11 +179,11 @@ impl KaniWitness for EmptiedContainerReportsEmpty {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_btree_map_iterates_in_key_order".to_owned(),
-            claim: VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_btree_map_iterates_in_key_order".to_owned(),
+            VERIFY_BTREE_MAP_ITERATES_IN_KEY_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -209,11 +209,11 @@ impl KaniWitness for RustStdStandard<BTreeSet<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_btree_set_iterates_in_sorted_order".to_owned(),
-            claim: VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_btree_set_iterates_in_sorted_order".to_owned(),
+            VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -267,11 +267,11 @@ impl KaniWitness for RustStdStandard<BinaryHeap<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_binary_heap_pop_yields_the_maximum_first".to_owned(),
-            claim: VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_binary_heap_pop_yields_the_maximum_first".to_owned(),
+            VERIFY_BINARY_HEAP_POP_YIELDS_THE_MAXIMUM_FIRST_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -369,11 +369,11 @@ impl KaniWitness for RustStdStandard<LinkedList<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_is_fifo_through_back_and_front".to_owned(),
-            claim: VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_is_fifo_through_back_and_front".to_owned(),
+            VERIFY_LINKED_LIST_IS_FIFO_THROUGH_BACK_AND_FRONT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -461,11 +461,11 @@ impl KaniWitness for RustStdStandard<VecDeque<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
-            claim: VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
+            VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -562,11 +562,11 @@ impl KaniWitness for RustStdStandard<TryReserveError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_reserve_rejects_an_impossible_capacity".to_owned(),
-            claim: VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_reserve_rejects_an_impossible_capacity".to_owned(),
+            VERIFY_TRY_RESERVE_REJECTS_AN_IMPOSSIBLE_CAPACITY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -607,11 +607,11 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Drain<'stati
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_binary_heap_drain_yields_every_pushed_element_once".to_owned(),
-            claim: VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_binary_heap_drain_yields_every_pushed_element_once".to_owned(),
+            VERIFY_BINARY_HEAP_DRAIN_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -724,11 +724,11 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_binary_heap_into_iter_yields_every_pushed_element_once".to_owned(),
-            claim: VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_binary_heap_into_iter_yields_every_pushed_element_once".to_owned(),
+            VERIFY_BINARY_HEAP_INTO_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -834,11 +834,11 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Iter<'static
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_binary_heap_iter_yields_every_pushed_element_once".to_owned(),
-            claim: VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_binary_heap_iter_yields_every_pushed_element_once".to_owned(),
+            VERIFY_BINARY_HEAP_ITER_YIELDS_EVERY_PUSHED_ELEMENT_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -893,11 +893,11 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'sta
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
-            claim: VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
+            VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -998,11 +998,11 @@ impl<T> KaniWitness for IteratorYieldsAReferenceToTheStoredValue<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_iter_yields_references_in_order".to_owned(),
-            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_iter_yields_references_in_order".to_owned(),
+            VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1051,11 +1051,11 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::Iter<'static
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_iter_yields_references_in_order".to_owned(),
-            claim: VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_iter_yields_references_in_order".to_owned(),
+            VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1108,11 +1108,11 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IterMut<'sta
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_iter_mut_writes_through".to_owned(),
-            claim: VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_iter_mut_writes_through".to_owned(),
+            VERIFY_LINKED_LIST_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1167,11 +1167,11 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IntoIter<i32
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_into_iter_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_into_iter_yields_owned_values_in_order".to_owned(),
+            VERIFY_LINKED_LIST_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1261,11 +1261,11 @@ impl KaniWitness
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_linked_list_extract_if_partitions_by_the_predicate".to_owned(),
-            claim: VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_linked_list_extract_if_partitions_by_the_predicate".to_owned(),
+            VERIFY_LINKED_LIST_EXTRACT_IF_PARTITIONS_BY_THE_PREDICATE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1339,11 +1339,11 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Drain<'static,
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_deque_drain_removes_and_yields_in_order".to_owned(),
-            claim: VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_deque_drain_removes_and_yields_in_order".to_owned(),
+            VERIFY_VEC_DEQUE_DRAIN_REMOVES_AND_YIELDS_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1425,11 +1425,11 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Iter<'static, 
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_deque_iter_yields_references_in_order".to_owned(),
-            claim: VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_deque_iter_yields_references_in_order".to_owned(),
+            VERIFY_VEC_DEQUE_ITER_YIELDS_REFERENCES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1482,11 +1482,11 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stati
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_deque_iter_mut_writes_through".to_owned(),
-            claim: VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_deque_iter_mut_writes_through".to_owned(),
+            VERIFY_VEC_DEQUE_ITER_MUT_WRITES_THROUGH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1541,11 +1541,11 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>>
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_vec_deque_into_iter_yields_owned_values_in_order".to_owned(),
-            claim: VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_vec_deque_into_iter_yields_owned_values_in_order".to_owned(),
+            VERIFY_VEC_DEQUE_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

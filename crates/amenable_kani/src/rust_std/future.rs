@@ -26,11 +26,11 @@ impl KaniWitness for RustStdStandard<Pending<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_pending_never_resolves".to_owned(),
-            claim: VERIFY_PENDING_NEVER_RESOLVES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_pending_never_resolves".to_owned(),
+            VERIFY_PENDING_NEVER_RESOLVES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -81,11 +81,11 @@ impl KaniWitness for RustStdStandard<Ready<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_ready_resolves_immediately_with_its_value".to_owned(),
-            claim: VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_ready_resolves_immediately_with_its_value".to_owned(),
+            VERIFY_READY_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -133,11 +133,11 @@ impl KaniWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> 
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_poll_fn_dispatches_through_to_its_closure".to_owned(),
-            claim: VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_poll_fn_dispatches_through_to_its_closure".to_owned(),
+            VERIFY_POLL_FN_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

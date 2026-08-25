@@ -17,11 +17,11 @@ impl KaniWitness for RustStdStandard<BuildHasherDefault<DefaultHasher>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_build_hasher_default_produces_consistent_hashers".to_owned(),
-            claim: VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_build_hasher_default_produces_consistent_hashers".to_owned(),
+            VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -88,11 +88,11 @@ impl KaniWitness for RustStdStandard<SipHasherAlias> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_sip_hasher_produces_consistent_hashes".to_owned(),
-            claim: VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_sip_hasher_produces_consistent_hashes".to_owned(),
+            VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

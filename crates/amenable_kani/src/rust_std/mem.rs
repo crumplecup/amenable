@@ -18,11 +18,11 @@ impl KaniWitness for RustStdStandard<ManuallyDrop<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_manually_drop_derefs_and_into_inner_round_trip".to_owned(),
-            claim: VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_manually_drop_derefs_and_into_inner_round_trip".to_owned(),
+            VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -65,11 +65,11 @@ impl KaniWitness for RustStdStandard<Discriminant<Option<i32>>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_discriminant_identifies_variant_not_payload".to_owned(),
-            claim: VERIFY_DISCRIMINANT_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_discriminant_identifies_variant_not_payload".to_owned(),
+            VERIFY_DISCRIMINANT_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

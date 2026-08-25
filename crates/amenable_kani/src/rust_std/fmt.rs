@@ -28,11 +28,11 @@ impl KaniWitness for RustStdStandard<std::fmt::Alignment> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_alignment_reaches_the_formatter_from_the_format_spec".to_owned(),
-            claim: VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_alignment_reaches_the_formatter_from_the_format_spec".to_owned(),
+            VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -94,11 +94,11 @@ impl KaniWitness for RenderedKindMatchesTheBuildingOperation {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
-            claim: VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
+            VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -124,11 +124,11 @@ impl KaniWitness for RustStdStandard<Arguments<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
-            claim: VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
+            VERIFY_ARGUMENTS_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -170,11 +170,11 @@ impl KaniWitness for RustStdStandard<Formatter<'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_formatter_exposes_the_parsed_width_and_precision".to_owned(),
-            claim: VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_formatter_exposes_the_parsed_width_and_precision".to_owned(),
+            VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -214,11 +214,11 @@ impl KaniWitness for RustStdStandard<DebugStruct<'static, 'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_debug_struct_renders_named_fields".to_owned(),
-            claim: VERIFY_DEBUG_STRUCT_RENDERS_NAMED_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_debug_struct_renders_named_fields".to_owned(),
+            VERIFY_DEBUG_STRUCT_RENDERS_NAMED_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -263,11 +263,11 @@ impl KaniWitness for RustStdStandard<DebugTuple<'static, 'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_debug_tuple_renders_positional_fields".to_owned(),
-            claim: VERIFY_DEBUG_TUPLE_RENDERS_POSITIONAL_FIELDS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_debug_tuple_renders_positional_fields".to_owned(),
+            VERIFY_DEBUG_TUPLE_RENDERS_POSITIONAL_FIELDS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -306,11 +306,11 @@ impl KaniWitness for RustStdStandard<DebugList<'static, 'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_debug_list_renders_entries_in_brackets".to_owned(),
-            claim: VERIFY_DEBUG_LIST_RENDERS_ENTRIES_IN_BRACKETS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_debug_list_renders_entries_in_brackets".to_owned(),
+            VERIFY_DEBUG_LIST_RENDERS_ENTRIES_IN_BRACKETS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -349,11 +349,11 @@ impl KaniWitness for RustStdStandard<DebugSet<'static, 'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_debug_set_renders_entries_in_braces".to_owned(),
-            claim: VERIFY_DEBUG_SET_RENDERS_ENTRIES_IN_BRACES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_debug_set_renders_entries_in_braces".to_owned(),
+            VERIFY_DEBUG_SET_RENDERS_ENTRIES_IN_BRACES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -393,11 +393,11 @@ impl KaniWitness for RustStdStandard<DebugMap<'static, 'static>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_debug_map_renders_key_value_pairs".to_owned(),
-            claim: VERIFY_DEBUG_MAP_RENDERS_KEY_VALUE_PAIRS_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_debug_map_renders_key_value_pairs".to_owned(),
+            VERIFY_DEBUG_MAP_RENDERS_KEY_VALUE_PAIRS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -439,11 +439,11 @@ impl KaniWitness
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_from_fn_forwards_display_to_the_supplied_closure".to_owned(),
-            claim: VERIFY_FROM_FN_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_from_fn_forwards_display_to_the_supplied_closure".to_owned(),
+            VERIFY_FROM_FN_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 

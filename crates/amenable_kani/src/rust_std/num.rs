@@ -29,11 +29,11 @@ impl KaniWitness for RustStdStandard<NonZero<i8>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i8".to_owned(),
-            claim: VERIFY_NONZERO_I8_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i8".to_owned(),
+            VERIFY_NONZERO_I8_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -84,11 +84,11 @@ impl KaniWitness for RustStdStandard<NonZero<i16>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i16".to_owned(),
-            claim: VERIFY_NONZERO_I16_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i16".to_owned(),
+            VERIFY_NONZERO_I16_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -139,11 +139,11 @@ impl KaniWitness for RustStdStandard<NonZero<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i32".to_owned(),
-            claim: VERIFY_NONZERO_I32_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i32".to_owned(),
+            VERIFY_NONZERO_I32_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -194,11 +194,11 @@ impl KaniWitness for RustStdStandard<NonZero<i64>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i64".to_owned(),
-            claim: VERIFY_NONZERO_I64_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i64".to_owned(),
+            VERIFY_NONZERO_I64_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -249,11 +249,11 @@ impl KaniWitness for RustStdStandard<NonZero<i128>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i128".to_owned(),
-            claim: VERIFY_NONZERO_I128_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i128".to_owned(),
+            VERIFY_NONZERO_I128_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -304,11 +304,11 @@ impl KaniWitness for RustStdStandard<NonZero<isize>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_isize".to_owned(),
-            claim: VERIFY_NONZERO_ISIZE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_isize".to_owned(),
+            VERIFY_NONZERO_ISIZE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -359,11 +359,11 @@ impl KaniWitness for RustStdStandard<NonZero<u8>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_u8".to_owned(),
-            claim: VERIFY_NONZERO_U8_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_u8".to_owned(),
+            VERIFY_NONZERO_U8_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -414,11 +414,11 @@ impl KaniWitness for RustStdStandard<NonZero<u16>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_u16".to_owned(),
-            claim: VERIFY_NONZERO_U16_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_u16".to_owned(),
+            VERIFY_NONZERO_U16_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -469,11 +469,11 @@ impl KaniWitness for RustStdStandard<NonZero<u32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_u32".to_owned(),
-            claim: VERIFY_NONZERO_U32_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_u32".to_owned(),
+            VERIFY_NONZERO_U32_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -524,11 +524,11 @@ impl KaniWitness for RustStdStandard<NonZero<u64>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_u64".to_owned(),
-            claim: VERIFY_NONZERO_U64_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_u64".to_owned(),
+            VERIFY_NONZERO_U64_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -579,11 +579,11 @@ impl KaniWitness for RustStdStandard<NonZero<u128>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_u128".to_owned(),
-            claim: VERIFY_NONZERO_U128_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_u128".to_owned(),
+            VERIFY_NONZERO_U128_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -634,11 +634,11 @@ impl KaniWitness for RustStdStandard<NonZero<usize>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_usize".to_owned(),
-            claim: VERIFY_NONZERO_USIZE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_usize".to_owned(),
+            VERIFY_NONZERO_USIZE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -775,11 +775,11 @@ impl<T> KaniWitness for NonZeroGetRoundTrips<T> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_nonzero_i8".to_owned(),
-            claim: VERIFY_NONZERO_I8_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_nonzero_i8".to_owned(),
+            VERIFY_NONZERO_I8_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -823,11 +823,11 @@ impl KaniWitness for RustStdStandard<Wrapping<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_wrapping_add_matches_the_inner_wrapping_add".to_owned(),
-            claim: VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_wrapping_add_matches_the_inner_wrapping_add".to_owned(),
+            VERIFY_WRAPPING_ADD_MATCHES_THE_INNER_WRAPPING_ADD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -864,11 +864,11 @@ impl KaniWitness for RustStdStandard<Saturating<i32>> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_saturating_add_matches_the_inner_saturating_add".to_owned(),
-            claim: VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_saturating_add_matches_the_inner_saturating_add".to_owned(),
+            VERIFY_SATURATING_ADD_MATCHES_THE_INNER_SATURATING_ADD_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -905,11 +905,11 @@ impl KaniWitness for RustStdStandard<TryFromIntError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
-            claim: VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
+            VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -953,11 +953,11 @@ impl KaniWitness for RustStdStandard<IntErrorKind> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_int_error_kind_classifies_parse_failures".to_owned(),
-            claim: VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_int_error_kind_classifies_parse_failures".to_owned(),
+            VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1011,11 +1011,11 @@ impl KaniWitness for RustStdStandard<ParseIntError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_parse_int_error_reports_the_kind_of_the_failure".to_owned(),
-            claim: VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_parse_int_error_reports_the_kind_of_the_failure".to_owned(),
+            VERIFY_PARSE_INT_ERROR_REPORTS_THE_KIND_OF_THE_FAILURE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1050,11 +1050,11 @@ impl KaniWitness for RustStdStandard<ParseFloatError> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),
-            claim: VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),
+            VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
@@ -1094,11 +1094,11 @@ impl KaniWitness for RustStdStandard<FpCategory> {
     type ProofArtifact = CheckedProof;
 
     fn proof() -> Self::ProofArtifact {
-        CheckedProof {
-            harness: "verify_fp_category_matches_the_value_it_classifies".to_owned(),
-            claim: VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC.to_owned(),
-            provenance: <Self::SupportingEvidence as Evidence>::basis().audit(),
-        }
+        CheckedProof::new(
+            "verify_fp_category_matches_the_value_it_classifies".to_owned(),
+            VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
     }
 }
 
