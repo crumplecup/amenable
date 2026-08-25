@@ -105,13 +105,13 @@ pub(crate) fn derive_call_shape(harness: &str) -> Option<VerusCallShape> {
         })
         .collect();
 
-    Some(VerusCallShape {
+    Some(VerusCallShape::new(
         module_path,
-        name: harness.to_owned(),
+        harness.to_owned(),
         params,
         requires,
         ensures,
         imports,
-        kind: VerusCallKind::Function { returns },
-    })
+        VerusCallKind::Function { returns },
+    ))
 }

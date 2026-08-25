@@ -375,28 +375,28 @@ pub enum VerusCallKind {
 /// into export keeps the two concerns (this crate's own witness
 /// registrations vs. what a downstream Verus-rendering tool needs) from
 /// forcing lockstep changes on each other.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct VerusCallShape {
     /// The crate-relative module path the harness lives in.
-    pub module_path: String,
+    module_path: String,
     /// The harness function's real name.
-    pub name: String,
+    name: String,
     /// The harness's real symbolic parameters, in order.
-    pub params: Vec<VerusParam>,
+    params: Vec<VerusParam>,
     /// The harness's own real precondition templates, propagated
     /// upward into a composite's own `requires` when this leaf composes.
-    pub requires: Vec<String>,
+    requires: Vec<String>,
     /// The harness's own real postcondition templates, cited (never
     /// restated) in a composite's own `ensures` when this leaf composes.
-    pub ensures: Vec<String>,
+    ensures: Vec<String>,
     /// Real predicate/spec-fns the templates above reference and that
     /// need an explicit `use` to resolve — listed separately from the
     /// templates themselves rather than parsed out of them, since a
     /// template may be a raw expression with no callable name in it at
     /// all (e.g. `$result.0`).
-    pub imports: Vec<VerusImport>,
+    imports: Vec<VerusImport>,
     /// How to invoke this specific harness.
-    pub kind: VerusCallKind,
+    kind: VerusCallKind,
 }
 
 /// A statically registered call shape for one Verus harness, keyed by
@@ -405,11 +405,39 @@ pub struct VerusCallShape {
 /// Additive and opt-in, matching [`amenable_core::WitnessExportRecord`]'s
 /// own opt-in registration story: only harnesses a compositional
 /// renderer actually needs to call get one.
+///
+/// Hand-written `const fn new`/getters, not derived: this record is
+/// itself passed to `inventory::submit!`, which requires a
+/// `const`-evaluable value, and `derive_new::new` cannot generate a
+/// `const fn`. `VerusCallShape` itself has no such requirement -- it's
+/// built at call time inside the stored closure -- so it uses the
+/// ordinary derives above.
 pub struct VerusCallShapeRecord {
+    harness: &'static str,
+    call_shape: fn() -> VerusCallShape,
+}
+
+impl VerusCallShapeRecord {
+    /// Register a harness's real call shape constructor.
+    #[must_use]
+    pub const fn new(harness: &'static str, call_shape: fn() -> VerusCallShape) -> Self {
+        Self {
+            harness,
+            call_shape,
+        }
+    }
+
     /// The harness name this call shape describes.
-    pub harness: &'static str,
+    #[must_use]
+    pub const fn harness(&self) -> &'static str {
+        self.harness
+    }
+
     /// Build the real call shape.
-    pub call_shape: fn() -> VerusCallShape,
+    #[must_use]
+    pub const fn call_shape(&self) -> fn() -> VerusCallShape {
+        self.call_shape
+    }
 }
 
 inventory::collect!(VerusCallShapeRecord);
@@ -475,30 +503,30 @@ macro_rules! register_verus_call_shape {
         imports = [$(($import_module:literal, $import_name:literal $(,)?)),* $(,)?] $(,)?
     ) => {
         ::inventory::submit! {
-            $crate::VerusCallShapeRecord {
-                harness: $harness,
-                call_shape: || $crate::VerusCallShape {
-                    module_path: $module_path.to_owned(),
-                    name: $harness.to_owned(),
-                    params: ::std::vec![
+            $crate::VerusCallShapeRecord::new(
+                $harness,
+                || $crate::VerusCallShape::new(
+                    $module_path.to_owned(),
+                    $harness.to_owned(),
+                    ::std::vec![
                         $($crate::VerusParam::new(
                             $param_name.to_owned(),
                             $param_ty.to_owned(),
                         )),*
                     ],
-                    requires: ::std::vec![$($requires_template.to_owned()),*],
-                    ensures: ::std::vec![$($ensures_template.to_owned()),*],
-                    imports: ::std::vec![
+                    ::std::vec![$($requires_template.to_owned()),*],
+                    ::std::vec![$($ensures_template.to_owned()),*],
+                    ::std::vec![
                         $($crate::VerusImport::new(
                             $import_module.to_owned(),
                             $import_name.to_owned(),
                         )),*
                     ],
-                    kind: $crate::VerusCallKind::Function {
+                    $crate::VerusCallKind::Function {
                         returns: $returns.to_owned(),
                     },
-                },
-            }
+                ),
+            )
         }
     };
 }

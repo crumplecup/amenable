@@ -4857,21 +4857,21 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
     let shape = verus_call_shape("verify_char_roundtrip")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
-    assert_eq!(shape.module_path, "crate::rust_std::char_carrier");
-    assert_eq!(shape.name, "verify_char_roundtrip");
-    assert_eq!(shape.params.len(), 1);
-    assert_eq!(shape.params[0].name(), "c");
-    assert_eq!(shape.params[0].ty(), "char");
-    assert!(shape.requires.is_empty());
+    assert_eq!(shape.module_path(), "crate::rust_std::char_carrier");
+    assert_eq!(shape.name(), "verify_char_roundtrip");
+    assert_eq!(shape.params().len(), 1);
+    assert_eq!(shape.params()[0].name(), "c");
+    assert_eq!(shape.params()[0].ty(), "char");
+    assert!(shape.requires().is_empty());
     assert_eq!(
-        shape.ensures,
+        *shape.ensures(),
         vec![
             "char_roundtrip_preserves_value($result, $c)",
             "char_is_valid_unicode_scalar($c)",
         ]
     );
     assert_eq!(
-        shape.imports,
+        *shape.imports(),
         vec![
             VerusImport::new(
                 "crate::rust_std::char_carrier".to_owned(),
@@ -4884,7 +4884,7 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
         ]
     );
     assert_eq!(
-        shape.kind,
+        *shape.kind(),
         VerusCallKind::Function {
             returns: "char".to_owned()
         }
@@ -4897,13 +4897,13 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
     let shape = verus_call_shape("verify_ref_cell_model_dynamic_borrow_rules")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
-    assert_eq!(shape.module_path, "crate::rust_std::ref_cell_carrier");
-    assert_eq!(shape.params.len(), 2);
-    assert_eq!(shape.params[0].name(), "initial");
-    assert_eq!(shape.params[1].name(), "updated");
-    assert!(shape.requires.is_empty());
+    assert_eq!(shape.module_path(), "crate::rust_std::ref_cell_carrier");
+    assert_eq!(shape.params().len(), 2);
+    assert_eq!(shape.params()[0].name(), "initial");
+    assert_eq!(shape.params()[1].name(), "updated");
+    assert!(shape.requires().is_empty());
     assert_eq!(
-        shape.ensures,
+        *shape.ensures(),
         vec![
             "$result.0",
             "!$result.1",
@@ -4914,7 +4914,7 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
         ]
     );
     assert_eq!(
-        shape.imports,
+        *shape.imports(),
         vec![VerusImport::new(
             "crate::rust_std::primitive_shapes_carrier".to_owned(),
             "observed_value_matches_input".to_owned(),

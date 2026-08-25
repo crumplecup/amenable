@@ -780,7 +780,7 @@ fn render_checked_leaf(
         std::collections::HashMap::new();
     let mut params = Vec::new();
 
-    for param in &shape.params {
+    for param in shape.params() {
         let local = names.allocate(param.name(), &route_hint);
         local_names.insert(param.name().clone(), local.clone());
         params.push(RenderedParam {
@@ -790,14 +790,14 @@ fn render_checked_leaf(
     }
 
     let call_args = shape
-        .params
+        .params()
         .iter()
         .map(|param| local_names[param.name()].clone())
         .collect::<Vec<_>>()
         .join(", ");
     let call = CheckedCall {
-        expr: format!("{}::{}({call_args})", shape.module_path, shape.name),
-        ty: match &shape.kind {
+        expr: format!("{}::{}({call_args})", shape.module_path(), shape.name()),
+        ty: match &shape.kind() {
             amenable_std::VerusCallKind::Function { returns } => returns.clone(),
             amenable_std::VerusCallKind::Predicate => {
                 return Err(AmenableError::invariant(format!(
@@ -810,17 +810,17 @@ fn render_checked_leaf(
     };
 
     let requires = shape
-        .requires
+        .requires()
         .iter()
         .map(|template| pending_clause(template, &local_names))
         .collect();
     let ensures = shape
-        .ensures
+        .ensures()
         .iter()
         .map(|template| pending_clause(template, &local_names))
         .collect();
     let imports = shape
-        .imports
+        .imports()
         .iter()
         .map(|import| (import.module_path().clone(), import.name().clone()))
         .collect();
@@ -828,8 +828,8 @@ fn render_checked_leaf(
     let comment = format!(
         "// checked leaf at {}: calls {}::{}",
         route_display(route),
-        shape.module_path,
-        shape.name
+        shape.module_path(),
+        shape.name()
     );
 
     Ok(RenderedNode {
