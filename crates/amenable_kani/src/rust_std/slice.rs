@@ -1050,7 +1050,7 @@ impl KaniSplitObservation<i32> {
         assert_eq!(pieces.0, [before]);
         assert_eq!(pieces.1, [after]);
 
-        self.set_before(updated);
+        self = self.with_before(updated);
 
         assert_eq!(
             self.data(),
@@ -1404,7 +1404,7 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
-            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let observation = crate::KaniSplitNObservationBuilder::default().first(a).first_delimiter(0).middle(b).second_delimiter(0).last(c).build().expect("all fields set");
             let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
             let _token = RustStdStandard::<
@@ -1475,7 +1475,7 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
-            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let observation = crate::KaniSplitNObservationBuilder::default().first(a).first_delimiter(0).middle(b).second_delimiter(0).last(c).build().expect("all fields set");
             let demonstration = observation.demonstrate_splitn_two(a, b, c);
 
             let _token = RustStdStandard::<
@@ -1626,7 +1626,7 @@ impl KaniSplitObservation<i32> {
         assert_eq!(pieces.0, [after]);
         assert_eq!(pieces.1, [before]);
 
-        self.set_after(updated);
+        self = self.with_after(updated);
 
         assert_eq!(
             self.data(),
@@ -1781,7 +1781,7 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
-            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let observation = crate::KaniSplitNObservationBuilder::default().first(a).first_delimiter(0).middle(b).second_delimiter(0).last(c).build().expect("all fields set");
             let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
             let _token = RustStdStandard::<
@@ -1852,7 +1852,7 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let c: i32 = kani::any();
             kani::assume(ThreeSplitOperandsAreDistinctFromThePattern::requires((a, b, c, 0)));
-            let observation = crate::KaniSplitNObservation::new(a, 0, b, 0, c);
+            let observation = crate::KaniSplitNObservationBuilder::default().first(a).first_delimiter(0).middle(b).second_delimiter(0).last(c).build().expect("all fields set");
             let demonstration = observation.demonstrate_rsplitn_two(a, b, c);
 
             let _token = RustStdStandard::<

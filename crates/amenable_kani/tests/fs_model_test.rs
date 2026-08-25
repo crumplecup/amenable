@@ -92,10 +92,10 @@ fn permissions_readonly_round_trips_through_set_readonly() {
     let mut observation = KaniPermissionsObservation::new();
     assert!(!observation.readonly());
 
-    observation.set_readonly(true);
+    observation = observation.with_readonly(true);
     assert!(observation.readonly());
 
-    observation.set_readonly(false);
+    observation = observation.with_readonly(false);
     assert!(!observation.readonly());
 }
 

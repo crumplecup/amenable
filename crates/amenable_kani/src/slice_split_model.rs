@@ -54,24 +54,29 @@ impl Provenance for KaniSplitWindow {
 }
 
 /// Bounded one-delimiter split observation for `[before, delimiter, after]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    derive_new::new,
+    derive_setters::Setters,
+)]
+#[setters(prefix = "with_")]
 pub struct KaniSplitObservation<T> {
+    /// The element before the delimiter.
     before: T,
+    /// The delimiter element.
     delimiter: T,
+    /// The element after the delimiter.
     after: T,
 }
 
 impl<T: Copy> KaniSplitObservation<T> {
-    /// Construct the bounded `[before, delimiter, after]` witness.
-    #[must_use]
-    pub fn new(before: T, delimiter: T, after: T) -> Self {
-        Self {
-            before,
-            delimiter,
-            after,
-        }
-    }
-
     /// Model `split(predicate)` over the bounded witness.
     #[must_use]
     pub fn split(&self) -> ([T; 1], [T; 1]) {
@@ -88,16 +93,6 @@ impl<T: Copy> KaniSplitObservation<T> {
     #[must_use]
     pub fn rsplit(&self) -> ([T; 1], [T; 1]) {
         ([self.after], [self.before])
-    }
-
-    /// Overwrite the first non-delimiter element, matching `split_mut`'s first piece.
-    pub fn set_before(&mut self, value: T) {
-        self.before = value;
-    }
-
-    /// Overwrite the last non-delimiter element, matching `rsplit_mut`'s first piece.
-    pub fn set_after(&mut self, value: T) {
-        self.after = value;
     }
 
     /// Recover the modeled underlying data after any write-through updates.
@@ -152,28 +147,21 @@ impl Provenance for KaniSplitNWindow {
 }
 
 /// Bounded two-delimiter split observation for `[first, d1, middle, d2, last]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct KaniSplitNObservation<T> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
+pub struct KaniSplitNObservation<T: Copy> {
+    /// The leading element.
     first: T,
+    /// The first delimiter.
     first_delimiter: T,
+    /// The middle element.
     middle: T,
+    /// The second delimiter.
     second_delimiter: T,
+    /// The trailing element.
     last: T,
 }
 
 impl<T: Copy> KaniSplitNObservation<T> {
-    /// Construct the bounded two-delimiter witness.
-    #[must_use]
-    pub fn new(first: T, first_delimiter: T, middle: T, second_delimiter: T, last: T) -> Self {
-        Self {
-            first,
-            first_delimiter,
-            middle,
-            second_delimiter,
-            last,
-        }
-    }
-
     /// Model `splitn(2, predicate)` over the bounded witness.
     #[must_use]
     pub fn splitn_two(&self) -> ([T; 1], [T; 3]) {
@@ -240,63 +228,42 @@ impl Provenance for KaniChunkByWindow {
 }
 
 /// Audit payload for a bounded `chunk_by` observation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct KaniChunkByAudit<T> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters)]
+pub struct KaniChunkByAudit<T: Copy> {
+    /// The modeled adjacent pair.
+    #[getter(copy)]
     data: [T; 2],
+    /// Whether the adjacent pair is modeled as one chunk.
+    #[getter(copy)]
     grouped_together: bool,
 }
 
-impl<T: Copy> KaniChunkByAudit<T> {
-    /// Recover the modeled adjacent pair.
-    #[must_use]
-    pub fn data(&self) -> [T; 2] {
-        self.data
-    }
-
-    /// Report whether the adjacent pair is modeled as one chunk.
-    #[must_use]
-    pub fn grouped_together(&self) -> bool {
-        self.grouped_together
-    }
-}
-
 /// Bounded two-element `chunk_by` observation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct KaniChunkByObservation<T> {
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    derive_getters::Getters,
+    derive_new::new,
+)]
+pub struct KaniChunkByObservation<T: Copy> {
+    /// The first element.
+    #[getter(copy)]
     first: T,
+    /// The second element.
+    #[getter(copy)]
     second: T,
+    /// Whether the adjacent pair is modeled as one chunk.
+    #[getter(copy)]
     grouped_together: bool,
 }
 
 impl<T: Copy> KaniChunkByObservation<T> {
-    /// Construct the bounded adjacent-pair witness.
-    #[must_use]
-    pub fn new(first: T, second: T, grouped_together: bool) -> Self {
-        Self {
-            first,
-            second,
-            grouped_together,
-        }
-    }
-
-    /// Report whether the adjacent pair is modeled as one chunk.
-    #[must_use]
-    pub fn grouped_together(&self) -> bool {
-        self.grouped_together
-    }
-
-    /// Recover the first element.
-    #[must_use]
-    pub fn first(&self) -> T {
-        self.first
-    }
-
-    /// Recover the second element.
-    #[must_use]
-    pub fn second(&self) -> T {
-        self.second
-    }
-
     /// Report the first chunk length under the modeled grouping rule.
     #[must_use]
     pub fn first_chunk_len(&self) -> usize {

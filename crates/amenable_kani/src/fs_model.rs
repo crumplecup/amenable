@@ -132,22 +132,15 @@ impl KaniFsNode {
 }
 
 /// Modeled directory entry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
+#[new(visibility = "")]
 pub struct KaniFsDirEntry {
+    /// The modeled full path.
+    #[getter(copy)]
     path: KaniFsPath,
 }
 
 impl KaniFsDirEntry {
-    fn new(path: KaniFsPath) -> Self {
-        Self { path }
-    }
-
-    /// Return the modeled full path.
-    #[must_use]
-    pub fn path(&self) -> KaniFsPath {
-        self.path
-    }
-
     /// Return the modeled entry name.
     #[must_use]
     pub fn file_name(&self) -> Option<KaniFsLabel> {
@@ -165,14 +158,20 @@ impl KaniFsDirEntry {
 /// `std::fs` path crosses OS-backed state Kani cannot symbolically execute
 /// well (see this module's own doc comment), so this bounded observation is
 /// what the `DirBuilder` proof actually rests on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::new(KaniFsPath::root(), KaniFsLabel::new('a'), KaniFsLabel::new('b'), KaniFsLabel::new('c'))"
 )]
 pub struct KaniRecursiveDirObservation {
+    /// The first ancestor directory guaranteed by recursive creation.
+    #[getter(copy)]
     first_ancestor: KaniFsPath,
+    /// The second ancestor directory guaranteed by recursive creation.
+    #[getter(copy)]
     second_ancestor: KaniFsPath,
+    /// The leaf directory guaranteed by recursive creation.
+    #[getter(copy)]
     leaf: KaniFsPath,
 }
 
@@ -218,24 +217,6 @@ impl KaniRecursiveDirObservation {
             leaf,
         }
     }
-
-    /// Return the first ancestor directory guaranteed by recursive creation.
-    #[must_use]
-    pub fn first_ancestor(&self) -> KaniFsPath {
-        self.first_ancestor
-    }
-
-    /// Return the second ancestor directory guaranteed by recursive creation.
-    #[must_use]
-    pub fn second_ancestor(&self) -> KaniFsPath {
-        self.second_ancestor
-    }
-
-    /// Return the leaf directory guaranteed by recursive creation.
-    #[must_use]
-    pub fn leaf(&self) -> KaniFsPath {
-        self.leaf
-    }
 }
 
 /// Observable result of reading one created entry from a directory.
@@ -247,12 +228,14 @@ impl KaniRecursiveDirObservation {
 /// direct `std::fs` path crosses OS-backed state Kani cannot symbolically
 /// execute well (see this module's own doc comment), so this bounded
 /// observation is what the `DirEntry` proof actually rests on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::new(KaniFsPath::root(), KaniFsLabel::new('f'))"
 )]
 pub struct KaniDirEntryObservation {
+    /// The modeled directory entry.
+    #[getter(copy)]
     entry: KaniFsDirEntry,
 }
 
@@ -284,12 +267,6 @@ impl KaniDirEntryObservation {
         Self {
             entry: KaniFsDirEntry::new(dir.join(file_name)),
         }
-    }
-
-    /// Return the modeled directory entry.
-    #[must_use]
-    pub fn entry(&self) -> KaniFsDirEntry {
-        self.entry
     }
 }
 
@@ -784,9 +761,14 @@ impl KaniCreateNewObservation {
 /// crosses OS-backed state Kani cannot symbolically execute well (see this
 /// module's own doc comment), so this bounded observation is what the
 /// `Permissions` proof actually rests on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters, derive_setters::Setters,
+)]
 #[standard(basis = "Self")]
+#[setters(prefix = "with_")]
 pub struct KaniPermissionsObservation {
+    /// The modeled readonly bit.
+    #[getter(copy)]
     readonly: bool,
 }
 
@@ -816,17 +798,6 @@ impl KaniPermissionsObservation {
     #[must_use]
     pub fn new() -> Self {
         Self { readonly: false }
-    }
-
-    /// Report the modeled readonly bit.
-    #[must_use]
-    pub fn readonly(&self) -> bool {
-        self.readonly
-    }
-
-    /// Model `.set_readonly()` followed by applying the change.
-    pub fn set_readonly(&mut self, readonly: bool) {
-        self.readonly = readonly;
     }
 }
 

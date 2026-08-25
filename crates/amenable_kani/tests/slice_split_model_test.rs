@@ -1,4 +1,4 @@
-use amenable_kani::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};
+use amenable_kani::{KaniChunkByObservation, KaniSplitNObservationBuilder, KaniSplitObservation};
 
 #[test]
 fn split_observation_recovers_split_inclusive_and_reverse_views() {
@@ -13,15 +13,22 @@ fn split_observation_recovers_split_inclusive_and_reverse_views() {
 fn split_observation_write_through_updates_the_underlying_data() {
     let mut observation = KaniSplitObservation::new(1, 0, 2);
 
-    observation.set_before(10);
-    observation.set_after(20);
+    observation = observation.with_before(10);
+    observation = observation.with_after(20);
 
     assert_eq!(observation.data(), [10, 0, 20]);
 }
 
 #[test]
 fn split_n_observation_preserves_the_capped_second_piece() {
-    let observation = KaniSplitNObservation::new(1, 0, 2, 0, 3);
+    let observation = KaniSplitNObservationBuilder::default()
+        .first(1)
+        .first_delimiter(0)
+        .middle(2)
+        .second_delimiter(0)
+        .last(3)
+        .build()
+        .expect("all fields set");
 
     assert_eq!(observation.splitn_two(), ([1], [2, 0, 3]));
     assert_eq!(observation.rsplitn_two(), ([3], [1, 0, 2]));

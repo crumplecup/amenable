@@ -720,13 +720,13 @@ impl KaniPermissionsObservation {
     pub fn demonstrate_readonly_round_trip(mut self) -> KaniPermissionsWitnessToken {
         assert!(!self.readonly(), "a freshly created file is not readonly");
 
-        self.set_readonly(true);
+        self = self.with_readonly(true);
         assert!(
             self.readonly(),
             "setting readonly is reflected the next time permissions are read"
         );
 
-        self.set_readonly(false);
+        self = self.with_readonly(false);
         assert!(!self.readonly(), "clearing readonly is reflected as well");
         KaniPermissionsWitnessToken(())
     }

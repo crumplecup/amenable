@@ -109,7 +109,10 @@ pub use rust_std::{
     WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
-pub use slice_split_model::{KaniChunkByObservation, KaniSplitNObservation, KaniSplitObservation};
+pub use slice_split_model::{
+    KaniChunkByObservation, KaniSplitNObservation, KaniSplitNObservationBuilder,
+    KaniSplitObservation,
+};
 pub use stoplight::{Established, GreenToken, RedToken, Stoplight, StoplightError, YellowToken};
 pub use str_pattern_model::{
     KaniStrMatchObservation, KaniStrRSplitNObservation, KaniStrRSplitObservation,
