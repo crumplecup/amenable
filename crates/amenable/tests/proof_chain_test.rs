@@ -7396,7 +7396,7 @@ fn unregistered_subject_yields_a_not_found_error() {
         matches!(
             &result,
             Err(error) if matches!(
-                error.kind(),
+                &**error.kind(),
                 ChainErrorKind::NotFound(NotFoundSource { subject, .. }) if subject == "NoSuchEvidenceType"
             )
         ),
@@ -7478,7 +7478,7 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
         assert!(
             matches!(
                 &result,
-                Err(error) if matches!(error.kind(), ChainErrorKind::Incomplete(_))
+                Err(error) if matches!(&**error.kind(), ChainErrorKind::Incomplete(_))
             ),
             "expected ChainError::Incomplete for {verifier}, got {result:?}"
         );
@@ -7491,7 +7491,7 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
                 required,
                 gaps,
                 ..
-            }) = error.kind()
+            }) = &**error.kind()
         {
             assert!(subject.ends_with("AddEvidence"));
             assert_eq!(required, &vec![verifier.to_string()]);
@@ -7524,7 +7524,7 @@ fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
     assert!(
         matches!(
             &result,
-            Err(error) if matches!(error.kind(), ChainErrorKind::Incomplete(_))
+            Err(error) if matches!(&**error.kind(), ChainErrorKind::Incomplete(_))
         ),
         "expected ChainError::Incomplete, got {result:?}"
     );
@@ -7532,7 +7532,7 @@ fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
     // hold, so this nested `if let` only ever runs once it's
     // established -- no `else` diverging arm needed.
     if let Err(error) = &result
-        && let ChainErrorKind::Incomplete(IncompleteSource { required, .. }) = error.kind()
+        && let ChainErrorKind::Incomplete(IncompleteSource { required, .. }) = &**error.kind()
     {
         assert_eq!(required.len(), 3);
         assert!(required.iter().any(|v| v == "kani"));

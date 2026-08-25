@@ -32,7 +32,11 @@ amenable_verus = { path = "crates/amenable_verus", version = "0.1.0" }
 
 clap = { version = "4", features = ["derive"] }
 creusot-std = { version = "0.11.0", features = ["sc-drf"] }
-derive_more = { version = "2", features = ["display", "error", "from"] }
+derive-getters = "0.5"
+derive-new = "0.7"
+derive_builder = "0.20"
+derive_more = { version = "2", features = ["as_ref", "display", "error", "from"] }
+derive_setters = "0.1"
 inventory = "0.3"
 miette = { version = "7", features = ["fancy"] }
 proc-macro2 = "1.0"

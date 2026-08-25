@@ -5,6 +5,16 @@ use std::fmt::{self, Display, Formatter};
 use crate::Registry;
 
 /// One provenance metadata fact expressed as a key-value pair.
+///
+/// Hand-written `new`/`key`/`value` instead of `derive_new`/
+/// `derive_getters`, despite otherwise matching that exact shape:
+/// `amenable_verus` `#[path]`-includes this file directly into its own
+/// crate (the real `verus` binary never resolves an ordinary Cargo
+/// dependency, so nothing outside `verus_builtin_macros`/`vstd` can be
+/// used here), and neither derive crate is available in that context.
+/// Confirmed the hard way -- `cargo check --all-features` fails with
+/// "private field, not a method" once this file gains a derive that
+/// `amenable_verus`'s Cargo.toml can't provide.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MetadataEntry {
     /// Stable metadata key.

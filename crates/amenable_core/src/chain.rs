@@ -243,10 +243,14 @@ pub enum ChainErrorKind {
 /// Proof-chain lookup error, carrying kind + call site location -- the
 /// same `struct` boxing a `*Kind` enum shape `amenable::AmenableError`
 /// uses.
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("{kind} at {file}:{line}")]
 pub struct ChainError {
     /// The specific error kind, boxed to keep `ChainError` itself small.
+    /// `derive_getters::Getters` returns the field's literal type
+    /// (`&Box<ChainErrorKind>`, not the dereferenced `&ChainErrorKind` a
+    /// hand-written getter could return) -- it has no special handling
+    /// for `Box`, confirmed against its own docs.
     #[error(source)]
     kind: Box<ChainErrorKind>,
     /// Source line of the call site that produced this error.
@@ -266,11 +270,6 @@ impl ChainError {
             line: loc.line(),
             file: loc.file().to_string(),
         }
-    }
-
-    /// The specific error kind.
-    pub fn kind(&self) -> &ChainErrorKind {
-        &self.kind
     }
 
     /// Construct a [`ChainErrorKind::NotFound`] error naming the subject
