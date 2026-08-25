@@ -17,31 +17,18 @@ use crate::KaniCompose;
 use crate::compose::{kani_assume, symbolic_any};
 
 /// Modeled process argv with one guaranteed program slot.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
+)]
 pub struct KaniArgv {
+    /// The guaranteed first argv slot.
     program_slot: String,
+    /// How many extra argument slots follow the program slot.
+    #[getter(copy)]
     extra_count: u8,
 }
 
 impl KaniArgv {
-    /// Construct modeled argv from its required program slot and extra args.
-    pub fn new(program_slot: String, extra_count: u8) -> Self {
-        Self {
-            program_slot,
-            extra_count,
-        }
-    }
-
-    /// Report the guaranteed first argv slot.
-    pub fn program_slot(&self) -> &str {
-        &self.program_slot
-    }
-
-    /// Report how many extra argument slots follow the program slot.
-    pub fn extra_count(&self) -> u8 {
-        self.extra_count
-    }
-
     /// Report the total slot count in the UTF-8 argv view.
     pub fn args_count(&self) -> usize {
         1 + usize::from(self.extra_count)

@@ -12,25 +12,15 @@ use amenable_derive::Standard;
 
 /// Observable result of locking once, rejecting a second lock while held, then
 /// allowing a new lock after release.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters, derive_new::new)]
 #[standard(basis = "Self", basis_ctor = "Self::new(0)")]
 pub struct KaniMutexExclusionObservation {
+    /// The value observed through the first guard.
+    #[getter(copy)]
     held_value: i32,
 }
 
 impl KaniMutexExclusionObservation {
-    /// Model a lock observation for one wrapped value.
-    #[must_use]
-    pub fn new(held_value: i32) -> Self {
-        Self { held_value }
-    }
-
-    /// Report the value observed through the first guard.
-    #[must_use]
-    pub fn held_value(&self) -> i32 {
-        self.held_value
-    }
-
     /// Report whether a second lock attempt is rejected while the first guard
     /// is still live.
     #[must_use]
@@ -147,33 +137,23 @@ impl Provenance for KaniWaitTimeoutObservation {
 }
 
 /// Observable result of lock poisoning and non-blocking lock failure.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters, derive_new::new)]
 #[standard(basis = "Self", basis_ctor = "Self::new(0, 1)")]
 pub struct KaniMutexFailureObservation {
+    /// The value from the poisoned case -- only exposed under a different
+    /// name, via [`KaniMutexFailureObservation::poisoned_recovered_value`].
+    #[getter(skip)]
     poisoned_value: i32,
+    /// The value held in the would-block case.
+    #[getter(copy)]
     held_value: i32,
 }
 
 impl KaniMutexFailureObservation {
-    /// Model one poisoned case and one already-held case.
-    #[must_use]
-    pub fn new(poisoned_value: i32, held_value: i32) -> Self {
-        Self {
-            poisoned_value,
-            held_value,
-        }
-    }
-
     /// Report the recovered value from the poisoned case.
     #[must_use]
     pub fn poisoned_recovered_value(&self) -> i32 {
         self.poisoned_value
-    }
-
-    /// Report the value held in the would-block case.
-    #[must_use]
-    pub fn held_value(&self) -> i32 {
-        self.held_value
     }
 
     /// Report whether the poisoned case is classified as poisoned.

@@ -9,14 +9,29 @@ use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of two tracked call sites in one source file.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::same_file_distinct_lines(\"proof.rs\", 10, 11)"
 )]
 pub struct KaniCallerLocationObservation {
+    /// The shared file path.
+    ///
+    /// `#[getter(skip)]`, kept hand-written: `derive_getters` binds a
+    /// `&'static`-typed field's getter to a `&'static self` receiver
+    /// (confirmed via `cargo expand`: `pub fn file(&'static self) ->
+    /// &'static str`), not a plain `&self` returning the field's own
+    /// `'static` content the way the hand-written version does -- a real
+    /// regression, not a style difference: it broke
+    /// `demonstrate_immediate_call_site`'s `self.file()` call on an
+    /// owned, short-lived `self` binding.
+    #[getter(skip)]
     file: &'static str,
+    /// The first immediate call-site line.
+    #[getter(copy)]
     first_line: u32,
+    /// The second immediate call-site line.
+    #[getter(copy)]
     second_line: u32,
 }
 
@@ -35,18 +50,6 @@ impl KaniCallerLocationObservation {
     #[must_use]
     pub fn file(&self) -> &'static str {
         self.file
-    }
-
-    /// Report the first immediate call-site line.
-    #[must_use]
-    pub fn first_line(&self) -> u32 {
-        self.first_line
-    }
-
-    /// Report the second immediate call-site line.
-    #[must_use]
-    pub fn second_line(&self) -> u32 {
-        self.second_line
     }
 
     /// Report whether the two modeled lines are distinct.

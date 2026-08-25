@@ -239,24 +239,16 @@ impl KaniCompose for KaniFromUtf8Error {
 /// `std::str::Utf8Error`: how many leading bytes were valid, and the byte
 /// width of the invalid sequence at that position (when determinable
 /// without more input).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_getters::Getters)]
 pub struct KaniUtf8PositionError {
-    valid_up_to: usize,
-    error_len: Option<usize>,
-}
-
-impl KaniUtf8PositionError {
     /// The number of leading bytes that were valid UTF-8.
-    pub fn valid_up_to(&self) -> usize {
-        self.valid_up_to
-    }
-
+    #[getter(copy)]
+    valid_up_to: usize,
     /// The byte width of the invalid sequence at `valid_up_to`, or `None`
     /// if more input would be needed to determine it (an incomplete
     /// trailing multi-byte sequence).
-    pub fn error_len(&self) -> Option<usize> {
-        self.error_len
-    }
+    #[getter(copy)]
+    error_len: Option<usize>,
 }
 
 impl KaniUtf8 {
@@ -402,9 +394,13 @@ pub enum KaniUtf8BufferError {
 /// not the validation algorithm itself; `is_valid_utf8` above is exercised
 /// directly (outside Kani, and inside Kani only on its early-return/invalid
 /// path) for that separate concern.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, derive_getters::Getters)]
 pub struct KaniUtf8Buffer<const MAX_LEN: usize> {
+    /// The modeled buffer content, valid up to `len`.
+    #[getter(skip)]
     bytes: [u8; MAX_LEN],
+    /// The byte length.
+    #[getter(copy)]
     len: usize,
 }
 
@@ -433,12 +429,6 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
         } else {
             Err(KaniUtf8BufferError::InvalidUtf8)
         }
-    }
-
-    /// Report the byte length.
-    #[must_use]
-    pub fn len(&self) -> usize {
-        self.len
     }
 
     /// Report whether the modeled buffer is empty.

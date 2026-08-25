@@ -36,39 +36,23 @@ impl Provenance for KaniEscapeAsciiWindow {
 }
 
 /// Audit payload for the bounded `escape_ascii` observation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters)]
 pub struct KaniEscapeAsciiAudit {
+    /// The modeled source bytes.
+    #[getter(copy)]
     source: [u8; 2],
+    /// The modeled escaped bytes.
+    #[getter(copy)]
     escaped: [u8; 3],
 }
 
-impl KaniEscapeAsciiAudit {
-    /// Recover the modeled source bytes.
-    #[must_use]
-    pub fn source(&self) -> [u8; 2] {
-        self.source
-    }
-
-    /// Recover the modeled escaped bytes.
-    #[must_use]
-    pub fn escaped(&self) -> [u8; 3] {
-        self.escaped
-    }
-}
-
 /// Bounded `escape_ascii` observation for `[printable, b'\n']`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniEscapeAsciiObservation {
     printable: u8,
 }
 
 impl KaniEscapeAsciiObservation {
-    /// Construct the bounded `[printable, b'\n']` witness.
-    #[must_use]
-    pub fn new(printable: u8) -> Self {
-        Self { printable }
-    }
-
     /// Recover the modeled source bytes.
     #[must_use]
     pub fn source(&self) -> [u8; 2] {
