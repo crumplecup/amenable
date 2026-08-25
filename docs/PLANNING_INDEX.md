@@ -4,6 +4,33 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### cfg Hygiene
+
+**Document:** [CFG_HYGIENE_PLAN.md](CFG_HYGIENE_PLAN.md)
+
+**Status:** 🔲 Step 0 done and verified (workspace-wide `unexpected_cfgs`
+union replaced with per-crate `build.rs` declarations, committed
+`1dd1985`). Steps 1–3 (fixing four confirmed live `amenable_derive`
+macro cfg-injection sites; a new cordial `cfg-hygiene` etiquette;
+cordial's `--apply` generalization) deliberately parked until the
+tracing-instrumentation rollout lands first.
+
+**Description:** Surfaced while investigating why cordial's tracing
+`--apply` couldn't run blind against this workspace. Problem 1 (fixed):
+a workspace-wide check-cfg union let a verifier's cfg name go
+"expected" in every crate, not just its own — confirmed real, not
+theoretical, by adding a bare `#[cfg(creusot)]` to `amenable_kani` and
+watching it pass silently under the old config. Problem 2 (not yet
+fixed): four of `amenable_derive`'s own proc macros
+(`exchange`, `capture_exchange_body`, `StateMachine`, `KaniCompose`)
+generate real `#[cfg(kani)]`/`#[cfg_attr(#cfg, ...)]` tokens spliced
+directly into whatever crate applies them — the exact bug class
+`~/repos/elicitation`'s `UNEXPECTED_CFGS.md` white paper documents
+("the library pissing on the user"), safe today only because the sole
+current consumer of all four is `amenable_kani`, which already declares
+`kani` itself. `Witness`/`establish`/`proof_token` were checked and are
+clean.
+
 ### Verus Derive-Witness Composition
 
 **Document:** [VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md](VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md)
