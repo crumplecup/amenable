@@ -1,20 +1,20 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 683 8 683 85 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 677 8 677 85 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 684 16 684 45
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 687 16 687 55
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 690 16 690 49
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 681 19 681 23
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 682 18 682 59
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 678 16 678 45
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 681 16 681 55
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 684 16 684 49
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 675 19 675 23
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 676 18 676 59
 let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 485 19 485 23
 let%span sledger'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 486 18 486 55
-let%span sledger'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 547 19 547 23
-let%span sledger'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 548 18 548 65
-let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 599 19 599 23
-let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 600 18 600 59
-let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 665 16 670 17
+let%span sledger'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 545 19 545 23
+let%span sledger'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 546 18 546 65
+let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 595 19 595 23
+let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 596 18 596 59
+let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 659 16 664 17
 let%span sledger'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 475 24 475 48
-let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 538 24 538 56
-let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 589 24 589 47
+let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 56
+let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 585 24 585 47
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -43,7 +43,7 @@ let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
   {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger'5] amount_positive_holds amount result}
     (! return {result}) ]
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 537 8 537 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#sledger'12] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = any
@@ -51,7 +51,7 @@ let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: 
   {[@stop_split] [@expl:check_sufficient_funds ensures] [%#sledger'7] sufficient_funds_holds balance amount result}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 588 8 588 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 584 8 584 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#sledger'13] outcome = (from <> to')
 
 let rec check_accounts_distinct (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = any
@@ -108,7 +108,7 @@ function cmp_le_log_i64 (x: Int64.t) (y: Int64.t) : ()
 
 axiom cmp_le_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord] Int64.le x y = (cmp_log_i64 x y <> Greater)
 
-predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 663 8 663 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
+predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 657 8 657 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
   [%#sledger'10] match outcome with
     | Ok -> amount_positive_holds amount true /\ accounts_distinct_holds from to' true
     | NegativeAmount bad -> bad = amount /\ Int64.to_int amount <= 0
@@ -120,7 +120,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 683 8 683 85] (balance: Int64.t)
+let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 677 8 677 85] (balance: Int64.t)
   (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (return (x: t_TransferOutcome)) = (! bb0
   [ bb0 = s0
     [ s0 = check_amount_positive [%#sledger] {amount} (fun (_x: bool) -> [ &_11 <- _x ] s1)

@@ -2,37 +2,62 @@
 
 (* <stoplight::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 309 9 309 16
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 309 18 309 26
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 310 9 310 17
-let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 310 19 310 24
-let%span sstoplight'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 311 9 311 14
-let%span sstoplight'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 311 16 311 23
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 17 20 17 30
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38
+let%span sseq = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/seq.rs" 921 20 921 91
 
 use creusot.slice.Slice64
+use seq.Seq
 use creusot.prelude.Any
+use int.Int
 
-type t_Transition = { from: string; to': string }
+type t_Transition
 
-meta "compute_max_steps" 1000000
+predicate inv_Transition (_1: t_Transition)
 
-meta "select_lsinst" "all"
+predicate invariant_ref_Transition [@inline:trivial] (self: t_Transition) = [%#sinvariant] inv_Transition self
 
-let rec transitions_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38]
-  (return (x: Slice64.slice t_Transition)) = (! bb0
+meta "rewrite_def" predicate invariant_ref_Transition
+
+predicate inv_ref_Transition [@inline:trivial] (_1: t_Transition) = invariant_ref_Transition _1
+
+meta "rewrite_def" predicate inv_ref_Transition
+
+predicate invariant_Seq_Transition [@inline:trivial] (self: Seq.seq t_Transition) =
+  [%#sseq] forall i: int. 0 <= i /\ i < Seq.length self -> inv_ref_Transition (Seq.get self i)
+
+meta "rewrite_def" predicate invariant_Seq_Transition
+
+predicate inv_Seq_Transition [@inline:trivial] (_1: Seq.seq t_Transition) = invariant_Seq_Transition _1
+
+meta "rewrite_def" predicate inv_Seq_Transition
+
+predicate invariant_slice_Transition (self: Slice64.slice t_Transition) =
+  [%#sslice] inv_Seq_Transition (Slice64.view self)
+
+predicate inv_slice_Transition [@inline:trivial] (_1: Slice64.slice t_Transition) = invariant_slice_Transition _1
+
+meta "rewrite_def" predicate inv_slice_Transition
+
+predicate invariant_ref_slice_Transition [@inline:trivial] (self: Slice64.slice t_Transition) =
+  [%#sinvariant] inv_slice_Transition self
+
+meta "rewrite_def" predicate invariant_ref_slice_Transition
+
+predicate inv_ref_slice_Transition [@inline:trivial] (_1: Slice64.slice t_Transition) =
+  invariant_ref_slice_Transition _1
+
+meta "rewrite_def" predicate inv_ref_slice_Transition
+
+constant const_TRANSITIONS [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38] : Slice64.slice t_Transition
+
+axiom const_TRANSITIONS_spec: [%#sstoplight] inv_ref_slice_Transition const_TRANSITIONS
+
+let rec set_TRANSITIONS (return) = bb0
   [ bb0 = s0
     [ s0 = bb0'0
-      [ bb0'0 = s0'0
-        [ s0'0 = [ &_2'0 <- { from = ([%#sstoplight] "Green"); to' = ([%#sstoplight'0] "Yellow") } ] s1'0
-        | s1'0 = [ &_3 <- { from = ([%#sstoplight'1] "Yellow"); to' = ([%#sstoplight'2] "Red") } ] s2'0
-        | s2'0 = [ &_4 <- { from = ([%#sstoplight'3] "Red"); to' = ([%#sstoplight'4] "Green") } ] s3'0
-        | s3'0 = any
-          [ any_ (__arr_temp: Slice64.array t_Transition) -> (! -{Seq.get __arr_temp.Slice64.elts 0 = _2'0
-            /\ Seq.get __arr_temp.Slice64.elts 1 = _3
-            /\ Seq.get __arr_temp.Slice64.elts 2 = _4 /\ Seq.length __arr_temp.Slice64.elts = 3}-
-            [ &_1 <- __arr_temp ] s4) ]
-        | s4 = [ &_ret'0 <- _1 ] s5
-        | s5 = _const_ret {_ret'0} ] ]
+      [ bb0'0 = {[%#sstoplight] false} any ]
       [ & _ret'0: Slice64.array t_Transition = Any.any_l ()
       | & _1: Slice64.array t_Transition = Any.any_l ()
       | & _2'0: t_Transition = Any.any_l ()
@@ -43,5 +68,18 @@ let rec transitions_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creus
     | s3 = return {_ret} ] ]
   [ & _ret: Slice64.slice t_Transition = Any.any_l ()
   | & _2: Slice64.array t_Transition = Any.any_l ()
-  | & _7: Slice64.array t_Transition = Any.any_l () ])
-  [ return (result: Slice64.slice t_Transition) -> (! return {result}) ]
+  | & _7: Slice64.array t_Transition = Any.any_l () ]
+  [ return (_const: Slice64.slice t_Transition) -> -{const_TRANSITIONS = _const}- return ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec transitions_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38]
+  (return (x: Slice64.slice t_Transition)) = set_TRANSITIONS
+    ((! bb0
+    [ bb0 = s0 [ s0 = [ &_ret <- [%#sstoplight] const_TRANSITIONS ] s1 | s1 = return {_ret} ] ]
+    [ & _ret: Slice64.slice t_Transition = Any.any_l () ])
+    [ return (result: Slice64.slice t_Transition) ->
+    {[@stop_split] [@expl:transitions result type invariant] [%#sstoplight] inv_ref_slice_Transition result}
+      (! return {result}) ])

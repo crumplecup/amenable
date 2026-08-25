@@ -4,7 +4,7 @@
 
 let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 424 15 424 19
 let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 425 14 428 5
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 538 24 538 56
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 56
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -16,7 +16,7 @@ type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok () | Err tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 537 8 537 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#sledger'1] outcome = (Int64.to_int balance'0 >= Int64.to_int amount)
 
 meta "compute_max_steps" 1000000

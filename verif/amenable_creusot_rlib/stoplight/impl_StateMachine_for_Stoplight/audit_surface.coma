@@ -2,9 +2,12 @@
 
 (* <stoplight::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
 
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 302 9 302 38
+let%span sseq = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/seq.rs" 921 20 921 91
 let%span svec = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/vec.rs" 104 18 104 36
 let%span svec'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/vec.rs" 18 14 18 41
+let%span svec'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/vec.rs" 89 20 89 30
 
 use seq.Seq
 use creusot.int.UInt64
@@ -13,7 +16,27 @@ use int.Int
 
 type t_Vec_TransitionAudit_Global
 
-type t_TransitionAudit = { to': string; method_name: string; body: string }
+type t_TransitionAudit
+
+predicate inv_TransitionAudit (_1: t_TransitionAudit)
+
+predicate invariant_ref_TransitionAudit [@inline:trivial] (self: t_TransitionAudit) =
+  [%#sinvariant] inv_TransitionAudit self
+
+meta "rewrite_def" predicate invariant_ref_TransitionAudit
+
+predicate inv_ref_TransitionAudit [@inline:trivial] (_1: t_TransitionAudit) = invariant_ref_TransitionAudit _1
+
+meta "rewrite_def" predicate inv_ref_TransitionAudit
+
+predicate invariant_Seq_TransitionAudit [@inline:trivial] (self: Seq.seq t_TransitionAudit) =
+  [%#sseq] forall i: int. 0 <= i /\ i < Seq.length self -> inv_ref_TransitionAudit (Seq.get self i)
+
+meta "rewrite_def" predicate invariant_Seq_TransitionAudit
+
+predicate inv_Seq_TransitionAudit [@inline:trivial] (_1: Seq.seq t_TransitionAudit) = invariant_Seq_TransitionAudit _1
+
+meta "rewrite_def" predicate inv_Seq_TransitionAudit
 
 constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
 
@@ -23,9 +46,19 @@ axiom view_Vec_TransitionAudit_Global_spec:
   forall self: t_Vec_TransitionAudit_Global. [%#svec'0] Seq.length (view_Vec_TransitionAudit_Global self)
     <= UInt64.t'int const_MAX
 
+predicate invariant_Vec_TransitionAudit_Global (self: t_Vec_TransitionAudit_Global) =
+  [%#svec'1] inv_Seq_TransitionAudit (view_Vec_TransitionAudit_Global self)
+
+predicate inv_Vec_TransitionAudit_Global (_1: t_Vec_TransitionAudit_Global)
+
+axiom inv_axiom:
+  forall x: t_Vec_TransitionAudit_Global [inv_Vec_TransitionAudit_Global x]. inv_Vec_TransitionAudit_Global x
+    -> invariant_Vec_TransitionAudit_Global x
+
 let rec new_TransitionAudit (return (x: t_Vec_TransitionAudit_Global)) = any
   [ return (result: t_Vec_TransitionAudit_Global) ->
-  {[@stop_split] [@expl:new ensures] [%#svec] Seq.length (view_Vec_TransitionAudit_Global result) = 0}
+  {[@stop_split] [@expl:new_TransitionAudit ensures] ([@stop_split] [@expl:new result type invariant] inv_Vec_TransitionAudit_Global result)
+    /\ ([@stop_split] [@expl:new ensures] [%#svec] Seq.length (view_Vec_TransitionAudit_Global result) = 0)}
     (! return {result}) ]
 
 meta "compute_max_steps" 1000000
@@ -37,4 +70,6 @@ let rec audit_surface_Stoplight [#"/home/erik/repos/amenable/crates/amenable_cre
   [ bb0 = s0
     [ s0 = new_TransitionAudit [%#sstoplight] (fun (_x: t_Vec_TransitionAudit_Global) -> [ &_ret <- _x ] s1)
     | s1 = return {_ret} ] ] [ & _ret: t_Vec_TransitionAudit_Global = Any.any_l () ])
-  [ return (result: t_Vec_TransitionAudit_Global) -> (! return {result}) ]
+  [ return (result: t_Vec_TransitionAudit_Global) ->
+  {[@stop_split] [@expl:audit_surface result type invariant] [%#sstoplight] inv_Vec_TransitionAudit_Global result}
+    (! return {result}) ]

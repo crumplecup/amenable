@@ -21,8 +21,8 @@ let%span sledger'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/led
 let%span sledger'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 161 18 161 22
 let%span sledger'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 242 8 242 13
 let%span sledger'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 475 24 475 48
-let%span sledger'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 589 24 589 47
-let%span sledger'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 538 24 538 56
+let%span sledger'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 585 24 585 47
+let%span sledger'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 56
 let%span sledger'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 451 4 451 49
 let%span sledger'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 447 14 450 5
 let%span sledger'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 460 4 460 59
@@ -62,7 +62,7 @@ let%span sops'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sops'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 138 15 138 28
 let%span sops'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 139 14 139 30
 let%span sops'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 144 14 145 104
-let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 59 0 59 85
+let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 63 0 63 85
 let%span sconvert = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/convert.rs" 19 18 19 32
 
 use creusot.int.UInt64
@@ -321,7 +321,7 @@ type tup2_i64_i64 = { f0'1: Int64.t; f1'1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok'3 () | Err'3 tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 537 8 537 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
   [%#sledger'19] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'1)
 
 let rec check_sufficient_funds_V (self: t_Ledger) (amount'1: Int64.t) (return (x: t_Result_unit_tup2_i64_i64)) = any
@@ -390,7 +390,7 @@ let rec new_Validated (payload'1: t_TransferPayload) (token'1: t_ValidatedToken)
     /\ ([@stop_split] [@expl:new ensures] [%#sledger] result.payload'0 = payload'1)}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 588 8 588 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 584 8 584 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
   [%#sledger'18] outcome = (from'1 <> to''1)
 
 meta "compute_max_steps" 1000000
