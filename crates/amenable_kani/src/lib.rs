@@ -74,8 +74,9 @@ pub use fs_model::{
 pub use hash_collections_model::{KaniHashMap, KaniHashSet};
 pub use hash_model::KaniRandomStateObservation;
 pub use io_model::{
-    KaniBufReadSplitObservation, KaniBufferedReadObservation, KaniFlushErrorObservation,
-    KaniLineWriterObservation, KaniLinesObservation, KaniWriterPanickedObservation,
+    KaniBufReadSplitObservation, KaniBufReadSplitObservationBuilder, KaniBufferedReadObservation,
+    KaniFlushErrorObservation, KaniLineWriterObservation, KaniLinesObservation,
+    KaniWriterPanickedObservation,
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};

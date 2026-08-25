@@ -37,18 +37,12 @@ impl Provenance for KaniBufferedReadWindow {
 }
 
 /// Bounded buffered-read observation over a two-byte payload.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniBufferedReadObservation {
     bytes: [u8; 2],
 }
 
 impl KaniBufferedReadObservation {
-    /// Construct the bounded buffered-read witness.
-    #[must_use]
-    pub fn new(bytes: [u8; 2]) -> Self {
-        Self { bytes }
-    }
-
     /// Model reading the underlying source to completion.
     #[must_use]
     pub fn read_to_end(&self) -> [u8; 2] {
@@ -95,18 +89,12 @@ impl Provenance for KaniFlushErrorWindow {
 }
 
 /// Bounded `IntoInnerError`-style recovery observation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniFlushErrorObservation {
     buffered: [u8; 2],
 }
 
 impl KaniFlushErrorObservation {
-    /// Construct the bounded flush-failure witness.
-    #[must_use]
-    pub fn new(buffered: [u8; 2]) -> Self {
-        Self { buffered }
-    }
-
     /// Model whether the flush failed.
     #[must_use]
     pub fn flush_failed(&self) -> bool {
@@ -159,22 +147,13 @@ impl Provenance for KaniLineWriterWindow {
 }
 
 /// Bounded line-buffering observation over one complete line and one trailing byte.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniLineWriterObservation {
     line_byte: u8,
     trailing_byte: u8,
 }
 
 impl KaniLineWriterObservation {
-    /// Construct the bounded line-buffering witness.
-    #[must_use]
-    pub fn new(line_byte: u8, trailing_byte: u8) -> Self {
-        Self {
-            line_byte,
-            trailing_byte,
-        }
-    }
-
     /// Model the bytes visible in the underlying writer after writing a newline-terminated line.
     #[must_use]
     pub fn after_newline_write(&self) -> [u8; 2] {
@@ -233,7 +212,7 @@ impl Provenance for KaniLinesWindow {
 }
 
 /// Bounded line-splitting observation over three one-byte ASCII lines.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniLinesObservation {
     first: u8,
     second: u8,
@@ -241,16 +220,6 @@ pub struct KaniLinesObservation {
 }
 
 impl KaniLinesObservation {
-    /// Construct the bounded line-splitting witness.
-    #[must_use]
-    pub fn new(first: u8, second: u8, third: u8) -> Self {
-        Self {
-            first,
-            second,
-            third,
-        }
-    }
-
     /// Model `BufRead::lines()` over the bounded witness.
     #[must_use]
     pub fn lines(&self) -> ([u8; 1], [u8; 1], [u8; 1]) {
@@ -297,26 +266,19 @@ impl Provenance for KaniBufReadSplitWindow {
 }
 
 /// Bounded delimiter-splitting observation over `[first, delimiter, second, delimiter, third]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
 pub struct KaniBufReadSplitObservation {
+    /// The first segment byte.
     first: u8,
+    /// The repeated delimiter byte.
     delimiter: u8,
+    /// The second segment byte.
     second: u8,
+    /// The third segment byte.
     third: u8,
 }
 
 impl KaniBufReadSplitObservation {
-    /// Construct the bounded split witness.
-    #[must_use]
-    pub fn new(first: u8, delimiter: u8, second: u8, third: u8) -> Self {
-        Self {
-            first,
-            delimiter,
-            second,
-            third,
-        }
-    }
-
     /// Model `BufRead::split(delimiter)` over the bounded witness.
     #[must_use]
     pub fn segments(&self) -> ([u8; 1], [u8; 1], [u8; 1]) {
@@ -369,18 +331,12 @@ impl Provenance for KaniWriterPanickedWindow {
 }
 
 /// Bounded panic-recovery observation for `WriterPanicked`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniWriterPanickedObservation {
     buffered: [u8; 2],
 }
 
 impl KaniWriterPanickedObservation {
-    /// Construct the bounded panic-recovery witness.
-    #[must_use]
-    pub fn new(buffered: [u8; 2]) -> Self {
-        Self { buffered }
-    }
-
     /// Model whether the inner writer panicked.
     #[must_use]
     pub fn panicked(&self) -> bool {

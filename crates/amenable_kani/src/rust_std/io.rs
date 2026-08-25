@@ -728,9 +728,13 @@ amenable_derive::harness! {
             kani::assume(ByteIsDistinctFromTheMarker::requires((first, delimiter)));
             kani::assume(ByteIsDistinctFromTheMarker::requires((second, delimiter)));
             kani::assume(ByteIsDistinctFromTheMarker::requires((third, delimiter)));
-            let observation = crate::KaniBufReadSplitObservation::new(
-                first, delimiter, second, third,
-            );
+            let observation = crate::KaniBufReadSplitObservationBuilder::default()
+                .first(first)
+                .delimiter(delimiter)
+                .second(second)
+                .third(third)
+                .build()
+                .expect("all fields set");
             let demonstration = observation.demonstrate_segments(first, second, third);
 
             let _token =
