@@ -309,7 +309,8 @@ use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
 use amenable_std::{
     ArgvIncludesProgramPath, AsciiByte, DrainsTwoValuesInOrderAndEmpties, IndexingAndLength,
     IterYieldsValueOnceThenEnds, NonNulByte, NulOnlyAtTheEndValidates, RustLanguageProvenance,
-    RustStdProvenance, RustStdStandard, ValidUnicodeScalar, YieldsTwoValuesInOrderThenEnds,
+    RustStdProvenance, RustStdProvenanceBuilder, RustStdStandard, ValidUnicodeScalar,
+    YieldsTwoValuesInOrderThenEnds,
 };
 
 #[expect(
@@ -4866,12 +4867,13 @@ fn windows_provenance(
     type_name: &str,
     summary: &str,
 ) -> RustStdProvenance {
-    RustStdProvenance::new(
-        RustLanguageProvenance::for_source("std", source_module),
-        url,
-        type_name,
-        summary,
-    )
+    RustStdProvenanceBuilder::default()
+        .rust(RustLanguageProvenance::for_source("std", source_module))
+        .source_url(url)
+        .type_name(type_name)
+        .semantic_summary(summary)
+        .build()
+        .expect("all fields set")
 }
 
 ::inventory::submit! {

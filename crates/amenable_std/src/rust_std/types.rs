@@ -7,8 +7,9 @@ use amenable_core::{OwnedProvenanceReport, Provenance as _, Registry};
 use amenable_derive::{Provenance, Standard};
 
 /// Shared provenance for Rust-authored documented semantics.
-#[derive(Debug, Clone, PartialEq, Eq, Provenance)]
+#[derive(Debug, Clone, PartialEq, Eq, Provenance, derive_builder::Builder)]
 #[provenance(crate = "amenable_core")]
+#[builder(setter(into))]
 pub struct RustLanguageProvenance {
     /// The class of authority this provenance record represents.
     authority_kind: String,
@@ -21,55 +22,44 @@ pub struct RustLanguageProvenance {
 }
 
 impl RustLanguageProvenance {
-    /// Create a shared Rust-language provenance record.
-    pub fn new(
-        authority_kind: impl Into<String>,
-        authority: impl Into<String>,
-        source_crate: impl Into<String>,
-        source_module: impl Into<String>,
-    ) -> Self {
-        Self {
-            authority_kind: authority_kind.into(),
-            authority: authority.into(),
-            source_crate: source_crate.into(),
-            source_module: source_module.into(),
-        }
-    }
-
     /// Provenance for Rust's primitive carriers as documented through `core`.
     pub fn core_primitive() -> Self {
-        Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            "core",
-            "core::primitive",
-        )
+        RustLanguageProvenanceBuilder::default()
+            .authority_kind("external_standard")
+            .authority("Rust Project Developers")
+            .source_crate("core")
+            .source_module("core::primitive")
+            .build()
+            .expect("all fields set")
     }
 
     /// Provenance for `String` as documented through `alloc`.
     pub fn alloc_string() -> Self {
-        Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            "alloc",
-            "alloc::string",
-        )
+        RustLanguageProvenanceBuilder::default()
+            .authority_kind("external_standard")
+            .authority("Rust Project Developers")
+            .source_crate("alloc")
+            .source_module("alloc::string")
+            .build()
+            .expect("all fields set")
     }
 
     /// Provenance for a type documented through `source_crate`/`source_module`.
     pub fn for_source(source_crate: impl Into<String>, source_module: impl Into<String>) -> Self {
-        Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            source_crate,
-            source_module,
-        )
+        RustLanguageProvenanceBuilder::default()
+            .authority_kind("external_standard")
+            .authority("Rust Project Developers")
+            .source_crate(source_crate)
+            .source_module(source_module)
+            .build()
+            .expect("all fields set")
     }
 }
 
 /// Structured provenance for a Rust standard-library-backed carrier.
-#[derive(Debug, Clone, PartialEq, Eq, Provenance)]
+#[derive(Debug, Clone, PartialEq, Eq, Provenance, derive_builder::Builder)]
 #[provenance(crate = "amenable_core")]
+#[builder(setter(into))]
 pub struct RustStdProvenance {
     /// The shared Rust-language provenance this type-specific record relies on.
     rust: RustLanguageProvenance,
@@ -79,23 +69,6 @@ pub struct RustStdProvenance {
     type_name: String,
     /// Concise summary of the semantic promise made by the standard library.
     semantic_summary: String,
-}
-
-impl RustStdProvenance {
-    /// Create a provenance record for a concrete Rust standard-library type.
-    pub fn new(
-        rust: RustLanguageProvenance,
-        source_url: impl Into<String>,
-        type_name: impl Into<String>,
-        semantic_summary: impl Into<String>,
-    ) -> Self {
-        Self {
-            rust,
-            source_url: source_url.into(),
-            type_name: type_name.into(),
-            semantic_summary: semantic_summary.into(),
-        }
-    }
 }
 
 impl Display for RustStdProvenance {
@@ -143,12 +116,13 @@ impl<T: ?Sized> RustStdStandard<T> {
 pub trait RustStdType {
     /// Structured provenance for the documented semantics of this type.
     fn provenance() -> RustStdProvenance {
-        RustStdProvenance::new(
-            Self::rust_language_provenance(),
-            Self::rust_doc_url(),
-            std::any::type_name::<Self>(),
-            Self::rust_semantics_summary(),
-        )
+        RustStdProvenanceBuilder::default()
+            .rust(Self::rust_language_provenance())
+            .source_url(Self::rust_doc_url())
+            .type_name(std::any::type_name::<Self>())
+            .semantic_summary(Self::rust_semantics_summary())
+            .build()
+            .expect("all fields set")
     }
 
     /// Shared Rust-language provenance for this carrier family.

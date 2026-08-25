@@ -29,21 +29,19 @@ impl Display for CertId {
 }
 
 /// Concrete provenance certificate issued by the default registry.
-#[derive(Debug, Clone, PartialEq, Eq)]
+///
+/// `new` stays private (`#[new(visibility = "")]`): the derive can't
+/// replicate the original `subject: impl Display` parameter (`#[new(
+/// into)]` only widens to `impl Into<String>`, a different bound), so
+/// [`CertRegistry::issue_provenance_certificate`] converts via
+/// `.to_string()` before calling `new` instead.
+#[derive(Debug, Clone, PartialEq, Eq, derive_new::new)]
+#[new(visibility = "")]
 pub struct ProvenanceCertificate {
     id: CertId,
+    #[new(into)]
     subject: String,
     entries: Vec<MetadataEntry>,
-}
-
-impl ProvenanceCertificate {
-    fn new(id: CertId, subject: impl Display, entries: Vec<MetadataEntry>) -> Self {
-        Self {
-            id,
-            subject: subject.to_string(),
-            entries,
-        }
-    }
 }
 
 impl Certificate for ProvenanceCertificate {
@@ -104,7 +102,7 @@ impl Registry for CertRegistry {
     {
         let certificate = ProvenanceCertificate::new(
             CertId::new(self.next_id),
-            subject,
+            subject.to_string(),
             provenance.metadata().collect(),
         );
 

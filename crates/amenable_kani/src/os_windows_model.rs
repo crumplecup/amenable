@@ -64,7 +64,8 @@
 use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::{
-    RustLanguageProvenance, RustStdProvenance, WindowsHandleOrInvalidRejectsOnlyTheSentinel,
+    RustLanguageProvenance, RustStdProvenance, RustStdProvenanceBuilder,
+    WindowsHandleOrInvalidRejectsOnlyTheSentinel,
 };
 
 use super::CheckedProof;
@@ -161,12 +162,13 @@ fn windows_provenance(
     type_name: &str,
     summary: &str,
 ) -> RustStdProvenance {
-    RustStdProvenance::new(
-        RustLanguageProvenance::for_source("std", source_module),
-        url,
-        type_name,
-        summary,
-    )
+    RustStdProvenanceBuilder::default()
+        .rust(RustLanguageProvenance::for_source("std", source_module))
+        .source_url(url)
+        .type_name(type_name)
+        .semantic_summary(summary)
+        .build()
+        .expect("all fields set")
 }
 
 amenable_derive::harness! {

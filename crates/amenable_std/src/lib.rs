@@ -73,8 +73,8 @@ pub use observed_option_matches_input::ObservedOptionMatchesInput;
 pub use observed_pair_matches_input::ObservedPairMatchesInput;
 pub use observed_value_matches_input::ObservedValueMatchesInput;
 pub use rust_std::{
-    RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
-    write_rust_std_certificate_artifacts,
+    RustLanguageProvenance, RustLanguageProvenanceBuilder, RustStdProvenance,
+    RustStdProvenanceBuilder, RustStdStandard, RustStdType, write_rust_std_certificate_artifacts,
 };
 pub use valid_unicode_scalar::ValidUnicodeScalar;
 pub use value_unchanged::ValueUnchanged;

@@ -27,20 +27,22 @@ crate::emit_verus_witnesses!(
 /// A leaf whose [`Witness<VerusVerifier>`] proof is real and
 /// machine-checked — exercises the `Checked` slot of the derive-witness
 /// composition canaries.
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+    ProvenanceDerive,
+    StandardDerive,
+    derive_new::new,
+)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub struct CheckedVerusExportLeaf {
+    /// Label for [`VerusExportCanaryEnum`]'s checked-leaf slots.
+    #[new(into)]
     label: String,
-}
-
-impl CheckedVerusExportLeaf {
-    /// Wrap a label for [`VerusExportCanaryEnum`]'s checked-leaf slots.
-    pub fn new(label: impl Into<String>) -> Self {
-        Self {
-            label: label.into(),
-        }
-    }
 }
 
 impl Witness<VerusVerifier> for CheckedVerusExportLeaf {
@@ -61,20 +63,22 @@ impl ClassifiedWitness<VerusVerifier> for CheckedVerusExportLeaf {}
 /// A leaf whose [`Witness<VerusVerifier>`] proof rests on explicit
 /// provenance rather than a machine-checked spec — exercises the
 /// `Trusted` slot of the derive-witness composition canaries.
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+    ProvenanceDerive,
+    StandardDerive,
+    derive_new::new,
+)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub struct TrustedVerusExportLeaf {
+    /// Label for [`VerusExportCanaryEnum`]'s trusted-leaf slots.
+    #[new(into)]
     label: String,
-}
-
-impl TrustedVerusExportLeaf {
-    /// Wrap a label for [`VerusExportCanaryEnum`]'s trusted-leaf slots.
-    pub fn new(label: impl Into<String>) -> Self {
-        Self {
-            label: label.into(),
-        }
-    }
 }
 
 impl Witness<VerusVerifier> for TrustedVerusExportLeaf {
@@ -96,20 +100,22 @@ impl ClassifiedWitness<VerusVerifier> for TrustedVerusExportLeaf {}
 /// exercises the derive-witness composition renderer's `requires`-
 /// propagation path (reuses `EscapeAscii`'s real harness/call shape,
 /// registered in `verus_witness.rs`).
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+    ProvenanceDerive,
+    StandardDerive,
+    derive_new::new,
+)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub struct RequiresVerusExportLeaf {
+    /// Label for the `requires`-propagation canary's leaf slot.
+    #[new(into)]
     label: String,
-}
-
-impl RequiresVerusExportLeaf {
-    /// Wrap a label for the `requires`-propagation canary's leaf slot.
-    pub fn new(label: impl Into<String>) -> Self {
-        Self {
-            label: label.into(),
-        }
-    }
 }
 
 impl Witness<VerusVerifier> for RequiresVerusExportLeaf {
@@ -172,20 +178,22 @@ struct VerusExportNestedStruct {
 /// composition renderer's `$placeholder`-template path (reuses
 /// `RefCell`'s real harness/call shape, registered in
 /// `verus_witness.rs`).
-#[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+    ProvenanceDerive,
+    StandardDerive,
+    derive_new::new,
+)]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub struct RawTemplateVerusExportLeaf {
+    /// Label for the raw-template canary's leaf slot.
+    #[new(into)]
     label: String,
-}
-
-impl RawTemplateVerusExportLeaf {
-    /// Wrap a label for the raw-template canary's leaf slot.
-    pub fn new(label: impl Into<String>) -> Self {
-        Self {
-            label: label.into(),
-        }
-    }
 }
 
 impl Witness<VerusVerifier> for RawTemplateVerusExportLeaf {
