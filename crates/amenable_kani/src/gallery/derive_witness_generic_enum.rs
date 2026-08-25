@@ -94,18 +94,12 @@ amenable_derive::harness! {
             let adjustment_size = core::mem::size_of_val(&adjustment);
             let closed_size = core::mem::size_of_val(&closed);
 
-            let crate::CalculationProof::new(
-                debit_harness,
-                debit_claim,
-            ) = balanced.debit;
-            let crate::CalculationProof::new(
-                named_credit_harness,
-                named_credit_claim,
-            ) = balanced.credit;
-            let crate::CalculationProof::new(
-                tuple_credit_harness,
-                tuple_credit_claim,
-            ) = adjustment.field_0;
+            let debit_harness = balanced.debit.harness();
+            let debit_claim = balanced.debit.claim();
+            let named_credit_harness = balanced.credit.harness();
+            let named_credit_claim = balanced.credit.claim();
+            let tuple_credit_harness = adjustment.field_0.harness();
+            let tuple_credit_claim = adjustment.field_0.claim();
 
             let _ = (
                 debit_harness,
