@@ -33,14 +33,14 @@ use crate::{EvidenceLink, ProofRecord};
 /// One node in a reconstructed evidence tree: the evidence type's name,
 /// every registered proof backing it (one per verifier with a
 /// [`ProofRecord`] for it), and the node for each basis it rests on.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_getters::Getters, derive_getters::Dissolve, derive_new::new)]
 pub struct ChainNode {
     /// This node's evidence type name.
-    pub evidence: String,
+    evidence: String,
     /// Registered proofs for this node, as `(verifier, description)` pairs.
-    pub proofs: Vec<(String, String)>,
+    proofs: Vec<(String, String)>,
     /// The node for each basis this evidence rests on — empty at a root.
-    pub bases: Vec<ChainNode>,
+    bases: Vec<ChainNode>,
 }
 
 impl ChainNode {
@@ -52,15 +52,15 @@ impl ChainNode {
 
 /// A reconstructed evidence tree, rooted at a named subject, complete for
 /// every verifier in `verifiers`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_getters::Getters, derive_new::new)]
 pub struct ProofChainReport {
     /// The evidence type name the report was built from.
-    pub subject: String,
+    subject: String,
     /// Every verifier this report is complete for — each node in `root`
     /// is guaranteed to carry a proof for all of them.
-    pub verifiers: Vec<String>,
+    verifiers: Vec<String>,
     /// The subject's own node, and everything it rests on.
-    pub root: ChainNode,
+    root: ChainNode,
 }
 
 impl Display for ProofChainReport {
@@ -88,23 +88,23 @@ impl Display for ProofChainReport {
 fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Result {
     let indent = "  ".repeat(depth);
 
-    write!(f, "{indent}{}", node.evidence)?;
+    write!(f, "{indent}{}", node.evidence())?;
     if node.is_root() {
         write!(f, " (root)")?;
     }
     writeln!(f)?;
 
-    if !node.bases.is_empty() {
+    if !node.bases().is_empty() {
         let names = node
-            .bases
+            .bases()
             .iter()
-            .map(|basis| basis.evidence.as_str())
+            .map(|basis| basis.evidence().as_str())
             .collect::<Vec<_>>()
             .join(", ");
         writeln!(f, "{indent}  basis: {names}")?;
     }
 
-    for (verifier, description) in &node.proofs {
+    for (verifier, description) in node.proofs() {
         writeln!(f, "{indent}  proof [{verifier}]:")?;
 
         for line in description.lines() {
@@ -112,7 +112,7 @@ fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Res
         }
     }
 
-    for basis in &node.bases {
+    for basis in node.bases() {
         write_node(f, basis, depth + 1)?;
     }
 
@@ -121,12 +121,12 @@ fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Res
 
 /// One missing proof: `evidence` has no [`ProofRecord`] registered for
 /// `verifier`, even though the chain was asked to be complete for it.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct ChainGap {
     /// The evidence type name missing a proof.
-    pub evidence: String,
+    evidence: String,
     /// The verifier it has no proof registered for.
-    pub verifier: String,
+    verifier: String,
 }
 
 impl Display for ChainGap {
@@ -134,25 +134,29 @@ impl Display for ChainGap {
         write!(
             f,
             "{} has no proof registered for verifier {:?}",
-            self.evidence, self.verifier
+            self.evidence(),
+            self.verifier()
         )
     }
 }
 
 /// No registered [`EvidenceLink`] matched the requested subject at all --
 /// a real, `Error`-implementing leaf, not a bare `String`.
-#[derive(Debug, Clone, PartialEq, Eq, derive_more::Display, derive_more::Error)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, derive_more::Display, derive_more::Error, derive_getters::Getters,
+)]
 #[display("no registered evidence link matches {subject:?}")]
 pub struct NotFoundSource {
     /// The subject that was searched for.
     #[error(ignore)]
-    pub subject: String,
+    subject: String,
     /// Source line of the call site that produced this error.
     #[error(ignore)]
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
     #[error(ignore)]
-    pub file: String,
+    file: String,
 }
 
 impl NotFoundSource {
@@ -171,26 +175,24 @@ impl NotFoundSource {
 
 /// The subject was found, but at least one node in its tree has no proof
 /// registered for at least one of the required verifiers.
-#[derive(Debug, Clone, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Error, derive_getters::Getters)]
 pub struct IncompleteSource {
     /// The evidence type name the lookup was rooted at.
     #[error(ignore)]
-    pub subject: String,
+    subject: String,
     /// Every verifier the chain was required to be complete for.
     #[error(ignore)]
-    pub required: Vec<String>,
+    required: Vec<String>,
     /// Every `(evidence, verifier)` gap found, in tree order.
     #[error(ignore)]
-    pub gaps: Vec<ChainGap>,
-    /// Source line of the call site that produced this error. Public,
-    /// like every other field in this module -- matching this file's
-    /// own established convention (`ChainGap`/`ChainNode`/
-    /// `ProofChainReport` are all plain public-field data types too).
+    gaps: Vec<ChainGap>,
+    /// Source line of the call site that produced this error.
     #[error(ignore)]
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
     #[error(ignore)]
-    pub file: String,
+    file: String,
 }
 
 impl IncompleteSource {
@@ -214,13 +216,13 @@ impl Display for IncompleteSource {
         writeln!(
             f,
             "proof chain for {} is incomplete for verifier(s): {}",
-            self.subject,
-            self.required.join(", ")
+            self.subject(),
+            self.required().join(", ")
         )?;
         writeln!(f)?;
         write!(f, "missing proofs:")?;
 
-        for gap in &self.gaps {
+        for gap in self.gaps() {
             write!(f, "\n  {gap}")?;
         }
 
@@ -333,30 +335,25 @@ pub fn proof_chain_for_verifiers(
 
     let root = filter_node(full_root, &required);
 
-    Ok(ProofChainReport {
-        subject: root_name.to_string(),
-        verifiers: required,
-        root,
-    })
+    Ok(ProofChainReport::new(root_name.to_string(), required, root))
 }
 
 /// Narrow a node's (already-complete) proofs down to just `required`, so
 /// a chain explicitly scoped to one verifier doesn't also print proofs
 /// for others that happen to be registered alongside it.
 fn filter_node(node: ChainNode, required: &[String]) -> ChainNode {
-    ChainNode {
-        evidence: node.evidence,
-        proofs: node
-            .proofs
+    let (evidence, proofs, bases) = node.dissolve();
+    ChainNode::new(
+        evidence,
+        proofs
             .into_iter()
             .filter(|(verifier, _)| required.iter().any(|r| r == verifier))
             .collect(),
-        bases: node
-            .bases
+        bases
             .into_iter()
             .map(|basis| filter_node(basis, required))
             .collect(),
-    }
+    )
 }
 
 fn build_node(
@@ -389,11 +386,7 @@ fn build_node(
         visiting.remove(name);
     }
 
-    ChainNode {
-        evidence: name.to_string(),
-        proofs,
-        bases,
-    }
+    ChainNode::new(name.to_string(), proofs, bases)
 }
 
 /// Every distinct verifier with a registered proof anywhere in the tree.
@@ -404,28 +397,25 @@ fn discover_verifiers(node: &ChainNode) -> Vec<String> {
 }
 
 fn collect_verifiers(node: &ChainNode, found: &mut Vec<String>) {
-    for (verifier, _) in &node.proofs {
+    for (verifier, _) in node.proofs() {
         if !found.iter().any(|seen| seen == verifier) {
             found.push((*verifier).to_owned());
         }
     }
 
-    for basis in &node.bases {
+    for basis in node.bases() {
         collect_verifiers(basis, found);
     }
 }
 
 fn collect_gaps(node: &ChainNode, required: &[String], gaps: &mut Vec<ChainGap>) {
     for verifier in required {
-        if !node.proofs.iter().any(|(v, _)| v == verifier) {
-            gaps.push(ChainGap {
-                evidence: node.evidence.clone(),
-                verifier: verifier.clone(),
-            });
+        if !node.proofs().iter().any(|(v, _)| v == verifier) {
+            gaps.push(ChainGap::new(node.evidence().clone(), verifier.clone()));
         }
     }
 
-    for basis in &node.bases {
+    for basis in node.bases() {
         collect_gaps(basis, required, gaps);
     }
 }

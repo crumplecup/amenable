@@ -1,15 +1,15 @@
 #[path = "support_chain.rs"]
 mod support;
 
-use amenable::{ChainErrorKind, IncompleteSource, NotFoundSource};
+use amenable::ChainErrorKind;
 
 fn assert_root_has_kani_and_creusot(report: &amenable::ProofChainReport, expected_suffix: &str) {
-    let root = &report.root;
-    assert!(root.evidence.ends_with(expected_suffix));
+    let root = report.root();
+    assert!(root.evidence().ends_with(expected_suffix));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -22,8 +22,8 @@ fn proof_description<'a>(
     verifier: &str,
 ) -> Option<&'a str> {
     report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(registered, _)| *registered == verifier)
         .map(|(_, description)| description.as_str())
@@ -44,14 +44,14 @@ fn proof_description<'a>(
 fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<bool>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<bool>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<bool>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 3);
-    assert_eq!(report.verifiers.len(), 3);
+    assert_eq!(root.proofs().len(), 3);
+    assert_eq!(report.verifiers().len(), 3);
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -65,9 +65,9 @@ fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() -> miette::
 fn char_proof_chain_carries_the_checked_harness_name_per_verifier() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<char>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for char"))?;
@@ -84,19 +84,19 @@ fn array_i32_3_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<[i32; 3]>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<[i32; 3]>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<[i32; 3]>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for [i32; 3]"))?;
     assert!(kani_description.contains("verify_array_indexing_and_length"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for [i32; 3]"))?;
@@ -112,19 +112,19 @@ fn atomic_bool_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<AtomicBool>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<AtomicBool>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<AtomicBool>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for AtomicBool"))?;
     assert!(kani_description.contains("verify_atomic_bool"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for AtomicBool"))?;
@@ -140,19 +140,19 @@ fn atomic_ptr_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<AtomicPtr<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<AtomicPtr<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<AtomicPtr<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for AtomicPtr<i32>"))?;
     assert!(kani_description.contains("verify_atomic_ptr_load_store_swap_and_compare_exchange"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for AtomicPtr<i32>"))?;
@@ -168,19 +168,19 @@ fn atomic_ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ordering>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Ordering>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Ordering>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for atomic Ordering"))?;
     assert!(kani_description.contains("verify_relaxed_ordering_still_makes_a_store_observable"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for atomic Ordering"))?;
@@ -194,19 +194,19 @@ fn system_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<System>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<System>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<System>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for System"))?;
     assert!(kani_description.contains("verify_system_allocates_and_deallocates_a_layout"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for System"))?;
@@ -220,19 +220,19 @@ fn backtrace_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Backtrace>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Backtrace>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Backtrace>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Backtrace"))?;
     assert!(kani_description.contains("verify_backtrace_force_capture_always_actually_captures"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Backtrace"))?;
@@ -248,12 +248,15 @@ fn backtrace_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<BacktraceStatus>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<BacktraceStatus>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<BacktraceStatus>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BacktraceStatus"))?;
@@ -262,7 +265,7 @@ fn backtrace_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BacktraceStatus"))?;
@@ -279,19 +282,19 @@ fn seek_from_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SeekFrom>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<SeekFrom>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<SeekFrom>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SeekFrom"))?;
     assert!(kani_description.contains("verify_seek_from_round_trips_each_variants_offset"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for SeekFrom"))?;
@@ -305,19 +308,19 @@ fn shutdown_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Shutdown>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Shutdown>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Shutdown>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Shutdown"))?;
     assert!(kani_description.contains("verify_shutdown_write_prevents_further_writes"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Shutdown"))?;
@@ -1104,19 +1107,19 @@ fn slice_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<[i32]>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<[i32]>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<[i32]>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for [i32]"))?;
     assert!(kani_description.contains("verify_slice_indexing_and_length"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for [i32]"))?;
@@ -1132,19 +1135,19 @@ fn str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<str>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<str>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<str>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for str"))?;
     assert!(kani_description.contains("verify_str_byte_length_and_content"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for str"))?;
@@ -1283,15 +1286,15 @@ fn slice_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -1300,7 +1303,7 @@ fn slice_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     assert!(kani_description.contains("verify_iter_yields_shared_references_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -1318,15 +1321,15 @@ fn slice_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::IterMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::IterMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -1337,7 +1340,7 @@ fn slice_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -1358,15 +1361,15 @@ fn chunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Chunks<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Chunks<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1383,15 +1386,15 @@ fn chunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChunksExact<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ChunksExact<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1408,15 +1411,15 @@ fn chunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChunksMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ChunksMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1433,15 +1436,15 @@ fn chunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChunksExactMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ChunksExactMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1458,15 +1461,15 @@ fn windows_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Windows<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Windows<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1483,15 +1486,15 @@ fn rchunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RChunks<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RChunks<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1508,15 +1511,15 @@ fn rchunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RChunksExact<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RChunksExact<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1533,15 +1536,15 @@ fn rchunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RChunksExactMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RChunksExactMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1558,15 +1561,15 @@ fn rchunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RChunksMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RChunksMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1583,15 +1586,15 @@ fn chunk_by_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1608,15 +1611,15 @@ fn chunk_by_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1633,15 +1636,15 @@ fn rsplit_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1658,15 +1661,15 @@ fn rsplit_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1683,15 +1686,15 @@ fn rsplit_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1708,15 +1711,15 @@ fn rsplit_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1733,15 +1736,15 @@ fn split_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<(
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1758,16 +1761,16 @@ fn split_inclusive_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence.ends_with(
+        root.evidence().ends_with(
             "RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>"
         )
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1784,15 +1787,15 @@ fn split_inclusive_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> mi
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1809,15 +1812,15 @@ fn split_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1834,15 +1837,15 @@ fn split_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1859,15 +1862,15 @@ fn split_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1884,15 +1887,15 @@ fn escape_ascii_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<EscapeAscii<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<EscapeAscii<'static>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1910,15 +1913,15 @@ fn get_disjoint_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() ->
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<GetDisjointMutError>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<GetDisjointMutError>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -1935,19 +1938,19 @@ fn tuple_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<(i32, i32)>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<(i32, i32)>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<(i32, i32)>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for (i32, i32)"))?;
     assert!(kani_description.contains("verify_tuple_field_access"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for (i32, i32)"))?;
@@ -1963,19 +1966,19 @@ fn fn_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<fn(i32) -> i32>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<fn(i32) -> i32>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<fn(i32) -> i32>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for fn(i32) -> i32"))?;
     assert!(kani_description.contains("verify_fn_pointer_calls_the_underlying_function"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for fn(i32) -> i32"))?;
@@ -1991,19 +1994,19 @@ fn const_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<*const i32>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<*const i32>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<*const i32>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for *const i32"))?;
     assert!(kani_description.contains("verify_const_pointer_cast_is_reproducible"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for *const i32"))?;
@@ -2019,19 +2022,19 @@ fn mut_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<*mut i32>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<*mut i32>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<*mut i32>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for *mut i32"))?;
     assert!(kani_description.contains("verify_mut_pointer_cast_is_reproducible"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for *mut i32"))?;
@@ -2047,22 +2050,22 @@ fn assert_unwind_safe_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<AssertUnwindSafe<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<AssertUnwindSafe<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for AssertUnwindSafe<i32>"))?;
     assert!(kani_description.contains("verify_assert_unwind_safe_derefs_transparently"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for AssertUnwindSafe<i32>"))?;
@@ -2078,12 +2081,12 @@ fn pin_box_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Pin<Box<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Pin<Box<i32>>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Pin<Box<i32>>>"));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2100,12 +2103,12 @@ fn non_null_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonNull<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonNull<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonNull<i32>>"));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2122,19 +2125,19 @@ fn shared_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<&'static i32>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<&'static i32>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<&'static i32>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for &'static i32"))?;
     assert!(kani_description.contains("verify_shared_reference_dereferences_to_the_referent"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for &'static i32"))?;
@@ -2150,12 +2153,15 @@ fn mutable_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<&'static mut i32>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<&'static mut i32>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<&'static mut i32>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for &'static mut i32"))?;
@@ -2165,7 +2171,7 @@ fn mutable_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for &'static mut i32"))?;
@@ -2184,12 +2190,16 @@ fn unit_proof_chain_reports_kani_and_creusot_provenance() -> miette::Result<()> 
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<()>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<()>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<()>"));
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2204,15 +2214,15 @@ fn location_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Location<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Location<'static>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2229,15 +2239,15 @@ fn panic_info_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PanicInfo<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<PanicInfo<'static>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2254,15 +2264,15 @@ fn panic_message_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PanicMessage<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<PanicMessage<'static>>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2279,22 +2289,22 @@ fn cow_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cow<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Cow<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Cow<'static, i32>"))?;
     assert!(kani_description.contains("verify_cow_borrowed_and_owned_agree_on_their_value"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Cow<'static, i32>"))?;
@@ -2307,19 +2317,19 @@ fn cow_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cell<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Cell<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Cell<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Cell"))?;
     assert!(kani_description.contains("verify_cell_get_set_replace_take_round_trip"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2331,19 +2341,19 @@ fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 fn ref_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<RefCell<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<RefCell<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<RefCell<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RefCell"))?;
     assert!(kani_description.contains("verify_ref_cell_dynamic_borrow_rules"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2358,22 +2368,22 @@ fn ref_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ref<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Ref<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Ref"))?;
     assert!(kani_description.contains("verify_ref_derefs_to_the_borrowed_value"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2388,22 +2398,22 @@ fn ref_mut_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RefMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RefMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RefMut"))?;
     assert!(kani_description.contains("verify_ref_mut_derefs_and_writes_through_to_the_cell"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2415,19 +2425,19 @@ fn ref_mut_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 fn once_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<OnceCell<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<OnceCell<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<OnceCell<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for OnceCell"))?;
     assert!(kani_description.contains("verify_once_cell_initializes_exactly_once"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2439,19 +2449,22 @@ fn once_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 fn unsafe_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<UnsafeCell<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<UnsafeCell<i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<UnsafeCell<i32>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for UnsafeCell"))?;
     assert!(kani_description.contains("verify_unsafe_cell_get_mut_and_into_inner_round_trip"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2466,22 +2479,22 @@ fn lazy_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<LazyCell<i32, fn() -> i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<LazyCell<i32, fn() -> i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LazyCell"))?;
     assert!(kani_description.contains("verify_lazy_cell_caches_its_initializer_result"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2493,12 +2506,12 @@ fn lazy_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 fn borrow_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<BorrowError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<BorrowError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<BorrowError>"));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2512,12 +2525,12 @@ fn borrow_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 fn borrow_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<BorrowMutError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<BorrowMutError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<BorrowMutError>"));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -2531,12 +2544,15 @@ fn borrow_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 fn char_try_from_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<CharTryFromError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<CharTryFromError>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<CharTryFromError>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for CharTryFromError"))?;
@@ -2546,7 +2562,7 @@ fn char_try_from_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2561,22 +2577,22 @@ fn decode_utf16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DecodeUtf16"))?;
     assert!(kani_description.contains("verify_decode_utf16_round_trips_a_bmp_code_unit"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2588,19 +2604,22 @@ fn decode_utf16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 fn decode_utf16_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<DecodeUtf16Error>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<DecodeUtf16Error>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<DecodeUtf16Error>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DecodeUtf16Error"))?;
     assert!(kani_description.contains("verify_decode_utf16_error_reports_the_unpaired_surrogate"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2615,22 +2634,22 @@ fn char_escape_debug_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::char::EscapeDebug>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::char::EscapeDebug>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::char::EscapeDebug"))?;
     assert!(kani_description.contains("verify_char_escape_debug_escapes_a_newline"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2645,22 +2664,22 @@ fn char_escape_default_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::char::EscapeDefault>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::char::EscapeDefault>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::char::EscapeDefault"))?;
     assert!(kani_description.contains("verify_char_escape_default_escapes_a_newline"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2675,22 +2694,22 @@ fn char_escape_unicode_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::char::EscapeUnicode>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::char::EscapeUnicode>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::char::EscapeUnicode"))?;
     assert!(kani_description.contains("verify_char_escape_unicode_renders_the_codepoint_escape"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2702,12 +2721,12 @@ fn char_escape_unicode_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 fn parse_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<ParseCharError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<ParseCharError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<ParseCharError>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ParseCharError"))?;
@@ -2717,7 +2736,7 @@ fn parse_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2729,19 +2748,19 @@ fn parse_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 fn to_lowercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<ToLowercase>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<ToLowercase>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<ToLowercase>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ToLowercase"))?;
     assert!(kani_description.contains("verify_to_lowercase_maps_an_uppercase_ascii_letter"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2753,19 +2772,19 @@ fn to_lowercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 fn to_uppercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<ToUppercase>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<ToUppercase>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<ToUppercase>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ToUppercase"))?;
     assert!(kani_description.contains("verify_to_uppercase_maps_a_lowercase_ascii_letter"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2777,12 +2796,15 @@ fn to_uppercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 fn try_from_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryFromCharError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<TryFromCharError>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<TryFromCharError>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for TryFromCharError"))?;
@@ -2791,7 +2813,7 @@ fn try_from_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -2803,22 +2825,22 @@ fn try_from_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 fn btree_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<BTreeMap<i32, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<BTreeMap<i32, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BTreeMap"))?;
     assert!(kani_description.contains("verify_btree_map_iterates_in_key_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BTreeMap"))?;
@@ -2831,19 +2853,19 @@ fn btree_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 fn btree_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<BTreeSet<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<BTreeSet<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<BTreeSet<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BTreeSet"))?;
     assert!(kani_description.contains("verify_btree_set_iterates_in_sorted_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BTreeSet"))?;
@@ -2856,19 +2878,22 @@ fn btree_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 fn binary_heap_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<BinaryHeap<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<BinaryHeap<i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<BinaryHeap<i32>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BinaryHeap"))?;
     assert!(kani_description.contains("verify_binary_heap_pop_yields_the_maximum_first"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BinaryHeap"))?;
@@ -2884,22 +2909,22 @@ fn binary_heap_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BinaryHeap drain"))?;
     assert!(kani_description.contains("verify_binary_heap_drain_yields_every_pushed_element_once"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BinaryHeap drain"))?;
@@ -2918,15 +2943,15 @@ fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() ->
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::binary_heap::IntoIter<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::binary_heap::IntoIter<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BinaryHeap into_iter"))?;
@@ -2935,7 +2960,7 @@ fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() ->
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BinaryHeap into_iter"))?;
@@ -2954,22 +2979,22 @@ fn binary_heap_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BinaryHeap iter"))?;
     assert!(kani_description.contains("verify_binary_heap_iter_yields_every_pushed_element_once"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BinaryHeap iter"))?;
@@ -2987,22 +3012,22 @@ fn binary_heap_peek_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BinaryHeap peek_mut"))?;
     assert!(kani_description.contains("verify_binary_heap_peek_mut_exposes_the_maximum"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for BinaryHeap peek_mut"))?;
@@ -3015,19 +3040,22 @@ fn binary_heap_peek_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
 fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<LinkedList<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<LinkedList<i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<LinkedList<i32>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LinkedList"))?;
     assert!(kani_description.contains("verify_linked_list_is_fifo_through_back_and_front"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for LinkedList"))?;
@@ -3043,22 +3071,22 @@ fn linked_list_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::linked_list::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::linked_list::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LinkedList iter"))?;
     assert!(kani_description.contains("verify_linked_list_iter_yields_references_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for LinkedList iter"))?;
@@ -3074,22 +3102,22 @@ fn linked_list_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LinkedList iter_mut"))?;
     assert!(kani_description.contains("verify_linked_list_iter_mut_writes_through"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for LinkedList iter_mut"))?;
@@ -3106,22 +3134,22 @@ fn linked_list_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() ->
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::linked_list::IntoIter<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::linked_list::IntoIter<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LinkedList into_iter"))?;
     assert!(kani_description.contains("verify_linked_list_into_iter_yields_owned_values_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for LinkedList into_iter"))?;
@@ -3140,22 +3168,22 @@ fn linked_list_extract_if_proof_chain_reports_the_kani_and_creusot_harnesses() -
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LinkedList extract_if"))?;
     assert!(kani_description.contains("verify_linked_list_extract_if_partitions_by_the_predicate"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for LinkedList extract_if"))?;
@@ -3170,19 +3198,22 @@ fn linked_list_extract_if_proof_chain_reports_the_kani_and_creusot_harnesses() -
 fn try_reserve_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryReserveError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<TryReserveError>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<TryReserveError>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for TryReserveError"))?;
     assert!(kani_description.contains("verify_try_reserve_rejects_an_impossible_capacity"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for TryReserveError"))?;
@@ -3195,19 +3226,19 @@ fn try_reserve_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 fn vec_deque_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<VecDeque<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<VecDeque<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<VecDeque<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VecDeque"))?;
     assert!(kani_description.contains("verify_vec_deque_pushes_and_pops_from_both_ends"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VecDeque"))?;
@@ -3223,22 +3254,22 @@ fn vec_deque_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::vec_deque::IntoIter<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::vec_deque::IntoIter<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VecDeque into_iter"))?;
     assert!(kani_description.contains("verify_vec_deque_into_iter_yields_owned_values_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VecDeque into_iter"))?;
@@ -3256,22 +3287,22 @@ fn vec_deque_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VecDeque drain"))?;
     assert!(kani_description.contains("verify_vec_deque_drain_removes_and_yields_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VecDeque drain"))?;
@@ -3287,22 +3318,22 @@ fn vec_deque_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VecDeque iter"))?;
     assert!(kani_description.contains("verify_vec_deque_iter_yields_references_in_order"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VecDeque iter"))?;
@@ -3318,22 +3349,22 @@ fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VecDeque iter_mut"))?;
     assert!(kani_description.contains("verify_vec_deque_iter_mut_writes_through"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VecDeque iter_mut"))?;
@@ -3346,19 +3377,19 @@ fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 fn vec_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Vec<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Vec<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Vec<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vec"))?;
     assert!(kani_description.contains("verify_vec_push_pop_round_trips"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3373,22 +3404,22 @@ fn vec_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::vec::Drain<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::vec::Drain<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vec drain"))?;
     assert!(kani_description.contains("verify_vec_drain_removes_and_yields_in_order"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3403,22 +3434,22 @@ fn vec_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::vec::IntoIter<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::vec::IntoIter<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vec into_iter"))?;
     assert!(kani_description.contains("verify_vec_into_iter_yields_owned_values_in_order"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3433,22 +3464,22 @@ fn vec_extract_if_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vec extract_if"))?;
     assert!(kani_description.contains("verify_vec_extract_if_partitions_by_the_predicate"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3463,22 +3494,22 @@ fn vec_splice_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vec splice"))?;
     assert!(kani_description.contains("verify_splice_replaces_a_range_and_yields_what_it_removed"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3490,12 +3521,12 @@ fn vec_splice_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 fn type_id_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<TypeId>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<TypeId>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<TypeId>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for TypeId"))?;
@@ -3504,7 +3535,7 @@ fn type_id_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3516,19 +3547,19 @@ fn type_id_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 fn layout_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Layout>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Layout>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Layout>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Layout"))?;
     assert!(kani_description.contains("verify_layout_new_reports_the_types_size_and_alignment"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3540,22 +3571,22 @@ fn layout_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 fn try_from_slice_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryFromSliceError>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<TryFromSliceError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for TryFromSliceError"))?;
     assert!(kani_description.contains("verify_try_from_slice_rejects_a_length_mismatch"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3567,19 +3598,22 @@ fn try_from_slice_error_proof_chain_registers_the_kani_and_creusot_proofs() -> m
 fn array_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<IntoIter<i32, 3>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<IntoIter<i32, 3>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<IntoIter<i32, 3>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for array IntoIter"))?;
     assert!(kani_description.contains("verify_array_into_iter_yields_elements_in_order"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3593,22 +3627,22 @@ fn ascii_escape_default_proof_chain_registers_the_kani_and_creusot_proofs() -> m
         "RustStdStandard<core::ascii::EscapeDefault>",
     ))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::ascii::EscapeDefault>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::ascii::EscapeDefault"))?;
     assert!(kani_description.contains("verify_escape_default_escapes_a_control_byte"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3620,22 +3654,22 @@ fn ascii_escape_default_proof_chain_registers_the_kani_and_creusot_proofs() -> m
 fn ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::cmp::Ordering>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::cmp::Ordering>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Ordering"))?;
     assert!(kani_description.contains("verify_ordering_reverse_involution"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Ordering"))?;
@@ -3648,19 +3682,19 @@ fn ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 fn reverse_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Reverse<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Reverse<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Reverse<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Reverse<i32>"))?;
     assert!(kani_description.contains("verify_reverse_inverts_comparison"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Reverse<i32>"))?;
@@ -3673,12 +3707,16 @@ fn reverse_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 fn rc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Rc<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Rc<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Rc<i32>>"));
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3693,15 +3731,19 @@ fn rc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::rc::Weak<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::rc::Weak<i32>>")
     );
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3716,22 +3758,22 @@ fn string_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::string::Drain<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::string::Drain<'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for String drain"))?;
     assert!(kani_description.contains("verify_string_drain_removes_and_yields_the_content"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3743,19 +3785,19 @@ fn string_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 fn from_utf16_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<FromUtf16Error>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<FromUtf16Error>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<FromUtf16Error>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromUtf16Error"))?;
     assert!(kani_description.contains("verify_from_utf16_rejects_a_lone_surrogate"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3767,19 +3809,19 @@ fn from_utf16_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 fn from_utf8_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<FromUtf8Error>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<FromUtf8Error>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<FromUtf8Error>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromUtf8Error"))?;
     assert!(kani_description.contains("verify_from_utf8_error_recovers_the_original_bytes"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3791,12 +3833,16 @@ fn from_utf8_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
 fn arc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Arc<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Arc<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Arc<i32>>"));
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3811,15 +3857,19 @@ fn arc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::sync::Weak<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::sync::Weak<i32>>")
     );
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3831,12 +3881,16 @@ fn arc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 fn infallible_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Infallible>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Infallible>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Infallible>"));
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3848,12 +3902,12 @@ fn infallible_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 fn layout_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<LayoutError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<LayoutError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<LayoutError>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for LayoutError"))?;
@@ -3863,7 +3917,7 @@ fn layout_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3875,12 +3929,16 @@ fn layout_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 fn addr_parse_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<AddrParseError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<AddrParseError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<AddrParseError>"));
     assert!(root.is_root());
-    assert!(root.proofs.iter().any(|(verifier, _)| *verifier == "kani"));
     assert!(
-        root.proofs
+        root.proofs()
+            .iter()
+            .any(|(verifier, _)| *verifier == "kani")
+    );
+    assert!(
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3895,19 +3953,19 @@ fn ip_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<IpAddr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<IpAddr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<IpAddr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for IpAddr"))?;
     assert!(kani_description.contains("verify_ip_addr_variant_matches_its_kind"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3922,19 +3980,19 @@ fn ipv4_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ipv4Addr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Ipv4Addr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Ipv4Addr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Ipv4Addr"))?;
     assert!(kani_description.contains("verify_ipv4_addr_octets_round_trip"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3949,19 +4007,19 @@ fn ipv6_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ipv6Addr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Ipv6Addr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Ipv6Addr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Ipv6Addr"))?;
     assert!(kani_description.contains("verify_ipv6_addr_segments_round_trip"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -3976,19 +4034,19 @@ fn socket_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SocketAddr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<SocketAddr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<SocketAddr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SocketAddr"))?;
     assert!(kani_description.contains("verify_socket_addr_variant_matches_its_kind"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -4003,19 +4061,19 @@ fn socket_addr_v4_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SocketAddrV4>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<SocketAddrV4>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<SocketAddrV4>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SocketAddrV4"))?;
     assert!(kani_description.contains("verify_socket_addr_v4_round_trips_ip_and_port"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -4030,19 +4088,19 @@ fn socket_addr_v6_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SocketAddrV6>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<SocketAddrV6>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<SocketAddrV6>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SocketAddrV6"))?;
     assert!(kani_description.contains("verify_socket_addr_v6_round_trips_all_fields"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -4056,14 +4114,14 @@ fn nonzero_i8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<i8>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<i8>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<i8>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<i8>"))?;
@@ -4079,19 +4137,19 @@ fn nonzero_i16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<i16>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<i16>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<i16>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<i16>"))?;
     assert!(kani_description.contains("verify_nonzero_i16"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for NonZero<i16>"))?;
@@ -4106,14 +4164,14 @@ fn nonzero_i32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<i32>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<i32>"))?;
@@ -4128,14 +4186,14 @@ fn nonzero_i64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<i64>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<i64>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<i64>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<i64>"))?;
@@ -4150,14 +4208,14 @@ fn nonzero_i128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<i128>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<i128>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<i128>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<i128>"))?;
@@ -4172,14 +4230,14 @@ fn nonzero_isize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<isize>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<isize>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<isize>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<isize>"))?;
@@ -4194,14 +4252,14 @@ fn nonzero_u8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<u8>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<u8>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<u8>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<u8>"))?;
@@ -4216,14 +4274,14 @@ fn nonzero_u16_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<u16>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<u16>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<u16>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<u16>"))?;
@@ -4238,14 +4296,14 @@ fn nonzero_u32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<u32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<u32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<u32>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<u32>"))?;
@@ -4260,14 +4318,14 @@ fn nonzero_u64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<u64>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<u64>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<u64>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<u64>"))?;
@@ -4282,14 +4340,14 @@ fn nonzero_u128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<u128>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<u128>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<u128>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<u128>"))?;
@@ -4304,14 +4362,14 @@ fn nonzero_usize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<NonZero<usize>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NonZero<usize>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NonZero<usize>>"));
     assert!(root.is_root());
-    assert_eq!(root.proofs.len(), 1);
-    assert_eq!(report.verifiers.len(), 1);
+    assert_eq!(root.proofs().len(), 1);
+    assert_eq!(report.verifiers().len(), 1);
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NonZero<usize>"))?;
@@ -4327,19 +4385,19 @@ fn wrapping_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Wrapping<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Wrapping<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Wrapping<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Wrapping<i32>"))?;
     assert!(kani_description.contains("verify_wrapping_add_matches_the_inner_wrapping_add"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Wrapping<i32>"))?;
@@ -4355,19 +4413,22 @@ fn saturating_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Saturating<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Saturating<i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Saturating<i32>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Saturating<i32>"))?;
     assert!(kani_description.contains("verify_saturating_add_matches_the_inner_saturating_add"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Saturating<i32>"))?;
@@ -4383,22 +4444,22 @@ fn int_error_kind_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::num::IntErrorKind>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::num::IntErrorKind>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::num::IntErrorKind"))?;
     assert!(kani_description.contains("verify_int_error_kind_classifies_parse_failures"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for core::num::IntErrorKind"))?;
@@ -4414,15 +4475,15 @@ fn try_from_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::num::TryFromIntError>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::num::TryFromIntError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::num::TryFromIntError"))?;
@@ -4431,7 +4492,7 @@ fn try_from_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -4451,22 +4512,22 @@ fn parse_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::num::ParseIntError>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::num::ParseIntError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::num::ParseIntError"))?;
     assert!(kani_description.contains("verify_parse_int_error_reports_the_kind_of_the_failure"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for core::num::ParseIntError"))?;
@@ -4482,22 +4543,22 @@ fn fp_category_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::num::FpCategory>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::num::FpCategory>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::num::FpCategory"))?;
     assert!(kani_description.contains("verify_fp_category_matches_the_value_it_classifies"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for core::num::FpCategory"))?;
@@ -4513,15 +4574,15 @@ fn parse_float_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::num::ParseFloatError>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::num::ParseFloatError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for core::num::ParseFloatError"))?;
@@ -4530,7 +4591,7 @@ fn parse_float_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -4547,12 +4608,12 @@ fn parse_float_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<CString>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<CString>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<CString>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for CString"))?;
@@ -4562,7 +4623,7 @@ fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for CString"))?;
@@ -4581,19 +4642,19 @@ fn args_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Args>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Args>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Args>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Args"))?;
     assert!(kani_description.contains("verify_args_reports_at_least_the_program_path"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Args"))?;
@@ -4609,19 +4670,19 @@ fn args_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ArgsOs>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<ArgsOs>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<ArgsOs>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ArgsOs"))?;
     assert!(kani_description.contains("verify_args_os_reports_at_least_the_program_path"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for ArgsOs"))?;
@@ -4637,19 +4698,19 @@ fn join_paths_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<JoinPathsError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<JoinPathsError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<JoinPathsError>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for JoinPathsError"))?;
     assert!(kani_description.contains("verify_join_paths_error_reports_an_unjoinable_path"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for JoinPathsError"))?;
@@ -4665,22 +4726,22 @@ fn split_paths_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SplitPaths<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<SplitPaths<'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SplitPaths<'static>"))?;
     assert!(kani_description.contains("verify_split_paths_recovers_paths_joined_by_join_paths"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for SplitPaths<'static>"))?;
@@ -4696,19 +4757,19 @@ fn var_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<VarError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<VarError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<VarError>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VarError"))?;
     assert!(kani_description.contains("type_name: std::env::VarError"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VarError"))?;
@@ -4726,19 +4787,19 @@ fn vars_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Vars>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Vars>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Vars>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Vars"))?;
     assert!(kani_description.contains("type_name: std::env::Vars"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Vars"))?;
@@ -4754,19 +4815,19 @@ fn vars_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<VarsOs>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<VarsOs>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<VarsOs>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for VarsOs"))?;
     assert!(kani_description.contains("type_name: std::env::VarsOs"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for VarsOs"))?;
@@ -4785,16 +4846,16 @@ fn dir_builder_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<DirBuilder>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DirBuilder"))?;
     assert!(kani_description.contains("verify_dir_builder_creates_nested_directories_recursively"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for DirBuilder"))?;
@@ -4813,16 +4874,16 @@ fn dir_entry_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<DirEntry>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DirEntry"))?;
     assert!(kani_description.contains("verify_dir_entry_reports_the_created_files_name_and_path"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for DirEntry"))?;
@@ -4841,16 +4902,16 @@ fn file_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<File>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for File"))?;
     assert!(kani_description.contains("verify_file_write_then_read_round_trips_the_bytes"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for File"))?;
@@ -4869,16 +4930,16 @@ fn file_times_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<FileTimes>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FileTimes"))?;
     assert!(kani_description.contains("verify_file_times_sets_the_recorded_modification_time"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for FileTimes"))?;
@@ -4897,16 +4958,16 @@ fn file_type_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<FileType>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FileType"))?;
     assert!(kani_description.contains("verify_file_type_distinguishes_files_from_directories"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for FileType"))?;
@@ -4925,16 +4986,16 @@ fn metadata_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Metadata>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Metadata"))?;
     assert!(kani_description.contains("verify_metadata_reports_the_written_length"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Metadata"))?;
@@ -4953,16 +5014,16 @@ fn open_options_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<OpenOptions>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for OpenOptions"))?;
     assert!(kani_description.contains("verify_open_options_create_new_rejects_an_existing_file"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for OpenOptions"))?;
@@ -4981,8 +5042,8 @@ fn permissions_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<Permissions>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Permissions"))?;
@@ -4992,8 +5053,8 @@ fn permissions_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     );
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Permissions"))?;
@@ -5012,16 +5073,16 @@ fn read_dir_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<ReadDir>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ReadDir"))?;
     assert!(kani_description.contains("verify_read_dir_iterates_every_entry_in_the_directory"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for ReadDir"))?;
@@ -5040,16 +5101,16 @@ fn fs_try_lock_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     assert_root_has_kani_and_creusot(&report, "RustStdStandard<std::fs::TryLockError>");
 
     let (_, kani_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for std::fs::TryLockError"))?;
     assert!(kani_description.contains("verify_try_lock_error_reports_a_lock_already_held"));
 
     let (_, creusot_description) = report
-        .root
-        .proofs
+        .root()
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for std::fs::TryLockError"))?;
@@ -5065,12 +5126,12 @@ fn os_str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<OsStr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<OsStr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<OsStr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for OsStr"))?;
@@ -5079,7 +5140,7 @@ fn os_str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for OsStr"))?;
@@ -5097,19 +5158,19 @@ fn os_string_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<OsString>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<OsString>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<OsString>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for OsString"))?;
     assert!(kani_description.contains("verify_os_string_push_appends_to_the_existing_content"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for OsString"))?;
@@ -5125,15 +5186,15 @@ fn os_str_display_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::ffi::os_str::Display<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::ffi::os_str::Display<'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -5144,7 +5205,7 @@ fn os_str_display_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -5164,22 +5225,22 @@ fn from_vec_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() 
         "RustStdStandard<FromVecWithNulError>",
     ))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<FromVecWithNulError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromVecWithNulError"))?;
     assert!(kani_description.contains("verify_from_vec_with_nul_requires_the_nul_only_at_the_end"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for FromVecWithNulError"))?;
@@ -5194,19 +5255,22 @@ fn from_vec_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() 
 fn into_string_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<IntoStringError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<IntoStringError>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<IntoStringError>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for IntoStringError"))?;
     assert!(kani_description.contains("verify_into_string_error_recovers_the_original_cstring"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for IntoStringError"))?;
@@ -5219,19 +5283,19 @@ fn into_string_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<NulError>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<NulError>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<NulError>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for NulError"))?;
     assert!(kani_description.contains("verify_nul_error_reports_the_interior_nuls_position"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for NulError"))?;
@@ -5244,19 +5308,19 @@ fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 fn cstr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<CStr>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<CStr>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<CStr>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for CStr"))?;
     assert!(kani_description.contains("verify_cstr_excludes_the_terminating_nul_from_to_bytes"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for CStr"))?;
@@ -5272,22 +5336,22 @@ fn from_bytes_until_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses
         "RustStdStandard<FromBytesUntilNulError>",
     ))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<FromBytesUntilNulError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromBytesUntilNulError"))?;
     assert!(kani_description.contains("verify_from_bytes_until_nul_requires_a_nul_byte_somewhere"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for FromBytesUntilNulError"))?;
@@ -5305,15 +5369,15 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
         "RustStdStandard<FromBytesWithNulError>",
     ))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<FromBytesWithNulError>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromBytesWithNulError"))?;
@@ -5322,7 +5386,7 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for FromBytesWithNulError"))?;
@@ -5337,12 +5401,12 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
 fn duration_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
     let report = support::chain(amenable::proof_chain("RustStdStandard<Duration>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Duration>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Duration>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Duration"))?;
@@ -5351,7 +5415,7 @@ fn duration_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Duration"))?;
@@ -5369,15 +5433,15 @@ fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs()
         "RustStdStandard<TryFromFloatSecsError>",
     ))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<TryFromFloatSecsError>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -5394,19 +5458,19 @@ fn range_to_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RangeTo<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<RangeTo<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<RangeTo<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RangeTo<i32>"))?;
     assert!(kani_description.contains("verify_range_to_contains_matches_bound"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for RangeTo<i32>"))?;
@@ -5422,19 +5486,19 @@ fn range_full_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RangeFull>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<RangeFull>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<RangeFull>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RangeFull"))?;
     assert!(kani_description.contains("verify_range_full_contains_everything"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for RangeFull"))?;
@@ -5450,19 +5514,19 @@ fn bound_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Bound<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Bound<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Bound<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Bound<i32>"))?;
     assert!(kani_description.contains("verify_bound_round_trips_its_endpoint"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Bound<i32>"))?;
@@ -5478,22 +5542,22 @@ fn control_flow_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ControlFlow<i32, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ControlFlow<i32, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ControlFlow<i32, i32>"))?;
     assert!(kani_description.contains("verify_control_flow_continue_and_break_are_disjoint"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for ControlFlow<i32, i32>"))?;
@@ -5509,19 +5573,19 @@ fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Box<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Box<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Box<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Box<i32>"))?;
     assert!(kani_description.contains("verify_box_derefs_and_writes_through"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Box<i32>"))?;
@@ -5537,15 +5601,15 @@ fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::ffi::c_void>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::ffi::c_void>")
     );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -5562,15 +5626,15 @@ fn fmt_alignment_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::fmt::Alignment>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::fmt::Alignment>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for std::fmt::Alignment"))?;
@@ -5579,7 +5643,7 @@ fn fmt_alignment_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5594,22 +5658,22 @@ fn fmt_arguments_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Arguments<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Arguments<'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Arguments"))?;
     assert!(kani_description.contains("verify_arguments_renders_the_same_as_the_value_itself"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5624,12 +5688,15 @@ fn fmt_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::fmt::Error>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<std::fmt::Error>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<std::fmt::Error>")
+    );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -5646,22 +5713,22 @@ fn fmt_formatter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Formatter<'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Formatter<'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Formatter"))?;
     assert!(kani_description.contains("verify_formatter_exposes_the_parsed_width_and_precision"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5676,22 +5743,22 @@ fn fmt_debug_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DebugList<'static, 'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DebugList<'static, 'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DebugList"))?;
     assert!(kani_description.contains("verify_debug_list_renders_entries_in_brackets"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5706,22 +5773,22 @@ fn fmt_debug_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DebugMap<'static, 'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DebugMap<'static, 'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DebugMap"))?;
     assert!(kani_description.contains("verify_debug_map_renders_key_value_pairs"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5736,22 +5803,22 @@ fn fmt_debug_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DebugSet<'static, 'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DebugSet<'static, 'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DebugSet"))?;
     assert!(kani_description.contains("verify_debug_set_renders_entries_in_braces"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5766,22 +5833,22 @@ fn fmt_debug_struct_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DebugStruct<'static, 'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DebugStruct<'static, 'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DebugStruct"))?;
     assert!(kani_description.contains("verify_debug_struct_renders_named_fields"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5796,22 +5863,22 @@ fn fmt_debug_tuple_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DebugTuple<'static, 'static>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<DebugTuple<'static, 'static>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DebugTuple"))?;
     assert!(kani_description.contains("verify_debug_tuple_renders_positional_fields"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5826,22 +5893,22 @@ fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<FromFn<fn(&mut Formatter<'_>) -> std::fmt::Result>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FromFn"))?;
     assert!(kani_description.contains("verify_from_fn_forwards_display_to_the_supplied_closure"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -5856,19 +5923,19 @@ fn option_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Option<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Option<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Option<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Option<i32>"))?;
     assert!(kani_description.contains("verify_option_some_and_none_are_disjoint"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Option<i32>"))?;
@@ -5884,19 +5951,22 @@ fn result_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Result<i32, i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Result<i32, i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Result<i32, i32>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Result<i32, i32>"))?;
     assert!(kani_description.contains("verify_result_ok_and_err_are_disjoint"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Result<i32, i32>"))?;
@@ -5912,15 +5982,15 @@ fn option_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::option::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::option::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -5929,7 +5999,7 @@ fn option_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     assert!(kani_description.contains("verify_option_iter_yields_zero_or_one_reference"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -5947,15 +6017,15 @@ fn option_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::option::IterMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::option::IterMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -5964,7 +6034,7 @@ fn option_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     assert!(kani_description.contains("verify_option_iter_mut_writes_through_to_the_option"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -5982,15 +6052,15 @@ fn result_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::result::Iter<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::result::Iter<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -5999,7 +6069,7 @@ fn result_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     assert!(kani_description.contains("verify_result_iter_yields_a_reference_to_the_ok_value"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -6017,15 +6087,15 @@ fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<core::result::IterMut<'static, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<core::result::IterMut<'static, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -6034,7 +6104,7 @@ fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     assert!(kani_description.contains("verify_result_iter_mut_writes_through_to_the_result"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -6052,19 +6122,19 @@ fn pending_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Pending<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Pending<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Pending<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Pending<i32>"))?;
     assert!(kani_description.contains("verify_pending_never_resolves"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Pending<i32>"))?;
@@ -6080,15 +6150,15 @@ fn poll_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| {
@@ -6097,7 +6167,7 @@ fn poll_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
     assert!(kani_description.contains("verify_poll_fn_dispatches_through_to_its_closure"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| {
@@ -6117,19 +6187,19 @@ fn ready_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ready<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Ready<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Ready<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Ready<i32>"))?;
     assert!(kani_description.contains("verify_ready_resolves_immediately_with_its_value"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Ready<i32>"))?;
@@ -6145,19 +6215,22 @@ fn context_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Context<'static>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Context<'static>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Context<'static>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Context<'static>"))?;
     assert!(kani_description.contains("verify_context_from_waker_exposes_the_same_waker"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Context<'static>"))?;
@@ -6173,19 +6246,19 @@ fn poll_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Poll<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Poll<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Poll<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Poll<i32>"))?;
     assert!(kani_description.contains("verify_poll_ready_and_pending_are_disjoint"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Poll<i32>"))?;
@@ -6216,19 +6289,19 @@ fn waker_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Waker>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Waker>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<Waker>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Waker"))?;
     assert!(kani_description.contains("verify_waker_wake_by_ref_invokes_the_wake_impl"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for Waker"))?;
@@ -6244,22 +6317,22 @@ fn iter_chain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Chain"))?;
     assert!(kani_description.contains("verify_chain_sequences_two_iterators_end_to_end"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6274,22 +6347,22 @@ fn iter_cloned_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cloned<Iter<'static, i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Cloned<Iter<'static, i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Cloned"))?;
     assert!(kani_description.contains("verify_cloned_clones_each_referenced_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6304,22 +6377,22 @@ fn iter_copied_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Copied<Iter<'static, i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Copied<Iter<'static, i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Copied"))?;
     assert!(kani_description.contains("verify_copied_copies_each_referenced_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6334,22 +6407,22 @@ fn iter_cycle_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cycle<Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Cycle<Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Cycle"))?;
     assert!(kani_description.contains("verify_cycle_repeats_its_sequence_forever"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6364,22 +6437,22 @@ fn iter_empty_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::iter::Empty<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::iter::Empty<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Empty"))?;
     assert!(kani_description.contains("verify_empty_yields_nothing"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6394,22 +6467,22 @@ fn iter_enumerate_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Enumerate<Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Enumerate<Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Enumerate"))?;
     assert!(kani_description.contains("verify_enumerate_pairs_each_item_with_its_index"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6424,22 +6497,22 @@ fn iter_filter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Filter"))?;
     assert!(kani_description.contains("verify_filter_yields_only_items_matching_the_predicate"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6454,21 +6527,21 @@ fn iter_filter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with(
+    let root = report.root();
+    assert!(root.evidence().ends_with(
         "RustStdStandard<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>"
     ));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FilterMap"))?;
     assert!(kani_description.contains("verify_filter_map_applies_and_filters_in_one_step"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6483,21 +6556,21 @@ fn iter_flat_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with(
+    let root = report.root();
+    assert!(root.evidence().ends_with(
         "RustStdStandard<FlatMap<std::array::IntoIter<i32, 1>, Range<i32>, fn(i32) -> Range<i32>>>"
     ));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for FlatMap"))?;
     assert!(kani_description.contains("verify_flat_map_flattens_each_generated_iterator"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6512,22 +6585,22 @@ fn iter_flatten_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Flatten<IntoIter<Range<i32>>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Flatten<IntoIter<Range<i32>>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Flatten"))?;
     assert!(kani_description.contains("verify_flatten_concatenates_the_inner_iterators"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6542,22 +6615,22 @@ fn iter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Map"))?;
     assert!(kani_description.contains("verify_map_applies_its_closure_to_each_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6572,22 +6645,22 @@ fn iter_zip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Zip<Range<i32>, Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Zip<Range<i32>, Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Zip"))?;
     assert!(kani_description.contains("verify_zip_pairs_items_from_two_iterators"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6602,19 +6675,22 @@ fn iter_rev_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Rev<Range<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Rev<Range<i32>>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Rev<Range<i32>>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Rev"))?;
     assert!(kani_description.contains("verify_rev_reverses_iteration_order"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6629,19 +6705,22 @@ fn iter_fuse_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Fuse<Range<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Fuse<Range<i32>>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Fuse<Range<i32>>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Fuse"))?;
     assert!(kani_description.contains("verify_fuse_keeps_returning_none_once_exhausted"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6656,15 +6735,15 @@ fn iter_inspect_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Inspect<Range<i32>, fn(&i32)>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Inspect<Range<i32>, fn(&i32)>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Inspect"))?;
@@ -6673,7 +6752,7 @@ fn iter_inspect_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6688,22 +6767,22 @@ fn iter_peekable_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Peekable<Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Peekable<Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Peekable"))?;
     assert!(kani_description.contains("verify_peekable_peek_does_not_consume"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6718,22 +6797,22 @@ fn iter_scan_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Scan"))?;
     assert!(kani_description.contains("verify_scan_threads_state_through_its_closure"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6748,19 +6827,22 @@ fn iter_skip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Skip<Range<i32>>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<Skip<Range<i32>>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<Skip<Range<i32>>>")
+    );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Skip"))?;
     assert!(kani_description.contains("verify_skip_discards_the_first_n_items"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6775,15 +6857,15 @@ fn iter_skip_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SkipWhile"))?;
@@ -6792,7 +6874,7 @@ fn iter_skip_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6807,22 +6889,22 @@ fn iter_step_by_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<StepBy<Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<StepBy<Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for StepBy"))?;
     assert!(kani_description.contains("verify_step_by_yields_every_nth_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6837,22 +6919,22 @@ fn iter_take_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::iter::Take<Range<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::iter::Take<Range<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Take"))?;
     assert!(kani_description.contains("verify_take_yields_at_most_n_items"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6867,22 +6949,22 @@ fn iter_take_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for TakeWhile"))?;
     assert!(kani_description.contains("verify_take_while_yields_items_while_the_predicate_holds"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6897,15 +6979,15 @@ fn iter_map_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for MapWhile"))?;
@@ -6914,7 +6996,7 @@ fn iter_map_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     );
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6929,22 +7011,22 @@ fn iter_once_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::iter::Once<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::iter::Once<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Once"))?;
     assert!(kani_description.contains("verify_once_yields_exactly_one_value"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6959,22 +7041,22 @@ fn iter_once_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<OnceWith<fn() -> i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<OnceWith<fn() -> i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for OnceWith"))?;
     assert!(kani_description.contains("verify_once_with_calls_its_closure_exactly_once"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -6989,22 +7071,22 @@ fn iter_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::iter::Repeat<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<std::iter::Repeat<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Repeat"))?;
     assert!(kani_description.contains("verify_repeat_yields_the_same_value_forever"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7019,22 +7101,22 @@ fn iter_repeat_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RepeatWith<fn() -> i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<RepeatWith<fn() -> i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RepeatWith"))?;
     assert!(kani_description.contains("verify_repeat_with_calls_its_closure_once_per_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7049,19 +7131,19 @@ fn iter_repeat_n_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RepeatN<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<RepeatN<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<RepeatN<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RepeatN"))?;
     assert!(kani_description.contains("verify_repeat_n_yields_the_value_exactly_n_times"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7076,22 +7158,22 @@ fn iter_successors_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Successors"))?;
     assert!(kani_description.contains("verify_successors_generates_from_the_previous_item"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7106,12 +7188,12 @@ fn hash_default_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<DefaultHasher>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<DefaultHasher>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<DefaultHasher>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for DefaultHasher"))?;
@@ -7120,7 +7202,7 @@ fn hash_default_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for DefaultHasher"))?;
@@ -7139,12 +7221,12 @@ fn hash_random_state_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<RandomState>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<RandomState>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<RandomState>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for RandomState"))?;
@@ -7153,7 +7235,7 @@ fn hash_random_state_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
     );
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for RandomState"))?;
@@ -7172,22 +7254,22 @@ fn hash_build_hasher_default_proof_chain_reports_the_kani_and_creusot_harnesses(
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<BuildHasherDefault<DefaultHasher>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<BuildHasherDefault<DefaultHasher>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for BuildHasherDefault"))?;
     assert!(kani_description.contains("verify_build_hasher_default_produces_consistent_hashers"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7202,22 +7284,22 @@ fn hash_map_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<HashMap<i32, i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<HashMap<i32, i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for HashMap<i32, i32>"))?;
     assert!(kani_description.contains("verify_hash_map_insert_then_get_recovers_the_value"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for HashMap<i32, i32>"))?;
@@ -7233,19 +7315,19 @@ fn hash_set_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<HashSet<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<HashSet<i32>>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<HashSet<i32>>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for HashSet<i32>"))?;
     assert!(kani_description.contains("verify_hash_set_insert_then_contains_reports_membership"));
 
     let (_, creusot_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "creusot")
         .ok_or_else(|| miette::miette!("creusot proof registered for HashSet<i32>"))?;
@@ -7263,19 +7345,19 @@ fn hash_sip_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SipHasher>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<SipHasher>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<SipHasher>"));
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for SipHasher"))?;
     assert!(kani_description.contains("verify_sip_hasher_produces_consistent_hashes"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7291,12 +7373,15 @@ fn marker_phantom_data_i32_proof_chain_registers_the_kani_and_creusot_proofs() -
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PhantomData<i32>>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<PhantomData<i32>>"));
+    let root = report.root();
+    assert!(
+        root.evidence()
+            .ends_with("RustStdStandard<PhantomData<i32>>")
+    );
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -7313,12 +7398,12 @@ fn marker_phantom_pinned_proof_chain_registers_the_kani_and_creusot_proofs() -> 
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PhantomPinned>"))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("RustStdStandard<PhantomPinned>"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("RustStdStandard<PhantomPinned>"));
     assert!(root.is_root());
 
     let verifiers: Vec<&str> = root
-        .proofs
+        .proofs()
         .iter()
         .map(|(verifier, _)| verifier.as_str())
         .collect();
@@ -7336,22 +7421,22 @@ fn mem_manually_drop_i32_proof_chain_reports_the_kani_and_creusot_harnesses() ->
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ManuallyDrop<i32>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<ManuallyDrop<i32>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for ManuallyDrop<i32>"))?;
     assert!(kani_description.contains("verify_manually_drop_derefs_and_into_inner_round_trip"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7367,22 +7452,22 @@ fn mem_discriminant_option_i32_proof_chain_reports_the_kani_and_creusot_harnesse
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Discriminant<Option<i32>>>"))?;
 
-    let root = &report.root;
+    let root = report.root();
     assert!(
-        root.evidence
+        root.evidence()
             .ends_with("RustStdStandard<Discriminant<Option<i32>>>")
     );
     assert!(root.is_root());
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for Discriminant<Option<i32>>"))?;
     assert!(kani_description.contains("verify_discriminant_identifies_variant_not_payload"));
 
     assert!(
-        root.proofs
+        root.proofs()
             .iter()
             .any(|(verifier, _)| *verifier == "creusot")
     );
@@ -7397,7 +7482,7 @@ fn unregistered_subject_yields_a_not_found_error() {
             &result,
             Err(error) if matches!(
                 &**error.kind(),
-                ChainErrorKind::NotFound(NotFoundSource { subject, .. }) if subject == "NoSuchEvidenceType"
+                ChainErrorKind::NotFound(source) if source.subject() == "NoSuchEvidenceType"
             )
         ),
         "expected ChainError::NotFound(subject = \"NoSuchEvidenceType\"), got {result:?}"
@@ -7428,35 +7513,35 @@ fn calculation_over_two_arguments_fans_out_into_a_tree_that_bottoms_out_in_std()
         Some(&["kani"]),
     ))?;
 
-    let root = &report.root;
-    assert!(root.evidence.ends_with("AddEvidence"));
+    let root = report.root();
+    assert!(root.evidence().ends_with("AddEvidence"));
     assert!(!root.is_root());
     assert_eq!(
-        root.bases.len(),
+        root.bases().len(),
         2,
         "Debit and Credit are separate branches"
     );
 
     // Argument order is preserved (a: Debit, b: Credit), not whatever
     // order `inventory` happened to iterate registrations in.
-    assert!(root.bases[0].evidence.ends_with("Debit"));
-    assert!(root.bases[1].evidence.ends_with("Credit"));
+    assert!(root.bases()[0].evidence().ends_with("Debit"));
+    assert!(root.bases()[1].evidence().ends_with("Credit"));
 
     // Neither Debit nor Credit is itself a root: both are thin domain
     // wrappers around i64, so both bottom out in the same std standard.
-    for branch in &root.bases {
+    for branch in root.bases() {
         assert!(!branch.is_root());
-        assert_eq!(branch.bases.len(), 1);
-        assert_eq!(branch.proofs.len(), 1, "access proof, kani-only");
+        assert_eq!(branch.bases().len(), 1);
+        assert_eq!(branch.proofs().len(), 1, "access proof, kani-only");
 
-        let std_node = &branch.bases[0];
-        assert!(std_node.evidence.ends_with("RustStdStandard<i64>"));
+        let std_node = &branch.bases()[0];
+        assert!(std_node.evidence().ends_with("RustStdStandard<i64>"));
         assert!(std_node.is_root());
-        assert_eq!(std_node.proofs.len(), 1, "kani-only trusted proof");
+        assert_eq!(std_node.proofs().len(), 1, "kani-only trusted proof");
     }
 
     let (_, kani_description) = root
-        .proofs
+        .proofs()
         .iter()
         .find(|(verifier, _)| *verifier == "kani")
         .ok_or_else(|| miette::miette!("kani proof registered for AddEvidence"))?;
@@ -7486,13 +7571,9 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
         // hold, so these nested `if let`s only ever run once it's
         // established -- no `else` diverging arm needed.
         if let Err(error) = &result
-            && let ChainErrorKind::Incomplete(IncompleteSource {
-                subject,
-                required,
-                gaps,
-                ..
-            }) = &**error.kind()
+            && let ChainErrorKind::Incomplete(source) = &**error.kind()
         {
+            let (subject, required, gaps) = (source.subject(), source.required(), source.gaps());
             assert!(subject.ends_with("AddEvidence"));
             assert_eq!(required, &vec![verifier.to_string()]);
 
@@ -7500,10 +7581,13 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
             // verifier; only the RustStdStandard<i64> leaf has one, so
             // exactly three gaps are expected.
             assert_eq!(gaps.len(), 3, "gaps for {verifier}: {gaps:?}");
-            assert!(gaps.iter().any(|gap| gap.evidence.ends_with("AddEvidence")));
-            assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Debit")));
-            assert!(gaps.iter().any(|gap| gap.evidence.ends_with("Credit")));
-            assert!(gaps.iter().all(|gap| gap.verifier == verifier));
+            assert!(
+                gaps.iter()
+                    .any(|gap| gap.evidence().ends_with("AddEvidence"))
+            );
+            assert!(gaps.iter().any(|gap| gap.evidence().ends_with("Debit")));
+            assert!(gaps.iter().any(|gap| gap.evidence().ends_with("Credit")));
+            assert!(gaps.iter().all(|gap| gap.verifier() == verifier));
         }
     }
 }
@@ -7532,8 +7616,9 @@ fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
     // hold, so this nested `if let` only ever runs once it's
     // established -- no `else` diverging arm needed.
     if let Err(error) = &result
-        && let ChainErrorKind::Incomplete(IncompleteSource { required, .. }) = &**error.kind()
+        && let ChainErrorKind::Incomplete(source) = &**error.kind()
     {
+        let required = source.required();
         assert_eq!(required.len(), 3);
         assert!(required.iter().any(|v| v == "kani"));
         assert!(required.iter().any(|v| v == "creusot"));
