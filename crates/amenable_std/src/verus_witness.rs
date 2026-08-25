@@ -182,11 +182,11 @@ macro_rules! impl_verus_witness_trusted {
             bridge_verus_witness!(RustStdStandard<$ty>);
 
             ::inventory::submit! {
-                ::amenable_core::ProofRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                    verifier: "verus",
-                    describe: || <RustStdStandard<$ty> as VerusWitness>::proof().report().to_string(),
-                }
+                ::amenable_core::ProofRecord::new(
+                    concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    "verus",
+                    || <RustStdStandard<$ty> as VerusWitness>::proof().report().to_string(),
+                )
             }
         )*
     };
@@ -535,11 +535,11 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "verus",
-        describe: || <RustStdStandard<char> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<char>",
+        "verus",
+        || <RustStdStandard<char> as VerusWitness>::proof().to_string(),
+    )
 }
 
 /// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
@@ -570,11 +570,11 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "verus",
-        describe: || <ValidUnicodeScalar as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::ValidUnicodeScalar",
+        "verus",
+        || <ValidUnicodeScalar as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_STRING_ROUNDTRIP_SRC: &str =
@@ -596,11 +596,11 @@ impl VerusWitness for RustStdStandard<String> {
 bridge_verus_witness!(RustStdStandard<String>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<String>",
-        verifier: "verus",
-        describe: || <RustStdStandard<String> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<String>",
+        "verus",
+        || <RustStdStandard<String> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC: &str =
@@ -622,13 +622,13 @@ impl VerusWitness for RustStdStandard<std::cmp::Ordering> {
 bridge_verus_witness!(RustStdStandard<std::cmp::Ordering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        "verus",
+        || {
             <RustStdStandard<std::cmp::Ordering> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC: &str =
@@ -650,11 +650,11 @@ impl VerusWitness for RustStdStandard<Option<i32>> {
 bridge_verus_witness!(RustStdStandard<Option<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
-        verifier: "verus",
-        describe: || <RustStdStandard<Option<i32>> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        "verus",
+        || <RustStdStandard<Option<i32>> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC: &str =
@@ -676,13 +676,13 @@ impl VerusWitness for RustStdStandard<Result<i32, i32>> {
 bridge_verus_witness!(RustStdStandard<Result<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        "verus",
+        || {
             <RustStdStandard<Result<i32, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_WRAPPING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
@@ -704,13 +704,13 @@ impl VerusWitness for RustStdStandard<std::num::Wrapping<i32>> {
 bridge_verus_witness!(RustStdStandard<std::num::Wrapping<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::num::Wrapping<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::num::Wrapping<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::num::Wrapping<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
@@ -732,13 +732,13 @@ impl VerusWitness for RustStdStandard<std::num::Saturating<i32>> {
 bridge_verus_witness!(RustStdStandard<std::num::Saturating<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::num::Saturating<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::num::Saturating<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::num::Saturating<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
@@ -760,13 +760,13 @@ impl VerusWitness for RustStdStandard<std::cmp::Reverse<i32>> {
 bridge_verus_witness!(RustStdStandard<std::cmp::Reverse<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Reverse<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cmp::Reverse<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cmp::Reverse<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
@@ -788,13 +788,13 @@ impl VerusWitness for RustStdStandard<std::mem::ManuallyDrop<i32>> {
 bridge_verus_witness!(RustStdStandard<std::mem::ManuallyDrop<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::mem::ManuallyDrop<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::mem::ManuallyDrop<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::mem::ManuallyDrop<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC: &str =
@@ -831,13 +831,13 @@ impl VerusWitness for RustStdStandard<core::num::FpCategory> {
 bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "verus",
+        || {
             <RustStdStandard<core::num::FpCategory> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -886,13 +886,13 @@ impl VerusWitness for RustStdStandard<core::num::IntErrorKind> {
 bridge_verus_witness!(RustStdStandard<core::num::IntErrorKind>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        "verus",
+        || {
             <RustStdStandard<core::num::IntErrorKind> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC: &str =
@@ -914,13 +914,13 @@ impl VerusWitness for RustStdStandard<core::num::ParseIntError> {
 bridge_verus_witness!(RustStdStandard<core::num::ParseIntError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        "verus",
+        || {
             <RustStdStandard<core::num::ParseIntError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC: &str =
@@ -942,13 +942,13 @@ impl VerusWitness for RustStdStandard<core::num::ParseFloatError> {
 bridge_verus_witness!(RustStdStandard<core::num::ParseFloatError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        "verus",
+        || {
             <RustStdStandard<core::num::ParseFloatError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
@@ -970,13 +970,13 @@ impl VerusWitness for RustStdStandard<core::num::TryFromIntError> {
 bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        "verus",
+        || {
             <RustStdStandard<core::num::TryFromIntError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC: &str =
@@ -1004,11 +1004,11 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
-        verifier: "verus",
-        describe: || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        "verus",
+        || <RustStdStandard<Box<i32>> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC: &str =
@@ -1032,11 +1032,11 @@ impl VerusWitness for RustStdStandard<core::alloc::Layout> {
 bridge_verus_witness!(RustStdStandard<core::alloc::Layout>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::alloc::Layout>",
-        verifier: "verus",
-        describe: || <RustStdStandard<core::alloc::Layout> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::alloc::Layout>",
+        "verus",
+        || <RustStdStandard<core::alloc::Layout> as VerusWitness>::proof().to_string(),
+    )
 }
 
 impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
@@ -1057,13 +1057,13 @@ impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
 bridge_verus_witness!(RustStdStandard<core::alloc::LayoutError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::alloc::LayoutError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::alloc::LayoutError>",
+        "verus",
+        || {
             <RustStdStandard<core::alloc::LayoutError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC: &str =
@@ -1085,11 +1085,11 @@ impl VerusWitness for RustStdStandard<Vec<i32>> {
 bridge_verus_witness!(RustStdStandard<Vec<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
-        verifier: "verus",
-        describe: || <RustStdStandard<Vec<i32>> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+        "verus",
+        || <RustStdStandard<Vec<i32>> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC: &str =
@@ -1131,13 +1131,13 @@ impl VerusWitness for RustStdStandard<core::char::CharTryFromError> {
 bridge_verus_witness!(RustStdStandard<core::char::CharTryFromError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        "verus",
+        || {
             <RustStdStandard<core::char::CharTryFromError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1204,13 +1204,13 @@ impl VerusWitness for RustStdStandard<core::char::TryFromCharError> {
 bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        "verus",
+        || {
             <RustStdStandard<core::char::TryFromCharError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1259,11 +1259,11 @@ impl VerusWitness for RustStdStandard<core::any::TypeId> {
 bridge_verus_witness!(RustStdStandard<core::any::TypeId>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::any::TypeId>",
-        verifier: "verus",
-        describe: || <RustStdStandard<core::any::TypeId> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::any::TypeId>",
+        "verus",
+        || <RustStdStandard<core::any::TypeId> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC: &str =
@@ -1285,13 +1285,13 @@ impl VerusWitness for RustStdStandard<std::array::TryFromSliceError> {
 bridge_verus_witness!(RustStdStandard<std::array::TryFromSliceError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::array::TryFromSliceError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::array::TryFromSliceError>",
+        "verus",
+        || {
             <RustStdStandard<std::array::TryFromSliceError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC: &str =
@@ -1336,13 +1336,13 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf16Error> {
 bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        "verus",
+        || {
             <RustStdStandard<std::string::FromUtf16Error> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1410,11 +1410,11 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
-        verifier: "verus",
-        describe: || <RustStdStandard<std::ffi::CString> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        "verus",
+        || <RustStdStandard<std::ffi::CString> as VerusWitness>::proof().to_string(),
+    )
 }
 
 ::inventory::submit! {
@@ -1457,11 +1457,11 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
-        verifier: "verus",
-        describe: || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        "verus",
+        || <RustStdStandard<std::ffi::NulError> as VerusWitness>::proof().to_string(),
+    )
 }
 
 ::inventory::submit! {
@@ -1518,13 +1518,13 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        "verus",
+        || {
             <RustStdStandard<std::ffi::FromVecWithNulError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1557,13 +1557,13 @@ impl VerusWitness for RustStdStandard<core::char::ParseCharError> {
 bridge_verus_witness!(RustStdStandard<core::char::ParseCharError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::ParseCharError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::ParseCharError>",
+        "verus",
+        || {
             <RustStdStandard<core::char::ParseCharError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
@@ -1585,11 +1585,11 @@ impl VerusWitness for RustStdStandard<std::rc::Rc<i32>> {
 bridge_verus_witness!(RustStdStandard<std::rc::Rc<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::rc::Rc<i32>>",
-        verifier: "verus",
-        describe: || <RustStdStandard<std::rc::Rc<i32>> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::rc::Rc<i32>>",
+        "verus",
+        || <RustStdStandard<std::rc::Rc<i32>> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
@@ -1611,11 +1611,11 @@ impl VerusWitness for RustStdStandard<std::sync::Arc<i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::Arc<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Arc<i32>>",
-        verifier: "verus",
-        describe: || <RustStdStandard<std::sync::Arc<i32>> as VerusWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Arc<i32>>",
+        "verus",
+        || <RustStdStandard<std::sync::Arc<i32>> as VerusWitness>::proof().to_string(),
+    )
 }
 
 const VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC: &str =
@@ -1637,13 +1637,13 @@ impl VerusWitness for RustStdStandard<std::ffi::IntoStringError> {
 bridge_verus_witness!(RustStdStandard<std::ffi::IntoStringError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::IntoStringError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::IntoStringError>",
+        "verus",
+        || {
             <RustStdStandard<std::ffi::IntoStringError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC: &str =
@@ -1679,13 +1679,13 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        "verus",
+        || {
             <RustStdStandard<core::ffi::FromBytesUntilNulError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1727,13 +1727,13 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesWithNulError> {
 bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
+        "verus",
+        || {
             <RustStdStandard<core::ffi::FromBytesWithNulError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1768,16 +1768,16 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>",
+        "verus",
+        || {
             <RustStdStandard<
                 std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
             > as VerusWitness>::proof()
             .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC: &str =
@@ -1799,13 +1799,13 @@ impl VerusWitness for RustStdStandard<std::hash::SipHasher> {
 bridge_verus_witness!(RustStdStandard<std::hash::SipHasher>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::hash::SipHasher>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::hash::SipHasher>",
+        "verus",
+        || {
             <RustStdStandard<std::hash::SipHasher> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC: &str =
@@ -1841,13 +1841,13 @@ impl VerusWitness for RustStdStandard<std::borrow::Cow<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::borrow::Cow<'static, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -1899,14 +1899,14 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::BTreeMap<i32, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::BTreeMap<i32, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC: &str =
@@ -1940,13 +1940,13 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::BTreeSet<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::BTreeSet<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC: &str =
@@ -1968,13 +1968,13 @@ impl VerusWitness for RustStdStandard<std::collections::VecDeque<i32>> {
 bridge_verus_witness!(RustStdStandard<std::collections::VecDeque<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::VecDeque<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::VecDeque<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::VecDeque<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC: &str =
@@ -1996,13 +1996,13 @@ impl VerusWitness for RustStdStandard<std::collections::TryReserveError> {
 bridge_verus_witness!(RustStdStandard<std::collections::TryReserveError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::TryReserveError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::TryReserveError>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::TryReserveError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
@@ -2024,13 +2024,13 @@ impl VerusWitness for RustStdStandard<std::vec::IntoIter<i32>> {
 bridge_verus_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::IntoIter<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::vec::IntoIter<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::vec::IntoIter<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
@@ -2052,14 +2052,14 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Iter<'static,
 bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC: &str =
@@ -2093,13 +2093,13 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::str::Chars<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::str::Chars<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC: &str =
@@ -2145,13 +2145,13 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::BinaryHeap<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -2191,13 +2191,13 @@ impl VerusWitness for RustStdStandard<std::collections::LinkedList<i32>> {
 bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::LinkedList<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::LinkedList<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::LinkedList<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC: &str =
@@ -2235,13 +2235,13 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::Cell<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -2395,13 +2395,13 @@ impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
 bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::array::IntoIter<i32, 3>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::array::IntoIter<i32, 3>>",
+        "verus",
+        || {
             <RustStdStandard<std::array::IntoIter<i32, 3>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
@@ -2439,13 +2439,13 @@ impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::RefCell<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 amenable_derive::verus_ensures_predicate!(
@@ -2473,13 +2473,13 @@ impl VerusWitness for RustStdStandard<std::cell::OnceCell<i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::OnceCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::OnceCell<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::OnceCell<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::OnceCell<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
@@ -2501,13 +2501,13 @@ impl VerusWitness for RustStdStandard<std::cell::UnsafeCell<i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::UnsafeCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::UnsafeCell<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::UnsafeCell<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::UnsafeCell<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 amenable_derive::verus_ensures_predicate!(
@@ -2535,14 +2535,14 @@ impl VerusWitness for RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
@@ -2561,14 +2561,14 @@ impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC: &str =
@@ -2590,13 +2590,13 @@ impl VerusWitness for RustStdStandard<std::rc::Weak<i32>> {
 bridge_verus_witness!(RustStdStandard<std::rc::Weak<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::rc::Weak<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
@@ -2615,13 +2615,13 @@ impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::Weak<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Weak<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Weak<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::Weak<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC: &str =
@@ -2662,13 +2662,13 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
 bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        "verus",
+        || {
             <RustStdStandard<std::string::FromUtf8Error> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -2717,13 +2717,13 @@ impl VerusWitness for RustStdStandard<core::ascii::EscapeDefault> {
 bridge_verus_witness!(RustStdStandard<core::ascii::EscapeDefault>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
+        "verus",
+        || {
             <RustStdStandard<core::ascii::EscapeDefault> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC: &str =
@@ -2749,13 +2749,13 @@ impl VerusWitness for RustStdStandard<core::ffi::CStr> {
 bridge_verus_witness!(RustStdStandard<core::ffi::CStr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
+        "verus",
+        || {
             <RustStdStandard<core::ffi::CStr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -2810,13 +2810,13 @@ impl VerusWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::vec::Drain<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::Drain<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::vec::Drain<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::vec::Drain<'static, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>> {
@@ -2835,14 +2835,14 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>
 bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::IntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::vec_deque::IntoIter<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::linked_list::IntoIter<i32>> {
@@ -2861,14 +2861,14 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IntoIter<i3
 bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::linked_list::IntoIter<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'static, i32>> {
@@ -2887,14 +2887,14 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'stati
 bridge_verus_witness!(RustStdStandard<std::collections::linked_list::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::linked_list::Iter<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
@@ -2913,13 +2913,13 @@ impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
 bridge_verus_witness!(RustStdStandard<std::string::Drain<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::string::Drain<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC: &str =
@@ -2941,14 +2941,14 @@ impl VerusWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut 
 bridge_verus_witness!(RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        "verus",
+        || {
             <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness
@@ -2973,14 +2973,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SPLICE_MODEL_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC: &str =
@@ -3002,14 +3002,14 @@ impl VerusWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIt
 bridge_verus_witness!(RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_MAP_MODEL_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC: &str =
@@ -3031,14 +3031,14 @@ impl VerusWitness for RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i3
 bridge_verus_witness!(RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FILTER_MODEL_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC: &str =
@@ -3064,14 +3064,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FILTER_MAP_MODEL_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC: &str =
@@ -3097,14 +3097,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_MAP_WHILE_MODEL_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC: &str =
@@ -3130,14 +3130,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CLONED_MODEL_CLONES_EACH_REFERENCED_ITEM_SRC: &str =
@@ -3159,14 +3159,14 @@ impl VerusWitness for RustStdStandard<std::iter::Cloned<std::slice::Iter<'static
 bridge_verus_witness!(RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COPIED_MODEL_COPIES_EACH_REFERENCED_ITEM_SRC: &str =
@@ -3188,14 +3188,14 @@ impl VerusWitness for RustStdStandard<std::iter::Copied<std::slice::Iter<'static
 bridge_verus_witness!(RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC: &str =
@@ -3221,14 +3221,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC: &str =
@@ -3250,14 +3250,14 @@ impl VerusWitness for RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::
 bridge_verus_witness!(RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC: &str =
@@ -3279,14 +3279,14 @@ impl VerusWitness for RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>
 bridge_verus_witness!(RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 /// [`IncrementHeadroom`] reuses the same harness rather than adding a new
@@ -3468,14 +3468,14 @@ impl VerusWitness for RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC: &str =
@@ -3497,14 +3497,14 @@ impl VerusWitness for RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
@@ -3530,14 +3530,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC: &str =
@@ -3559,14 +3559,14 @@ impl VerusWitness for RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC: &str =
@@ -3588,14 +3588,14 @@ impl VerusWitness for RustStdStandard<std::iter::Take<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Take<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Take<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Take<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Take<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
@@ -3621,14 +3621,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC: &str =
@@ -3650,13 +3650,13 @@ impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Once<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Once<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Once<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Once<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
@@ -3678,13 +3678,13 @@ impl VerusWitness for RustStdStandard<std::iter::OnceWith<fn() -> i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::OnceWith<fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::OnceWith<fn() -> i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::OnceWith<fn() -> i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::OnceWith<fn() -> i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC: &str =
@@ -3706,13 +3706,13 @@ impl VerusWitness for RustStdStandard<std::iter::Repeat<i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Repeat<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Repeat<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Repeat<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Repeat<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC: &str =
@@ -3734,13 +3734,13 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatWith<fn() -> i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::RepeatWith<fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::RepeatWith<fn() -> i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::RepeatWith<fn() -> i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::RepeatWith<fn() -> i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC: &str =
@@ -3762,13 +3762,13 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatN<i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::RepeatN<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::RepeatN<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::RepeatN<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::RepeatN<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC: &str =
@@ -3790,13 +3790,13 @@ impl VerusWitness for RustStdStandard<std::iter::Empty<i32>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Empty<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Empty<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Empty<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Empty<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC: &str =
@@ -3818,14 +3818,14 @@ impl VerusWitness for RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FUSE_MODEL_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC: &str =
@@ -3847,14 +3847,14 @@ impl VerusWitness for RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_INSPECT_MODEL_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC: &str =
@@ -3876,14 +3876,14 @@ impl VerusWitness for RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, f
 bridge_verus_witness!(RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PEEKABLE_MODEL_PEEK_DOES_NOT_CONSUME_SRC: &str =
@@ -3905,14 +3905,14 @@ impl VerusWitness for RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>
 bridge_verus_witness!(RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SCAN_MODEL_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC: &str =
@@ -3940,14 +3940,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FLAT_MAP_MODEL_FLATTENS_EACH_GENERATED_ITERATOR_SRC: &str =
@@ -3985,14 +3985,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::FlatMap<std::array::IntoIter<i32, 1>, std::ops::Range<i32>, fn(i32) -> std::ops::Range<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::FlatMap<std::array::IntoIter<i32, 1>, std::ops::Range<i32>, fn(i32) -> std::ops::Range<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::FlatMap<std::array::IntoIter<i32, 1>, std::ops::Range<i32>, fn(i32) -> std::ops::Range<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FLATTEN_MODEL_CONCATENATES_THE_INNER_ITERATORS_SRC: &str =
@@ -4018,14 +4018,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC: &str =
@@ -4047,14 +4047,14 @@ impl VerusWitness for RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Opt
 bridge_verus_witness!(RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FROM_FN_MODEL_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC: &str =
@@ -4076,14 +4076,14 @@ impl VerusWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC: &str =
@@ -4105,13 +4105,13 @@ impl VerusWitness for RustStdStandard<std::fmt::Alignment> {
 bridge_verus_witness!(RustStdStandard<std::fmt::Alignment>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Alignment>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::Alignment>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::Alignment> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC: &str =
@@ -4133,13 +4133,13 @@ impl VerusWitness for RustStdStandard<std::fmt::Formatter<'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::Formatter<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Formatter<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::Formatter<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::Formatter<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC: &str =
@@ -4203,13 +4203,13 @@ impl VerusWitness for RustStdStandard<std::fmt::Arguments<'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::Arguments<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::Arguments<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4244,14 +4244,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4282,14 +4282,14 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugStruct<'static, 'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::DebugStruct<'static, 'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::DebugStruct<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4320,14 +4320,14 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugTuple<'static, 'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::DebugTuple<'static, 'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::DebugTuple<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4358,14 +4358,14 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugList<'static, 'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::DebugList<'static, 'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::DebugList<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4396,14 +4396,14 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugSet<'static, 'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::DebugSet<'static, 'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::DebugSet<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4434,14 +4434,14 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugMap<'static, 'static>> {
 bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4472,14 +4472,14 @@ impl VerusWitness for RustStdStandard<std::mem::Discriminant<Option<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::mem::Discriminant<Option<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::mem::Discriminant<Option<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::mem::Discriminant<Option<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::mem::Discriminant<Option<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 /// `RustStdStandard<NonZero<T>>`'s Verus proof states its claim as two
@@ -4512,11 +4512,11 @@ macro_rules! impl_non_zero_verus_witness {
             bridge_verus_witness!(RustStdStandard<std::num::NonZero<$ty>>);
 
             ::inventory::submit! {
-                ::amenable_core::ProofRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
-                    verifier: "verus",
-                    describe: || <RustStdStandard<std::num::NonZero<$ty>> as VerusWitness>::proof().to_string(),
-                }
+                ::amenable_core::ProofRecord::new(
+                    concat!("amenable_std::rust_std::RustStdStandard<std::num::NonZero<", stringify!($ty), ">>"),
+                    "verus",
+                    || <RustStdStandard<std::num::NonZero<$ty>> as VerusWitness>::proof().to_string(),
+                )
             }
 
             amenable_derive::verus_ensures_witness!(
@@ -4547,13 +4547,13 @@ impl VerusWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::slice::Iter<'static, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC: &str =
@@ -4577,14 +4577,14 @@ impl VerusWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::slice::IterMut<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC: &str =
@@ -4606,13 +4606,13 @@ impl VerusWitness for RustStdStandard<std::net::Ipv4Addr> {
 bridge_verus_witness!(RustStdStandard<std::net::Ipv4Addr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Ipv4Addr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::Ipv4Addr>",
+        "verus",
+        || {
             <RustStdStandard<std::net::Ipv4Addr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC: &str =
@@ -4634,13 +4634,13 @@ impl VerusWitness for RustStdStandard<std::net::Ipv6Addr> {
 bridge_verus_witness!(RustStdStandard<std::net::Ipv6Addr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Ipv6Addr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::Ipv6Addr>",
+        "verus",
+        || {
             <RustStdStandard<std::net::Ipv6Addr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
@@ -4662,13 +4662,13 @@ impl VerusWitness for RustStdStandard<std::net::IpAddr> {
 bridge_verus_witness!(RustStdStandard<std::net::IpAddr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::IpAddr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::IpAddr>",
+        "verus",
+        || {
             <RustStdStandard<std::net::IpAddr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC: &str =
@@ -4690,13 +4690,13 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV4> {
 bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV4>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV4>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV4>",
+        "verus",
+        || {
             <RustStdStandard<std::net::SocketAddrV4> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC: &str =
@@ -4718,13 +4718,13 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV6> {
 bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV6>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV6>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::SocketAddrV6>",
+        "verus",
+        || {
             <RustStdStandard<std::net::SocketAddrV6> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
@@ -4746,13 +4746,13 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddr> {
 bridge_verus_witness!(RustStdStandard<std::net::SocketAddr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::SocketAddr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::SocketAddr>",
+        "verus",
+        || {
             <RustStdStandard<std::net::SocketAddr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl_non_zero_verus_witness!(
@@ -4789,14 +4789,14 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stat
 bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> {
@@ -4815,14 +4815,14 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IterMut<'st
 bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC: &str =
@@ -4844,14 +4844,14 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Drain<'stat
 bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32>> {
@@ -4870,14 +4870,14 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i3
 bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::IntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::binary_heap::IntoIter<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> {
@@ -4896,14 +4896,14 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Iter<'stati
 bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> {
@@ -4922,14 +4922,14 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'st
 bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
@@ -4951,13 +4951,13 @@ impl VerusWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::Ref<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Ref<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::Ref<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::Ref<'static, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC: &str =
@@ -4979,13 +4979,13 @@ impl VerusWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::RefMut<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::RefMut<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::cell::RefMut<'static, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC: &str =
@@ -5033,14 +5033,14 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "verus",
+        || {
             <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -5101,13 +5101,13 @@ amenable_derive::verus_requires_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        "verus",
+        || {
             <RustStdStandard<std::char::DecodeUtf16Error> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -5165,13 +5165,13 @@ impl VerusWitness for RustStdStandard<std::char::ToLowercase> {
 bridge_verus_witness!(RustStdStandard<std::char::ToLowercase>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::ToLowercase>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::ToLowercase>",
+        "verus",
+        || {
             <RustStdStandard<std::char::ToLowercase> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC: &str =
@@ -5193,13 +5193,13 @@ impl VerusWitness for RustStdStandard<std::char::ToUppercase> {
 bridge_verus_witness!(RustStdStandard<std::char::ToUppercase>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::ToUppercase>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::ToUppercase>",
+        "verus",
+        || {
             <RustStdStandard<std::char::ToUppercase> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
@@ -5221,13 +5221,13 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDebug> {
 bridge_verus_witness!(RustStdStandard<std::char::EscapeDebug>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeDebug>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::EscapeDebug>",
+        "verus",
+        || {
             <RustStdStandard<std::char::EscapeDebug> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
@@ -5249,13 +5249,13 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDefault> {
 bridge_verus_witness!(RustStdStandard<std::char::EscapeDefault>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeDefault>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::EscapeDefault>",
+        "verus",
+        || {
             <RustStdStandard<std::char::EscapeDefault> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC: &str =
@@ -5277,13 +5277,13 @@ impl VerusWitness for RustStdStandard<std::char::EscapeUnicode> {
 bridge_verus_witness!(RustStdStandard<std::char::EscapeUnicode>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::EscapeUnicode>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::EscapeUnicode>",
+        "verus",
+        || {
             <RustStdStandard<std::char::EscapeUnicode> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 macro_rules! impl_slice_chunks_verus_witness {
@@ -5307,11 +5307,11 @@ macro_rules! impl_slice_chunks_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5413,11 +5413,11 @@ macro_rules! impl_chunk_by_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5446,11 +5446,11 @@ macro_rules! impl_slice_split_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5541,13 +5541,13 @@ impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
 bridge_verus_witness!(RustStdStandard<std::slice::EscapeAscii<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::slice::EscapeAscii<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -5587,13 +5587,13 @@ impl VerusWitness for RustStdStandard<std::slice::GetDisjointMutError> {
 bridge_verus_witness!(RustStdStandard<std::slice::GetDisjointMutError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::GetDisjointMutError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::GetDisjointMutError>",
+        "verus",
+        || {
             <RustStdStandard<std::slice::GetDisjointMutError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 macro_rules! impl_str_ascii_iter_verus_witness {
@@ -5617,11 +5617,11 @@ macro_rules! impl_str_ascii_iter_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5663,11 +5663,11 @@ macro_rules! impl_str_escape_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5707,13 +5707,13 @@ impl VerusWitness for RustStdStandard<std::str::Lines<'static>> {
 bridge_verus_witness!(RustStdStandard<std::str::Lines<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::Lines<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::str::Lines<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::str::Lines<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_LINES_ANY_MODEL_SPLITS_ON_ANY_LINE_ENDING_SRC: &str =
@@ -5735,13 +5735,13 @@ impl VerusWitness for RustStdStandard<std::str::LinesAny<'static>> {
 bridge_verus_witness!(RustStdStandard<std::str::LinesAny<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::LinesAny<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::str::LinesAny<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::str::LinesAny<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 macro_rules! impl_str_whitespace_verus_witness {
@@ -5765,11 +5765,11 @@ macro_rules! impl_str_whitespace_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5806,11 +5806,11 @@ macro_rules! impl_str_utf8_chunks_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5852,11 +5852,11 @@ macro_rules! impl_str_pattern_split_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5898,11 +5898,11 @@ macro_rules! impl_str_pattern_reverse_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5939,11 +5939,11 @@ macro_rules! impl_str_pattern_terminator_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -5982,11 +5982,11 @@ macro_rules! impl_str_matches_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -6045,14 +6045,14 @@ impl VerusWitness for RustStdStandard<std::str::MatchIndices<'static, char>> {
 bridge_verus_witness!(RustStdStandard<std::str::MatchIndices<'static, char>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::MatchIndices<'static, char>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::str::MatchIndices<'static, char>>",
+        "verus",
+        || {
             <RustStdStandard<std::str::MatchIndices<'static, char>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_STR_RMATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC:
@@ -6074,14 +6074,14 @@ impl VerusWitness for RustStdStandard<std::str::RMatchIndices<'static, char>> {
 bridge_verus_witness!(RustStdStandard<std::str::RMatchIndices<'static, char>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::str::RMatchIndices<'static, char>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::str::RMatchIndices<'static, char>>",
+        "verus",
+        || {
             <RustStdStandard<std::str::RMatchIndices<'static, char>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BUF_READER_MODEL_READS_THE_UNDERLYING_BYTES_SRC: &str =
@@ -6103,14 +6103,14 @@ impl VerusWitness for RustStdStandard<std::io::BufReader<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::BufReader<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::BufReader<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::BufReader<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::BufReader<&'static [u8]>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BUF_WRITER_MODEL_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC: &str =
@@ -6132,13 +6132,13 @@ impl VerusWitness for RustStdStandard<std::io::BufWriter<Vec<u8>>> {
 bridge_verus_witness!(RustStdStandard<std::io::BufWriter<Vec<u8>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::BufWriter<Vec<u8>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::BufWriter<Vec<u8>>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::BufWriter<Vec<u8>>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BYTES_MODEL_YIELDS_ONE_BYTE_AT_A_TIME_SRC: &str =
@@ -6160,13 +6160,13 @@ impl VerusWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::Bytes<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Bytes<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Bytes<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Bytes<&'static [u8]>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_INTO_INNER_ERROR_MODEL_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC: &str =
@@ -6190,14 +6190,14 @@ impl VerusWitness for RustStdStandard<std::io::IntoInnerError<std::io::BufWriter
 bridge_verus_witness!(RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_LINE_WRITER_MODEL_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC: &str =
@@ -6219,13 +6219,13 @@ impl VerusWitness for RustStdStandard<std::io::LineWriter<Vec<u8>>> {
 bridge_verus_witness!(RustStdStandard<std::io::LineWriter<Vec<u8>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::LineWriter<Vec<u8>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::LineWriter<Vec<u8>>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::LineWriter<Vec<u8>>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC: &str =
@@ -6247,13 +6247,13 @@ impl VerusWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::Lines<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Lines<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Lines<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Lines<&'static [u8]>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PIPE_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_PAIRED_READER_SRC: &str =
@@ -6279,11 +6279,11 @@ macro_rules! impl_io_pipe_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -6310,13 +6310,13 @@ impl VerusWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::Split<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Split<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Split<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Split<&'static [u8]>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_WRITER_PANICKED_MODEL_RECOVERS_THE_BUFFERED_DATA_SRC: &str =
@@ -6338,13 +6338,13 @@ impl VerusWitness for RustStdStandard<std::io::WriterPanicked> {
 bridge_verus_witness!(RustStdStandard<std::io::WriterPanicked>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::WriterPanicked>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::WriterPanicked>",
+        "verus",
+        || {
             <RustStdStandard<std::io::WriterPanicked> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 macro_rules! impl_io_empty_repeat_sink_verus_witness {
@@ -6368,11 +6368,11 @@ macro_rules! impl_io_empty_repeat_sink_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -6412,13 +6412,13 @@ impl VerusWitness for RustStdStandard<std::io::SeekFrom> {
 bridge_verus_witness!(RustStdStandard<std::io::SeekFrom>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::SeekFrom>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::SeekFrom>",
+        "verus",
+        || {
             <RustStdStandard<std::io::SeekFrom> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHAIN_MODEL_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC: &str =
@@ -6440,14 +6440,14 @@ impl VerusWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8
 bridge_verus_witness!(RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CURSOR_MODEL_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC: &str =
@@ -6471,13 +6471,13 @@ impl VerusWitness for RustStdStandard<std::io::Cursor<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::Cursor<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Cursor<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Cursor<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Cursor<&'static [u8]>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ERROR_MODEL_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC: &str =
@@ -6499,13 +6499,13 @@ impl VerusWitness for RustStdStandard<std::io::Error> {
 bridge_verus_witness!(RustStdStandard<std::io::Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Error>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Error>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Error> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_IO_SLICE_MODEL_DEREFS_TO_THE_WRAPPED_BYTES_SRC: &str =
@@ -6527,13 +6527,13 @@ impl VerusWitness for RustStdStandard<std::io::IoSlice<'static>> {
 bridge_verus_witness!(RustStdStandard<std::io::IoSlice<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::IoSlice<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::IoSlice<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::IoSlice<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_IO_SLICE_MUT_MODEL_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC: &str =
@@ -6557,13 +6557,13 @@ impl VerusWitness for RustStdStandard<std::io::IoSliceMut<'static>> {
 bridge_verus_witness!(RustStdStandard<std::io::IoSliceMut<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::IoSliceMut<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::IoSliceMut<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::IoSliceMut<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TAKE_MODEL_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC: &str =
@@ -6585,13 +6585,13 @@ impl VerusWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
 bridge_verus_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
+        "verus",
+        || {
             <RustStdStandard<std::io::Take<&'static [u8]>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Every width's Verus accommodation model states the identical claim
@@ -6622,11 +6622,11 @@ macro_rules! impl_sync_atomic_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
 
         amenable_derive::verus_ensures_witness!(
@@ -6742,14 +6742,14 @@ amenable_derive::verus_ensures_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -6785,13 +6785,13 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::Ordering> {
 bridge_verus_witness!(RustStdStandard<std::sync::atomic::Ordering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ordering>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::atomic::Ordering> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC: &str =
@@ -6813,13 +6813,13 @@ impl VerusWitness for RustStdStandard<std::process::Child> {
 bridge_verus_witness!(RustStdStandard<std::process::Child>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Child>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::Child>",
+        "verus",
+        || {
             <RustStdStandard<std::process::Child> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC: &str =
@@ -6841,13 +6841,13 @@ impl VerusWitness for RustStdStandard<std::process::ChildStderr> {
 bridge_verus_witness!(RustStdStandard<std::process::ChildStderr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStderr>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::ChildStderr>",
+        "verus",
+        || {
             <RustStdStandard<std::process::ChildStderr> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC: &str =
@@ -6869,13 +6869,13 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdin> {
 bridge_verus_witness!(RustStdStandard<std::process::ChildStdin>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStdin>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::ChildStdin>",
+        "verus",
+        || {
             <RustStdStandard<std::process::ChildStdin> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC: &str =
@@ -6897,13 +6897,13 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdout> {
 bridge_verus_witness!(RustStdStandard<std::process::ChildStdout>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ChildStdout>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::ChildStdout>",
+        "verus",
+        || {
             <RustStdStandard<std::process::ChildStdout> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC: &str =
@@ -6927,13 +6927,13 @@ impl VerusWitness for RustStdStandard<std::process::Command> {
 bridge_verus_witness!(RustStdStandard<std::process::Command>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Command>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::Command>",
+        "verus",
+        || {
             <RustStdStandard<std::process::Command> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC: &str =
@@ -6955,14 +6955,14 @@ impl VerusWitness for RustStdStandard<std::process::CommandArgs<'static>> {
 bridge_verus_witness!(RustStdStandard<std::process::CommandArgs<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::CommandArgs<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::CommandArgs<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::process::CommandArgs<'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC: &str =
@@ -6984,14 +6984,14 @@ impl VerusWitness for RustStdStandard<std::process::CommandEnvs<'static>> {
 bridge_verus_witness!(RustStdStandard<std::process::CommandEnvs<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::CommandEnvs<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::CommandEnvs<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::process::CommandEnvs<'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC: &str =
@@ -7013,13 +7013,13 @@ impl VerusWitness for RustStdStandard<std::process::ExitStatus> {
 bridge_verus_witness!(RustStdStandard<std::process::ExitStatus>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::ExitStatus>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::ExitStatus>",
+        "verus",
+        || {
             <RustStdStandard<std::process::ExitStatus> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC: &str =
@@ -7041,13 +7041,13 @@ impl VerusWitness for RustStdStandard<std::process::Output> {
 bridge_verus_witness!(RustStdStandard<std::process::Output>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Output>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::Output>",
+        "verus",
+        || {
             <RustStdStandard<std::process::Output> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC: &str =
@@ -7069,13 +7069,13 @@ impl VerusWitness for RustStdStandard<std::process::Stdio> {
 bridge_verus_witness!(RustStdStandard<std::process::Stdio>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::process::Stdio>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::process::Stdio>",
+        "verus",
+        || {
             <RustStdStandard<std::process::Stdio> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ANCESTORS_MODEL_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC: &str =
@@ -7097,13 +7097,13 @@ impl VerusWitness for RustStdStandard<std::path::Ancestors<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Ancestors<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Ancestors<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Ancestors<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Ancestors<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COMPONENT_MODEL_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC: &str =
@@ -7125,13 +7125,13 @@ impl VerusWitness for RustStdStandard<std::path::Component<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Component<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Component<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Component<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Component<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_COMPONENTS_MODEL_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC: &str =
@@ -7153,13 +7153,13 @@ impl VerusWitness for RustStdStandard<std::path::Components<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Components<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Components<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Components<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Components<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ITER_MODEL_YIELDS_THE_NAMED_SEGMENTS_SRC: &str =
@@ -7181,13 +7181,13 @@ impl VerusWitness for RustStdStandard<std::path::Iter<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Iter<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Iter<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Iter<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Iter<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_DISPLAY_MODEL_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC: &str =
@@ -7209,13 +7209,13 @@ impl VerusWitness for RustStdStandard<std::path::Display<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Display<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Display<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Display<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Display<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PATH_MODEL_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC: &str =
@@ -7237,13 +7237,13 @@ impl VerusWitness for RustStdStandard<std::path::Path> {
 bridge_verus_witness!(RustStdStandard<std::path::Path>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Path>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Path>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Path> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PATH_BUF_MODEL_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC: &str =
@@ -7265,13 +7265,13 @@ impl VerusWitness for RustStdStandard<std::path::PathBuf> {
 bridge_verus_witness!(RustStdStandard<std::path::PathBuf>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::PathBuf>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::PathBuf>",
+        "verus",
+        || {
             <RustStdStandard<std::path::PathBuf> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PREFIX_MODEL_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC: &str =
@@ -7293,13 +7293,13 @@ impl VerusWitness for RustStdStandard<std::path::Prefix<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::Prefix<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::Prefix<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::Prefix<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::Prefix<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PREFIX_COMPONENT_MODEL_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC: &str =
@@ -7321,14 +7321,14 @@ impl VerusWitness for RustStdStandard<std::path::PrefixComponent<'static>> {
 bridge_verus_witness!(RustStdStandard<std::path::PrefixComponent<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::PrefixComponent<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::PrefixComponent<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::path::PrefixComponent<'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_STRIP_PREFIX_ERROR_MODEL_REPORTS_A_NON_MATCHING_PREFIX_SRC: &str =
@@ -7350,13 +7350,13 @@ impl VerusWitness for RustStdStandard<std::path::StripPrefixError> {
 bridge_verus_witness!(RustStdStandard<std::path::StripPrefixError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::path::StripPrefixError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::path::StripPrefixError>",
+        "verus",
+        || {
             <RustStdStandard<std::path::StripPrefixError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC: &str =
@@ -7389,13 +7389,13 @@ impl VerusWitness for RustStdStandard<std::fs::DirBuilder> {
 bridge_verus_witness!(RustStdStandard<std::fs::DirBuilder>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::DirBuilder> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -7435,13 +7435,13 @@ impl VerusWitness for RustStdStandard<std::fs::DirEntry> {
 bridge_verus_witness!(RustStdStandard<std::fs::DirEntry>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::DirEntry> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -7482,13 +7482,13 @@ impl VerusWitness for RustStdStandard<std::fs::ReadDir> {
 bridge_verus_witness!(RustStdStandard<std::fs::ReadDir>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::ReadDir> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -7529,11 +7529,11 @@ impl VerusWitness for RustStdStandard<std::fs::File> {
 bridge_verus_witness!(RustStdStandard<std::fs::File>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::File>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<std::fs::File> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::File>",
+        "verus",
+        || { <RustStdStandard<std::fs::File> as VerusWitness>::proof().to_string() },
+    )
 }
 
 ::inventory::submit! {
@@ -7571,13 +7571,13 @@ impl VerusWitness for RustStdStandard<std::fs::FileTimes> {
 bridge_verus_witness!(RustStdStandard<std::fs::FileTimes>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::FileTimes> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -7616,13 +7616,13 @@ impl VerusWitness for RustStdStandard<std::fs::Metadata> {
 bridge_verus_witness!(RustStdStandard<std::fs::Metadata>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::Metadata> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -7653,13 +7653,13 @@ impl VerusWitness for RustStdStandard<std::fs::FileType> {
 bridge_verus_witness!(RustStdStandard<std::fs::FileType>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileType>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::FileType>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::FileType> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_OPEN_OPTIONS_MODEL_CREATE_NEW_REJECTS_AN_EXISTING_FILE_SRC: &str =
@@ -7681,13 +7681,13 @@ impl VerusWitness for RustStdStandard<std::fs::OpenOptions> {
 bridge_verus_witness!(RustStdStandard<std::fs::OpenOptions>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::OpenOptions>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::OpenOptions>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::OpenOptions> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PERMISSIONS_MODEL_READONLY_ROUND_TRIPS_THROUGH_SET_PERMISSIONS_SRC: &str =
@@ -7711,13 +7711,13 @@ impl VerusWitness for RustStdStandard<std::fs::Permissions> {
 bridge_verus_witness!(RustStdStandard<std::fs::Permissions>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Permissions>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::Permissions>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::Permissions> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TRY_LOCK_ERROR_MODEL_REPORTS_A_LOCK_ALREADY_HELD_SRC: &str =
@@ -7739,13 +7739,13 @@ impl VerusWitness for RustStdStandard<std::fs::TryLockError> {
 bridge_verus_witness!(RustStdStandard<std::fs::TryLockError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
+        "verus",
+        || {
             <RustStdStandard<std::fs::TryLockError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_LOCAL_KEY_MODEL_WITH_READS_THE_INITIALIZED_VALUE_SRC: &str =
@@ -7767,15 +7767,14 @@ impl VerusWitness for RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>
 bridge_verus_witness!(RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC: &str =
@@ -7797,13 +7796,13 @@ impl VerusWitness for RustStdStandard<std::thread::Thread> {
 bridge_verus_witness!(RustStdStandard<std::thread::Thread>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::thread::Thread>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::thread::Thread>",
+        "verus",
+        || {
             <RustStdStandard<std::thread::Thread> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::thread::ThreadId> {
@@ -7822,13 +7821,13 @@ impl VerusWitness for RustStdStandard<std::thread::ThreadId> {
 bridge_verus_witness!(RustStdStandard<std::thread::ThreadId>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::thread::ThreadId>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::thread::ThreadId>",
+        "verus",
+        || {
             <RustStdStandard<std::thread::ThreadId> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC: &str =
@@ -7859,11 +7858,11 @@ macro_rules! impl_env_args_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
 
         ::inventory::submit! {
@@ -7899,13 +7898,13 @@ impl VerusWitness for RustStdStandard<std::env::JoinPathsError> {
 bridge_verus_witness!(RustStdStandard<std::env::JoinPathsError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::env::JoinPathsError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::env::JoinPathsError>",
+        "verus",
+        || {
             <RustStdStandard<std::env::JoinPathsError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC: &str =
@@ -7927,13 +7926,13 @@ impl VerusWitness for RustStdStandard<std::env::SplitPaths<'static>> {
 bridge_verus_witness!(RustStdStandard<std::env::SplitPaths<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::env::SplitPaths<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::env::SplitPaths<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::env::SplitPaths<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC: &str =
@@ -7957,11 +7956,11 @@ macro_rules! impl_mpsc_channel_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -7988,13 +7987,13 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::mpsc::Receiver<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC: &str =
@@ -8018,11 +8017,11 @@ macro_rules! impl_mpsc_iter_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -8049,14 +8048,14 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
@@ -8078,11 +8077,11 @@ impl VerusWitness for RustStdStandard<std::sync::Once> {
 bridge_verus_witness!(RustStdStandard<std::sync::Once>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<std::sync::Once> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
+        "verus",
+        || { <RustStdStandard<std::sync::Once> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC: &str =
@@ -8104,13 +8103,13 @@ impl VerusWitness for RustStdStandard<std::sync::OnceState> {
 bridge_verus_witness!(RustStdStandard<std::sync::OnceState>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::OnceState>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::OnceState>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::OnceState> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
@@ -8132,13 +8131,13 @@ impl VerusWitness for RustStdStandard<std::sync::OnceLock<i32>> {
 bridge_verus_witness!(RustStdStandard<std::sync::OnceLock<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::OnceLock<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::OnceLock<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::OnceLock<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC: &str =
@@ -8160,13 +8159,13 @@ impl VerusWitness for RustStdStandard<std::sync::Barrier> {
 bridge_verus_witness!(RustStdStandard<std::sync::Barrier>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Barrier>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Barrier>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::Barrier> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::sync::BarrierWaitResult> {
@@ -8185,13 +8184,13 @@ impl VerusWitness for RustStdStandard<std::sync::BarrierWaitResult> {
 bridge_verus_witness!(RustStdStandard<std::sync::BarrierWaitResult>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::BarrierWaitResult>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::BarrierWaitResult>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::BarrierWaitResult> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC: &str =
@@ -8213,13 +8212,13 @@ impl VerusWitness for RustStdStandard<std::sync::WaitTimeoutResult> {
 bridge_verus_witness!(RustStdStandard<std::sync::WaitTimeoutResult>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::WaitTimeoutResult>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::WaitTimeoutResult>",
+        "verus",
+        || {
             <RustStdStandard<std::sync::WaitTimeoutResult> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC: &str =
@@ -8241,13 +8240,13 @@ impl VerusWitness for RustStdStandard<std::net::Incoming<'static>> {
 bridge_verus_witness!(RustStdStandard<std::net::Incoming<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Incoming<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::Incoming<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::net::Incoming<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC: &str =
@@ -8269,13 +8268,13 @@ impl VerusWitness for RustStdStandard<std::net::Shutdown> {
 bridge_verus_witness!(RustStdStandard<std::net::Shutdown>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::Shutdown>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::Shutdown>",
+        "verus",
+        || {
             <RustStdStandard<std::net::Shutdown> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC: &str =
@@ -8297,13 +8296,13 @@ impl VerusWitness for RustStdStandard<std::net::TcpListener> {
 bridge_verus_witness!(RustStdStandard<std::net::TcpListener>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::TcpListener>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::TcpListener>",
+        "verus",
+        || {
             <RustStdStandard<std::net::TcpListener> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC: &str =
@@ -8327,13 +8326,13 @@ impl VerusWitness for RustStdStandard<std::net::TcpStream> {
 bridge_verus_witness!(RustStdStandard<std::net::TcpStream>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::TcpStream>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::TcpStream>",
+        "verus",
+        || {
             <RustStdStandard<std::net::TcpStream> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC: &str =
@@ -8355,13 +8354,13 @@ impl VerusWitness for RustStdStandard<std::net::UdpSocket> {
 bridge_verus_witness!(RustStdStandard<std::net::UdpSocket>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::net::UdpSocket>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::net::UdpSocket>",
+        "verus",
+        || {
             <RustStdStandard<std::net::UdpSocket> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC: &str =
@@ -8383,13 +8382,13 @@ impl VerusWitness for RustStdStandard<std::task::Context<'static>> {
 bridge_verus_witness!(RustStdStandard<std::task::Context<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Context<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::task::Context<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::task::Context<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC: &str =
@@ -8411,13 +8410,13 @@ impl VerusWitness for RustStdStandard<std::task::Poll<i32>> {
 bridge_verus_witness!(RustStdStandard<std::task::Poll<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Poll<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::task::Poll<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::task::Poll<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC: &str =
@@ -8439,13 +8438,13 @@ impl VerusWitness for RustStdStandard<std::task::Waker> {
 bridge_verus_witness!(RustStdStandard<std::task::Waker>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::task::Waker>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::task::Waker>",
+        "verus",
+        || {
             <RustStdStandard<std::task::Waker> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC: &str =
@@ -8467,14 +8466,14 @@ impl VerusWitness for RustStdStandard<std::panic::AssertUnwindSafe<i32>> {
 bridge_verus_witness!(RustStdStandard<std::panic::AssertUnwindSafe<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::panic::AssertUnwindSafe<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::panic::AssertUnwindSafe<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::panic::AssertUnwindSafe<i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC: &str =
@@ -8496,13 +8495,13 @@ impl VerusWitness for RustStdStandard<core::panic::Location<'static>> {
 bridge_verus_witness!(RustStdStandard<core::panic::Location<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::panic::Location<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::panic::Location<'static>>",
+        "verus",
+        || {
             <RustStdStandard<core::panic::Location<'static>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC: &str =
@@ -8524,13 +8523,13 @@ impl VerusWitness for RustStdStandard<std::ops::RangeTo<i32>> {
 bridge_verus_witness!(RustStdStandard<std::ops::RangeTo<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ops::RangeTo<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ops::RangeTo<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::ops::RangeTo<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC: &str =
@@ -8552,13 +8551,13 @@ impl VerusWitness for RustStdStandard<std::ops::RangeFull> {
 bridge_verus_witness!(RustStdStandard<std::ops::RangeFull>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeFull>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RangeFull>",
+        "verus",
+        || {
             <RustStdStandard<std::ops::RangeFull> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC: &str =
@@ -8580,13 +8579,13 @@ impl VerusWitness for RustStdStandard<std::ops::Bound<i32>> {
 bridge_verus_witness!(RustStdStandard<std::ops::Bound<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::ops::Bound<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC: &str =
@@ -8608,13 +8607,13 @@ impl VerusWitness for RustStdStandard<std::ops::ControlFlow<i32, i32>> {
 bridge_verus_witness!(RustStdStandard<std::ops::ControlFlow<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::ops::ControlFlow<i32, i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC: &str =
@@ -8636,13 +8635,13 @@ impl VerusWitness for RustStdStandard<std::time::Instant> {
 bridge_verus_witness!(RustStdStandard<std::time::Instant>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Instant>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Instant>",
+        "verus",
+        || {
             <RustStdStandard<std::time::Instant> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC: &str =
@@ -8664,13 +8663,13 @@ impl VerusWitness for RustStdStandard<std::time::SystemTime> {
 bridge_verus_witness!(RustStdStandard<std::time::SystemTime>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SystemTime>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SystemTime>",
+        "verus",
+        || {
             <RustStdStandard<std::time::SystemTime> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC: &str =
@@ -8692,13 +8691,13 @@ impl VerusWitness for RustStdStandard<std::time::SystemTimeError> {
 bridge_verus_witness!(RustStdStandard<std::time::SystemTimeError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SystemTimeError>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SystemTimeError>",
+        "verus",
+        || {
             <RustStdStandard<std::time::SystemTimeError> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC: &str =
@@ -8720,13 +8719,13 @@ impl VerusWitness for RustStdStandard<std::time::Duration> {
 bridge_verus_witness!(RustStdStandard<std::time::Duration>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Duration>",
+        "verus",
+        || {
             <RustStdStandard<std::time::Duration> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC: &str =
@@ -8750,11 +8749,11 @@ macro_rules! impl_option_result_into_iter_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -8783,11 +8782,11 @@ macro_rules! impl_option_result_iter_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -8816,11 +8815,11 @@ macro_rules! impl_option_result_iter_mut_verus_witness {
         bridge_verus_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                describe: || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                || <RustStdStandard<$ty> as VerusWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -8847,13 +8846,13 @@ impl VerusWitness for RustStdStandard<std::future::Pending<i32>> {
 bridge_verus_witness!(RustStdStandard<std::future::Pending<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::future::Pending<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC: &str =
@@ -8875,13 +8874,13 @@ impl VerusWitness for RustStdStandard<std::future::Ready<i32>> {
 bridge_verus_witness!(RustStdStandard<std::future::Ready<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::future::Ready<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC: &str =
@@ -8909,14 +8908,14 @@ bridge_verus_witness!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_ARRAY_MODEL_INDEXING_AND_LENGTH_SRC: &str =
@@ -8941,11 +8940,11 @@ impl VerusWitness for RustStdStandard<[i32; 3]> {
 bridge_verus_witness!(RustStdStandard<[i32; 3]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<[i32; 3]> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+        "verus",
+        || { <RustStdStandard<[i32; 3]> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_SLICE_MODEL_INDEXING_AND_LENGTH_SRC: &str =
@@ -8967,11 +8966,11 @@ impl VerusWitness for RustStdStandard<[i32]> {
 bridge_verus_witness!(RustStdStandard<[i32]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<[i32]> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32]>",
+        "verus",
+        || { <RustStdStandard<[i32]> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_STR_MODEL_BYTE_LENGTH_AND_CONTENT_SRC: &str =
@@ -9002,11 +9001,11 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<str> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<str>",
+        "verus",
+        || { <RustStdStandard<str> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_TUPLE_MODEL_FIELD_ACCESS_SRC: &str =
@@ -9028,11 +9027,11 @@ impl VerusWitness for RustStdStandard<(i32, i32)> {
 bridge_verus_witness!(RustStdStandard<(i32, i32)>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<(i32, i32)> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        "verus",
+        || { <RustStdStandard<(i32, i32)> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_FN_POINTER_MODEL_CALLS_THE_UNDERLYING_FUNCTION_SRC: &str =
@@ -9054,11 +9053,11 @@ impl VerusWitness for RustStdStandard<fn(i32) -> i32> {
 bridge_verus_witness!(RustStdStandard<fn(i32) -> i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<fn(i32) -> i32> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        "verus",
+        || { <RustStdStandard<fn(i32) -> i32> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_CONST_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC: &str =
@@ -9080,11 +9079,11 @@ impl VerusWitness for RustStdStandard<*const i32> {
 bridge_verus_witness!(RustStdStandard<*const i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<*const i32> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*const i32>",
+        "verus",
+        || { <RustStdStandard<*const i32> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_MUT_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC: &str =
@@ -9106,11 +9105,11 @@ impl VerusWitness for RustStdStandard<*mut i32> {
 bridge_verus_witness!(RustStdStandard<*mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<*mut i32> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        "verus",
+        || { <RustStdStandard<*mut i32> as VerusWitness>::proof().to_string() },
+    )
 }
 
 impl VerusWitness for RustStdStandard<&'static i32> {
@@ -9129,11 +9128,11 @@ impl VerusWitness for RustStdStandard<&'static i32> {
 bridge_verus_witness!(RustStdStandard<&'static i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<&'static i32> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        "verus",
+        || { <RustStdStandard<&'static i32> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_MUTABLE_REFERENCE_MODEL_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC: &str =
@@ -9157,11 +9156,11 @@ impl VerusWitness for RustStdStandard<&'static mut i32> {
 bridge_verus_witness!(RustStdStandard<&'static mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<&'static mut i32> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        "verus",
+        || { <RustStdStandard<&'static mut i32> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC: &str =
@@ -9185,13 +9184,13 @@ impl VerusWitness for RustStdStandard<std::hash::DefaultHasher> {
 bridge_verus_witness!(RustStdStandard<std::hash::DefaultHasher>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+        "verus",
+        || {
             <RustStdStandard<std::hash::DefaultHasher> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC: &str =
@@ -9213,13 +9212,13 @@ impl VerusWitness for RustStdStandard<std::hash::RandomState> {
 bridge_verus_witness!(RustStdStandard<std::hash::RandomState>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RandomState>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RandomState>",
+        "verus",
+        || {
             <RustStdStandard<std::hash::RandomState> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC: &str =
@@ -9241,11 +9240,11 @@ impl VerusWitness for RustStdStandard<std::ffi::OsStr> {
 bridge_verus_witness!(RustStdStandard<std::ffi::OsStr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<std::ffi::OsStr> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsStr>",
+        "verus",
+        || { <RustStdStandard<std::ffi::OsStr> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC: &str =
@@ -9267,13 +9266,13 @@ impl VerusWitness for RustStdStandard<std::ffi::OsString> {
 bridge_verus_witness!(RustStdStandard<std::ffi::OsString>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsString>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsString>",
+        "verus",
+        || {
             <RustStdStandard<std::ffi::OsString> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC: &str =
@@ -9295,14 +9294,14 @@ impl VerusWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
 bridge_verus_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::ffi::os_str::Display<'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC: &str =
@@ -9324,14 +9323,14 @@ impl VerusWitness for RustStdStandard<std::collections::HashMap<i32, i32>> {
 bridge_verus_witness!(RustStdStandard<std::collections::HashMap<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::HashMap<i32, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC: &str =
@@ -9353,13 +9352,13 @@ impl VerusWitness for RustStdStandard<std::collections::HashSet<i32>> {
 bridge_verus_witness!(RustStdStandard<std::collections::HashSet<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::HashSet<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC: &str =
@@ -9381,13 +9380,13 @@ impl VerusWitness for RustStdStandard<std::pin::Pin<Box<i32>>> {
 bridge_verus_witness!(RustStdStandard<std::pin::Pin<Box<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Pin<Box<i32>>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Pin<Box<i32>>>",
+        "verus",
+        || {
             <RustStdStandard<std::pin::Pin<Box<i32>>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC: &str =
@@ -9409,13 +9408,13 @@ impl VerusWitness for RustStdStandard<std::ptr::NonNull<i32>> {
 bridge_verus_witness!(RustStdStandard<std::ptr::NonNull<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NonNull<i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NonNull<i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::ptr::NonNull<i32>> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC: &str =
@@ -9437,11 +9436,11 @@ impl VerusWitness for RustStdStandard<std::alloc::System> {
 bridge_verus_witness!(RustStdStandard<std::alloc::System>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<System>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<std::alloc::System> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<System>",
+        "verus",
+        || { <RustStdStandard<std::alloc::System> as VerusWitness>::proof().to_string() },
+    )
 }
 
 const VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC: &str =
@@ -9463,13 +9462,13 @@ impl VerusWitness for RustStdStandard<std::backtrace::Backtrace> {
 bridge_verus_witness!(RustStdStandard<std::backtrace::Backtrace>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Backtrace>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Backtrace>",
+        "verus",
+        || {
             <RustStdStandard<std::backtrace::Backtrace> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::backtrace::BacktraceStatus> {
@@ -9488,13 +9487,13 @@ impl VerusWitness for RustStdStandard<std::backtrace::BacktraceStatus> {
 bridge_verus_witness!(RustStdStandard<std::backtrace::BacktraceStatus>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
+        "verus",
+        || {
             <RustStdStandard<std::backtrace::BacktraceStatus> as VerusWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 const VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC: &str =
@@ -9516,14 +9515,14 @@ impl VerusWitness for RustStdStandard<std::panic::PanicHookInfo<'static>> {
 bridge_verus_witness!(RustStdStandard<std::panic::PanicHookInfo<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PanicHookInfo<'static>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PanicHookInfo<'static>>",
+        "verus",
+        || {
             <RustStdStandard<std::panic::PanicHookInfo<'static>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 const VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC: &str =
@@ -9545,14 +9544,14 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Drain<'static
 bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
-        verifier: "verus",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
+        "verus",
+        || {
             <RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> as VerusWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 // `std::os::windows::*` witnesses: `#[cfg(windows)]`-gated per item,
@@ -9587,11 +9586,11 @@ bridge_verus_witness!(RustStdStandard<EncodeWide<'static>>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<EncodeWide<'static>> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "verus",
+        || { <RustStdStandard<EncodeWide<'static>> as VerusWitness>::proof().to_string() },
+    )
 }
 
 #[cfg(windows)]
@@ -9617,11 +9616,11 @@ bridge_verus_witness!(RustStdStandard<BorrowedHandle<'static>>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<BorrowedHandle<'static>> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        "verus",
+        || { <RustStdStandard<BorrowedHandle<'static>> as VerusWitness>::proof().to_string() },
+    )
 }
 
 #[cfg(windows)]
@@ -9647,11 +9646,11 @@ bridge_verus_witness!(RustStdStandard<BorrowedSocket<'static>>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<BorrowedSocket<'static>> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        "verus",
+        || { <RustStdStandard<BorrowedSocket<'static>> as VerusWitness>::proof().to_string() },
+    )
 }
 
 #[cfg(windows)]
@@ -9677,11 +9676,11 @@ bridge_verus_witness!(RustStdStandard<HandleOrInvalid>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<HandleOrInvalid> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        "verus",
+        || { <RustStdStandard<HandleOrInvalid> as VerusWitness>::proof().to_string() },
+    )
 }
 
 #[cfg(windows)]
@@ -9707,11 +9706,11 @@ bridge_verus_witness!(RustStdStandard<OwnedHandle>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<OwnedHandle> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        "verus",
+        || { <RustStdStandard<OwnedHandle> as VerusWitness>::proof().to_string() },
+    )
 }
 
 #[cfg(windows)]
@@ -9737,9 +9736,9 @@ bridge_verus_witness!(RustStdStandard<OwnedSocket>);
 
 #[cfg(windows)]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        verifier: "verus",
-        describe: || { <RustStdStandard<OwnedSocket> as VerusWitness>::proof().to_string() },
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        "verus",
+        || { <RustStdStandard<OwnedSocket> as VerusWitness>::proof().to_string() },
+    )
 }

@@ -735,11 +735,11 @@ impl Witness<CreusotVerifier> for Validated {
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_gaap::Validated",
-        verifier: "creusot",
-        describe: || validated_proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_gaap::Validated",
+        "creusot",
+        || validated_proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -851,11 +851,11 @@ impl Witness<CreusotVerifier> for Committed {
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_gaap::Committed",
-        verifier: "creusot",
-        describe: || committed_proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_gaap::Committed",
+        "creusot",
+        || committed_proof().to_string(),
+    )
 }
 
 // `reject`'s/`rollback`'s own claims are legitimately trivial (`result.

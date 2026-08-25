@@ -27,11 +27,11 @@ impl KaniWitness for RustStdStandard<DefaultHasher> {
 bridge_kani_witness!(RustStdStandard<DefaultHasher>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
-        verifier: "kani",
-        describe: || <RustStdStandard<DefaultHasher> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+        "kani",
+        || <RustStdStandard<DefaultHasher> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -70,11 +70,11 @@ impl KaniWitness for RustStdStandard<RandomState> {
 bridge_kani_witness!(RustStdStandard<RandomState>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RandomState>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RandomState> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RandomState>",
+        "kani",
+        || <RustStdStandard<RandomState> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniRandomStateObservation` instance actually

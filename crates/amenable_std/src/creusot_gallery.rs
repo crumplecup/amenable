@@ -189,11 +189,11 @@ impl Provenance for CreusotVerifierMetadata {
 // before the fix — the ProofRecord registrations that now live in
 // amenable_std::creusot_witness instead):
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<char> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<char>",
+        "creusot",
+        || <RustStdStandard<char> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 // Observed under `cargo creusot -- -p amenable_creusot`:

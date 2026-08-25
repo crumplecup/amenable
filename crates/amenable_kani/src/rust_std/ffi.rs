@@ -31,11 +31,11 @@ impl KaniWitness for RustStdStandard<CStr> {
 bridge_kani_witness!(RustStdStandard<CStr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CStr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<CStr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CStr>",
+        "kani",
+        || <RustStdStandard<CStr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// [`NonNulByte`] reuses the same harness rather than adding a new Kani
@@ -99,12 +99,12 @@ impl KaniWitness for RustStdStandard<FromBytesUntilNulError> {
 bridge_kani_witness!(RustStdStandard<FromBytesUntilNulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FromBytesUntilNulError> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
+        "kani",
+        || <RustStdStandard<FromBytesUntilNulError> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -148,11 +148,11 @@ impl KaniWitness for RustStdStandard<FromBytesWithNulError> {
 bridge_kani_witness!(RustStdStandard<FromBytesWithNulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromBytesWithNulError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FromBytesWithNulError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromBytesWithNulError>",
+        "kani",
+        || <RustStdStandard<FromBytesWithNulError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

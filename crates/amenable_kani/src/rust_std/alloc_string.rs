@@ -37,12 +37,12 @@ impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
 bridge_kani_witness!(RustStdStandard<std::string::Drain<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::string::Drain<'static>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
+        "kani",
+        || <RustStdStandard<std::string::Drain<'static>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniStringDrainObservation` instance actually
@@ -168,11 +168,11 @@ impl KaniWitness for RustStdStandard<FromUtf16Error> {
 bridge_kani_witness!(RustStdStandard<FromUtf16Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromUtf16Error>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FromUtf16Error> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromUtf16Error>",
+        "kani",
+        || <RustStdStandard<FromUtf16Error> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -217,11 +217,11 @@ impl KaniWitness for RustStdStandard<FromUtf8Error> {
 bridge_kani_witness!(RustStdStandard<FromUtf8Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromUtf8Error>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FromUtf8Error> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromUtf8Error>",
+        "kani",
+        || <RustStdStandard<FromUtf8Error> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

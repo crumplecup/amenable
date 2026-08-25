@@ -28,12 +28,12 @@ impl KaniWitness for RustStdStandard<BuildHasherDefault<DefaultHasher>> {
 bridge_kani_witness!(RustStdStandard<BuildHasherDefault<DefaultHasher>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BuildHasherDefault<DefaultHasher>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BuildHasherDefault<DefaultHasher>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BuildHasherDefault<DefaultHasher>>",
+        "kani",
+        || <RustStdStandard<BuildHasherDefault<DefaultHasher>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -99,11 +99,11 @@ impl KaniWitness for RustStdStandard<SipHasherAlias> {
 bridge_kani_witness!(RustStdStandard<SipHasherAlias>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SipHasher>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SipHasherAlias> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SipHasher>",
+        "kani",
+        || <RustStdStandard<SipHasherAlias> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

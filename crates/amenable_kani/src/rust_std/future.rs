@@ -37,11 +37,11 @@ impl KaniWitness for RustStdStandard<Pending<i32>> {
 bridge_kani_witness!(RustStdStandard<Pending<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Pending<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        "kani",
+        || <RustStdStandard<Pending<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -92,11 +92,11 @@ impl KaniWitness for RustStdStandard<Ready<i32>> {
 bridge_kani_witness!(RustStdStandard<Ready<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Ready<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        "kani",
+        || <RustStdStandard<Ready<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -144,12 +144,12 @@ impl KaniWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> 
 bridge_kani_witness!(RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        "kani",
+        || <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {

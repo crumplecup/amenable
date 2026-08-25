@@ -118,11 +118,11 @@ impl KaniWitness for RustStdStandard<char> {
 bridge_kani_witness!(RustStdStandard<char>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "kani",
-        describe: || <RustStdStandard<char> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<char>",
+        "kani",
+        || <RustStdStandard<char> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -177,11 +177,11 @@ impl KaniWitness for RustStdStandard<String> {
 bridge_kani_witness!(RustStdStandard<String>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<String>",
-        verifier: "kani",
-        describe: || <RustStdStandard<String> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<String>",
+        "kani",
+        || <RustStdStandard<String> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<String>`'s UTF-8 bookkeeping
@@ -274,11 +274,11 @@ impl KaniWitness for RustStdStandard<[i32; 3]> {
 bridge_kani_witness!(RustStdStandard<[i32; 3]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
-        verifier: "kani",
-        describe: || <RustStdStandard<[i32; 3]> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+        "kani",
+        || <RustStdStandard<[i32; 3]> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -326,11 +326,11 @@ impl KaniWitness for RustStdStandard<[i32]> {
 bridge_kani_witness!(RustStdStandard<[i32]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
-        verifier: "kani",
-        describe: || <RustStdStandard<[i32]> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32]>",
+        "kani",
+        || <RustStdStandard<[i32]> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -383,11 +383,11 @@ impl KaniWitness for RustStdStandard<str> {
 bridge_kani_witness!(RustStdStandard<str>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "kani",
-        describe: || <RustStdStandard<str> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<str>",
+        "kani",
+        || <RustStdStandard<str> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -492,11 +492,11 @@ kani_requires!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::FourBytesAreEachAscii",
-        verifier: "kani",
-        describe: || <FourBytesAreEachAscii as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::FourBytesAreEachAscii",
+        "kani",
+        || <FourBytesAreEachAscii as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<(i32, i32)> {
@@ -515,11 +515,11 @@ impl KaniWitness for RustStdStandard<(i32, i32)> {
 bridge_kani_witness!(RustStdStandard<(i32, i32)>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
-        verifier: "kani",
-        describe: || <RustStdStandard<(i32, i32)> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        "kani",
+        || <RustStdStandard<(i32, i32)> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -553,11 +553,11 @@ impl KaniWitness for RustStdStandard<fn(i32) -> i32> {
 bridge_kani_witness!(RustStdStandard<fn(i32) -> i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<fn(i32) -> i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        "kani",
+        || <RustStdStandard<fn(i32) -> i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -592,11 +592,11 @@ impl KaniWitness for RustStdStandard<*const i32> {
 bridge_kani_witness!(RustStdStandard<*const i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<*const i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*const i32>",
+        "kani",
+        || <RustStdStandard<*const i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -641,11 +641,11 @@ impl KaniWitness for RustStdStandard<*mut i32> {
 bridge_kani_witness!(RustStdStandard<*mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<*mut i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        "kani",
+        || <RustStdStandard<*mut i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -689,11 +689,11 @@ impl KaniWitness for RustStdStandard<&'static i32> {
 bridge_kani_witness!(RustStdStandard<&'static i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<&'static i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        "kani",
+        || <RustStdStandard<&'static i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -802,11 +802,11 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for DerefReflects
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::DerefReflectsTheStoredValue",
-        verifier: "kani",
-        describe: || <DerefReflectsTheStoredValue<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::DerefReflectsTheStoredValue",
+        "kani",
+        || <DerefReflectsTheStoredValue<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// An `(actual, expected)` pair known to agree: indexing a fixed-length
@@ -898,11 +898,11 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::IndexRecoversTheStoredElement",
-        verifier: "kani",
-        describe: || <IndexRecoversTheStoredElement<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IndexRecoversTheStoredElement",
+        "kani",
+        || <IndexRecoversTheStoredElement<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// An `(actual, expected)` pair known to agree: a struct or tuple
@@ -991,11 +991,11 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::FieldAccessRecoversTheStoredValue",
-        verifier: "kani",
-        describe: || <FieldAccessRecoversTheStoredValue<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::FieldAccessRecoversTheStoredValue",
+        "kani",
+        || <FieldAccessRecoversTheStoredValue<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<&'static mut i32> {
@@ -1014,11 +1014,11 @@ impl KaniWitness for RustStdStandard<&'static mut i32> {
 bridge_kani_witness!(RustStdStandard<&'static mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<&'static mut i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        "kani",
+        || <RustStdStandard<&'static mut i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

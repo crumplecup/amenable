@@ -47,11 +47,11 @@ impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::Mutex<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Mutex<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::Mutex<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Mutex<i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::Mutex<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniMutexExclusionObservation` instance actually
@@ -139,12 +139,12 @@ impl KaniWitness for RustStdStandard<std::sync::MutexGuard<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::MutexGuard<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::MutexGuard<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::MutexGuard<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::MutexGuard<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::MutexGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -186,11 +186,11 @@ impl KaniWitness for RustStdStandard<std::sync::RwLock<i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::RwLock<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLock<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::RwLock<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::RwLock<i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::RwLock<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -239,12 +239,12 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::RwLockReadGuard<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLockReadGuard<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::RwLockReadGuard<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -276,12 +276,12 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> 
 bridge_kani_witness!(RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -319,11 +319,11 @@ impl KaniWitness for RustStdStandard<std::sync::Once> {
 bridge_kani_witness!(RustStdStandard<std::sync::Once>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::Once> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
+        "kani",
+        || <RustStdStandard<std::sync::Once> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -367,11 +367,11 @@ impl KaniWitness for RustStdStandard<OnceState> {
 bridge_kani_witness!(RustStdStandard<OnceState>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OnceState>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OnceState> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OnceState>",
+        "kani",
+        || <RustStdStandard<OnceState> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -405,11 +405,11 @@ impl KaniWitness for RustStdStandard<OnceLock<i32>> {
 bridge_kani_witness!(RustStdStandard<OnceLock<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OnceLock<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OnceLock<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OnceLock<i32>>",
+        "kani",
+        || <RustStdStandard<OnceLock<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -452,12 +452,12 @@ impl KaniWitness for RustStdStandard<LazyLock<i32, fn() -> i32>> {
 bridge_kani_witness!(RustStdStandard<LazyLock<i32, fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LazyLock<i32, fn() -> i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<LazyLock<i32, fn() -> i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LazyLock<i32, fn() -> i32>>",
+        "kani",
+        || <RustStdStandard<LazyLock<i32, fn() -> i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(
@@ -506,11 +506,11 @@ impl KaniWitness for RustStdStandard<Barrier> {
 bridge_kani_witness!(RustStdStandard<Barrier>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Barrier>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Barrier> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Barrier>",
+        "kani",
+        || <RustStdStandard<Barrier> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniBarrierLeaderObservation` instance actually
@@ -588,11 +588,11 @@ impl KaniWitness for RustStdStandard<BarrierWaitResult> {
 bridge_kani_witness!(RustStdStandard<BarrierWaitResult>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BarrierWaitResult>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BarrierWaitResult> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BarrierWaitResult>",
+        "kani",
+        || <RustStdStandard<BarrierWaitResult> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<BarrierWaitResult>`'s leader
@@ -647,11 +647,11 @@ impl KaniWitness for RustStdStandard<std::sync::Condvar> {
 bridge_kani_witness!(RustStdStandard<std::sync::Condvar>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::Condvar>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::Condvar> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::Condvar>",
+        "kani",
+        || <RustStdStandard<std::sync::Condvar> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniWaitTimeoutObservation` instance actually
@@ -729,12 +729,12 @@ impl KaniWitness for RustStdStandard<PoisonError<MutexGuard<'static, i32>>> {
 bridge_kani_witness!(RustStdStandard<PoisonError<MutexGuard<'static, i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PoisonError<MutexGuard<'static, i32>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<PoisonError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PoisonError<MutexGuard<'static, i32>>>",
+        "kani",
+        || <RustStdStandard<PoisonError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniMutexFailureObservation` instance actually
@@ -825,12 +825,12 @@ impl KaniWitness for RustStdStandard<std::sync::TryLockError<MutexGuard<'static,
 bridge_kani_witness!(RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>>",
+        "kani",
+        || <RustStdStandard<std::sync::TryLockError<MutexGuard<'static, i32>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniMutexFailureObservation` instance actually
@@ -940,11 +940,11 @@ impl KaniWitness for RustStdStandard<WaitTimeoutResult> {
 bridge_kani_witness!(RustStdStandard<WaitTimeoutResult>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<WaitTimeoutResult>",
-        verifier: "kani",
-        describe: || <RustStdStandard<WaitTimeoutResult> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<WaitTimeoutResult>",
+        "kani",
+        || <RustStdStandard<WaitTimeoutResult> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<WaitTimeoutResult>`'s timeout

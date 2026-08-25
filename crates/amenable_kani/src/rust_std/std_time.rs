@@ -32,11 +32,11 @@ impl KaniWitness for RustStdStandard<Instant> {
 bridge_kani_witness!(RustStdStandard<Instant>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Instant>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Instant> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Instant>",
+        "kani",
+        || <RustStdStandard<Instant> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniInstantObservation` instance actually demonstrated
@@ -118,11 +118,11 @@ impl KaniWitness for RustStdStandard<SystemTime> {
 bridge_kani_witness!(RustStdStandard<SystemTime>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SystemTime>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SystemTime> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SystemTime>",
+        "kani",
+        || <RustStdStandard<SystemTime> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -157,11 +157,11 @@ impl KaniWitness for RustStdStandard<SystemTimeError> {
 bridge_kani_witness!(RustStdStandard<SystemTimeError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SystemTimeError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SystemTimeError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SystemTimeError>",
+        "kani",
+        || <RustStdStandard<SystemTimeError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

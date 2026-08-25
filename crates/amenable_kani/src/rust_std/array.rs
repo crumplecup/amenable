@@ -31,11 +31,11 @@ impl KaniWitness for RustStdStandard<TryFromSliceError> {
 bridge_kani_witness!(RustStdStandard<TryFromSliceError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryFromSliceError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<TryFromSliceError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<TryFromSliceError>",
+        "kani",
+        || <RustStdStandard<TryFromSliceError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -87,12 +87,12 @@ impl KaniWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
 bridge_kani_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IntoIter<i32, 3>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::array::IntoIter<i32, 3>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IntoIter<i32, 3>>",
+        "kani",
+        || <RustStdStandard<std::array::IntoIter<i32, 3>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(

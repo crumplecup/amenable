@@ -72,11 +72,11 @@ impl Witness<KaniVerifier> for Debit {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(Debit)),
-        verifier: "kani",
-        describe: || <Debit as Witness<KaniVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        concat!(module_path!(), "::", stringify!(Debit)),
+        "kani",
+        || <Debit as Witness<KaniVerifier>>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -140,11 +140,11 @@ impl Witness<KaniVerifier> for Credit {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(Credit)),
-        verifier: "kani",
-        describe: || <Credit as Witness<KaniVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        concat!(module_path!(), "::", stringify!(Credit)),
+        "kani",
+        || <Credit as Witness<KaniVerifier>>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -251,11 +251,11 @@ impl Establish<AddEvidence, KaniVerifier> for AddEvidence {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(AddEvidence)),
-        verifier: "kani",
-        describe: || <AddEvidence as Witness<KaniVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        concat!(module_path!(), "::", stringify!(AddEvidence)),
+        "kani",
+        || <AddEvidence as Witness<KaniVerifier>>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

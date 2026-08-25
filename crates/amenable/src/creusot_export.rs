@@ -216,11 +216,11 @@ fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
          \n\
          #[cfg(not(creusot))]\n\
          ::inventory::submit! {{\n\
-         \x20\x20\x20\x20::amenable_core::ProofRecord {{\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20evidence: \"{evidence_path}\",\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20verifier: \"creusot\",\n\
-         \x20\x20\x20\x20\x20\x20\x20\x20describe: || {const_name}.to_owned(),\n\
-         \x20\x20\x20\x20}}\n\
+         \x20\x20\x20\x20::amenable_core::ProofRecord::new(\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\"{evidence_path}\",\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20\"creusot\",\n\
+         \x20\x20\x20\x20\x20\x20\x20\x20|| {const_name}.to_owned(),\n\
+         \x20\x20\x20\x20)\n\
          }}\n",
         self_ty = tidy_stringified_type(record.self_ty),
         method_name = record.method_name,

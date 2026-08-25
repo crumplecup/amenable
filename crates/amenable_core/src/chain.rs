@@ -362,8 +362,8 @@ fn build_node(
     visiting: &mut HashSet<&'static str>,
 ) -> ChainNode {
     let proofs = inventory::iter::<ProofRecord>()
-        .filter(|record| record.evidence == name)
-        .map(|record| (record.verifier.to_string(), (record.describe)()))
+        .filter(|record| record.evidence() == name)
+        .map(|record| (record.verifier().to_string(), (record.describe())()))
         .collect();
 
     let mut bases = Vec::new();

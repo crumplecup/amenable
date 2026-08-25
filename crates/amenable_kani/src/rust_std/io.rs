@@ -56,12 +56,12 @@ impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<BufReader<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BufReader<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BufReader<&'static [u8]>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BufReader<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<BufReader<&'static [u8]>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniBufferedReadObservation` instance actually
@@ -141,11 +141,11 @@ impl KaniWitness for RustStdStandard<BufWriter<Vec<u8>>> {
 bridge_kani_witness!(RustStdStandard<BufWriter<Vec<u8>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BufWriter<Vec<u8>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BufWriter<Vec<u8>>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BufWriter<Vec<u8>>>",
+        "kani",
+        || <RustStdStandard<BufWriter<Vec<u8>>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -183,11 +183,11 @@ impl KaniWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<std::io::Bytes<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Bytes<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Bytes<&'static [u8]>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Bytes<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<std::io::Bytes<&'static [u8]>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -220,13 +220,12 @@ impl KaniWitness for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> {
 bridge_kani_witness!(RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>",
+        "kani",
+        || <RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniFlushErrorObservation` instance actually
@@ -308,11 +307,11 @@ impl KaniWitness for RustStdStandard<LineWriter<Vec<u8>>> {
 bridge_kani_witness!(RustStdStandard<LineWriter<Vec<u8>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LineWriter<Vec<u8>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<LineWriter<Vec<u8>>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LineWriter<Vec<u8>>>",
+        "kani",
+        || <RustStdStandard<LineWriter<Vec<u8>>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniLineWriterObservation` instance actually
@@ -408,11 +407,11 @@ kani_requires!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::ByteIsDistinctFromTheMarker",
-        verifier: "kani",
-        describe: || <ByteIsDistinctFromTheMarker as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ByteIsDistinctFromTheMarker",
+        "kani",
+        || <ByteIsDistinctFromTheMarker as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -457,11 +456,11 @@ impl KaniWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<std::io::Lines<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Lines<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Lines<&'static [u8]>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Lines<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<std::io::Lines<&'static [u8]>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniLinesObservation` instance actually demonstrated
@@ -545,11 +544,11 @@ impl KaniWitness for RustStdStandard<PipeReader> {
 bridge_kani_witness!(RustStdStandard<PipeReader>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PipeReader>",
-        verifier: "kani",
-        describe: || <RustStdStandard<PipeReader> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PipeReader>",
+        "kani",
+        || <RustStdStandard<PipeReader> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -599,11 +598,11 @@ impl KaniWitness for RustStdStandard<PipeWriter> {
 bridge_kani_witness!(RustStdStandard<PipeWriter>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PipeWriter>",
-        verifier: "kani",
-        describe: || <RustStdStandard<PipeWriter> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PipeWriter>",
+        "kani",
+        || <RustStdStandard<PipeWriter> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -655,11 +654,11 @@ impl KaniWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<std::io::Split<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Split<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Split<&'static [u8]>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Split<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<std::io::Split<&'static [u8]>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniBufReadSplitObservation` instance actually
@@ -759,11 +758,11 @@ impl KaniWitness for RustStdStandard<WriterPanicked> {
 bridge_kani_witness!(RustStdStandard<WriterPanicked>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<WriterPanicked>",
-        verifier: "kani",
-        describe: || <RustStdStandard<WriterPanicked> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<WriterPanicked>",
+        "kani",
+        || <RustStdStandard<WriterPanicked> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniWriterPanickedObservation` instance actually
@@ -843,11 +842,11 @@ impl KaniWitness for RustStdStandard<std::io::Empty> {
 bridge_kani_witness!(RustStdStandard<std::io::Empty>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Empty> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
+        "kani",
+        || <RustStdStandard<std::io::Empty> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -892,11 +891,11 @@ impl KaniWitness for RustStdStandard<std::io::Repeat> {
 bridge_kani_witness!(RustStdStandard<std::io::Repeat>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Repeat> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
+        "kani",
+        || <RustStdStandard<std::io::Repeat> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -948,11 +947,11 @@ impl KaniWitness for RustStdStandard<SeekFrom> {
 bridge_kani_witness!(RustStdStandard<SeekFrom>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SeekFrom> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        "kani",
+        || <RustStdStandard<SeekFrom> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -1021,11 +1020,11 @@ impl KaniWitness for RustStdStandard<std::io::Sink> {
 bridge_kani_witness!(RustStdStandard<std::io::Sink>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Sink>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Sink> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Sink>",
+        "kani",
+        || <RustStdStandard<std::io::Sink> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -1064,13 +1063,12 @@ impl KaniWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]
 bridge_kani_witness!(RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>",
+        "kani",
+        || <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(
@@ -1140,11 +1138,11 @@ impl KaniWitness for RustStdStandard<Cursor<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<Cursor<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Cursor<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Cursor<&'static [u8]>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Cursor<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<Cursor<&'static [u8]>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -1205,11 +1203,11 @@ impl KaniWitness for RustStdStandard<std::io::Error> {
 bridge_kani_witness!(RustStdStandard<std::io::Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Error>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Error> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Error>",
+        "kani",
+        || <RustStdStandard<std::io::Error> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -1259,11 +1257,11 @@ impl KaniWitness for RustStdStandard<IoSlice<'static>> {
 bridge_kani_witness!(RustStdStandard<IoSlice<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IoSlice<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<IoSlice<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IoSlice<'static>>",
+        "kani",
+        || <RustStdStandard<IoSlice<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -1297,11 +1295,11 @@ impl KaniWitness for RustStdStandard<IoSliceMut<'static>> {
 bridge_kani_witness!(RustStdStandard<IoSliceMut<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IoSliceMut<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<IoSliceMut<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IoSliceMut<'static>>",
+        "kani",
+        || <RustStdStandard<IoSliceMut<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -1343,12 +1341,12 @@ impl KaniWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
 bridge_kani_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::io::Take<&'static [u8]>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
+        "kani",
+        || <RustStdStandard<std::io::Take<&'static [u8]>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {

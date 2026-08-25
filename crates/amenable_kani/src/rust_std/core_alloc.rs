@@ -29,11 +29,11 @@ impl KaniWitness for RustStdStandard<Layout> {
 bridge_kani_witness!(RustStdStandard<Layout>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Layout>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Layout> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Layout>",
+        "kani",
+        || <RustStdStandard<Layout> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -66,11 +66,11 @@ impl KaniWitness for RustStdStandard<LayoutError> {
 bridge_kani_witness!(RustStdStandard<LayoutError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LayoutError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<LayoutError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LayoutError>",
+        "kani",
+        || <RustStdStandard<LayoutError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

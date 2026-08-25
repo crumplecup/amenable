@@ -33,11 +33,11 @@ impl KaniWitness for RustStdStandard<HashMap<i32, i32>> {
 bridge_kani_witness!(RustStdStandard<HashMap<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<HashMap<i32, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        "kani",
+        || <RustStdStandard<HashMap<i32, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -73,11 +73,11 @@ impl KaniWitness for RustStdStandard<HashSet<i32>> {
 bridge_kani_witness!(RustStdStandard<HashSet<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<HashSet<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        "kani",
+        || <RustStdStandard<HashSet<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

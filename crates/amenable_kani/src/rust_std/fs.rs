@@ -37,11 +37,11 @@ impl KaniWitness for RustStdStandard<DirBuilder> {
 bridge_kani_witness!(RustStdStandard<DirBuilder>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DirBuilder>",
-        verifier: "kani",
-        describe: || <RustStdStandard<DirBuilder> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DirBuilder>",
+        "kani",
+        || <RustStdStandard<DirBuilder> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniRecursiveDirObservation` instance actually
@@ -144,11 +144,11 @@ impl KaniWitness for RustStdStandard<DirEntry> {
 bridge_kani_witness!(RustStdStandard<DirEntry>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DirEntry>",
-        verifier: "kani",
-        describe: || <RustStdStandard<DirEntry> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DirEntry>",
+        "kani",
+        || <RustStdStandard<DirEntry> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniDirEntryObservation` instance actually demonstrated
@@ -235,11 +235,11 @@ impl KaniWitness for RustStdStandard<File> {
 bridge_kani_witness!(RustStdStandard<File>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<File>",
-        verifier: "kani",
-        describe: || <RustStdStandard<File> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<File>",
+        "kani",
+        || <RustStdStandard<File> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniFileContentObservation` instance actually
@@ -322,11 +322,11 @@ impl KaniWitness for RustStdStandard<FileTimes> {
 bridge_kani_witness!(RustStdStandard<FileTimes>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FileTimes>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FileTimes> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FileTimes>",
+        "kani",
+        || <RustStdStandard<FileTimes> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniFileTimesObservation` instance actually
@@ -414,11 +414,11 @@ impl KaniWitness for RustStdStandard<FileType> {
 bridge_kani_witness!(RustStdStandard<FileType>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FileType>",
-        verifier: "kani",
-        describe: || <RustStdStandard<FileType> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FileType>",
+        "kani",
+        || <RustStdStandard<FileType> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniFileTypeObservation` instance actually demonstrated
@@ -500,11 +500,11 @@ impl KaniWitness for RustStdStandard<Metadata> {
 bridge_kani_witness!(RustStdStandard<Metadata>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Metadata>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Metadata> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Metadata>",
+        "kani",
+        || <RustStdStandard<Metadata> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniFileLenObservation` instance actually demonstrated
@@ -588,11 +588,11 @@ impl KaniWitness for RustStdStandard<OpenOptions> {
 bridge_kani_witness!(RustStdStandard<OpenOptions>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OpenOptions>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OpenOptions> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OpenOptions>",
+        "kani",
+        || <RustStdStandard<OpenOptions> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCreateNewObservation` instance actually demonstrated
@@ -694,11 +694,11 @@ impl KaniWitness for RustStdStandard<Permissions> {
 bridge_kani_witness!(RustStdStandard<Permissions>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Permissions>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Permissions> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Permissions>",
+        "kani",
+        || <RustStdStandard<Permissions> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniPermissionsObservation` instance actually
@@ -787,11 +787,11 @@ impl KaniWitness for RustStdStandard<ReadDir> {
 bridge_kani_witness!(RustStdStandard<ReadDir>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ReadDir>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ReadDir> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ReadDir>",
+        "kani",
+        || <RustStdStandard<ReadDir> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniReadDirObservation` instance actually demonstrated
@@ -883,13 +883,13 @@ impl KaniWitness for RustStdStandard<std::fs::TryLockError> {
 bridge_kani_witness!(RustStdStandard<std::fs::TryLockError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
-        verifier: "kani",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::TryLockError>",
+        "kani",
+        || {
             <RustStdStandard<std::fs::TryLockError> as KaniWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Witness that a `KaniLockObservation` instance actually demonstrated a

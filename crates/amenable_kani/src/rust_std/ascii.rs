@@ -25,12 +25,12 @@ impl KaniWitness for RustStdStandard<core::ascii::EscapeDefault> {
 bridge_kani_witness!(RustStdStandard<core::ascii::EscapeDefault>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
-        verifier: "kani",
-        describe: || <RustStdStandard<core::ascii::EscapeDefault> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ascii::EscapeDefault>",
+        "kani",
+        || <RustStdStandard<core::ascii::EscapeDefault> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(

@@ -479,11 +479,11 @@ impl Witness<KaniVerifier> for KaniUtf8Buffer<2> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: concat!(module_path!(), "::", stringify!(KaniUtf8Buffer)),
-        verifier: "kani",
-        describe: || <KaniUtf8Buffer<2> as Witness<KaniVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        concat!(module_path!(), "::", stringify!(KaniUtf8Buffer)),
+        "kani",
+        || <KaniUtf8Buffer<2> as Witness<KaniVerifier>>::proof().to_string(),
+    )
 }
 
 kani_ensures!(

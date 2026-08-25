@@ -39,11 +39,11 @@ impl KaniWitness for RustStdStandard<Child> {
 bridge_kani_witness!(RustStdStandard<Child>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Child>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Child> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Child>",
+        "kani",
+        || <RustStdStandard<Child> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChildObservation` instance actually demonstrated its
@@ -120,11 +120,11 @@ impl KaniWitness for RustStdStandard<ChildStderr> {
 bridge_kani_witness!(RustStdStandard<ChildStderr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChildStderr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChildStderr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChildStderr>",
+        "kani",
+        || <RustStdStandard<ChildStderr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChildStderrObservation` instance actually
@@ -200,11 +200,11 @@ impl KaniWitness for RustStdStandard<ChildStdin> {
 bridge_kani_witness!(RustStdStandard<ChildStdin>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChildStdin>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChildStdin> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChildStdin>",
+        "kani",
+        || <RustStdStandard<ChildStdin> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChildStdinObservation` instance actually
@@ -279,11 +279,11 @@ impl KaniWitness for RustStdStandard<ChildStdout> {
 bridge_kani_witness!(RustStdStandard<ChildStdout>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChildStdout>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChildStdout> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChildStdout>",
+        "kani",
+        || <RustStdStandard<ChildStdout> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChildStdoutObservation` instance actually
@@ -356,11 +356,11 @@ impl KaniWitness for RustStdStandard<Command> {
 bridge_kani_witness!(RustStdStandard<Command>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Command>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Command> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Command>",
+        "kani",
+        || <RustStdStandard<Command> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCommandEnvObservation` instance actually
@@ -440,11 +440,11 @@ impl KaniWitness for RustStdStandard<CommandArgs<'static>> {
 bridge_kani_witness!(RustStdStandard<CommandArgs<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CommandArgs<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<CommandArgs<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CommandArgs<'static>>",
+        "kani",
+        || <RustStdStandard<CommandArgs<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCommandArgsObservation` instance actually
@@ -525,11 +525,11 @@ impl KaniWitness for RustStdStandard<CommandEnvs<'static>> {
 bridge_kani_witness!(RustStdStandard<CommandEnvs<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CommandEnvs<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<CommandEnvs<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CommandEnvs<'static>>",
+        "kani",
+        || <RustStdStandard<CommandEnvs<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCommandEnvsObservation` instance actually
@@ -614,11 +614,11 @@ impl KaniWitness for RustStdStandard<ExitStatus> {
 bridge_kani_witness!(RustStdStandard<ExitStatus>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ExitStatus>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ExitStatus> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ExitStatus>",
+        "kani",
+        || <RustStdStandard<ExitStatus> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniExitStatusObservation` instance actually
@@ -695,11 +695,11 @@ impl KaniWitness for RustStdStandard<Output> {
 bridge_kani_witness!(RustStdStandard<Output>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Output>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Output> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Output>",
+        "kani",
+        || <RustStdStandard<Output> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniOutputObservation` instance actually demonstrated
@@ -776,11 +776,11 @@ impl KaniWitness for RustStdStandard<Stdio> {
 bridge_kani_witness!(RustStdStandard<Stdio>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Stdio>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Stdio> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Stdio>",
+        "kani",
+        || <RustStdStandard<Stdio> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniStdioObservation` instance actually demonstrated

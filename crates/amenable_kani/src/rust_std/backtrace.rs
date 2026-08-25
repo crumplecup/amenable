@@ -30,11 +30,11 @@ impl KaniWitness for RustStdStandard<Backtrace> {
 bridge_kani_witness!(RustStdStandard<Backtrace>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Backtrace>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Backtrace> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Backtrace>",
+        "kani",
+        || <RustStdStandard<Backtrace> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -69,11 +69,11 @@ impl KaniWitness for RustStdStandard<BacktraceStatus> {
 bridge_kani_witness!(RustStdStandard<BacktraceStatus>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BacktraceStatus> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
+        "kani",
+        || <RustStdStandard<BacktraceStatus> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

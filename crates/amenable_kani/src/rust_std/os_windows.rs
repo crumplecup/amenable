@@ -40,11 +40,11 @@ impl KaniWitness for RustStdStandard<EncodeWide<'static>> {
 bridge_kani_witness!(RustStdStandard<EncodeWide<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<EncodeWide<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "kani",
+        || <RustStdStandard<EncodeWide<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -77,12 +77,12 @@ impl KaniWitness for RustStdStandard<BorrowedHandle<'static>> {
 bridge_kani_witness!(RustStdStandard<BorrowedHandle<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BorrowedHandle<'static>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        "kani",
+        || <RustStdStandard<BorrowedHandle<'static>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -124,12 +124,12 @@ impl KaniWitness for RustStdStandard<BorrowedSocket<'static>> {
 bridge_kani_witness!(RustStdStandard<BorrowedSocket<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BorrowedSocket<'static>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        "kani",
+        || <RustStdStandard<BorrowedSocket<'static>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -165,11 +165,11 @@ impl KaniWitness for RustStdStandard<HandleOrInvalid> {
 bridge_kani_witness!(RustStdStandard<HandleOrInvalid>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        verifier: "kani",
-        describe: || <RustStdStandard<HandleOrInvalid> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        "kani",
+        || <RustStdStandard<HandleOrInvalid> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -218,11 +218,11 @@ impl KaniWitness for RustStdStandard<OwnedHandle> {
 bridge_kani_witness!(RustStdStandard<OwnedHandle>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OwnedHandle> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        "kani",
+        || <RustStdStandard<OwnedHandle> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -266,11 +266,11 @@ impl KaniWitness for RustStdStandard<OwnedSocket> {
 bridge_kani_witness!(RustStdStandard<OwnedSocket>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OwnedSocket> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        "kani",
+        || <RustStdStandard<OwnedSocket> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

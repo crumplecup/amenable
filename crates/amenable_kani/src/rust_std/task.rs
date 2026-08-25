@@ -35,11 +35,11 @@ impl KaniWitness for RustStdStandard<Context<'static>> {
 bridge_kani_witness!(RustStdStandard<Context<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Context<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Context<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Context<'static>>",
+        "kani",
+        || <RustStdStandard<Context<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -81,11 +81,11 @@ impl KaniWitness for RustStdStandard<Poll<i32>> {
 bridge_kani_witness!(RustStdStandard<Poll<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Poll<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        "kani",
+        || <RustStdStandard<Poll<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -136,11 +136,11 @@ impl KaniWitness for RustStdStandard<Waker> {
 bridge_kani_witness!(RustStdStandard<Waker>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Waker> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Waker>",
+        "kani",
+        || <RustStdStandard<Waker> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

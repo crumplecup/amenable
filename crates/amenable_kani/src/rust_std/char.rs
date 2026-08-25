@@ -48,11 +48,11 @@ impl KaniWitness for RustStdStandard<CharTryFromError> {
 bridge_kani_witness!(RustStdStandard<CharTryFromError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CharTryFromError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<CharTryFromError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CharTryFromError>",
+        "kani",
+        || <RustStdStandard<CharTryFromError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -113,11 +113,11 @@ kani_ensures!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "kani",
-        describe: || <ValidUnicodeScalar as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::ValidUnicodeScalar",
+        "kani",
+        || <ValidUnicodeScalar as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<TryFromCharError> {
@@ -136,11 +136,11 @@ impl KaniWitness for RustStdStandard<TryFromCharError> {
 bridge_kani_witness!(RustStdStandard<TryFromCharError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryFromCharError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<TryFromCharError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<TryFromCharError>",
+        "kani",
+        || <RustStdStandard<TryFromCharError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -184,13 +184,12 @@ impl KaniWitness for RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> 
 bridge_kani_witness!(RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence:
-            "amenable_std::rust_std::RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "kani",
+        || <RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -232,11 +231,11 @@ impl KaniWitness for RustStdStandard<DecodeUtf16Error> {
 bridge_kani_witness!(RustStdStandard<DecodeUtf16Error>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DecodeUtf16Error>",
-        verifier: "kani",
-        describe: || <RustStdStandard<DecodeUtf16Error> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DecodeUtf16Error>",
+        "kani",
+        || <RustStdStandard<DecodeUtf16Error> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -278,11 +277,11 @@ impl KaniWitness for RustStdStandard<ParseCharError> {
 bridge_kani_witness!(RustStdStandard<ParseCharError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ParseCharError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ParseCharError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ParseCharError>",
+        "kani",
+        || <RustStdStandard<ParseCharError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -325,11 +324,11 @@ impl KaniWitness for RustStdStandard<ToLowercase> {
 bridge_kani_witness!(RustStdStandard<ToLowercase>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ToLowercase>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ToLowercase> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ToLowercase>",
+        "kani",
+        || <RustStdStandard<ToLowercase> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -370,11 +369,11 @@ impl KaniWitness for RustStdStandard<ToUppercase> {
 bridge_kani_witness!(RustStdStandard<ToUppercase>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ToUppercase>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ToUppercase> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ToUppercase>",
+        "kani",
+        || <RustStdStandard<ToUppercase> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -415,11 +414,11 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDebug> {
 bridge_kani_witness!(RustStdStandard<core::char::EscapeDebug>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDebug>",
-        verifier: "kani",
-        describe: || <RustStdStandard<core::char::EscapeDebug> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::EscapeDebug>",
+        "kani",
+        || <RustStdStandard<core::char::EscapeDebug> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -460,12 +459,12 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDefault> {
 bridge_kani_witness!(RustStdStandard<core::char::EscapeDefault>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeDefault>",
-        verifier: "kani",
-        describe: || <RustStdStandard<core::char::EscapeDefault> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::EscapeDefault>",
+        "kani",
+        || <RustStdStandard<core::char::EscapeDefault> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(
@@ -506,12 +505,12 @@ impl KaniWitness for RustStdStandard<core::char::EscapeUnicode> {
 bridge_kani_witness!(RustStdStandard<core::char::EscapeUnicode>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::EscapeUnicode>",
-        verifier: "kani",
-        describe: || <RustStdStandard<core::char::EscapeUnicode> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::EscapeUnicode>",
+        "kani",
+        || <RustStdStandard<core::char::EscapeUnicode> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(

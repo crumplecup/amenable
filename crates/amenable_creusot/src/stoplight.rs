@@ -384,11 +384,11 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Yellow {
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_core::Yellow",
-        verifier: "creusot",
-        describe: || <amenable_core::Yellow as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_core::Yellow",
+        "creusot",
+        || <amenable_core::Yellow as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    )
 }
 
 #[cfg(not(creusot))]
@@ -408,11 +408,11 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Red {
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_core::Red",
-        verifier: "creusot",
-        describe: || <amenable_core::Red as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_core::Red",
+        "creusot",
+        || <amenable_core::Red as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    )
 }
 
 /// `Green` is a root claim (see `amenable_core::Green`'s own
@@ -439,9 +439,9 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Green {
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_core::Green::cycle_back",
-        verifier: "creusot",
-        describe: || <amenable_core::Green as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_core::Green::cycle_back",
+        "creusot",
+        || <amenable_core::Green as amenable_core::Witness<CreusotVerifier>>::proof().to_string(),
+    )
 }

@@ -27,11 +27,11 @@ impl KaniWitness for RustStdStandard<System> {
 bridge_kani_witness!(RustStdStandard<System>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<System>",
-        verifier: "kani",
-        describe: || <RustStdStandard<System> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<System>",
+        "kani",
+        || <RustStdStandard<System> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(

@@ -62,9 +62,9 @@ impl
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_creusot::ledger::rollback",
-        verifier: "creusot",
-        describe: || VERIFY_ROLLBACK_EXCHANGE_SRC.to_owned(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_creusot::ledger::rollback",
+        "creusot",
+        || VERIFY_ROLLBACK_EXCHANGE_SRC.to_owned(),
+    )
 }

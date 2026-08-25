@@ -60,11 +60,11 @@ kani_ensures!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::StrongCountTracksLiveReferences",
-        verifier: "kani",
-        describe: || <StrongCountTracksLiveReferences as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::StrongCountTracksLiveReferences",
+        "kani",
+        || <StrongCountTracksLiveReferences as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<Rc<i32>> {
@@ -83,11 +83,11 @@ impl KaniWitness for RustStdStandard<Rc<i32>> {
 bridge_kani_witness!(RustStdStandard<Rc<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Rc<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Rc<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Rc<i32>>",
+        "kani",
+        || <RustStdStandard<Rc<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -200,11 +200,11 @@ kani_ensures!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::WeakUpgradeReturnsNone",
-        verifier: "kani",
-        describe: || <WeakUpgradeReturnsNone as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::WeakUpgradeReturnsNone",
+        "kani",
+        || <WeakUpgradeReturnsNone as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<std::rc::Weak<i32>> {
@@ -223,11 +223,11 @@ impl KaniWitness for RustStdStandard<std::rc::Weak<i32>> {
 bridge_kani_witness!(RustStdStandard<std::rc::Weak<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::rc::Weak<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
+        "kani",
+        || <RustStdStandard<std::rc::Weak<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

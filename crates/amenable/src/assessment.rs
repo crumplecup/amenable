@@ -981,9 +981,9 @@ fn registered_proofs() -> Vec<RegisteredProof> {
 /// `#[kani::proof]` harnesses.
 fn registered_checked_proofs(verifier: &str) -> Vec<RegisteredProof> {
     let harnesses: BTreeSet<String> = inventory::iter::<ProofRecord>()
-        .filter(|record| record.verifier == verifier)
+        .filter(|record| record.verifier() == verifier)
         .filter_map(|record| {
-            let description = (record.describe)();
+            let description = (record.describe())();
             description
                 .lines()
                 .find_map(|line| line.strip_prefix("harness: "))

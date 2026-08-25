@@ -33,11 +33,11 @@ impl KaniWitness for RustStdStandard<Args> {
 bridge_kani_witness!(RustStdStandard<Args>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Args>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Args> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Args>",
+        "kani",
+        || <RustStdStandard<Args> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -72,11 +72,11 @@ impl KaniWitness for RustStdStandard<ArgsOs> {
 bridge_kani_witness!(RustStdStandard<ArgsOs>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ArgsOs>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ArgsOs> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ArgsOs>",
+        "kani",
+        || <RustStdStandard<ArgsOs> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -107,11 +107,11 @@ impl KaniWitness for RustStdStandard<JoinPathsError> {
 bridge_kani_witness!(RustStdStandard<JoinPathsError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<JoinPathsError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<JoinPathsError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<JoinPathsError>",
+        "kani",
+        || <RustStdStandard<JoinPathsError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -146,11 +146,11 @@ impl KaniWitness for RustStdStandard<SplitPaths<'static>> {
 bridge_kani_witness!(RustStdStandard<SplitPaths<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SplitPaths<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
+        "kani",
+        || <RustStdStandard<SplitPaths<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(

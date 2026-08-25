@@ -432,8 +432,8 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
             .collect(),
         proof_records: inventory::iter::<amenable::ProofRecord>()
             .map(|record| ProofRecordDump {
-                evidence: record.evidence.to_owned(),
-                verifier: record.verifier.to_owned(),
+                evidence: record.evidence().to_owned(),
+                verifier: record.verifier().to_owned(),
             })
             .collect(),
         contract_records: inventory::iter::<amenable::ContractRecord>()

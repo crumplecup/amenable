@@ -25,11 +25,11 @@ impl KaniWitness for RustStdStandard<PanicHookInfo<'static>> {
 bridge_kani_witness!(RustStdStandard<PanicHookInfo<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PanicHookInfo<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<PanicHookInfo<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PanicHookInfo<'static>>",
+        "kani",
+        || <RustStdStandard<PanicHookInfo<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniPanicHookObservation` instance actually demonstrated

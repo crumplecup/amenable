@@ -353,11 +353,11 @@ macro_rules! impl_creusot_witness_trusted {
             bridge_creusot_witness!(RustStdStandard<$ty>);
 
             ::inventory::submit! {
-                ::amenable_core::ProofRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                    verifier: "creusot",
-                    describe: || <RustStdStandard<$ty> as CreusotWitness>::proof().report().to_string(),
-                }
+                ::amenable_core::ProofRecord::new(
+                    concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    "creusot",
+                    || <RustStdStandard<$ty> as CreusotWitness>::proof().report().to_string(),
+                )
             }
         )*
     };
@@ -620,11 +620,11 @@ impl CreusotWitness for RustStdStandard<LinesAnyStatic> {
 bridge_creusot_witness!(RustStdStandard<LinesAnyStatic>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LinesAny<'static>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<LinesAnyStatic> as CreusotWitness>::proof().report().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LinesAny<'static>>",
+        "creusot",
+        || <RustStdStandard<LinesAnyStatic> as CreusotWitness>::proof().report().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<SipHasherAlias> {
@@ -639,11 +639,11 @@ impl CreusotWitness for RustStdStandard<SipHasherAlias> {
 bridge_creusot_witness!(RustStdStandard<SipHasherAlias>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SipHasher>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<SipHasherAlias> as CreusotWitness>::proof().report().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SipHasher>",
+        "creusot",
+        || <RustStdStandard<SipHasherAlias> as CreusotWitness>::proof().report().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>> {
@@ -658,15 +658,15 @@ impl CreusotWitness for RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>>
 bridge_creusot_witness!(RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Flatten<IntoIter<Range<i32>>>>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Flatten<IntoIter<Range<i32>>>>",
+        "creusot",
+        || {
             <RustStdStandard<Flatten<std::vec::IntoIter<Range<i32>>>> as CreusotWitness>::proof()
                 .report()
                 .to_string()
         },
-    }
+    )
 }
 
 /// Proof artifact for a carrier with a real, machine-checked Creusot
@@ -707,11 +707,11 @@ impl CreusotWitness for RustStdStandard<char> {
 bridge_creusot_witness!(RustStdStandard<char>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<char> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<char>",
+        "creusot",
+        || <RustStdStandard<char> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::CHAR_ROUNDTRIPS_SRC` directly -- the
@@ -779,11 +779,11 @@ impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "creusot",
-        describe: || <ValidUnicodeScalar as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::ValidUnicodeScalar",
+        "creusot",
+        || <ValidUnicodeScalar as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<String> {
@@ -802,11 +802,11 @@ impl CreusotWitness for RustStdStandard<String> {
 bridge_creusot_witness!(RustStdStandard<String>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<String>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<String>",
+        "creusot",
+        || <RustStdStandard<String> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -850,11 +850,11 @@ macro_rules! impl_creusot_atomic_checked_witness {
         bridge_creusot_witness!(RustStdStandard<$ty>);
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "creusot",
-                describe: || <RustStdStandard<$ty> as CreusotWitness>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "creusot",
+                || <RustStdStandard<$ty> as CreusotWitness>::proof().to_string(),
+            )
         }
     };
 }
@@ -934,11 +934,11 @@ impl CreusotWitness for RustStdStandard<AtomicOrdering> {
 bridge_creusot_witness!(RustStdStandard<AtomicOrdering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<AtomicOrdering> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ordering>",
+        "creusot",
+        || <RustStdStandard<AtomicOrdering> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -981,11 +981,11 @@ impl CreusotWitness for RustStdStandard<System> {
 bridge_creusot_witness!(RustStdStandard<System>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<System>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<System> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<System>",
+        "creusot",
+        || <RustStdStandard<System> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::SYSTEM_ALLOCATION_ROUND_TRIPS_SRC` directly
@@ -1029,11 +1029,11 @@ impl CreusotWitness for RustStdStandard<Backtrace> {
 bridge_creusot_witness!(RustStdStandard<Backtrace>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Backtrace>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Backtrace> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Backtrace>",
+        "creusot",
+        || <RustStdStandard<Backtrace> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BacktraceStatus> {
@@ -1052,11 +1052,11 @@ impl CreusotWitness for RustStdStandard<BacktraceStatus> {
 bridge_creusot_witness!(RustStdStandard<BacktraceStatus>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BacktraceStatus> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BacktraceStatus>",
+        "creusot",
+        || <RustStdStandard<BacktraceStatus> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<SeekFrom> {
@@ -1075,11 +1075,11 @@ impl CreusotWitness for RustStdStandard<SeekFrom> {
 bridge_creusot_witness!(RustStdStandard<SeekFrom>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<SeekFrom> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        "creusot",
+        || <RustStdStandard<SeekFrom> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::SEEK_FROM_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC`
@@ -1120,11 +1120,11 @@ impl CreusotWitness for RustStdStandard<Shutdown> {
 bridge_creusot_witness!(RustStdStandard<Shutdown>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Shutdown>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Shutdown> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Shutdown>",
+        "creusot",
+        || <RustStdStandard<Shutdown> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<DefaultHasher> {
@@ -1143,11 +1143,11 @@ impl CreusotWitness for RustStdStandard<DefaultHasher> {
 bridge_creusot_witness!(RustStdStandard<DefaultHasher>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<DefaultHasher> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+        "creusot",
+        || <RustStdStandard<DefaultHasher> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<RandomState> {
@@ -1166,11 +1166,11 @@ impl CreusotWitness for RustStdStandard<RandomState> {
 bridge_creusot_witness!(RustStdStandard<RandomState>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RandomState>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<RandomState> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RandomState>",
+        "creusot",
+        || <RustStdStandard<RandomState> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<HashMap<i32, i32>> {
@@ -1189,11 +1189,11 @@ impl CreusotWitness for RustStdStandard<HashMap<i32, i32>> {
 bridge_creusot_witness!(RustStdStandard<HashMap<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<HashMap<i32, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        "creusot",
+        || <RustStdStandard<HashMap<i32, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::HASH_MAP_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC`
@@ -1234,11 +1234,11 @@ impl CreusotWitness for RustStdStandard<HashSet<i32>> {
 bridge_creusot_witness!(RustStdStandard<HashSet<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<HashSet<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        "creusot",
+        || <RustStdStandard<HashSet<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -1286,11 +1286,11 @@ impl CreusotWitness for RustStdStandard<[i32; 3]> {
 bridge_creusot_witness!(RustStdStandard<[i32; 3]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<[i32; 3]> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32; 3]>",
+        "creusot",
+        || <RustStdStandard<[i32; 3]> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<[i32]> {
@@ -1309,11 +1309,11 @@ impl CreusotWitness for RustStdStandard<[i32]> {
 bridge_creusot_witness!(RustStdStandard<[i32]>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<[i32]>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<[i32]> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<[i32]>",
+        "creusot",
+        || <RustStdStandard<[i32]> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// [`IndexingAndLength`] reuses the array-indexing harness rather than
@@ -1375,12 +1375,12 @@ impl CreusotWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<std::slice::Iter<'static, i32>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<std::slice::Iter<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Returns `amenable_creusot::SLICE_ITER_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC`
@@ -1423,14 +1423,14 @@ impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        "creusot",
+        || {
             <RustStdStandard<std::slice::IterMut<'static, i32>> as CreusotWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -1473,11 +1473,11 @@ impl CreusotWitness for RustStdStandard<str> {
 bridge_creusot_witness!(RustStdStandard<str>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<str> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<str>",
+        "creusot",
+        || <RustStdStandard<str> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC`
@@ -1558,11 +1558,11 @@ impl CreusotWitness for RustStdStandard<(i32, i32)> {
 bridge_creusot_witness!(RustStdStandard<(i32, i32)>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<(i32, i32)> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        "creusot",
+        || <RustStdStandard<(i32, i32)> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::TUPLE_FIELD_ACCESS_HOLDS_SRC` directly --
@@ -1603,11 +1603,11 @@ impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
 bridge_creusot_witness!(RustStdStandard<fn(i32) -> i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        "creusot",
+        || <RustStdStandard<fn(i32) -> i32> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::FN_POINTER_CALLS_THE_UNDERLYING_FUNCTION_SRC`
@@ -1648,11 +1648,11 @@ impl CreusotWitness for RustStdStandard<*const i32> {
 bridge_creusot_witness!(RustStdStandard<*const i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*const i32>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<*const i32> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*const i32>",
+        "creusot",
+        || <RustStdStandard<*const i32> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<*mut i32> {
@@ -1671,11 +1671,11 @@ impl CreusotWitness for RustStdStandard<*mut i32> {
 bridge_creusot_witness!(RustStdStandard<*mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<*mut i32>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<*mut i32> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<*mut i32>",
+        "creusot",
+        || <RustStdStandard<*mut i32> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<AssertUnwindSafe<i32>> {
@@ -1694,11 +1694,11 @@ impl CreusotWitness for RustStdStandard<AssertUnwindSafe<i32>> {
 bridge_creusot_witness!(RustStdStandard<AssertUnwindSafe<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<AssertUnwindSafe<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        "creusot",
+        || <RustStdStandard<AssertUnwindSafe<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::ASSERT_UNWIND_SAFE_DEREFS_TRANSPARENTLY_SRC`
@@ -1739,11 +1739,11 @@ impl CreusotWitness for RustStdStandard<&'static i32> {
 bridge_creusot_witness!(RustStdStandard<&'static i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<&'static i32> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        "creusot",
+        || <RustStdStandard<&'static i32> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -1787,11 +1787,11 @@ impl CreusotWitness for RustStdStandard<&'static mut i32> {
 bridge_creusot_witness!(RustStdStandard<&'static mut i32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<&'static mut i32> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        "creusot",
+        || <RustStdStandard<&'static mut i32> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -1838,11 +1838,11 @@ impl CreusotWitness for RustStdStandard<Cow<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<Cow<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Cow<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<Cow<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -1884,11 +1884,11 @@ impl CreusotWitness for RustStdStandard<BTreeMap<i32, i32>> {
 bridge_creusot_witness!(RustStdStandard<BTreeMap<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BTreeMap<i32, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        "creusot",
+        || <RustStdStandard<BTreeMap<i32, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::K1_LESS_THAN_K2_HOLDS_SRC` /
@@ -1949,11 +1949,11 @@ impl CreusotWitness for RustStdStandard<BTreeSet<i32>> {
 bridge_creusot_witness!(RustStdStandard<BTreeSet<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BTreeSet<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        "creusot",
+        || <RustStdStandard<BTreeSet<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::A_LESS_THAN_B_HOLDS_SRC` /
@@ -2015,11 +2015,11 @@ impl CreusotWitness for RustStdStandard<BinaryHeap<i32>> {
 bridge_creusot_witness!(RustStdStandard<BinaryHeap<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BinaryHeap<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
+        "creusot",
+        || <RustStdStandard<BinaryHeap<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2061,11 +2061,11 @@ impl CreusotWitness for RustStdStandard<BinaryHeapDrain<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<BinaryHeapDrain<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BinaryHeapDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<BinaryHeapDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2108,11 +2108,11 @@ impl CreusotWitness for RustStdStandard<BinaryHeapIntoIter<i32>> {
 bridge_creusot_witness!(RustStdStandard<BinaryHeapIntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BinaryHeapIntoIter<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::IntoIter<i32>>",
+        "creusot",
+        || <RustStdStandard<BinaryHeapIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2155,11 +2155,11 @@ impl CreusotWitness for RustStdStandard<BinaryHeapIter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<BinaryHeapIter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BinaryHeapIter<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<BinaryHeapIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2202,11 +2202,11 @@ impl CreusotWitness for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<BinaryHeapPeekMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::A_LESS_THAN_B_HOLDS_SRC` /
@@ -2270,11 +2270,11 @@ impl CreusotWitness for RustStdStandard<LinkedList<i32>> {
 bridge_creusot_witness!(RustStdStandard<LinkedList<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LinkedList<i32>>",
+        "creusot",
+        || <RustStdStandard<LinkedList<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// [`DrainsTwoValuesInOrderAndEmpties`] reuses the `LinkedList` FIFO
@@ -2336,11 +2336,11 @@ impl CreusotWitness for RustStdStandard<LinkedListIter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<LinkedListIter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<LinkedListIter<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<LinkedListIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2382,11 +2382,11 @@ impl CreusotWitness for RustStdStandard<LinkedListIterMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<LinkedListIterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<LinkedListIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IterMut<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<LinkedListIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2428,11 +2428,11 @@ impl CreusotWitness for RustStdStandard<LinkedListIntoIter<i32>> {
 bridge_creusot_witness!(RustStdStandard<LinkedListIntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<LinkedListIntoIter<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
+        "creusot",
+        || <RustStdStandard<LinkedListIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// [`YieldsTwoValuesInOrderThenEnds`] reuses the `LinkedList::into_iter`
@@ -2494,14 +2494,14 @@ impl CreusotWitness for RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mu
 bridge_creusot_witness!(RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        "creusot",
+        || {
             <RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> as CreusotWitness>::proof()
                 .to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -2570,11 +2570,11 @@ impl Ensures<CreusotVerifier> for RustStdStandard<TryReserveError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryReserveError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<TryReserveError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<TryReserveError>",
+        "creusot",
+        || <RustStdStandard<TryReserveError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VecDeque<i32>> {
@@ -2593,11 +2593,11 @@ impl CreusotWitness for RustStdStandard<VecDeque<i32>> {
 bridge_creusot_witness!(RustStdStandard<VecDeque<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VecDeque<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
+        "creusot",
+        || <RustStdStandard<VecDeque<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2639,11 +2639,11 @@ impl CreusotWitness for RustStdStandard<VecDequeIntoIter<i32>> {
 bridge_creusot_witness!(RustStdStandard<VecDequeIntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VecDequeIntoIter<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
+        "creusot",
+        || <RustStdStandard<VecDequeIntoIter<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VecDequeDrain<'static, i32>> {
@@ -2662,11 +2662,11 @@ impl CreusotWitness for RustStdStandard<VecDequeDrain<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<VecDequeDrain<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VecDequeDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Drain<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<VecDequeDrain<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VecDequeIter<'static, i32>> {
@@ -2685,11 +2685,11 @@ impl CreusotWitness for RustStdStandard<VecDequeIter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<VecDequeIter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VecDequeIter<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<VecDequeIter<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2731,11 +2731,11 @@ impl CreusotWitness for RustStdStandard<VecDequeIterMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<VecDequeIterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VecDequeIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<VecDequeIterMut<'static, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2777,11 +2777,11 @@ impl CreusotWitness for RustStdStandard<Args> {
 bridge_creusot_witness!(RustStdStandard<Args>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Args>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Args> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Args>",
+        "creusot",
+        || <RustStdStandard<Args> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<ArgsOs> {
@@ -2800,11 +2800,11 @@ impl CreusotWitness for RustStdStandard<ArgsOs> {
 bridge_creusot_witness!(RustStdStandard<ArgsOs>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ArgsOs>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<ArgsOs> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ArgsOs>",
+        "creusot",
+        || <RustStdStandard<ArgsOs> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// [`ArgvIncludesProgramPath`] reuses the `Args` harness rather than
@@ -2886,11 +2886,11 @@ impl CreusotWitness for RustStdStandard<JoinPathsError> {
 bridge_creusot_witness!(RustStdStandard<JoinPathsError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<JoinPathsError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<JoinPathsError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<JoinPathsError>",
+        "creusot",
+        || <RustStdStandard<JoinPathsError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<SplitPaths<'static>> {
@@ -2909,11 +2909,11 @@ impl CreusotWitness for RustStdStandard<SplitPaths<'static>> {
 bridge_creusot_witness!(RustStdStandard<SplitPaths<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<SplitPaths<'static>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SplitPaths<'static>>",
+        "creusot",
+        || <RustStdStandard<SplitPaths<'static>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VarError> {
@@ -2932,11 +2932,11 @@ impl CreusotWitness for RustStdStandard<VarError> {
 bridge_creusot_witness!(RustStdStandard<VarError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VarError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VarError>",
+        "creusot",
+        || <RustStdStandard<VarError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -2974,11 +2974,11 @@ impl CreusotWitness for RustStdStandard<Vars> {
 bridge_creusot_witness!(RustStdStandard<Vars>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Vars>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Vars> as CreusotWitness>::proof().report().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Vars>",
+        "creusot",
+        || <RustStdStandard<Vars> as CreusotWitness>::proof().report().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VarsOs> {
@@ -2993,11 +2993,11 @@ impl CreusotWitness for RustStdStandard<VarsOs> {
 bridge_creusot_witness!(RustStdStandard<VarsOs>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VarsOs>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<VarsOs> as CreusotWitness>::proof().report().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VarsOs>",
+        "creusot",
+        || <RustStdStandard<VarsOs> as CreusotWitness>::proof().report().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<OsStr> {
@@ -3016,11 +3016,11 @@ impl CreusotWitness for RustStdStandard<OsStr> {
 bridge_creusot_witness!(RustStdStandard<OsStr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<OsStr> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsStr>",
+        "creusot",
+        || <RustStdStandard<OsStr> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3062,11 +3062,11 @@ impl CreusotWitness for RustStdStandard<OsString> {
 bridge_creusot_witness!(RustStdStandard<OsString>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsString>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<OsString> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsString>",
+        "creusot",
+        || <RustStdStandard<OsString> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<OsStrDisplay<'static>> {
@@ -3085,11 +3085,11 @@ impl CreusotWitness for RustStdStandard<OsStrDisplay<'static>> {
 bridge_creusot_witness!(RustStdStandard<OsStrDisplay<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<OsStrDisplay<'static>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
+        "creusot",
+        || <RustStdStandard<OsStrDisplay<'static>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<CString> {
@@ -3108,11 +3108,11 @@ impl CreusotWitness for RustStdStandard<CString> {
 bridge_creusot_witness!(RustStdStandard<CString>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CString>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<CString> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CString>",
+        "creusot",
+        || <RustStdStandard<CString> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3155,11 +3155,11 @@ impl CreusotWitness for RustStdStandard<FromVecWithNulError> {
 bridge_creusot_witness!(RustStdStandard<FromVecWithNulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromVecWithNulError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<FromVecWithNulError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromVecWithNulError>",
+        "creusot",
+        || <RustStdStandard<FromVecWithNulError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<IntoStringError> {
@@ -3178,11 +3178,11 @@ impl CreusotWitness for RustStdStandard<IntoStringError> {
 bridge_creusot_witness!(RustStdStandard<IntoStringError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IntoStringError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<IntoStringError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IntoStringError>",
+        "creusot",
+        || <RustStdStandard<IntoStringError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3225,11 +3225,11 @@ impl CreusotWitness for RustStdStandard<NulError> {
 bridge_creusot_witness!(RustStdStandard<NulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NulError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<NulError> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NulError>",
+        "creusot",
+        || <RustStdStandard<NulError> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3295,11 +3295,11 @@ impl Ensures<CreusotVerifier> for RustStdStandard<CStr> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CStr>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<CStr> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CStr>",
+        "creusot",
+        || <RustStdStandard<CStr> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// [`NonNulByte`] reuses the same harness rather than adding a new
@@ -3427,12 +3427,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<FromBytesUntilNulError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<FromBytesUntilNulError> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
+        "creusot",
+        || <RustStdStandard<FromBytesUntilNulError> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 impl CreusotWitness for RustStdStandard<FromBytesWithNulError> {
@@ -3451,12 +3451,12 @@ impl CreusotWitness for RustStdStandard<FromBytesWithNulError> {
 bridge_creusot_witness!(RustStdStandard<FromBytesWithNulError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromBytesWithNulError>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<FromBytesWithNulError> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromBytesWithNulError>",
+        "creusot",
+        || <RustStdStandard<FromBytesWithNulError> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Box<i32>> {
@@ -3475,11 +3475,11 @@ impl CreusotWitness for RustStdStandard<Box<i32>> {
 bridge_creusot_witness!(RustStdStandard<Box<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Box<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        "creusot",
+        || <RustStdStandard<Box<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::BOX_NEW_PRESERVES_THE_WRAPPED_VALUE_SRC`
@@ -3520,11 +3520,11 @@ impl CreusotWitness for RustStdStandard<Duration> {
 bridge_creusot_witness!(RustStdStandard<Duration>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Duration> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Duration>",
+        "creusot",
+        || <RustStdStandard<Duration> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::DURATION_NEW_HEADROOM_HOLDS_SRC` /
@@ -3584,11 +3584,11 @@ impl CreusotWitness for RustStdStandard<RangeTo<i32>> {
 bridge_creusot_witness!(RustStdStandard<RangeTo<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<RangeTo<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
+        "creusot",
+        || <RustStdStandard<RangeTo<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::RANGE_TO_CONTAINS_MATCHES_BOUND_HOLDS_SRC`
@@ -3629,11 +3629,11 @@ impl CreusotWitness for RustStdStandard<RangeFull> {
 bridge_creusot_witness!(RustStdStandard<RangeFull>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeFull>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<RangeFull> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RangeFull>",
+        "creusot",
+        || <RustStdStandard<RangeFull> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Bound<i32>> {
@@ -3652,11 +3652,11 @@ impl CreusotWitness for RustStdStandard<Bound<i32>> {
 bridge_creusot_witness!(RustStdStandard<Bound<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Bound<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        "creusot",
+        || <RustStdStandard<Bound<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::BOUND_ROUND_TRIPS_ITS_ENDPOINT_HOLDS_SRC`
@@ -3697,13 +3697,13 @@ impl CreusotWitness for RustStdStandard<ControlFlow<i32, i32>> {
 bridge_creusot_witness!(RustStdStandard<ControlFlow<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
+        "creusot",
+        || {
             <RustStdStandard<ControlFlow<i32, i32>> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -3746,11 +3746,11 @@ impl CreusotWitness for RustStdStandard<NonZero<i16>> {
 bridge_creusot_witness!(RustStdStandard<NonZero<i16>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<NonZero<i16>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        "creusot",
+        || <RustStdStandard<NonZero<i16>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// `#[trusted]`'s two `#[ensures]` clauses each get their own
@@ -3809,11 +3809,11 @@ impl CreusotWitness for RustStdStandard<std::cmp::Ordering> {
 bridge_creusot_witness!(RustStdStandard<std::cmp::Ordering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<std::cmp::Ordering> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        "creusot",
+        || <RustStdStandard<std::cmp::Ordering> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3855,11 +3855,11 @@ impl CreusotWitness for RustStdStandard<Wrapping<i32>> {
 bridge_creusot_witness!(RustStdStandard<Wrapping<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Wrapping<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Wrapping<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Wrapping<i32>>",
+        "creusot",
+        || <RustStdStandard<Wrapping<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::WRAPPING_I32_ADD_WRAPS_HOLDS_SRC`
@@ -3900,11 +3900,11 @@ impl CreusotWitness for RustStdStandard<Saturating<i32>> {
 bridge_creusot_witness!(RustStdStandard<Saturating<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Saturating<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Saturating<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Saturating<i32>>",
+        "creusot",
+        || <RustStdStandard<Saturating<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::SATURATING_I32_ADD_CLAMPS_HOLDS_SRC`
@@ -3949,11 +3949,11 @@ impl CreusotWitness for RustStdStandard<core::num::IntErrorKind> {
 bridge_creusot_witness!(RustStdStandard<core::num::IntErrorKind>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<core::num::IntErrorKind> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        "creusot",
+        || <RustStdStandard<core::num::IntErrorKind> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -3999,13 +3999,13 @@ impl CreusotWitness for RustStdStandard<core::num::TryFromIntError> {
 bridge_creusot_witness!(RustStdStandard<core::num::TryFromIntError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        "creusot",
+        || {
             <RustStdStandard<core::num::TryFromIntError> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -4053,13 +4053,13 @@ impl CreusotWitness for RustStdStandard<core::num::ParseIntError> {
 bridge_creusot_witness!(RustStdStandard<core::num::ParseIntError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        "creusot",
+        || {
             <RustStdStandard<core::num::ParseIntError> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -4113,13 +4113,13 @@ impl CreusotWitness for RustStdStandard<core::num::FpCategory> {
 bridge_creusot_witness!(RustStdStandard<core::num::FpCategory>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "creusot",
+        || {
             <RustStdStandard<core::num::FpCategory> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -4171,13 +4171,13 @@ impl CreusotWitness for RustStdStandard<core::num::ParseFloatError> {
 bridge_creusot_witness!(RustStdStandard<core::num::ParseFloatError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        "creusot",
+        || {
             <RustStdStandard<core::num::ParseFloatError> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 /// Returns
@@ -4247,11 +4247,11 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Reverse<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Reverse<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        "creusot",
+        || <RustStdStandard<Reverse<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 // Bare `Option<i32>`, matching `amenable_std::rust_std::option_result`'s
@@ -4273,11 +4273,11 @@ impl CreusotWitness for RustStdStandard<Option<i32>> {
 bridge_creusot_witness!(RustStdStandard<Option<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Option<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        "creusot",
+        || <RustStdStandard<Option<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -4322,11 +4322,11 @@ impl CreusotWitness for RustStdStandard<Result<i32, i32>> {
 bridge_creusot_witness!(RustStdStandard<Result<i32, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        "creusot",
+        || <RustStdStandard<Result<i32, i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::RESULT_OK_AND_ERR_ARE_DISJOINT_HOLDS_SRC`
@@ -4369,12 +4369,12 @@ impl CreusotWitness for RustStdStandard<core::option::Iter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<core::option::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::option::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<core::option::Iter<'static, i32>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::option::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<core::option::Iter<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 // Fully qualified to distinguish `core::option::IterMut` from the many other
@@ -4395,12 +4395,12 @@ impl CreusotWitness for RustStdStandard<core::option::IterMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<core::option::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::option::IterMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<core::option::IterMut<'static, i32>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::option::IterMut<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<core::option::IterMut<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 // Fully qualified to distinguish `core::result::Iter` from the many other
@@ -4421,12 +4421,12 @@ impl CreusotWitness for RustStdStandard<core::result::Iter<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<core::result::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::result::Iter<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<core::result::Iter<'static, i32>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::result::Iter<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<core::result::Iter<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 // Fully qualified to distinguish `core::result::IterMut` from the many other
@@ -4447,12 +4447,12 @@ impl CreusotWitness for RustStdStandard<core::result::IterMut<'static, i32>> {
 bridge_creusot_witness!(RustStdStandard<core::result::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::result::IterMut<'static, i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<core::result::IterMut<'static, i32>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::result::IterMut<'static, i32>>",
+        "creusot",
+        || <RustStdStandard<core::result::IterMut<'static, i32>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// [`IterYieldsValueOnceThenEnds`] reuses the `Option::iter` harness
@@ -4533,11 +4533,11 @@ impl CreusotWitness for RustStdStandard<Pending<i32>> {
 bridge_creusot_witness!(RustStdStandard<Pending<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Pending<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        "creusot",
+        || <RustStdStandard<Pending<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns `amenable_creusot::PENDING_NEVER_RESOLVES_HOLDS_SRC`
@@ -4580,12 +4580,12 @@ impl CreusotWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>
 bridge_creusot_witness!(RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as CreusotWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        "creusot",
+        || <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as CreusotWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Returns
@@ -4631,11 +4631,11 @@ impl CreusotWitness for RustStdStandard<Ready<i32>> {
 bridge_creusot_witness!(RustStdStandard<Ready<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Ready<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        "creusot",
+        || <RustStdStandard<Ready<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -4679,11 +4679,11 @@ impl CreusotWitness for RustStdStandard<Context<'static>> {
 bridge_creusot_witness!(RustStdStandard<Context<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Context<'static>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Context<'static>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Context<'static>>",
+        "creusot",
+        || <RustStdStandard<Context<'static>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 // Bare `Poll<i32>`, matching `amenable_std::rust_std::task`'s own
@@ -4726,11 +4726,11 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Poll<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Poll<i32>> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        "creusot",
+        || <RustStdStandard<Poll<i32>> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 // `RawWaker` and `RawWakerVTable` stay trusted in Creusot for the same
@@ -4755,11 +4755,11 @@ impl CreusotWitness for RustStdStandard<Waker> {
 bridge_creusot_witness!(RustStdStandard<Waker>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
-        verifier: "creusot",
-        describe: || <RustStdStandard<Waker> as CreusotWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Waker>",
+        "creusot",
+        || <RustStdStandard<Waker> as CreusotWitness>::proof().to_string(),
+    )
 }
 
 /// Returns
@@ -4829,13 +4829,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<ManuallyDrop<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
-        verifier: "creusot",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        "creusot",
+        || {
             <RustStdStandard<ManuallyDrop<i32>> as CreusotWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 // `std::os::windows::{ffi::EncodeWide, io::{BorrowedHandle, BorrowedSocket,
@@ -4877,10 +4877,10 @@ fn windows_provenance(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_string(),
             claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
@@ -4891,14 +4891,14 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_string(),
             claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
@@ -4909,14 +4909,14 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_string(),
             claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_string(),
             provenance: windows_provenance(
@@ -4927,14 +4927,14 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_string(),
             claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
@@ -4945,14 +4945,14 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_string(),
             claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_string(),
             provenance: windows_provenance(
@@ -4963,14 +4963,14 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "creusot",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "creusot",
+        || CheckedProof {
             harness: "verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit".to_string(),
             claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_SRC.to_string(),
             provenance: windows_provenance(
@@ -4981,7 +4981,7 @@ fn windows_provenance(
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 // None of these five types can carry a real `Ensures<CreusotVerifier>`

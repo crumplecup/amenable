@@ -38,11 +38,11 @@ impl KaniWitness for RustStdStandard<AtomicBool> {
 bridge_kani_witness!(RustStdStandard<AtomicBool>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicBool>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicBool> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicBool>",
+        "kani",
+        || <RustStdStandard<AtomicBool> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -171,11 +171,11 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::AtomicLoadReflectsTheLastWrite",
-        verifier: "kani",
-        describe: || <AtomicLoadReflectsTheLastWrite<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::AtomicLoadReflectsTheLastWrite",
+        "kani",
+        || <AtomicLoadReflectsTheLastWrite<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<AtomicI8> {
@@ -194,11 +194,11 @@ impl KaniWitness for RustStdStandard<AtomicI8> {
 bridge_kani_witness!(RustStdStandard<AtomicI8>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicI8>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicI8> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicI8>",
+        "kani",
+        || <RustStdStandard<AtomicI8> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -246,11 +246,11 @@ impl KaniWitness for RustStdStandard<AtomicI16> {
 bridge_kani_witness!(RustStdStandard<AtomicI16>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicI16>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicI16> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicI16>",
+        "kani",
+        || <RustStdStandard<AtomicI16> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -298,11 +298,11 @@ impl KaniWitness for RustStdStandard<AtomicI32> {
 bridge_kani_witness!(RustStdStandard<AtomicI32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicI32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicI32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicI32>",
+        "kani",
+        || <RustStdStandard<AtomicI32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -350,11 +350,11 @@ impl KaniWitness for RustStdStandard<AtomicI64> {
 bridge_kani_witness!(RustStdStandard<AtomicI64>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicI64>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicI64> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicI64>",
+        "kani",
+        || <RustStdStandard<AtomicI64> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -402,11 +402,11 @@ impl KaniWitness for RustStdStandard<AtomicIsize> {
 bridge_kani_witness!(RustStdStandard<AtomicIsize>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicIsize>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicIsize> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicIsize>",
+        "kani",
+        || <RustStdStandard<AtomicIsize> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -454,11 +454,11 @@ impl KaniWitness for RustStdStandard<AtomicU8> {
 bridge_kani_witness!(RustStdStandard<AtomicU8>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicU8>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicU8> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicU8>",
+        "kani",
+        || <RustStdStandard<AtomicU8> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -506,11 +506,11 @@ impl KaniWitness for RustStdStandard<AtomicU16> {
 bridge_kani_witness!(RustStdStandard<AtomicU16>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicU16>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicU16> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicU16>",
+        "kani",
+        || <RustStdStandard<AtomicU16> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -558,11 +558,11 @@ impl KaniWitness for RustStdStandard<AtomicU32> {
 bridge_kani_witness!(RustStdStandard<AtomicU32>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicU32>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicU32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicU32>",
+        "kani",
+        || <RustStdStandard<AtomicU32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -610,11 +610,11 @@ impl KaniWitness for RustStdStandard<AtomicU64> {
 bridge_kani_witness!(RustStdStandard<AtomicU64>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicU64>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicU64> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicU64>",
+        "kani",
+        || <RustStdStandard<AtomicU64> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -662,11 +662,11 @@ impl KaniWitness for RustStdStandard<AtomicUsize> {
 bridge_kani_witness!(RustStdStandard<AtomicUsize>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicUsize>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicUsize> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicUsize>",
+        "kani",
+        || <RustStdStandard<AtomicUsize> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -714,11 +714,11 @@ impl KaniWitness for RustStdStandard<AtomicPtr<i32>> {
 bridge_kani_witness!(RustStdStandard<AtomicPtr<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AtomicPtr<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AtomicPtr<i32>>",
+        "kani",
+        || <RustStdStandard<AtomicPtr<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -832,12 +832,12 @@ impl KaniWitness for RustStdStandard<std::sync::atomic::Ordering> {
 bridge_kani_witness!(RustStdStandard<std::sync::atomic::Ordering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::atomic::Ordering> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ordering>",
+        "kani",
+        || <RustStdStandard<std::sync::atomic::Ordering> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {

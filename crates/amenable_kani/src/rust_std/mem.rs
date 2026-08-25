@@ -29,11 +29,11 @@ impl KaniWitness for RustStdStandard<ManuallyDrop<i32>> {
 bridge_kani_witness!(RustStdStandard<ManuallyDrop<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ManuallyDrop<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        "kani",
+        || <RustStdStandard<ManuallyDrop<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -76,12 +76,12 @@ impl KaniWitness for RustStdStandard<Discriminant<Option<i32>>> {
 bridge_kani_witness!(RustStdStandard<Discriminant<Option<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Discriminant<Option<i32>>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Discriminant<Option<i32>>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Discriminant<Option<i32>>>",
+        "kani",
+        || <RustStdStandard<Discriminant<Option<i32>>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {

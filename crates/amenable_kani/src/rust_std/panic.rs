@@ -37,11 +37,11 @@ impl KaniWitness for RustStdStandard<AssertUnwindSafe<i32>> {
 bridge_kani_witness!(RustStdStandard<AssertUnwindSafe<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<AssertUnwindSafe<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        "kani",
+        || <RustStdStandard<AssertUnwindSafe<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -83,11 +83,11 @@ impl KaniWitness for RustStdStandard<Location<'static>> {
 bridge_kani_witness!(RustStdStandard<Location<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Location<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Location<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Location<'static>>",
+        "kani",
+        || <RustStdStandard<Location<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCallerLocationObservation` instance actually

@@ -30,11 +30,11 @@ impl KaniWitness for RustStdStandard<OsStr> {
 bridge_kani_witness!(RustStdStandard<OsStr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OsStr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsStr>",
+        "kani",
+        || <RustStdStandard<OsStr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<OsStr>`'s UTF-8 round-trip
@@ -143,11 +143,11 @@ impl KaniWitness for RustStdStandard<OsString> {
 bridge_kani_witness!(RustStdStandard<OsString>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsString>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OsString> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsString>",
+        "kani",
+        || <RustStdStandard<OsString> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -179,12 +179,12 @@ impl KaniWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
 bridge_kani_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::ffi::os_str::Display<'static>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::os_str::Display<'static>>",
+        "kani",
+        || <RustStdStandard<std::ffi::os_str::Display<'static>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {

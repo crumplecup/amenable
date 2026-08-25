@@ -52,11 +52,11 @@ impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::slice::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -92,11 +92,11 @@ impl KaniWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::IterMut<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::slice::IterMut<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -142,11 +142,11 @@ impl KaniWitness for RustStdStandard<Chunks<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<Chunks<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Chunks<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Chunks<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Chunks<'static, i32>>",
+        "kani",
+        || <RustStdStandard<Chunks<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -186,12 +186,12 @@ impl KaniWitness for RustStdStandard<ChunksExact<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<ChunksExact<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChunksExact<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChunksExact<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChunksExact<'static, i32>>",
+        "kani",
+        || <RustStdStandard<ChunksExact<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -232,12 +232,12 @@ impl KaniWitness for RustStdStandard<ChunksMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<ChunksMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChunksMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChunksMut<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChunksMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<ChunksMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -277,12 +277,12 @@ impl KaniWitness for RustStdStandard<ChunksExactMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<ChunksExactMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChunksExactMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChunksExactMut<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChunksExactMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<ChunksExactMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -325,11 +325,11 @@ impl KaniWitness for RustStdStandard<RChunks<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<RChunks<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RChunks<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RChunks<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RChunks<'static, i32>>",
+        "kani",
+        || <RustStdStandard<RChunks<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -370,12 +370,12 @@ impl KaniWitness for RustStdStandard<RChunksExact<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<RChunksExact<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RChunksExact<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RChunksExact<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RChunksExact<'static, i32>>",
+        "kani",
+        || <RustStdStandard<RChunksExact<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -413,12 +413,12 @@ impl KaniWitness for RustStdStandard<RChunksExactMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<RChunksExactMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RChunksExactMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RChunksExactMut<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RChunksExactMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<RChunksExactMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -462,12 +462,12 @@ impl KaniWitness for RustStdStandard<RChunksMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<RChunksMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RChunksMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RChunksMut<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RChunksMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<RChunksMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -507,11 +507,11 @@ impl KaniWitness for RustStdStandard<Windows<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<Windows<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Windows<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Windows<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Windows<'static, i32>>",
+        "kani",
+        || <RustStdStandard<Windows<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -552,12 +552,12 @@ impl KaniWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> boo
 bridge_kani_witness!(RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniChunkByObservation<i32>` instance actually
@@ -674,12 +674,12 @@ impl KaniWitness for RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> 
 bridge_kani_witness!(RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(
@@ -810,11 +810,11 @@ impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::SplitOperandsAreDistinctFromThePattern",
-        verifier: "kani",
-        describe: || <SplitOperandsAreDistinctFromThePattern<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::SplitOperandsAreDistinctFromThePattern",
+        "kani",
+        || <SplitOperandsAreDistinctFromThePattern<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// The three-operand sibling of [`SplitOperandsAreDistinctFromThePattern`]:
@@ -901,12 +901,12 @@ impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
-        verifier: "kani",
-        describe: || <ThreeSplitOperandsAreDistinctFromThePattern<i32> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
+        "kani",
+        || <ThreeSplitOperandsAreDistinctFromThePattern<i32> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> {
@@ -925,12 +925,12 @@ impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) ->
 bridge_kani_witness!(RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1017,12 +1017,12 @@ impl KaniWitness for RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>> {
 bridge_kani_witness!(RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1124,12 +1124,12 @@ impl KaniWitness for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn
 bridge_kani_witness!(RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1227,12 +1227,12 @@ impl KaniWitness for RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) ->
 bridge_kani_witness!(RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1323,12 +1323,12 @@ impl KaniWitness for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -
 bridge_kani_witness!(RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitNObservation<i32>` instance actually
@@ -1430,12 +1430,12 @@ impl KaniWitness for RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>> 
 bridge_kani_witness!(RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<SplitNMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<SplitNMut<'static, i32,
@@ -1501,12 +1501,12 @@ impl KaniWitness for RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -
 bridge_kani_witness!(RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1593,12 +1593,12 @@ impl KaniWitness for RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>> 
 bridge_kani_witness!(RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitObservation<i32>` instance actually
@@ -1700,12 +1700,12 @@ impl KaniWitness for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) 
 bridge_kani_witness!(RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Witness that a `KaniSplitNObservation<i32>` instance actually
@@ -1807,12 +1807,12 @@ impl KaniWitness for RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
 bridge_kani_witness!(RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>",
+        "kani",
+        || <RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<RSplitNMut<'static, i32,
@@ -1878,11 +1878,11 @@ impl KaniWitness for RustStdStandard<EscapeAscii<'static>> {
 bridge_kani_witness!(RustStdStandard<EscapeAscii<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EscapeAscii<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<EscapeAscii<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EscapeAscii<'static>>",
+        "kani",
+        || <RustStdStandard<EscapeAscii<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniEscapeAsciiObservation` instance actually
@@ -1976,11 +1976,11 @@ impl KaniWitness for RustStdStandard<GetDisjointMutError> {
 bridge_kani_witness!(RustStdStandard<GetDisjointMutError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<GetDisjointMutError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<GetDisjointMutError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<GetDisjointMutError>",
+        "kani",
+        || <RustStdStandard<GetDisjointMutError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

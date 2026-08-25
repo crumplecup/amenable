@@ -54,13 +54,13 @@ macro_rules! impl_kani_witness_trusted {
             crate::rust_std::macros::bridge_kani_witness!(amenable_std::RustStdStandard<$ty>);
 
             ::inventory::submit! {
-                ::amenable_core::ProofRecord {
-                    evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                    verifier: "kani",
-                    describe: || amenable_core::Provenance::report(
+                ::amenable_core::ProofRecord::new(
+                    concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    "kani",
+                    || amenable_core::Provenance::report(
                         &<amenable_std::RustStdStandard<$ty> as crate::KaniWitness>::proof(),
                     ).to_string(),
-                }
+                )
             }
         )*
     };

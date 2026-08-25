@@ -185,10 +185,10 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        "kani",
+        || CheckedProof {
             harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
             claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
             provenance: windows_provenance(
@@ -199,14 +199,14 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        "kani",
+        || CheckedProof {
             harness: "verify_windows_handle_as_raw_handle_recovers_the_wrapped_value".to_owned(),
             claim: VERIFY_WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
             provenance: windows_provenance(
@@ -217,7 +217,7 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 /// [`WindowsHandleOrInvalidRejectsOnlyTheSentinel`] reuses the same
@@ -278,10 +278,10 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        "kani",
+        || CheckedProof {
             harness: "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
             claim: VERIFY_WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_SRC.to_owned(),
             provenance: windows_provenance(
@@ -292,7 +292,7 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -309,10 +309,10 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        "kani",
+        || CheckedProof {
             harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
             claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
             provenance: windows_provenance(
@@ -323,14 +323,14 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        "kani",
+        || CheckedProof {
             harness: "verify_windows_socket_as_raw_socket_recovers_the_wrapped_value".to_owned(),
             claim: VERIFY_WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_SRC.to_owned(),
             provenance: windows_provenance(
@@ -341,7 +341,7 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -363,10 +363,10 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "kani",
-        describe: || CheckedProof {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "kani",
+        || CheckedProof {
             harness: "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
             claim: VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CHAR_AS_ONE_CODE_UNIT_SRC.to_owned(),
             provenance: windows_provenance(
@@ -377,5 +377,5 @@ amenable_derive::harness! {
             ),
         }
         .to_string(),
-    }
+    )
 }

@@ -52,9 +52,9 @@ fn add_evidence_links_fan_out_one_per_argument() {
 fn add_proof_record_is_discoverable_through_inventory() -> miette::Result<()> {
     let record = inventory::iter::<ProofRecord>()
         .into_iter()
-        .find(|record| record.evidence.ends_with("AddEvidence") && record.verifier == "kani")
+        .find(|record| record.evidence().ends_with("AddEvidence") && record.verifier() == "kani")
         .ok_or_else(|| miette::miette!("AddEvidence's kani proof record is registered"))?;
 
-    assert!((record.describe)().contains("add_impl_computes_exact_sum"));
+    assert!((record.describe())().contains("add_impl_computes_exact_sum"));
     Ok(())
 }

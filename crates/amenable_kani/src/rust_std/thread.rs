@@ -38,13 +38,13 @@ impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {
 bridge_kani_witness!(RustStdStandard<LocalKey<std::cell::Cell<i32>>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LocalKey<std::cell::Cell<i32>>>",
-        verifier: "kani",
-        describe: || {
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LocalKey<std::cell::Cell<i32>>>",
+        "kani",
+        || {
             <RustStdStandard<LocalKey<std::cell::Cell<i32>>> as KaniWitness>::proof().to_string()
         },
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -83,11 +83,11 @@ impl KaniWitness for RustStdStandard<Thread> {
 bridge_kani_witness!(RustStdStandard<Thread>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Thread>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Thread> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Thread>",
+        "kani",
+        || <RustStdStandard<Thread> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCurrentThreadObservation` instance actually
@@ -169,11 +169,11 @@ impl KaniWitness for RustStdStandard<ThreadId> {
 bridge_kani_witness!(RustStdStandard<ThreadId>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ThreadId>",
-        verifier: "kani",
-        describe: || <RustStdStandard<ThreadId> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ThreadId>",
+        "kani",
+        || <RustStdStandard<ThreadId> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniCurrentThreadObservation` instance actually

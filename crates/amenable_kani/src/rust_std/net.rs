@@ -29,11 +29,11 @@ impl KaniWitness for RustStdStandard<Ipv4Addr> {
 bridge_kani_witness!(RustStdStandard<Ipv4Addr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ipv4Addr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Ipv4Addr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ipv4Addr>",
+        "kani",
+        || <RustStdStandard<Ipv4Addr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -71,11 +71,11 @@ impl KaniWitness for RustStdStandard<Ipv6Addr> {
 bridge_kani_witness!(RustStdStandard<Ipv6Addr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ipv6Addr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Ipv6Addr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ipv6Addr>",
+        "kani",
+        || <RustStdStandard<Ipv6Addr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -118,11 +118,11 @@ impl KaniWitness for RustStdStandard<IpAddr> {
 bridge_kani_witness!(RustStdStandard<IpAddr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IpAddr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<IpAddr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IpAddr>",
+        "kani",
+        || <RustStdStandard<IpAddr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -199,11 +199,11 @@ impl KaniWitness for RustStdStandard<SocketAddrV4> {
 bridge_kani_witness!(RustStdStandard<SocketAddrV4>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SocketAddrV4>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SocketAddrV4> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SocketAddrV4>",
+        "kani",
+        || <RustStdStandard<SocketAddrV4> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -245,11 +245,11 @@ impl KaniWitness for RustStdStandard<SocketAddrV6> {
 bridge_kani_witness!(RustStdStandard<SocketAddrV6>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SocketAddrV6>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SocketAddrV6> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SocketAddrV6>",
+        "kani",
+        || <RustStdStandard<SocketAddrV6> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -301,11 +301,11 @@ impl KaniWitness for RustStdStandard<SocketAddr> {
 bridge_kani_witness!(RustStdStandard<SocketAddr>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SocketAddr>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SocketAddr> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SocketAddr>",
+        "kani",
+        || <RustStdStandard<SocketAddr> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

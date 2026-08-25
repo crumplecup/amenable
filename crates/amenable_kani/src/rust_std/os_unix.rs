@@ -38,11 +38,11 @@ impl KaniWitness for RustStdStandard<BorrowedFd<'static>> {
 bridge_kani_witness!(RustStdStandard<BorrowedFd<'static>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedFd<'static>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<BorrowedFd<'static>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedFd<'static>>",
+        "kani",
+        || <RustStdStandard<BorrowedFd<'static>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -94,11 +94,11 @@ kani_ensures!(
 );
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::NonNegativeFd",
-        verifier: "kani",
-        describe: || <NonNegativeFd as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::NonNegativeFd",
+        "kani",
+        || <NonNegativeFd as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<OwnedFd> {
@@ -117,11 +117,11 @@ impl KaniWitness for RustStdStandard<OwnedFd> {
 bridge_kani_witness!(RustStdStandard<OwnedFd>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedFd>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OwnedFd> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedFd>",
+        "kani",
+        || <RustStdStandard<OwnedFd> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

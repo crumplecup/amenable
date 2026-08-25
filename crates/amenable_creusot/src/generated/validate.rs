@@ -70,9 +70,9 @@ impl
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_creusot::ledger::validate",
-        verifier: "creusot",
-        describe: || VERIFY_VALIDATE_EXCHANGE_SRC.to_owned(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_creusot::ledger::validate",
+        "creusot",
+        || VERIFY_VALIDATE_EXCHANGE_SRC.to_owned(),
+    )
 }

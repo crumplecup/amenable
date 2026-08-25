@@ -25,11 +25,11 @@ impl KaniWitness for RustStdStandard<std::cmp::Ordering> {
 bridge_kani_witness!(RustStdStandard<std::cmp::Ordering>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::cmp::Ordering> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        "kani",
+        || <RustStdStandard<std::cmp::Ordering> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -82,11 +82,11 @@ impl KaniWitness for RustStdStandard<Reverse<i32>> {
 bridge_kani_witness!(RustStdStandard<Reverse<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Reverse<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        "kani",
+        || <RustStdStandard<Reverse<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {

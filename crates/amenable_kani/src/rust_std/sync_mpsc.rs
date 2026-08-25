@@ -32,11 +32,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Sender<i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Sender<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Sender<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::Sender<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Sender<i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::Sender<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually delivered a sent
@@ -137,11 +137,11 @@ impl KaniWitness for RustStdStandard<SyncSender<i32>> {
 bridge_kani_witness!(RustStdStandard<SyncSender<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SyncSender<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SyncSender<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SyncSender<i32>>",
+        "kani",
+        || <RustStdStandard<SyncSender<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<SyncSender<i32>>`'s delivery
@@ -197,11 +197,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::Receiver<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Receiver<i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::Receiver<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually failed `.recv()`
@@ -285,11 +285,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::IntoIter<i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::IntoIter<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::IntoIter<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::IntoIter<i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually yielded a sent
@@ -384,11 +384,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Iter<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::Iter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Iter<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::Iter<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Lawful token minted once `RustStdStandard<Iter<'static, i32>>`'s
@@ -450,11 +450,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually returned `None`
@@ -541,11 +541,11 @@ impl KaniWitness for RustStdStandard<RecvError> {
 bridge_kani_witness!(RustStdStandard<RecvError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RecvError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RecvError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RecvError>",
+        "kani",
+        || <RustStdStandard<RecvError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually failed `.recv()`
@@ -623,11 +623,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::RecvTimeoutError> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::RecvTimeoutError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::RecvTimeoutError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::RecvTimeoutError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::RecvTimeoutError>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::RecvTimeoutError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually distinguished a
@@ -726,11 +726,11 @@ impl KaniWitness for RustStdStandard<SendError<i32>> {
 bridge_kani_witness!(RustStdStandard<SendError<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SendError<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<SendError<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SendError<i32>>",
+        "kani",
+        || <RustStdStandard<SendError<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually recovered an unsent
@@ -820,11 +820,11 @@ impl KaniWitness for RustStdStandard<TrySendError<i32>> {
 bridge_kani_witness!(RustStdStandard<TrySendError<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TrySendError<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<TrySendError<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<TrySendError<i32>>",
+        "kani",
+        || <RustStdStandard<TrySendError<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually recovered an unsent
@@ -912,11 +912,11 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::TryRecvError> {
 bridge_kani_witness!(RustStdStandard<std::sync::mpsc::TryRecvError>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryRecvError>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::sync::mpsc::TryRecvError> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::mpsc::TryRecvError>",
+        "kani",
+        || <RustStdStandard<std::sync::mpsc::TryRecvError> as KaniWitness>::proof().to_string(),
+    )
 }
 
 /// Witness that a `KaniChannel<i32>` instance actually distinguished

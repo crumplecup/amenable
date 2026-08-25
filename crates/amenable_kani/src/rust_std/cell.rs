@@ -34,11 +34,11 @@ impl KaniWitness for RustStdStandard<Cell<i32>> {
 bridge_kani_witness!(RustStdStandard<Cell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<Cell<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Cell<i32>>",
+        "kani",
+        || <RustStdStandard<Cell<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 kani_ensures!(
@@ -165,11 +165,11 @@ impl KaniWitness for RustStdStandard<RefCell<i32>> {
 bridge_kani_witness!(RustStdStandard<RefCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RefCell<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<RefCell<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RefCell<i32>>",
+        "kani",
+        || <RustStdStandard<RefCell<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -239,12 +239,12 @@ impl KaniWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::cell::Ref<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ref<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::cell::Ref<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ref<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::cell::Ref<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -281,12 +281,12 @@ impl KaniWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
 bridge_kani_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RefMut<'static, i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<std::cell::RefMut<'static, i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RefMut<'static, i32>>",
+        "kani",
+        || <RustStdStandard<std::cell::RefMut<'static, i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 amenable_derive::harness! {
@@ -400,11 +400,11 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_kani::GetterRecoversTheStoredReference",
-        verifier: "kani",
-        describe: || <GetterRecoversTheStoredReference<i32> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::GetterRecoversTheStoredReference",
+        "kani",
+        || <GetterRecoversTheStoredReference<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<OnceCell<i32>> {
@@ -423,11 +423,11 @@ impl KaniWitness for RustStdStandard<OnceCell<i32>> {
 bridge_kani_witness!(RustStdStandard<OnceCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OnceCell<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<OnceCell<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OnceCell<i32>>",
+        "kani",
+        || <RustStdStandard<OnceCell<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -474,11 +474,11 @@ impl KaniWitness for RustStdStandard<UnsafeCell<i32>> {
 bridge_kani_witness!(RustStdStandard<UnsafeCell<i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<UnsafeCell<i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<UnsafeCell<i32>> as KaniWitness>::proof().to_string(),
-    }
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<UnsafeCell<i32>>",
+        "kani",
+        || <RustStdStandard<UnsafeCell<i32>> as KaniWitness>::proof().to_string(),
+    )
 }
 
 amenable_derive::harness! {
@@ -521,12 +521,12 @@ impl KaniWitness for RustStdStandard<LazyCell<i32, fn() -> i32>> {
 bridge_kani_witness!(RustStdStandard<LazyCell<i32, fn() -> i32>>);
 
 ::inventory::submit! {
-    ::amenable_core::ProofRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LazyCell<i32, fn() -> i32>>",
-        verifier: "kani",
-        describe: || <RustStdStandard<LazyCell<i32, fn() -> i32>> as KaniWitness>::proof()
+    ::amenable_core::ProofRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LazyCell<i32, fn() -> i32>>",
+        "kani",
+        || <RustStdStandard<LazyCell<i32, fn() -> i32>> as KaniWitness>::proof()
             .to_string(),
-    }
+    )
 }
 
 kani_ensures!(

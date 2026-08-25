@@ -321,11 +321,11 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
         }
 
         ::inventory::submit! {
-            ::amenable_core::ProofRecord {
-                evidence: #evidence_id_expr,
-                verifier: stringify!(#cfg),
-                describe: || <#evidence as ::amenable_core::Witness<#verifier>>::proof().to_string(),
-            }
+            ::amenable_core::ProofRecord::new(
+                #evidence_id_expr,
+                stringify!(#cfg),
+                || <#evidence as ::amenable_core::Witness<#verifier>>::proof().to_string(),
+            )
         }
 
         // Always registered, regardless of `#cfg` -- this crate is
