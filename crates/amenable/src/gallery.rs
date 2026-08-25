@@ -68,10 +68,10 @@ fn list_cases() -> AmenableResult<()> {
     for case in cases {
         println!(
             "{} [{} / {}] {}",
-            case.id,
-            case.disposition.as_str(),
-            case.expected.as_str(),
-            case.title
+            case.id(),
+            case.disposition().as_str(),
+            case.expected().as_str(),
+            case.title()
         );
     }
 
@@ -93,19 +93,19 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
 
     let mut mismatches = 0;
     for (index, case) in selected.iter().enumerate() {
-        println!("[{}/{}] Running {}", index + 1, selected.len(), case.id);
+        println!("[{}/{}] Running {}", index + 1, selected.len(), case.id());
         let run = run_case(case, &args.harness_timeout);
         if let Some(message) = &run.message {
             eprintln!("    {message}");
         }
 
-        if run.observed == case.expected {
+        if run.observed == case.expected() {
             println!("    observed {}", run.observed.as_str());
         } else {
             println!(
                 "    observed {} (expected {})",
                 run.observed.as_str(),
-                case.expected.as_str()
+                case.expected().as_str()
             );
             mismatches += 1;
         }
@@ -125,9 +125,9 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
 
 fn registered_cases() -> Vec<KaniGalleryCase> {
     let mut cases: Vec<_> = inventory::iter::<KaniGalleryRegistration>()
-        .map(|registration| (registration.case)())
+        .map(|registration| (registration.case())())
         .collect();
-    cases.sort_unstable_by(|left, right| left.id.cmp(&right.id));
+    cases.sort_unstable_by(|left, right| left.id().cmp(right.id()));
     cases
 }
 
@@ -138,7 +138,7 @@ fn select_cases<'a>(
     match id {
         Some(id) => cases
             .iter()
-            .find(|case| case.id == id)
+            .find(|case| case.id() == id)
             .map(|case| vec![case])
             .ok_or_else(|| {
                 AmenableError::invariant(format!("unknown Kani proof-gallery case ID: {id}"))
@@ -186,12 +186,12 @@ fn kani_command(case: &KaniGalleryCase, harness_timeout: &str) -> Command {
     command.args([
         "kani",
         "-p",
-        case.package.as_str(),
+        case.package().as_str(),
         "--lib",
         "--all-features",
         "--exact",
         "--harness",
-        case.harness.as_str(),
+        case.harness().as_str(),
         "-Z",
         "unstable-options",
         "--harness-timeout",
@@ -310,13 +310,13 @@ impl Ledger {
             .as_secs()
             .to_string();
         self.rows.insert(
-            case.id.clone(),
+            case.id().clone(),
             LedgerRow {
                 timestamp,
-                disposition: case.disposition.as_str().to_owned(),
-                expected: case.expected,
+                disposition: case.disposition().as_str().to_owned(),
+                expected: case.expected(),
                 observed,
-                matched: observed == case.expected,
+                matched: observed == case.expected(),
             },
         );
         Ok(())

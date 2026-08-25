@@ -7,16 +7,16 @@
 //! failure mode here and keep the lighter iterator-step observation beside it.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::string_drain::single_char_collect_times_out".to_owned(),
-            harness: "gallery::string_drain::single_char_collect_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "collecting a drained single-character string still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::string_drain::single_char_collect_times_out".to_owned(),
+            "gallery::string_drain::single_char_collect_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "collecting a drained single-character string still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -36,16 +36,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::string_drain::single_char_incremental_next_passes".to_owned(),
-            harness: "gallery::string_drain::single_char_incremental_next_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "stepwise observation makes single-character drain verifier-friendly".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::string_drain::single_char_incremental_next_passes".to_owned(),
+            "gallery::string_drain::single_char_incremental_next_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "stepwise observation makes single-character drain verifier-friendly".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -73,16 +73,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
-            harness: "gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "symbolic utf8 drain observation still times out after replacing the std iterator".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
+            "gallery::string_drain::symbolic_utf8_observation_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "symbolic utf8 drain observation still times out after replacing the std iterator".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {

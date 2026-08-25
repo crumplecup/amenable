@@ -59,20 +59,20 @@ fn concrete_variants() -> (ConcreteDerivedWitnessEnum, ConcreteDerivedWitnessEnu
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || {
             let _ = concrete_variants();
 
-            ::amenable_kani::KaniGalleryCase {
-                id: "amenable_kani::gallery::derive_witness_generic_enum::derive_witness_supports_concrete_generic_enums".to_owned(),
-                harness: "gallery::derive_witness_generic_enum::derive_witness_supports_concrete_generic_enums".to_owned(),
-                package: "amenable_kani".to_owned(),
-                title: "derive(Witness) builds a structured Kani artifact for a concrete generic enum".to_owned(),
-                disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-                expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-            }
+            ::amenable_kani::KaniGalleryCase::new(
+                "amenable_kani::gallery::derive_witness_generic_enum::derive_witness_supports_concrete_generic_enums".to_owned(),
+                "gallery::derive_witness_generic_enum::derive_witness_supports_concrete_generic_enums".to_owned(),
+                "amenable_kani".to_owned(),
+                "derive(Witness) builds a structured Kani artifact for a concrete generic enum".to_owned(),
+                ::amenable_kani::KaniGalleryDisposition::BestPractice,
+                ::amenable_kani::KaniGalleryExpectation::Passed,
+            )
         },
-    }
+    )
 }
 
 amenable_derive::harness! {

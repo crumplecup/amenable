@@ -16,16 +16,16 @@
 //! establish`/`Transfer::new` chain inside the harness's own setup code.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_with_concrete_amounts".to_owned(),
-            harness: "gallery::ledger_commit_contract_timeout::commit_contract_with_concrete_amounts".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "verify_commit_always_balances's exact real shape (Sidecar/Establish/Transfer::new construction chain in the harness setup), but with concrete amount/balance instead of kani::any()".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_with_concrete_amounts".to_owned(),
+            "gallery::ledger_commit_contract_timeout::commit_contract_with_concrete_amounts".to_owned(),
+            "amenable_kani".to_owned(),
+            "verify_commit_always_balances's exact real shape (Sidecar/Establish/Transfer::new construction chain in the harness setup), but with concrete amount/balance instead of kani::any()".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -55,16 +55,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_bypassing_establish_chain".to_owned(),
-            harness: "gallery::ledger_commit_contract_timeout::commit_contract_bypassing_establish_chain".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "verify_commit_always_balances's real symbolic amount/balance, but the harness setup constructs ValidatedToken directly (ValidatedToken::diagnostic_only) instead of through the real Sidecar::sidecar/Establish::establish chain".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_bypassing_establish_chain".to_owned(),
+            "gallery::ledger_commit_contract_timeout::commit_contract_bypassing_establish_chain".to_owned(),
+            "amenable_kani".to_owned(),
+            "verify_commit_always_balances's real symbolic amount/balance, but the harness setup constructs ValidatedToken directly (ValidatedToken::diagnostic_only) instead of through the real Sidecar::sidecar/Establish::establish chain".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -99,16 +99,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_with_amount_assumed_positive".to_owned(),
-            harness: "gallery::ledger_commit_contract_timeout::commit_contract_with_amount_assumed_positive".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Same as commit_contract_bypassing_establish_chain, but kani::assume(amount > 0) -- commit's postcondition negates amount (debit = -amount), which overflows at i64::MIN; a real Transfer<Validated,..> could never carry a non-positive amount in the first place (validate already checked AmountPositive)".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_commit_contract_timeout::commit_contract_with_amount_assumed_positive".to_owned(),
+            "gallery::ledger_commit_contract_timeout::commit_contract_with_amount_assumed_positive".to_owned(),
+            "amenable_kani".to_owned(),
+            "Same as commit_contract_bypassing_establish_chain, but kani::assume(amount > 0) -- commit's postcondition negates amount (debit = -amount), which overflows at i64::MIN; a real Transfer<Validated,..> could never carry a non-positive amount in the first place (validate already checked AmountPositive)".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

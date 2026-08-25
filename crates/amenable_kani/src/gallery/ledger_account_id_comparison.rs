@@ -118,16 +118,16 @@
 //! for the write-up.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "AccountId inequality over two concrete short strings resolves immediately".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "AccountId inequality over two concrete short strings resolves immediately".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -145,16 +145,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Ledger::exchange with fully concrete amount/balance, isolating symbolic-branching cost from structural Sidecar/Establish cost".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Ledger::exchange with fully concrete amount/balance, isolating symbolic-branching cost from structural Sidecar/Establish cost".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -183,16 +183,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Ledger::exchange with only `amount` symbolic (balance concrete and always sufficient) -- still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Ledger::exchange with only `amount` symbolic (balance concrete and always sufficient) -- still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -222,16 +222,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Ledger::validate's own body, called directly with no #[kani::proof_for_contract] checking -- rules out DFCC/stubbing overhead as the cause".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Ledger::validate's own body, called directly with no #[kani::proof_for_contract] checking -- rules out DFCC/stubbing overhead as the cause".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -263,16 +263,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Bare fn(i64) -> Result<TransferPayload, i64>, symbolic branch, no Sidecar/Establish/Transfer<S,Token> generics at all".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Bare fn(i64) -> Result<TransferPayload, i64>, symbolic branch, no Sidecar/Establish/Transfer<S,Token> generics at all".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -308,16 +308,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Symbolic branch that calls Establish::establish (its #[track_caller]) in the Ok arm, with no String/heap allocation anywhere".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Symbolic branch that calls Establish::establish (its #[track_caller]) in the Ok arm, with no String/heap allocation anywhere".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -356,16 +356,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Symbolic branch whose Ok arm constructs the real Transfer<Validated, ValidatedToken> wrapper (pulling in the real, #[amenable_derive::exchange]-generated Witness<KaniVerifier> for Validated)".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Symbolic branch whose Ok arm constructs the real Transfer<Validated, ValidatedToken> wrapper (pulling in the real, #[amenable_derive::exchange]-generated Witness<KaniVerifier> for Validated)".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -415,16 +415,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "fn(i64) -> Result<Transfer<Validated, ValidatedToken>, TransferError> (validate's exact real types), symbolic amount, result discarded by caller".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "fn(i64) -> Result<Transfer<Validated, ValidatedToken>, TransferError> (validate's exact real types), symbolic amount, result discarded by caller".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -477,16 +477,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Transfer::pending built from a payload with a symbolic amount, then .primary()/.sidecar() called on it -- no branching downstream at all".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Transfer::pending built from a payload with a symbolic amount, then .primary()/.sidecar() called on it -- no branching downstream at all".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -518,16 +518,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Every piece that passed individually (symbolic Transfer::pending extraction, amount-positive check, sufficient-funds check against self.balance, accounts-distinct check, establish, Transfer::new), assembled inline -- not calling Ledger::validate/Exchange::exchange at all".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
+            "gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
+            "amenable_kani".to_owned(),
+            "Every piece that passed individually (symbolic Transfer::pending extraction, amount-positive check, sufficient-funds check against self.balance, accounts-distinct check, establish, Transfer::new), assembled inline -- not calling Ledger::validate/Exchange::exchange at all".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -580,16 +580,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Same combination as full_combination_inline_without_calling_validate, but each check path actually constructs and returns its real TransferError variant (not a bare early return) wrapped in Result<Transfer<Validated,..>, TransferError>".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Same combination as full_combination_inline_without_calling_validate, but each check path actually constructs and returns its real TransferError variant (not a bare early return) wrapped in Result<Transfer<Validated,..>, TransferError>".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -648,16 +648,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "The real Ledger::validate, called directly (bypassing Exchange::exchange's extra dispatch layer)".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "The real Ledger::validate, called directly (bypassing Exchange::exchange's extra dispatch layer)".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -691,16 +691,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "validate's exact &self/self.balance/?/.map_err() shape, calling helper methods with the identical bodies as check_amount_positive/check_sufficient_funds but with no #[kani::ensures] attribute at all".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "validate's exact &self/self.balance/?/.map_err() shape, calling helper methods with the identical bodies as check_amount_positive/check_sufficient_funds but with no #[kani::ensures] attribute at all".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -782,16 +782,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "validate's exact real branching+allocation body, #[kani::ensures] attached, but with a TRIVIAL closure (result.is_ok(), matching Stoplight's own claim shape) instead of the real biconditional".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
+            "gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
+            "amenable_kani".to_owned(),
+            "validate's exact real branching+allocation body, #[kani::ensures] attached, but with a TRIVIAL closure (result.is_ok(), matching Stoplight's own claim shape) instead of the real biconditional".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -868,16 +868,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "validate's exact real body, #[kani::ensures] closure that matches on Ok/Err and calls .primary().amount().value() > 0 in the Ok arm -- no accounts-distinct string comparison, no per-Err-variant destructuring".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "validate's exact real body, #[kani::ensures] closure that matches on Ok/Err and calls .primary().amount().value() > 0 in the Ok arm -- no accounts-distinct string comparison, no per-Err-variant destructuring".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -956,16 +956,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "ensures_closure_checking_only_amount_passes, plus the accounts-distinct string comparison (payload.from() != payload.to()) in the Ok arm -- Err arms still bare `_ => true`".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
+            "amenable_kani".to_owned(),
+            "ensures_closure_checking_only_amount_passes, plus the accounts-distinct string comparison (payload.from() != payload.to()) in the Ok arm -- Err arms still bare `_ => true`".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1044,16 +1044,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "ensures_closure_with_accounts_distinct_string_comparison's exact shape, but account identity is a 2-variant enum (AccountName) instead of a String -- swaps only the comparison operand's own type".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "ensures_closure_with_accounts_distinct_string_comparison's exact shape, but account identity is a 2-variant enum (AccountName) instead of a String -- swaps only the comparison operand's own type".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1129,16 +1129,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Same shape again, but account identity is a u64 newtype (AccountNumber) instead of a 2-variant enum -- tests whether an arbitrarily-large, non-fixed identity space is also cheap, not just a small closed enum".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Same shape again, but account identity is a u64 newtype (AccountNumber) instead of a 2-variant enum -- tests whether an arbitrarily-large, non-fixed identity space is also cheap, not just a small closed enum".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1207,16 +1207,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "AccountId carries BOTH a numeric id (compared) and a String display name (never compared, present purely for realism/allocation cost) -- the practically useful shape, not just a bare u64".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "AccountId carries BOTH a numeric id (compared) and a String display name (never compared, present purely for realism/allocation cost) -- the practically useful shape, not just a bare u64".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1306,16 +1306,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Account identity modeled as a UUID's real internal representation ([u8; 16], what uuid::Uuid actually wraps -- fixed-size, stack-allocated, not heap-allocated like String) -- no `uuid` crate dependency needed to test the shape".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Account identity modeled as a UUID's real internal representation ([u8; 16], what uuid::Uuid actually wraps -- fixed-size, stack-allocated, not heap-allocated like String) -- no `uuid` crate dependency needed to test the shape".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1387,16 +1387,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
-            harness: "gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Account identity is a fixed-CAPACITY string (stack-allocated [u8; 24] buffer + a used-length field, PartialEq compares only the first `len` bytes -- a bounded variable-length comparison, not a bare fixed-array one, the shape arrayvec::ArrayString/heapless::String actually have) -- still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Account identity is a fixed-CAPACITY string (stack-allocated [u8; 24] buffer + a used-length field, PartialEq compares only the first `len` bytes -- a bounded variable-length comparison, not a bare fixed-array one, the shape arrayvec::ArrayString/heapless::String actually have) -- still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {

@@ -30,16 +30,16 @@
 //! massaging.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_split_position::bare_iter_position_over_fixed_array_passes".to_owned(),
-            harness: "gallery::slice_split_position::bare_iter_position_over_fixed_array_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Iter::position over a fixed-length array resolves immediately".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_split_position::bare_iter_position_over_fixed_array_passes".to_owned(),
+            "gallery::slice_split_position::bare_iter_position_over_fixed_array_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Iter::position over a fixed-length array resolves immediately".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -62,16 +62,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out".to_owned(),
-            harness: "gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Split::next() over the identical fixed-length array still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out".to_owned(),
+            "gallery::slice_split_position::split_next_over_the_same_fixed_array_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Split::next() over the identical fixed-length array still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -100,16 +100,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
-            harness: "gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "A bounded split observation states the same delimiter law without the std timeout".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
+            "gallery::slice_split_position::bounded_split_observation_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "A bounded split observation states the same delimiter law without the std timeout".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

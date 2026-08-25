@@ -9,16 +9,16 @@
 //!   shape of a real, non-vacuous pass
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass".to_owned(),
-            harness: "gallery::vacuity::assume_false_is_vacuous_pass".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "an unsatisfiable assumption can produce a vacuous pass".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::vacuity::assume_false_is_vacuous_pass".to_owned(),
+            "gallery::vacuity::assume_false_is_vacuous_pass".to_owned(),
+            "amenable_kani".to_owned(),
+            "an unsatisfiable assumption can produce a vacuous pass".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -39,16 +39,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::vacuity::explicit_contradiction_fails".to_owned(),
-            harness: "gallery::vacuity::explicit_contradiction_fails".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a reachable contradiction produces a genuine failure".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::vacuity::explicit_contradiction_fails".to_owned(),
+            "gallery::vacuity::explicit_contradiction_fails".to_owned(),
+            "amenable_kani".to_owned(),
+            "a reachable contradiction produces a genuine failure".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -67,16 +67,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::vacuity::bounded_assumption_passes_nonvacuously".to_owned(),
-            harness: "gallery::vacuity::bounded_assumption_passes_nonvacuously".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a satisfiable bounded assumption yields a genuine pass".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::vacuity::bounded_assumption_passes_nonvacuously".to_owned(),
+            "gallery::vacuity::bounded_assumption_passes_nonvacuously".to_owned(),
+            "amenable_kani".to_owned(),
+            "a satisfiable bounded assumption yields a genuine pass".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

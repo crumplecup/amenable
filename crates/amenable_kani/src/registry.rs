@@ -97,26 +97,50 @@ impl KaniGalleryExpectation {
 /// but they are explicitly diagnostic. Their expected verifier outcome may be
 /// `failed` or `timeout`, because the point is to document what Kani does with
 /// a particular modeling pattern.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
+)]
 pub struct KaniGalleryCase {
     /// Stable, fully-qualified gallery-case identifier.
-    pub id: String,
+    id: String,
     /// Exact Kani harness selector.
-    pub harness: String,
+    harness: String,
     /// Cargo package containing the library target that defines this harness.
-    pub package: String,
+    package: String,
     /// Short human-facing summary of what the case demonstrates.
-    pub title: String,
+    title: String,
     /// Whether the case is a hypothesis, a false trail, or a best practice.
-    pub disposition: KaniGalleryDisposition,
+    #[getter(copy)]
+    disposition: KaniGalleryDisposition,
     /// The verifier outcome this diagnostic case is expected to produce.
-    pub expected: KaniGalleryExpectation,
+    #[getter(copy)]
+    expected: KaniGalleryExpectation,
 }
 
 /// Static registration that constructs an owned [`KaniGalleryCase`] on demand.
+///
+/// Hand-written `const fn new`/getter, not derived: this record is itself
+/// passed to `inventory::submit!`, which requires a `const`-evaluable value,
+/// and `derive_new::new` cannot generate a `const fn`. `KaniGalleryCase`
+/// itself has no such requirement -- it's built at call time inside the
+/// stored closure, not at registration time -- so it uses the ordinary
+/// derives above.
 pub struct KaniGalleryRegistration {
+    case: fn() -> KaniGalleryCase,
+}
+
+impl KaniGalleryRegistration {
+    /// Register a proof-gallery case constructor.
+    #[must_use]
+    pub const fn new(case: fn() -> KaniGalleryCase) -> Self {
+        Self { case }
+    }
+
     /// Construct this registration's proof-gallery descriptor.
-    pub case: fn() -> KaniGalleryCase,
+    #[must_use]
+    pub const fn case(&self) -> fn() -> KaniGalleryCase {
+        self.case
+    }
 }
 
 inventory::collect!(KaniGalleryRegistration);

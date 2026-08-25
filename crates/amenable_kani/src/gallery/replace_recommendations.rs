@@ -44,16 +44,16 @@
 //!   timing not predicting real-crate Kani/CBMC behavior
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
-            harness: "gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct String::from_utf8 error recovery can still time out for a tiny fixed invalid vector".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
+            "gallery::replace_recommendations::from_utf8_error_times_out_even_for_a_fixed_two_byte_invalid_vector".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct String::from_utf8 error recovery can still time out for a tiny fixed invalid vector".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -82,16 +82,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BTreeMap symbolic iteration can still time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::btree_map_symbolic_iteration_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BTreeMap symbolic iteration can still time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -123,16 +123,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
-            harness: "gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct LinkedList::extract_if can still time out even without materialization".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
+            "gallery::replace_recommendations::linked_list_extract_if_times_out_even_with_incremental_observation".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct LinkedList::extract_if can still time out even without materialization".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -162,16 +162,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::backtrace_force_capture_reaches_unsupported_foreign_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::backtrace_force_capture_reaches_unsupported_foreign_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct backtrace capture reaches an unsupported foreign boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::backtrace_force_capture_reaches_unsupported_foreign_boundary".to_owned(),
+            "gallery::replace_recommendations::backtrace_force_capture_reaches_unsupported_foreign_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct backtrace capture reaches an unsupported foreign boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -192,16 +192,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "borrowed-fd cloning reaches an unsupported fcntl boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
+            "gallery::replace_recommendations::borrowed_fd_clone_reaches_unsupported_fcntl_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "borrowed-fd cloning reaches an unsupported fcntl boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -232,16 +232,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "anonymous pipe creation reaches an unsupported pipe2 boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
+            "gallery::replace_recommendations::anonymous_pipe_creation_reaches_unsupported_pipe2_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "anonymous pipe creation reaches an unsupported pipe2 boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -276,16 +276,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Location::caller reaches an unsupported track_caller boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
+            "gallery::replace_recommendations::location_caller_reaches_unsupported_track_caller_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Location::caller reaches an unsupported track_caller boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -309,16 +309,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::catch_unwind_reaches_an_unsupported_panic_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::catch_unwind_reaches_an_unsupported_panic_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "catch_unwind reaches an unsupported panic boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::catch_unwind_reaches_an_unsupported_panic_boundary".to_owned(),
+            "gallery::replace_recommendations::catch_unwind_reaches_an_unsupported_panic_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "catch_unwind reaches an unsupported panic boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -340,16 +340,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
-            harness: "gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "process-argument invariants can fail under Kani's synthetic model".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            "gallery::replace_recommendations::env_args_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            "amenable_kani".to_owned(),
+            "process-argument invariants can fail under Kani's synthetic model".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -368,16 +368,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
-            harness: "gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "raw process-argument invariants can fail under Kani's synthetic model".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            "gallery::replace_recommendations::env_args_os_process_invariant_fails_under_the_synthetic_kani_model".to_owned(),
+            "amenable_kani".to_owned(),
+            "raw process-argument invariants can fail under Kani's synthetic model".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -396,16 +396,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct join_paths can still time out even for one fixed unjoinable path".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::join_paths_unjoinable_path_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct join_paths can still time out even for one fixed unjoinable path".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -423,16 +423,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct split_paths round trips can still time out on a tiny fixed path list".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct split_paths round trips can still time out on a tiny fixed path list".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -458,16 +458,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
-            harness: "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a first-pass concrete PATH string model can still time out under Kani".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
+            "gallery::replace_recommendations::split_paths_round_trip_times_out_in_the_first_concrete_string_model".to_owned(),
+            "amenable_kani".to_owned(),
+            "a first-pass concrete PATH string model can still time out under Kani".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -497,16 +497,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::default_hasher_determinism_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::default_hasher_determinism_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct default-hasher determinism can still time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::default_hasher_determinism_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::default_hasher_determinism_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct default-hasher determinism can still time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -537,16 +537,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
-            harness: "gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct HashMap insert-then-get can still time out even for one fixed entry".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
+            "gallery::replace_recommendations::hash_map_insert_then_get_times_out_even_for_a_fixed_entry".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct HashMap insert-then-get can still time out even for one fixed entry".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -569,16 +569,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario".to_owned(),
-            harness: "gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a small real-filesystem tempdir scenario can still time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario".to_owned(),
+            "gallery::replace_recommendations::real_filesystem_boundary_times_out_even_for_a_small_tempdir_scenario".to_owned(),
+            "amenable_kani".to_owned(),
+            "a small real-filesystem tempdir scenario can still time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -612,16 +612,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct fmt::Arguments rendering can still time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::format_arguments_rendering_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct fmt::Arguments rendering can still time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -644,16 +644,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct fmt::from_fn rendering can still time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::from_fn_rendering_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct fmt::from_fn rendering can still time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -670,16 +670,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "RandomState::new() reaches an unsupported OS entropy-source boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
+            "gallery::replace_recommendations::random_state_construction_reaches_an_unsupported_entropy_source_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "RandomState::new() reaches an unsupported OS entropy-source boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -707,16 +707,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "std::thread::current() reaches an unsupported pthread_key_create boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
+            "gallery::replace_recommendations::thread_current_reaches_an_unsupported_thread_local_storage_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "std::thread::current() reaches an unsupported pthread_key_create boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -736,16 +736,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Barrier::wait() reaches an unsupported futex syscall boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
+            "gallery::replace_recommendations::barrier_wait_reaches_an_unsupported_futex_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Barrier::wait() reaches an unsupported futex syscall boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -766,16 +766,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Condvar::wait_timeout reaches an unsupported clock_gettime boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
+            "gallery::replace_recommendations::condvar_wait_timeout_reaches_an_unsupported_clock_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Condvar::wait_timeout reaches an unsupported clock_gettime boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -799,16 +799,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Mutex poisoning reaches an unsupported catch_unwind boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            "gallery::replace_recommendations::mutex_poisoning_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Mutex poisoning reaches an unsupported catch_unwind boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -832,16 +832,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
-            harness: "gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Mutex::try_lock succeeds while a guard is held, under Kani's no-concurrency-support environment model".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
+            "gallery::replace_recommendations::try_lock_succeeds_under_kanis_no_concurrency_environment_model".to_owned(),
+            "amenable_kani".to_owned(),
+            "Mutex::try_lock succeeds while a guard is held, under Kani's no-concurrency-support environment model".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -870,16 +870,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Command::new(...).arg(...) reaches an unsupported CString strlen boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
+            "gallery::replace_recommendations::command_construction_reaches_an_unsupported_cstring_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Command::new(...).arg(...) reaches an unsupported CString strlen boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -901,16 +901,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Command::spawn() reaches an unsupported gnu_get_libc_version boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
+            "gallery::replace_recommendations::command_spawn_reaches_an_unsupported_glibc_version_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Command::spawn() reaches an unsupported gnu_get_libc_version boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -929,16 +929,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Stdio::to_child_stdio reaches an unsupported C string literal construct".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
+            "gallery::replace_recommendations::stdio_conversion_reaches_an_unsupported_c_string_literal_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "Stdio::to_child_stdio reaches an unsupported C string literal construct".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -958,16 +958,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "TcpListener::bind reaches an unsupported socket() syscall boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
+            "gallery::replace_recommendations::socket_construction_reaches_an_unsupported_socket_syscall_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "TcpListener::bind reaches an unsupported socket() syscall boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -988,16 +988,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BufReader::read_to_string still times out in the pure std path".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::buf_reader_read_to_string_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BufReader::read_to_string still times out in the pure std path".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1021,16 +1021,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BufWriter::into_inner error recovery still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::into_inner_error_recovery_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BufWriter::into_inner error recovery still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1068,16 +1068,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct LineWriter newline flushing still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::line_writer_newline_flush_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct LineWriter newline flushing still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1109,16 +1109,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BufRead::lines still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::bufread_lines_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BufRead::lines still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1139,16 +1139,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
-            harness: "gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BufRead::split still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
+            "gallery::replace_recommendations::bufread_split_times_out_in_the_direct_std_path".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BufRead::split still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1175,16 +1175,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call".to_owned(),
-            harness: "gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "reverse str Pattern search (rsplit and friends) times out even for one next() call".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call".to_owned(),
+            "gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call".to_owned(),
+            "amenable_kani".to_owned(),
+            "reverse str Pattern search (rsplit and friends) times out even for one next() call".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1217,16 +1217,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate".to_owned(),
-            harness: "gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "forward str Pattern iteration (split_terminator/matches/match_indices) times out for real, despite passing in an isolated probe crate".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate".to_owned(),
+            "gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate".to_owned(),
+            "amenable_kani".to_owned(),
+            "forward str Pattern iteration (split_terminator/matches/match_indices) times out for real, despite passing in an isolated probe crate".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -1259,16 +1259,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
-            harness: "gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "direct BufWriter panic recovery reaches the unsupported catch_unwind boundary".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            "gallery::replace_recommendations::buf_writer_panic_recovery_reaches_the_unsupported_catch_unwind_boundary".to_owned(),
+            "amenable_kani".to_owned(),
+            "direct BufWriter panic recovery reaches the unsupported catch_unwind boundary".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

@@ -38,16 +38,16 @@ use std::{ops::Range, vec::IntoIter};
 use core::iter::Flatten;
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
-            harness: "gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Filter over a single-item symbolic Range<i32> still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
+            "gallery::iter_materialization::find_routed_filter_over_symbolic_range_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Filter over a single-item symbolic Range<i32> still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -77,16 +77,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
-            harness: "gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Filter over a one-element array source resolves the same find/try_fold timeout".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
+            "gallery::iter_materialization::find_routed_filter_over_array_source_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "Filter over a one-element array source resolves the same find/try_fold timeout".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -116,16 +116,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::iter_materialization::flatten_collect_times_out".to_owned(),
-            harness: "gallery::iter_materialization::flatten_collect_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "eagerly collecting a flattened iterator can time out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::iter_materialization::flatten_collect_times_out".to_owned(),
+            "gallery::iter_materialization::flatten_collect_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "eagerly collecting a flattened iterator can time out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -154,16 +154,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::iter_materialization::flatten_incremental_next_passes".to_owned(),
-            harness: "gallery::iter_materialization::flatten_incremental_next_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "incremental observation alone still times out for symbolic flatten".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::iter_materialization::flatten_incremental_next_passes".to_owned(),
+            "gallery::iter_materialization::flatten_incremental_next_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "incremental observation alone still times out for symbolic flatten".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -238,16 +238,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::iter_materialization::flatten_incremental_fixed_lengths_passes".to_owned(),
-            harness: "gallery::iter_materialization::flatten_incremental_fixed_lengths_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "incremental flatten passes once the lengths are concrete".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::Hypothesis,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::iter_materialization::flatten_incremental_fixed_lengths_passes".to_owned(),
+            "gallery::iter_materialization::flatten_incremental_fixed_lengths_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "incremental flatten passes once the lengths are concrete".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

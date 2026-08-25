@@ -9,16 +9,16 @@
 //! observation the production proof now uses.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_escape_ascii::two_byte_collect_times_out".to_owned(),
-            harness: "gallery::slice_escape_ascii::two_byte_collect_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "collecting a two-byte escape_ascii iterator still times out".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_escape_ascii::two_byte_collect_times_out".to_owned(),
+            "gallery::slice_escape_ascii::two_byte_collect_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "collecting a two-byte escape_ascii iterator still times out".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -38,16 +38,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_escape_ascii::two_byte_incremental_next_still_times_out".to_owned(),
-            harness: "gallery::slice_escape_ascii::two_byte_incremental_next_still_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "stepwise next() alone still times out on the same escape_ascii witness".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_escape_ascii::two_byte_incremental_next_still_times_out".to_owned(),
+            "gallery::slice_escape_ascii::two_byte_incremental_next_still_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "stepwise next() alone still times out on the same escape_ascii witness".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -72,16 +72,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::slice_escape_ascii::bounded_escape_ascii_observation_passes".to_owned(),
-            harness: "gallery::slice_escape_ascii::bounded_escape_ascii_observation_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a bounded escape_ascii observation states the same law without the std timeout".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::slice_escape_ascii::bounded_escape_ascii_observation_passes".to_owned(),
+            "gallery::slice_escape_ascii::bounded_escape_ascii_observation_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "a bounded escape_ascii observation states the same law without the std timeout".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

@@ -16,16 +16,16 @@
 //! Rust-facing law and verified quickly.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new".to_owned(),
-            harness: "gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a generic mutable filesystem state machine still times out for create_new".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new".to_owned(),
+            "gallery::filesystem_observation_granularity::generic_filesystem_state_machine_times_out_for_create_new".to_owned(),
+            "amenable_kani".to_owned(),
+            "a generic mutable filesystem state machine still times out for create_new".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -60,16 +60,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::filesystem_observation_granularity::single_path_create_new_observation_passes".to_owned(),
-            harness: "gallery::filesystem_observation_granularity::single_path_create_new_observation_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "a single-path create_new observation verifies the same law quickly".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::filesystem_observation_granularity::single_path_create_new_observation_passes".to_owned(),
+            "gallery::filesystem_observation_granularity::single_path_create_new_observation_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "a single-path create_new observation verifies the same law quickly".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

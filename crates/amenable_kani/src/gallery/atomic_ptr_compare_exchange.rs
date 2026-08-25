@@ -20,16 +20,16 @@
 use std::sync::atomic::{AtomicPtr, Ordering};
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::atomic_ptr_compare_exchange::mismatch_does_not_report_the_real_current_value".to_owned(),
-            harness: "gallery::atomic_ptr_compare_exchange::mismatch_does_not_report_the_real_current_value".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "AtomicPtr::compare_exchange's failure branch loses the reported value under Kani".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::atomic_ptr_compare_exchange::mismatch_does_not_report_the_real_current_value".to_owned(),
+            "gallery::atomic_ptr_compare_exchange::mismatch_does_not_report_the_real_current_value".to_owned(),
+            "amenable_kani".to_owned(),
+            "AtomicPtr::compare_exchange's failure branch loses the reported value under Kani".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

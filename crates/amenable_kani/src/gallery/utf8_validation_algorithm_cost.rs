@@ -30,16 +30,16 @@
 //! the two production proofs above actually use.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::utf8_validation_algorithm_cost::full_branch_validation_over_two_valid_bytes_times_out".to_owned(),
-            harness: "gallery::utf8_validation_algorithm_cost::full_branch_validation_over_two_valid_bytes_times_out".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "the full multi-byte UTF-8 validation state machine times out even for two fixed valid bytes".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Timeout,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::utf8_validation_algorithm_cost::full_branch_validation_over_two_valid_bytes_times_out".to_owned(),
+            "gallery::utf8_validation_algorithm_cost::full_branch_validation_over_two_valid_bytes_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "the full multi-byte UTF-8 validation state machine times out even for two fixed valid bytes".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
 }
 
 amenable_derive::harness! {
@@ -60,16 +60,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::utf8_validation_algorithm_cost::assumed_symbolic_validity_over_the_same_case_passes".to_owned(),
-            harness: "gallery::utf8_validation_algorithm_cost::assumed_symbolic_validity_over_the_same_case_passes".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "assuming validity symbolically instead of computing it resolves the same case immediately".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::utf8_validation_algorithm_cost::assumed_symbolic_validity_over_the_same_case_passes".to_owned(),
+            "gallery::utf8_validation_algorithm_cost::assumed_symbolic_validity_over_the_same_case_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "assuming validity symbolically instead of computing it resolves the same case immediately".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {

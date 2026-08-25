@@ -102,16 +102,16 @@
 //! wrapper.
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
-            harness: "gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Ledger::commit's real body moved to amenable_gaap (generic over V: Verifier), Kani contract attached to a thin free-function wrapper delegating to it -- fails at a real Kani DFCC scaffolding check (free.frees.1, builtin location, immediately after no_alloc_dealloc_in_ensures passes), not in any of our own logic; every other real contract in this workspace targets a method, never a free function".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
+            "gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
+            "amenable_kani".to_owned(),
+            "Ledger::commit's real body moved to amenable_gaap (generic over V: Verifier), Kani contract attached to a thin free-function wrapper delegating to it -- fails at a real Kani DFCC scaffolding check (free.frees.1, builtin location, immediately after no_alloc_dealloc_in_ensures passes), not in any of our own logic; every other real contract in this workspace targets a method, never a free function".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 #[cfg(kani)]
@@ -172,16 +172,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
-            harness: "gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Same real cross-crate delegation as commit_contract_free_function_wrapper, but the Kani-contracted function is an associated function on a local zero-sized wrapper type (KaniLedgerCommit::commit) instead of a bare free function -- fails identically (free.frees.1, same builtin location), ruling out \"bare free function specifically\" as the cause; narrows it to the cross-crate call or the generic-over-V dispatch".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
+            "gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
+            "amenable_kani".to_owned(),
+            "Same real cross-crate delegation as commit_contract_free_function_wrapper, but the Kani-contracted function is an associated function on a local zero-sized wrapper type (KaniLedgerCommit::commit) instead of a bare free function -- fails identically (free.frees.1, same builtin location), ruling out \"bare free function specifically\" as the cause; narrows it to the cross-crate call or the generic-over-V dispatch".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 /// Zero-sized local wrapper: `Ledger` itself lives in `amenable_gaap` now,
@@ -237,16 +237,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
-            harness: "gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "Same real cross-crate generic delegation (ledger.commit::<KaniVerifier>(input)) as the other two cases, but the contract itself is trivial (requires(true)/ensures(|_| true), dropping the BalancedEntries::ensures(..) call and match) -- fails identically (free.frees.1, same builtin location, 266 checks not 287 since the trivial ensures skips BalancedEntries), definitively ruling out contract content as the cause: this is purely structural to a Kani-contracted function whose body delegates to a cross-crate generic method".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            expected: ::amenable_kani::KaniGalleryExpectation::Failed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
+            "gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
+            "amenable_kani".to_owned(),
+            "Same real cross-crate generic delegation (ledger.commit::<KaniVerifier>(input)) as the other two cases, but the contract itself is trivial (requires(true)/ensures(|_| true), dropping the BalancedEntries::ensures(..) call and match) -- fails identically (free.frees.1, same builtin location, 266 checks not 287 since the trivial ensures skips BalancedEntries), definitively ruling out contract content as the cause: this is purely structural to a Kani-contracted function whose body delegates to a cross-crate generic method".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Failed,
+        ),
+    )
 }
 
 #[cfg(kani)]
@@ -293,16 +293,16 @@ amenable_derive::harness! {
 }
 
 ::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration {
-        case: || ::amenable_kani::KaniGalleryCase {
-            id: "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_no_wrapper".to_owned(),
-            harness: "gallery::ledger_gaap_free_function_contract::commit_contract_no_wrapper".to_owned(),
-            package: "amenable_kani".to_owned(),
-            title: "CONFIRMED SOLUTION: attach the Kani contract directly to amenable_gaap::Ledger::commit (a real, generic-over-V method) with zero delegating wrapper at all, using a fully generic BalancedEntries: Ensures<V, ..> bound (never naming a concrete verifier) so it still compiles from amenable_gaap with no backend dependency -- verifies clean (0 of 287 failed), confirming the free.frees.1 DFCC failure was specific to the wrapper/delegation pattern, not to cross-crate generic contracts as such; Ledger's own methods CAN move to amenable_gaap for real by attaching the contract directly instead of through a wrapper".to_owned(),
-            disposition: ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            expected: ::amenable_kani::KaniGalleryExpectation::Passed,
-        },
-    }
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_no_wrapper".to_owned(),
+            "gallery::ledger_gaap_free_function_contract::commit_contract_no_wrapper".to_owned(),
+            "amenable_kani".to_owned(),
+            "CONFIRMED SOLUTION: attach the Kani contract directly to amenable_gaap::Ledger::commit (a real, generic-over-V method) with zero delegating wrapper at all, using a fully generic BalancedEntries: Ensures<V, ..> bound (never naming a concrete verifier) so it still compiles from amenable_gaap with no backend dependency -- verifies clean (0 of 287 failed), confirming the free.frees.1 DFCC failure was specific to the wrapper/delegation pattern, not to cross-crate generic contracts as such; Ledger's own methods CAN move to amenable_gaap for real by attaching the contract directly instead of through a wrapper".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::harness! {
