@@ -123,7 +123,16 @@ pub enum TransferError {
 /// the way an earlier, zero-argument-only version of this mechanism
 /// left it (`RootEntry::seed`'s own doc comment in `amenable_core::
 /// state_machine` has the full account).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, amenable_derive::StateMachine)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    amenable_derive::StateMachine,
+    derive_getters::Getters,
+    derive_new::new,
+)]
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 #[state_machine(
     generic_over_verifier,
@@ -149,16 +158,16 @@ pub enum TransferError {
     edge("Validated", "Rejected<Validated>")
 )]
 pub struct Ledger {
+    /// The account's current balance. `derive_new`/`derive_getters` have
+    /// no way to carry the `#[must_use]` this constructor/getter used to
+    /// have -- confirmed against both crates' own docs -- but neither
+    /// clippy lint that would care (`must_use_candidate`) is enabled in
+    /// this workspace, so nothing actually stops warning either way.
+    #[getter(copy)]
     balance: i64,
 }
 
 impl Ledger {
-    /// Construct a ledger view of an account holding `balance`.
-    #[must_use]
-    pub fn new(balance: i64) -> Self {
-        Self { balance }
-    }
-
     /// `AmountPositive`, isolated: `amount > 0`. Broken out from
     /// `validate`'s own body specifically so this can be proven cheaply
     /// on its own -- see `GAAP_LEDGER_PLAN.md`'s Step 1: the combined
@@ -250,12 +259,6 @@ impl Ledger {
             balance: bad.0,
             required: bad.1,
         }
-    }
-
-    /// The account's current balance.
-    #[must_use]
-    pub fn balance(&self) -> i64 {
-        self.balance
     }
 }
 

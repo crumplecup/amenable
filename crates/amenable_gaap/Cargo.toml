@@ -16,6 +16,8 @@ categories = ["development-tools", "rust-patterns"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
+derive-getters = { workspace = true }
+derive-new = { workspace = true }
 inventory = { workspace = true }
 uuid = { workspace = true }
 

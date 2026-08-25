@@ -52,30 +52,20 @@ use uuid::Uuid;
 /// only holds if its id is stable across reconstructions — the same
 /// reason a real chart of accounts assigns an id once, at account
 /// creation, rather than re-deriving one per lookup.
-#[derive(Debug, Clone, Default)]
+#[derive(
+    Debug,
+    Clone,
+    Default,
+    derive_getters::Getters,
+    derive_new::new,
+)]
 pub struct AccountId {
-    id: Uuid,
-    name: String,
-}
-
-impl AccountId {
-    /// Identify an account by its stable id and a human-readable name.
-    pub fn new(id: Uuid, name: impl Into<String>) -> Self {
-        Self {
-            id,
-            name: name.into(),
-        }
-    }
-
     /// The account's stable id — what identity checks compare.
-    pub fn id(&self) -> Uuid {
-        self.id
-    }
-
+    #[getter(copy)]
+    id: Uuid,
     /// The account's human-readable name — display only, never compared.
-    pub fn name(&self) -> &str {
-        &self.name
-    }
+    #[new(into)]
+    name: String,
 }
 
 impl PartialEq for AccountId {
@@ -127,34 +117,25 @@ impl Amount {
 /// `Sidecar<V>::Primary`, once a verifier's impls exist. Distinct from
 /// the state marker itself (`Sidecar<V>::Proposition`): a `Transfer` in
 /// any state still names the same two accounts and amount.
-#[derive(Debug, Clone, Default, PartialEq, Eq, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct TransferPayload {
-    from: AccountId,
-    to: AccountId,
-    amount: Amount,
-}
-
-impl TransferPayload {
-    /// Construct a transfer payload naming its two accounts and amount.
-    pub fn new(from: AccountId, to: AccountId, amount: Amount) -> Self {
-        Self { from, to, amount }
-    }
-
     /// The source account.
-    pub fn from(&self) -> &AccountId {
-        &self.from
-    }
-
+    from: AccountId,
     /// The destination account.
-    pub fn to(&self) -> &AccountId {
-        &self.to
-    }
-
+    to: AccountId,
     /// The transfer amount.
-    pub fn amount(&self) -> Amount {
-        self.amount
-    }
+    #[getter(copy)]
+    amount: Amount,
 }
 
 /// The transfer is awaiting validation — a root state claim, asserted
