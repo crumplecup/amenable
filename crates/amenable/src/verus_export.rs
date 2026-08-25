@@ -889,7 +889,7 @@ fn metadata_value<'a>(metadata: &'a [MetadataEntry], key: &str) -> Option<&'a st
     metadata
         .iter()
         .find(|entry| entry.key() == key)
-        .map(MetadataEntry::value)
+        .map(|entry| entry.value().as_str())
 }
 
 fn route_display(route: &[RouteSegment]) -> String {

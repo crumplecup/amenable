@@ -5,42 +5,16 @@ use std::fmt::{self, Display, Formatter};
 use crate::Registry;
 
 /// One provenance metadata fact expressed as a key-value pair.
-///
-/// Hand-written `new`/`key`/`value` instead of `derive_new`/
-/// `derive_getters`, despite otherwise matching that exact shape:
-/// `amenable_verus` `#[path]`-includes this file directly into its own
-/// crate (the real `verus` binary never resolves an ordinary Cargo
-/// dependency, so nothing outside `verus_builtin_macros`/`vstd` can be
-/// used here), and neither derive crate is available in that context.
-/// Confirmed the hard way -- `cargo check --all-features` fails with
-/// "private field, not a method" once this file gains a derive that
-/// `amenable_verus`'s Cargo.toml can't provide.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
+)]
 pub struct MetadataEntry {
     /// Stable metadata key.
+    #[new(into)]
     key: String,
     /// Stable metadata value.
+    #[new(into)]
     value: String,
-}
-
-impl MetadataEntry {
-    /// Create a new provenance metadata entry.
-    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
-        Self {
-            key: key.into(),
-            value: value.into(),
-        }
-    }
-
-    /// Return the metadata key.
-    pub fn key(&self) -> &str {
-        &self.key
-    }
-
-    /// Return the metadata value.
-    pub fn value(&self) -> &str {
-        &self.value
-    }
 }
 
 impl Display for MetadataEntry {
