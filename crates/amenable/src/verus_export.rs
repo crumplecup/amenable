@@ -360,7 +360,7 @@ fn render_verus_module(
     // another variant) still fall through to `render_node`'s own
     // rejection -- no real nested-enum type is registered anywhere in
     // this codebase yet.
-    if export.artifact.shape == WitnessArtifactShape::Enum {
+    if export.artifact.shape() == WitnessArtifactShape::Enum {
         return render_enum_module(export, &module_stem, &mut names);
     }
 
@@ -521,7 +521,7 @@ fn render_enum_module(
     module_stem: &str,
     names: &mut NameAllocator,
 ) -> AmenableResult<String> {
-    if export.artifact.variants.is_empty() {
+    if export.artifact.variants().is_empty() {
         return Err(AmenableError::invariant(format!(
             "enum-shaped export {} has no variants -- nothing to compose",
             export.evidence
@@ -532,17 +532,17 @@ fn render_enum_module(
     let selector_ty = format!("{type_prefix}Selector");
     let result_ty = format!("{type_prefix}Result");
 
-    let mut per_variant = Vec::with_capacity(export.artifact.variants.len());
-    for variant in &export.artifact.variants {
-        let route = vec![RouteSegment::Variant(variant.name.clone())];
-        let rendered = render_node(&variant.artifact, &route, names)?;
+    let mut per_variant = Vec::with_capacity(export.artifact.variants().len());
+    for variant in export.artifact.variants() {
+        let route = vec![RouteSegment::Variant(variant.name().clone())];
+        let rendered = render_node(variant.artifact(), &route, names)?;
         // The artifact's own variant name may carry a provenance rename
         // (e.g. `fallback`, all-lowercase) rather than the real source
         // identifier's casing -- fine for audit labels/comments (route
         // display keeps the original above), but not a valid Rust enum
         // variant identifier on its own. Normalize to PascalCase for the
         // synthetic selector/result enums' own variant names.
-        let variant_ident = to_pascal_case(&normalize_identifier(&variant.name));
+        let variant_ident = to_pascal_case(&normalize_identifier(variant.name()));
         per_variant.push((variant_ident, rendered));
     }
 
@@ -702,7 +702,7 @@ fn render_node(
     route: &[RouteSegment],
     names: &mut NameAllocator,
 ) -> AmenableResult<RenderedNode> {
-    match node.shape {
+    match node.shape() {
         WitnessArtifactShape::Leaf => render_leaf_node(node, route, names),
         WitnessArtifactShape::Enum => Err(AmenableError::invariant(format!(
             "Verus composition for a nested enum-shaped witness is not supported yet (route: {}); \
@@ -718,10 +718,10 @@ fn render_node(
         | WitnessArtifactShape::TupleVariant
         | WitnessArtifactShape::UnitVariant => {
             let mut combined = RenderedNode::default();
-            for member in &node.members {
+            for member in node.members() {
                 let mut child_route = route.to_vec();
-                child_route.push(RouteSegment::Member(member.label.clone()));
-                combined.merge(render_node(&member.artifact, &child_route, names)?);
+                child_route.push(RouteSegment::Member(member.label().clone()));
+                combined.merge(render_node(member.artifact(), &child_route, names)?);
             }
             Ok(combined)
         }
@@ -733,7 +733,7 @@ fn render_leaf_node(
     route: &[RouteSegment],
     names: &mut NameAllocator,
 ) -> AmenableResult<RenderedNode> {
-    match node.kind {
+    match node.kind() {
         WitnessSupportKind::Trivial => Ok(RenderedNode::default()),
         WitnessSupportKind::Trusted => Ok(RenderedNode {
             comments: vec![render_trust_comment(node, route)],
@@ -746,7 +746,7 @@ fn render_leaf_node(
                  arises from composing multiple leaves, and Opaque leaves cannot reach this \
                  renderer (amenable_core::ClassifiedWitness blocks them at cargo check time)",
                 route_display(route),
-                node.kind
+                node.kind()
             )))
         }
     }
@@ -757,7 +757,7 @@ fn render_checked_leaf(
     route: &[RouteSegment],
     names: &mut NameAllocator,
 ) -> AmenableResult<RenderedNode> {
-    let harness = metadata_value(&node.metadata, "harness").ok_or_else(|| {
+    let harness = metadata_value(node.metadata(), "harness").ok_or_else(|| {
         AmenableError::invariant(format!(
             "checked leaf at {} has no \"harness\" metadata entry",
             route_display(route)
@@ -868,7 +868,7 @@ fn render_trust_comment(node: &WitnessArtifactNode, route: &[RouteSegment]) -> S
     let mut line = format!("// trusted leaf at {}", route_display(route));
 
     let metadata = node
-        .metadata
+        .metadata()
         .iter()
         .map(|entry| format!("{} = {}", entry.key(), entry.value()))
         .collect::<Vec<_>>()

@@ -5,7 +5,7 @@ use amenable_std::{VerusGalleryExpectation, VerusGalleryRegistration};
 #[test]
 fn all_eleven_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<VerusGalleryRegistration>()
-        .map(|registration| (registration.case)())
+        .map(|registration| (registration.case())())
         .collect();
 
     assert_eq!(
@@ -14,14 +14,14 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
         "expected exactly the 11 findings from this session's real Verus pipeline work: {cases:#?}"
     );
 
-    let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
+    let mut ids: Vec<&str> = cases.iter().map(|case| case.id().as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
     assert_eq!(ids.len(), 11, "gallery case ids must be unique");
 
     let not_supported_count = cases
         .iter()
-        .filter(|case| case.expected == VerusGalleryExpectation::NotSupported)
+        .filter(|case| case.expected() == VerusGalleryExpectation::NotSupported)
         .count();
     assert_eq!(
         not_supported_count, 2,
@@ -30,7 +30,7 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
 
     let unproved_count = cases
         .iter()
-        .filter(|case| case.expected == VerusGalleryExpectation::Unproved)
+        .filter(|case| case.expected() == VerusGalleryExpectation::Unproved)
         .count();
     assert_eq!(
         unproved_count, 5,
@@ -39,7 +39,7 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
 
     let ice_count = cases
         .iter()
-        .filter(|case| case.expected == VerusGalleryExpectation::Ice)
+        .filter(|case| case.expected() == VerusGalleryExpectation::Ice)
         .count();
     assert_eq!(
         ice_count, 1,
@@ -48,7 +48,7 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
 
     let proved_count = cases
         .iter()
-        .filter(|case| case.expected == VerusGalleryExpectation::Proved)
+        .filter(|case| case.expected() == VerusGalleryExpectation::Proved)
         .count();
     assert_eq!(
         proved_count, 2,
@@ -57,7 +57,7 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
 
     let compile_error_count = cases
         .iter()
-        .filter(|case| case.expected == VerusGalleryExpectation::CompileError)
+        .filter(|case| case.expected() == VerusGalleryExpectation::CompileError)
         .count();
     assert_eq!(
         compile_error_count, 1,
@@ -66,14 +66,14 @@ fn all_eleven_gallery_findings_are_registered_and_distinct() {
 
     for case in &cases {
         assert!(
-            !case.title.is_empty(),
+            !case.title().is_empty(),
             "gallery case {} must have a title",
-            case.id
+            case.id()
         );
         assert!(
-            !case.claim.is_empty(),
+            !case.claim().is_empty(),
             "gallery case {} must have a claim",
-            case.id
+            case.id()
         );
     }
 }

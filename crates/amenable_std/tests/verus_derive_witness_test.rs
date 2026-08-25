@@ -323,20 +323,22 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::
         .artifact
         .clone();
 
-    assert_eq!(enum_artifact.shape, WitnessArtifactShape::Enum);
-    assert_eq!(enum_artifact.kind, WitnessSupportKind::Mixed);
-    assert_eq!(enum_artifact.tag.as_deref(), Some("entry_kind"));
-    assert_eq!(enum_artifact.variants.len(), 3);
+    assert_eq!(enum_artifact.shape(), WitnessArtifactShape::Enum);
+    assert_eq!(enum_artifact.kind(), WitnessSupportKind::Mixed);
+    assert_eq!(enum_artifact.tag().as_deref(), Some("entry_kind"));
+    assert_eq!(enum_artifact.variants().len(), 3);
     let balanced_variant = enum_artifact
-        .variants
+        .variants()
         .iter()
-        .find(|variant| variant.name == "Balanced")
+        .find(|variant| variant.name() == "Balanced")
         .ok_or_else(|| miette::miette!("expected Balanced variant artifact"))?;
     assert_eq!(
-        balanced_variant.artifact.shape,
+        balanced_variant.artifact().shape(),
         WitnessArtifactShape::NamedVariant
     );
-    let checked_leaf_metadata = &balanced_variant.artifact.members[0].artifact.metadata;
+    let checked_leaf_metadata = &balanced_variant.artifact().members()[0]
+        .artifact()
+        .metadata();
     assert_eq!(checked_leaf_metadata.len(), 3);
     assert_eq!(checked_leaf_metadata[0].key(), "verifier");
     assert_eq!(checked_leaf_metadata[0].value(), "verus");
@@ -350,7 +352,9 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::
         "{}",
         checked_leaf_metadata[2].value()
     );
-    let trusted_leaf_metadata = &balanced_variant.artifact.members[1].artifact.metadata;
+    let trusted_leaf_metadata = &balanced_variant.artifact().members()[1]
+        .artifact()
+        .metadata();
     assert!(
         trusted_leaf_metadata.iter().any(|entry| {
             entry.key() == "rust.authority" && entry.value() == "Rust Project Developers"
@@ -358,19 +362,19 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::
         "{trusted_leaf_metadata:?}"
     );
 
-    assert_eq!(struct_artifact.shape, WitnessArtifactShape::NamedStruct);
-    assert_eq!(struct_artifact.kind, WitnessSupportKind::Checked);
-    assert_eq!(struct_artifact.members.len(), 2);
+    assert_eq!(struct_artifact.shape(), WitnessArtifactShape::NamedStruct);
+    assert_eq!(struct_artifact.kind(), WitnessSupportKind::Checked);
+    assert_eq!(struct_artifact.members().len(), 2);
     assert_eq!(
-        struct_artifact.members[0].artifact.shape,
+        struct_artifact.members()[0].artifact().shape(),
         WitnessArtifactShape::Leaf
     );
 
-    assert_eq!(tuple_artifact.shape, WitnessArtifactShape::TupleStruct);
-    assert_eq!(tuple_artifact.kind, WitnessSupportKind::Mixed);
-    assert_eq!(tuple_artifact.members.len(), 3);
+    assert_eq!(tuple_artifact.shape(), WitnessArtifactShape::TupleStruct);
+    assert_eq!(tuple_artifact.kind(), WitnessSupportKind::Mixed);
+    assert_eq!(tuple_artifact.members().len(), 3);
     assert_eq!(
-        tuple_artifact.members[0].artifact.shape,
+        tuple_artifact.members()[0].artifact().shape(),
         WitnessArtifactShape::Leaf
     );
     Ok(())
@@ -387,13 +391,13 @@ fn live_verus_canary_exports_include_tuple_struct_shape() -> miette::Result<()> 
         })
         .ok_or_else(|| miette::miette!("expected library Verus tuple-struct export canary"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::TupleStruct);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::TupleStruct);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Mixed);
     assert_eq!(export.support, tuple_struct_support());
-    assert_eq!(export.artifact.members.len(), 3);
-    assert_eq!(export.artifact.members[0].label, "0");
-    assert_eq!(export.artifact.members[1].label, "trusted");
-    assert_eq!(export.artifact.members[2].label, "marker");
+    assert_eq!(export.artifact.members().len(), 3);
+    assert_eq!(export.artifact.members()[0].label(), "0");
+    assert_eq!(export.artifact.members()[1].label(), "trusted");
+    assert_eq!(export.artifact.members()[2].label(), "marker");
     Ok(())
 }
 
@@ -427,23 +431,23 @@ fn live_verus_canary_exports_include_canary_enum_shape() -> miette::Result<()> {
         })
         .ok_or_else(|| miette::miette!("expected library Verus canary-enum export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
-    assert_eq!(export.artifact.variants.len(), 3);
-    assert_eq!(export.artifact.variants[0].name, "Balanced");
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::Enum);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Mixed);
+    assert_eq!(export.artifact.variants().len(), 3);
+    assert_eq!(export.artifact.variants()[0].name(), "Balanced");
     assert_eq!(
-        export.artifact.variants[0].artifact.shape,
+        export.artifact.variants()[0].artifact().shape(),
         WitnessArtifactShape::NamedVariant
     );
-    assert_eq!(export.artifact.variants[1].name, "fallback");
+    assert_eq!(export.artifact.variants()[1].name(), "fallback");
     assert_eq!(
-        export.artifact.variants[1].artifact.shape,
+        export.artifact.variants()[1].artifact().shape(),
         WitnessArtifactShape::TupleVariant
     );
-    assert_eq!(export.artifact.variants[1].artifact.members.len(), 1);
-    assert_eq!(export.artifact.variants[2].name, "Closed");
+    assert_eq!(export.artifact.variants()[1].artifact().members().len(), 1);
+    assert_eq!(export.artifact.variants()[2].name(), "Closed");
     assert_eq!(
-        export.artifact.variants[2].artifact.shape,
+        export.artifact.variants()[2].artifact().shape(),
         WitnessArtifactShape::UnitVariant
     );
     Ok(())
@@ -472,26 +476,26 @@ fn live_verus_canary_exports_include_multi_checked_enum_shape() -> miette::Resul
         })
         .ok_or_else(|| miette::miette!("expected library Verus multi-checked-enum export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::Enum);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
-    assert_eq!(export.artifact.variants.len(), 2);
-    assert_eq!(export.artifact.variants[0].name, "Active");
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::Enum);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.variants().len(), 2);
+    assert_eq!(export.artifact.variants()[0].name(), "Active");
     assert_eq!(
-        export.artifact.variants[0].artifact.shape,
+        export.artifact.variants()[0].artifact().shape(),
         WitnessArtifactShape::NamedVariant
     );
-    assert_eq!(export.artifact.variants[0].artifact.members.len(), 2);
+    assert_eq!(export.artifact.variants()[0].artifact().members().len(), 2);
     assert_eq!(
-        export.artifact.variants[0].artifact.members[0].label,
+        export.artifact.variants()[0].artifact().members()[0].label(),
         "first"
     );
     assert_eq!(
-        export.artifact.variants[0].artifact.members[1].label,
+        export.artifact.variants()[0].artifact().members()[1].label(),
         "second"
     );
-    assert_eq!(export.artifact.variants[1].name, "Idle");
+    assert_eq!(export.artifact.variants()[1].name(), "Idle");
     assert_eq!(
-        export.artifact.variants[1].artifact.shape,
+        export.artifact.variants()[1].artifact().shape(),
         WitnessArtifactShape::UnitVariant
     );
     Ok(())
@@ -519,8 +523,8 @@ fn live_verus_canary_exports_include_requires_struct_shape() -> miette::Result<(
         })
         .ok_or_else(|| miette::miette!("expected library Verus requires-struct export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Checked);
     Ok(())
 }
 
@@ -546,8 +550,8 @@ fn live_verus_canary_exports_include_raw_template_struct_shape() -> miette::Resu
         })
         .ok_or_else(|| miette::miette!("expected library Verus raw-template-struct export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Checked);
     Ok(())
 }
 
@@ -562,11 +566,11 @@ fn live_verus_canary_exports_include_multi_checked_struct_shape() -> miette::Res
         })
         .ok_or_else(|| miette::miette!("expected library Verus multi-checked-struct export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Checked);
-    assert_eq!(export.artifact.members.len(), 2);
-    assert_eq!(export.artifact.members[0].label, "first");
-    assert_eq!(export.artifact.members[1].label, "second");
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Checked);
+    assert_eq!(export.artifact.members().len(), 2);
+    assert_eq!(export.artifact.members()[0].label(), "first");
+    assert_eq!(export.artifact.members()[1].label(), "second");
     Ok(())
 }
 
@@ -581,19 +585,19 @@ fn live_verus_canary_exports_include_nested_struct_shape() -> miette::Result<()>
         })
         .ok_or_else(|| miette::miette!("expected library Verus nested-struct export"))?;
 
-    assert_eq!(export.artifact.shape, WitnessArtifactShape::NamedStruct);
-    assert_eq!(export.artifact.kind, WitnessSupportKind::Mixed);
-    assert_eq!(export.artifact.members.len(), 2);
-    assert_eq!(export.artifact.members[0].label, "inner");
+    assert_eq!(export.artifact.shape(), WitnessArtifactShape::NamedStruct);
+    assert_eq!(export.artifact.kind(), WitnessSupportKind::Mixed);
+    assert_eq!(export.artifact.members().len(), 2);
+    assert_eq!(export.artifact.members()[0].label(), "inner");
     assert_eq!(
-        export.artifact.members[0].artifact.shape,
+        export.artifact.members()[0].artifact().shape(),
         WitnessArtifactShape::NamedStruct
     );
-    assert_eq!(export.artifact.members[0].artifact.members.len(), 1);
+    assert_eq!(export.artifact.members()[0].artifact().members().len(), 1);
     assert_eq!(
-        export.artifact.members[0].artifact.members[0].label,
+        export.artifact.members()[0].artifact().members()[0].label(),
         "checked"
     );
-    assert_eq!(export.artifact.members[1].label, "trusted");
+    assert_eq!(export.artifact.members()[1].label(), "trusted");
     Ok(())
 }

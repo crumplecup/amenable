@@ -201,46 +201,53 @@ impl WitnessArtifactShape {
 }
 
 /// One named child member inside a witness artifact tree.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_getters::Dissolve, derive_new::new,
+)]
 pub struct WitnessArtifactMember {
     /// Stable field/member label.
-    pub label: String,
+    label: String,
     /// Nested proof artifact for that member.
-    pub artifact: Box<WitnessArtifactNode>,
+    artifact: Box<WitnessArtifactNode>,
 }
 
 /// One named enum variant inside a witness artifact tree.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_getters::Dissolve, derive_new::new,
+)]
 pub struct WitnessArtifactVariant {
     /// Stable variant label after any derive-side rename.
-    pub name: String,
+    name: String,
     /// Nested proof artifact for that variant.
-    pub artifact: Box<WitnessArtifactNode>,
+    artifact: Box<WitnessArtifactNode>,
 }
 
 /// One node in a verifier-facing witness artifact tree.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_getters::Dissolve)]
 pub struct WitnessArtifactNode {
     /// Structural shape for this node.
-    pub shape: WitnessArtifactShape,
+    #[getter(copy)]
+    shape: WitnessArtifactShape,
     /// Support summary this node closes over.
-    pub support: WitnessSupportSummary,
+    #[getter(copy)]
+    support: WitnessSupportSummary,
     /// Leaf classification or the collapsed class of this composite node.
-    pub kind: WitnessSupportKind,
+    #[getter(copy)]
+    kind: WitnessSupportKind,
     /// Optional tag name for enum roots.
-    pub tag: Option<String>,
+    tag: Option<String>,
     /// Optional source-language variant name for enum-variant nodes.
-    pub variant: Option<String>,
+    variant: Option<String>,
     /// Optional backend detail for leaves, such as a harness name or
     /// provenance report.
-    pub detail: Option<String>,
+    detail: Option<String>,
     /// Structured backend metadata for leaves, such as a harness name,
     /// captured claim source, or provenance facts.
-    pub metadata: Vec<MetadataEntry>,
+    metadata: Vec<MetadataEntry>,
     /// Named child members for struct- and variant-like nodes.
-    pub members: Vec<WitnessArtifactMember>,
+    members: Vec<WitnessArtifactMember>,
     /// Named child variants for enum roots.
-    pub variants: Vec<WitnessArtifactVariant>,
+    variants: Vec<WitnessArtifactVariant>,
 }
 
 impl WitnessArtifactNode {
@@ -274,7 +281,7 @@ impl WitnessArtifactNode {
     }
 
     /// Construct one composite node with named child members.
-    pub fn members(
+    pub fn with_members(
         shape: WitnessArtifactShape,
         support: WitnessSupportSummary,
         variant: Option<String>,

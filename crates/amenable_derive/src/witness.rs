@@ -195,12 +195,12 @@ fn expand_struct_proof_type(
         let label = &field.label;
 
         quote! {
-            ::amenable_core::WitnessArtifactMember {
-                label: #label.to_owned(),
-                artifact: ::std::boxed::Box::new(
+            ::amenable_core::WitnessArtifactMember::new(
+                #label.to_owned(),
+                ::std::boxed::Box::new(
                     ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
                 ),
-            }
+            )
         }
     });
     let generics_marker = expand_generics_marker(evidence_generics);
@@ -258,7 +258,7 @@ fn expand_struct_proof_type(
             #artifact_where_clause
         {
             fn witness_artifact(&self) -> ::amenable_core::WitnessArtifactNode {
-                ::amenable_core::WitnessArtifactNode::members(
+                ::amenable_core::WitnessArtifactNode::with_members(
                     match #shape_name {
                         "named_struct" => ::amenable_core::WitnessArtifactShape::NamedStruct,
                         "tuple_struct" => ::amenable_core::WitnessArtifactShape::TupleStruct,
@@ -358,12 +358,12 @@ fn expand_enum_proof_types(
         let variant_name = &field.variant_name;
 
         quote! {
-            ::amenable_core::WitnessArtifactVariant {
-                name: #variant_name.to_owned(),
-                artifact: ::std::boxed::Box::new(
+            ::amenable_core::WitnessArtifactVariant::new(
+                #variant_name.to_owned(),
+                ::std::boxed::Box::new(
                     ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
                 ),
-            }
+            )
         }
     });
 
@@ -480,12 +480,12 @@ fn expand_enum_variant_proof_type(
         let label = &field.label;
 
         quote! {
-            ::amenable_core::WitnessArtifactMember {
-                label: #label.to_owned(),
-                artifact: ::std::boxed::Box::new(
+            ::amenable_core::WitnessArtifactMember::new(
+                #label.to_owned(),
+                ::std::boxed::Box::new(
                     ::amenable_core::WitnessArtifact::witness_artifact(&self.#field_ident)
                 ),
-            }
+            )
         }
     });
     let generics_marker = expand_generics_marker(evidence_generics);
@@ -532,7 +532,7 @@ fn expand_enum_variant_proof_type(
             #artifact_where_clause
         {
             fn witness_artifact(&self) -> ::amenable_core::WitnessArtifactNode {
-                ::amenable_core::WitnessArtifactNode::members(
+                ::amenable_core::WitnessArtifactNode::with_members(
                     match #shape_name {
                         "named_variant" => ::amenable_core::WitnessArtifactShape::NamedVariant,
                         "tuple_variant" => ::amenable_core::WitnessArtifactShape::TupleVariant,

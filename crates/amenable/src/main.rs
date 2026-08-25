@@ -381,16 +381,15 @@ struct KaniProofDump {
 }
 
 fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifactNodeDump {
-    let support = node.support;
+    let (shape, support, kind, tag, variant, detail, metadata, members, variants) = node.dissolve();
 
     WitnessArtifactNodeDump {
-        shape: node.shape.as_str().to_owned(),
-        kind: node.kind.as_str().to_owned(),
-        tag: node.tag,
-        variant: node.variant,
-        detail: node.detail,
-        metadata: node
-            .metadata
+        shape: shape.as_str().to_owned(),
+        kind: kind.as_str().to_owned(),
+        tag,
+        variant,
+        detail,
+        metadata: metadata
             .into_iter()
             .map(|entry| WitnessArtifactMetadataDump {
                 key: entry.key().to_owned(),
@@ -402,20 +401,24 @@ fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifact
         checked: support.checked(),
         trusted: support.trusted(),
         opaque: support.opaque(),
-        members: node
-            .members
+        members: members
             .into_iter()
-            .map(|member| WitnessArtifactMemberDump {
-                label: member.label,
-                artifact: dump_witness_artifact(*member.artifact),
+            .map(|member| {
+                let (label, artifact) = member.dissolve();
+                WitnessArtifactMemberDump {
+                    label,
+                    artifact: dump_witness_artifact(*artifact),
+                }
             })
             .collect(),
-        variants: node
-            .variants
+        variants: variants
             .into_iter()
-            .map(|variant| WitnessArtifactVariantDump {
-                name: variant.name,
-                artifact: dump_witness_artifact(*variant.artifact),
+            .map(|variant| {
+                let (name, artifact) = variant.dissolve();
+                WitnessArtifactVariantDump {
+                    name,
+                    artifact: dump_witness_artifact(*artifact),
+                }
             })
             .collect(),
     }

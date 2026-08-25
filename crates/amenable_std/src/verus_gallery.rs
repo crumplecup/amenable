@@ -111,40 +111,81 @@ impl VerusGalleryExpectation {
 /// Unlike `amenable_kani::KaniGalleryCase`, there's no `harness`/`package`
 /// pair to select and run — see the module doc comment for why these
 /// aren't live, independently invocable proofs.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
+)]
 pub struct VerusGalleryCase {
     /// Stable, fully-qualified gallery-case identifier.
-    pub id: String,
+    id: String,
     /// Short human-facing summary of what the case demonstrates.
-    pub title: String,
+    title: String,
     /// Whether the case is a hypothesis, a false trail, or a best practice.
-    pub disposition: VerusGalleryDisposition,
+    #[getter(copy)]
+    disposition: VerusGalleryDisposition,
     /// The real `verus` outcome this case documents.
-    pub expected: VerusGalleryExpectation,
+    #[getter(copy)]
+    expected: VerusGalleryExpectation,
     /// The reduced repro (or, for `BestPractice` cases, the working
     /// alternative) as real Rust/Verus source — verbatim, not a
     /// paraphrase — plus a trailing note citing the actual diagnostic
     /// observed, so this can't silently drift into an unverified claim.
-    pub claim: &'static str,
+    ///
+    /// Hand-written getter, not `#[getter(copy)]`: confirmed via
+    /// `cargo expand` elsewhere in this workspace that `#[getter(copy)]`
+    /// on a `&'static` field generates a `&'static self` receiver, which
+    /// breaks calls through a non-`'static`, short-lived `self` (as every
+    /// real `VerusGalleryCase` instance here is -- built owned inside a
+    /// closure, not held as `&'static`).
+    #[getter(skip)]
+    claim: &'static str,
+}
+
+impl VerusGalleryCase {
+    /// The reduced repro/working-alternative source. See the field's own
+    /// doc comment for why this getter is hand-written.
+    #[must_use]
+    pub const fn claim(&self) -> &'static str {
+        self.claim
+    }
 }
 
 /// Static registration that constructs an owned [`VerusGalleryCase`] on
 /// demand.
+///
+/// Hand-written `const fn new`/getter, not derived: this record is itself
+/// passed to `inventory::submit!`, which requires a `const`-evaluable
+/// value, and `derive_new::new` cannot generate a `const fn`.
+/// `VerusGalleryCase` itself has no such requirement -- it's built at call
+/// time inside the stored closure, not at registration time -- so it uses
+/// the ordinary derives above.
 pub struct VerusGalleryRegistration {
+    case: fn() -> VerusGalleryCase,
+}
+
+impl VerusGalleryRegistration {
+    /// Register a proof-gallery case constructor.
+    #[must_use]
+    pub const fn new(case: fn() -> VerusGalleryCase) -> Self {
+        Self { case }
+    }
+
     /// Construct this registration's proof-gallery descriptor.
-    pub case: fn() -> VerusGalleryCase,
+    #[must_use]
+    pub const fn case(&self) -> fn() -> VerusGalleryCase {
+        self.case
+    }
 }
 
 inventory::collect!(VerusGalleryRegistration);
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::wrapping_add_operator_blocked_by_coherence".to_owned(),
-            title: "Wrapping<i32>'s `+` operator can't be verified from outside vstd (coherence); real, narrower field-roundtrip coverage lands instead".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Unproved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::wrapping_add_operator_blocked_by_coherence".to_owned(),
+            "Wrapping<i32>'s `+` operator can't be verified from outside vstd (coherence); real, narrower field-roundtrip coverage lands instead".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
 // Attempt 1 (naive): call the real Wrapping<i32> `+` operator directly,
 // the same claim amenable_kani's verify_wrapping_add_matches_the_inner_
 // wrapping_add harness checks.
@@ -212,18 +253,18 @@ pub assume_specification [<Wrapping<i32> as std::ops::Add>::add] (a: Wrapping<i3
 // operator-overload claim Kani/Creusot check remains unprovable under
 // Verus from this crate.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::saturating_add_operator_blocked_by_coherence_and_missing_primitive_spec".to_owned(),
-            title: "Saturating<i32>'s `+` operator hits Wrapping's same coherence block, plus i32::saturating_add itself has no vstd spec at all".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::NotSupported,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::saturating_add_operator_blocked_by_coherence_and_missing_primitive_spec".to_owned(),
+            "Saturating<i32>'s `+` operator hits Wrapping's same coherence block, plus i32::saturating_add itself has no vstd spec at all".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::NotSupported,
+            r#"
 // Attempt: the same claim amenable_kani's verify_saturating_add_matches_
 // the_inner_saturating_add harness checks, via the same
 // external_type_specification approach that got Wrapping<i32> as far as
@@ -259,18 +300,18 @@ pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) ->
 // Saturating(value).0 == value, the tuple constructor/field-access
 // roundtrip, via ExSaturating, without touching Add or saturating_add.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::reverse_cmp_blocked_by_coherence_through_ord_not_add".to_owned(),
-            title: "Reverse<i32>'s comparison-inversion claim hits the same coherence wall as Wrapping's +, through Ord's OrdSpecImpl instead of Add's AddSpecImpl".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Unproved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::reverse_cmp_blocked_by_coherence_through_ord_not_add".to_owned(),
+            "Reverse<i32>'s comparison-inversion claim hits the same coherence wall as Wrapping's +, through Ord's OrdSpecImpl instead of Add's AddSpecImpl".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
 // Attempt 1: the same claim amenable_kani's verify_reverse_inverts_
 // comparison harness checks — Reverse<T>'s .cmp() swaps T's ordering.
 use std::cmp::Reverse;
@@ -317,18 +358,18 @@ pub assume_specification<T> [<Reverse<T> as core::cmp::Ord>::cmp] (a: &Reverse<T
 // Saturating: Reverse(value).0 == value, the tuple constructor/field-
 // access roundtrip, via ExReverse, without touching Ord or cmp.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::nonzero_new_blocked_by_sealed_zeroable_primitive".to_owned(),
-            title: "NonZero::new can't be given a Verus spec: its real signature bounds on the sealed, unstable ZeroablePrimitive trait".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::NotSupported,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::nonzero_new_blocked_by_sealed_zeroable_primitive".to_owned(),
+            "NonZero::new can't be given a Verus spec: its real signature bounds on the sealed, unstable ZeroablePrimitive trait".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::NotSupported,
+            r#"
 // Attempt 1: axiomatize the real, unmodified std::num::NonZero::<T>::new,
 // generic over T, the same shape amenable_kani/amenable_creusot both
 // check concretely (e.g. for i8).
@@ -400,18 +441,18 @@ pub trait ExZeroablePrimitive: Sized + Copy {
 // downstream crate in either verifier until std stabilizes a nameable
 // bound.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::cfg_verus_is_never_actually_set".to_owned(),
-            title: "#[cfg(verus)] is a declared check-cfg name, not a cfg the real verus binary ever sets — gating proof content behind it silently strips it".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Unproved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::cfg_verus_is_never_actually_set".to_owned(),
+            "#[cfg(verus)] is a declared check-cfg name, not a cfg the real verus binary ever sets — gating proof content behind it silently strips it".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
 // Hypothesis (by analogy with amenable_kani's #[cfg(kani)] and
 // amenable_creusot's #[cfg(creusot)], both of which really are set by
 // their respective toolchains): gate Option/Result proof content behind
@@ -441,18 +482,18 @@ verus! {
 // Option/Result as a `requires`-constrained parameter, not a literal
 // constructed inline).
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::try_from_int_error_occurs_via_duplicate_assume_specification_ice".to_owned(),
-            title: "declaring assume_specification for a trait method vstd already specifies crashes verus outright, not a diagnosed conflict".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Ice,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::try_from_int_error_occurs_via_duplicate_assume_specification_ice".to_owned(),
+            "declaring assume_specification for a trait method vstd already specifies crashes verus outright, not a diagnosed conflict".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Ice,
+            r#"
 // Attempt: axiomatize u8::try_from(i32), the same claim amenable_kani's
 // verify_try_from_int_error_occurs_exactly_when_out_of_range harness
 // checks over every possible i32.
@@ -499,18 +540,18 @@ pub assume_specification [<u8 as std::convert::TryFrom<i32>>::try_from] (value: 
 // duplicate effort, but because here a duplicate isn't merely wasted
 // work, it crashes the toolchain.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::layout_new_size_and_align_are_opaque_even_for_primitives".to_owned(),
-            title: "Layout::new::<i32>()'s size/align values are unprovable: vstd deliberately treats size_of/align_of as fully opaque, even for i32".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Unproved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::layout_new_size_and_align_are_opaque_even_for_primitives".to_owned(),
+            "Layout::new::<i32>()'s size/align values are unprovable: vstd deliberately treats size_of/align_of as fully opaque, even for i32".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
 // Attempt: the same claim amenable_kani's verify_layout_new_reports_
 // the_types_size_and_alignment harness checks — Layout::new::<i32>()
 // reports size 4, align 4.
@@ -554,18 +595,18 @@ pub assume_specification [Layout::new::<i32>] () -> (result: Layout)
 // fact about the constructor's own validation logic, provable without
 // ever touching size_of/align_of's opacity.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::cell_hidden_state_unreachable_via_plain_assume_specification".to_owned(),
-            title: "Cell<T>'s get/set/replace/take can't be chained: assume_specification only relates one call's own inputs/outputs, never a prior call's effect".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::Unproved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::cell_hidden_state_unreachable_via_plain_assume_specification".to_owned(),
+            "Cell<T>'s get/set/replace/take can't be chained: assume_specification only relates one call's own inputs/outputs, never a prior call's effect".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
 // Attempt: the same claim amenable_kani's verify_cell_get_set_replace_
 // take_round_trip harness checks — new stores the initial value, set
 // overwrites it, replace overwrites it and hands back the old value,
@@ -621,18 +662,18 @@ pub fn verify_cell_round_trip(initial: i32) -> (result: i32)
 // (as it does, differently, for Cell-like PCell) before this becomes
 // provable.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::try_from_slice_phantom_lifetime_binder_and_match_ergonomics".to_owned(),
-            title: "<[T; N]>::try_from(&[T]) needed a phantom outer lifetime binder to match, and a match expression on the result doesn't see the call's own postcondition -- both solved, full claim proved".to_owned(),
-            disposition: VerusGalleryDisposition::BestPractice,
-            expected: VerusGalleryExpectation::Proved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::try_from_slice_phantom_lifetime_binder_and_match_ergonomics".to_owned(),
+            "<[T; N]>::try_from(&[T]) needed a phantom outer lifetime binder to match, and a match expression on the result doesn't see the call's own postcondition -- both solved, full claim proved".to_owned(),
+            VerusGalleryDisposition::BestPractice,
+            VerusGalleryExpectation::Proved,
+            r#"
 // Real claim, now proved in full in amenable_verus::rust_std::
 // try_from_slice_carrier: <[T; N]>::try_from(&[T]) succeeds exactly
 // when the slice's length matches N, round-tripping the elements
@@ -674,18 +715,18 @@ arr[0] == matching[0] && arr[1] == matching[1]  // verifies cleanly
 // prefer let+assert+unwrap over a bare match when the postcondition
 // needs to be visible inside the branch.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::cow_deref_lifetime_elision_ambiguity".to_owned(),
-            title: "Cow<'a, B>::deref can't be axiomatized: spelling the receiver out concretely creates a lifetime ambiguity plain Rust elision can't resolve".to_owned(),
-            disposition: VerusGalleryDisposition::FalseTrail,
-            expected: VerusGalleryExpectation::CompileError,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::cow_deref_lifetime_elision_ambiguity".to_owned(),
+            "Cow<'a, B>::deref can't be axiomatized: spelling the receiver out concretely creates a lifetime ambiguity plain Rust elision can't resolve".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::CompileError,
+            r#"
 // Attempt: the deref half of the claim amenable_kani's
 // verify_cow_borrowed_and_owned_agree_on_their_value harness checks --
 // Cow::Borrowed and Cow::Owned both deref to the wrapped value.
@@ -732,18 +773,18 @@ pub assume_specification<'a, B: ToOwned + ?Sized> [<Cow<'a, B> as core::ops::Der
 // ambiguity at all) -- covering two of the claim's three original
 // facts in full, with only the deref half left uncovered.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    VerusGalleryRegistration {
-        case: || VerusGalleryCase {
-            id: "amenable_std::verus_gallery::cross_file_spec_fn_reuse_gets_real_proof_credit".to_owned(),
-            title: "a pub open spec fn defined in one carrier file, called from a requires clause in a sibling carrier file, verifies for real -- not opaque the way Creusot's cross-module #[logic] calls are".to_owned(),
-            disposition: VerusGalleryDisposition::BestPractice,
-            expected: VerusGalleryExpectation::Proved,
-            claim: r#"
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::cross_file_spec_fn_reuse_gets_real_proof_credit".to_owned(),
+            "a pub open spec fn defined in one carrier file, called from a requires clause in a sibling carrier file, verifies for real -- not opaque the way Creusot's cross-module #[logic] calls are".to_owned(),
+            VerusGalleryDisposition::BestPractice,
+            VerusGalleryExpectation::Proved,
+            r#"
 // Investigated while designing a "single source living with the
 // contract type" mechanism for amenable_core::Requires<VerusVerifier>/
 // Ensures<VerusVerifier> (Kani already reached this: its Bound = bool,
@@ -808,6 +849,6 @@ pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32,
 // executable, provable connection across it, unlike the boundary
 // between a Kani contract type and its own crate's proof sites.
 "#,
-        },
-    }
+        ),
+    )
 }

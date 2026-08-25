@@ -92,9 +92,9 @@ impl WitnessArtifact for LocalEnumProofArtifact {
             ]),
             "entry_kind",
             vec![
-                WitnessArtifactVariant {
-                    name: "Balanced".to_owned(),
-                    artifact: Box::new(WitnessArtifactNode::members(
+                WitnessArtifactVariant::new(
+                    "Balanced".to_owned(),
+                    Box::new(WitnessArtifactNode::with_members(
                         WitnessArtifactShape::NamedVariant,
                         WitnessSupportSummary::compose(&[
                             WitnessSupportSummary::checked_leaf(),
@@ -102,9 +102,9 @@ impl WitnessArtifact for LocalEnumProofArtifact {
                         ]),
                         Some("Balanced".to_owned()),
                         vec![
-                            WitnessArtifactMember {
-                                label: "checked".to_owned(),
-                                artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
+                            WitnessArtifactMember::new(
+                                "checked".to_owned(),
+                                Box::new(WitnessArtifactNode::leaf_with_metadata(
                                     WitnessSupportKind::Checked,
                                     WitnessSupportSummary::checked_leaf(),
                                     "harness: verify_local_enum_evidence_missing_harness",
@@ -116,45 +116,45 @@ impl WitnessArtifact for LocalEnumProofArtifact {
                                         ),
                                     ],
                                 )),
-                            },
-                            WitnessArtifactMember {
-                                label: "trusted".to_owned(),
-                                artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
+                            ),
+                            WitnessArtifactMember::new(
+                                "trusted".to_owned(),
+                                Box::new(WitnessArtifactNode::leaf_with_metadata(
                                     WitnessSupportKind::Trusted,
                                     WitnessSupportSummary::trusted_leaf(),
                                     "authority: Rust Project Developers",
                                     [MetadataEntry::new("authority", "Rust Project Developers")],
                                 )),
-                            },
+                            ),
                         ],
                     )),
-                },
-                WitnessArtifactVariant {
-                    name: "fallback".to_owned(),
-                    artifact: Box::new(WitnessArtifactNode::members(
+                ),
+                WitnessArtifactVariant::new(
+                    "fallback".to_owned(),
+                    Box::new(WitnessArtifactNode::with_members(
                         WitnessArtifactShape::TupleVariant,
                         WitnessSupportSummary::trusted_leaf(),
                         Some("Adjustment".to_owned()),
-                        vec![WitnessArtifactMember {
-                            label: "field_0".to_owned(),
-                            artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
+                        vec![WitnessArtifactMember::new(
+                            "field_0".to_owned(),
+                            Box::new(WitnessArtifactNode::leaf_with_metadata(
                                 WitnessSupportKind::Trusted,
                                 WitnessSupportSummary::trusted_leaf(),
                                 "authority: Rust Project Developers",
                                 [MetadataEntry::new("authority", "Rust Project Developers")],
                             )),
-                        }],
+                        )],
                     )),
-                },
-                WitnessArtifactVariant {
-                    name: "Closed".to_owned(),
-                    artifact: Box::new(WitnessArtifactNode::members(
+                ),
+                WitnessArtifactVariant::new(
+                    "Closed".to_owned(),
+                    Box::new(WitnessArtifactNode::with_members(
                         WitnessArtifactShape::UnitVariant,
                         WitnessSupportSummary::trivial_leaf(),
                         Some("Closed".to_owned()),
                         vec![],
                     )),
-                },
+                ),
             ],
         )
     }
@@ -304,15 +304,15 @@ impl WitnessArtifact for LocalWorkingEnumProofArtifact {
             ]),
             "state",
             vec![
-                WitnessArtifactVariant {
-                    name: "Active".to_owned(),
-                    artifact: Box::new(WitnessArtifactNode::members(
+                WitnessArtifactVariant::new(
+                    "Active".to_owned(),
+                    Box::new(WitnessArtifactNode::with_members(
                         WitnessArtifactShape::NamedVariant,
                         WitnessSupportSummary::checked_leaf(),
                         Some("Active".to_owned()),
-                        vec![WitnessArtifactMember {
-                            label: "checked".to_owned(),
-                            artifact: Box::new(WitnessArtifactNode::leaf_with_metadata(
+                        vec![WitnessArtifactMember::new(
+                            "checked".to_owned(),
+                            Box::new(WitnessArtifactNode::leaf_with_metadata(
                                 WitnessSupportKind::Checked,
                                 WitnessSupportSummary::checked_leaf(),
                                 "harness: verify_shape_override",
@@ -321,18 +321,18 @@ impl WitnessArtifact for LocalWorkingEnumProofArtifact {
                                     MetadataEntry::new("harness", "verify_shape_override"),
                                 ],
                             )),
-                        }],
+                        )],
                     )),
-                },
-                WitnessArtifactVariant {
-                    name: "Idle".to_owned(),
-                    artifact: Box::new(WitnessArtifactNode::members(
+                ),
+                WitnessArtifactVariant::new(
+                    "Idle".to_owned(),
+                    Box::new(WitnessArtifactNode::with_members(
                         WitnessArtifactShape::UnitVariant,
                         WitnessSupportSummary::trivial_leaf(),
                         Some("Idle".to_owned()),
                         vec![],
                     )),
-                },
+                ),
             ],
         )
     }
