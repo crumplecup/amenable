@@ -3,7 +3,7 @@ use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 #[test]
 fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
-        .map(|registration| (registration.case)())
+        .map(|registration| (registration.case())())
         .collect();
 
     assert_eq!(
@@ -12,14 +12,14 @@ fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
         "expected exactly the 28 findings from this session's real pipeline work: {cases:#?}"
     );
 
-    let mut ids: Vec<&str> = cases.iter().map(|case| case.id.as_str()).collect();
+    let mut ids: Vec<&str> = cases.iter().map(|case| case.id().as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
     assert_eq!(ids.len(), 28, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
-        .filter(|case| case.expected == CreusotGalleryExpectation::Ice)
+        .filter(|case| case.expected() == CreusotGalleryExpectation::Ice)
         .count();
     assert_eq!(
         ice_count, 2,
@@ -28,7 +28,7 @@ fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
 
     let translation_error_count = cases
         .iter()
-        .filter(|case| case.expected == CreusotGalleryExpectation::TranslationError)
+        .filter(|case| case.expected() == CreusotGalleryExpectation::TranslationError)
         .count();
     assert_eq!(
         translation_error_count, 21,
@@ -37,7 +37,7 @@ fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
 
     let unproved_count = cases
         .iter()
-        .filter(|case| case.expected == CreusotGalleryExpectation::Unproved)
+        .filter(|case| case.expected() == CreusotGalleryExpectation::Unproved)
         .count();
     assert_eq!(
         unproved_count, 3,
@@ -46,7 +46,7 @@ fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
 
     let proved_count = cases
         .iter()
-        .filter(|case| case.expected == CreusotGalleryExpectation::Proved)
+        .filter(|case| case.expected() == CreusotGalleryExpectation::Proved)
         .count();
     assert_eq!(
         proved_count, 2,
@@ -58,10 +58,10 @@ fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
 
     for case in &cases {
         assert!(
-            !case.claim.trim().is_empty(),
+            !case.claim().trim().is_empty(),
             "{} has an empty claim",
-            case.id
+            case.id()
         );
-        assert!(!case.title.is_empty(), "{} has an empty title", case.id);
+        assert!(!case.title().is_empty(), "{} has an empty title", case.id());
     }
 }

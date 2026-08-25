@@ -111,40 +111,81 @@ impl CreusotGalleryExpectation {
 /// Unlike `amenable_kani::KaniGalleryCase`, there's no `harness`/`package`
 /// pair to select and run — see the module doc comment for why these
 /// aren't live, independently invocable proofs.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
+)]
 pub struct CreusotGalleryCase {
     /// Stable, fully-qualified gallery-case identifier.
-    pub id: String,
+    id: String,
     /// Short human-facing summary of what the case demonstrates.
-    pub title: String,
+    title: String,
     /// Whether the case is a hypothesis, a false trail, or a best practice.
-    pub disposition: CreusotGalleryDisposition,
+    #[getter(copy)]
+    disposition: CreusotGalleryDisposition,
     /// The `creusot-rustc`/`why3find` outcome this case documents.
-    pub expected: CreusotGalleryExpectation,
+    #[getter(copy)]
+    expected: CreusotGalleryExpectation,
     /// The reduced repro (or, for `BestPractice` cases, the working
     /// alternative) as real Rust/Pearlite source — verbatim, not a
     /// paraphrase — plus a trailing note citing the actual diagnostic
     /// observed, so this can't silently drift into an unverified claim.
-    pub claim: &'static str,
+    ///
+    /// Hand-written getter, not `#[getter(copy)]`: confirmed via
+    /// `cargo expand` elsewhere in this workspace that `#[getter(copy)]`
+    /// on a `&'static` field generates a `&'static self` receiver, which
+    /// breaks calls through a non-`'static`, short-lived `self` (as every
+    /// real `CreusotGalleryCase` instance here is -- built owned inside a
+    /// closure, not held as `&'static`).
+    #[getter(skip)]
+    claim: &'static str,
+}
+
+impl CreusotGalleryCase {
+    /// The reduced repro/working-alternative source. See the field's own
+    /// doc comment for why this getter is hand-written.
+    #[must_use]
+    pub const fn claim(&self) -> &'static str {
+        self.claim
+    }
 }
 
 /// Static registration that constructs an owned [`CreusotGalleryCase`] on
 /// demand.
+///
+/// Hand-written `const fn new`/getter, not derived: this record is itself
+/// passed to `inventory::submit!`, which requires a `const`-evaluable
+/// value, and `derive_new::new` cannot generate a `const fn`.
+/// `CreusotGalleryCase` itself has no such requirement -- it's built at call
+/// time inside the stored closure, not at registration time -- so it uses
+/// the ordinary derives above.
 pub struct CreusotGalleryRegistration {
+    case: fn() -> CreusotGalleryCase,
+}
+
+impl CreusotGalleryRegistration {
+    /// Register a proof-gallery case constructor.
+    #[must_use]
+    pub const fn new(case: fn() -> CreusotGalleryCase) -> Self {
+        Self { case }
+    }
+
     /// Construct this registration's proof-gallery descriptor.
-    pub case: fn() -> CreusotGalleryCase,
+    #[must_use]
+    pub const fn case(&self) -> fn() -> CreusotGalleryCase {
+        self.case
+    }
 }
 
 inventory::collect!(CreusotGalleryRegistration);
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::rpitit_panics_intrinsics_gathering".to_owned(),
-            title: "a local return-position impl Trait method panics creusot-rustc's intrinsics-gathering pass".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::Ice,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::rpitit_panics_intrinsics_gathering".to_owned(),
+            "a local return-position impl Trait method panics creusot-rustc's intrinsics-gathering pass".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Ice,
+            r#"
 // Reduced repro (this exact shape lived in amenable_creusot::witness before
 // the fix — see amenable_core::Provenance's own doc comment):
 trait Provenance {
@@ -173,18 +214,18 @@ impl Provenance for CreusotVerifierMetadata {
 // = MetadataEntry>; fn metadata(&self) -> Self::MetadataIter;`) — an
 // ordinary named item, not an opaque one. See amenable_core::Provenance.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::inventory_submit_static_is_unsupported".to_owned(),
-            title: "::inventory::submit!'s generated static item can't be translated".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::inventory_submit_static_is_unsupported".to_owned(),
+            "::inventory::submit!'s generated static item can't be translated".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Reduced repro (this exact shape lived in amenable_creusot::rust_std
 // before the fix — the ProofRecord registrations that now live in
 // amenable_std::creusot_witness instead):
@@ -212,18 +253,18 @@ impl Provenance for CreusotVerifierMetadata {
 // RustStdStandard<T>, not the verifier marker, is the local type there.
 // amenable_creusot now contains zero inventory calls.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors".to_owned(),
-            title: "#[cfg(not(creusot))]-gating inventory::collect!/submit! and Box<dyn Iterator<..>> avoids both translator errors entirely -- confirmed in an isolated probe crate, not assumed from the earlier crate-split fix".to_owned(),
-            disposition: CreusotGalleryDisposition::BestPractice,
-            expected: CreusotGalleryExpectation::Proved,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::cfg_not_creusot_gating_avoids_the_inventory_and_dyn_iterator_errors".to_owned(),
+            "#[cfg(not(creusot))]-gating inventory::collect!/submit! and Box<dyn Iterator<..>> avoids both translator errors entirely -- confirmed in an isolated probe crate, not assumed from the earlier crate-split fix".to_owned(),
+            CreusotGalleryDisposition::BestPractice,
+            CreusotGalleryExpectation::Proved,
+            r#"
 // The `inventory_submit_static_is_unsupported` case above (and this
 // crate's own historical split of witness-bridge code out of
 // amenable_creusot into amenable_std) concluded "any use of inventory
@@ -290,18 +331,18 @@ impl HasIter for Boxed {
 // worth real consideration next time this class of tradeoff comes up,
 // not assumed away by this gallery's own earlier, narrower test.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::char_as_u32_cast_is_unsupported".to_owned(),
-            title: "`c as u32` isn't a supported cast in Pearlite logic context; use the `@` View operator".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::char_as_u32_cast_is_unsupported".to_owned(),
+            "`c as u32` isn't a supported cast in Pearlite logic context; use the `@` View operator".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact clause was in amenable_creusot::rust_std's char
 // contract before the fix):
 #[ensures((c as u32) <= 0xD7FFu32 || ((c as u32) >= 0xE000u32 && (c as u32) <= 0x10FFFFu32))]
@@ -320,18 +361,18 @@ fn verify_char_roundtrip(c: char) -> char { c }
 // way to reach a char's ordinal value in logic context, not a program-level
 // cast.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::string_len_in_logic_context_is_unsupported".to_owned(),
-            title: "`s.len()` can't be called directly inside #[ensures]; wrap it in a #[trusted] #[logic(opaque)] accessor".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::string_len_in_logic_context_is_unsupported".to_owned(),
+            "`s.len()` can't be called directly inside #[ensures]; wrap it in a #[trusted] #[logic(opaque)] accessor".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form:
 #[ensures(result.len() == s.len())]
 fn verify_string_roundtrip(s: String) -> String { s }
@@ -355,18 +396,18 @@ fn verify_string_roundtrip(s: String) -> String { s }
 // relationship (never proven, just asserted) so the real method becomes
 // referenceable from logic context at all.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::boxed_dyn_iterator_is_unsupported".to_owned(),
-            title: "Box<dyn Iterator<...>> has \"currently minimal\" dyn support in creusot-rustc".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::boxed_dyn_iterator_is_unsupported".to_owned(),
+            "Box<dyn Iterator<...>> has \"currently minimal\" dyn support in creusot-rustc".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact shape was amenable_creusot::witness's own
 // Provenance impl before the fix — and is still the shape every OTHER
 // verifier backend's own equivalent impl uses, in amenable_kani/
@@ -396,18 +437,18 @@ fn metadata(&self) -> Self::MetadataIter {
 // Iterator<...>>` is the right, general answer (see
 // amenable_core::provenance's impl_scalar_provenance! macro).
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::partial_eq_derive_requires_deep_model".to_owned(),
-            title: "deriving PartialEq (and so Eq/PartialOrd/Ord) requires a DeepModel impl under real translation".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::partial_eq_derive_requires_deep_model".to_owned(),
+            "deriving PartialEq (and so Eq/PartialOrd/Ord) requires a DeepModel impl under real translation".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact derive list was amenable_creusot::witness's
 // CreusotVerifierMetadata before the fix — CLAUDE.md's own standard
 // derive policy for data structures, applied uniformly to a marker type
@@ -433,18 +474,18 @@ pub struct CreusotVerifierMetadata;
 // + Default; nothing compares two CreusotVerifierMetadata values anywhere
 // in this workspace) before dropping them, not as a blanket rule.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::check_ghost_extern_spec_methods_are_still_program_functions".to_owned(),
-            title: "creusot-std's own #[check(ghost)] extern_spec methods can't be called inside #[ensures] either".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::check_ghost_extern_spec_methods_are_still_program_functions".to_owned(),
+            "creusot-std's own #[check(ghost)] extern_spec methods can't be called inside #[ensures] either".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact shape was in amenable_creusot::rust_std's
 // Duration contract before the fix — calling creusot-std's own trusted
 // extern_spec methods for Duration::as_secs/subsec_nanos directly inside
@@ -484,18 +525,18 @@ fn verify_duration_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: 
 // stated in, so this proves the same underlying fact their (untouchable)
 // contracts would give, without ever invoking the methods themselves.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::nonzero_new_extern_spec_needs_a_sealed_unstable_trait_bound".to_owned(),
-            title: "extern_spec!-ing NonZero<T>::new isn't practical: it needs the sealed, unstable ZeroablePrimitive bound".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::nonzero_new_extern_spec_needs_a_sealed_unstable_trait_bound".to_owned(),
+            "extern_spec!-ing NonZero<T>::new isn't practical: it needs the sealed, unstable ZeroablePrimitive bound".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact shape was in amenable_creusot::rust_std before
 // the fix — an extern_spec targeting the concrete NonZero<i16> alone,
 // bypassing the generic std::num::NonZero<T>::new):
@@ -538,18 +579,18 @@ fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
     NonZero::new(value)
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::uncontracted_calls_poison_the_whole_goal_not_just_logic_context".to_owned(),
-            title: "an uncontracted external call anywhere in a harness body blocks the goal, not just calls inside #[ensures]".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::Unproved,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::uncontracted_calls_poison_the_whole_goal_not_just_logic_context".to_owned(),
+            "an uncontracted external call anywhere in a harness body blocks the goal, not just calls inside #[ensures]".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Unproved,
+            r#"
 // Failing form (this exact shape was in amenable_creusot::rust_std before
 // the fix — the postcondition matches the (o, result) PAIR structurally,
 // never calling .reverse() inside #[ensures], which was expected to route
@@ -599,18 +640,18 @@ extern_spec! {
     }
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::view_operator_needs_pearlite_macro_outside_attributes".to_owned(),
-            title: "the @ View operator only parses inside #[requires]/#[ensures]; a #[logic] function body needs pearlite! {} to use it".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::view_operator_needs_pearlite_macro_outside_attributes".to_owned(),
+            "the @ View operator only parses inside #[requires]/#[ensures]; a #[logic] function body needs pearlite! {} to use it".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact shape was attempted while writing
 // amenable_creusot::rust_std's IntErrorKind contract — a plain #[logic]
 // helper function using `@` directly in its body, the same operator
@@ -644,18 +685,18 @@ fn is_ascii_digit(c: char) -> bool {
     pearlite! { c@ >= 48 && c@ <= 57 }
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::str_parse_is_a_distinct_uncontracted_wrapper_around_from_str".to_owned(),
-            title: "extern_spec-ing FromStr::from_str doesn't cover calls through str::parse<F>, a separate generic wrapper method".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::str_parse_is_a_distinct_uncontracted_wrapper_around_from_str".to_owned(),
+            "extern_spec-ing FromStr::from_str doesn't cover calls through str::parse<F>, a separate generic wrapper method".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact call shape was in amenable_creusot::rust_std's
 // IntErrorKind harness before the fix — calling through the ordinary,
 // idiomatic `.parse()` method, after already giving `<i32 as
@@ -692,18 +733,18 @@ fn verify_int_error_kind_classifies_parse_failures() -> ... {
     )
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::f64_has_no_view_impl_at_all".to_owned(),
-            title: "f64/f32 have no View impl in creusot-std, so `self@` is unavailable for any float postcondition".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::f64_has_no_view_impl_at_all".to_owned(),
+            "f64/f32 have no View impl in creusot-std, so `self@` is unavailable for any float postcondition".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Attempted while investigating FpCategory coverage (a candidate contract
 // for f64::classify(), the same idiom every other extern_spec in this
 // crate uses for its own input — `self@` to reach an arbitrary-precision
@@ -732,18 +773,18 @@ extern_spec! {
 // to reach an arbitrary-precision numeric value the way every other
 // harness in this crate does for its own inputs.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::float_literals_in_pearlite_ice_the_compiler".to_owned(),
-            title: "a plain float literal (e.g. 0.0) inside #[ensures]/#[requires] panics creusot-rustc outright, not just an unsupported-construct error".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::Ice,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::float_literals_in_pearlite_ice_the_compiler".to_owned(),
+            "a plain float literal (e.g. 0.0) inside #[ensures]/#[requires] panics creusot-rustc outright, not just an unsupported-construct error".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Ice,
+            r#"
 // Attempted next, after `f64_has_no_view_impl_at_all` ruled out `@`:
 // compare the plain (non-View) f64 value directly, the same way `.0` field
 // projections in the Wrapping/Saturating contracts compare plain i32s:
@@ -788,18 +829,18 @@ extern_spec! {
 // applies to Pearlite literal kinds more broadly than just floats; only
 // integer/bool/char literals are confirmed to translate.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::parse_float_error_extern_spec_translates_but_wont_discharge".to_owned(),
-            title: "a real, char/int-literal-only extern_spec for FromStr for f64 translates cleanly but why3find's automatic strategy won't discharge the goal against it".to_owned(),
-            disposition: CreusotGalleryDisposition::Hypothesis,
-            expected: CreusotGalleryExpectation::Unproved,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::parse_float_error_extern_spec_translates_but_wont_discharge".to_owned(),
+            "a real, char/int-literal-only extern_spec for FromStr for f64 translates cleanly but why3find's automatic strategy won't discharge the goal against it".to_owned(),
+            CreusotGalleryDisposition::Hypothesis,
+            CreusotGalleryExpectation::Unproved,
+            r#"
 // Attempted after `f64_has_no_view_impl_at_all`/
 // `float_literals_in_pearlite_ice_the_compiler` ruled out `@` and float
 // literals: ParseFloatError's own claim never needs a float VALUE (only
@@ -868,18 +909,18 @@ fn verify_parse_float_error_occurs_only_for_unparseable_input() -> (...) {
     )
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::derefs_own_postcondition_cant_reference_self_via_deref".to_owned(),
-            title: "*self inside deref's OWN #[ensures] yields Self, not Target -- circular, and a real type error".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::derefs_own_postcondition_cant_reference_self_via_deref".to_owned(),
+            "*self inside deref's OWN #[ensures] yields Self, not Target -- circular, and a real type error".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (attempted while writing ManuallyDrop<T>'s extern_spec —
 // ManuallyDrop's own field is private, so there's no `.0` to compare
 // against the way Wrapping/Saturating/Reverse's postconditions do):
@@ -924,18 +965,18 @@ extern_spec! {
 // to "what deref/into_inner return" without ever needing `*self` inside
 // deref's own contract.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::fn_pointer_calls_are_unsupported".to_owned(),
-            title: "calling through a plain fn pointer is rejected as an unsupported function call type".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::fn_pointer_calls_are_unsupported".to_owned(),
+            "calling through a plain fn pointer is rejected as an unsupported function call type".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (attempted while adding Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>):
 #[ensures(result == value)]
@@ -965,18 +1006,18 @@ fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
 // while the gallery preserves the exact translator limitation that blocked
 // a real call-through proof.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::atomic_sc_empty_callbacks_leave_the_store_load_relation_unproved".to_owned(),
-            title: "atomic_sc callbacks must shoot the committer permission; empty callbacks translate but leave the store/load relation unproved".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::Unproved,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::atomic_sc_empty_callbacks_leave_the_store_load_relation_unproved".to_owned(),
+            "atomic_sc callbacks must shoot the committer permission; empty callbacks translate but leave the store/load relation unproved".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Unproved,
+            r#"
 // Failing form (attempted first while adding direct Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<AtomicBool> and the rest of
 // core::sync::atomic):
@@ -1021,18 +1062,18 @@ let observed_next = atomic.load(ghost!(
 // `atomic_sc` is usable, but only if the ghost callback actually "shoots"
 // the committer against the permission token returned by `new`.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::borrowed_slice_chunk_iterators_lack_creusot_contracts".to_owned(),
-            title: "borrowed slice chunk/window iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::borrowed_slice_chunk_iterators_lack_creusot_contracts".to_owned(),
+            "borrowed slice chunk/window iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (attempted while adding direct Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<Chunks<'static, i32>> and the
 // related ChunksExact/ChunksMut/ChunksExactMut/Windows carriers):
@@ -1102,18 +1143,18 @@ impl CreusotWitness for RustStdStandard<Chunks<'static, i32>> {
 // ChunksExactMut, and Windows until creusot-std grows the missing
 // contracts and creusot-rustc stops ICE-ing on the slice-pattern route.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::borrowed_slice_reverse_chunk_iterators_lack_creusot_contracts".to_owned(),
-            title: "borrowed reverse chunk iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::borrowed_slice_reverse_chunk_iterators_lack_creusot_contracts".to_owned(),
+            "borrowed reverse chunk iterators still need trusted boundaries because creusot-std lacks the direct contracts".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (attempted while adding direct Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<RChunks<'static, i32>> and the
 // related RChunksExact/RChunksExactMut/RChunksMut carriers):
@@ -1194,18 +1235,18 @@ impl CreusotWitness for RustStdStandard<RChunks<'static, i32>> {
 // The same trusted boundary is used for RChunksExact, RChunksExactMut, and
 // RChunksMut until creusot-std grows the missing contracts.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::slice_predicate_iterators_lack_creusot_iterator_contracts".to_owned(),
-            title: "slice predicate carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::slice_predicate_iterators_lack_creusot_iterator_contracts".to_owned(),
+            "slice predicate carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (representative probes run while adding direct Creusot
 // coverage for the remaining predicate-driven slice carriers in
 // amenable_std::rust_std):
@@ -1287,18 +1328,18 @@ impl CreusotWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> 
 // RSplitN, RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut,
 // SplitN, and SplitNMut until creusot-std grows the missing contracts.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::str_iterators_lack_creusot_iterator_contracts".to_owned(),
-            title: "core::str iterator carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::str_iterators_lack_creusot_iterator_contracts".to_owned(),
+            "core::str iterator carriers still need trusted boundaries because creusot-std lacks both method contracts and IteratorSpec for them".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (representative probes run while assessing whether the
 // remaining `core::str` carriers in amenable_std::rust_std::str could be
 // moved from trusted witnesses to direct Creusot proofs):
@@ -1388,18 +1429,18 @@ impl CreusotWitness for RustStdStandard<std::str::Bytes<'static>> {
 // The same trusted boundary is used for the rest of the `core::str`
 // iterator family until creusot-std grows the missing contracts.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::slice_escape_ascii_lacks_creusot_iterator_contracts".to_owned(),
-            title: "slice escape_ascii still needs a trusted boundary because creusot-std has neither iterator contracts nor stable byte-literal ergonomics for the direct proof".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::slice_escape_ascii_lacks_creusot_iterator_contracts".to_owned(),
+            "slice escape_ascii still needs a trusted boundary because creusot-std has neither iterator contracts nor stable byte-literal ergonomics for the direct proof".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (attempted while adding direct Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<EscapeAscii<'static>>):
 #[ensures(match result {
@@ -1462,18 +1503,18 @@ impl CreusotWitness for RustStdStandard<EscapeAscii<'static>> {
     }
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::get_disjoint_mut_without_a_contract_can_appear_proved_but_is_still_unusable".to_owned(),
-            title: "get_disjoint_mut can appear proved under Creusot even though the call is contractless and therefore not acceptable proof evidence".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::Proved,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::get_disjoint_mut_without_a_contract_can_appear_proved_but_is_still_unusable".to_owned(),
+            "get_disjoint_mut can appear proved under Creusot even though the call is contractless and therefore not acceptable proof evidence".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Proved,
+            r#"
 // Failing form (attempted while adding direct Creusot coverage for
 // amenable_std::rust_std::RustStdStandard<GetDisjointMutError>):
 #[ensures(match result {
@@ -1516,20 +1557,20 @@ impl CreusotWitness for RustStdStandard<GetDisjointMutError> {
     }
 }
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::bare_integer_literal_comparison_is_unsupported"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::bare_integer_literal_comparison_is_unsupported"
                 .to_owned(),
-            title: "Comparing an exec-typed integer to a bare literal in a contract needs the `@` View operator on both sides"
+            "Comparing an exec-typed integer to a bare literal in a contract needs the `@` View operator on both sides"
                 .to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Failing form (this exact shape was in amenable_creusot::rust_std's argv
 // accommodation model, and separately in its std::os::windows Handle/
 // EncodeWide models, before the fix -- same root cause, three sites):
@@ -1562,18 +1603,18 @@ fn verify_args_reports_at_least_the_program_path(extra: usize) -> (usize, usize)
 // `usize`: the same fix applies to `isize`/`u64`/`u32`/any integer type
 // compared against a bare literal in logic context.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::binary_heap_has_no_local_fix_either".to_owned(),
-            title: "creusot-std ships no BinaryHeap contracts, and a downstream crate can't add a View for it either -- resolved with an accommodation model instead of extending the real type".to_owned(),
-            disposition: CreusotGalleryDisposition::BestPractice,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::binary_heap_has_no_local_fix_either".to_owned(),
+            "creusot-std ships no BinaryHeap contracts, and a downstream crate can't add a View for it either -- resolved with an accommodation model instead of extending the real type".to_owned(),
+            CreusotGalleryDisposition::BestPractice,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Attempted fix for amenable_creusot::rust_std's five #[trusted]
 // BinaryHeap<i32> proofs (verify_binary_heap_{pop,drain,into_iter,iter,
 // peek_mut}_...): give BinaryHeap<i32> a real View (the `@` operator's
@@ -1659,20 +1700,20 @@ impl creusot_std::model::View for std::collections::BinaryHeap<i32> {
 // confirmed above), and an accommodation model was the actual way
 // through, not just the fallback if nothing better turned up.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::try_reserve_error_is_not_publicly_constructible"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::try_reserve_error_is_not_publicly_constructible"
                 .to_owned(),
-            title: "TryReserveError has no public constructor, so it blocks even the accommodation-model escape hatch that fixed HashMap/BinaryHeap/LinkedList"
+            "TryReserveError has no public constructor, so it blocks even the accommodation-model escape hatch that fixed HashMap/BinaryHeap/LinkedList"
                 .to_owned(),
-            disposition: CreusotGalleryDisposition::BestPractice,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+            CreusotGalleryDisposition::BestPractice,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // amenable_creusot::rust_std::verify_try_reserve_rejects_an_impossible_capacity
 // stayed #[trusted] after the HashMap/HashSet/LinkedList/VecDeque/Result-iterator
 // accommodation-model sweep that resolved every other "creusot-std has no
@@ -1705,18 +1746,18 @@ impl creusot_std::model::View for std::collections::BinaryHeap<i32> {
 // same accommodation-model conversion and re-discover the same
 // non-constructible-type blocker.
 "#,
-        },
-    }
+        ),
+    )
 }
 
 ::inventory::submit! {
-    CreusotGalleryRegistration {
-        case: || CreusotGalleryCase {
-            id: "amenable_std::creusot_gallery::macro_invocation_inside_an_attribute_is_never_pre_expanded".to_owned(),
-            title: "a macro_rules! invocation inside #[requires(...)]'s argument position is not expanded before Creusot's own Pearlite parser sees it".to_owned(),
-            disposition: CreusotGalleryDisposition::FalseTrail,
-            expected: CreusotGalleryExpectation::TranslationError,
-            claim: r#"
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::macro_invocation_inside_an_attribute_is_never_pre_expanded".to_owned(),
+            "a macro_rules! invocation inside #[requires(...)]'s argument position is not expanded before Creusot's own Pearlite parser sees it".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::TranslationError,
+            r#"
 // Investigated as part of the same "single source living with the
 // contract type" effort as amenable_std::verus_gallery's
 // cross_file_spec_fn_reuse_gets_real_proof_credit case: if a bound's
@@ -1768,6 +1809,6 @@ fn probe_macro_nesting_in_attribute_position(value: i32) -> i32 {
 // step (before rustc ever parses either file), not as a macro nested
 // inside Creusot's own attribute-position parsing.
 "#,
-        },
-    }
+        ),
+    )
 }
