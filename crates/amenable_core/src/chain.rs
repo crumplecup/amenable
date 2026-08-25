@@ -315,9 +315,9 @@ pub fn proof_chain_for_verifiers(
     let links: Vec<&EvidenceLink> = inventory::iter::<EvidenceLink>().collect();
     let root_name = links
         .iter()
-        .find(|link| link.name.ends_with(subject))
+        .find(|link| link.name().ends_with(subject))
         .ok_or_else(|| ChainError::not_found(subject))?
-        .name;
+        .name();
     let mut visiting = HashSet::new();
     let full_root = build_node(root_name, &links, &mut visiting);
 
@@ -370,17 +370,17 @@ fn build_node(
 
     if visiting.insert(name) {
         let mut matching: Vec<&&EvidenceLink> =
-            links.iter().filter(|link| link.name == name).collect();
+            links.iter().filter(|link| link.name() == name).collect();
         // `inventory`'s iteration order isn't guaranteed to match
         // registration order, so a calculation's arguments could otherwise
         // come out in an arbitrary order rather than `add(a, b)`'s a-then-b.
-        matching.sort_by_key(|link| link.index);
+        matching.sort_by_key(|link| link.index());
 
         for link in matching {
             // A root registers a link to itself; that's a marker, not a
             // real basis to recurse into.
-            if link.basis != link.name {
-                bases.push(build_node(link.basis, links, visiting));
+            if link.basis() != link.name() {
+                bases.push(build_node(link.basis(), links, visiting));
             }
         }
         visiting.remove(name);

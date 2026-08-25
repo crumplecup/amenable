@@ -13,8 +13,8 @@ where
     let type_name = std::any::type_name::<F>();
     let basis = inventory::iter::<EvidenceLink>()
         .into_iter()
-        .find(|link| link.name == type_name)
-        .map(|link| link.basis);
+        .find(|link| link.name() == type_name)
+        .map(|link| link.basis());
 
     assert_eq!(
         basis,

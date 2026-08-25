@@ -425,9 +425,9 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
     let dump = RegistryDump {
         evidence_links: inventory::iter::<amenable::EvidenceLink>()
             .map(|link| EvidenceLinkDump {
-                name: link.name.to_owned(),
-                basis: link.basis.to_owned(),
-                index: link.index,
+                name: link.name().to_owned(),
+                basis: link.basis().to_owned(),
+                index: link.index(),
             })
             .collect(),
         proof_records: inventory::iter::<amenable::ProofRecord>()

@@ -224,11 +224,11 @@ macro_rules! register_rust_std_standard_evidence {
     ($($ty:ty),* $(,)?) => {
         $(
             inventory::submit! {
-                amenable_core::EvidenceLink {
-                    name: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                    basis: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                    index: 0,
-                }
+                amenable_core::EvidenceLink::new(
+                    concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                    0,
+                )
             }
         )*
     };

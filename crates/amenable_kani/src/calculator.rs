@@ -46,11 +46,11 @@ impl Provenance for Debit {
 }
 
 ::inventory::submit! {
-    ::amenable_core::EvidenceLink {
-        name: concat!(module_path!(), "::", stringify!(Debit)),
-        basis: "amenable_std::rust_std::RustStdStandard<i64>",
-        index: 0,
-    }
+    ::amenable_core::EvidenceLink::new(
+        concat!(module_path!(), "::", stringify!(Debit)),
+        "amenable_std::rust_std::RustStdStandard<i64>",
+        0,
+    )
 }
 
 /// Access proof for [`Debit`]: nothing statically guarantees a private
@@ -119,11 +119,11 @@ impl Provenance for Credit {
 }
 
 ::inventory::submit! {
-    ::amenable_core::EvidenceLink {
-        name: concat!(module_path!(), "::", stringify!(Credit)),
-        basis: "amenable_std::rust_std::RustStdStandard<i64>",
-        index: 0,
-    }
+    ::amenable_core::EvidenceLink::new(
+        concat!(module_path!(), "::", stringify!(Credit)),
+        "amenable_std::rust_std::RustStdStandard<i64>",
+        0,
+    )
 }
 
 /// Access proof for [`Credit`] — see [`Debit`]'s impl for the rationale.

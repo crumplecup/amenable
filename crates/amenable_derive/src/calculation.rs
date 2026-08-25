@@ -125,11 +125,11 @@ pub fn expand_calculation(args: &CalculationArgs, input: &ItemFn) -> syn::Result
     let evidence_link_registrations = param_types.iter().enumerate().map(|(index, param_ty)| {
         quote! {
             ::inventory::submit! {
-                ::amenable_core::EvidenceLink {
-                    name: concat!(module_path!(), "::", stringify!(#evidence_name)),
-                    basis: concat!(module_path!(), "::", stringify!(#param_ty)),
-                    index: #index,
-                }
+                ::amenable_core::EvidenceLink::new(
+                    concat!(module_path!(), "::", stringify!(#evidence_name)),
+                    concat!(module_path!(), "::", stringify!(#param_ty)),
+                    #index,
+                )
             }
         }
     });

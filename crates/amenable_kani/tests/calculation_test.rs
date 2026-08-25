@@ -38,14 +38,14 @@ fn add_evidence_chain_walks_back_through_the_tuple_to_std_i64() {
 #[test]
 fn add_evidence_links_fan_out_one_per_argument() {
     let links: Vec<_> = inventory::iter::<EvidenceLink>()
-        .filter(|link| link.name.ends_with("AddEvidence"))
+        .filter(|link| link.name().ends_with("AddEvidence"))
         .collect();
 
     // Two arguments (Debit, Credit) means two separate links sharing the
     // same name, not one link naming a composite tuple basis.
     assert_eq!(links.len(), 2);
-    assert!(links.iter().any(|link| link.basis.ends_with("Debit")));
-    assert!(links.iter().any(|link| link.basis.ends_with("Credit")));
+    assert!(links.iter().any(|link| link.basis().ends_with("Debit")));
+    assert!(links.iter().any(|link| link.basis().ends_with("Credit")));
 }
 
 #[test]

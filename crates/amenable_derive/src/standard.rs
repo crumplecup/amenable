@@ -88,11 +88,11 @@ pub fn expand_standard(input: &DeriveInput) -> syn::Result<TokenStream> {
     let evidence_link_registration = if is_root && input.generics.params.is_empty() {
         quote! {
             ::inventory::submit! {
-                ::amenable_core::EvidenceLink {
-                    name: concat!(module_path!(), "::", stringify!(#name)),
-                    basis: concat!(module_path!(), "::", stringify!(#name)),
-                    index: 0,
-                }
+                ::amenable_core::EvidenceLink::new(
+                    concat!(module_path!(), "::", stringify!(#name)),
+                    concat!(module_path!(), "::", stringify!(#name)),
+                    0,
+                )
             }
         }
     } else {

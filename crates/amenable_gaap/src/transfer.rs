@@ -267,17 +267,17 @@ impl Provenance for Rejected<Validated> {
 // register under) -- manual registration for each concrete
 // instantiation, per that derive's own documented precedent.
 ::inventory::submit! {
-    ::amenable_core::EvidenceLink {
-        name: concat!(module_path!(), "::Rejected<Pending>"),
-        basis: concat!(module_path!(), "::Rejected<Pending>"),
-        index: 0,
-    }
+    ::amenable_core::EvidenceLink::new(
+        concat!(module_path!(), "::Rejected<Pending>"),
+        concat!(module_path!(), "::Rejected<Pending>"),
+        0,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::EvidenceLink {
-        name: concat!(module_path!(), "::Rejected<Validated>"),
-        basis: concat!(module_path!(), "::Rejected<Validated>"),
-        index: 0,
-    }
+    ::amenable_core::EvidenceLink::new(
+        concat!(module_path!(), "::Rejected<Validated>"),
+        concat!(module_path!(), "::Rejected<Validated>"),
+        0,
+    )
 }
