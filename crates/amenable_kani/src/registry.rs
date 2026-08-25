@@ -5,14 +5,25 @@
 /// This record is a catalog entry, not a verification result. It says which
 /// proof Kani can run; the CLI's CSV ledger records whether a particular run
 /// later passed, failed, or timed out.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    derive_getters::Getters,
+    derive_getters::Dissolve,
+    derive_new::new,
+)]
 pub struct KaniProof {
     /// Stable, fully-qualified proof identifier.
-    pub id: String,
+    id: String,
     /// Exact Kani harness selector.
-    pub harness: String,
+    harness: String,
     /// Cargo package containing the library target that defines this harness.
-    pub package: String,
+    package: String,
 }
 
 /// Static registration that constructs an owned [`KaniProof`] on discovery.
@@ -20,9 +31,29 @@ pub struct KaniProof {
 /// `inventory` entries must be static, so the registration holds only a
 /// function pointer. The CLI calls it to obtain owned strings; no proof data
 /// is represented by `&'static str` fields.
+///
+/// Hand-written `const fn new`/getter, not derived: this record is itself
+/// passed to `inventory::submit!`, which requires a `const`-evaluable
+/// value, and `derive_new::new` cannot generate a `const fn`. `KaniProof`
+/// itself has no such requirement -- it's built at call time inside the
+/// stored closure, not at registration time -- so it uses the ordinary
+/// derives above.
 pub struct KaniProofRegistration {
+    proof: fn() -> KaniProof,
+}
+
+impl KaniProofRegistration {
+    /// Register an executable Kani proof harness constructor.
+    #[must_use]
+    pub const fn new(proof: fn() -> KaniProof) -> Self {
+        Self { proof }
+    }
+
     /// Construct this registration's executable Kani proof descriptor.
-    pub proof: fn() -> KaniProof,
+    #[must_use]
+    pub const fn proof(&self) -> fn() -> KaniProof {
+        self.proof
+    }
 }
 
 inventory::collect!(KaniProofRegistration);

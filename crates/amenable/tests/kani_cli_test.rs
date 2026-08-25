@@ -11,11 +11,11 @@ use miette::{IntoDiagnostic, WrapErr};
 
 #[test]
 fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
-    let record = KaniProof {
-        id: "amenable_kani::calculator::verify_debit_access_preserves_value".to_owned(),
-        harness: "calculator::verify_debit_access_preserves_value".to_owned(),
-        package: "amenable_kani".to_owned(),
-    };
+    let record = KaniProof::new(
+        "amenable_kani::calculator::verify_debit_access_preserves_value".to_owned(),
+        "calculator::verify_debit_access_preserves_value".to_owned(),
+        "amenable_kani".to_owned(),
+    );
 
     let command = kani_command(&record, "3m");
     let arguments: Vec<_> = command

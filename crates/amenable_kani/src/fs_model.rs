@@ -662,13 +662,14 @@ impl Provenance for KaniCreateNewObservation {
 /// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking
 /// makes comparison confusing (this workspace's own error-type
 /// exception, `CLAUDE.md`), and not `Copy`: owned `file` is a `String`.
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("the modeled path already exists")]
 pub struct KaniAlreadyExists {
     /// Source line of the call site that produced this error.
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
-    pub file: String,
+    file: String,
 }
 
 impl KaniAlreadyExists {
@@ -907,13 +908,14 @@ impl Provenance for KaniLockObservation {
 /// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking
 /// makes comparison confusing (this workspace's own error-type
 /// exception, `CLAUDE.md`), and not `Copy`: owned `file` is a `String`.
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("the modeled lock is already held")]
 pub struct KaniAlreadyLocked {
     /// Source line of the call site that produced this error.
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
-    pub file: String,
+    file: String,
 }
 
 impl KaniAlreadyLocked {

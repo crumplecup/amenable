@@ -50,7 +50,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     let records = registered_proofs();
     if args.list {
         for record in records {
-            println!("{}", record.id);
+            println!("{}", record.id());
         }
         return Ok(());
     }
@@ -68,7 +68,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
 
     let mut unsuccessful = 0;
     for (index, record) in selected.iter().enumerate() {
-        println!("[{}/{}] Running {}", index + 1, selected.len(), record.id);
+        println!("[{}/{}] Running {}", index + 1, selected.len(), record.id());
         let result = run_proof(record, &args.harness_timeout);
         if let Some(message) = &result.message {
             eprintln!("    {message}");
@@ -86,7 +86,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
             }
         }
 
-        ledger.upsert(&record.id, result.status)?;
+        ledger.upsert(record.id(), result.status)?;
         ledger.persist(&args.results)?;
     }
 
@@ -101,9 +101,9 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
 
 fn registered_proofs() -> Vec<KaniProof> {
     let mut records: Vec<_> = inventory::iter::<KaniProofRegistration>()
-        .map(|registration| (registration.proof)())
+        .map(|registration| (registration.proof())())
         .collect();
-    records.sort_unstable_by(|left, right| left.id.cmp(&right.id));
+    records.sort_unstable_by(|left, right| left.id().cmp(right.id()));
     records
 }
 
@@ -115,7 +115,7 @@ fn select_records<'a>(
     if let Some(proof) = &args.proof {
         return records
             .iter()
-            .find(|record| record.id == *proof)
+            .find(|record| record.id() == proof)
             .map(|record| vec![record])
             .ok_or_else(|| AmenableError::invariant(format!("unknown Kani proof ID: {proof}")));
     }
@@ -133,7 +133,7 @@ fn select_records<'a>(
         })
         .map(|(id, _)| id.as_str())
         .collect();
-    let registered_ids: BTreeSet<_> = records.iter().map(|record| record.id.as_str()).collect();
+    let registered_ids: BTreeSet<_> = records.iter().map(|record| record.id().as_str()).collect();
 
     for id in retry_ids.difference(&registered_ids) {
         eprintln!("Ledger proof is no longer registered and will be skipped: {id}");
@@ -141,7 +141,7 @@ fn select_records<'a>(
 
     Ok(records
         .iter()
-        .filter(|record| retry_ids.contains(record.id.as_str()))
+        .filter(|record| retry_ids.contains(record.id().as_str()))
         .collect())
 }
 
@@ -184,12 +184,12 @@ pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     command.args([
         "kani",
         "-p",
-        record.package.as_str(),
+        record.package().as_str(),
         "--lib",
         "--all-features",
         "--exact",
         "--harness",
-        record.harness.as_str(),
+        record.harness().as_str(),
         "-Z",
         "unstable-options",
         "--harness-timeout",

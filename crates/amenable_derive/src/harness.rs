@@ -53,18 +53,18 @@ pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
 
         quote! {
             ::inventory::submit! {
-                ::amenable_kani::KaniProofRegistration {
-                    proof: || ::amenable_kani::KaniProof {
-                        id: concat!(module_path!(), "::", stringify!(#name)).to_owned(),
-                        harness: module_path!()
+                ::amenable_kani::KaniProofRegistration::new(
+                    || ::amenable_kani::KaniProof::new(
+                        concat!(module_path!(), "::", stringify!(#name)).to_owned(),
+                        module_path!()
                             .split_once("::")
                             .map_or_else(
                                 || stringify!(#name).to_owned(),
                                 |(_, module)| format!("{module}::{}", stringify!(#name)),
                             ),
-                        package: "amenable_kani".to_owned(),
-                    },
-                }
+                        "amenable_kani".to_owned(),
+                    ),
+                )
             }
         }
     } else {

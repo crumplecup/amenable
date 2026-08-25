@@ -959,7 +959,7 @@ struct RegisteredProof {
 fn registered_proofs() -> Vec<RegisteredProof> {
     let mut proofs: Vec<RegisteredProof> = inventory::iter::<KaniProofRegistration>()
         .map(|registration| RegisteredProof {
-            id: (registration.proof)().id,
+            id: (registration.proof())().id().clone(),
         })
         .collect();
     proofs.extend(registered_checked_proofs("creusot"));

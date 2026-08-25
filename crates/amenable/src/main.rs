@@ -462,11 +462,14 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
             })
             .collect(),
         kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()
-            .map(|registration| (registration.proof)())
-            .map(|record| KaniProofDump {
-                id: record.id,
-                harness: record.harness,
-                package: record.package,
+            .map(|registration| (registration.proof())())
+            .map(|record| {
+                let (id, harness, package) = record.dissolve();
+                KaniProofDump {
+                    id,
+                    harness,
+                    package,
+                }
             })
             .collect(),
     };
