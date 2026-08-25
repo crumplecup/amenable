@@ -17,8 +17,8 @@ fn add_calculation_forms_an_evidence_chain() {
 #[test]
 fn add_witness_names_its_kani_proof() {
     let proof = <AddEvidence as Witness<KaniVerifier>>::proof();
-    assert_eq!(proof.harness, "add_impl_computes_exact_sum");
-    assert!(proof.claim.contains("fn add_impl_computes_exact_sum"));
+    assert_eq!(proof.harness(), "add_impl_computes_exact_sum");
+    assert!(proof.claim().contains("fn add_impl_computes_exact_sum"));
 }
 
 #[test]

@@ -313,10 +313,10 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
             type ProofArtifact = #proof_artifact;
 
             fn proof() -> Self::ProofArtifact {
-                #proof_artifact {
-                    harness: ::std::borrow::ToOwned::to_owned(stringify!(#harness_fn)),
-                    claim: ::std::borrow::ToOwned::to_owned(#harness_const),
-                }
+                #proof_artifact::new(
+                    ::std::borrow::ToOwned::to_owned(stringify!(#harness_fn)),
+                    ::std::borrow::ToOwned::to_owned(#harness_const),
+                )
             }
         }
 

@@ -471,10 +471,10 @@ impl Witness<KaniVerifier> for KaniUtf8Buffer<2> {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_kani_utf8_buffer_bookkeeping_is_consistent".to_owned(),
-            claim: VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "verify_kani_utf8_buffer_bookkeeping_is_consistent".to_owned(),
+            VERIFY_KANI_UTF8_BUFFER_BOOKKEEPING_IS_CONSISTENT_SRC.to_owned(),
+        )
     }
 }
 

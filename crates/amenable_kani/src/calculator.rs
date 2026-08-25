@@ -64,10 +64,10 @@ impl Witness<KaniVerifier> for Debit {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_debit_access_preserves_value".to_owned(),
-            claim: VERIFY_DEBIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "verify_debit_access_preserves_value".to_owned(),
+            VERIFY_DEBIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
+        )
     }
 }
 
@@ -132,10 +132,10 @@ impl Witness<KaniVerifier> for Credit {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "verify_credit_access_preserves_value".to_owned(),
-            claim: VERIFY_CREDIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "verify_credit_access_preserves_value".to_owned(),
+            VERIFY_CREDIT_ACCESS_PRESERVES_VALUE_SRC.to_owned(),
+        )
     }
 }
 
@@ -194,12 +194,12 @@ impl ProofToken for AddToken {
 /// Proof artifact for [`AddEvidence`]'s Kani witness: names the harness
 /// and carries its verbatim source, captured via
 /// [`amenable_derive::harness!`] so the two can never drift apart.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct CalculationProof {
     /// The Kani harness that checks this calculation's invariant.
-    pub harness: String,
+    harness: String,
     /// The harness's own source — what it actually asserts, verbatim.
-    pub claim: String,
+    claim: String,
 }
 
 impl std::fmt::Display for CalculationProof {
@@ -224,10 +224,10 @@ where
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "add_impl_computes_exact_sum".to_owned(),
-            claim: ADD_IMPL_COMPUTES_EXACT_SUM_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "add_impl_computes_exact_sum".to_owned(),
+            ADD_IMPL_COMPUTES_EXACT_SUM_SRC.to_owned(),
+        )
     }
 }
 

@@ -267,10 +267,10 @@ impl Witness<KaniVerifier> for AmountPositive {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_check_amount_positive".to_owned(),
-            claim: VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_check_amount_positive".to_owned(),
+            VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+        )
     }
 }
 
@@ -286,10 +286,10 @@ impl Witness<KaniVerifier> for SufficientFunds {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_check_sufficient_funds".to_owned(),
-            claim: VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_check_sufficient_funds".to_owned(),
+            VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+        )
     }
 }
 
@@ -392,11 +392,10 @@ impl Witness<KaniVerifier> for Validated {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer".to_owned(),
-            claim: crate::gaap_ledger::VERIFY_GAAP_VALIDATE_ACCEPTS_A_LAWFUL_TRANSFER_SRC
-                .to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer".to_owned(),
+            crate::gaap_ledger::VERIFY_GAAP_VALIDATE_ACCEPTS_A_LAWFUL_TRANSFER_SRC.to_owned(),
+        )
     }
 }
 
@@ -420,10 +419,10 @@ impl Witness<KaniVerifier> for Committed {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_commit_always_balances".to_owned(),
-            claim: crate::gaap_ledger::VERIFY_GAAP_COMMIT_ALWAYS_BALANCES_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_commit_always_balances".to_owned(),
+            crate::gaap_ledger::VERIFY_GAAP_COMMIT_ALWAYS_BALANCES_SRC.to_owned(),
+        )
     }
 }
 
@@ -444,10 +443,10 @@ impl Witness<KaniVerifier> for Rejected<Pending> {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_reject_always_succeeds".to_owned(),
-            claim: crate::gaap_ledger::VERIFY_GAAP_REJECT_ALWAYS_SUCCEEDS_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_reject_always_succeeds".to_owned(),
+            crate::gaap_ledger::VERIFY_GAAP_REJECT_ALWAYS_SUCCEEDS_SRC.to_owned(),
+        )
     }
 }
 
@@ -463,9 +462,9 @@ impl Witness<KaniVerifier> for Rejected<Validated> {
     type ProofArtifact = CalculationProof;
 
     fn proof() -> Self::ProofArtifact {
-        CalculationProof {
-            harness: "gaap_ledger::verify_gaap_rollback_always_succeeds".to_owned(),
-            claim: crate::gaap_ledger::VERIFY_GAAP_ROLLBACK_ALWAYS_SUCCEEDS_SRC.to_owned(),
-        }
+        CalculationProof::new(
+            "gaap_ledger::verify_gaap_rollback_always_succeeds".to_owned(),
+            crate::gaap_ledger::VERIFY_GAAP_ROLLBACK_ALWAYS_SUCCEEDS_SRC.to_owned(),
+        )
     }
 }
