@@ -793,12 +793,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for DerefReflects
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::DerefReflectsTheStoredValue",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(dereferenced == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::DerefReflectsTheStoredValue",
+        "kani",
+        "ensures",
+        || stringify!(dereferenced == expected),
+    )
 }
 
 ::inventory::submit! {
@@ -889,12 +889,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::IndexRecoversTheStoredElement",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(actual == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::IndexRecoversTheStoredElement",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
 }
 
 ::inventory::submit! {
@@ -982,12 +982,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::FieldAccessRecoversTheStoredValue",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(actual == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::FieldAccessRecoversTheStoredValue",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
 }
 
 ::inventory::submit! {

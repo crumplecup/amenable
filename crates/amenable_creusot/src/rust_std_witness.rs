@@ -728,12 +728,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<char> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<char>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<char> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<char>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<char> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 /// The [`ValidUnicodeScalar`] contract type reuses `verify_char_roundtrip`
@@ -770,12 +770,12 @@ impl Ensures<CreusotVerifier> for ValidUnicodeScalar {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ValidUnicodeScalar",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::ValidUnicodeScalar",
+        "creusot",
+        "ensures",
+        || <ValidUnicodeScalar as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -824,12 +824,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<String> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<String>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<String> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<String>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<String> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 macro_rules! impl_creusot_atomic_checked_witness {
@@ -957,12 +957,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<AtomicOrdering> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ordering>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<AtomicOrdering> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ordering>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<AtomicOrdering> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<System> {
@@ -1005,12 +1005,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<System> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<System>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<System> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<System>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<System> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Backtrace> {
@@ -1096,12 +1096,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<SeekFrom> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<SeekFrom>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<SeekFrom> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<SeekFrom>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<SeekFrom> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Shutdown> {
@@ -1210,12 +1210,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<HashMap<i32, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<HashMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashMap<i32, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<HashMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<HashSet<i32>> {
@@ -1256,12 +1256,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<HashSet<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<HashSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<HashSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl_creusot_atomic_checked_witness!(
@@ -1351,12 +1351,12 @@ impl Ensures<CreusotVerifier> for IndexingAndLength {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IndexingAndLength",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <IndexingAndLength as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::IndexingAndLength",
+        "creusot",
+        "ensures",
+        || <IndexingAndLength as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
@@ -1397,12 +1397,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<std::slice::Iter<'static, i32>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::slice::Iter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::Iter<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<std::slice::Iter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
@@ -1447,12 +1447,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<std::slice::IterMut<'static, i
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::slice::IterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::IterMut<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<std::slice::IterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<str> {
@@ -1492,12 +1492,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<str> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<str>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<str> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<str>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<str> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 /// [`AsciiByte`] reuses the same harness rather than adding a new Creusot
@@ -1532,12 +1532,12 @@ impl Requires<CreusotVerifier> for AsciiByte {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::AsciiByte",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <AsciiByte as Requires<CreusotVerifier>>::requires(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::AsciiByte",
+        "creusot",
+        "requires",
+        || <AsciiByte as Requires<CreusotVerifier>>::requires(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<(i32, i32)> {
@@ -1577,12 +1577,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<(i32, i32)> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<(i32, i32)> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<(i32, i32)>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<(i32, i32)> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<fn(i32) -> i32> {
@@ -1622,12 +1622,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<fn(i32) -> i32> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<fn(i32) -> i32> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<fn(i32) -> i32>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<fn(i32) -> i32> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<*const i32> {
@@ -1713,12 +1713,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<AssertUnwindSafe<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<AssertUnwindSafe<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<AssertUnwindSafe<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<AssertUnwindSafe<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<&'static i32> {
@@ -1759,12 +1759,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<&'static i32> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static i32>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<&'static i32> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static i32>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<&'static i32> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<&'static mut i32> {
@@ -1806,12 +1806,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<&'static mut i32> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<&'static mut i32> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<&'static mut i32>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<&'static mut i32> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Bare `Cow<'static, i32>`, matching `amenable_std::rust_std::
@@ -1856,12 +1856,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Cow<'static, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Cow<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Cow<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Cow<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BTreeMap<i32, i32>> {
@@ -1910,23 +1910,23 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BTreeMap<i32, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <RustStdStandard<BTreeMap<i32, i32>> as Requires<CreusotVerifier>>::requires(
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        "creusot",
+        "requires",
+        || <RustStdStandard<BTreeMap<i32, i32>> as Requires<CreusotVerifier>>::requires(
             (),
         ),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BTreeMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeMap<i32, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BTreeMap<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BTreeSet<i32>> {
@@ -1978,21 +1978,21 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BTreeSet<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <RustStdStandard<BTreeSet<i32>> as Requires<CreusotVerifier>>::requires(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        "creusot",
+        "requires",
+        || <RustStdStandard<BTreeSet<i32>> as Requires<CreusotVerifier>>::requires(()),
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BTreeSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BTreeSet<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BTreeSet<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BinaryHeap<i32>> {
@@ -2033,12 +2033,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeap<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BinaryHeap<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeap<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BinaryHeap<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BinaryHeapDrain<'static, i32>> {
@@ -2080,12 +2080,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapDrain<'static, i32>>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapDrain<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BinaryHeapDrain<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeapDrain<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BinaryHeapDrain<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BinaryHeapIntoIter<i32>> {
@@ -2127,12 +2127,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapIntoIter<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIntoIter<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BinaryHeapIntoIter<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeapIntoIter<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BinaryHeapIntoIter<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BinaryHeapIter<'static, i32>> {
@@ -2174,12 +2174,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapIter<'static, i32>> 
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapIter<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<BinaryHeapIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeapIter<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<BinaryHeapIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<BinaryHeapPeekMut<'static, i32>> {
@@ -2231,23 +2231,23 @@ impl Ensures<CreusotVerifier> for RustStdStandard<BinaryHeapPeekMut<'static, i32
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
+        "creusot",
+        "requires",
+        ||
             <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as Requires<CreusotVerifier>>::requires(()),
-    }
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BinaryHeapPeekMut<'static, i32>>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<BinaryHeapPeekMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 impl CreusotWitness for RustStdStandard<LinkedList<i32>> {
@@ -2308,12 +2308,12 @@ impl Ensures<CreusotVerifier> for DrainsTwoValuesInOrderAndEmpties {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::DrainsTwoValuesInOrderAndEmpties",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <DrainsTwoValuesInOrderAndEmpties as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::DrainsTwoValuesInOrderAndEmpties",
+        "creusot",
+        "ensures",
+        || <DrainsTwoValuesInOrderAndEmpties as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<LinkedListIter<'static, i32>> {
@@ -2354,12 +2354,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<LinkedListIter<'static, i32>> 
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LinkedListIter<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<LinkedListIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LinkedListIter<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<LinkedListIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<LinkedListIterMut<'static, i32>> {
@@ -2400,12 +2400,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<LinkedListIterMut<'static, i32
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LinkedListIterMut<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<LinkedListIterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LinkedListIterMut<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<LinkedListIterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<LinkedListIntoIter<i32>> {
@@ -2466,12 +2466,12 @@ impl Ensures<CreusotVerifier> for YieldsTwoValuesInOrderThenEnds {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::YieldsTwoValuesInOrderThenEnds",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <YieldsTwoValuesInOrderThenEnds as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::YieldsTwoValuesInOrderThenEnds",
+        "creusot",
+        "ensures",
+        || <YieldsTwoValuesInOrderThenEnds as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> {
@@ -2518,13 +2518,13 @@ impl Ensures<CreusotVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<LinkedListExtractIf<'static, i32, fn(&mut i32) -> bool>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 impl CreusotWitness for RustStdStandard<TryReserveError> {
@@ -2557,12 +2557,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<TryReserveError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<TryReserveError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<TryReserveError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<TryReserveError>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<TryReserveError> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -2611,12 +2611,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<VecDeque<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<VecDeque<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VecDeque<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<VecDeque<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VecDequeIntoIter<i32>> {
@@ -2703,12 +2703,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<VecDequeIter<'static, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecDequeIter<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<VecDequeIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VecDequeIter<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<VecDequeIter<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<VecDequeIterMut<'static, i32>> {
@@ -2749,12 +2749,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<VecDequeIterMut<'static, i32>>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VecDequeIterMut<'static, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<VecDequeIterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VecDequeIterMut<'static, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<VecDequeIterMut<'static, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Args> {
@@ -2849,21 +2849,21 @@ impl Ensures<CreusotVerifier> for ArgvIncludesProgramPath {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArgvIncludesProgramPath",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <ArgvIncludesProgramPath as Requires<CreusotVerifier>>::requires(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::ArgvIncludesProgramPath",
+        "creusot",
+        "requires",
+        || <ArgvIncludesProgramPath as Requires<CreusotVerifier>>::requires(()),
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::ArgvIncludesProgramPath",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <ArgvIncludesProgramPath as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::ArgvIncludesProgramPath",
+        "creusot",
+        "ensures",
+        || <ArgvIncludesProgramPath as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<JoinPathsError> {
@@ -2950,12 +2950,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<VarError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<VarError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<VarError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<VarError>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<VarError> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Vars> {
@@ -3034,12 +3034,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<OsStr> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OsStr>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<OsStr> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OsStr>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<OsStr> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<OsString> {
@@ -3127,12 +3127,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<CString> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CString>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<CString> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CString>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<CString> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<FromVecWithNulError> {
@@ -3197,12 +3197,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<IntoStringError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<IntoStringError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<IntoStringError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<IntoStringError>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<IntoStringError> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<NulError> {
@@ -3243,12 +3243,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<NulError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NulError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<NulError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NulError>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<NulError> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<CStr> {
@@ -3282,12 +3282,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<CStr> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<CStr>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<CStr> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<CStr>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<CStr> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -3331,12 +3331,12 @@ impl Requires<CreusotVerifier> for NonNulByte {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::NonNulByte",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <NonNulByte as Requires<CreusotVerifier>>::requires(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::NonNulByte",
+        "creusot",
+        "requires",
+        || <NonNulByte as Requires<CreusotVerifier>>::requires(()),
+    )
 }
 
 /// [`NulOnlyAtTheEndValidates`] reuses the `FromVecWithNulError` harness
@@ -3375,12 +3375,12 @@ impl Ensures<CreusotVerifier> for NulOnlyAtTheEndValidates {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::NulOnlyAtTheEndValidates",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <NulOnlyAtTheEndValidates as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::NulOnlyAtTheEndValidates",
+        "creusot",
+        "ensures",
+        || <NulOnlyAtTheEndValidates as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<FromBytesUntilNulError> {
@@ -3414,12 +3414,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<FromBytesUntilNulError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<FromBytesUntilNulError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<FromBytesUntilNulError>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<FromBytesUntilNulError> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -3492,12 +3492,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Box<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Box<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Box<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Box<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Box<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Duration> {
@@ -3547,21 +3547,21 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Duration> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || <RustStdStandard<Duration> as Requires<CreusotVerifier>>::requires(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Duration>",
+        "creusot",
+        "requires",
+        || <RustStdStandard<Duration> as Requires<CreusotVerifier>>::requires(()),
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Duration>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Duration> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Duration>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Duration> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<RangeTo<i32>> {
@@ -3601,12 +3601,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<RangeTo<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<RangeTo<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<RangeTo<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<RangeFull> {
@@ -3669,12 +3669,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Bound<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Bound<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Bound<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Bound<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<ControlFlow<i32, i32>> {
@@ -3718,12 +3718,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<ControlFlow<i32, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<ControlFlow<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ControlFlow<i32, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<ControlFlow<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<NonZero<i16>> {
@@ -3767,21 +3767,21 @@ impl Ensures<CreusotVerifier> for RustStdStandard<NonZero<i16>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<NonZero<i16>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<NonZero<i16>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || NONZERO_I16_GET_ROUND_TRIPS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<NonZero<i16>>",
+        "creusot",
+        "ensures",
+        || NONZERO_I16_GET_ROUND_TRIPS_SRC,
+    )
 }
 
 // Fully qualified, matching `amenable_kani::rust_std::cmp` and
@@ -3827,12 +3827,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<std::cmp::Ordering> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<std::cmp::Ordering> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<std::cmp::Ordering> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Wrapping<i32>> {
@@ -3872,12 +3872,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Wrapping<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Wrapping<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Wrapping<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Wrapping<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Wrapping<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 impl CreusotWitness for RustStdStandard<Saturating<i32>> {
@@ -3917,12 +3917,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Saturating<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Saturating<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Saturating<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Saturating<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Saturating<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
@@ -3967,12 +3967,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<core::num::IntErrorKind> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<core::num::IntErrorKind> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<core::num::IntErrorKind> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
@@ -4020,13 +4020,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<core::num::TryFromIntError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::TryFromIntError>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<core::num::TryFromIntError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
@@ -4073,13 +4073,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<core::num::ParseIntError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<core::num::ParseIntError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
@@ -4133,12 +4133,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<core::num::FpCategory> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<core::num::FpCategory> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<core::num::FpCategory> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Fully qualified, matching `amenable_std::rust_std::num`'s own
@@ -4192,13 +4192,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<core::num::ParseFloatError> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<core::num::ParseFloatError> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 // Bare `Reverse<i32>`, matching `amenable_std::rust_std::cmp`'s own
@@ -4234,12 +4234,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Reverse<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Reverse<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Reverse<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Reverse<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -4291,12 +4291,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Option<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Option<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Option<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Option<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Bare `Result<i32, i32>`, matching `amenable_std::rust_std::option_result`'s
@@ -4339,12 +4339,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Result<i32, i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Result<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Result<i32, i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Fully qualified to distinguish `core::option::Iter` from the many other
@@ -4489,12 +4489,12 @@ impl Ensures<CreusotVerifier> for IterYieldsValueOnceThenEnds {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <IterYieldsValueOnceThenEnds as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::IterYieldsValueOnceThenEnds",
+        "creusot",
+        "ensures",
+        || <IterYieldsValueOnceThenEnds as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // The `Result`-shaped sibling of the registration above -- both real
@@ -4502,12 +4502,12 @@ impl Ensures<CreusotVerifier> for IterYieldsValueOnceThenEnds {
 // (`iter_yields_value_once_then_ends` for `Option`, this one for
 // `Result`), not a second, competing definition of the same claim.
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::IterYieldsValueOnceThenEnds",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::IterYieldsValueOnceThenEnds",
+        "creusot",
+        "ensures",
+        || ITER_YIELDS_OK_VALUE_ONCE_THEN_ENDS_SRC,
+    )
 }
 
 // Bare `Pending<i32>`, matching `amenable_std::rust_std::future`'s own
@@ -4550,12 +4550,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Pending<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Pending<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Pending<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Pending<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Bare `PollFn<fn(&mut Context<'_>) -> Poll<i32>>`, matching
@@ -4599,13 +4599,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<PollFn<fn(&mut Context<'_>) ->
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 // Bare `Ready<i32>`, matching `amenable_std::rust_std::future`'s own
@@ -4649,12 +4649,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Ready<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Ready<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Ready<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Ready<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Bare `Context<'static>`, matching `amenable_std::rust_std::task`'s own
@@ -4713,12 +4713,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Poll<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Poll<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Poll<i32>>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Poll<i32>> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 ::inventory::submit! {
@@ -4773,12 +4773,12 @@ impl Ensures<CreusotVerifier> for RustStdStandard<Waker> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<Waker>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || <RustStdStandard<Waker> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<Waker>",
+        "creusot",
+        "ensures",
+        || <RustStdStandard<Waker> as Ensures<CreusotVerifier>>::ensures(()),
+    )
 }
 
 // Bare `ManuallyDrop<i32>`, matching `amenable_std::rust_std::mem`'s own
@@ -4815,13 +4815,13 @@ impl Ensures<CreusotVerifier> for RustStdStandard<ManuallyDrop<i32>> {
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: ||
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<ManuallyDrop<i32>>",
+        "creusot",
+        "ensures",
+        ||
             <RustStdStandard<ManuallyDrop<i32>> as Ensures<CreusotVerifier>>::ensures(()),
-    }
+    )
 }
 
 ::inventory::submit! {
@@ -4989,64 +4989,64 @@ fn windows_provenance(
 // just point straight at them, the same bypass this module's
 // `ProofRecord` entries above already use for the same reason.
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+        "creusot",
+        "ensures",
+        || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+        "creusot",
+        "ensures",
+        || WINDOWS_HANDLE_AS_RAW_HANDLE_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+        "creusot",
+        "ensures",
+        || WINDOWS_HANDLE_OR_INVALID_REJECTS_ONLY_THE_SENTINEL_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+        "creusot",
+        "ensures",
+        || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+        "creusot",
+        "ensures",
+        || WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "creusot",
-        kind: "requires",
-        fragment: || ENCODE_WIDE_HEADROOM_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "creusot",
+        "requires",
+        || ENCODE_WIDE_HEADROOM_HOLDS_SRC,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        verifier: "creusot",
-        kind: "ensures",
-        fragment: || ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_HOLDS_SRC,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+        "creusot",
+        "ensures",
+        || ENCODE_WIDE_ENCODES_A_BMP_CODE_POINT_AS_ONE_CODE_UNIT_HOLDS_SRC,
+    )
 }

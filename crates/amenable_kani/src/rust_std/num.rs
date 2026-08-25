@@ -706,16 +706,16 @@ macro_rules! impl_nonzero_ensures_kani {
             }
 
             ::inventory::submit! {
-                ::amenable_core::ContractRecord {
-                    evidence: concat!(
+                ::amenable_core::ContractRecord::new(
+                    concat!(
                         "amenable_std::rust_std::RustStdStandard<NonZero<",
                         stringify!($ty),
                         ">>"
                     ),
-                    verifier: "kani",
-                    kind: "ensures",
-                    fragment: || "value != 0",
-                }
+                    "kani",
+                    "ensures",
+                    || "value != 0",
+                )
             }
         )*
     };
@@ -802,12 +802,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for NonZeroGetRou
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::NonZeroGetRoundTrips",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(actual == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::NonZeroGetRoundTrips",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
 }
 
 ::inventory::submit! {

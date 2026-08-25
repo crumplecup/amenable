@@ -352,12 +352,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::IteratorMatchesReferenceStepByStep",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(actual == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::IteratorMatchesReferenceStepByStep",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
 }
 
 ::inventory::submit! {
@@ -1699,12 +1699,12 @@ impl<T> amenable_core::Ensures<crate::KaniVerifier> for IteratorYieldsNoneWhenEx
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::IteratorYieldsNoneWhenExhausted",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(input.is_none()),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::IteratorYieldsNoneWhenExhausted",
+        "kani",
+        "ensures",
+        || stringify!(input.is_none()),
+    )
 }
 
 ::inventory::submit! {

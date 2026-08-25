@@ -438,10 +438,10 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
             .collect(),
         contract_records: inventory::iter::<amenable::ContractRecord>()
             .map(|record| ContractRecordDump {
-                evidence: record.evidence.to_owned(),
-                verifier: record.verifier.to_owned(),
-                kind: record.kind.to_owned(),
-                fragment: (record.fragment)().to_owned(),
+                evidence: record.evidence().to_owned(),
+                verifier: record.verifier().to_owned(),
+                kind: record.kind().to_owned(),
+                fragment: (record.fragment())().to_owned(),
             })
             .collect(),
         witness_export_records: amenable::witness_exports()

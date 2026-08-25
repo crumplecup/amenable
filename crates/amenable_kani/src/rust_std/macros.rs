@@ -86,12 +86,12 @@ macro_rules! kani_requires {
         }
 
         ::inventory::submit! {
-            ::amenable_core::ContractRecord {
-                evidence: $evidence,
-                verifier: "kani",
-                kind: "requires",
-                fragment: || stringify!($expr),
-            }
+            ::amenable_core::ContractRecord::new(
+                $evidence,
+                "kani",
+                "requires",
+                || stringify!($expr),
+            )
         }
     };
 }
@@ -110,12 +110,12 @@ macro_rules! kani_ensures {
         }
 
         ::inventory::submit! {
-            ::amenable_core::ContractRecord {
-                evidence: $evidence,
-                verifier: "kani",
-                kind: "ensures",
-                fragment: || stringify!($expr),
-            }
+            ::amenable_core::ContractRecord::new(
+                $evidence,
+                "kani",
+                "ensures",
+                || stringify!($expr),
+            )
         }
     };
 }

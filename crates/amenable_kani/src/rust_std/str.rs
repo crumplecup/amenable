@@ -511,12 +511,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::CollectedSequenceMatchesExpected",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(actual == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::CollectedSequenceMatchesExpected",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
 }
 
 ::inventory::submit! {

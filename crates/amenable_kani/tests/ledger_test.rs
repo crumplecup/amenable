@@ -173,9 +173,9 @@ fn validated_requires_holds_for_a_lawfully_validated_transfer() -> miette::Resul
 fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() -> miette::Result<()> {
     let records: Vec<&ContractRecord> = inventory::iter::<ContractRecord>()
         .filter(|record| {
-            record.verifier == "kani"
-                && (record.evidence == "amenable_kani::ledger::Validated::validate_ensures"
-                    || record.evidence == "amenable_kani::ledger::Validated::commit_requires")
+            record.verifier() == "kani"
+                && (record.evidence() == "amenable_kani::ledger::Validated::validate_ensures"
+                    || record.evidence() == "amenable_kani::ledger::Validated::commit_requires")
         })
         .collect();
 
@@ -187,15 +187,15 @@ fn validate_ensures_and_commit_requires_are_sewn_to_the_same_atomic_claim() -> m
 
     let ensures = records
         .iter()
-        .find(|record| record.kind == "ensures")
+        .find(|record| record.kind() == "ensures")
         .ok_or_else(|| miette::miette!("validate_ensures record missing"))?;
     let requires = records
         .iter()
-        .find(|record| record.kind == "requires")
+        .find(|record| record.kind() == "requires")
         .ok_or_else(|| miette::miette!("commit_requires record missing"))?;
 
-    assert!((ensures.fragment)().contains("AmountPositive"));
-    assert!((requires.fragment)().contains("AmountPositive"));
+    assert!((ensures.fragment())().contains("AmountPositive"));
+    assert!((requires.fragment())().contains("AmountPositive"));
     Ok(())
 }
 

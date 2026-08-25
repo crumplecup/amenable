@@ -162,12 +162,12 @@ impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::AtomicLoadReflectsTheLastWrite",
-        verifier: "kani",
-        kind: "ensures",
-        fragment: || stringify!(loaded == expected),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::AtomicLoadReflectsTheLastWrite",
+        "kani",
+        "ensures",
+        || stringify!(loaded == expected),
+    )
 }
 
 ::inventory::submit! {

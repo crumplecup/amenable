@@ -164,16 +164,63 @@ inventory::collect!(ProofRecord);
 /// `"result == value"` for a round-trip claim about completely different
 /// types); call-shape recognition means that coincidence can never silence
 /// an unnamed site, so no per-site scoping field is needed here.
+///
+/// Hand-written `const fn new`/getters, not derived, for the same real
+/// reason [`EvidenceLink`]/[`ProofRecord`] are:
+/// `inventory::submit!` requires a `const`-evaluable value, and every
+/// real reader gets a `ContractRecord` back as `&'static` (from
+/// [`inventory::iter`]), so plain `&self` getters are both sufficient
+/// and strictly more general than `derive_getters::Getters`' `&'static
+/// self` receiver quirk for reference-typed fields.
 pub struct ContractRecord {
+    evidence: &'static str,
+    verifier: &'static str,
+    kind: &'static str,
+    fragment: fn() -> &'static str,
+}
+
+impl ContractRecord {
+    /// Register a `kind` contract fragment for `evidence`, written for
+    /// `verifier`.
+    #[must_use]
+    pub const fn new(
+        evidence: &'static str,
+        verifier: &'static str,
+        kind: &'static str,
+        fragment: fn() -> &'static str,
+    ) -> Self {
+        Self {
+            evidence,
+            verifier,
+            kind,
+            fragment,
+        }
+    }
+
     /// The evidence type this contract names, in the same naming
     /// convention as [`EvidenceLink::name`].
-    pub evidence: &'static str,
+    #[must_use]
+    pub const fn evidence(&self) -> &'static str {
+        self.evidence
+    }
+
     /// The verifier backend this fragment is written for (e.g. `"kani"`).
-    pub verifier: &'static str,
+    #[must_use]
+    pub const fn verifier(&self) -> &'static str {
+        self.verifier
+    }
+
     /// Which half of the contract this is: `"ensures"` or `"requires"`.
-    pub kind: &'static str,
+    #[must_use]
+    pub const fn kind(&self) -> &'static str {
+        self.kind
+    }
+
     /// The bound's fragment, in the verifier's own native syntax.
-    pub fragment: fn() -> &'static str,
+    #[must_use]
+    pub const fn fragment(&self) -> fn() -> &'static str {
+        self.fragment
+    }
 }
 
 inventory::collect!(ContractRecord);

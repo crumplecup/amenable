@@ -226,12 +226,12 @@ fn codegen(
     let registrations = (0..clauses.len()).map(|index| {
         quote! {
             ::amenable_core::__inventory::submit! {
-                ::amenable_core::ContractRecord {
-                    evidence: #evidence,
-                    verifier: "verus",
-                    kind: #kind,
-                    fragment: || <#ty as ::amenable_core::#trait_ident<crate::VerusVerifier>>::#method_ident(())[#index],
-                }
+                ::amenable_core::ContractRecord::new(
+                    #evidence,
+                    "verus",
+                    #kind,
+                    || <#ty as ::amenable_core::#trait_ident<crate::VerusVerifier>>::#method_ident(())[#index],
+                )
             }
         }
     });

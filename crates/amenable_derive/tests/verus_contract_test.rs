@@ -268,9 +268,9 @@ fn one_contract_record_is_registered_per_real_clause() {
     // separate `submit!` blocks, so compare as sets, not sequences.
     let mut ensures_records = inventory::iter::<ContractRecord>()
         .filter(|record| {
-            record.evidence == "verus_contract_test::CharRoundtrip" && record.kind == "ensures"
+            record.evidence() == "verus_contract_test::CharRoundtrip" && record.kind() == "ensures"
         })
-        .map(|record| (record.fragment)())
+        .map(|record| (record.fragment())())
         .collect::<Vec<_>>();
     ensures_records.sort_unstable();
 
@@ -283,9 +283,10 @@ fn one_contract_record_is_registered_per_real_clause() {
 
     let requires_records = inventory::iter::<ContractRecord>()
         .filter(|record| {
-            record.evidence == "verus_contract_test::EscapeAsciiModel" && record.kind == "requires"
+            record.evidence() == "verus_contract_test::EscapeAsciiModel"
+                && record.kind() == "requires"
         })
-        .map(|record| (record.fragment)())
+        .map(|record| (record.fragment())())
         .collect::<Vec<_>>();
 
     assert_eq!(

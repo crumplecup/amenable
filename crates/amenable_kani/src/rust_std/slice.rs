@@ -797,12 +797,12 @@ impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::SplitOperandsAreDistinctFromThePattern",
-        verifier: "kani",
-        kind: "requires",
-        fragment: || stringify!(before != pattern && after != pattern),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::SplitOperandsAreDistinctFromThePattern",
+        "kani",
+        "requires",
+        || stringify!(before != pattern && after != pattern),
+    )
 }
 
 ::inventory::submit! {
@@ -888,12 +888,12 @@ impl<T: PartialEq> amenable_core::Requires<crate::KaniVerifier>
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
-        verifier: "kani",
-        kind: "requires",
-        fragment: || stringify!(a != pattern && b != pattern && c != pattern),
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ThreeSplitOperandsAreDistinctFromThePattern",
+        "kani",
+        "requires",
+        || stringify!(a != pattern && b != pattern && c != pattern),
+    )
 }
 
 ::inventory::submit! {

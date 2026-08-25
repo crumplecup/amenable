@@ -841,30 +841,30 @@ bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FP_CATEGORY_CLASSIFY_RESULT_MATCHES_SPECIAL_VALUE_CATEGORIES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "verus",
+        "ensures",
+        || FP_CATEGORY_CLASSIFY_RESULT_MATCHES_SPECIAL_VALUE_CATEGORIES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || FP_CATEGORY_INPUTS_COVER_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "verus",
+        "requires",
+        || FP_CATEGORY_INPUTS_COVER_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FP_CATEGORY_RESULTS_MATCH_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+        "verus",
+        "ensures",
+        || FP_CATEGORY_RESULTS_MATCH_NAN_AND_INFINITE_CASES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC: &str =
@@ -1135,30 +1135,30 @@ bridge_verus_witness!(RustStdStandard<core::char::CharTryFromError>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || U32_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        "verus",
+        "ensures",
+        || U32_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHAR_TRY_FROM_U32_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        "verus",
+        "ensures",
+        || CHAR_TRY_FROM_U32_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHAR_TRY_FROM_U32_REJECTS_INVALID_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::CharTryFromError>",
+        "verus",
+        "ensures",
+        || CHAR_TRY_FROM_U32_REJECTS_INVALID_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
@@ -1208,30 +1208,30 @@ bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CHAR_FITS_IN_U8_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        "verus",
+        "ensures",
+        || CHAR_FITS_IN_U8_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || U8_TRY_FROM_CHAR_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        "verus",
+        "ensures",
+        || U8_TRY_FROM_CHAR_SUCCEEDS_WITH_SAME_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || U8_TRY_FROM_CHAR_REJECTS_OUT_OF_RANGE_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::char::TryFromCharError>",
+        "verus",
+        "ensures",
+        || U8_TRY_FROM_CHAR_REJECTS_OUT_OF_RANGE_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC: &str =
@@ -1340,30 +1340,30 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_UTF16_RESULT_MATCHES_SINGLE_UNIT_EXAMPLES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        "verus",
+        "ensures",
+        || FROM_UTF16_RESULT_MATCHES_SINGLE_UNIT_EXAMPLES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || FROM_UTF16_INPUTS_COVER_VALID_AND_LONE_SURROGATE_CASES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        "verus",
+        "requires",
+        || FROM_UTF16_INPUTS_COVER_VALID_AND_LONE_SURROGATE_CASES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_UTF16_CASE_RESULTS_MATCH_ACCEPT_REJECT_TRIPLE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf16Error>",
+        "verus",
+        "ensures",
+        || FROM_UTF16_CASE_RESULTS_MATCH_ACCEPT_REJECT_TRIPLE_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC: &str =
@@ -1412,21 +1412,21 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        "verus",
+        "ensures",
+        || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::CString>",
+        "verus",
+        "ensures",
+        || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::ffi::NulError> {
@@ -1459,21 +1459,21 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        "verus",
+        "ensures",
+        || INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::NulError>",
+        "verus",
+        "ensures",
+        || CSTRING_NEW_RESULT_MATCHES_INPUT_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
@@ -1522,12 +1522,12 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::ffi::FromVecWithNulError>",
+        "verus",
+        "ensures",
+        || FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC: &str =
@@ -1681,12 +1681,12 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesUntilNulError>",
+        "verus",
+        "ensures",
+        || CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
@@ -1729,12 +1729,12 @@ bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CSTR_FROM_BYTES_WITH_NUL_RESULT_MATCHES_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::FromBytesWithNulError>",
+        "verus",
+        "ensures",
+        || CSTR_FROM_BYTES_WITH_NUL_RESULT_MATCHES_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC: &str =
@@ -1843,21 +1843,21 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        "verus",
+        "ensures",
+        || I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || COW_INTO_OWNED_PRESERVES_VARIANT_VALUE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::borrow::Cow<'static, i32>>",
+        "verus",
+        "ensures",
+        || COW_INTO_OWNED_PRESERVES_VARIANT_VALUE_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC: &str =
@@ -2147,21 +2147,21 @@ amenable_derive::verus_ensures_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BINARY_HEAP_MODEL_RECORDS_VALUES_IN_HEAP_ORDER_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        "verus",
+        "ensures",
+        || BINARY_HEAP_MODEL_RECORDS_VALUES_IN_HEAP_ORDER_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::collections::BinaryHeap<i32>>",
+        "verus",
+        "ensures",
+        || BINARY_HEAP_MODEL_POP_RETURNS_RECORDED_ORDER_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC: &str =
@@ -2237,30 +2237,30 @@ amenable_derive::verus_ensures_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CELL_MODEL_NEW_STORES_INITIAL_VALUE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        "verus",
+        "ensures",
+        || CELL_MODEL_NEW_STORES_INITIAL_VALUE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CELL_MODEL_GET_READS_CURRENT_VALUE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        "verus",
+        "ensures",
+        || CELL_MODEL_GET_READS_CURRENT_VALUE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::cell::Cell<i32>>",
+        "verus",
+        "ensures",
+        || CELL_MODEL_REPLACE_RETURNS_PREVIOUS_VALUE_VERUS_FRAGMENT,
+    )
 }
 
 /// [`WriteStoresNewValue`] reuses `Cell`'s own round-trip harness rather
@@ -2664,30 +2664,30 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        "verus",
+        "ensures",
+        || FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        "verus",
+        "ensures",
+        || FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::string::FromUtf8Error>",
+        "verus",
+        "ensures",
+        || FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC: &str =
@@ -2751,12 +2751,12 @@ bridge_verus_witness!(RustStdStandard<core::ffi::CStr>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || CSTR_TO_BYTES_MATCHES_MODEL_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<core::ffi::CStr>",
+        "verus",
+        "ensures",
+        || CSTR_TO_BYTES_MATCHES_MODEL_VERUS_FRAGMENT,
+    )
 }
 
 /// [`NonNulByte`] reuses the same harness rather than adding a new Verus
@@ -4205,12 +4205,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Arguments<'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_ARGUMENTS_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::Arguments<'static>>",
+        "verus",
+        "ensures",
+        || FMT_ARGUMENTS_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC: &str =
@@ -4247,12 +4247,12 @@ bridge_verus_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_FROM_FN_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>",
+        "verus",
+        "ensures",
+        || FMT_FROM_FN_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC: &str =
@@ -4285,12 +4285,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugStruct<'static, 'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_DEBUG_STRUCT_RESULT_MATCHES_NAMED_FIELDS_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugStruct<'static, 'static>>",
+        "verus",
+        "ensures",
+        || FMT_DEBUG_STRUCT_RESULT_MATCHES_NAMED_FIELDS_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC: &str =
@@ -4323,12 +4323,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugTuple<'static, 'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_DEBUG_TUPLE_RESULT_MATCHES_POSITIONAL_FIELDS_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugTuple<'static, 'static>>",
+        "verus",
+        "ensures",
+        || FMT_DEBUG_TUPLE_RESULT_MATCHES_POSITIONAL_FIELDS_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC: &str =
@@ -4361,12 +4361,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugList<'static, 'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_DEBUG_LIST_RESULT_MATCHES_ENTRIES_IN_BRACKETS_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugList<'static, 'static>>",
+        "verus",
+        "ensures",
+        || FMT_DEBUG_LIST_RESULT_MATCHES_ENTRIES_IN_BRACKETS_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC: &str =
@@ -4399,12 +4399,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugSet<'static, 'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_DEBUG_SET_RESULT_MATCHES_ENTRIES_IN_BRACES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugSet<'static, 'static>>",
+        "verus",
+        "ensures",
+        || FMT_DEBUG_SET_RESULT_MATCHES_ENTRIES_IN_BRACES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC: &str =
@@ -4437,12 +4437,12 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FMT_DEBUG_MAP_RESULT_MATCHES_KEY_VALUE_PAIR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fmt::DebugMap<'static, 'static>>",
+        "verus",
+        "ensures",
+        || FMT_DEBUG_MAP_RESULT_MATCHES_KEY_VALUE_PAIR_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC: &str =
@@ -5034,39 +5034,39 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "verus",
+        "requires",
+        || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "verus",
+        "requires",
+        || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "verus",
+        "ensures",
+        || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>>",
+        "verus",
+        "ensures",
+        || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
+    )
 }
 
 impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
@@ -5101,39 +5101,39 @@ amenable_derive::verus_requires_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        "verus",
+        "requires",
+        || DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        "verus",
+        "requires",
+        || DECODE_UTF16_UNIT_IS_SURROGATE_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        "verus",
+        "ensures",
+        || DECODE_UTF16_BMP_UNIT_DECODES_TO_SAME_SCALAR_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::char::DecodeUtf16Error>",
+        "verus",
+        "ensures",
+        || DECODE_UTF16_LONE_SURROGATE_REPORTS_SAME_UNIT_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC: &str =
@@ -5313,16 +5313,16 @@ const TEN_INCREMENT_WRITE_THROUGH_VERUS_FRAGMENT: &str = r#"pub open spec fn ten
 macro_rules! register_slice_chunks_increment_fragment {
     ($ty:ty) => {
         ::inventory::submit! {
-            ::amenable_core::ContractRecord {
-                evidence: concat!(
+            ::amenable_core::ContractRecord::new(
+                concat!(
                     "amenable_std::rust_std::RustStdStandard<",
                     stringify!($ty),
                     ">"
                 ),
-                verifier: "verus",
-                kind: "ensures",
-                fragment: || TEN_INCREMENT_WRITE_THROUGH_VERUS_FRAGMENT,
-            }
+                "verus",
+                "ensures",
+                || TEN_INCREMENT_WRITE_THROUGH_VERUS_FRAGMENT,
+            )
         }
     };
 }
@@ -5539,21 +5539,21 @@ bridge_verus_witness!(RustStdStandard<std::slice::EscapeAscii<'static>>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
-        verifier: "verus",
-        kind: "requires",
-        fragment: || ESCAPE_ASCII_INPUT_IS_PRINTABLE_ASCII_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        "verus",
+        "requires",
+        || ESCAPE_ASCII_INPUT_IS_PRINTABLE_ASCII_VERUS_FRAGMENT,
+    )
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::slice::EscapeAscii<'static>>",
+        "verus",
+        "ensures",
+        || ESCAPE_ASCII_RESULT_MATCHES_PRINTABLE_PLUS_NEWLINE_ESCAPE_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC: &str =
@@ -6732,12 +6732,12 @@ amenable_derive::verus_ensures_witness!(
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::sync::atomic::AtomicPtr<i32>>",
+        "verus",
+        "ensures",
+        || ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC: &str =
@@ -7376,12 +7376,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::DirBuilder>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::DirBuilder>",
+        "verus",
+        "ensures",
+        || DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_SRC: &str =
@@ -7422,12 +7422,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::DirEntry>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::DirEntry>",
+        "verus",
+        "ensures",
+        || DIR_ENTRY_MODEL_REPORTS_THE_CREATED_FILES_NAME_AND_PATH_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_SRC: &str =
@@ -7469,12 +7469,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::ReadDir>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::ReadDir>",
+        "verus",
+        "ensures",
+        || READ_DIR_MODEL_ITERATES_EVERY_ENTRY_IN_THE_DIRECTORY_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_SRC: &str =
@@ -7514,12 +7514,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::File>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::File>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::File>",
+        "verus",
+        "ensures",
+        || FILE_MODEL_WRITE_THEN_READ_ROUND_TRIPS_THE_BYTES_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_SRC: &str =
@@ -7558,12 +7558,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::FileTimes>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::FileTimes>",
+        "verus",
+        "ensures",
+        || FILE_TIMES_MODEL_SETS_THE_RECORDED_MODIFICATION_TIME_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_SRC: &str =
@@ -7603,12 +7603,12 @@ bridge_verus_witness!(RustStdStandard<std::fs::Metadata>);
 }
 
 ::inventory::submit! {
-    ::amenable_core::ContractRecord {
-        evidence: "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
-        verifier: "verus",
-        kind: "ensures",
-        fragment: || METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_VERUS_FRAGMENT,
-    }
+    ::amenable_core::ContractRecord::new(
+        "amenable_std::rust_std::RustStdStandard<std::fs::Metadata>",
+        "verus",
+        "ensures",
+        || METADATA_MODEL_REPORTS_THE_WRITTEN_LENGTH_VERUS_FRAGMENT,
+    )
 }
 
 const VERIFY_FILE_TYPE_MODEL_DISTINGUISHES_FILES_FROM_DIRECTORIES_SRC: &str =
@@ -7841,12 +7841,12 @@ macro_rules! impl_env_args_verus_witness {
         }
 
         ::inventory::submit! {
-            ::amenable_core::ContractRecord {
-                evidence: concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
-                verifier: "verus",
-                kind: "ensures",
-                fragment: || ARGS_MODEL_COUNT_MATCHES_PROGRAM_PLUS_EXTRA_VERUS_FRAGMENT,
-            }
+            ::amenable_core::ContractRecord::new(
+                concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
+                "verus",
+                "ensures",
+                || ARGS_MODEL_COUNT_MATCHES_PROGRAM_PLUS_EXTRA_VERUS_FRAGMENT,
+            )
         }
     };
 }
