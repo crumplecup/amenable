@@ -64,15 +64,50 @@ impl Transition {
 /// inherent method's own name and verbatim body — never hand-typed, so
 /// it can't drift from the real logic the way a hand-maintained
 /// description could.
-#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
+///
+/// Hand-written `new`/getters instead of `derive_new`/`derive_getters`:
+/// this file is `#[path]`-included directly into `amenable_verus`, and
+/// the real `verus` binary is invoked as a bare compiler that never
+/// reads `Cargo.toml` -- see [`crate::MetadataEntry`]'s own doc comment
+/// for the same constraint, confirmed the identical way here (`cargo
+/// check --all-features` passed, the real `verus` binary failed with
+/// "cannot find crate `derive_getters`").
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TransitionAudit {
+    to: String,
+    method_name: String,
+    body: String,
+}
+
+impl TransitionAudit {
+    /// Record a transition's real audit content.
+    #[must_use]
+    pub fn new(to: String, method_name: String, body: String) -> Self {
+        Self {
+            to,
+            method_name,
+            body,
+        }
+    }
+
     /// The target state's declared name — the evidence type this
     /// transition establishes.
-    to: String,
+    #[must_use]
+    pub fn to(&self) -> &str {
+        &self.to
+    }
+
     /// The real inherent method's own name.
-    method_name: String,
+    #[must_use]
+    pub fn method_name(&self) -> &str {
+        &self.method_name
+    }
+
     /// The real inherent method's own body, verbatim.
-    body: String,
+    #[must_use]
+    pub fn body(&self) -> &str {
+        &self.body
+    }
 }
 
 /// A declared state's real, lawful root constructor — the answer to

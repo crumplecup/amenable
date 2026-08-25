@@ -5,16 +5,49 @@ use std::fmt::{self, Display, Formatter};
 use crate::Registry;
 
 /// One provenance metadata fact expressed as a key-value pair.
-#[derive(
-    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
-)]
+///
+/// Hand-written `new`/`key`/`value` instead of `derive_new`/
+/// `derive_getters`, despite otherwise matching that exact shape:
+/// `amenable_verus` `#[path]`-includes this file directly into its own
+/// crate, and the real `verus` binary is invoked as a bare compiler
+/// over a single file tree (`verus --crate-type=lib
+/// crates/amenable_verus/src/lib.rs`) that never reads `Cargo.toml` at
+/// all -- so a dependency declared there (even a real one, as
+/// confirmed by `cargo check --all-features` passing) is still
+/// invisible to the real verifier. Confirmed the hard way, twice: a
+/// version of this file gained these derives, `cargo check
+/// --all-features` passed clean (only `amenable_verus`'s own
+/// `Cargo.toml` dependency, checked via ordinary `cargo`, which does
+/// read `Cargo.toml`), and the real `verus` binary still failed with
+/// "cannot find crate `derive_getters`" -- the two toolchains disagree
+/// about what's resolvable here, and only the real `verus` invocation
+/// is authoritative for this file.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct MetadataEntry {
     /// Stable metadata key.
-    #[new(into)]
     key: String,
     /// Stable metadata value.
-    #[new(into)]
     value: String,
+}
+
+impl MetadataEntry {
+    /// Create a new provenance metadata entry.
+    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
+    }
+
+    /// Return the metadata key.
+    pub fn key(&self) -> &str {
+        &self.key
+    }
+
+    /// Return the metadata value.
+    pub fn value(&self) -> &str {
+        &self.value
+    }
 }
 
 impl Display for MetadataEntry {
