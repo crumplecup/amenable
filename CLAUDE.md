@@ -265,14 +265,18 @@ pub enum StorageErrorKind {
 Wrapper (error + location):
 
 ```rust
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("Storage: {} at {}:{}", kind, file, line)]
 pub struct StorageError {
-    pub kind: StorageErrorKind,
-    pub line: u32,
-    pub file: String,  // ✅ owned -- errors aren't a hot path, don't borrow
+    kind: StorageErrorKind,
+    line: u32,
+    file: String,  // ✅ owned -- errors aren't a hot path, don't borrow
 }
 ```
+
+Fields are private with `derive_getters::Getters` accessors, same as any other type -- error types are not a
+`pub`-field exception. `#[error(source)]` (for `derive_more::Error`'s `source()` chaining, see Pattern 3) targets a
+field, not a getter, so privacy and the `source()` chain don't conflict.
 
 Do not derive `PartialEq`, `Eq`, `Hash`, `PartialOrd`, `Ord` on wrapper errors (location tracking makes comparison confusing).
 
@@ -295,16 +299,17 @@ Audit checklist:
 - ✅ No manual `impl std::error::Error`
 - ✅ All constructors use `#[track_caller]`
 - ✅ Error `file` fields are owned `String` (errors aren't a hot path; don't borrow to save an allocation)
+- ✅ Error struct fields are private, with `derive_getters::Getters` accessors (error types are not a `pub`-field exception)
 
 ### Pattern 1: Simple Error (message + location)
 
 ```rust
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("HTTP Error: {} at {}:{}", message, file, line)]
 pub struct HttpError {
-    pub message: String,
-    pub line: u32,
-    pub file: String,
+    message: String,
+    line: u32,
+    file: String,
 }
 
 impl HttpError {
@@ -336,12 +341,13 @@ pub enum StorageErrorKind {
 ### Pattern 3: Wrapper (ErrorKind + location)
 
 ```rust
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("Storage: {} at {}:{}", kind, file, line)]
 pub struct StorageError {
-    pub kind: StorageErrorKind,
-    pub line: u32,
-    pub file: String,
+    #[error(source)]
+    kind: StorageErrorKind,
+    line: u32,
+    file: String,
 }
 
 impl StorageError {
