@@ -1016,7 +1016,7 @@ amenable_derive::harness! {
                 a, b, c, pattern,
             )));
             let observation =
-                crate::KaniStrRSplitNObservation::new(a as char, pattern as char, b as char, c as char);
+                crate::KaniStrRSplitNObservationBuilder::default().a(a as char).pattern(pattern as char).b(b as char).c(c as char).build().expect("all fields set");
             let (first, rest) = observation.rsplitn_two();
             assert_eq!(first, c as char, "rsplitn's first piece is everything after the last match");
             assert_eq!(
@@ -1189,7 +1189,7 @@ amenable_derive::harness! {
                 f0, f1, f2, pattern,
             )));
             let observation =
-                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+                crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
             assert_eq!(
                 observation.matches(),
                 [pattern as char, pattern as char],
@@ -1242,7 +1242,7 @@ amenable_derive::harness! {
                 f0, f1, f2, pattern,
             )));
             let observation =
-                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+                crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
             assert_eq!(
                 observation.rmatches(),
                 [pattern as char, pattern as char],
@@ -1296,7 +1296,7 @@ amenable_derive::harness! {
                 f0, f1, f2, pattern,
             )));
             let observation =
-                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+                crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
             assert_eq!(
                 observation.match_indices(),
                 [(1, pattern as char), (3, pattern as char)],
@@ -1354,7 +1354,7 @@ amenable_derive::harness! {
                 f0, f1, f2, pattern,
             )));
             let observation =
-                crate::KaniStrMatchObservation::new(f0 as char, pattern as char, f1 as char, f2 as char);
+                crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
             assert_eq!(
                 observation.rmatch_indices(),
                 [(3, pattern as char), (1, pattern as char)],

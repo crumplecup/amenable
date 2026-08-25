@@ -59,7 +59,7 @@ impl Provenance for KaniStrRSplitWindow {
 }
 
 /// Bounded one-occurrence `rsplit` observation for `[before, pattern, after]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniStrRSplitObservation {
     before: char,
     pattern: char,
@@ -67,16 +67,6 @@ pub struct KaniStrRSplitObservation {
 }
 
 impl KaniStrRSplitObservation {
-    /// Construct the bounded `[before, pattern, after]` witness.
-    #[must_use]
-    pub fn new(before: char, pattern: char, after: char) -> Self {
-        Self {
-            before,
-            pattern,
-            after,
-        }
-    }
-
     /// Model `rsplit(pattern)` over the bounded witness: the piece after
     /// the match comes first.
     #[must_use]
@@ -135,23 +125,21 @@ impl Provenance for KaniStrRSplitNWindow {
 
 /// Bounded two-occurrence `rsplitn` observation for `[a, pattern, b,
 /// pattern, c]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
 pub struct KaniStrRSplitNObservation {
+    /// The leading occurrence.
     a: char,
+    /// The (repeated) pattern. Both occurrences of the pattern share the
+    /// same value, matching a real `char`-`Pattern` search on a str that
+    /// contains it exactly twice.
     pattern: char,
+    /// The middle occurrence.
     b: char,
+    /// The trailing occurrence.
     c: char,
 }
 
 impl KaniStrRSplitNObservation {
-    /// Construct the bounded two-occurrence witness. Both occurrences of
-    /// the pattern share the same `pattern` value, matching a real
-    /// `char`-`Pattern` search on a str that contains it exactly twice.
-    #[must_use]
-    pub fn new(a: char, pattern: char, b: char, c: char) -> Self {
-        Self { a, pattern, b, c }
-    }
-
     /// Model `rsplitn(2, pattern)` over the bounded witness: the piece
     /// after the last match comes first, then everything before it, uncut.
     #[must_use]
@@ -205,7 +193,7 @@ impl Provenance for KaniStrSplitTerminatorWindow {
 
 /// Bounded two-occurrence, nothing-trailing `split_terminator` observation
 /// for `[a, pattern, b, pattern]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
 pub struct KaniStrSplitTerminatorObservation {
     a: char,
     pattern: char,
@@ -213,13 +201,6 @@ pub struct KaniStrSplitTerminatorObservation {
 }
 
 impl KaniStrSplitTerminatorObservation {
-    /// Construct the bounded `[a, pattern, b, pattern]` witness (nothing
-    /// after the second, terminal match).
-    #[must_use]
-    pub fn new(a: char, pattern: char, b: char) -> Self {
-        Self { a, pattern, b }
-    }
-
     /// Model `split_terminator(pattern)` over the bounded witness: no
     /// trailing empty piece after the terminal match.
     #[must_use]
@@ -281,26 +262,19 @@ impl Provenance for KaniStrMatchWindow {
 
 /// Bounded two-occurrence `matches`/`match_indices` observation for
 /// `[f0, pattern, f1, pattern, f2]`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
 pub struct KaniStrMatchObservation {
+    /// The element before the first match.
     f0: char,
+    /// The (repeated) matched pattern.
     pattern: char,
+    /// The element between the two matches.
     f1: char,
+    /// The element after the second match.
     f2: char,
 }
 
 impl KaniStrMatchObservation {
-    /// Construct the bounded `[f0, pattern, f1, pattern, f2]` witness.
-    #[must_use]
-    pub fn new(f0: char, pattern: char, f1: char, f2: char) -> Self {
-        Self {
-            f0,
-            pattern,
-            f1,
-            f2,
-        }
-    }
-
     /// Model `matches(pattern)` over the bounded witness.
     #[must_use]
     pub fn matches(&self) -> [char; 2] {

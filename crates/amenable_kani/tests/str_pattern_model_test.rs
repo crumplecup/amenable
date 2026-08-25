@@ -1,5 +1,5 @@
 use amenable_kani::{
-    KaniStrMatchObservation, KaniStrRSplitNObservation, KaniStrRSplitObservation,
+    KaniStrMatchObservationBuilder, KaniStrRSplitNObservationBuilder, KaniStrRSplitObservation,
     KaniStrSplitTerminatorObservation,
 };
 
@@ -13,7 +13,13 @@ fn rsplit_observation_reverses_the_before_after_order() {
 
 #[test]
 fn rsplitn_observation_keeps_the_uncut_leading_piece() {
-    let observation = KaniStrRSplitNObservation::new('a', ',', 'b', 'c');
+    let observation = KaniStrRSplitNObservationBuilder::default()
+        .a('a')
+        .pattern(',')
+        .b('b')
+        .c('c')
+        .build()
+        .expect("all fields set");
 
     assert_eq!(observation.rsplitn_two(), ('c', ['a', ',', 'b']));
 }
@@ -28,7 +34,13 @@ fn split_terminator_observation_suppresses_the_trailing_empty_piece() {
 
 #[test]
 fn match_observation_pairs_each_occurrence_with_its_byte_offset() {
-    let observation = KaniStrMatchObservation::new('x', 'a', 'y', 'z');
+    let observation = KaniStrMatchObservationBuilder::default()
+        .f0('x')
+        .pattern('a')
+        .f1('y')
+        .f2('z')
+        .build()
+        .expect("all fields set");
 
     assert_eq!(observation.matches(), ['a', 'a']);
     assert_eq!(observation.rmatches(), ['a', 'a']);

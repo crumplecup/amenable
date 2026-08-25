@@ -116,8 +116,8 @@ pub use slice_split_model::{
 };
 pub use stoplight::{Established, GreenToken, RedToken, Stoplight, StoplightError, YellowToken};
 pub use str_pattern_model::{
-    KaniStrMatchObservation, KaniStrRSplitNObservation, KaniStrRSplitObservation,
-    KaniStrSplitTerminatorObservation,
+    KaniStrMatchObservation, KaniStrMatchObservationBuilder, KaniStrRSplitNObservation,
+    KaniStrRSplitNObservationBuilder, KaniStrRSplitObservation, KaniStrSplitTerminatorObservation,
 };
 pub use string_drain_model::KaniStringDrainObservation;
 pub use sync_lock_model::{
