@@ -52,25 +52,23 @@ verus_builtin_macros = "0.0.0-2026-05-31-0205"
 verus_syn = "0.0.0-2026-08-02-0125"
 vstd = "0.0.0-2026-05-31-0205"
 
-# Union of every crate-specific `unexpected_cfgs` check-cfg list this
-# workspace used to carry per-crate. Cargo doesn't allow `[lints]
-# workspace = true` (needed so every crate picks up the shared clippy
-# list below) to coexist with a crate-local `[lints.rust]` override in
-# the same manifest -- since check-cfg only ever widens what's silently
-# accepted, not narrows it, unioning is safe: a crate accepting a cfg
-# name it never actually uses can't hide a real bug in that name's own
-# gated code, only in principle let a *misplaced* use of another
-# backend's cfg name go unflagged (e.g. an accidental `#[cfg(creusot)]`
-# copy-pasted into `amenable_kani`) -- a real, if minor, precision loss
-# versus the old per-crate lists, not eliminated here.
-[workspace.lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = [
-  "cfg(kani)",
-  "cfg(creusot)",
-  "cfg(verus)",
-  "cfg(verus_verify_core)",
-  "cfg(verus_keep_ghost)",
-] }
+# No [workspace.lints.rust] unexpected_cfgs here: a workspace-wide union
+# list was tried and reverted -- it let a verifier's cfg name go
+# "expected" in every crate, not just its own (e.g. an accidental
+# `#[cfg(creusot)]` copy-pasted into `amenable_kani` would silently pass,
+# since `creusot` was declared expected workspace-wide). Cargo doesn't
+# allow `[lints] workspace = true` (needed for the shared clippy list
+# below) to coexist with a crate-local `[lints.rust]` override in the
+# same manifest, so each crate that has its own real cfg names declares
+# them via a small `build.rs` (`cargo::rustc-check-cfg=cfg(name)`)
+# instead -- independent of the `[lints]` table entirely, so `workspace
+# = true` and a crate-scoped check-cfg list both hold at once. Verified
+# empirically per crate (`cargo clippy` with an empty check-cfg list,
+# reading exactly which crate/file/name each real warning named) rather
+# than assumed from the old list: `verus`/`verus_verify_core` turned out
+# to be declared but never actually used anywhere in the workspace, and
+# `amenable_gaap` turned out to need `kani` even though it wasn't on the
+# old list at all.
 
 # Stricter-than-default clippy config, per
 # https://emschwartz.me/your-clippy-config-should-be-stricter/ -- selective
