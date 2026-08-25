@@ -111,11 +111,9 @@ fn gather_tokens() -> BTreeMap<&'static str, TokenSpec> {
     let mut gathered: BTreeMap<&'static str, TokenSpec> = BTreeMap::new();
 
     for record in inventory::iter::<ProofTokenMintRecord>() {
-        let ProofTokenMintRecord {
-            token,
-            proposition,
-            credential,
-        } = *record;
+        let token = record.token();
+        let proposition = record.proposition();
+        let credential = record.credential();
 
         let richer =
             !matches!(gathered.get(token), Some(existing) if existing.credential.is_some());

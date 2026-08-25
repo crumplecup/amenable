@@ -35,11 +35,11 @@ pub fn expand_proof_token(input: &DeriveInput) -> syn::Result<TokenStream> {
         }
 
         ::inventory::submit! {
-            ::amenable_core::ProofTokenMintRecord {
-                token: stringify!(#name),
-                proposition: stringify!(#proposition),
-                credential: None,
-            }
+            ::amenable_core::ProofTokenMintRecord::new(
+                stringify!(#name),
+                stringify!(#proposition),
+                None,
+            )
         }
     })
 }

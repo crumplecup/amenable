@@ -111,16 +111,50 @@ pub struct TransitionAudit {
 /// bundles them into one real struct elsewhere in this codebase
 /// (`TransferPayload` itself bundling `from`/`to`/`amount`) rather than
 /// this mechanism supporting several raw arguments directly.
+///
+/// Hand-written `const fn new`/getters, not derived: every real
+/// `StateMachine::root_entries()` impl builds a `&'static [RootEntry]`
+/// array literal, which only compiles via `rustc`'s rvalue static
+/// promotion -- itself only available for `const`-evaluable element
+/// construction, which `derive_new::new` cannot generate (see
+/// [`Transition`]'s own doc comment for the same constraint, hit first).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RootEntry {
+    state: &'static str,
+    constructor: &'static str,
+    seed: &'static str,
+}
+
+impl RootEntry {
+    /// Declare a root state entered by `constructor`, seeded by `seed`.
+    #[must_use]
+    pub const fn new(state: &'static str, constructor: &'static str, seed: &'static str) -> Self {
+        Self {
+            state,
+            constructor,
+            seed,
+        }
+    }
+
     /// The state's declared name.
-    pub state: &'static str,
+    #[must_use]
+    pub const fn state(&self) -> &'static str {
+        self.state
+    }
+
     /// The real, compiler-checked path to the function returning that
     /// state's own declared carrier type.
-    pub constructor: &'static str,
+    #[must_use]
+    pub const fn constructor(&self) -> &'static str {
+        self.constructor
+    }
+
     /// `"()"` for a root callable with no arguments; otherwise the
     /// real type `constructor` requires as its one real argument.
-    pub seed: &'static str,
+    #[must_use]
+    pub const fn seed(&self) -> &'static str {
+        self.seed
+    }
 }
 
 /// A closed, proof-bearing state machine. Every method here is backed by

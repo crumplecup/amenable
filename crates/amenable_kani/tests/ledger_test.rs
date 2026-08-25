@@ -248,11 +248,11 @@ fn ledger_transitions_reports_all_four_declared_edges_in_declaration_order() {
 fn ledger_root_entries_reports_pending_and_its_real_seed_type() {
     assert_eq!(
         <Ledger as StateMachine<KaniVerifier>>::root_entries(),
-        &[RootEntry {
-            state: "Pending",
-            constructor: "Transfer::pending",
-            seed: "TransferPayload",
-        }]
+        &[RootEntry::new(
+            "Pending",
+            "Transfer::pending",
+            "TransferPayload",
+        )]
     );
 }
 

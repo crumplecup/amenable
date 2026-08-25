@@ -397,17 +397,14 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
                 None => quote! { "()" },
             };
             quote! {
-                ::amenable_core::RootEntry {
-                    state: #name,
-                    constructor: #root_str,
-                    seed: #seed_str,
-                }
+                ::amenable_core::RootEntry::new(#name, #root_str, #seed_str)
             }
         });
 
         quote! {
             fn root_entries() -> &'static [::amenable_core::RootEntry] {
-                &[#(#entries),*]
+                const ROOT_ENTRIES: &[::amenable_core::RootEntry] = &[#(#entries),*];
+                ROOT_ENTRIES
             }
         }
     };

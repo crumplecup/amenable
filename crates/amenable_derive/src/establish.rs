@@ -204,11 +204,11 @@ pub fn expand_establish(args: &EstablishArgs, item: &ItemStruct) -> syn::Result<
             // `ProofTokenMintRecord`'s own doc comment for why this exists
             // at all.
             ::inventory::submit! {
-                ::amenable_core::ProofTokenMintRecord {
-                    token: stringify!(#name),
-                    proposition: stringify!(#proposition),
-                    credential: Some(stringify!(#credential)),
-                }
+                ::amenable_core::ProofTokenMintRecord::new(
+                    stringify!(#name),
+                    stringify!(#proposition),
+                    Some(stringify!(#credential)),
+                )
             }
         },
     };
