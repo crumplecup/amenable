@@ -117,11 +117,11 @@ pub trait CreusotWitness {
 /// (`ProofArtifact = ()`) and only builds one of these on the
 /// `#[cfg(not(creusot))]` side.
 #[cfg(not(creusot))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct MultiCheckProof {
     /// Each real Creusot contract function backing this claim, and its
     /// own verbatim source.
-    pub checks: Vec<(String, String)>,
+    checks: Vec<(String, String)>,
 }
 
 #[cfg(not(creusot))]

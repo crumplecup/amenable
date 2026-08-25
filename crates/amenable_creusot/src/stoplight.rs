@@ -373,12 +373,10 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Yellow {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "green_to_yellow".to_owned(),
-                VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "green_to_yellow".to_owned(),
+            VERIFY_GREEN_TO_YELLOW_EXCHANGE_SRC.to_owned(),
+        )])
     }
 }
 
@@ -397,12 +395,10 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Red {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "yellow_to_red".to_owned(),
-                VERIFY_YELLOW_TO_RED_EXCHANGE_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "yellow_to_red".to_owned(),
+            VERIFY_YELLOW_TO_RED_EXCHANGE_SRC.to_owned(),
+        )])
     }
 }
 
@@ -428,12 +424,10 @@ impl amenable_core::Witness<CreusotVerifier> for amenable_core::Green {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "red_to_green".to_owned(),
-                VERIFY_RED_TO_GREEN_EXCHANGE_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "red_to_green".to_owned(),
+            VERIFY_RED_TO_GREEN_EXCHANGE_SRC.to_owned(),
+        )])
     }
 }
 

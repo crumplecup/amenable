@@ -511,12 +511,10 @@ impl amenable_core::Witness<CreusotVerifier> for AmountPositive {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "check_amount_positive".to_owned(),
-                VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "check_amount_positive".to_owned(),
+            VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+        )])
     }
 }
 
@@ -559,12 +557,10 @@ impl amenable_core::Witness<CreusotVerifier> for SufficientFunds {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "check_sufficient_funds".to_owned(),
-                VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "check_sufficient_funds".to_owned(),
+            VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+        )])
     }
 }
 
@@ -611,12 +607,10 @@ impl amenable_core::Witness<CreusotVerifier> for AccountsDistinct {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "check_accounts_distinct".to_owned(),
-                VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "check_accounts_distinct".to_owned(),
+            VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
+        )])
     }
 }
 
@@ -707,22 +701,20 @@ amenable_derive::harness! {
 /// way, building this very module).
 #[cfg(not(creusot))]
 fn validated_proof() -> crate::witness::MultiCheckProof {
-    crate::witness::MultiCheckProof {
-        checks: vec![
-            (
-                "check_amount_positive".to_owned(),
-                VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
-            ),
-            (
-                "check_sufficient_funds".to_owned(),
-                VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
-            ),
-            (
-                "check_accounts_distinct".to_owned(),
-                VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
-            ),
-        ],
-    }
+    crate::witness::MultiCheckProof::new(vec![
+        (
+            "check_amount_positive".to_owned(),
+            VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+        ),
+        (
+            "check_sufficient_funds".to_owned(),
+            VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+        ),
+        (
+            "check_accounts_distinct".to_owned(),
+            VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
+        ),
+    ])
 }
 
 #[cfg(creusot)]
@@ -812,12 +804,10 @@ impl amenable_core::Witness<CreusotVerifier> for BalancedEntries {
     type ProofArtifact = crate::witness::MultiCheckProof;
 
     fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof {
-            checks: vec![(
-                "check_commit_balances".to_owned(),
-                VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
-            )],
-        }
+        crate::witness::MultiCheckProof::new(vec![(
+            "check_commit_balances".to_owned(),
+            VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
+        )])
     }
 }
 
@@ -833,12 +823,10 @@ impl amenable_core::Ensures<CreusotVerifier> for BalancedEntries {
 
 #[cfg(not(creusot))]
 fn committed_proof() -> crate::witness::MultiCheckProof {
-    crate::witness::MultiCheckProof {
-        checks: vec![(
-            "check_commit_balances".to_owned(),
-            VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
-        )],
-    }
+    crate::witness::MultiCheckProof::new(vec![(
+        "check_commit_balances".to_owned(),
+        VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
+    )])
 }
 
 #[cfg(creusot)]
