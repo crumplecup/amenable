@@ -76,21 +76,25 @@ use crate::{AmenableError, AmenableResult};
 pub fn write_verus_exchange_companions(root: &Path) -> AmenableResult<Vec<PathBuf>> {
     let mut records: Vec<&ExchangeEdgeRecord> = inventory::iter::<ExchangeEdgeRecord>()
         .filter(|record| {
-            edge_group(&tidy_stringified_type(record.self_ty), record.method_name).is_some()
+            edge_group(
+                &tidy_stringified_type(record.self_ty()),
+                record.method_name(),
+            )
+            .is_some()
         })
         .collect();
-    records.sort_by_key(|record| (record.self_ty, record.method_name));
+    records.sort_by_key(|record| (record.self_ty(), record.method_name()));
 
     let mut written = Vec::with_capacity(records.len());
     for record in records {
-        let self_ty = tidy_stringified_type(record.self_ty);
-        let Some(group) = edge_group(&self_ty, record.method_name) else {
+        let self_ty = tidy_stringified_type(record.self_ty());
+        let Some(group) = edge_group(&self_ty, record.method_name()) else {
             continue;
         };
         let dir = root.join(group);
         fs::create_dir_all(&dir).map_err(|error| AmenableError::io(&dir, error))?;
 
-        let path = dir.join(format!("{}.rs", record.method_name));
+        let path = dir.join(format!("{}.rs", record.method_name()));
         let source = render_companion(record);
         fs::write(&path, source).map_err(|error| AmenableError::io(&path, error))?;
         written.push(path);
@@ -126,7 +130,7 @@ fn edge_group(self_ty: &str, method_name: &str) -> Option<&'static str> {
 /// verifier marker is always `GalleryVerifier` (every gallery case
 /// defines its own, matching `gallery::evidence_self_referential_root`'s
 /// own doc comment for why), not derivable from `ExchangeEdgeRecord` --
-/// `record.self_ty` is Kani's own `Stoplight`/`Ledger`, which happens to
+/// `record.self_ty()` is Kani's own `Stoplight`/`Ledger`, which happens to
 /// match the gallery's own identically-named local type by convention,
 /// the same way every other type name here does. `$self_param` is always
 /// literally `self`, not a variable name -- unlike `$input_param`
@@ -172,13 +176,13 @@ fn render_companion(record: &ExchangeEdgeRecord) -> String {
          {body}\n\
          \x20\x20\x20\x20}}\n\
          );\n",
-        self_ty = tidy_stringified_type(record.self_ty),
-        method_name = record.method_name,
-        input_ty = tidy_stringified_type(record.input_ty),
-        output_ty = tidy_stringified_type(record.output_ty),
-        error_ty = tidy_stringified_type(record.error_ty),
-        evidence = tidy_stringified_type(record.evidence),
-        body = indent_body(record.body),
+        self_ty = tidy_stringified_type(record.self_ty()),
+        method_name = record.method_name(),
+        input_ty = tidy_stringified_type(record.input_ty()),
+        output_ty = tidy_stringified_type(record.output_ty()),
+        error_ty = tidy_stringified_type(record.error_ty()),
+        evidence = tidy_stringified_type(record.evidence()),
+        body = indent_body(record.body()),
     )
 }
 

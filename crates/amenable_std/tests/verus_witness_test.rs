@@ -4860,8 +4860,8 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
     assert_eq!(shape.module_path, "crate::rust_std::char_carrier");
     assert_eq!(shape.name, "verify_char_roundtrip");
     assert_eq!(shape.params.len(), 1);
-    assert_eq!(shape.params[0].name, "c");
-    assert_eq!(shape.params[0].ty, "char");
+    assert_eq!(shape.params[0].name(), "c");
+    assert_eq!(shape.params[0].ty(), "char");
     assert!(shape.requires.is_empty());
     assert_eq!(
         shape.ensures,
@@ -4873,14 +4873,14 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
     assert_eq!(
         shape.imports,
         vec![
-            VerusImport {
-                module_path: "crate::rust_std::char_carrier".to_owned(),
-                name: "char_roundtrip_preserves_value".to_owned(),
-            },
-            VerusImport {
-                module_path: "crate::rust_std::char_carrier".to_owned(),
-                name: "char_is_valid_unicode_scalar".to_owned(),
-            },
+            VerusImport::new(
+                "crate::rust_std::char_carrier".to_owned(),
+                "char_roundtrip_preserves_value".to_owned(),
+            ),
+            VerusImport::new(
+                "crate::rust_std::char_carrier".to_owned(),
+                "char_is_valid_unicode_scalar".to_owned(),
+            ),
         ]
     );
     assert_eq!(
@@ -4899,8 +4899,8 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
 
     assert_eq!(shape.module_path, "crate::rust_std::ref_cell_carrier");
     assert_eq!(shape.params.len(), 2);
-    assert_eq!(shape.params[0].name, "initial");
-    assert_eq!(shape.params[1].name, "updated");
+    assert_eq!(shape.params[0].name(), "initial");
+    assert_eq!(shape.params[1].name(), "updated");
     assert!(shape.requires.is_empty());
     assert_eq!(
         shape.ensures,
@@ -4915,10 +4915,10 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
     );
     assert_eq!(
         shape.imports,
-        vec![VerusImport {
-            module_path: "crate::rust_std::primitive_shapes_carrier".to_owned(),
-            name: "observed_value_matches_input".to_owned(),
-        }]
+        vec![VerusImport::new(
+            "crate::rust_std::primitive_shapes_carrier".to_owned(),
+            "observed_value_matches_input".to_owned(),
+        )]
     );
     Ok(())
 }

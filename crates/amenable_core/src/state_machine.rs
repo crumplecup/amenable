@@ -28,27 +28,51 @@
 use crate::Verifier;
 
 /// One declared transition between two named states.
+///
+/// Hand-written `const fn new`/getters, not derived: every real
+/// `StateMachine::transitions()` impl builds a `&'static [Transition]`
+/// array literal, which only compiles via `rustc`'s rvalue static
+/// promotion -- itself only available for `const`-evaluable element
+/// construction, which `derive_new::new` cannot generate.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Transition {
+    from: &'static str,
+    to: &'static str,
+}
+
+impl Transition {
+    /// Declare a transition from `from` to `to`.
+    #[must_use]
+    pub const fn new(from: &'static str, to: &'static str) -> Self {
+        Self { from, to }
+    }
+
     /// The source state's declared name.
-    pub from: &'static str,
+    #[must_use]
+    pub const fn from(&self) -> &'static str {
+        self.from
+    }
+
     /// The target state's declared name.
-    pub to: &'static str,
+    #[must_use]
+    pub const fn to(&self) -> &'static str {
+        self.to
+    }
 }
 
 /// Real, registry-backed audit content for one transition: the real
 /// inherent method's own name and verbatim body — never hand-typed, so
 /// it can't drift from the real logic the way a hand-maintained
 /// description could.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct TransitionAudit {
     /// The target state's declared name — the evidence type this
     /// transition establishes.
-    pub to: String,
+    to: String,
     /// The real inherent method's own name.
-    pub method_name: String,
+    method_name: String,
     /// The real inherent method's own body, verbatim.
-    pub body: String,
+    body: String,
 }
 
 /// A declared state's real, lawful root constructor — the answer to

@@ -224,7 +224,7 @@ fn ledger_transitions_reports_all_four_declared_edges_in_declaration_order() {
     let transitions = <Ledger as StateMachine<KaniVerifier>>::transitions();
     let pairs: Vec<(&str, &str)> = transitions
         .iter()
-        .map(|transition| (transition.from, transition.to))
+        .map(|transition| (transition.from(), transition.to()))
         .collect();
 
     assert_eq!(
@@ -277,13 +277,13 @@ fn ledger_declared_transitions_match_real_exchange_edge_registrations_exactly() 
 
     let mut declared: Vec<String> = <Ledger as StateMachine<KaniVerifier>>::transitions()
         .iter()
-        .map(|transition| normalize(transition.to))
+        .map(|transition| normalize(transition.to()))
         .collect();
     declared.sort_unstable();
 
     let mut registered: Vec<String> = inventory::iter::<ExchangeEdgeRecord>()
-        .filter(|record| record.self_ty == "Ledger")
-        .map(|record| normalize(record.evidence))
+        .filter(|record| record.self_ty() == "Ledger")
+        .map(|record| normalize(record.evidence()))
         .collect();
     registered.sort_unstable();
 

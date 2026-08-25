@@ -349,17 +349,17 @@ pub fn expand_capture_exchange_body(
         // own companion from the real body, without a Cargo dependency
         // on this crate's method at all.
         ::inventory::submit! {
-            ::amenable_core::ExchangeEdgeRecord {
-                self_ty: stringify!(#self_ty),
-                input_ty: stringify!(#input_ty),
-                output_ty: stringify!(#output_ty),
-                error_ty: stringify!(#error_ty),
-                evidence: stringify!(#evidence),
-                method_name: stringify!(#method_ident),
-                body: #body_source,
-                creusot_ensures: #creusot_ensures_lit,
-                method_generics: #method_generics_lit,
-            }
+            ::amenable_core::ExchangeEdgeRecord::new(
+                stringify!(#self_ty),
+                stringify!(#input_ty),
+                stringify!(#output_ty),
+                stringify!(#error_ty),
+                stringify!(#evidence),
+                stringify!(#method_ident),
+                #body_source,
+            )
+            .with_creusot_ensures(#creusot_ensures_lit)
+            .with_method_generics(#method_generics_lit)
         }
     })
 }

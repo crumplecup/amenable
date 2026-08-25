@@ -305,12 +305,12 @@ impl std::fmt::Display for VerusCheckedProof {
 }
 
 /// One symbolic input a real Verus harness takes, in declaration order.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct VerusParam {
     /// The parameter's real name in the harness signature.
-    pub name: String,
+    name: String,
     /// The parameter's real Verus type, as written in the signature.
-    pub ty: String,
+    ty: String,
 }
 
 /// A real predicate/spec-fn a harness's clause templates cite, together
@@ -322,12 +322,12 @@ pub struct VerusParam {
 /// `ref_cell_carrier` — importing it via the harness's own module path
 /// (`crate::rust_std::ref_cell_carrier::observed_value_matches_input`)
 /// failed with `E0603: function import ... is private`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct VerusImport {
     /// The predicate/spec-fn's own defining module.
-    pub module_path: String,
+    module_path: String,
     /// The predicate/spec-fn's real name.
-    pub name: String,
+    name: String,
 }
 
 /// How a compositional renderer should invoke a leaf's real Verus proof,
@@ -481,18 +481,18 @@ macro_rules! register_verus_call_shape {
                     module_path: $module_path.to_owned(),
                     name: $harness.to_owned(),
                     params: ::std::vec![
-                        $($crate::VerusParam {
-                            name: $param_name.to_owned(),
-                            ty: $param_ty.to_owned(),
-                        }),*
+                        $($crate::VerusParam::new(
+                            $param_name.to_owned(),
+                            $param_ty.to_owned(),
+                        )),*
                     ],
                     requires: ::std::vec![$($requires_template.to_owned()),*],
                     ensures: ::std::vec![$($ensures_template.to_owned()),*],
                     imports: ::std::vec![
-                        $($crate::VerusImport {
-                            module_path: $import_module.to_owned(),
-                            name: $import_name.to_owned(),
-                        }),*
+                        $($crate::VerusImport::new(
+                            $import_module.to_owned(),
+                            $import_name.to_owned(),
+                        )),*
                     ],
                     kind: $crate::VerusCallKind::Function {
                         returns: $returns.to_owned(),

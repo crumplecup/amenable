@@ -304,7 +304,7 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
     let transitions = block.edges.iter().map(|edge| {
         let from = &edge.from;
         let to = &edge.to;
-        quote! { ::amenable_core::Transition { from: #from, to: #to } }
+        quote! { ::amenable_core::Transition::new(#from, #to) }
     });
 
     let (impl_generics, verifier) = match &block.verifier {
@@ -315,16 +315,18 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
     let audit_surface_body = quote! {
         let mut audits: ::std::vec::Vec<::amenable_core::TransitionAudit> =
             ::inventory::iter::<::amenable_core::ExchangeEdgeRecord>()
-                .filter(|record| record.self_ty == #self_ty_str)
-                .map(|record| ::amenable_core::TransitionAudit {
-                    to: record.evidence.to_string(),
-                    method_name: record.method_name.to_string(),
-                    body: record.body.to_string(),
+                .filter(|record| record.self_ty() == #self_ty_str)
+                .map(|record| {
+                    ::amenable_core::TransitionAudit::new(
+                        record.evidence().to_string(),
+                        record.method_name().to_string(),
+                        record.body().to_string(),
+                    )
                 })
                 .collect();
 
         audits.sort_by(|left, right| {
-            (&left.to, &left.method_name).cmp(&(&right.to, &right.method_name))
+            (left.to(), left.method_name()).cmp(&(right.to(), right.method_name()))
         });
 
         audits
@@ -417,7 +419,8 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
             }
 
             fn transitions() -> &'static [::amenable_core::Transition] {
-                &[#(#transitions),*]
+                const TRANSITIONS: &[::amenable_core::Transition] = &[#(#transitions),*];
+                TRANSITIONS
             }
 
             #audit_surface

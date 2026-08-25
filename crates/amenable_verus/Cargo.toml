@@ -14,6 +14,8 @@ keywords = ["formal-verification", "verus", "proof"]
 categories = ["development-tools"]
 
 [dependencies]
+derive-getters = { workspace = true }
+derive-new = { workspace = true }
 verus_builtin_macros = { workspace = true }
 vstd = { workspace = true }
 

@@ -136,6 +136,8 @@ dependencies = [
 name = "amenable_verus"
 version = "0.1.0"
 dependencies = [
+ "derive-getters",
+ "derive-new",
  "verus_builtin_macros",
  "vstd",
 ]

@@ -34,7 +34,7 @@ pub(crate) fn derive_call_shape(harness: &str) -> Option<VerusCallShape> {
                 let name = verus_param_name(&pat_type.pat)?;
                 let ty = &pat_type.ty;
                 let ty = verus_walk_tokens(quote::quote!(#ty), &HashSet::new(), &mut Vec::new());
-                Some(VerusParam { name, ty })
+                Some(VerusParam::new(name, ty))
             }
             verus_syn::FnArgKind::Receiver(_) => None,
         })
@@ -56,7 +56,8 @@ pub(crate) fn derive_call_shape(harness: &str) -> Option<VerusCallShape> {
         verus_syn::ReturnType::Default => "()".to_owned(),
     };
 
-    let mut placeholders: HashSet<String> = params.iter().map(|param| param.name.clone()).collect();
+    let mut placeholders: HashSet<String> =
+        params.iter().map(|param| param.name().clone()).collect();
     placeholders.insert("result".to_owned());
 
     // A `Vec`, not a `HashSet`: iteration order must be stable (the
@@ -100,10 +101,7 @@ pub(crate) fn derive_call_shape(harness: &str) -> Option<VerusCallShape> {
         .filter(|name| !placeholders.contains(name))
         .filter_map(|name| {
             let (_, import_module_path, _) = verus_find_fn(&name)?;
-            Some(VerusImport {
-                module_path: import_module_path,
-                name,
-            })
+            Some(VerusImport::new(import_module_path, name))
         })
         .collect();
 

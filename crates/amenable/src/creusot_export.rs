@@ -47,7 +47,7 @@
 //! needs a genuine precondition on its *captured* body (`Ledger::commit`'s
 //! own real `#[kani::requires]` guards a helper's exec arithmetic that
 //! `commit`'s own body never runs; see `amenable_creusot::ledger`'s own
-//! doc comment). `#[ensures(..)]` is not: `record.creusot_ensures` (`GAAP_
+//! doc comment). `#[ensures(..)]` is not: `record.creusot_ensures()` (`GAAP_
 //! LEDGER_PLAN.md`'s Step 6) names the real Pearlite predicate to call,
 //! defaulting to `"true"` for edges with no meaningful postcondition
 //! (every `Stoplight` edge) -- see `ExchangeEdgeRecord::creusot_ensures`'s
@@ -90,19 +90,23 @@ pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<Path
 
     let mut records: Vec<&ExchangeEdgeRecord> = inventory::iter::<ExchangeEdgeRecord>()
         .filter(|record| {
-            edge_module(&tidy_stringified_type(record.self_ty), record.method_name).is_some()
+            edge_module(
+                &tidy_stringified_type(record.self_ty()),
+                record.method_name(),
+            )
+            .is_some()
         })
         .collect();
-    records.sort_by_key(|record| record.method_name);
+    records.sort_by_key(|record| record.method_name());
 
     let mut written = Vec::with_capacity(records.len());
     for record in records {
-        let self_ty = tidy_stringified_type(record.self_ty);
-        let Some(module) = edge_module(&self_ty, record.method_name) else {
+        let self_ty = tidy_stringified_type(record.self_ty());
+        let Some(module) = edge_module(&self_ty, record.method_name()) else {
             continue;
         };
 
-        let path = root.join(format!("{}.rs", record.method_name));
+        let path = root.join(format!("{}.rs", record.method_name()));
         let source = render_companion(record, module);
         fs::write(&path, source).map_err(|error| AmenableError::io(&path, error))?;
         written.push(path);
@@ -133,18 +137,21 @@ fn edge_module(self_ty: &str, method_name: &str) -> Option<&'static str> {
 }
 
 fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
-    let const_name = format!("VERIFY_{}_EXCHANGE_SRC", record.method_name.to_uppercase());
-    let evidence_path = format!("amenable_creusot::{module}::{}", record.method_name);
+    let const_name = format!(
+        "VERIFY_{}_EXCHANGE_SRC",
+        record.method_name().to_uppercase()
+    );
+    let evidence_path = format!("amenable_creusot::{module}::{}", record.method_name());
     // See `ExchangeEdgeRecord::method_generics`'s own doc comment: `""`
     // (every edge but `Ledger::validate`) renders no generic parameter
     // list at all; a real captured turbofish (`Ledger::validate`'s own
     // `check_amount_positive::<V>(..)` call) needs the generated
     // function to declare the identical parameter for that text to
     // resolve.
-    let method_generics = if record.method_generics.is_empty() {
+    let method_generics = if record.method_generics().is_empty() {
         String::new()
     } else {
-        format!("<{}>", record.method_generics)
+        format!("<{}>", record.method_generics())
     };
     // The generated inherent method's own `<V>` (when present) is an
     // unconstrained, never-referenced placeholder -- it exists only so a
@@ -157,7 +164,7 @@ fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
     // mirror, never a real multi-backend one -- so the delegating call
     // just needs *some* concrete type to satisfy that unconstrained
     // parameter; `CreusotVerifier` is the natural, meaningful choice.
-    let exchange_turbofish = if record.method_generics.is_empty() {
+    let exchange_turbofish = if record.method_generics().is_empty() {
         String::new()
     } else {
         "::<CreusotVerifier>".to_owned()
@@ -222,13 +229,13 @@ fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
          \x20\x20\x20\x20\x20\x20\x20\x20|| {const_name}.to_owned(),\n\
          \x20\x20\x20\x20)\n\
          }}\n",
-        self_ty = tidy_stringified_type(record.self_ty),
-        method_name = record.method_name,
-        input_ty = tidy_stringified_type(record.input_ty),
-        output_ty = tidy_stringified_type(record.output_ty),
-        error_ty = tidy_stringified_type(record.error_ty),
-        body = indent_body(record.body),
-        creusot_ensures = record.creusot_ensures,
+        self_ty = tidy_stringified_type(record.self_ty()),
+        method_name = record.method_name(),
+        input_ty = tidy_stringified_type(record.input_ty()),
+        output_ty = tidy_stringified_type(record.output_ty()),
+        error_ty = tidy_stringified_type(record.error_ty()),
+        body = indent_body(record.body()),
+        creusot_ensures = record.creusot_ensures(),
     )
 }
 

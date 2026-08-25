@@ -26,18 +26,9 @@ fn transitions_reports_all_three_declared_edges_in_declaration_order() {
     assert_eq!(
         <Stoplight as StateMachine<KaniVerifier>>::transitions(),
         &[
-            Transition {
-                from: "Green",
-                to: "Yellow"
-            },
-            Transition {
-                from: "Yellow",
-                to: "Red"
-            },
-            Transition {
-                from: "Red",
-                to: "Green"
-            },
+            Transition::new("Green", "Yellow"),
+            Transition::new("Yellow", "Red"),
+            Transition::new("Red", "Green"),
         ]
     );
 }
@@ -50,24 +41,24 @@ fn audit_surface_reports_real_captured_bodies_for_every_declared_edge() -> miett
 
     let yellow = surface
         .iter()
-        .find(|audit| audit.to == "Yellow")
+        .find(|audit| audit.to() == "Yellow")
         .ok_or_else(|| miette::miette!("Green -> Yellow edge missing from audit surface"))?;
-    assert_eq!(yellow.method_name, "green_to_yellow");
-    assert!(yellow.body.contains("Yellow::establish"));
+    assert_eq!(yellow.method_name(), "green_to_yellow");
+    assert!(yellow.body().contains("Yellow::establish"));
 
     let red = surface
         .iter()
-        .find(|audit| audit.to == "Red")
+        .find(|audit| audit.to() == "Red")
         .ok_or_else(|| miette::miette!("Yellow -> Red edge missing from audit surface"))?;
-    assert_eq!(red.method_name, "yellow_to_red");
-    assert!(red.body.contains("Red::establish"));
+    assert_eq!(red.method_name(), "yellow_to_red");
+    assert!(red.body().contains("Red::establish"));
 
     let green = surface
         .iter()
-        .find(|audit| audit.to == "Green")
+        .find(|audit| audit.to() == "Green")
         .ok_or_else(|| miette::miette!("Red -> Green edge missing from audit surface"))?;
-    assert_eq!(green.method_name, "red_to_green");
-    assert!(green.body.contains("Green::establish"));
+    assert_eq!(green.method_name(), "red_to_green");
+    assert!(green.body().contains("Green::establish"));
     Ok(())
 }
 
@@ -87,13 +78,13 @@ fn root_entries_reports_green_as_the_only_declared_root() {
 fn declared_transitions_match_real_exchange_edge_registrations_exactly() {
     let mut declared: Vec<&str> = <Stoplight as StateMachine<KaniVerifier>>::transitions()
         .iter()
-        .map(|transition| transition.to)
+        .map(|transition| transition.to())
         .collect();
     declared.sort_unstable();
 
     let mut registered: Vec<&str> = inventory::iter::<ExchangeEdgeRecord>()
-        .filter(|record| record.self_ty == "Stoplight")
-        .map(|record| record.evidence)
+        .filter(|record| record.self_ty() == "Stoplight")
+        .map(|record| record.evidence())
         .collect();
     registered.sort_unstable();
 

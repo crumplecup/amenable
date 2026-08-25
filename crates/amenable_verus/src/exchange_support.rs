@@ -315,7 +315,9 @@ macro_rules! verus_state_machine {
             }
 
             fn transitions() -> &'static [crate::Transition] {
-                &[$(crate::Transition { from: $from, to: $to }),+]
+                const TRANSITIONS: &[crate::Transition] =
+                    &[$(crate::Transition::new($from, $to)),+];
+                TRANSITIONS
             }
 
             fn audit_surface() -> ::std::vec::Vec<crate::TransitionAudit> {

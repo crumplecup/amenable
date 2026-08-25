@@ -336,24 +336,24 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
         // codegen tool queries this to generate its own companion from the
         // real body, without a Cargo dependency on this crate at all.
         ::inventory::submit! {
-            ::amenable_core::ExchangeEdgeRecord {
-                self_ty: stringify!(#self_ty),
-                input_ty: stringify!(#input_ty),
-                output_ty: stringify!(#output_ty),
-                error_ty: stringify!(#error_ty),
-                evidence: stringify!(#evidence),
-                method_name: stringify!(#method_ident),
-                body: #body_source,
-                creusot_ensures: #creusot_ensures_lit,
-                // Every `#[exchange(..)]`-decorated edge today is a
-                // non-generic method (`Ledger::validate`/`::commit`
-                // moved to `#[capture_exchange_body(..)]` once they
-                // gained a real `<V: Verifier>` parameter, precisely
-                // because this macro requires a concrete `verifier`
-                // -- see `ExchangeEdgeRecord::method_generics`'s own
-                // doc comment).
-                method_generics: "",
-            }
+            ::amenable_core::ExchangeEdgeRecord::new(
+                stringify!(#self_ty),
+                stringify!(#input_ty),
+                stringify!(#output_ty),
+                stringify!(#error_ty),
+                stringify!(#evidence),
+                stringify!(#method_ident),
+                #body_source,
+            )
+            .with_creusot_ensures(#creusot_ensures_lit)
+            // Every `#[exchange(..)]`-decorated edge today is a
+            // non-generic method (`Ledger::validate`/`::commit`
+            // moved to `#[capture_exchange_body(..)]` once they
+            // gained a real `<V: Verifier>` parameter, precisely
+            // because this macro requires a concrete `verifier`
+            // -- see `ExchangeEdgeRecord::method_generics`'s own
+            // doc comment). `method_generics` stays at its `""`
+            // default here.
         }
 
         impl ::amenable_core::Exchange<#input_ty, #output_ty, #verifier> for #self_ty {

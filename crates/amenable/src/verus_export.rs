@@ -781,18 +781,18 @@ fn render_checked_leaf(
     let mut params = Vec::new();
 
     for param in &shape.params {
-        let local = names.allocate(&param.name, &route_hint);
-        local_names.insert(param.name.clone(), local.clone());
+        let local = names.allocate(param.name(), &route_hint);
+        local_names.insert(param.name().clone(), local.clone());
         params.push(RenderedParam {
             local_name: local,
-            ty: param.ty.clone(),
+            ty: param.ty().clone(),
         });
     }
 
     let call_args = shape
         .params
         .iter()
-        .map(|param| local_names[&param.name].clone())
+        .map(|param| local_names[param.name()].clone())
         .collect::<Vec<_>>()
         .join(", ");
     let call = CheckedCall {
@@ -822,7 +822,7 @@ fn render_checked_leaf(
     let imports = shape
         .imports
         .iter()
-        .map(|import| (import.module_path.clone(), import.name.clone()))
+        .map(|import| (import.module_path().clone(), import.name().clone()))
         .collect();
 
     let comment = format!(
