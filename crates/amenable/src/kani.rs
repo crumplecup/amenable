@@ -279,11 +279,13 @@ pub struct Ledger {
     rows: BTreeMap<String, LedgerRow>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, derive_getters::Getters, derive_getters::Dissolve)]
 pub(super) struct VerificationResult {
-    pub(super) proof_id: String,
-    pub(super) timestamp: u64,
-    pub(super) status: ProofStatus,
+    proof_id: String,
+    #[getter(copy)]
+    timestamp: u64,
+    #[getter(copy)]
+    status: ProofStatus,
 }
 
 impl Ledger {

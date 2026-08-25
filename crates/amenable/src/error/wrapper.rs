@@ -20,7 +20,7 @@ use crate::error::sources::{
 pub type AmenableResult<T> = Result<T, AmenableError>;
 
 /// Wrapper error carrying kind + call site location.
-#[derive(Debug, derive_more::Display, derive_more::Error)]
+#[derive(Debug, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("amenable: {kind} at {file}:{line}")]
 pub struct AmenableError {
     /// The specific error kind, boxed to keep `AmenableError` itself
@@ -33,11 +33,12 @@ pub struct AmenableError {
     /// `std::error::Error::source()`, breaking the exact chain this
     /// module exists to preserve.
     #[error(source)]
-    pub kind: Box<AmenableErrorKind>,
+    kind: Box<AmenableErrorKind>,
     /// Source line of the call site that produced this error.
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
-    pub file: String,
+    file: String,
 }
 
 impl AmenableError {

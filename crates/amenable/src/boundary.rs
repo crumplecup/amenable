@@ -51,7 +51,7 @@ impl Diagnostic for CliError {
     fn code<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
         Some(Box::new(format!(
             "amenable::{}",
-            error_kind_code(&self.0.kind)
+            error_kind_code(self.0.kind())
         )))
     }
 

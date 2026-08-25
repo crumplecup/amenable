@@ -658,10 +658,10 @@ fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     let mut failures = Vec::new();
 
     for result in kani::load_results(&args.results)? {
-        if !registered.contains(&result.proof_id) {
+        if !registered.contains(result.proof_id()) {
             eprintln!(
                 "Verification result is no longer registered and will be skipped: {}",
-                result.proof_id
+                result.proof_id()
             );
             continue;
         }
@@ -669,16 +669,16 @@ fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
         if args
             .proof
             .as_ref()
-            .is_some_and(|proof| result.proof_id != *proof)
+            .is_some_and(|proof| *result.proof_id() != *proof)
         {
             continue;
         }
 
-        if !matches_failure_filter(result.status, args.status) {
+        if !matches_failure_filter(result.status(), args.status) {
             continue;
         }
 
-        if args.needs_assessment && assessed.contains(result.proof_id.as_str()) {
+        if args.needs_assessment && assessed.contains(result.proof_id().as_str()) {
             continue;
         }
 
@@ -694,11 +694,12 @@ fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
         let listed = failures
             .into_iter()
             .map(|result| {
+                let (proof_id, timestamp, status) = result.dissolve();
                 Ok(ListedVerificationFailure {
-                    proof_id: result.proof_id,
-                    timestamp: result.timestamp,
-                    recorded_at: format_timestamp(result.timestamp)?,
-                    status: result.status,
+                    proof_id,
+                    timestamp,
+                    recorded_at: format_timestamp(timestamp)?,
+                    status,
                 })
             })
             .collect::<AmenableResult<Vec<_>>>()?;
@@ -706,11 +707,11 @@ fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     }
 
     for result in failures {
-        let recorded_at = format_timestamp(result.timestamp)?;
+        let recorded_at = format_timestamp(result.timestamp())?;
         println!(
             "{}\t{recorded_at}\t{}",
-            result.status.as_str(),
-            result.proof_id
+            result.status().as_str(),
+            result.proof_id()
         );
     }
 

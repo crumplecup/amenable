@@ -52,13 +52,7 @@ use uuid::Uuid;
 /// only holds if its id is stable across reconstructions — the same
 /// reason a real chart of accounts assigns an id once, at account
 /// creation, rather than re-deriving one per lookup.
-#[derive(
-    Debug,
-    Clone,
-    Default,
-    derive_getters::Getters,
-    derive_new::new,
-)]
+#[derive(Debug, Clone, Default, derive_getters::Getters, derive_new::new)]
 pub struct AccountId {
     /// The account's stable id — what identity checks compare.
     #[getter(copy)]

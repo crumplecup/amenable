@@ -28,14 +28,7 @@ crate::emit_verus_witnesses!(
 /// machine-checked — exercises the `Checked` slot of the derive-witness
 /// composition canaries.
 #[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Default,
-    ProvenanceDerive,
-    StandardDerive,
-    derive_new::new,
+    Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, derive_new::new,
 )]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
@@ -64,14 +57,7 @@ impl ClassifiedWitness<VerusVerifier> for CheckedVerusExportLeaf {}
 /// provenance rather than a machine-checked spec — exercises the
 /// `Trusted` slot of the derive-witness composition canaries.
 #[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Default,
-    ProvenanceDerive,
-    StandardDerive,
-    derive_new::new,
+    Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, derive_new::new,
 )]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
@@ -101,14 +87,7 @@ impl ClassifiedWitness<VerusVerifier> for TrustedVerusExportLeaf {}
 /// propagation path (reuses `EscapeAscii`'s real harness/call shape,
 /// registered in `verus_witness.rs`).
 #[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Default,
-    ProvenanceDerive,
-    StandardDerive,
-    derive_new::new,
+    Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, derive_new::new,
 )]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
@@ -179,14 +158,7 @@ struct VerusExportNestedStruct {
 /// `RefCell`'s real harness/call shape, registered in
 /// `verus_witness.rs`).
 #[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Default,
-    ProvenanceDerive,
-    StandardDerive,
-    derive_new::new,
+    Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, derive_new::new,
 )]
 #[provenance(crate = "amenable_core")]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
