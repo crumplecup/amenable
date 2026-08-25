@@ -10,10 +10,11 @@ This file tracks all planning documents for the amenable project.
 
 **Status:** 🔲 Step 0 done and verified (workspace-wide `unexpected_cfgs`
 union replaced with per-crate `build.rs` declarations, committed
-`1dd1985`). Steps 1–3 (fixing four confirmed live `amenable_derive`
-macro cfg-injection sites; a new cordial `cfg-hygiene` etiquette;
-cordial's `--apply` generalization) deliberately parked until the
-tracing-instrumentation rollout lands first.
+`1dd1985`). Step 3's per-crate tracing-apply policy is confirmed
+empirically — Creusot turned out to hard-fail compilation on a bare
+`#[instrument]` (not just risk a timeout like Kani), tested directly and
+reverted — but not yet implemented. Steps 1–3 all deliberately parked
+until the tracing-instrumentation rollout lands first.
 
 **Description:** Surfaced while investigating why cordial's tracing
 `--apply` couldn't run blind against this workspace. Problem 1 (fixed):

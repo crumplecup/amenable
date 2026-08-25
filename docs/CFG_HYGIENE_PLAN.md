@@ -1,8 +1,11 @@
 # cfg Hygiene Plan
 
-**Status:** 🔲 Step 0 done and verified. Steps 1–3 not started — parked
-deliberately until the tracing-instrumentation rollout (cordial's
-`DERIVE-*`/tracing checklist work) lands, per explicit direction.
+**Status:** 🔲 Step 0 done and verified. Step 3's per-crate tracing
+policy is confirmed empirically (see Step 3 below) but not yet
+implemented in cordial. Steps 1–2 not started at all. Implementation of
+Step 3 is parked deliberately until the broader tracing-instrumentation
+rollout (cordial's `DERIVE-*`/tracing checklist work) lands, per
+explicit direction; Steps 1–2 return after that.
 
 ## Why this exists
 
@@ -150,10 +153,56 @@ investigation did by hand.
 
 Not started — this is the plan already discussed for the tracing
 rollout itself (generalizing `--apply` from tracing-only to a
-config-toggleable suite of etiquette applies, plus a `gate_cfg`/
-`bare_compiler_crates` policy so tracing's own apply doesn't blindly
-insert `#[instrument]` into Kani-reachable or Verus-spliced code).
-Tracked here only for sequencing: **do this work first**, using
-whatever `cfg-hygiene` (Step 2) already exists at that point to validate
-its own output, then return to this plan's Steps 1–2 for the two
-narrower, `amenable_derive`-specific and cordial-specific pieces.
+config-toggleable suite of etiquette applies, plus a per-crate policy so
+tracing's own apply doesn't blindly insert `#[instrument]` into
+Kani-reachable, Creusot-translated, or Verus-spliced code). Tracked here
+only for sequencing: **do this work first**, using whatever
+`cfg-hygiene` (Step 2) already exists at that point to validate its own
+output, then return to this plan's Steps 1–2 for the two narrower,
+`amenable_derive`-specific and cordial-specific pieces.
+
+**The real per-crate policy, confirmed empirically before writing any
+code** — the naive two-bucket model (gate Kani-reachable code, skip
+Verus-spliced code) turned out wrong on one axis: Creusot isn't a milder
+version of the same risk, it's a *harder* failure than Kani's.
+
+- `amenable_kani` → **Gated**, `#[cfg_attr(not(kani), tracing::instrument(...))]`.
+  Compiles fine under ordinary `cargo kani`; the risk is a CBMC
+  symbolic-closure-capture timeout at proof time (confirmed via
+  `~/repos/elicitation`'s `KANI_FOR_VSMS.md` §6.3 gallery evidence —
+  `gallery14a_ungated_debug` hangs, `gallery14b_gated_debug` completes
+  in ~8s), not a compile failure.
+- `amenable_creusot` → **Skip entirely**. Tested directly: added a bare
+  `#[tracing::instrument(level = "debug")]` to one ordinary, really-
+  translated function (`amenable_creusot::stoplight::Green::basis`, not
+  a generated companion, not `#[cfg(not(creusot))]`-only) and ran the
+  real `cargo creusot -- -p amenable_creusot` translation pass. Hard
+  compile failure, not a milder or narrower-scoped one:
+  `creusot-std`'s `DeepModel` trait isn't implemented for
+  `tracing::Level`/`LevelFilter` (both types the `#[instrument]`
+  expansion touches), and independently: `error: Unsupported constant
+  value: Scalar(alloc191) of type &'?36 tracing::callsite::DefaultCallsite`
+  — creusot-rustc's translator can't handle the static `DefaultCallsite`
+  reference `tracing::span!` embeds, the same "ordinary Rust
+  infrastructure the translator has never seen" failure class as the
+  already-documented `Box<dyn Iterator>`/RPITIT ICEs. Reverted
+  immediately after confirming (`git checkout --
+  crates/amenable_creusot/{Cargo.toml,src/stoplight.rs} Cargo.lock`);
+  never committed. This means the elicitation white paper's narrower
+  "generated companions need tracing-free bodies" framing does not
+  apply here as written — the real constraint is crate-wide, any real
+  translated function, not just the generated companion surface.
+- `amenable_verus` → **Skip entirely**. `tracing` isn't resolvable at
+  all under the real, bare-compiler `verus --crate-type=lib` invocation
+  (same root cause already confirmed by the `MetadataEntry`/
+  `TransitionAudit` incident this session — the real binary never reads
+  `Cargo.toml`).
+- Any file `#[path]`-spliced into a **Skip** crate is **Skip** there too,
+  independent of its own owning crate's own policy — reuses
+  `path_inclusion.rs`'s existing splice graph (see the original
+  plan discussion: it needs a small extension, a per-crate "toolchain
+  never reads `Cargo.toml`" fact for Verus specifically, since that
+  can't be inferred from the dependency graph the way Creusot's
+  ordinary-`cargo`-driven build can).
+- Everything else → **Bare**, `#[instrument(...)]` as cordial already
+  generates it today.
