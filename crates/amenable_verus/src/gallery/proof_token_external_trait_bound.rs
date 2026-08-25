@@ -191,8 +191,8 @@ impl ProofToken for GreenToken {
 }
 
 pub struct Established<T, Token> {
-    pub primary: T,
-    pub token: Token,
+    primary: T,
+    token: Token,
 }
 
 /// The real, load-bearing check: `Sidecar<V>`'s exact generic shape,

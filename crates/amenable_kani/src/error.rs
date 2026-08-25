@@ -36,16 +36,17 @@ pub enum KaniModelErrorKind {
 /// [`KaniModelErrorKind`] so a caller composing its own error type has
 /// a real, single conversion target for every native source this crate
 /// defines, matching `amenable::AmenableError`'s own shape.
-#[derive(Debug, Clone, derive_more::Display, derive_more::Error)]
+#[derive(Debug, Clone, derive_more::Display, derive_more::Error, derive_getters::Getters)]
 #[display("amenable_kani: {kind} at {file}:{line}")]
 pub struct KaniModelError {
     /// The specific error kind.
     #[error(source)]
-    pub kind: Box<KaniModelErrorKind>,
+    kind: Box<KaniModelErrorKind>,
     /// Source line of the call site that produced this error.
-    pub line: u32,
+    #[getter(copy)]
+    line: u32,
     /// Source file of the call site that produced this error.
-    pub file: String,
+    file: String,
 }
 
 impl KaniModelError {
