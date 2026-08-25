@@ -9,10 +9,15 @@ use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of spawning one waitable child process.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::waitable(7, 3)")]
 pub struct KaniChildObservation {
+    /// The modeled child process id.
+    #[getter(copy)]
     process_id: u32,
+    /// The modeled waited exit code -- only exposed wrapped, via
+    /// [`KaniChildObservation::waited_exit_code`].
+    #[getter(skip)]
     exit_code: i32,
 }
 
@@ -24,12 +29,6 @@ impl KaniChildObservation {
             process_id,
             exit_code,
         }
-    }
-
-    /// Report the modeled child process id.
-    #[must_use]
-    pub fn process_id(&self) -> u32 {
-        self.process_id
     }
 
     /// Report the modeled waited exit code.
@@ -62,13 +61,15 @@ impl Provenance for KaniChildObservation {
 }
 
 /// Observable result of capturing one child's stderr independently of stdout.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::captured(\"\", \"error message\\n\")"
 )]
 pub struct KaniChildStderrObservation {
+    /// The modeled stdout text.
     stdout_text: String,
+    /// The modeled stderr text.
     stderr_text: String,
 }
 
@@ -80,18 +81,6 @@ impl KaniChildStderrObservation {
             stdout_text: stdout_text.into(),
             stderr_text: stderr_text.into(),
         }
-    }
-
-    /// Report the modeled stdout text.
-    #[must_use]
-    pub fn stdout_text(&self) -> &str {
-        &self.stdout_text
-    }
-
-    /// Report the modeled stderr text.
-    #[must_use]
-    pub fn stderr_text(&self) -> &str {
-        &self.stderr_text
     }
 }
 
@@ -118,13 +107,15 @@ impl Provenance for KaniChildStderrObservation {
 }
 
 /// Observable result of writing text to one child's stdin and reading it back.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::echo(\"hello, child\\n\", \"hello, child\\n\")"
 )]
 pub struct KaniChildStdinObservation {
+    /// The modeled stdin text written to the child.
     input_text: String,
+    /// The modeled stdout echo from the child.
     echoed_stdout: String,
 }
 
@@ -136,18 +127,6 @@ impl KaniChildStdinObservation {
             input_text: input_text.into(),
             echoed_stdout: echoed_stdout.into(),
         }
-    }
-
-    /// Report the modeled stdin text written to the child.
-    #[must_use]
-    pub fn input_text(&self) -> &str {
-        &self.input_text
-    }
-
-    /// Report the modeled stdout echo from the child.
-    #[must_use]
-    pub fn echoed_stdout(&self) -> &str {
-        &self.echoed_stdout
     }
 }
 
@@ -174,9 +153,10 @@ impl Provenance for KaniChildStdinObservation {
 }
 
 /// Observable result of capturing one child's stdout.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::captured(\"hello\\n\")")]
 pub struct KaniChildStdoutObservation {
+    /// The modeled stdout text.
     stdout_text: String,
 }
 
@@ -187,12 +167,6 @@ impl KaniChildStdoutObservation {
         Self {
             stdout_text: stdout_text.into(),
         }
-    }
-
-    /// Report the modeled stdout text.
-    #[must_use]
-    pub fn stdout_text(&self) -> &str {
-        &self.stdout_text
     }
 }
 
@@ -263,14 +237,17 @@ impl Provenance for KaniCommandArgsObservation {
 }
 
 /// Observable result of one environment override being visible to a spawned command.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::visible_override(\"AMENABLE_TEST_VAR\", \"configured-value\", \"configured-value\")"
 )]
 pub struct KaniCommandEnvObservation {
+    /// The modeled override key.
     key: String,
+    /// The modeled override value.
     value: String,
+    /// The modeled child-visible stdout text.
     visible_stdout: String,
 }
 
@@ -287,24 +264,6 @@ impl KaniCommandEnvObservation {
             value: value.into(),
             visible_stdout: visible_stdout.into(),
         }
-    }
-
-    /// Report the modeled override key.
-    #[must_use]
-    pub fn key(&self) -> &str {
-        &self.key
-    }
-
-    /// Report the modeled override value.
-    #[must_use]
-    pub fn value(&self) -> &str {
-        &self.value
-    }
-
-    /// Report the modeled child-visible stdout text.
-    #[must_use]
-    pub fn visible_stdout(&self) -> &str {
-        &self.visible_stdout
     }
 }
 
@@ -332,13 +291,15 @@ impl Provenance for KaniCommandEnvObservation {
 }
 
 /// Observable result of reading back one configured environment override.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(
     basis = "Self",
     basis_ctor = "Self::configured_override(\"SOME_KEY\", \"some_value\")"
 )]
 pub struct KaniCommandEnvsObservation {
+    /// The modeled override key.
     key: String,
+    /// The modeled override value.
     value: String,
 }
 
@@ -350,18 +311,6 @@ impl KaniCommandEnvsObservation {
             key: key.into(),
             value: value.into(),
         }
-    }
-
-    /// Report the modeled override key.
-    #[must_use]
-    pub fn key(&self) -> &str {
-        &self.key
-    }
-
-    /// Report the modeled override value.
-    #[must_use]
-    pub fn value(&self) -> &str {
-        &self.value
     }
 }
 
@@ -436,10 +385,14 @@ impl Provenance for KaniExitStatusObservation {
 }
 
 /// Observable result of collecting one command's output bundle.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::captured(0, \"hello\\n\")")]
 pub struct KaniOutputObservation {
+    /// The modeled exit status code -- only exposed wrapped, via
+    /// [`KaniOutputObservation::status_code`]/[`KaniOutputObservation::success`].
+    #[getter(skip)]
     exit_code: i32,
+    /// The modeled stdout text.
     stdout_text: String,
 }
 
@@ -463,12 +416,6 @@ impl KaniOutputObservation {
     #[must_use]
     pub fn success(&self) -> bool {
         self.exit_code == 0
-    }
-
-    /// Report the modeled stdout text.
-    #[must_use]
-    pub fn stdout_text(&self) -> &str {
-        &self.stdout_text
     }
 }
 
@@ -495,10 +442,14 @@ impl Provenance for KaniOutputObservation {
 }
 
 /// Observable result of choosing between `Stdio::null()` and `Stdio::piped()`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::stdout_handle_policy(false, true)")]
 pub struct KaniStdioObservation {
+    /// Whether `Stdio::null()` leaves a stdout handle present.
+    #[getter(copy)]
     null_stdout_handle_present: bool,
+    /// Whether `Stdio::piped()` leaves a stdout handle present.
+    #[getter(copy)]
     piped_stdout_handle_present: bool,
 }
 
@@ -513,18 +464,6 @@ impl KaniStdioObservation {
             null_stdout_handle_present,
             piped_stdout_handle_present,
         }
-    }
-
-    /// Report whether `Stdio::null()` leaves a stdout handle present.
-    #[must_use]
-    pub fn null_stdout_handle_present(&self) -> bool {
-        self.null_stdout_handle_present
-    }
-
-    /// Report whether `Stdio::piped()` leaves a stdout handle present.
-    #[must_use]
-    pub fn piped_stdout_handle_present(&self) -> bool {
-        self.piped_stdout_handle_present
     }
 }
 
