@@ -64,11 +64,11 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
     // original fail-fast version.
     for export in witness_exports()
         .into_iter()
-        .filter(|record| record.verifier == "verus")
+        .filter(|record| record.verifier() == "verus")
     {
         match render_and_write_export(root, &export) {
             Ok(path) => written_paths.push(path),
-            Err(error) => failures.push(format!("{}: {error}", export.evidence)),
+            Err(error) => failures.push(format!("{}: {error}", export.evidence())),
         }
     }
 
@@ -85,7 +85,7 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
 }
 
 fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> AmenableResult<PathBuf> {
-    let (parent_segments, final_segment) = parse_destination_module(&export.destination_module)?;
+    let (parent_segments, final_segment) = parse_destination_module(export.destination_module())?;
     let output_path = ensure_module_tree(root, &parent_segments, &final_segment)?;
     let source = render_verus_module(export, &final_segment)?;
 
@@ -360,11 +360,11 @@ fn render_verus_module(
     // another variant) still fall through to `render_node`'s own
     // rejection -- no real nested-enum type is registered anywhere in
     // this codebase yet.
-    if export.artifact.shape() == WitnessArtifactShape::Enum {
+    if export.artifact().shape() == WitnessArtifactShape::Enum {
         return render_enum_module(export, &module_stem, &mut names);
     }
 
-    let rendered = render_node(&export.artifact, &[], &mut names)?;
+    let rendered = render_node(export.artifact(), &[], &mut names)?;
     let checked_call_count = rendered.checked_calls.len();
 
     let mut source = String::new();
@@ -444,7 +444,7 @@ fn write_module_header(
 ) {
     source.push_str(&format!(
         "//! Derived Verus closure for `{}`.\n\n",
-        export.evidence
+        export.evidence()
     ));
     source.push_str("use verus_builtin_macros::verus;\n");
     source.push_str(
@@ -469,9 +469,12 @@ fn write_module_header(
     source.push('\n');
 
     source.push_str("verus! {\n\n");
-    source.push_str(&format!("// evidence: {}\n", export.evidence));
-    source.push_str(&format!("// destination: {}\n", export.destination_module));
-    source.push_str(&format!("// support: {}\n", export.support));
+    source.push_str(&format!("// evidence: {}\n", export.evidence()));
+    source.push_str(&format!(
+        "// destination: {}\n",
+        export.destination_module()
+    ));
+    source.push_str(&format!("// support: {}\n", export.support()));
 
     if !comments.is_empty() {
         source.push('\n');
@@ -521,10 +524,10 @@ fn render_enum_module(
     module_stem: &str,
     names: &mut NameAllocator,
 ) -> AmenableResult<String> {
-    if export.artifact.variants().is_empty() {
+    if export.artifact().variants().is_empty() {
         return Err(AmenableError::invariant(format!(
             "enum-shaped export {} has no variants -- nothing to compose",
-            export.evidence
+            export.evidence()
         )));
     }
 
@@ -532,8 +535,8 @@ fn render_enum_module(
     let selector_ty = format!("{type_prefix}Selector");
     let result_ty = format!("{type_prefix}Result");
 
-    let mut per_variant = Vec::with_capacity(export.artifact.variants().len());
-    for variant in export.artifact.variants() {
+    let mut per_variant = Vec::with_capacity(export.artifact().variants().len());
+    for variant in export.artifact().variants() {
         let route = vec![RouteSegment::Variant(variant.name().clone())];
         let rendered = render_node(variant.artifact(), &route, names)?;
         // The artifact's own variant name may carry a provenance rename

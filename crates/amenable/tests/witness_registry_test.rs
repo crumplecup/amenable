@@ -94,25 +94,25 @@ fn witness_exports_include_concrete_local_registrations() -> miette::Result<()> 
     let exports = witness_exports();
     let record = exports
         .iter()
-        .find(|record| record.evidence == std::any::type_name::<LocalEvidence>())
+        .find(|record| record.evidence() == std::any::type_name::<LocalEvidence>())
         .ok_or_else(|| miette::miette!("local witness export should be registered"))?;
 
-    assert_eq!(record.verifier, "local-verifier");
+    assert_eq!(record.verifier(), "local-verifier");
     assert_eq!(
-        record.destination_module,
+        record.destination_module(),
         "crate::derived_witness::local_evidence_witness"
     );
-    assert_eq!(record.support, WitnessSupportSummary::checked_leaf());
-    assert_eq!(record.artifact.shape().as_str(), "leaf");
-    assert_eq!(record.artifact.kind(), WitnessSupportKind::Checked);
+    assert_eq!(record.support(), WitnessSupportSummary::checked_leaf());
+    assert_eq!(record.artifact().shape().as_str(), "leaf");
+    assert_eq!(record.artifact().kind(), WitnessSupportKind::Checked);
     assert_eq!(
-        record.artifact.detail().as_deref(),
+        record.artifact().detail().as_deref(),
         Some("harness: verify_local_evidence_shape")
     );
-    assert_eq!(record.artifact.metadata().len(), 1);
-    assert_eq!(record.artifact.metadata()[0].key(), "harness");
+    assert_eq!(record.artifact().metadata().len(), 1);
+    assert_eq!(record.artifact().metadata()[0].key(), "harness");
     assert_eq!(
-        record.artifact.metadata()[0].value(),
+        record.artifact().metadata()[0].value(),
         "verify_local_evidence_shape"
     );
     Ok(())

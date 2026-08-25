@@ -449,16 +449,19 @@ fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
             .collect(),
         witness_export_records: amenable::witness_exports()
             .into_iter()
-            .map(|record| WitnessExportRecordDump {
-                support_kind: record.support.kind().as_str().to_owned(),
-                trivial: record.support.trivial(),
-                checked: record.support.checked(),
-                trusted: record.support.trusted(),
-                opaque: record.support.opaque(),
-                artifact: dump_witness_artifact(record.artifact),
-                verifier: record.verifier,
-                evidence: record.evidence,
-                destination_module: record.destination_module,
+            .map(|record| {
+                let (verifier, evidence, destination_module, support, artifact) = record.dissolve();
+                WitnessExportRecordDump {
+                    support_kind: support.kind().as_str().to_owned(),
+                    trivial: support.trivial(),
+                    checked: support.checked(),
+                    trusted: support.trusted(),
+                    opaque: support.opaque(),
+                    artifact: dump_witness_artifact(artifact),
+                    verifier,
+                    evidence,
+                    destination_module,
+                }
             })
             .collect(),
         kani_proofs: inventory::iter::<amenable::KaniProofRegistration>()

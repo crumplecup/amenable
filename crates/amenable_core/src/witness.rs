@@ -334,36 +334,96 @@ pub trait WitnessArtifact {
 /// already implements, this record is opt-in and concrete: callers
 /// register the exact instantiated witness types they want a separate
 /// backend pipeline to materialize.
+///
+/// Hand-written `const fn new`/getters, not derived: this record is
+/// itself passed to `inventory::submit!`, which requires a
+/// `const`-evaluable value, and `derive_new::new` cannot generate a
+/// `const fn`.
 pub struct WitnessExportRecord {
+    verifier: fn() -> &'static str,
+    evidence: fn() -> &'static str,
+    destination_module: fn() -> &'static str,
+    describe: fn() -> String,
+    support: fn() -> WitnessSupportSummary,
+    artifact: fn() -> WitnessArtifactNode,
+}
+
+impl WitnessExportRecord {
+    /// Register an explicit witness export target.
+    #[must_use]
+    pub const fn new(
+        verifier: fn() -> &'static str,
+        evidence: fn() -> &'static str,
+        destination_module: fn() -> &'static str,
+        describe: fn() -> String,
+        support: fn() -> WitnessSupportSummary,
+        artifact: fn() -> WitnessArtifactNode,
+    ) -> Self {
+        Self {
+            verifier,
+            evidence,
+            destination_module,
+            describe,
+            support,
+            artifact,
+        }
+    }
+
     /// The verifier backend this export targets.
-    pub verifier: fn() -> &'static str,
+    #[must_use]
+    pub const fn verifier(&self) -> fn() -> &'static str {
+        self.verifier
+    }
+
     /// The concrete evidence type to materialize.
-    pub evidence: fn() -> &'static str,
+    #[must_use]
+    pub const fn evidence(&self) -> fn() -> &'static str {
+        self.evidence
+    }
+
     /// The backend module path where the proof content belongs.
-    pub destination_module: fn() -> &'static str,
+    #[must_use]
+    pub const fn destination_module(&self) -> fn() -> &'static str {
+        self.destination_module
+    }
+
     /// Render the witness artifact for audit without running a verifier.
-    pub describe: fn() -> String,
+    #[must_use]
+    pub const fn describe(&self) -> fn() -> String {
+        self.describe
+    }
+
     /// Summarize the support surface the witness closes over.
-    pub support: fn() -> WitnessSupportSummary,
+    #[must_use]
+    pub const fn support(&self) -> fn() -> WitnessSupportSummary {
+        self.support
+    }
+
     /// Structured witness artifact tree for backend-specific generation.
-    pub artifact: fn() -> WitnessArtifactNode,
+    #[must_use]
+    pub const fn artifact(&self) -> fn() -> WitnessArtifactNode {
+        self.artifact
+    }
 }
 
 inventory::collect!(WitnessExportRecord);
 
 /// Owned snapshot of one registered witness export target.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_getters::Dissolve, derive_new::new,
+)]
 pub struct WitnessExportSnapshot {
     /// The verifier backend this export targets.
-    pub verifier: String,
+    verifier: String,
     /// The concrete evidence type to materialize.
-    pub evidence: String,
+    evidence: String,
     /// The backend module path where the proof content belongs.
-    pub destination_module: String,
+    destination_module: String,
     /// Structural summary of the support surface this export closes over.
-    pub support: WitnessSupportSummary,
+    #[getter(copy)]
+    support: WitnessSupportSummary,
     /// Structured witness artifact tree for backend-specific generation.
-    pub artifact: WitnessArtifactNode,
+    artifact: WitnessArtifactNode,
 }
 
 /// Collect every registered witness export target into owned values.
@@ -372,25 +432,27 @@ pub struct WitnessExportSnapshot {
 /// downstream tooling and tests can consume it deterministically.
 pub fn witness_exports() -> Vec<WitnessExportSnapshot> {
     let mut exports: Vec<_> = inventory::iter::<WitnessExportRecord>()
-        .map(|record| WitnessExportSnapshot {
-            verifier: (record.verifier)().to_owned(),
-            evidence: (record.evidence)().to_owned(),
-            destination_module: (record.destination_module)().to_owned(),
-            support: (record.support)(),
-            artifact: (record.artifact)(),
+        .map(|record| {
+            WitnessExportSnapshot::new(
+                (record.verifier())().to_owned(),
+                (record.evidence())().to_owned(),
+                (record.destination_module())().to_owned(),
+                (record.support())(),
+                (record.artifact())(),
+            )
         })
         .collect();
 
     exports.sort_by(|left, right| {
         (
-            left.verifier.as_str(),
-            left.evidence.as_str(),
-            left.destination_module.as_str(),
+            left.verifier().as_str(),
+            left.evidence().as_str(),
+            left.destination_module().as_str(),
         )
             .cmp(&(
-                right.verifier.as_str(),
-                right.evidence.as_str(),
-                right.destination_module.as_str(),
+                right.verifier().as_str(),
+                right.evidence().as_str(),
+                right.destination_module().as_str(),
             ))
     });
 
@@ -471,17 +533,17 @@ macro_rules! register_witness_exports {
             };
 
             $crate::__inventory::submit! {
-                $crate::WitnessExportRecord {
-                    verifier: || <$verifier as $crate::Verifier>::name(),
-                    evidence: || ::std::any::type_name::<$ty>(),
-                    destination_module: || <<$ty as $crate::Witness<$verifier>>::ProofArtifact as $crate::WitnessModulePath>::MODULE_PATH,
-                    describe: || <$ty as $crate::Witness<$verifier>>::proof().to_string(),
-                    support: || <$ty as $crate::Witness<$verifier>>::support(),
-                    artifact: || {
+                $crate::WitnessExportRecord::new(
+                    || <$verifier as $crate::Verifier>::name(),
+                    || ::std::any::type_name::<$ty>(),
+                    || <<$ty as $crate::Witness<$verifier>>::ProofArtifact as $crate::WitnessModulePath>::MODULE_PATH,
+                    || <$ty as $crate::Witness<$verifier>>::proof().to_string(),
+                    || <$ty as $crate::Witness<$verifier>>::support(),
+                    || {
                         let proof = <$ty as $crate::Witness<$verifier>>::proof();
                         $crate::WitnessArtifact::witness_artifact(&proof)
                     },
-                }
+                )
             }
         )*
     };
