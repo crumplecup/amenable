@@ -27,6 +27,12 @@ pub struct KaniPipeReader(KaniFd);
 pub struct KaniPipeWriter(KaniFd);
 
 /// Modeled anonymous pipe with a bounded byte buffer and explicit close state.
+///
+/// `reader`/`writer` getters stay hand-written: they return an owned
+/// clone of a non-`Copy` type (`KaniPipeReader`/`KaniPipeWriter`), and
+/// `derive_getters` has no action for that -- `#[getter(copy)]` is its
+/// only owned-return option and requires genuine `Copy` (confirmed
+/// against its own source: only skip/rename/copy exist).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KaniPipe {
     reader: KaniPipeReader,

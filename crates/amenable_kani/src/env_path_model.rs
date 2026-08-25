@@ -22,8 +22,9 @@ pub struct KaniEnvPath(String);
 pub struct KaniEnvPathList(Vec<KaniEnvPath>);
 
 /// Modeled error for a path that cannot be joined in the bounded subset.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters)]
 pub struct KaniJoinPathsError {
+    /// The path that violated the bounded join law.
     offending_path: String,
 }
 
@@ -95,11 +96,6 @@ impl KaniEnvPathList {
 }
 
 impl KaniJoinPathsError {
-    /// Borrow the path that violated the bounded join law.
-    pub fn offending_path(&self) -> &str {
-        &self.offending_path
-    }
-
     /// Consume the error and recover the offending path.
     pub fn into_offending_path(self) -> String {
         self.offending_path

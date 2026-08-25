@@ -58,10 +58,13 @@ impl Provenance for KaniPathDisplayObservation {
 }
 
 /// Observable result of parsing a Windows drive-letter prefix component.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::disk(\"C:\\\\\", b'C')")]
 pub struct KaniWindowsPrefixObservation {
+    /// The raw prefix text.
     raw_text: String,
+    /// The parsed drive letter.
+    #[getter(copy)]
     drive_letter: u8,
 }
 
@@ -73,18 +76,6 @@ impl KaniWindowsPrefixObservation {
             raw_text: raw_text.into(),
             drive_letter,
         }
-    }
-
-    /// Report the raw prefix text.
-    #[must_use]
-    pub fn raw_text(&self) -> &str {
-        &self.raw_text
-    }
-
-    /// Report the parsed drive letter.
-    #[must_use]
-    pub fn drive_letter(&self) -> u8 {
-        self.drive_letter
     }
 }
 

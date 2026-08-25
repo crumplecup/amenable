@@ -40,7 +40,7 @@ fn env_paths_reject_an_unjoinable_string() {
     let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" }.to_owned();
     let err = KaniEnvPath::new(bad_path.clone()).unwrap_err();
 
-    assert_eq!(err.offending_path(), bad_path);
+    assert_eq!(err.offending_path(), &bad_path);
     assert_eq!(err.into_offending_path(), bad_path);
 }
 

@@ -28,8 +28,21 @@ pub enum KaniBacktraceStatus {
 }
 
 /// Modeled backtrace whose observable property is its status.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    derive_getters::Getters,
+    derive_new::new,
+)]
 pub struct KaniBacktrace {
+    /// The modeled backtrace status.
+    #[getter(copy)]
     status: KaniBacktraceStatus,
 }
 
@@ -46,19 +59,9 @@ impl KaniBacktraceStatus {
 }
 
 impl KaniBacktrace {
-    /// Construct a modeled backtrace with the provided status.
-    pub fn new(status: KaniBacktraceStatus) -> Self {
-        Self { status }
-    }
-
     /// Model `Backtrace::force_capture()` as a guaranteed captured backtrace.
     pub fn force_capture() -> Self {
         Self::new(KaniBacktraceStatus::Captured)
-    }
-
-    /// Report the modeled backtrace status.
-    pub fn status(&self) -> KaniBacktraceStatus {
-        self.status
     }
 }
 

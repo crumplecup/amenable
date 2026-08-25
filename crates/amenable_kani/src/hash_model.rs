@@ -9,10 +9,13 @@ use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of hashing the same input twice through one `RandomState`.
-#[derive(Debug, Clone, PartialEq, Eq, Standard)]
+#[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
 #[standard(basis = "Self", basis_ctor = "Self::same_input(\"some value\", 7)")]
 pub struct KaniRandomStateObservation {
+    /// The shared input both hashers saw.
     input: String,
+    /// The shared digest both hashers produced.
+    #[getter(skip)]
     digest: u64,
 }
 
@@ -24,12 +27,6 @@ impl KaniRandomStateObservation {
             input: input.into(),
             digest,
         }
-    }
-
-    /// Report the shared input both hashers saw.
-    #[must_use]
-    pub fn input(&self) -> &str {
-        &self.input
     }
 
     /// Report the first observed hash digest.
