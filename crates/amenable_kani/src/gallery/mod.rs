@@ -26,5 +26,6 @@ mod replace_recommendations;
 mod slice_escape_ascii;
 mod slice_split_position;
 mod string_drain;
+mod udp_inbox_removal_cost;
 mod utf8_validation_algorithm_cost;
 mod vacuity;

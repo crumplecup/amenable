@@ -1,10 +1,14 @@
 //! `KaniWitness` impls for `std::net`.
 //!
-//! Every harness runs on the loopback interface, single-threaded: a
-//! connecting `TcpStream::connect()` (or a UDP `send_to`) queues in the
-//! OS itself before the harness ever calls `accept()`/`recv_from()`, so
-//! one thread can drive both sides sequentially without spawning a
-//! second one.
+//! Every harness here proves against `net_model`'s TCP/UDP accommodation
+//! model rather than calling `TcpListener`/`TcpStream`/`UdpSocket`
+//! directly: constructing any real socket at all reaches libc's
+//! `socket()` syscall, which Kani reports unsupported, confirmed by
+//! `gallery::replace_recommendations::
+//! socket_construction_reaches_an_unsupported_socket_syscall_boundary`
+//! identically across all five claims below. If the real std/libc path
+//! conforms to `net_model`'s laws, the modeled proof carries the
+//! intended Rust-facing claim.
 
 use std::net::{Incoming, Shutdown, TcpListener, TcpStream, UdpSocket};
 
@@ -40,17 +44,22 @@ bridge_kani_witness!(RustStdStandard<Incoming<'static>>);
 
 amenable_derive::harness! {
     kani, VERIFY_INCOMING_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC, {
-        /// A connection that's already queued in the OS backlog is
-        /// yielded by `.incoming()` without needing a second thread to
-        /// drive it.
+        /// A connection that's already queued in the backlog is yielded
+        /// by `.incoming()` without needing a second thread to drive
+        /// it. Proven against `net_model::KaniTcpListener`: real socket
+        /// construction reaches an unsupported `socket()` syscall (see
+        /// this module's doc comment).
         #[kani::proof]
         fn verify_incoming_yields_an_already_queued_connection() {
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let addr = listener.local_addr().unwrap();
-            let _client = TcpStream::connect(addr).unwrap();
+            let mut listener = crate::KaniTcpListener::minimal();
+            let client = listener.connect(1);
 
-            let mut incoming = listener.incoming();
-            assert!(incoming.next().unwrap().is_ok());
+            let server = listener.incoming_next();
+            assert_eq!(
+                server.peer_addr(),
+                client.local_addr(),
+                "incoming should yield the already-queued client's connection"
+            );
         }
     }
 }
@@ -81,19 +90,21 @@ bridge_kani_witness!(RustStdStandard<Shutdown>);
 amenable_derive::harness! {
     kani, VERIFY_SHUTDOWN_WRITE_PREVENTS_FURTHER_WRITES_SRC, {
         /// `.shutdown(Shutdown::Write)` closes the write half, so a
-        /// later write on that stream fails.
+        /// later write on that stream fails. Proven against
+        /// `net_model::KaniTcpListener`: real socket construction
+        /// reaches an unsupported `socket()` syscall (see this module's
+        /// doc comment).
         #[kani::proof]
         fn verify_shutdown_write_prevents_further_writes() {
-            use std::io::Write;
+            let mut listener = crate::KaniTcpListener::minimal();
+            let client = listener.connect(1);
+            let _server = listener.accept();
 
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let addr = listener.local_addr().unwrap();
-            let mut client = TcpStream::connect(addr).unwrap();
-            let _server_side = listener.accept().unwrap();
-
-            client.shutdown(Shutdown::Write).unwrap();
+            listener.client_shutdown_write(client);
             assert!(
-                client.write(b"more data").is_err(),
+                listener
+                    .client_write(client, b"more data".to_vec())
+                    .is_err(),
                 "a write after shutdown(Write) should fail"
             );
         }
@@ -126,14 +137,17 @@ bridge_kani_witness!(RustStdStandard<TcpListener>);
 amenable_derive::harness! {
     kani, VERIFY_TCP_LISTENER_ACCEPTS_A_CONNECTING_STREAM_SRC, {
         /// `.accept()` succeeds for a stream that connected to the
-        /// listener's bound address.
+        /// listener's bound address. Proven against
+        /// `net_model::KaniTcpListener`: real socket construction
+        /// reaches an unsupported `socket()` syscall (see this module's
+        /// doc comment).
         #[kani::proof]
         fn verify_tcp_listener_accepts_a_connecting_stream() {
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let addr = listener.local_addr().unwrap();
-            let _client = TcpStream::connect(addr).unwrap();
+            let mut listener = crate::KaniTcpListener::minimal();
+            let addr = listener.local_addr();
+            let _client = listener.connect(1);
 
-            let (_server_side, peer_addr) = listener.accept().unwrap();
+            let (_server_side, peer_addr) = listener.accept();
             assert_eq!(peer_addr.ip(), addr.ip());
         }
     }
@@ -165,20 +179,21 @@ bridge_kani_witness!(RustStdStandard<TcpStream>);
 amenable_derive::harness! {
     kani, VERIFY_TCP_STREAM_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC, {
         /// Bytes written on a connected `TcpStream` arrive, unaltered,
-        /// on the accepted peer's side.
+        /// on the accepted peer's side. Proven against
+        /// `net_model::KaniTcpListener`: real socket construction
+        /// reaches an unsupported `socket()` syscall (see this module's
+        /// doc comment).
         #[kani::proof]
         fn verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer() {
-            use std::io::{Read, Write};
+            let mut listener = crate::KaniTcpListener::minimal();
+            let client = listener.connect(1);
+            let (server, _peer_addr) = listener.accept();
 
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let addr = listener.local_addr().unwrap();
-            let mut client = TcpStream::connect(addr).unwrap();
-            let (mut server_side, _peer_addr) = listener.accept().unwrap();
-
-            client.write_all(b"hello, server").unwrap();
-            let mut buf = [0u8; 32];
-            let n = server_side.read(&mut buf).unwrap();
-            assert_eq!(&buf[..n], b"hello, server");
+            listener
+                .client_write(client, b"hello, server".to_vec())
+                .unwrap();
+            let delivered = listener.server_read(server);
+            assert_eq!(delivered, b"hello, server");
         }
     }
 }
@@ -211,19 +226,20 @@ amenable_derive::harness! {
     kani, VERIFY_UDP_SOCKET_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC, {
         /// `.send_to()` delivers a datagram to the target address, and
         /// `.recv_from()` reports both its bytes and the real sender
-        /// address.
+        /// address. Proven against `net_model::KaniUdpSocket`: real
+        /// socket construction reaches an unsupported `socket()`
+        /// syscall (see this module's doc comment).
         #[kani::proof]
         fn verify_udp_socket_send_to_recv_from_round_trips_a_datagram() {
-            let socket_a = UdpSocket::bind("127.0.0.1:0").unwrap();
-            let socket_b = UdpSocket::bind("127.0.0.1:0").unwrap();
-            let addr_a = socket_a.local_addr().unwrap();
+            let mut socket_a = crate::KaniUdpSocket::bind(0);
+            let mut socket_b = crate::KaniUdpSocket::bind(1);
+            let addr_b = socket_b.local_addr();
 
-            socket_b.send_to(b"ping", addr_a).unwrap();
+            socket_b.send_to(&mut socket_a, b"ping".to_vec());
 
-            let mut buf = [0u8; 32];
-            let (n, from) = socket_a.recv_from(&mut buf).unwrap();
-            assert_eq!(&buf[..n], b"ping");
-            assert_eq!(from, socket_b.local_addr().unwrap());
+            let (payload, from) = socket_a.recv_from();
+            assert_eq!(payload, b"ping");
+            assert_eq!(from, addr_b);
         }
     }
 }

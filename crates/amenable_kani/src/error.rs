@@ -13,7 +13,7 @@
 //! …) — the umbrella exists for that composability, not to replace the
 //! narrower per-method signatures.
 
-use crate::{KaniAlreadyExists, KaniAlreadyLocked};
+use crate::{KaniAlreadyExists, KaniAlreadyLocked, KaniWriteHalfClosed};
 
 /// Every distinct condition `amenable_kani`'s own model types fail
 /// with. Every variant wraps a real, named, `Error`-implementing native
@@ -30,6 +30,11 @@ pub enum KaniModelErrorKind {
     #[display("{_0}")]
     #[from(KaniAlreadyLocked)]
     AlreadyLocked(KaniAlreadyLocked),
+    /// The modeled connection's write half is closed (see
+    /// [`KaniWriteHalfClosed`]).
+    #[display("{_0}")]
+    #[from(KaniWriteHalfClosed)]
+    WriteHalfClosed(KaniWriteHalfClosed),
 }
 
 /// Umbrella error for `amenable_kani`'s own model-error surface — boxes
@@ -52,14 +57,25 @@ pub struct KaniModelError {
 impl KaniModelError {
     /// Construct an error from an already-classified kind, recording
     /// the caller's location.
+    ///
+    /// `Location::caller()` is itself an unsupported construct under
+    /// Kani (see `fs_model::KaniAlreadyExists::new`'s doc comment for
+    /// the confirming detail) -- a Kani-reachable panic is its own
+    /// failure signal regardless of what file/line this carries.
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(kind)))]
     pub fn new(kind: impl Into<KaniModelErrorKind>) -> Self {
-        let loc = std::panic::Location::caller();
+        #[cfg(kani)]
+        let (line, file) = (0, String::new());
+        #[cfg(not(kani))]
+        let (line, file) = {
+            let loc = std::panic::Location::caller();
+            (loc.line(), loc.file().to_string())
+        };
         Self {
             kind: Box::new(kind.into()),
-            line: loc.line(),
-            file: loc.file().to_string(),
+            line,
+            file,
         }
     }
 
@@ -77,5 +93,13 @@ impl KaniModelError {
     #[must_use]
     pub fn already_locked() -> Self {
         Self::new(KaniAlreadyLocked::new())
+    }
+
+    /// Construct a [`KaniModelErrorKind::WriteHalfClosed`] error.
+    #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
+    #[must_use]
+    pub fn write_half_closed() -> Self {
+        Self::new(KaniWriteHalfClosed::new())
     }
 }

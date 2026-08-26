@@ -35,6 +35,7 @@ mod io_model;
 mod ledger;
 mod linked_list_extract_model;
 mod mpsc_model;
+mod net_model;
 mod os_windows_model;
 mod panic_model;
 mod path_model;
@@ -80,6 +81,9 @@ pub use io_model::{
 };
 pub use linked_list_extract_model::KaniLinkedListExtractIf;
 pub use mpsc_model::{KaniChannel, KaniRecvError, KaniRecvTimeoutError, KaniSendError};
+pub use net_model::{
+    KaniTcpClient, KaniTcpListener, KaniTcpServer, KaniUdpSocket, KaniWriteHalfClosed,
+};
 pub use os_windows_model::{
     KANI_INVALID_HANDLE_VALUE, KaniWindowsHandle, KaniWindowsHandleOrInvalid, KaniWindowsSocket,
     kani_encode_wide_bmp_char,
