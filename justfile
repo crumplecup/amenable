@@ -31,23 +31,29 @@ check-all-package package:
     cargo clippy -p {{package}} --all-targets --all-features -- -D warnings
     cargo test -p {{package}}
 
-verify-kani harness:
-    cargo kani -p amenable_kani --lib --all-features --output-format terse --exact --harness {{harness}} -Z unstable-options --harness-timeout 3m
-
-# For `#[kani::proof_for_contract(...)]` harnesses (real function contracts
-# via DFCC, see EXCHANGE_PROOF_DERIVATION_PLAN.md). `-Z function-contracts`
-# is required for any harness using `kani::requires`/`kani::ensures`/
-# `kani::proof_for_contract`; `-Z stubbing` additionally for
-# `kani::stub_verified` composition harnesses (not yet used, staged here
-# for when Step 4 needs it). Harness names for contract harnesses include
-# their module path (see `cargo kani list -Z function-contracts` from
-# inside `crates/amenable_kani` to discover exact names) -- `--exact` still
-# applies. Kani cannot place contracts on trait methods when the trait
+# Canonical Kani verification entrypoint -- delegates to the `amenable
+# verify kani` binary, never a raw `cargo kani` call, so it's registry-
+# driven: `crates/amenable/src/kani.rs`'s `registered_proofs()` iterates
+# only `KaniProofRegistration`, a real, separate registry from proof-
+# gallery cases' own `KaniGalleryRegistration` (see `just gallery-run`
+# for those) -- this can never sweep the gallery in by accident, unlike
+# a bare `cargo kani` invocation with no `--harness` filter, which
+# discovers and runs *every* `#[kani::proof]` compiled into the crate
+# regardless of which registry (if any) it's in.
+#
+# With a harness name, runs exactly that one registered proof; with
+# none, runs every registered proof and persists a CSV ledger (`amenable
+# verify kani --help` for `--failed`/`--timeout` retry selectors). `-Z
+# function-contracts -Z stubbing` are always enabled by `kani_command`
+# (required for `kani::requires`/`kani::ensures`/`kani::proof_for_
+# contract`/`kani::stub_verified` harnesses, harmless for ones that
+# don't use them), so contract/stub-based harnesses need no separate
+# recipe. Kani cannot place contracts on trait methods when the trait
 # itself is generic (a real 0.67.0 tooling limitation, not a project
 # convention): contracted logic lives on plain inherent methods instead,
 # with trait impls reduced to single-expression delegation.
-verify-kani-contract harness:
-    cargo kani -p amenable_kani --lib --all-features --output-format terse --exact --harness {{harness}} -Z unstable-options -Z function-contracts -Z stubbing --harness-timeout 3m
+verify-kani harness="":
+    cargo run -p amenable -- verify kani {{ if harness == "" { "" } else { "--proof " + harness } }} --harness-timeout 3m
 
 # Required env vars for cargo-creusot/why3find; see CREUSOT_GUIDE.md in
 # ~/repos/elicitation for the reference invocation this mirrors.

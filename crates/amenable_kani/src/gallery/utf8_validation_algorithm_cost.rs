@@ -42,7 +42,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FULL_BRANCH_VALIDATION_OVER_TWO_VALID_BYTES_TIMES_OUT_SRC, {
         /// `utf8_model::KaniUtf8::is_valid` (the real 1/2/3/4-byte UTF-8
         /// state machine) over a fixed two-byte all-ASCII input -- must run
@@ -72,7 +72,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ASSUMED_SYMBOLIC_VALIDITY_OVER_THE_SAME_CASE_PASSES_SRC, {
         /// Same two symbolic bytes as the timeout control above, but
         /// validity is assumed (`kani::any()`) rather than computed by

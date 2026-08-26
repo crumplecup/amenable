@@ -21,7 +21,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, TWO_BYTE_COLLECT_TIMES_OUT_SRC, {
         /// Even a fixed `[printable, b'\n']` witness still times out when the
         /// full `EscapeAscii` iterator is eagerly materialized into a `Vec<u8>`.
@@ -50,7 +50,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, TWO_BYTE_INCREMENTAL_NEXT_STILL_TIMES_OUT_SRC, {
         /// Same bounded semantic claim as the timed-out case above, but
         /// observed one yielded byte at a time instead of through eager
@@ -84,7 +84,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BOUNDED_ESCAPE_ASCII_OBSERVATION_PASSES_SRC, {
         /// Best-practice accommodation: keep the same `[printable, b'\n']`
         /// semantic law, but state it through the Amenable-owned bounded

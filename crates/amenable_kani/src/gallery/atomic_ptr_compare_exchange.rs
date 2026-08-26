@@ -32,7 +32,7 @@ use std::sync::atomic::{AtomicPtr, Ordering};
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, MISMATCH_DOES_NOT_REPORT_THE_REAL_CURRENT_VALUE_SRC, {
         /// Minimal reproduction: one `AtomicPtr`, one `compare_exchange`
         /// call with a `current` that cannot match (a `null_mut` current

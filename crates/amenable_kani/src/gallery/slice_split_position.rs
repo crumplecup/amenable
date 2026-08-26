@@ -42,7 +42,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BARE_ITER_POSITION_OVER_FIXED_ARRAY_PASSES_SRC, {
         /// Control: the same fixed 3-element array, same predicate, same
         /// symbolic `a`/`b`, called through `Iter::position` directly
@@ -74,7 +74,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SPLIT_NEXT_OVER_THE_SAME_FIXED_ARRAY_TIMES_OUT_SRC, {
         /// Same array, same predicate, same symbolic `a`/`b` as the control
         /// above -- only the call path changes, from a bare `Iter::position`
@@ -112,7 +112,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BOUNDED_SPLIT_OBSERVATION_PASSES_SRC, {
         /// Best-practice accommodation: keep the same `[a, 0, b]`
         /// delimiter law, but state it through the Amenable-owned bounded

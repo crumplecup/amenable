@@ -50,7 +50,7 @@ use core::iter::Flatten;
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FIND_ROUTED_FILTER_OVER_SYMBOLIC_RANGE_TIMES_OUT_SRC, {
         /// `Filter::next` is implemented in std via `Iterator::find`, which
         /// routes through the source's `try_fold`. `Range<i32>::try_fold`'s
@@ -89,7 +89,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FIND_ROUTED_FILTER_OVER_ARRAY_SOURCE_PASSES_SRC, {
         /// Same claim, same predicate, same symbolic element value as the
         /// timeout control above -- the only change is the source type.
@@ -128,7 +128,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FLATTEN_COLLECT_TIMES_OUT_SRC, {
         /// This mirrors the original production harness shape closely: both
         /// the flattened iterator and the direct concatenation are eagerly
@@ -166,7 +166,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FLATTEN_INCREMENTAL_NEXT_PASSES_SRC, {
         /// This keeps the exact same semantic claim while avoiding eager
         /// materialization: compare one observed item at a time and then
@@ -250,7 +250,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FLATTEN_INCREMENTAL_FIXED_LENGTHS_PASSES_SRC, {
         /// This control keeps the same incremental observation style but fixes
         /// the iterator lengths to separate symbolic blow-up from the

@@ -75,7 +75,7 @@ fn concrete_variants() -> (ConcreteDerivedWitnessEnum, ConcreteDerivedWitnessEnu
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, DERIVE_WITNESS_SUPPORTS_CONCRETE_GENERIC_ENUMS_SRC, {
         /// One concrete generic-enum instantiation is enough for Kani to
         /// check the derive strategy: the outer proof artifact exists as

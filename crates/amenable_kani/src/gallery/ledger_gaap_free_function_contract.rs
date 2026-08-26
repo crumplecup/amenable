@@ -147,7 +147,7 @@ fn commit_checked(
     ledger.commit::<KaniVerifier>(input)
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_FREE_FUNCTION_WRAPPER_SRC, {
         #[kani::proof_for_contract(commit_checked)]
         fn commit_contract_free_function_wrapper() {
@@ -212,7 +212,7 @@ impl KaniLedgerCommit {
     }
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_LOCAL_TYPE_WRAPPER_SRC, {
         #[kani::proof_for_contract(KaniLedgerCommit::commit)]
         fn commit_contract_local_type_wrapper() {
@@ -268,7 +268,7 @@ impl KaniLedgerCommitTrivial {
     }
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_TRIVIAL_ENSURES_SRC, {
         #[kani::proof_for_contract(KaniLedgerCommitTrivial::commit)]
         fn commit_contract_trivial_ensures() {
@@ -305,7 +305,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_NO_WRAPPER_SRC, {
         #[kani::proof_for_contract(amenable_gaap::Ledger::commit)]
         fn commit_contract_no_wrapper() {

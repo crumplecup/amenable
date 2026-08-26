@@ -56,7 +56,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FROM_UTF8_ERROR_TIMES_OUT_EVEN_FOR_A_FIXED_TWO_BYTE_INVALID_VECTOR_SRC, {
         /// This is the reduced `FromUtf8Error` representative: no symbolic
         /// prefix, no cloning, and only a fixed two-byte invalid vector. If
@@ -94,7 +94,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BTREE_MAP_SYMBOLIC_ITERATION_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the reduced `BTreeMap` representative: two symbolic keys,
         /// reverse insertion order, and one observed iteration sequence. If
@@ -135,7 +135,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, LINKED_LIST_EXTRACT_IF_TIMES_OUT_EVEN_WITH_INCREMENTAL_OBSERVATION_SRC, {
         /// This is the reduced `LinkedList::extract_if` representative:
         /// incremental `next()` observation plus one early-drop remainder
@@ -174,7 +174,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BACKTRACE_FORCE_CAPTURE_REACHES_UNSUPPORTED_FOREIGN_BOUNDARY_SRC, {
         /// This is the reduced form of the backtrace replace issue: the claim
         /// itself is straightforward, but Kani reaches `_Unwind_Backtrace`
@@ -204,7 +204,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BORROWED_FD_CLONE_REACHES_UNSUPPORTED_FCNTL_BOUNDARY_SRC, {
         /// This is the reduced form behind the refined Unix `OwnedFd`
         /// replacement review: the ownership-transfer claim itself is small,
@@ -244,7 +244,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ANONYMOUS_PIPE_CREATION_REACHES_UNSUPPORTED_PIPE2_BOUNDARY_SRC, {
         /// This is the reduced form behind the refined `PipeReader` /
         /// `PipeWriter` replacement review: the delivery claim is reasonable,
@@ -288,7 +288,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, LOCATION_CALLER_REACHES_UNSUPPORTED_TRACK_CALLER_BOUNDARY_SRC, {
         /// This is the reduced form behind the `std::panic::Location`
         /// replacement review: the semantic claim is reasonable, but the
@@ -321,7 +321,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, CATCH_UNWIND_REACHES_AN_UNSUPPORTED_PANIC_BOUNDARY_SRC, {
         /// This is the minimal panic-capture shape behind the writer-panicked
         /// replacement reviews: no external state is needed, only the
@@ -352,7 +352,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENV_ARGS_PROCESS_INVARIANT_FAILS_UNDER_THE_SYNTHETIC_KANI_MODEL_SRC, {
         /// Real processes include their own program path in `args()`, but
         /// Kani's synthetic process model can violate that invariant. This is
@@ -380,7 +380,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENV_ARGS_OS_PROCESS_INVARIANT_FAILS_UNDER_THE_SYNTHETIC_KANI_MODEL_SRC, {
         /// Real processes include their own program slot in `args_os()`, but
         /// Kani's synthetic process model can violate that invariant. This is
@@ -408,7 +408,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, JOIN_PATHS_UNJOINABLE_PATH_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the reduced `join_paths()` representative: one fixed
         /// unjoinable path and one `is_err()` assertion. If this still times
@@ -435,7 +435,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SPLIT_PATHS_ROUND_TRIP_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the reduced `split_paths()` representative: a fixed
         /// three-path round trip with no symbolic input. If this still times
@@ -470,7 +470,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SPLIT_PATHS_ROUND_TRIP_TIMES_OUT_IN_THE_FIRST_CONCRETE_STRING_MODEL_SRC, {
         /// This is the first accommodation false trail for `split_paths()`:
         /// direct std helpers are gone, but the proof still asks Kani to
@@ -509,7 +509,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, DEFAULT_HASHER_DETERMINISM_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is a reduced representative for pure in-memory std blow-up:
         /// there is no OS boundary and no panic recovery, only direct hashing
@@ -549,7 +549,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, HASH_MAP_INSERT_THEN_GET_TIMES_OUT_EVEN_FOR_A_FIXED_ENTRY_SRC, {
         /// Another representative for the pure in-memory std blow-up class
         /// (same bucket as `default_hasher_determinism_times_out_in_the_direct_std_path`):
@@ -581,7 +581,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, REAL_FILESYSTEM_BOUNDARY_TIMES_OUT_EVEN_FOR_A_SMALL_TEMPDIR_SCENARIO_SRC, {
         /// This is the reduced filesystem-boundary representative: a single
         /// temp directory, one created file, one metadata observation, and
@@ -624,7 +624,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FORMAT_ARGUMENTS_RENDERING_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the reduced `fmt` representative: a single formatting
         /// argument rendered two ways. If this still times out, the issue is
@@ -656,7 +656,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FROM_FN_RENDERING_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// Same formatting-machinery timeout class as
         /// `format_arguments_rendering_times_out_in_the_direct_std_path`,
@@ -682,7 +682,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, RANDOM_STATE_CONSTRUCTION_REACHES_AN_UNSUPPORTED_ENTROPY_SOURCE_BOUNDARY_SRC, {
         /// This is the reduced form behind the `RandomState` review: the
         /// per-instance determinism claim itself is reasonable (two
@@ -719,7 +719,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, THREAD_CURRENT_REACHES_AN_UNSUPPORTED_THREAD_LOCAL_STORAGE_BOUNDARY_SRC, {
         /// This is the reduced form behind both `thread::current()`- and
         /// `ThreadId`-stability reviews: the two-calls-agree claim itself
@@ -748,7 +748,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BARRIER_WAIT_REACHES_AN_UNSUPPORTED_FUTEX_BOUNDARY_SRC, {
         /// This is the reduced form behind both `Barrier` reviews: the
         /// sole-participant-is-leader claim is straightforward, but even a
@@ -778,7 +778,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, CONDVAR_WAIT_TIMEOUT_REACHES_AN_UNSUPPORTED_CLOCK_BOUNDARY_SRC, {
         /// This is the reduced form behind both `Condvar`/`WaitTimeoutResult`
         /// reviews: the never-notified-wait-times-out claim is
@@ -811,7 +811,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, MUTEX_POISONING_REACHES_THE_UNSUPPORTED_CATCH_UNWIND_BOUNDARY_SRC, {
         /// This is the reduced form behind the `PoisonError` review and
         /// the poisoned branch of the `TryLockError` review: the data-
@@ -844,7 +844,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, TRY_LOCK_SUCCEEDS_UNDER_KANIS_NO_CONCURRENCY_ENVIRONMENT_MODEL_SRC, {
         /// Unlike the other cases in this module, this is not an
         /// unsupported-construct failure -- it is a genuine assertion
@@ -882,7 +882,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMAND_CONSTRUCTION_REACHES_AN_UNSUPPORTED_CSTRING_BOUNDARY_SRC, {
         /// This is the reduced form behind the `Command`-args review: pure
         /// builder introspection with no spawning at all still reaches
@@ -913,7 +913,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMAND_SPAWN_REACHES_AN_UNSUPPORTED_GLIBC_VERSION_BOUNDARY_SRC, {
         /// This is the reduced form behind both the `Child`-process-id and
         /// `ExitStatus` reviews: spawning any process at all, regardless of
@@ -941,7 +941,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, STDIO_CONVERSION_REACHES_AN_UNSUPPORTED_C_STRING_LITERAL_BOUNDARY_SRC, {
         /// This is the reduced form behind the `Output`/`Stdio` reviews:
         /// configuring a piped/null standard stream and spawning reaches a
@@ -970,7 +970,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SOCKET_CONSTRUCTION_REACHES_AN_UNSUPPORTED_SOCKET_SYSCALL_BOUNDARY_SRC, {
         /// This is the reduced form behind every `std::net` review
         /// (`TcpListener`, `TcpStream`, `UdpSocket`, `Incoming`,
@@ -1000,7 +1000,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BUF_READER_READ_TO_STRING_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the reduced direct `BufReader` path retained after the
         /// production proof moved to a bounded buffered-read observation:
@@ -1033,7 +1033,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, INTO_INNER_ERROR_RECOVERY_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the direct `IntoInnerError` path retained after the
         /// production proof moved to a bounded recovery observation: the
@@ -1080,7 +1080,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, LINE_WRITER_NEWLINE_FLUSH_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the direct `LineWriter` path retained after the production
         /// proof moved to a bounded line-buffer observation: the harness
@@ -1121,7 +1121,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BUFREAD_LINES_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the direct `BufRead::lines` path retained after the
         /// production proof moved to a bounded line-splitting observation:
@@ -1151,7 +1151,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BUFREAD_SPLIT_TIMES_OUT_IN_THE_DIRECT_STD_PATH_SRC, {
         /// This is the direct `BufRead::split` path retained after the
         /// production proof moved to a bounded delimiter-splitting
@@ -1187,7 +1187,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, STR_RSPLIT_REVERSE_PATTERN_SEARCH_TIMES_OUT_EVEN_FOR_A_SINGLE_NEXT_CALL_SRC, {
         /// This is the reduced representative for reverse `char`-pattern
         /// search under Kani: a five-byte fixed str, one `char` pattern,
@@ -1229,7 +1229,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, STR_SPLIT_TERMINATOR_MATCHES_FORWARD_PATTERN_ITERATION_TIMES_OUT_IN_THE_REAL_CRATE_SRC, {
         /// This is the reduced representative for `str::split_terminator`'s
         /// forward-direction timeout, and stands in for the identical
@@ -1271,7 +1271,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BUF_WRITER_PANIC_RECOVERY_REACHES_THE_UNSUPPORTED_CATCH_UNWIND_BOUNDARY_SRC, {
         /// This is the direct `WriterPanicked` path retained after the
         /// production proof moved to a bounded panic-recovery observation:

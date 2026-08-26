@@ -30,7 +30,7 @@ use capture_exchange_body::{CaptureExchangeBodyArgs, expand_capture_exchange_bod
 use establish::{EstablishArgs, expand_establish};
 use evidence::{expand_evidence, expand_evidence_derive};
 use exchange::{ExchangeArgs, expand_exchange};
-use harness::expand_harness;
+use harness::{HarnessRegistration, expand_harness};
 use kani_compose::expand_kani_compose;
 use proof_token::expand_proof_token;
 use sidecar::expand_sidecar;
@@ -54,7 +54,23 @@ use witness::expand_witness;
 /// unavailable for the span.
 #[proc_macro]
 pub fn harness(input: TokenStream) -> TokenStream {
-    match expand_harness(input.into()) {
+    match expand_harness(input.into(), HarnessRegistration::Tracked) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Identical grammar and `#[cfg(...)]`-gating to [`harness!`], for
+/// proof-gallery cases specifically: never registers the contained
+/// function as a tracked [`amenable_kani::KaniProof`], since gallery
+/// cases are explicitly *not* part of the tracked "does the suite still
+/// pass" sweep (`amenable verify kani`) -- they get their own,
+/// separately-registered `KaniGalleryRegistration` and run only via the
+/// dedicated `amenable gallery` subcommand. See `harness.rs`'s own doc
+/// comment for the real incident this split exists to prevent.
+#[proc_macro]
+pub fn gallery_harness(input: TokenStream) -> TokenStream {
+    match expand_harness(input.into(), HarnessRegistration::GalleryOnly) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

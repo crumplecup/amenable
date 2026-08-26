@@ -21,7 +21,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ASSUME_FALSE_IS_VACUOUS_PASS_SRC, {
         /// Demonstrates the core vacuity risk: once `assume(false)` removes all
         /// paths, the later assertion is unreachable and Kani reports success.
@@ -51,7 +51,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, EXPLICIT_CONTRADICTION_FAILS_SRC, {
         /// Provides the non-vacuous control case: the contradiction is
         /// reachable, so Kani should report a real failing assertion.
@@ -79,7 +79,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BOUNDED_ASSUMPTION_PASSES_NONVACUOUSLY_SRC, {
         /// This is the minimal "real pass" shape for later experiments: the
         /// assumption is satisfiable and the assertion restates the bounded

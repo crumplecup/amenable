@@ -28,7 +28,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, GENERIC_FILESYSTEM_STATE_MACHINE_TIMES_OUT_FOR_CREATE_NEW_SRC, {
         /// This is the "second filesystem false trail" after the real
         /// tempdir baseline: a fully Amenable-owned mutable filesystem model
@@ -72,7 +72,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SINGLE_PATH_CREATE_NEW_OBSERVATION_PASSES_SRC, {
         /// Same Rust-facing law as the timeout case above, but phrased as the
         /// exact observable boundary `OpenOptions::create_new` exposes:

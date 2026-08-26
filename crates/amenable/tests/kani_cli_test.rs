@@ -37,6 +37,10 @@ fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
             "calculator::verify_debit_access_preserves_value",
             "-Z",
             "unstable-options",
+            "-Z",
+            "function-contracts",
+            "-Z",
+            "stubbing",
             "--harness-timeout",
             "3m",
         ]

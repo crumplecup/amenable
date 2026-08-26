@@ -178,7 +178,12 @@ fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
 
 /// Build the `cargo kani` invocation for one registered proof, applying
 /// Kani's own native `--harness-timeout` rather than an outer process
-/// timeout.
+/// timeout. `-Z function-contracts`/`-Z stubbing` are always enabled --
+/// required for any harness using `kani::requires`/`kani::ensures`/
+/// `kani::proof_for_contract`/`kani::stub_verified`, and harmless for a
+/// harness that doesn't (this is the one canonical invocation, so it
+/// has to handle both without the caller needing to know which kind of
+/// harness they're running).
 pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
     command.args([
@@ -192,6 +197,10 @@ pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
         record.harness().as_str(),
         "-Z",
         "unstable-options",
+        "-Z",
+        "function-contracts",
+        "-Z",
+        "stubbing",
         "--harness-timeout",
         harness_timeout,
     ]);

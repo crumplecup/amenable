@@ -130,7 +130,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ACCOUNT_ID_INEQUALITY_OVER_CONCRETE_STRINGS_PASSES_SRC, {
         /// Control: no `#[kani::proof_for_contract]`, no `Sidecar`/
         /// `Establish` generics, no symbolic `i64`s -- just the bare
@@ -157,7 +157,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, VALIDATE_WITH_CONCRETE_AMOUNTS_PASSES_SRC, {
         /// Same call graph as `validate_without_dfcc_checking_times_out`,
         /// but `amount`/`balance` are concrete, not `kani::any()`. This
@@ -195,7 +195,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, VALIDATE_WITH_ONE_SYMBOLIC_FIELD_TIMES_OUT_SRC, {
         /// Isolates whether a *single* symbolic `i64` determining the
         /// `Ok`(heap-allocating)/`Err`(non-allocating) split is already
@@ -234,7 +234,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, VALIDATE_WITHOUT_DFCC_CHECKING_TIMES_OUT_SRC, {
         /// Isolates whether the real `validate` body (`Sidecar`/
         /// `Establish` generics, `TransferPayload::clone()`, the four
@@ -275,7 +275,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, BARE_RESULT_TRANSFER_PAYLOAD_PASSES_SRC, {
         /// Strips away every piece of `amenable_kani::ledger`'s own
         /// machinery (`Transfer<S, Token>`, `Sidecar`, `Establish`,
@@ -320,7 +320,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SYMBOLIC_BRANCH_WITH_TRACK_CALLER_AND_NO_STRING_PASSES_SRC, {
         /// Isolates `Establish::establish`'s `#[track_caller]` (flagged
         /// every run as an unsupported `caller_location` construct)
@@ -368,7 +368,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SYMBOLIC_BRANCH_CONSTRUCTING_REAL_TRANSFER_VALIDATED_PASSES_SRC, {
         /// `bare_result_transfer_payload_passes` proved a bare
         /// `Result<TransferPayload, i64>` under a symbolic branch is
@@ -427,7 +427,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, RETURNING_REAL_RESULT_TYPE_FROM_A_FUNCTION_PASSES_SRC, {
         /// `symbolic_branch_constructing_real_transfer_validated_passes` proved
         /// constructing `Transfer<Validated, ValidatedToken>` inline,
@@ -489,7 +489,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SYMBOLIC_PENDING_TRANSFER_EXTRACTION_PASSES_SRC, {
         /// Every prior probe passed a *plain* symbolic `i64` directly
         /// into a function or inline block. The real `validate` instead
@@ -530,7 +530,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, FULL_COMBINATION_INLINE_WITHOUT_CALLING_VALIDATE_SRC, {
         /// Every individual piece of `Ledger::validate` has now passed
         /// in isolation. This assembles all of them -- symbolic
@@ -592,7 +592,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, THREE_DISTINCT_ERROR_VARIANTS_FROM_ONE_FUNCTION_PASSES_SRC, {
         /// `full_combination_inline_without_calling_validate` passed,
         /// but its "error paths" were bare `return;` -- no
@@ -660,7 +660,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, CALLING_LEDGER_VALIDATE_DIRECTLY_TIMES_OUT_SRC, {
         /// `three_distinct_error_variants_from_one_function_passes`
         /// reproduces `Ledger::validate`'s exact logic/types/error
@@ -703,7 +703,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, VALIDATE_SHAPE_WITH_UNCONTRACTED_HELPERS_PASSES_SRC, {
         /// The one remaining structural difference between `Ledger::
         /// validate` (times out) and `three_distinct_error_variants_
@@ -794,7 +794,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, TRIVIAL_ENSURES_CLOSURE_ON_THE_REAL_BODY_FAILS_FAST_SRC, {
         /// The one remaining untested variable: is the cost driven by
         /// `validate`'s own *body* (branching + heap allocation) once
@@ -880,7 +880,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_CHECKING_ONLY_AMOUNT_PASSES_SRC, {
         /// `trivial_ensures_closure_on_the_real_body_fails_fast` proved
         /// `result.is_ok()` is cheap. This is the next step up in
@@ -968,7 +968,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_ACCOUNTS_DISTINCT_STRING_COMPARISON_SRC, {
         /// `ensures_closure_checking_only_amount_passes` proved
         /// `.primary()`/amount-checking inside the closure is cheap.
@@ -1056,7 +1056,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_ENUM_ACCOUNT_COMPARISON_PASSES_SRC, {
         /// `ensures_closure_with_accounts_distinct_string_comparison`
         /// isolated the cost to exactly one comparison: two
@@ -1141,7 +1141,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_NUMERIC_ID_COMPARISON_PASSES_SRC, {
         /// `ensures_closure_with_enum_account_comparison_passes` proved
         /// a *fixed, 2-variant* enum works. Real ledgers have many
@@ -1219,7 +1219,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_ID_PLUS_NAME_HYBRID_PASSES_SRC, {
         /// A real `AccountId` likely wants both a cheap-to-compare
         /// identity *and* a human-readable name (real bookkeeping UIs
@@ -1318,7 +1318,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_UUID_SHAPED_COMPARISON_PASSES_SRC, {
         /// Does a UUID work as account identity? The `uuid` crate isn't
         /// a workspace dependency, so this models `uuid::Uuid`'s real
@@ -1399,7 +1399,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, ENSURES_CLOSURE_WITH_FIXED_CAPACITY_STRING_COMPARISON_TIMES_OUT_SRC, {
         /// `ensures_closure_with_uuid_shaped_comparison_passes` tested a
         /// bare `[u8; 16]` -- a fixed-size array with no notion of

@@ -1,24 +1,48 @@
-//! `harness!`: defines a `#[cfg(...)]`-gated proof harness item and, right
-//! alongside it, an always-available `&'static str` constant holding the
-//! harness's verbatim source — whitespace and all — so an audit report can
-//! show a proof exactly as its author wrote it, not a machine-reflowed
-//! approximation. Both come from the same braced group of tokens, so they
-//! can never drift apart.
+//! `harness!`/`gallery_harness!`: define a `#[cfg(...)]`-gated proof
+//! harness item and, right alongside it, an always-available `&'static
+//! str` constant holding the harness's verbatim source — whitespace and
+//! all — so an audit report can show a proof exactly as its author wrote
+//! it, not a machine-reflowed approximation. Both come from the same
+//! braced group of tokens, so they can never drift apart.
 //!
-//! Kani invocations also emit an `inventory` record for the contained
-//! function. The record exists in ordinary Rust builds, while the harness
-//! itself remains gated behind `cfg(kani)`, allowing the CLI to discover the
-//! complete executable Kani catalog without source scanning.
+//! `harness!`'s `kani` invocations also emit an `inventory` record for
+//! the contained function, registering it as an executable, *tracked*
+//! Kani proof (`amenable_kani::KaniProofRegistration`) -- discoverable by
+//! `amenable verify kani`'s own registry-driven sweep with no source
+//! scanning needed. `gallery_harness!` has the identical grammar and
+//! `#[cfg(...)]`-gating behavior but never emits that record: proof-
+//! gallery cases already separately register their own
+//! `KaniGalleryRegistration` (disposition/expectation metadata, run only
+//! via the dedicated `amenable gallery` subcommand) and are explicitly
+//! *not* supposed to be part of the tracked, "does the suite still pass"
+//! sweep -- confirmed the hard way: before this split existed, every
+//! gallery case (many with deliberately expected `timeout`/`failed`
+//! outcomes) also silently ended up in `KaniProofRegistration` purely
+//! because it happened to be written through `harness!`, and `amenable
+//! verify kani`'s full sweep ran all of them.
 
 use proc_macro2::{Delimiter, Ident, TokenStream, TokenTree};
 use quote::quote;
 use syn::Error;
 
+/// Whether an expanded harness should also register itself as a tracked,
+/// executable [`amenable_kani::KaniProof`] -- see this module's own doc
+/// comment for why gallery harnesses deliberately don't.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HarnessRegistration {
+    Tracked,
+    GalleryOnly,
+}
+
 /// Expand `harness!(cfg_name, CONST_NAME, { item })` into the `#[cfg(...)]`
 /// gated `item` plus a `const CONST_NAME: &str = "...";` holding `item`'s
-/// verbatim source text. A `kani` invocation additionally registers the
-/// contained function as an [`amenable_kani::KaniProof`].
-pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
+/// verbatim source text. When `registration` is [`HarnessRegistration::
+/// Tracked`], a `kani` invocation additionally registers the contained
+/// function as a tracked [`amenable_kani::KaniProof`].
+pub fn expand_harness(
+    input: TokenStream,
+    registration: HarnessRegistration,
+) -> syn::Result<TokenStream> {
     let mut tokens = input.into_iter().peekable();
 
     let cfg_name = expect_ident(&mut tokens)?;
@@ -40,7 +64,7 @@ pub fn expand_harness(input: TokenStream) -> syn::Result<TokenStream> {
         .map(|text| trim_braces(&text).to_owned())
         .unwrap_or_else(|| group.stream().to_string());
     let item = group.stream();
-    let kani_record = if cfg_name == "kani" {
+    let kani_record = if cfg_name == "kani" && registration == HarnessRegistration::Tracked {
         let harness = syn::parse2::<syn::ItemFn>(item.clone()).map_err(|err| {
             let mut context = Error::new_spanned(
                 &item,

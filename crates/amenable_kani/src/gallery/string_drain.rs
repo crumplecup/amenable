@@ -19,7 +19,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SINGLE_CHAR_COLLECT_TIMES_OUT_SRC, {
         /// Even when the symbolic string is forced down to one ASCII code
         /// point, materializing the full drained iterator back into a `String`
@@ -48,7 +48,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SINGLE_CHAR_INCREMENTAL_NEXT_PASSES_SRC, {
         /// The semantic claim is the same as the timed-out case, but we only
         /// observe the drained iterator one step at a time and then confirm the
@@ -85,7 +85,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, SYMBOLIC_UTF8_OBSERVATION_TIMES_OUT_SRC, {
         /// Replacing the native `String::drain(..)` iterator with an
         /// Amenable-owned observation is not sufficient on its own: asking

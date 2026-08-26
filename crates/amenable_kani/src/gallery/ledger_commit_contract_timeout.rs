@@ -28,7 +28,7 @@
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_WITH_CONCRETE_AMOUNTS_SRC, {
         /// Isolates whether the symbolic `amount`/`balance` is what's
         /// expensive here, or whether the cost is structural to the
@@ -67,7 +67,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_BYPASSING_ESTABLISH_CHAIN_SRC, {
         /// `commit_contract_with_concrete_amounts` proved the setup
         /// chain (`Sidecar::sidecar`/`Establish::establish`/`Transfer::
@@ -111,7 +111,7 @@ amenable_derive::harness! {
     )
 }
 
-amenable_derive::harness! {
+amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_WITH_AMOUNT_ASSUMED_POSITIVE_SRC, {
         /// Isolates whether unconstrained `amount` (including
         /// `i64::MIN`, where `commit`'s own postcondition's `-amount`
