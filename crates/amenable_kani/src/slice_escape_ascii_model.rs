@@ -18,6 +18,7 @@ pub struct KaniEscapeAsciiWindow;
 impl Provenance for KaniEscapeAsciiWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -54,12 +55,14 @@ pub struct KaniEscapeAsciiObservation {
 
 impl KaniEscapeAsciiObservation {
     /// Recover the modeled source bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn source(&self) -> [u8; 2] {
         [self.printable, b'\n']
     }
 
     /// Recover the modeled escaped bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn escaped(&self) -> [u8; 3] {
         [self.printable, b'\\', b'n']
@@ -70,10 +73,12 @@ impl Evidence for KaniEscapeAsciiObservation {
     type Basis = KaniEscapeAsciiWindow;
     type Audit = KaniEscapeAsciiAudit;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniEscapeAsciiWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         KaniEscapeAsciiAudit {
             source: self.source(),

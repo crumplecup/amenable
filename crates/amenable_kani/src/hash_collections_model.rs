@@ -33,6 +33,7 @@ impl<K: PartialEq, V> KaniHashMap<K, V> {
 
     /// Model `get(key)`: `Some` only for the one modeled key, `None`
     /// otherwise (including after removal).
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, key)))]
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
         if &self.key == key {
@@ -43,6 +44,7 @@ impl<K: PartialEq, V> KaniHashMap<K, V> {
     }
 
     /// Model `remove(key)`, returning the removed value if present.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, key)))]
     pub fn remove(&mut self, key: &K) -> Option<V> {
         if &self.key == key {
             self.value.take()
@@ -70,12 +72,14 @@ impl<T: PartialEq> KaniHashSet<T> {
     }
 
     /// Model `contains(value)`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, value)))]
     #[must_use]
     pub fn contains(&self, value: &T) -> bool {
         self.present && &self.value == value
     }
 
     /// Model `remove(value)`, reporting whether it was present.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, value)))]
     pub fn remove(&mut self, value: &T) -> bool {
         if self.contains(value) {
             self.present = false;

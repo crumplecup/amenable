@@ -8,13 +8,30 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [CFG_HYGIENE_PLAN.md](CFG_HYGIENE_PLAN.md)
 
-**Status:** 🔲 Step 0 done and verified (workspace-wide `unexpected_cfgs`
+**Status:** ✅ Step 0 done and verified (workspace-wide `unexpected_cfgs`
 union replaced with per-crate `build.rs` declarations, committed
-`1dd1985`). Step 3's per-crate tracing-apply policy is confirmed
-empirically — Creusot turned out to hard-fail compilation on a bare
-`#[instrument]` (not just risk a timeout like Kani), tested directly and
-reverted — but not yet implemented. Steps 1–3 all deliberately parked
-until the tracing-instrumentation rollout lands first.
+`1dd1985`). ✅ Step 3 done: per-crate tracing-apply policy (Kani gated,
+Creusot and Verus skipped) implemented and tested in cordial
+(`TracingApplyPolicy`), plus six real cordial classifier bugs found and
+fixed along the way (`#[instrument]` on `const fn`s; `err()` on
+non-`Display` error types; tuple-destructured generic parameters
+invisible to the skip list; a gated attribute's short form leaving a
+real `unused_imports` warning when nested inside an outer
+`#[cfg(kani)]`; a workspace-wide call-graph reachability mechanism —
+not a hardcoded trait-name list — that finds any function reachable
+only from a proof-only entry point, wherever in the workspace it
+lives; and, caught by a direct user challenge to the first call-graph
+result's numbers, a fix for `syn` never expanding the `amenable_derive
+::harness!` macro that wraps almost every real Kani proof harness, so
+the call graph was blind to the dominant real call-site shape). A real
+`--apply --crate-name amenable_kani` run (396 functions, 83 files) is
+now landed and fully verified: `check`/`clippy -D warnings`/
+`fmt --check`/`test` all clean, `amenable_kani`'s checklist section has
+zero remaining `Ensures`/`Requires` rows, plus two real `cargo kani`
+proofs re-confirmed passing non-vacuously.
+`amenable_creusot`/`amenable_verus` received zero changes, as Skip
+policy requires. Not yet committed (user's call). Steps 1–2 still not
+started.
 
 **Description:** Surfaced while investigating why cordial's tracing
 `--apply` couldn't run blind against this workspace. Problem 1 (fixed):

@@ -24,12 +24,14 @@ impl KaniPathDisplayObservation {
     }
 
     /// Report the modeled source text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn source_text(&self) -> &str {
         &self.text
     }
 
     /// Report the modeled `Display` rendering.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn display_text(&self) -> &str {
         &self.text
@@ -82,6 +84,7 @@ impl KaniWindowsPrefixObservation {
 impl Provenance for KaniWindowsPrefixObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

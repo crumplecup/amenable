@@ -28,6 +28,7 @@ pub struct KaniStringDrainObservation {
 impl Provenance for KaniStringDrainObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -54,24 +55,28 @@ impl KaniStringDrainObservation {
     }
 
     /// Borrow the drained bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn yielded_bytes(&self) -> &[u8] {
         self.yielded.as_bytes()
     }
 
     /// Report the drained UTF-8 byte length.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn yielded_len(&self) -> usize {
         self.yielded.len()
     }
 
     /// Report the source length after draining.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn source_len_after_drain(&self) -> usize {
         0
     }
 
     /// Report that the drained source string is empty afterward.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn source_is_empty(&self) -> bool {
         true
@@ -79,6 +84,7 @@ impl KaniStringDrainObservation {
 }
 
 impl Default for KaniStringDrainObservation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new(KaniUtf8Buffer::<2>::new([0, 0], 0).expect("empty bytes are valid UTF-8"))
     }

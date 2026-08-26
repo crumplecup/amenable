@@ -44,16 +44,19 @@ pub struct KaniPipe {
 
 impl KaniPipeReader {
     /// Report the reader's raw fd value.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
         self.0.raw_fd()
     }
 
     /// Report the shared modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.0.resource_id()
     }
 
     /// Report whether the reader endpoint is live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_live(&self) -> bool {
         self.0.is_live()
     }
@@ -61,16 +64,19 @@ impl KaniPipeReader {
 
 impl KaniPipeWriter {
     /// Report the writer's raw fd value.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
         self.0.raw_fd()
     }
 
     /// Report the shared modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.0.resource_id()
     }
 
     /// Report whether the writer endpoint is live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_live(&self) -> bool {
         self.0.is_live()
     }
@@ -81,6 +87,7 @@ impl KaniPipe {
     /// resource id 0 -- unlike [`Self::fresh`], no non-deterministic
     /// construction, so (unlike `fresh`) this has nothing Kani-specific
     /// about it and stays available outside `cfg(kani)`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn minimal() -> Self {
         Self {
             reader: KaniPipeReader(KaniFd::live(0, 0)),
@@ -109,36 +116,43 @@ impl KaniPipe {
     }
 
     /// Snapshot the reader endpoint.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn reader(&self) -> KaniPipeReader {
         self.reader.clone()
     }
 
     /// Snapshot the writer endpoint.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn writer(&self) -> KaniPipeWriter {
         self.writer.clone()
     }
 
     /// Report the shared modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.reader.resource_id()
     }
 
     /// Report whether the reader endpoint is modeled as open.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn reader_is_open(&self) -> bool {
         self.reader_open
     }
 
     /// Report whether the writer endpoint is modeled as open.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn writer_is_open(&self) -> bool {
         self.writer_open
     }
 
     /// Report the current buffered byte count.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn buffered_len(&self) -> usize {
         self.buffered.len()
     }
 
     /// Append bytes written by the paired writer.
+    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self, writer)))]
     pub fn write_all(&mut self, writer: KaniPipeWriter, payload: Vec<u8>) {
         assert!(
             self.reader_open,
@@ -164,6 +178,7 @@ impl KaniPipe {
     }
 
     /// Close the writer endpoint while preserving buffered bytes for the reader.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, writer)))]
     pub fn close_writer(&mut self, writer: KaniPipeWriter) {
         assert!(self.writer_open, "writer cannot be closed twice");
         assert_eq!(
@@ -181,6 +196,7 @@ impl KaniPipe {
     }
 
     /// Drain all buffered bytes from the reader once the writer has closed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self, reader)))]
     pub fn read_to_end(&mut self, reader: KaniPipeReader) -> Vec<u8> {
         assert!(self.reader_open, "modeled reads require an open reader end");
         assert!(reader.is_live(), "modeled reads require a live reader");

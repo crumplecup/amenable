@@ -70,6 +70,7 @@ impl KaniWitness for RustStdStandard<Reverse<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_reverse_inverts_comparison".to_owned(),

@@ -52,6 +52,7 @@ impl KaniWitness for RustStdStandard<LayoutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),

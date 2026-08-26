@@ -113,6 +113,7 @@ impl Credit {
 impl Provenance for Credit {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
     }
@@ -177,6 +178,7 @@ impl Sum {
 }
 
 /// Add a debit and a credit, forming evidence rooted in both.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(a, b)))]
 #[calculation(token = AddToken)]
 pub fn add(a: Debit, b: Credit) -> Sum {
     Sum {
@@ -203,6 +205,7 @@ pub struct CalculationProof {
 }
 
 impl std::fmt::Display for CalculationProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "harness: {}", self.harness)?;
         write!(f, "claim: {}", self.claim)
@@ -223,6 +226,7 @@ where
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "add_impl_computes_exact_sum".to_owned(),
@@ -245,6 +249,7 @@ impl ProofToken for AddEvidence {
 impl Establish<AddEvidence, KaniVerifier> for AddEvidence {
     type Token = AddToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: AddEvidence) -> Self::Token {
         AddToken(())
     }

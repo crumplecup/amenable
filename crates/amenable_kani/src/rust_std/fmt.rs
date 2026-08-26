@@ -438,6 +438,7 @@ impl KaniWitness
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_fn_forwards_display_to_the_supplied_closure".to_owned(),

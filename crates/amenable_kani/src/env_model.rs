@@ -30,11 +30,13 @@ pub struct KaniArgv {
 
 impl KaniArgv {
     /// Report the total slot count in the UTF-8 argv view.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn args_count(&self) -> usize {
         1 + usize::from(self.extra_count)
     }
 
     /// Report the total slot count in the `OsString` argv view.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn args_os_count(&self) -> usize {
         self.args_count()
     }

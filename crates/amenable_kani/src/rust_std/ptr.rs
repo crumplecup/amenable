@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<NonNull<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_non_null_rejects_the_null_pointer".to_owned(),

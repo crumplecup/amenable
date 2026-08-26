@@ -252,6 +252,7 @@ impl KaniWitness for RustStdStandard<OwnedSocket> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_owned_socket_preserves_the_raw_value_across_conversion".to_owned(),

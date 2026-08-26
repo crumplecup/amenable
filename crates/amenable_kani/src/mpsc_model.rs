@@ -83,6 +83,7 @@ pub struct KaniChannel<T> {
 impl<T> Provenance for KaniChannel<T> {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             let capacity = match self.capacity {
@@ -133,11 +134,13 @@ impl<T> KaniChannel<T> {
     }
 
     /// Drop the modeled sender endpoint.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn drop_sender(&mut self) {
         self.sender_open = false;
     }
 
     /// Drop the modeled receiver endpoint.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn drop_receiver(&mut self) {
         self.receiver_open = false;
     }
@@ -149,6 +152,7 @@ impl<T> KaniChannel<T> {
     ///
     /// Returns `KaniSendError::Disconnected` if the receiver has been
     /// dropped, or `KaniSendError::Full` if a bounded channel is at capacity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, value)))]
     pub fn send(&mut self, value: T) -> Result<(), KaniSendError<T>> {
         if !self.receiver_open {
             return Err(KaniSendError::Disconnected(value));
@@ -172,6 +176,7 @@ impl<T> KaniChannel<T> {
     /// # Errors
     ///
     /// Same as [`Self::send`].
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, value)))]
     pub fn try_send(&mut self, value: T) -> Result<(), KaniSendError<T>> {
         self.send(value)
     }
@@ -187,6 +192,7 @@ impl<T> KaniChannel<T> {
     /// blocking `recv` on an open, empty channel doesn't return at all
     /// until a value arrives or the sender disconnects, so this model
     /// requires the sender closed once the queue is empty.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn recv(&mut self) -> Result<T, KaniRecvError> {
         if let Some(value) = self.pop_front() {
             return Ok(value);
@@ -206,6 +212,7 @@ impl<T> KaniChannel<T> {
     /// Returns `KaniRecvError::Empty` if the queue is empty and the sender
     /// is still open, or `KaniRecvError::Disconnected` if the queue is
     /// empty and the sender has been dropped.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn try_recv(&mut self) -> Result<T, KaniRecvError> {
         if let Some(value) = self.pop_front() {
             return Ok(value);
@@ -226,6 +233,7 @@ impl<T> KaniChannel<T> {
     /// Returns `KaniRecvTimeoutError::Timeout` if the queue is empty and the
     /// sender is still open, or `KaniRecvTimeoutError::Disconnected` if the
     /// queue is empty and the sender has been dropped.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn recv_timeout_zero(&mut self) -> Result<T, KaniRecvTimeoutError> {
         if let Some(value) = self.pop_front() {
             return Ok(value);
@@ -238,11 +246,13 @@ impl<T> KaniChannel<T> {
     }
 
     /// Report the number of currently queued values.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn queue_len(&self) -> usize {
         self.queue.len()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     fn pop_front(&mut self) -> Option<T> {
         if self.queue.is_empty() {
             None

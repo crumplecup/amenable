@@ -487,6 +487,7 @@ impl KaniWitness for RustStdStandard<core::char::EscapeUnicode> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_escape_unicode_renders_the_codepoint_escape".to_owned(),

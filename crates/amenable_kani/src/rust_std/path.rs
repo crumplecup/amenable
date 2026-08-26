@@ -194,6 +194,7 @@ impl KaniPathDisplayObservation {
     /// Consumes `self`: the only way to obtain the token is to have run
     /// this check against a real observation instance, not to assert it
     /// independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_verbatim_rendering(self) -> KaniPathDisplayWitnessToken {
         assert_eq!(self.display_text(), self.source_text());
@@ -411,6 +412,7 @@ impl KaniWindowsPrefixObservation {
     /// `self`: the only way to obtain the token is to have run this check
     /// against a real observation instance, not to assert it
     /// independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_drive_letter(
         self,
@@ -499,6 +501,7 @@ impl KaniWindowsPrefixObservation {
     /// the source path actually wrote. Consumes `self` for the same
     /// reason [`KaniWindowsPrefixObservation::demonstrate_drive_letter`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_raw_text_and_drive_letter(
         self,
@@ -525,6 +528,7 @@ impl Establish<KaniWindowsPrefixComponentWitnessToken, KaniVerifier>
 {
     type Token = RustStdPrefixComponentToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniWindowsPrefixComponentWitnessToken) -> Self::Token {
         RustStdPrefixComponentToken(())
     }
@@ -557,6 +561,7 @@ impl KaniWitness for RustStdStandard<StripPrefixError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_strip_prefix_error_reports_a_non_matching_prefix".to_owned(),

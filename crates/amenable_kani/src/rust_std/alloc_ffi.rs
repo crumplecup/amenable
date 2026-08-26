@@ -156,6 +156,7 @@ impl KaniWitness for RustStdStandard<NulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nul_error_reports_the_interior_nuls_position".to_owned(),

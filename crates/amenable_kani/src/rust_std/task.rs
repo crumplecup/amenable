@@ -124,6 +124,7 @@ impl KaniWitness for RustStdStandard<Waker> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_waker_wake_by_ref_invokes_the_wake_impl".to_owned(),

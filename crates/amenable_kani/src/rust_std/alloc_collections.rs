@@ -971,6 +971,7 @@ pub struct IteratorYieldsAReferenceToTheStoredValue<T>(std::marker::PhantomData<
 impl<T> amenable_core::Standard for IteratorYieldsAReferenceToTheStoredValue<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -980,14 +981,17 @@ impl<T> Evidence for IteratorYieldsAReferenceToTheStoredValue<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -1012,6 +1016,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier>
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -1540,6 +1545,7 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>>
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_deque_into_iter_yields_owned_values_in_order".to_owned(),

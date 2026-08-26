@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<core::ascii::EscapeDefault> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_escape_default_escapes_a_control_byte".to_owned(),

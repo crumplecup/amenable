@@ -58,6 +58,10 @@ impl KaniRecursiveDirObservation {
     /// from `base`. Consumes `self`: the only way to obtain the token is
     /// to have run this check against a real observation instance, not to
     /// assert it independently.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self, base, first, second, leaf))
+    )]
     #[must_use]
     pub fn demonstrate_ancestor_preservation(
         self,
@@ -165,6 +169,10 @@ impl KaniDirEntryObservation {
     /// `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self, expected_name, expected_path))
+    )]
     #[must_use]
     pub fn demonstrate_identity(
         self,
@@ -256,6 +264,7 @@ impl KaniFileContentObservation {
     /// `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_round_trip(self, bytes: [u8; 4]) -> KaniFileContentWitnessToken {
         assert_eq!(
@@ -343,6 +352,7 @@ impl KaniFileTimesObservation {
     /// Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_modification_time(
         self,
@@ -435,6 +445,7 @@ impl KaniFileTypeObservation {
     /// directory the reverse. Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_distinction(self) -> KaniFileTypeWitnessToken {
         assert!(self.file_is_file());
@@ -521,6 +532,7 @@ impl KaniFileLenObservation {
     /// count. Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_length(self, byte_count: u8) -> KaniFileLenWitnessToken {
         assert_eq!(
@@ -611,6 +623,10 @@ impl KaniCreateNewObservation {
     /// fresh path) and leaves a file there. Consumes all three: the only
     /// way to obtain the token is to have run this check against real
     /// observation instances, not to assert it independently.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "trace", skip(self, existing, existing_directory))
+    )]
     #[must_use]
     pub fn demonstrate_creation_succeeds(
         mut self,
@@ -716,6 +732,7 @@ impl KaniPermissionsObservation {
     /// read. Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_readonly_round_trip(mut self) -> KaniPermissionsWitnessToken {
         assert!(!self.readonly(), "a freshly created file is not readonly");
@@ -808,6 +825,10 @@ impl KaniReadDirObservation {
     /// order. Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self, first_name, second_name))
+    )]
     #[must_use]
     pub fn demonstrate_completeness(
         self,
@@ -871,6 +892,7 @@ impl KaniWitness for RustStdStandard<std::fs::TryLockError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_lock_error_reports_a_lock_already_held".to_owned(),
@@ -906,6 +928,7 @@ impl KaniLockObservation {
     /// the lock is still held. Consumes `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_exclusion(mut self) -> KaniLockWitnessToken {
         assert!(
@@ -934,6 +957,7 @@ impl ProofToken for RustStdTryLockErrorToken {
 impl Establish<KaniLockWitnessToken, KaniVerifier> for RustStdStandard<std::fs::TryLockError> {
     type Token = RustStdTryLockErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniLockWitnessToken) -> Self::Token {
         RustStdTryLockErrorToken(())
     }

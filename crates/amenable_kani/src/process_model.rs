@@ -32,6 +32,7 @@ impl KaniChildObservation {
     }
 
     /// Report the modeled waited exit code.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn waited_exit_code(&self) -> Option<i32> {
         Some(self.exit_code)
@@ -208,6 +209,7 @@ impl KaniCommandArgsObservation {
     }
 
     /// Report the modeled configured arguments.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn args(&self) -> [&str; 2] {
         [self.args[0].as_str(), self.args[1].as_str()]
@@ -351,12 +353,14 @@ impl KaniExitStatusObservation {
     }
 
     /// Report the modeled exit status code.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn code(&self) -> Option<i32> {
         Some(self.exit_code)
     }
 
     /// Report whether the modeled exit status is successful.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn success(&self) -> bool {
         self.exit_code == 0
@@ -407,12 +411,14 @@ impl KaniOutputObservation {
     }
 
     /// Report the modeled exit status code.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn status_code(&self) -> Option<i32> {
         Some(self.exit_code)
     }
 
     /// Report whether the modeled output status is successful.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn success(&self) -> bool {
         self.exit_code == 0
@@ -470,6 +476,7 @@ impl KaniStdioObservation {
 impl Provenance for KaniStdioObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

@@ -1,11 +1,26 @@
 # cfg Hygiene Plan
 
-**Status:** 🔲 Step 0 done and verified. Step 3's per-crate tracing
-policy is confirmed empirically (see Step 3 below) but not yet
-implemented in cordial. Steps 1–2 not started at all. Implementation of
-Step 3 is parked deliberately until the broader tracing-instrumentation
-rollout (cordial's `DERIVE-*`/tracing checklist work) lands, per
-explicit direction; Steps 1–2 return after that.
+**Status:** ✅ Step 0 done and verified. ✅ Step 3 done: per-crate tracing
+policy implemented + tested in cordial, and a real `amenable_kani`
+`--apply` (396 functions, 83 files) is now landed and fully verified —
+`cargo check`/`clippy -D warnings`/`fmt --check`/`test` all clean, plus
+two real `cargo kani` proof harnesses (including one exercising the
+tuple-destructuring fix directly) still verify successfully with the
+new gated instrumentation in place. Six real, pre-existing cordial
+classifier bugs were found and fixed along the way (unrelated to the
+policy layer itself) — see "Step 3 rollout" below, including a
+workspace-wide call-graph reachability mechanism (not a hardcoded
+trait-name list) that finds functions reachable only from proof-only
+entry points, wherever they live in the workspace, and a fix for `syn`
+never expanding the `amenable_derive::harness!` macro that wraps almost
+every real Kani proof harness in the crate -- with it fixed, **every**
+`amenable_core::Ensures`/`Requires` impl in `amenable_kani` is now
+correctly excluded, not just the ones that happened to be called
+outside a `harness!` block.
+`amenable_creusot`/`amenable_verus` correctly received zero changes
+(Skip policy). Not yet done: committing the `amenable_kani` apply
+result, or generalizing `--apply` beyond tracing (Phase 1). Steps 1–2
+not started at all.
 
 ## Why this exists
 
@@ -206,3 +221,309 @@ version of the same risk, it's a *harder* failure than Kani's.
   ordinary-`cargo`-driven build can).
 - Everything else → **Bare**, `#[instrument(...)]` as cordial already
   generates it today.
+
+**Implementation status:** done in cordial (not yet in this repo's own
+history — cordial is a sibling project). `TracingApplyPolicy` (`Bare`/
+`Gated(Vec<cfg>)`/`Skip`) lives in `~/repos/cordial/src/etiquettes/
+tracing/apply/verifier_policy.rs`, resolved from two new
+`PathInclusionFacts` methods (`splice_consumers`, `transitive_dependents`)
+and two new `TracingThresholds` config fields (`apply_gate_crates`,
+`apply_skip_crates`), threaded into `apply_gap`/`InstrumentApplySummary`
+(new `skipped_policy` count). 4 new integration tests cover bare/gated/
+skip/dependency-propagation/splice-propagation; all 22 tests in
+`tests/tracing_apply.rs` plus the full `cargo test --all-features`
+suite pass. `amenable/cordial.toml` now declares the real policy:
+`apply_gate_crates = { amenable_kani = "kani" }`, `apply_skip_crates =
+["amenable_creusot", "amenable_verus"]`.
+
+**Step 3 rollout — four real classifier bugs found and fixed across
+three attempts, apply now landed and fully verified:**
+
+Ran `cordial quality --apply --crate-name amenable_kani` for real (not
+dry-run) after rebuilding/reinstalling cordial and adding `tracing` as a
+dependency (workspace `[workspace.dependencies]` + `amenable_kani`'s own
+`[dependencies]` — the crate had zero prior `tracing` usage, so this was
+a real, necessary prerequisite, not scope creep). The **gating mechanism
+itself worked correctly**: all 530 changed functions got
+`#[cfg_attr(not(kani), instrument(...))]`, zero bare `#[instrument]`
+leaked through. But the resulting tree failed to compile
+(`cargo check -p amenable_kani`: 612 errors) for two reasons unrelated to
+gating — both would occur identically under a `Bare` policy in any
+crate, Kani-aware or not:
+
+1. **`#[instrument]` proposed on `const fn`s.** `tracing::instrument`
+   categorically rejects `const fn` (`error: the #[instrument]
+   attribute may not be used with const fns`). Real site:
+   `KaniProofRegistration::new`/`KaniGalleryRegistration::new` in
+   `crates/amenable_kani/src/registry.rs` (both hand-written `const fn`,
+   per that file's own doc comment — deliberately not derived). Cordial's
+   tracing scanner/classifier doesn't check `const`-ness before
+   recommending instrumentation. Because these two constructors are
+   called from nearly every proof/gallery registration site in the
+   crate, this single classifier miss cascaded into 530 downstream
+   "associated function `new` not found" errors once the two real
+   definitions failed to compile — not 530 independent bugs, one root
+   cause times two call sites.
+2. **`err(level = ...)` proposed on functions whose error type doesn't
+   implement `Display`.** `tracing::instrument`'s `err` option requires
+   the error type to implement `std::fmt::Display` (it renders the
+   error via `tracing_core::field::display`). Real sites: `KaniSendError`,
+   `KaniRecvError`, `KaniRecvTimeoutError`, `KaniJoinPathsError`,
+   `KaniFromUtf8Error`, `KaniUtf8BufferError`, `KaniUtf8PositionError`,
+   `KaniWindowsInvalidHandleError`, `StoplightError` — accommodation-
+   model error types that mirror real `std` error shapes and don't (all)
+   carry `derive_more::Display`. Cordial's classifier decides `err()` is
+   warranted purely from "function returns `Result`," without checking
+   whether the `Err` payload is `Display`.
+
+Reverted immediately (`git checkout -- crates/amenable_kani`, then
+re-added the `tracing` dependency edit was reverted along with it — the
+Cargo.lock/root-`Cargo.toml` `tracing = "0.1"` workspace-dependency
+declaration was left in place since it's harmless and will be needed
+again). Full workspace `cargo check --workspace` re-confirmed clean
+afterward. Both bugs are cordial classifier gaps (`~/repos/cordial/src/
+etiquettes/tracing/`, the recipe-building logic, not the apply/policy
+layer built in this step).
+
+**Both fixed in cordial:**
+
+1. `scan.rs::record_fn` now returns immediately (records nothing) when
+   `sig.constness.is_some()`, before `classify()`/`recipe()` ever run --
+   a `const fn` never enters the checklist or IR inventory at all, for
+   either the scan path (`enricher.rs` → probes → checklist) or the
+   direct-scan apply path (`apply/mod.rs` → `scan_rust_source`). A
+   stale checklist row referencing a const fn (from before this fix)
+   self-heals too: `apply`'s `recipe_for_gap` finds no matching record
+   and counts it `unresolved` rather than writing anything.
+2. New `~/repos/cordial/src/etiquettes/tracing/display_types.rs`:
+   per-file `DisplayTypeFacts`, built once per scanned file (both scan
+   paths already parse the whole file with `syn`, so this is a second
+   pass over the same already-parsed AST, not a new file read) —
+   collects locally defined types with a real `Display` impl
+   (`#[derive(..Display)]`, matched on the derive path's *last*
+   segment so `derive_more::Display` counts, not just a bare
+   `Display`; and hand-written `impl ..Display for X`), plus local
+   `type Alias<..> = Result<T, E>;` aliases so an aliased return type
+   still resolves to its real `E`. `recipe.rs::fallible_err` now
+   requires `ctx.err_is_displayable` in addition to `returns_result` —
+   unresolvable `Err` types (foreign, cross-file, generic) are treated
+   as **not** displayable by default, since a missed `err()` is a minor
+   omission and a proposed `err()` that can't compile is the actual
+   bug. A small, deliberately narrow well-known-safe list (`String`,
+   bare `Error`) covers the cases this codebase's own existing cordial
+   test fixtures already relied on (`Result<(), String>`), confirmed by
+   running the full pre-existing test suite unchanged afterward.
+   Scoped intentionally to single-file resolution, not a crate-wide
+   registry: every real failing case found (`KaniJoinPathsError`,
+   `KaniUtf8BufferError`, `StoplightError`, and 6 others) has the error
+   type's own definition in the same file as the function returning
+   it — a crate-wide pass would be more complete but wasn't needed for
+   what's actually broken today.
+
+2 new regression tests added to `~/repos/cordial/tests/
+tracing_etiquette.rs` (`tracing_const_fn_is_never_flagged`,
+`tracing_err_recipe_requires_confirmed_display`); all pre-existing
+tests (`tracing_etiquette.rs`, `tracing_apply.rs`, full `cargo test
+--all-features`) re-confirmed passing unchanged. `cargo clippy
+--all-features --all-targets -D warnings` clean.
+
+**Re-running the real `amenable_kani` `--apply` with both fixes in
+place found two more real bugs, both fixed too:**
+
+1. **`#[instrument]` proposed on a tuple-destructured generic
+   parameter with no `Debug` bound, silently un-skippable.** Real
+   site: `fn ensures((actual, expected): (T, T)) -> bool` (7 sites
+   across `alloc_collections.rs`, `cell.rs`, `num.rs`, `primitives.rs`,
+   `slice.rs`, `str.rs`, `sync_atomic.rs` — every `Ensures`/`Requires`
+   impl following this shape). `tracing::instrument`'s real expansion
+   records each binding *inside* a destructured pattern individually
+   via `Debug` (`actual`, `expected`), not "the parameter" as one
+   opaque unit — but cordial's own `param_names`/`unrecordable_params`
+   (`classify.rs`, `recordable.rs`) only ever recognized a bare
+   `Pat::Ident` parameter; a `Pat::Tuple` parameter was invisible to
+   both, so it could never be named in a `skip(..)` list at all,
+   silently proposing an `#[instrument(level = "trace")]` that
+   couldn't compile whenever `T` lacked `Debug`. Fixed with a new
+   `pattern_bindings(pat, ty)` in `recordable.rs`: zips a `Pat::Tuple`
+   against its matching `Type::Tuple` element-wise (and unwraps
+   `Pat::Reference`/`Pat::Paren`), recursing to find every real
+   binding name and, where the shapes line up, its real sub-type;
+   anything it can't structurally correlate (struct/slice/or-patterns)
+   falls back to a generic `syn::visit::Visit`-based ident collector
+   with an *unknown* type, which `unrecordable_params` then treats as
+   **not recordable by default** — the same "unresolvable means don't
+   propose it" bias as bug 2's `Display` check.
+2. **A gated attribute's short `instrument(..)` form leaves a real
+   `unused_imports` warning whenever the instrumented function only
+   exists under an outer `#[cfg(<verifier>)]` ancestor.** Real sites:
+   `compose.rs` and `gallery/ledger_gaap_free_function_contract.rs` —
+   every instrumented function in both files sits inside a real
+   `#[cfg(kani)]`-only trait/module (Kani proof harnesses and contract
+   wrappers, which structurally can't exist under an ordinary build at
+   all), so the `use tracing::instrument;` cordial inserted for the
+   file was never actually reachable under a plain `cargo check`.
+   Cordial had no way to know a function's *enclosing* items were
+   already `cfg`-excluded. Fixed by sidestepping the question entirely
+   rather than adding ancestor-cfg tracking: a `Gated` policy attribute
+   now always renders fully qualified (`tracing::instrument`, or
+   `::tracing::instrument` when a local `mod tracing;` shadows the
+   crate name) instead of relying on the short form, and the plain
+   `use tracing::instrument;` insertion now only fires when at least
+   one applied gap in the file actually used `Bare` policy (the only
+   policy that ever writes the short form) -- both in
+   `apply/instrument.rs`/`apply/mod.rs`.
+
+3 more regression tests (`tracing_skip_covers_tuple_destructured_
+generic_params` in `tracing_etiquette.rs`;
+`apply_gates_function_nested_in_outer_cfg_without_unused_import` in
+`tracing_apply.rs`, plus updating the two existing gated-attribute
+assertions to the new qualified form). Full `cargo test --all-features`
+and `cargo clippy --all-features --all-targets -D warnings` both
+re-confirmed clean after all four fixes together.
+
+**Real `amenable_kani` `--apply` re-run with all four fixes in place —
+clean:** 519 functions across 86 files, all `Gated(kani)`, zero
+un-gated, zero skipped-by-policy, zero unresolved. `cargo check -p
+amenable_kani`: zero errors, zero warnings. `cargo fmt -p amenable_kani`
+needed a normal re-wrap pass afterward (the fully-qualified
+`tracing::instrument` form is longer than the short form, pushing some
+`cfg_attr(..)` lines past rustfmt's width — expected, not a bug, the
+same as any codegen tool's output needing a `cargo fmt` pass). After
+that: `cargo clippy -p amenable_kani --all-targets --all-features -D
+warnings` clean, `cargo fmt -p amenable_kani --check` clean, `cargo test
+-p amenable_kani` all passing, `cargo check --workspace` clean.
+`amenable_creusot`/`amenable_verus` received zero file changes, exactly
+as Skip policy requires. Re-verified two real `cargo kani` proofs
+non-vacuously (serialized, one at a time, matching this workspace's
+established Kani-call discipline): `stoplight::
+verify_full_cycle_composes` (the crate's flagship full-cycle
+composition proof, needs `-Z function-contracts -Z stubbing` for its
+`#[kani::stub_verified]` harnesses) — `0 of 52 failed`, 0.55s; and
+`rust_std::primitives::verify_tuple_field_access`, chosen specifically
+because it directly calls `FieldAccessRecoversTheStoredValue::ensures`
+(the exact tuple-destructured-parameter function bug 3 fixed) — `0 of
+14 failed`, 0.04s. Both `VERIFICATION:- SUCCESSFUL`.
+
+**A fifth bug, found by asking the right question about the 519-function
+result above.** Every `#[cfg(kani)]`-nested function (46 of the 519,
+confirmed by a real `syn`-based census) can never actually receive
+`#[instrument]` in *any* build -- `Gated` policy suppresses it when
+`kani` *is* active, and the item doesn't exist when it isn't -- so
+gating (rather than skipping) them is dead weight. The same is true,
+transitively, of anything reachable *only* from those functions:
+`amenable_core::Ensures`/`Requires` impl methods are called either
+directly inside a `#[cfg(kani)]` harness or via a `#[cfg_attr(kani,
+kani::ensures(..))]`-attached contract (itself kani-only), confirmed by
+reading every real call site and the trait's own doc comment ("`ensures
+()` is the real check, called directly at the proof site").
+
+A first fix recognized `Ensures`/`Requires` by trait name specifically
+(a `proof_only_traits` config list). Correctly rejected: that's a
+special case tied to this one workspace's own trait names, not a
+mechanism any other cordial user gets for free. The real, reusable
+invariant is call-graph reachability -- a function whose *every* real
+caller, transitively, bottoms out in a proof-only entry point is
+exactly as dead-to-tracing as the entry point itself, whatever trait
+(if any) it happens to implement, and wherever in the workspace it
+lives (not scoped to the crate being scanned -- a proof-only helper
+type could just as easily live in a dependency crate another user's
+proof harnesses call into).
+
+Rebuilt as `~/repos/cordial/src/etiquettes/tracing/call_graph.rs`: a
+new `CallGraphFacts`, computed once per workspace (cached like
+`PathInclusionFacts`) by walking every workspace crate's source twice
+-- once to collect function definitions (seeding `excluded` with every
+function nested in an ancestor `#[cfg(<crate's own gate cfg>)]`, via
+the same `apply_gate_crates`-derived cfg set the policy layer already
+computes, factored out as `crate_gate_cfgs`), once to resolve each
+function body's call sites (`Type::method(..)`/`Trait::method(..)`/
+`bare_fn(..)` -- unambiguous path syntax only; `receiver.method(..)`
+calls are never resolved, since without real type inference guessing
+would risk a false exclusion, and a missed edge only risks under-
+excluding, never the reverse) against a workspace-wide registry.
+Fixed point: add a function to `excluded` once it has at least one
+known caller and *all* of them are already `excluded`; a function with
+zero known callers (`pub` API an external crate might call, or
+genuinely dead code) is never added. One real, load-bearing correctness
+fix along the way: `syn` never expands macros, and `assert!(..);`
+written as a whole statement parses as `Stmt::Macro`, not `Stmt::Expr
+(Expr::Macro(..), ..)` -- almost every real `Ensures`/`Requires` call
+site in `amenable_kani` is wrapped in `assert!(..)`, so the visitor had
+to hook the shared `visit_macro` (which both statement- and expression-
+position macros delegate to), not `visit_expr_macro` alone, or it would
+have silently found nothing.
+
+4 new regression tests (`tracing_never_flags_function_called_only_from_
+proof_context`, `tracing_still_flags_function_with_an_ordinary_caller_
+too` in `tracing_etiquette.rs`; `apply_skips_function_called_only_from_
+proof_context` and updating the trait-name test in `tracing_apply.rs`)
+-- including a positive control confirming a function with *any* real
+ordinary caller stays `Gated` even if it also happens to be called from
+a proof context. Full `cargo test --all-features` and `cargo clippy
+--all-features --all-targets -D warnings` re-confirmed clean.
+
+**First re-run with the call-graph mechanism, 473 functions across 84
+files -- a real number, but wrong in a way that took a direct user
+challenge to surface.** ("the majority of Kani functions are requires
+or ensures, so how did so many end up instrumented?") Checked: only 4
+of 15 real `Ensures`/`Requires` impl blocks had actually been excluded
+-- the rest, including `FieldAccessRecoversTheStoredValue::ensures`
+(which an earlier, sloppier grep had wrongly reported as excluded),
+stayed `Gated`. Root cause, confirmed with a real `syn::parse_file`
+probe: `amenable_derive::harness!` -- the macro almost every real Kani
+proof harness in `amenable_kani` is declared through (482 invocations
+workspace-wide) -- is a function-like macro invoked at item position.
+`syn` never expands macros; it parses `harness! { kani, NAME, { ..real
+items.. } }` as an opaque `Item::Macro`, so every `#[kani::proof] fn`
+inside one, and every `assert!(SomeType::ensures(..))` call inside
+*that*, was completely invisible to the call-graph's collector -- not
+a subtle edge case, the dominant shape almost every real call site
+actually uses.
+
+**Fixed properly, not by hardcoding `harness!`'s name** (the same
+generalization lesson as the `proof_only_traits` mistake earlier):
+`call_graph.rs` now extracts the trailing brace-delimited block of any
+item-position macro invocation whose tokens end in one (`syn::Block::
+parse_within` on the last brace group, filtering for `Stmt::Item`),
+recursing into the extracted items exactly as if they'd been written
+directly at that position -- works for `harness!` without knowing its
+name, and for any future macro shaped the same way. A second, paired
+fix: since `harness!`-generated functions never carry an explicit
+`#[cfg(kani)]` in their own source text (the gating is baked into the
+macro's real expansion, invisible to a source scan), a new `has_
+verifier_attr` check seeds `ancestor_seed` from any attribute whose
+path's *first* segment matches the crate's own gate cfg name --
+`#[kani::proof]`, `#[kani::proof_for_contract(..)]` -- the same
+generalization: not a hardcoded attribute name, but the verifier's own
+real namespace, which is exactly what `apply_gate_crates`'s cfg name
+already identifies.
+
+1 new regression test (`apply_finds_calls_inside_a_harness_style_macro_
+invocation`, modeling the exact `harness! { kani, NAME, { #[kani::
+proof] fn .. } }` shape with a made-up macro name, confirming the fix
+isn't tied to `amenable_derive::harness!`'s own name). Full `cargo test
+--all-features` and `cargo clippy --all-features --all-targets -D
+warnings` re-confirmed clean.
+
+**Real `amenable_kani` `--apply` re-run with the fix in place: 396
+functions across 83 files** (down from 473/84 -- 77 more real
+exclusions once `harness!` bodies were actually visible). Verified
+directly, not assumed: `amenable_kani`'s own checklist section now has
+**zero** remaining `Ensures::ensures`/`Requires::requires` rows at all
+(the 3 that first looked like stubborn leftovers turned out to belong
+to `amenable_creusot`'s own, separate `ledger.rs`/`rust_std_witness.rs`
+-- a Skip-policy crate, correctly untouched, found via an unscoped
+`grep` across the whole checklist file rather than `amenable_kani`'s
+own section). `cargo check`/`clippy -D warnings`/`fmt --check`/`test -p
+amenable_kani` all clean; `cargo check --workspace` clean. The same two
+real `cargo kani` proofs re-verified non-vacuously:
+`stoplight::verify_full_cycle_composes` (`0 of 52 failed`) and
+`rust_std::primitives::verify_tuple_field_access` (`0 of 14 failed`,
+now directly exercising the correctly-excluded
+`FieldAccessRecoversTheStoredValue::ensures`). `amenable_creusot`/
+`amenable_verus` received zero file changes.
+
+Not yet done: committing the `amenable_kani` apply result (`tracing`
+added as a dependency in root `Cargo.toml`/`amenable_kani/Cargo.toml`,
+396 functions instrumented across 83 files) — the user's call, not
+done automatically per this project's commit policy.

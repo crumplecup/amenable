@@ -71,6 +71,7 @@ impl KaniWitness for RustStdStandard<Location<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_location_caller_reflects_the_immediate_call_site".to_owned(),
@@ -104,6 +105,7 @@ impl KaniCallerLocationObservation {
     /// call-site lines differ. Consumes `self`: the only way to obtain
     /// the token is to have run this check against a real observation
     /// instance, not to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_immediate_call_site(
         self,
@@ -130,6 +132,7 @@ impl Establish<KaniCallerLocationWitnessToken, KaniVerifier>
 {
     type Token = RustStdLocationToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCallerLocationWitnessToken) -> Self::Token {
         RustStdLocationToken(())
     }

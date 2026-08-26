@@ -350,7 +350,7 @@ amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_val
 amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1787763342,passed
 amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1787763351,passed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1787763359,passed
-amenable_kani::stoplight::verify_full_cycle_composes,1787764004,passed
+amenable_kani::stoplight::verify_full_cycle_composes,1787764413,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1787763370,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1787763379,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1787763388,passed

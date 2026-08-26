@@ -29,6 +29,7 @@ impl<T> KaniLinkedListExtractIf<T> {
     }
 
     /// Visit elements until the next predicate match is found and removed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, predicate)))]
     pub fn next(&mut self, predicate: fn(&mut T) -> bool) -> Option<T> {
         while self.cursor < self.items.len() {
             let slot = &mut self.items[self.cursor];
@@ -45,6 +46,7 @@ impl<T> KaniLinkedListExtractIf<T> {
     }
 
     /// Recover the list contents that remain after the visited removals.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_remaining(self) -> Vec<T> {
         self.items.into_iter().flatten().collect()
     }

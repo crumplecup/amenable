@@ -280,6 +280,7 @@ kani_ensures!(
     harness_const = VERIFY_GREEN_TRANSITIONS_ONLY_TO_YELLOW_SRC,
 )]
 impl Stoplight {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     fn green_to_yellow(
         &self,
         input: Established<Green, GreenToken>,
@@ -335,6 +336,7 @@ kani_ensures!(
     harness_const = VERIFY_YELLOW_TRANSITIONS_ONLY_TO_RED_SRC,
 )]
 impl Stoplight {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     fn yellow_to_red(
         &self,
         input: Established<Yellow, YellowToken>,
@@ -383,6 +385,7 @@ kani_ensures!(
     harness_const = VERIFY_RED_TRANSITIONS_ONLY_TO_GREEN_SRC,
 )]
 impl Stoplight {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     fn red_to_green(
         &self,
         input: Established<Red, RedToken>,

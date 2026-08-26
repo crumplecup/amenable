@@ -47,12 +47,14 @@ impl KaniCallerLocationObservation {
     }
 
     /// Report the shared file path.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn file(&self) -> &'static str {
         self.file
     }
 
     /// Report whether the two modeled lines are distinct.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn lines_differ(&self) -> bool {
         self.first_line != self.second_line
@@ -102,6 +104,7 @@ impl KaniPanicHookObservation {
     }
 
     /// Report the panic payload message.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn captured_message(&self) -> &str {
         &self.message
@@ -111,6 +114,7 @@ impl KaniPanicHookObservation {
 impl Provenance for KaniPanicHookObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

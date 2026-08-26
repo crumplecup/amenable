@@ -136,6 +136,7 @@ pub struct CheckedProof {
 }
 
 impl std::fmt::Display for CheckedProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "harness: {}", self.harness)?;
         writeln!(f, "claim: {}", self.claim)?;

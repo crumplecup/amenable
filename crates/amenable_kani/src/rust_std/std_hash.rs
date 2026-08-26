@@ -58,6 +58,7 @@ impl KaniWitness for RustStdStandard<RandomState> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_random_state_gives_the_same_hasher_seed_across_calls".to_owned(),
@@ -91,6 +92,7 @@ impl KaniRandomStateObservation {
     /// the same `RandomState` instance agree on it. Consumes `self`: the
     /// only way to obtain the token is to have run this check against a
     /// real observation instance, not to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_same_input_agreement(
         self,
@@ -114,6 +116,7 @@ impl ProofToken for RustStdRandomStateToken {
 impl Establish<KaniRandomStateWitnessToken, KaniVerifier> for RustStdStandard<RandomState> {
     type Token = RustStdRandomStateToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniRandomStateWitnessToken) -> Self::Token {
         RustStdRandomStateToken(())
     }

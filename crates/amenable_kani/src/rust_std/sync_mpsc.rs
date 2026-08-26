@@ -64,6 +64,7 @@ impl KaniChannel<i32> {
     /// explicit `assert_eq!` is a real, CBMC-checked assertion either
     /// way.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn demonstrate_delivery(mut self, value: i32) -> KaniChannelDeliveryToken {
         assert_eq!(
             self.send(value),
@@ -217,6 +218,7 @@ impl KaniChannel<i32> {
     /// Drop the sender, then assert `.recv()` fails on the now-empty,
     /// disconnected channel. Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_disconnected_recv_fails(mut self) -> KaniChannelDisconnectedRecvToken {
         self.drop_sender();
@@ -309,6 +311,7 @@ impl KaniChannel<i32> {
     /// Asserts on the whole `Result`, not `.unwrap()`, the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn demonstrate_yield_then_stop(mut self, value: i32) -> KaniChannelYieldThenStopToken {
         assert_eq!(
             self.send(value),
@@ -470,6 +473,7 @@ impl KaniChannel<i32> {
     /// Assert `.try_recv()` returns `None`-equivalent immediately on an
     /// empty, open channel rather than blocking. Consumes `self` for the
     /// same reason [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_non_blocking_empty(mut self) -> KaniChannelNonBlockingEmptyToken {
         assert_eq!(
@@ -561,6 +565,7 @@ impl KaniChannel<i32> {
     /// Drop the sender, then assert `.recv()` fails with exactly
     /// `Disconnected`. Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_recv_disconnected(mut self) -> KaniChannelRecvDisconnectedToken {
         self.drop_sender();
@@ -644,6 +649,7 @@ impl KaniChannel<i32> {
     /// open and empty, then, after dropping the sender, assert it instead
     /// fails `Disconnected`. Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_recv_timeout_distinguishes_disconnect(
         mut self,
@@ -747,6 +753,7 @@ impl KaniChannel<i32> {
     /// error recovers it unchanged. Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn demonstrate_send_error_recovers_value(
         mut self,
@@ -841,6 +848,7 @@ impl KaniChannel<i32> {
     /// and assert the resulting `Full` error recovers it unchanged.
     /// Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn demonstrate_try_send_full_recovers_value(
         mut self,
@@ -900,6 +908,7 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::TryRecvError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_recv_error_distinguishes_empty_from_disconnected".to_owned(),
@@ -933,6 +942,7 @@ impl KaniChannel<i32> {
     /// after dropping the sender, assert it instead fails `Disconnected`.
     /// Consumes `self` for the same reason
     /// [`KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_try_recv_distinguishes_disconnect(mut self) -> KaniChannelTryRecvToken {
         assert_eq!(self.try_recv(), Err(crate::KaniRecvError::Empty));
@@ -958,6 +968,7 @@ impl Establish<KaniChannelTryRecvToken, KaniVerifier>
 {
     type Token = RustStdTryRecvErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelTryRecvToken) -> Self::Token {
         RustStdTryRecvErrorToken(())
     }

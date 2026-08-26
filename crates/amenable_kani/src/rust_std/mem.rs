@@ -64,6 +64,7 @@ impl KaniWitness for RustStdStandard<Discriminant<Option<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_discriminant_identifies_variant_not_payload".to_owned(),

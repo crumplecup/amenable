@@ -40,6 +40,7 @@ impl KaniFsPath {
     }
 
     /// Return a child path under this path.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, segment)))]
     #[must_use]
     pub fn join(&self, segment: KaniFsLabel) -> Self {
         assert!(
@@ -56,6 +57,7 @@ impl KaniFsPath {
     }
 
     /// Return the final path segment, if any.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn file_name(&self) -> Option<KaniFsLabel> {
         if self.depth == 0 {
@@ -65,6 +67,7 @@ impl KaniFsPath {
         }
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     fn parent(&self) -> Option<Self> {
         if self.depth == 0 {
             None
@@ -78,6 +81,7 @@ impl KaniFsPath {
         }
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     fn prefixes_without_root(&self) -> [Option<Self>; KANI_FS_MAX_DEPTH] {
         let mut prefixes = [None; KANI_FS_MAX_DEPTH];
         let mut index = 0;
@@ -116,6 +120,7 @@ struct KaniFsNode {
 }
 
 impl KaniFsNode {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
     fn directory(path: KaniFsPath) -> Self {
         Self {
             path,
@@ -123,6 +128,7 @@ impl KaniFsNode {
         }
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
     fn file(path: KaniFsPath) -> Self {
         Self {
             path,
@@ -142,6 +148,7 @@ pub struct KaniFsDirEntry {
 
 impl KaniFsDirEntry {
     /// Return the modeled entry name.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn file_name(&self) -> Option<KaniFsLabel> {
         self.path.file_name()
@@ -292,6 +299,7 @@ impl KaniFileSystem {
     }
 
     /// Recursively create every missing ancestor directory and the leaf.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, path)))]
     pub fn create_dir_all(&mut self, path: &KaniFsPath) {
         for prefix in path.prefixes_without_root().into_iter().flatten() {
             if self.node_index(&prefix).is_none() {
@@ -301,6 +309,7 @@ impl KaniFileSystem {
     }
 
     /// Create a file entry at the given path.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, path)))]
     pub fn create_file(&mut self, path: &KaniFsPath) {
         if let Some(parent) = path.parent() {
             assert!(
@@ -321,6 +330,10 @@ impl KaniFileSystem {
     ///
     /// Returns `Err(KaniAlreadyExists)` when the modeled path already names an
     /// existing node, mirroring `OpenOptions::create_new(true)`.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self, path), err(level = "warn"))
+    )]
     pub fn create_new_file(&mut self, path: &KaniFsPath) -> Result<(), KaniAlreadyExists> {
         if self.node_index(path).is_some() {
             Err(KaniAlreadyExists::new())
@@ -331,6 +344,7 @@ impl KaniFileSystem {
     }
 
     /// Return whether the path currently names a directory.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, path)))]
     #[must_use]
     pub fn is_dir(&self, path: &KaniFsPath) -> bool {
         self.node(path)
@@ -338,6 +352,7 @@ impl KaniFileSystem {
     }
 
     /// Return whether the path currently names a file.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, path)))]
     #[must_use]
     pub fn is_file(&self, path: &KaniFsPath) -> bool {
         self.node(path)
@@ -345,6 +360,7 @@ impl KaniFileSystem {
     }
 
     /// Return the immediate entries of a modeled directory.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, dir)))]
     #[must_use]
     pub fn entries(&self, dir: &KaniFsPath) -> Vec<KaniFsDirEntry> {
         self.nodes
@@ -361,10 +377,12 @@ impl KaniFileSystem {
             .collect()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, path)))]
     fn node(&self, path: &KaniFsPath) -> Option<&KaniFsNode> {
         self.node_index(path).map(|index| &self.nodes[index])
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, path)))]
     fn node_index(&self, path: &KaniFsPath) -> Option<usize> {
         self.nodes.iter().position(|node| node.path == *path)
     }
@@ -420,24 +438,28 @@ impl KaniFileTypeObservation {
     }
 
     /// Report whether the modeled file node reports as a file.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn file_is_file(&self) -> bool {
         self.file == KaniFsNodeKind::File
     }
 
     /// Report whether the modeled file node reports as a directory.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn file_is_dir(&self) -> bool {
         self.file == KaniFsNodeKind::Directory
     }
 
     /// Report whether the modeled directory node reports as a directory.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn directory_is_dir(&self) -> bool {
         self.directory == KaniFsNodeKind::Directory
     }
 
     /// Report whether the modeled directory node reports as a file.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn directory_is_file(&self) -> bool {
         self.directory == KaniFsNodeKind::File
@@ -495,6 +517,7 @@ impl KaniFileContentObservation {
     }
 
     /// Model reading the file back through a fresh handle.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn read(&self) -> [u8; 4] {
         self.content
@@ -546,12 +569,14 @@ impl KaniFileLenObservation {
     }
 
     /// Model the file's recorded metadata length.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn len(&self) -> u64 {
         u64::from(self.len)
     }
 
     /// Report whether the modeled file is empty.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len == 0
@@ -608,6 +633,7 @@ impl KaniFileTimesObservation {
     }
 
     /// Model reading the file's recorded modification time back.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn modified(&self) -> u64 {
         self.modified_unix_seconds
@@ -686,6 +712,7 @@ impl KaniAlreadyExists {
     /// carries, the same reasoning `kani_reach` already applies on the
     /// cordial side to a Kani harness's own panic site.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn new() -> Self {
         #[cfg(kani)]
@@ -735,6 +762,10 @@ impl KaniCreateNewObservation {
     ///
     /// Returns `Err(KaniAlreadyExists)` when the modeled path already names an
     /// existing node, mirroring `ErrorKind::AlreadyExists`.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self), err(level = "warn"))
+    )]
     pub fn create_new(&mut self) -> Result<(), KaniAlreadyExists> {
         if self.kind.is_some() {
             Err(KaniAlreadyExists::new())
@@ -745,6 +776,7 @@ impl KaniCreateNewObservation {
     }
 
     /// Report whether the modeled path now names a file.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn is_file(&self) -> bool {
         self.kind == Some(KaniFsNodeKind::File)
@@ -861,6 +893,7 @@ impl KaniReadDirObservation {
     }
 
     /// Return the modeled entries in the order they were created.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn entries(&self) -> [KaniFsDirEntry; 2] {
         [self.first, self.second]
@@ -886,6 +919,7 @@ pub struct KaniLockObservation {
 impl Provenance for KaniLockObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -932,6 +966,7 @@ impl KaniAlreadyLocked {
     /// carries, the same reasoning `kani_reach` already applies on the
     /// cordial side to a Kani harness's own panic site.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn new() -> Self {
         #[cfg(kani)]
@@ -965,6 +1000,10 @@ impl KaniLockObservation {
     ///
     /// Returns `Err(KaniAlreadyLocked)` when the modeled file is already
     /// locked, mirroring `TryLockError::WouldBlock`.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(self), err(level = "warn"))
+    )]
     pub fn try_lock(&mut self) -> Result<(), KaniAlreadyLocked> {
         if self.locked {
             Err(KaniAlreadyLocked::new())
@@ -976,6 +1015,7 @@ impl KaniLockObservation {
 }
 
 impl Default for KaniLockObservation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }

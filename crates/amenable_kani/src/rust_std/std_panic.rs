@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<PanicHookInfo<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_panic_hook_info_reports_the_panics_own_message".to_owned(),
@@ -46,6 +47,7 @@ impl KaniPanicHookObservation {
     /// exactly. Consumes `self`: the only way to obtain the token is to
     /// have run this check against a real observation instance, not to
     /// assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_message_capture(self, expected: &'static str) -> KaniPanicHookWitnessToken {
         assert_eq!(self.captured_message(), expected);
@@ -68,6 +70,7 @@ impl Establish<KaniPanicHookWitnessToken, KaniVerifier>
 {
     type Token = RustStdPanicHookInfoToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniPanicHookWitnessToken) -> Self::Token {
         RustStdPanicHookInfoToken(())
     }

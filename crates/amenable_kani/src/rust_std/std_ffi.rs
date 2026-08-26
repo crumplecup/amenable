@@ -50,6 +50,7 @@ impl ProofToken for RustStdOsStrUtf8Token {
 impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<OsStr> {
     type Token = RustStdOsStrUtf8Token;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         RustStdOsStrUtf8Token(())
     }
@@ -167,6 +168,7 @@ impl KaniWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_os_str_display_renders_valid_utf8_content_unchanged".to_owned(),

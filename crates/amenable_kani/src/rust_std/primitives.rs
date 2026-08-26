@@ -199,6 +199,7 @@ impl ProofToken for RustStdStringUtf8Token {
 impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<String> {
     type Token = RustStdStringUtf8Token;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         RustStdStringUtf8Token(())
     }
@@ -926,6 +927,7 @@ pub struct FieldAccessRecoversTheStoredValue<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for FieldAccessRecoversTheStoredValue<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -935,14 +937,17 @@ impl<T> Evidence for FieldAccessRecoversTheStoredValue<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -965,6 +970,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for FieldAccessRecoversTheSt
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -1002,6 +1008,7 @@ impl KaniWitness for RustStdStandard<&'static mut i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_mutable_reference_dereferences_to_and_updates_the_referent".to_owned(),

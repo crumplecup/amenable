@@ -60,6 +60,7 @@ impl KaniChildObservation {
     /// exit code. Consumes `self`: the only way to obtain the token is
     /// to have run this check against a real observation instance, not
     /// to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_waitable(self, exit_code: i32) -> KaniChildWitnessToken {
         assert_ne!(self.process_id(), 0);
@@ -140,6 +141,7 @@ impl KaniChildStderrObservation {
     /// Assert stdout stayed empty while stderr captured the expected
     /// text. Consumes `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_capture(self) -> KaniChildStderrWitnessToken {
         assert_eq!(self.stdout_text(), "");
@@ -220,6 +222,7 @@ impl KaniChildStdinObservation {
     /// Assert the echoed stdout matches the delivered input exactly.
     /// Consumes `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_echo(self) -> KaniChildStdinWitnessToken {
         assert_eq!(self.echoed_stdout(), self.input_text());
@@ -298,6 +301,7 @@ impl ProofToken for KaniChildStdoutWitnessToken {
 impl KaniChildStdoutObservation {
     /// Assert stdout captured the expected text. Consumes `self` for the
     /// same reason [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_capture(self) -> KaniChildStdoutWitnessToken {
         assert!(self.stdout_text().contains("hello"));
@@ -376,6 +380,7 @@ impl KaniCommandEnvObservation {
     /// Assert the configured key and the visible stdout match. Consumes
     /// `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_visibility(self, expected_key: &'static str) -> KaniCommandEnvWitnessToken {
         assert_eq!(self.key(), expected_key);
@@ -460,6 +465,7 @@ impl KaniCommandArgsObservation {
     /// Assert `.args()` reports the expected arguments in order. Consumes
     /// `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_configured_arguments(
         self,
@@ -546,6 +552,7 @@ impl KaniCommandEnvsObservation {
     /// Assert `.get_envs()` reports back the configured key and value.
     /// Consumes `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_configured_override(
         self,
@@ -634,6 +641,7 @@ impl KaniExitStatusObservation {
     /// Assert `!success()` and the expected exit code. Consumes `self`
     /// for the same reason [`KaniChildObservation::demonstrate_waitable`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_nonzero_exit(self, exit_code: i32) -> KaniExitStatusWitnessToken {
         assert!(!self.success());
@@ -715,6 +723,7 @@ impl KaniOutputObservation {
     /// Assert success, the expected status code, and captured stdout.
     /// Consumes `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_bundle(self, exit_code: i32) -> KaniOutputWitnessToken {
         assert!(self.success());
@@ -764,6 +773,7 @@ impl KaniWitness for RustStdStandard<Stdio> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_stdio_null_discards_the_childs_output_handle".to_owned(),
@@ -796,6 +806,7 @@ impl KaniStdioObservation {
     /// Assert `Stdio::null()` leaves no handle while `Stdio::piped()`
     /// exposes one. Consumes `self` for the same reason
     /// [`KaniChildObservation::demonstrate_waitable`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_handle_policy(self) -> KaniStdioWitnessToken {
         assert!(!self.null_stdout_handle_present());
@@ -815,6 +826,7 @@ impl ProofToken for RustStdStdioToken {
 impl Establish<KaniStdioWitnessToken, KaniVerifier> for RustStdStandard<Stdio> {
     type Token = RustStdStdioToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniStdioWitnessToken) -> Self::Token {
         RustStdStdioToken(())
     }

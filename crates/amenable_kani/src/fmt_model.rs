@@ -93,16 +93,19 @@ pub struct KaniFmt;
 
 impl KaniFormatAtom {
     /// Construct a modeled leaf value from display and debug tokens.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(display_token: char, debug_token: char) -> Self {
         Self(display_token, debug_token)
     }
 
     /// Report the modeled `Display` token.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn display_token(&self) -> char {
         self.0
     }
 
     /// Report the modeled `Debug` token.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn debug_token(&self) -> char {
         self.1
     }
@@ -115,6 +118,7 @@ impl KaniFormatLabel {
     }
 
     /// Report the opaque modeled label token.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn token(&self) -> char {
         self.0
     }
@@ -122,6 +126,7 @@ impl KaniFormatLabel {
 
 impl KaniRendered {
     /// Report which focused formatting law package this output satisfies.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn kind(&self) -> KaniRenderedKind {
         match self {
             Self::Arguments { .. } => KaniRenderedKind::Arguments,
@@ -134,6 +139,7 @@ impl KaniRendered {
     }
 
     /// Report the modeled display token when this is an `Arguments` rendering.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn display_token(&self) -> Option<char> {
         match self {
             Self::Arguments { display_token } => Some(*display_token),
@@ -142,6 +148,7 @@ impl KaniRendered {
     }
 
     /// Report the modeled type-label token when this rendering carries one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn type_label(&self) -> Option<KaniFormatLabel> {
         match self {
             Self::DebugStructOneField { type_label, .. }
@@ -151,6 +158,7 @@ impl KaniRendered {
     }
 
     /// Report the modeled field-label token when this rendering carries one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn field_label(&self) -> Option<KaniFormatLabel> {
         match self {
             Self::DebugStructOneField { field_label, .. } => Some(*field_label),
@@ -159,6 +167,7 @@ impl KaniRendered {
     }
 
     /// Report the first modeled debug token when this rendering carries one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn first_debug_token(&self) -> Option<char> {
         match self {
             Self::DebugListTwoEntries {
@@ -172,6 +181,7 @@ impl KaniRendered {
     }
 
     /// Report the second modeled debug token when this rendering carries one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn second_debug_token(&self) -> Option<char> {
         match self {
             Self::DebugListTwoEntries {
@@ -185,6 +195,7 @@ impl KaniRendered {
     }
 
     /// Report the modeled debug token for the field or value position.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn value_debug_token(&self) -> Option<char> {
         match self {
             Self::DebugStructOneField {
@@ -201,6 +212,7 @@ impl KaniRendered {
     }
 
     /// Report the modeled map-key label token when this rendering carries one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn key_debug_label(&self) -> Option<KaniFormatLabel> {
         match self {
             Self::DebugMapOneEntry {

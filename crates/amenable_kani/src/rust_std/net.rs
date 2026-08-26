@@ -289,6 +289,7 @@ impl KaniWitness for RustStdStandard<SocketAddr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_socket_addr_variant_matches_its_kind".to_owned(),

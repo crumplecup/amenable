@@ -87,6 +87,7 @@ impl KaniWitness for RustStdStandard<SipHasherAlias> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_sip_hasher_produces_consistent_hashes".to_owned(),

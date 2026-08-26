@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<TypeId> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_type_id_is_reflexive_and_distinguishes_distinct_types".to_owned(),

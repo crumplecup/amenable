@@ -61,6 +61,7 @@ impl KaniWitness for RustStdStandard<HashSet<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_hash_set_insert_then_contains_reports_membership".to_owned(),

@@ -15,6 +15,7 @@ impl KaniWitness for RustStdStandard<Duration> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_duration_new_normalizes_nanos_and_carries_into_secs".to_owned(),

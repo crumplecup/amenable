@@ -44,6 +44,7 @@ pub struct KaniBufferedReadObservation {
 
 impl KaniBufferedReadObservation {
     /// Model reading the underlying source to completion.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn read_to_end(&self) -> [u8; 2] {
         self.bytes
@@ -96,12 +97,14 @@ pub struct KaniFlushErrorObservation {
 
 impl KaniFlushErrorObservation {
     /// Model whether the flush failed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn flush_failed(&self) -> bool {
         true
     }
 
     /// Recover the bytes that remained buffered in the writer.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn recovered_buffer(&self) -> [u8; 2] {
         self.buffered
@@ -155,18 +158,21 @@ pub struct KaniLineWriterObservation {
 
 impl KaniLineWriterObservation {
     /// Model the bytes visible in the underlying writer after writing a newline-terminated line.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn after_newline_write(&self) -> [u8; 2] {
         [self.line_byte, b'\n']
     }
 
     /// Model the underlying writer state before the trailing partial line is flushed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn buffered_before_flush(&self) -> [u8; 2] {
         self.after_newline_write()
     }
 
     /// Model the underlying writer state after an explicit flush.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn after_flush(&self) -> [u8; 3] {
         [self.line_byte, b'\n', self.trailing_byte]
@@ -221,6 +227,7 @@ pub struct KaniLinesObservation {
 
 impl KaniLinesObservation {
     /// Model `BufRead::lines()` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn lines(&self) -> ([u8; 1], [u8; 1], [u8; 1]) {
         ([self.first], [self.second], [self.third])
@@ -280,6 +287,7 @@ pub struct KaniBufReadSplitObservation {
 
 impl KaniBufReadSplitObservation {
     /// Model `BufRead::split(delimiter)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn segments(&self) -> ([u8; 1], [u8; 1], [u8; 1]) {
         ([self.first], [self.second], [self.third])
@@ -313,6 +321,7 @@ pub struct KaniWriterPanickedWindow;
 impl Provenance for KaniWriterPanickedWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -338,12 +347,14 @@ pub struct KaniWriterPanickedObservation {
 
 impl KaniWriterPanickedObservation {
     /// Model whether the inner writer panicked.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn panicked(&self) -> bool {
         true
     }
 
     /// Recover the bytes that remained buffered after the panic.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn recovered_buffer(&self) -> [u8; 2] {
         self.buffered
@@ -354,10 +365,12 @@ impl Evidence for KaniWriterPanickedObservation {
     type Basis = KaniWriterPanickedWindow;
     type Audit = [u8; 2];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniWriterPanickedWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         self.buffered
     }

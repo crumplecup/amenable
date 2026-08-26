@@ -22,6 +22,7 @@ impl KaniCurrentThreadObservation {
 
     /// Report whether repeated `thread::current()` calls identify the same
     /// thread handle.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn handle_is_stable(&self) -> bool {
         true
@@ -29,6 +30,7 @@ impl KaniCurrentThreadObservation {
 
     /// Report whether repeated `thread::current().id()` calls identify the
     /// same thread id.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn id_is_stable(&self) -> bool {
         true
@@ -70,6 +72,7 @@ impl KaniInstantObservation {
     }
 
     /// Report whether the later reading is never earlier than the first one.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn later_is_not_earlier(&self) -> bool {
         true
@@ -79,6 +82,7 @@ impl KaniInstantObservation {
 impl Provenance for KaniInstantObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

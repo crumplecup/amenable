@@ -134,6 +134,7 @@ impl KaniWitness for RustStdStandard<SplitPaths<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_paths_recovers_paths_joined_by_join_paths".to_owned(),

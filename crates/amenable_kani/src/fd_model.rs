@@ -83,12 +83,14 @@ impl KaniFd {
     /// once, and its `Ensures<KaniVerifier>` impl (in
     /// `rust_std::os_unix`) for this exact fragment held as a reusable,
     /// backend-checkable claim.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn live(raw_fd: i32, resource_id: u64) -> Self {
         assert!(raw_fd >= 0, "live modeled fds must be non-negative");
         Self(raw_fd, true, resource_id)
     }
 
     /// Construct a dead modeled descriptor.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn dead(resource_id: u64) -> Self {
         Self(-1, false, resource_id)
     }
@@ -102,21 +104,25 @@ impl KaniFd {
     }
 
     /// Report the raw fd value.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
         self.0
     }
 
     /// Report whether the descriptor is modeled as live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_live(&self) -> bool {
         self.1
     }
 
     /// Report the modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.2
     }
 
     /// Borrow the descriptor without changing its observable identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn borrow(&self) -> KaniBorrowedFd {
         assert!(self.is_live(), "only live descriptors can be borrowed");
         KaniBorrowedFd(self.raw_fd(), self.is_live(), self.resource_id())
@@ -125,16 +131,19 @@ impl KaniFd {
 
 impl KaniBorrowedFd {
     /// Report the raw fd value.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
         self.0
     }
 
     /// Report whether the descriptor is modeled as live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_live(&self) -> bool {
         self.1
     }
 
     /// Report the modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.2
     }
@@ -162,21 +171,25 @@ impl KaniFile {
     }
 
     /// Report the raw fd value the file owner exposes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
         self.0.raw_fd()
     }
 
     /// Report the modeled resource identity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn resource_id(&self) -> u64 {
         self.0.resource_id()
     }
 
     /// Report whether the file is modeled as live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_live(&self) -> bool {
         self.0.is_live()
     }
 
     /// Transfer ownership into an owned fd without reopening anything.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_owned_fd(self) -> KaniFd {
         self.0
     }

@@ -78,6 +78,7 @@ impl KaniBufferedReadObservation {
     /// bytes. Consumes `self`: the only way to obtain the token is to
     /// have run this check against a real observation instance, not to
     /// assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_read_through(self, payload: [u8; 2]) -> KaniBufferedReadWitnessToken {
         assert_eq!(self.read_to_end(), payload);
@@ -241,6 +242,7 @@ impl KaniFlushErrorObservation {
     /// Assert the flush failed and the buffered bytes are recoverable
     /// unchanged. Consumes `self` for the same reason
     /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_recovery(self, buffered: [u8; 2]) -> KaniFlushErrorWitnessToken {
         assert!(self.flush_failed());
@@ -328,6 +330,7 @@ impl KaniLineWriterObservation {
     /// immediately, a trailing partial line stays buffered until flush,
     /// and flush then delivers it. Consumes `self` for the same reason
     /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_flush_behavior(
         self,
@@ -476,6 +479,7 @@ impl KaniLinesObservation {
     /// Assert `.lines()` yields the three lines with their terminators
     /// dropped. Consumes `self` for the same reason
     /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_line_split(self, first: u8, second: u8, third: u8) -> KaniLinesWitnessToken {
         assert_eq!(self.lines(), ([first], [second], [third]));
@@ -674,6 +678,7 @@ impl KaniBufReadSplitObservation {
     /// Assert `.segments()` yields the three segments with the delimiter
     /// dropped. Consumes `self` for the same reason
     /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_segments(
         self,
@@ -778,6 +783,7 @@ impl KaniWriterPanickedObservation {
     /// Assert the panic was captured and the buffered bytes are
     /// recoverable unchanged. Consumes `self` for the same reason
     /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_recovery(self, buffered: [u8; 2]) -> KaniWriterPanickedWitnessToken {
         assert!(self.panicked());
@@ -798,6 +804,7 @@ impl ProofToken for RustStdWriterPanickedToken {
 impl Establish<KaniWriterPanickedWitnessToken, KaniVerifier> for RustStdStandard<WriterPanicked> {
     type Token = RustStdWriterPanickedToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniWriterPanickedWitnessToken) -> Self::Token {
         RustStdWriterPanickedToken(())
     }
@@ -1327,6 +1334,7 @@ impl KaniWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_take_caps_reads_at_the_remaining_limit".to_owned(),

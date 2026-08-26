@@ -461,6 +461,7 @@ impl Witness<KaniVerifier> for Rejected<Validated> {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_rollback_always_succeeds".to_owned(),

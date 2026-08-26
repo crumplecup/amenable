@@ -53,6 +53,7 @@ impl KaniModelError {
     /// Construct an error from an already-classified kind, recording
     /// the caller's location.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(kind)))]
     pub fn new(kind: impl Into<KaniModelErrorKind>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -64,6 +65,7 @@ impl KaniModelError {
 
     /// Construct a [`KaniModelErrorKind::AlreadyExists`] error.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn already_exists() -> Self {
         Self::new(KaniAlreadyExists::new())
@@ -71,6 +73,7 @@ impl KaniModelError {
 
     /// Construct a [`KaniModelErrorKind::AlreadyLocked`] error.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn already_locked() -> Self {
         Self::new(KaniAlreadyLocked::new())

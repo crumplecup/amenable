@@ -30,18 +30,21 @@ impl KaniRandomStateObservation {
     }
 
     /// Report the first observed hash digest.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn first_digest(&self) -> u64 {
         self.digest
     }
 
     /// Report the second observed hash digest.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn second_digest(&self) -> u64 {
         self.digest
     }
 
     /// Report whether the two same-input hashes agree.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn same_input_hashes_agree(&self) -> bool {
         self.first_digest() == self.second_digest()
@@ -51,6 +54,7 @@ impl KaniRandomStateObservation {
 impl Provenance for KaniRandomStateObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

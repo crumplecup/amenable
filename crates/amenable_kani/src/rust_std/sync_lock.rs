@@ -68,6 +68,7 @@ impl KaniMutexExclusionObservation {
     /// fails while held but succeeds after release. Consumes `self`: the
     /// only way to obtain the token is to have run this check against a
     /// real observation instance, not to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_exclusion(self, value: i32) -> KaniMutexExclusionWitnessToken {
         assert_eq!(self.held_value(), value, "lock derefs to the wrapped value");
@@ -529,6 +530,7 @@ impl KaniBarrierLeaderObservation {
     /// Assert the sole participant is the leader. Consumes `self` for
     /// the same reason
     /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_leadership(self) -> KaniBarrierLeaderWitnessToken {
         assert!(self.is_leader(), "the sole participant is the leader");
@@ -670,6 +672,7 @@ impl KaniWaitTimeoutObservation {
     /// Assert a never-notified wait times out. Consumes `self` for the
     /// same reason
     /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_timeout(self) -> KaniWaitTimeoutWitnessToken {
         assert!(self.did_time_out(), "a never-notified wait times out");
@@ -750,6 +753,7 @@ impl KaniMutexFailureObservation {
     /// Assert `into_inner` still recovers the guard's value in the
     /// poisoned case. Consumes `self` for the same reason
     /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_poisoned_recovery(
         self,
@@ -848,6 +852,7 @@ impl KaniMutexFailureObservation {
     /// guarded value, and the already-held case reports `WouldBlock` and
     /// keeps the wrapped value. Consumes `self` for the same reason
     /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_failure_classes(
         self,
@@ -928,6 +933,7 @@ impl KaniWitness for RustStdStandard<WaitTimeoutResult> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_wait_timeout_result_reports_timed_out".to_owned(),
@@ -958,6 +964,7 @@ impl ProofToken for RustStdWaitTimeoutResultToken {
 impl Establish<KaniWaitTimeoutWitnessToken, KaniVerifier> for RustStdStandard<WaitTimeoutResult> {
     type Token = RustStdWaitTimeoutResultToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniWaitTimeoutWitnessToken) -> Self::Token {
         RustStdWaitTimeoutResultToken(())
     }

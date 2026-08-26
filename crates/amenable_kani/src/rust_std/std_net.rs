@@ -187,6 +187,7 @@ impl KaniWitness for RustStdStandard<UdpSocket> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_udp_socket_send_to_recv_from_round_trips_a_datagram".to_owned(),

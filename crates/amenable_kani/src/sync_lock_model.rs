@@ -23,12 +23,14 @@ pub struct KaniMutexExclusionObservation {
 impl KaniMutexExclusionObservation {
     /// Report whether a second lock attempt is rejected while the first guard
     /// is still live.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn try_lock_while_held_is_err(&self) -> bool {
         true
     }
 
     /// Report whether locking succeeds again once the first guard is dropped.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn try_lock_after_release_is_ok(&self) -> bool {
         true
@@ -69,6 +71,7 @@ impl KaniBarrierLeaderObservation {
     }
 
     /// Report whether the lone participant is the barrier leader.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn is_leader(&self) -> bool {
         true
@@ -109,6 +112,7 @@ impl KaniWaitTimeoutObservation {
     }
 
     /// Report whether the modeled wait timed out.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn did_time_out(&self) -> bool {
         true
@@ -151,18 +155,21 @@ pub struct KaniMutexFailureObservation {
 
 impl KaniMutexFailureObservation {
     /// Report the recovered value from the poisoned case.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn poisoned_recovered_value(&self) -> i32 {
         self.poisoned_value
     }
 
     /// Report whether the poisoned case is classified as poisoned.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn poisoned_case_reports_poisoned(&self) -> bool {
         true
     }
 
     /// Report whether the held case is classified as would-block.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn held_case_reports_would_block(&self) -> bool {
         true
@@ -172,6 +179,7 @@ impl KaniMutexFailureObservation {
 impl Provenance for KaniMutexFailureObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

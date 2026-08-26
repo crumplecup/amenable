@@ -71,6 +71,7 @@ pub enum KaniGalleryDisposition {
 
 impl KaniGalleryDisposition {
     /// Stable snake-case rendering used in CLI output and ledgers.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Hypothesis => "hypothesis",
@@ -80,6 +81,7 @@ impl KaniGalleryDisposition {
     }
 
     /// Parse a stable snake-case rendering from a persisted artifact.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn parse(value: &str) -> Option<Self> {
         match value {
             "hypothesis" => Some(Self::Hypothesis),
@@ -103,6 +105,7 @@ pub enum KaniGalleryExpectation {
 
 impl KaniGalleryExpectation {
     /// Stable snake-case rendering used in CLI output and ledgers.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Passed => "passed",
@@ -112,6 +115,7 @@ impl KaniGalleryExpectation {
     }
 
     /// Parse a stable snake-case rendering from a persisted artifact.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn parse(value: &str) -> Option<Self> {
         match value {
             "passed" => Some(Self::Passed),

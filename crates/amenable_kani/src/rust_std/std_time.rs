@@ -53,6 +53,7 @@ impl KaniInstantObservation {
     /// `self`: the only way to obtain the token is to have run this check
     /// against a real observation instance, not to assert it
     /// independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_monotonicity(self) -> KaniInstantWitnessToken {
         assert!(
@@ -75,6 +76,7 @@ impl ProofToken for RustStdInstantToken {
 impl Establish<KaniInstantWitnessToken, KaniVerifier> for RustStdStandard<Instant> {
     type Token = RustStdInstantToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniInstantWitnessToken) -> Self::Token {
         RustStdInstantToken(())
     }
@@ -145,6 +147,7 @@ impl KaniWitness for RustStdStandard<SystemTimeError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_system_time_error_recovers_how_far_backward_it_went".to_owned(),

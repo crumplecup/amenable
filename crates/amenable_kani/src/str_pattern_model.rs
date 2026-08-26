@@ -69,12 +69,14 @@ pub struct KaniStrRSplitObservation {
 impl KaniStrRSplitObservation {
     /// Model `rsplit(pattern)` over the bounded witness: the piece after
     /// the match comes first.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rsplit(&self) -> [char; 2] {
         [self.after, self.before]
     }
 
     /// Recover the modeled underlying data.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn data(&self) -> [char; 3] {
         [self.before, self.pattern, self.after]
@@ -142,6 +144,7 @@ pub struct KaniStrRSplitNObservation {
 impl KaniStrRSplitNObservation {
     /// Model `rsplitn(2, pattern)` over the bounded witness: the piece
     /// after the last match comes first, then everything before it, uncut.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rsplitn_two(&self) -> (char, [char; 3]) {
         (self.c, [self.a, self.pattern, self.b])
@@ -203,6 +206,7 @@ pub struct KaniStrSplitTerminatorObservation {
 impl KaniStrSplitTerminatorObservation {
     /// Model `split_terminator(pattern)` over the bounded witness: no
     /// trailing empty piece after the terminal match.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn split_terminator(&self) -> [char; 2] {
         [self.a, self.b]
@@ -210,6 +214,7 @@ impl KaniStrSplitTerminatorObservation {
 
     /// Model `rsplit_terminator(pattern)` over the bounded witness: same
     /// suppression, traversed from the back.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rsplit_terminator(&self) -> [char; 2] {
         [self.b, self.a]
@@ -243,6 +248,7 @@ pub struct KaniStrMatchWindow;
 impl Provenance for KaniStrMatchWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -276,6 +282,7 @@ pub struct KaniStrMatchObservation {
 
 impl KaniStrMatchObservation {
     /// Model `matches(pattern)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn matches(&self) -> [char; 2] {
         [self.pattern, self.pattern]
@@ -284,6 +291,7 @@ impl KaniStrMatchObservation {
     /// Model `rmatches(pattern)` over the bounded witness: same content,
     /// content alone can't distinguish traversal order for a `char`
     /// pattern (see `amenable_kani::rust_std::str`'s module doc).
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rmatches(&self) -> [char; 2] {
         [self.pattern, self.pattern]
@@ -291,6 +299,7 @@ impl KaniStrMatchObservation {
 
     /// Model `match_indices(pattern)` over the bounded witness: byte
     /// offsets 1 and 3, forward order.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn match_indices(&self) -> [(usize, char); 2] {
         [(1, self.pattern), (3, self.pattern)]
@@ -300,6 +309,7 @@ impl KaniStrMatchObservation {
     /// pairs, reverse order -- this is the one place order is directly
     /// assertable, since the byte offset differs per occurrence even
     /// though the matched char doesn't.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rmatch_indices(&self) -> [(usize, char); 2] {
         [(3, self.pattern), (1, self.pattern)]
@@ -310,10 +320,12 @@ impl Evidence for KaniStrMatchObservation {
     type Basis = KaniStrMatchWindow;
     type Audit = [char; 4];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniStrMatchWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [self.f0, self.pattern, self.f1, self.f2]
     }

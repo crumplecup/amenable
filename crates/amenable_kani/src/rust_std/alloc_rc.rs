@@ -211,6 +211,7 @@ impl KaniWitness for RustStdStandard<std::rc::Weak<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),

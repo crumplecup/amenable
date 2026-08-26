@@ -104,6 +104,7 @@ impl KaniCurrentThreadObservation {
     /// queries. Consumes `self`: the only way to obtain the token is to
     /// have run this check against a real observation instance, not to
     /// assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_handle_stability(self) -> KaniCurrentThreadHandleWitnessToken {
         assert!(
@@ -157,6 +158,7 @@ impl KaniWitness for RustStdStandard<ThreadId> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_thread_id_is_stable_across_repeated_calls".to_owned(),
@@ -190,6 +192,7 @@ impl KaniCurrentThreadObservation {
     /// queries. Consumes `self` for the same reason
     /// [`KaniCurrentThreadObservation::demonstrate_handle_stability`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_id_stability(self) -> KaniCurrentThreadIdWitnessToken {
         assert!(
@@ -212,6 +215,7 @@ impl ProofToken for RustStdThreadIdToken {
 impl Establish<KaniCurrentThreadIdWitnessToken, KaniVerifier> for RustStdStandard<ThreadId> {
     type Token = RustStdThreadIdToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCurrentThreadIdWitnessToken) -> Self::Token {
         RustStdThreadIdToken(())
     }

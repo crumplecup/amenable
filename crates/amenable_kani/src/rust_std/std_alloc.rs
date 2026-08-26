@@ -15,6 +15,7 @@ impl KaniWitness for RustStdStandard<System> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_system_allocates_and_deallocates_a_layout".to_owned(),

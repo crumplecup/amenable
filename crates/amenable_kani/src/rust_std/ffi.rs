@@ -136,6 +136,7 @@ impl KaniWitness for RustStdStandard<FromBytesWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_owned(),

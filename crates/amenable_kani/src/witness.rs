@@ -17,6 +17,7 @@ pub struct KaniVerifierMetadata;
 impl Provenance for KaniVerifierMetadata {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             const FACTS: &[(&str, &str)] = &[
@@ -41,6 +42,7 @@ impl Provenance for KaniVerifierMetadata {
 impl Verifier for KaniVerifier {
     type Metadata = KaniVerifierMetadata;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn name() -> &'static str {
         "kani"
     }

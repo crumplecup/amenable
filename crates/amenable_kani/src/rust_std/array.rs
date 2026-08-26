@@ -75,6 +75,7 @@ impl KaniWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_array_into_iter_yields_elements_in_order".to_owned(),

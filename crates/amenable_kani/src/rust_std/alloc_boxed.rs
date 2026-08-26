@@ -19,6 +19,7 @@ impl KaniWitness for RustStdStandard<Box<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_box_derefs_and_writes_through".to_owned(),

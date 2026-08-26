@@ -75,12 +75,14 @@ impl KaniAssumedUtf8Validity {
     /// static claim, or a downstream `Establish` call whose credential is
     /// a compile-time formality (see `Establish`'s own doc: establishing a
     /// token never invokes a verifier) rather than runtime-inspected data.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn asserted_valid() -> Self {
         Self { valid: true }
     }
 
     /// Report the assumed/computed validity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn holds(&self) -> bool {
         self.valid
@@ -90,6 +92,7 @@ impl KaniAssumedUtf8Validity {
 impl Provenance for KaniAssumedUtf8Validity {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -147,26 +150,31 @@ impl KaniUtf8 {
 
 impl KaniUtf8String {
     /// Borrow the modeled valid UTF-8 bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }
 
     /// Consume the modeled valid UTF-8 bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_bytes(self) -> Vec<u8> {
         self.0
     }
 
     /// Report the byte length.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
     /// Report whether the modeled string is empty.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
     /// Borrow the modeled valid UTF-8 content as `&str`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn as_str(&self) -> &str {
         std::str::from_utf8(&self.0).expect("KaniUtf8String stores validated UTF-8")
     }
@@ -174,11 +182,13 @@ impl KaniUtf8String {
 
 impl KaniFromUtf8Error {
     /// Borrow the original invalid owned bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }
 
     /// Consume the error and recover the original owned bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_bytes(self) -> Vec<u8> {
         self.0
     }
@@ -419,6 +429,7 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     /// Returns `KaniUtf8BufferError::TooLong` if `len > MAX_LEN`, or
     /// `KaniUtf8BufferError::InvalidUtf8` if the modeled content is not
     /// valid UTF-8.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(bytes: [u8; MAX_LEN], len: usize) -> Result<Self, KaniUtf8BufferError> {
         if len > MAX_LEN {
             return Err(KaniUtf8BufferError::TooLong);
@@ -432,12 +443,14 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     }
 
     /// Report whether the modeled buffer is empty.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 
     /// Borrow the modeled valid UTF-8 content bytes.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes[..self.len]
@@ -448,10 +461,12 @@ impl<const MAX_LEN: usize> Evidence for KaniUtf8Buffer<MAX_LEN> {
     type Basis = KaniAssumedUtf8Validity;
     type Audit = [u8; MAX_LEN];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniAssumedUtf8Validity::asserted_valid()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         self.bytes
     }
@@ -470,6 +485,7 @@ impl Witness<KaniVerifier> for KaniUtf8Buffer<2> {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "verify_kani_utf8_buffer_bookkeeping_is_consistent".to_owned(),
@@ -560,6 +576,7 @@ impl ProofToken for KaniUtf8Buffer<2> {
 impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for KaniUtf8Buffer<2> {
     type Token = KaniUtf8BufferToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         KaniUtf8BufferToken(())
     }
@@ -572,6 +589,7 @@ fn symbolic_ascii_byte() -> u8 {
     byte
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn is_valid_utf8(bytes: &[u8]) -> bool {
     let len = bytes.len();
     let mut i = 0;

@@ -54,11 +54,13 @@ where
     }
 
     /// Observe the first iterator entry in ascending key order.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn first_entry(&self) -> Option<(&K, &V)> {
         self.low_value.as_ref().map(|value| (&self.low_key, value))
     }
 
     /// Observe the second iterator entry in ascending key order.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn second_entry(&self) -> Option<(&K, &V)> {
         self.high_value
             .as_ref()
@@ -66,6 +68,7 @@ where
     }
 
     /// Remove a key and recover its value without disturbing the other entry.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, key)))]
     pub fn remove(&mut self, key: &K) -> Option<V> {
         if key == &self.low_key {
             self.low_value.take()
@@ -77,6 +80,7 @@ where
     }
 
     /// Report whether every modeled entry has been removed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_empty(&self) -> bool {
         self.low_value.is_none() && self.high_value.is_none()
     }
@@ -103,16 +107,19 @@ where
     }
 
     /// Observe the first iterator item in ascending order.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn first_item(&self) -> Option<&T> {
         self.low_value.as_ref()
     }
 
     /// Observe the second iterator item in ascending order.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn second_item(&self) -> Option<&T> {
         self.high_value.as_ref()
     }
 
     /// Remove an item while leaving the other member intact.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, value)))]
     pub fn remove(&mut self, value: &T) -> bool {
         if self.low_value.as_ref() == Some(value) {
             let _ = self.low_value.take();
@@ -126,6 +133,7 @@ where
     }
 
     /// Report whether every modeled member has been removed.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_empty(&self) -> bool {
         self.low_value.is_none() && self.high_value.is_none()
     }

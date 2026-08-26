@@ -132,6 +132,7 @@ impl KaniWitness for RustStdStandard<PollFn<fn(&mut Context<'_>) -> Poll<i32>>> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poll_fn_dispatches_through_to_its_closure".to_owned(),

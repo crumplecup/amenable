@@ -39,6 +39,7 @@ enum DerivedWitnessGenericEnum<TDebit: Provenance + Clone, TAdjustment: Provenan
 impl<TDebit: Provenance + Clone, TAdjustment: Provenance + Clone>
     DerivedWitnessGenericEnum<TDebit, TAdjustment>
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(debit)))]
     fn balanced(debit: TDebit) -> Self {
         Self::Balanced {
             debit,
@@ -46,6 +47,7 @@ impl<TDebit: Provenance + Clone, TAdjustment: Provenance + Clone>
         }
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(credit)))]
     fn adjustment(credit: TAdjustment) -> Self {
         Self::Adjustment(credit, crate::Credit::new(2))
     }

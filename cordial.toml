@@ -1,0 +1,45 @@
+# cordial workspace config for amenable.
+#
+# [tracing] apply_gate_crates / apply_skip_crates -- real, empirically
+# verified per-crate policy for cordial's tracing `--apply` (see
+# docs/CFG_HYGIENE_PLAN.md's Step 3 for the full evidence trail):
+#
+# - amenable_kani: `#[instrument]` reachable from a `#[kani::proof]`
+#   harness causes real CBMC symbolic-closure-capture timeouts (real
+#   gallery evidence, ~/repos/elicitation's KANI_FOR_VSMS.md sec 6.3:
+#   gallery14a_ungated_debug hangs, gallery14b_gated_debug completes
+#   ~8s gated). `cargo kani`'s `--cfg kani` applies to kani's whole
+#   dependency graph, so gating must propagate transitively -- any
+#   crate amenable_kani depends on (e.g. amenable_core, amenable_gaap)
+#   needs the same gate even though it isn't itself listed here.
+#
+# - amenable_creusot: a bare `#[instrument]` hard-fails Creusot's
+#   translator -- `creusot_std::model::DeepModel` isn't implemented for
+#   `tracing::Level`/`LevelFilter`, so `creusot-rustc` fatals on the
+#   static `DefaultCallsite` reference `tracing::span!` embeds
+#   (confirmed via a real `cargo creusot` run). This is crate-wide, not
+#   scoped to generated companions only.
+#
+# - amenable_verus: `verus --crate-type=lib` never reads `Cargo.toml`
+#   at all, so it can't resolve the `tracing` crate under any cfg.
+#
+# Skip does not propagate through the ordinary Cargo dependency graph
+# (a translator that only sweeps a crate's own local items, real
+# precedent: creusot-rustc, has no reason to touch an ordinary
+# dependency's source at all) but does propagate through a `#[path]`
+# splice, since that's a second, distinct compilation of the same file
+# text under the splicing crate's own rules.
+#
+# No config knob for Ensures/Requires: cordial now finds them itself.
+# Any function whose every real caller, transitively, bottoms out in a
+# proof-only entry point (a function nested in one of the cfg names
+# above) is never recorded as needing #[instrument] at all --
+# workspace-wide call-graph reachability, not a hardcoded trait name,
+# so it covers amenable_core::Ensures/Requires impls (confirmed:
+# their own doc comment says ensures() "is the real check, called
+# directly at the proof site") without naming them specifically, and
+# keeps working if this workspace grows other proof-only helpers later.
+
+[tracing]
+apply_gate_crates = { amenable_kani = "kani" }
+apply_skip_crates = ["amenable_creusot", "amenable_verus"]

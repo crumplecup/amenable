@@ -49,11 +49,13 @@ impl KaniEnvPath {
     }
 
     /// Borrow the modeled path string.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn as_str(&self) -> &str {
         &self.0
     }
 
     /// Consume the modeled path string.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_string(self) -> String {
         self.0
     }
@@ -75,21 +77,25 @@ impl KaniEnvPathList {
     }
 
     /// Report how many modeled paths are present.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
     /// Report whether the modeled path list is empty.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
     /// Borrow the modeled path entries.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn paths(&self) -> &[KaniEnvPath] {
         &self.0
     }
 
     /// Materialize the modeled path list back into owned strings.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn as_strings(&self) -> Vec<String> {
         self.0.iter().map(|path| path.as_str().to_owned()).collect()
     }
@@ -97,6 +103,7 @@ impl KaniEnvPathList {
 
 impl KaniJoinPathsError {
     /// Consume the error and recover the offending path.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_offending_path(self) -> String {
         self.offending_path
     }
@@ -104,6 +111,7 @@ impl KaniJoinPathsError {
 
 impl KaniJoinedEnvPaths {
     /// Recover the modeled path list carried by the semantic joined payload.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn into_paths(self) -> KaniEnvPathList {
         self.0
     }
@@ -111,6 +119,7 @@ impl KaniJoinedEnvPaths {
 
 impl KaniEnvPaths {
     /// Return the modeled platform separator.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn separator() -> char {
         if cfg!(windows) { ';' } else { ':' }
     }

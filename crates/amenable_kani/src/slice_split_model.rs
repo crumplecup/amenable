@@ -78,24 +78,28 @@ pub struct KaniSplitObservation<T> {
 
 impl<T: Copy> KaniSplitObservation<T> {
     /// Model `split(predicate)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn split(&self) -> ([T; 1], [T; 1]) {
         ([self.before], [self.after])
     }
 
     /// Model `split_inclusive(predicate)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn split_inclusive(&self) -> ([T; 2], [T; 1]) {
         ([self.before, self.delimiter], [self.after])
     }
 
     /// Model `rsplit(predicate)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rsplit(&self) -> ([T; 1], [T; 1]) {
         ([self.after], [self.before])
     }
 
     /// Recover the modeled underlying data after any write-through updates.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn data(&self) -> [T; 3] {
         [self.before, self.delimiter, self.after]
@@ -163,6 +167,7 @@ pub struct KaniSplitNObservation<T: Copy> {
 
 impl<T: Copy> KaniSplitNObservation<T> {
     /// Model `splitn(2, predicate)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn splitn_two(&self) -> ([T; 1], [T; 3]) {
         (
@@ -172,6 +177,7 @@ impl<T: Copy> KaniSplitNObservation<T> {
     }
 
     /// Model `rsplitn(2, predicate)` over the bounded witness.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn rsplitn_two(&self) -> ([T; 1], [T; 3]) {
         ([self.last], [self.first, self.first_delimiter, self.middle])
@@ -210,6 +216,7 @@ pub struct KaniChunkByWindow;
 impl Provenance for KaniChunkByWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -265,12 +272,14 @@ pub struct KaniChunkByObservation<T: Copy> {
 
 impl<T: Copy> KaniChunkByObservation<T> {
     /// Report the first chunk length under the modeled grouping rule.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn first_chunk_len(&self) -> usize {
         if self.grouped_together { 2 } else { 1 }
     }
 
     /// Report the trailing chunk length, if any.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn trailing_chunk_len(&self) -> Option<usize> {
         if self.grouped_together { None } else { Some(1) }
@@ -281,10 +290,12 @@ impl<T: Copy> Evidence for KaniChunkByObservation<T> {
     type Basis = KaniChunkByWindow;
     type Audit = KaniChunkByAudit<T>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniChunkByWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         KaniChunkByAudit {
             data: [self.first, self.second],

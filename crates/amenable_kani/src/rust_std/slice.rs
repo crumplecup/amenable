@@ -572,6 +572,7 @@ impl KaniChunkByObservation<i32> {
     /// construction implies, then mint the witness. Consumes `self`: the
     /// only way to obtain the token is to have run this check against a
     /// real observation instance, not to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_grouping(
         self,
@@ -830,6 +831,7 @@ pub struct ThreeSplitOperandsAreDistinctFromThePattern<T>(std::marker::PhantomDa
 impl<T> amenable_core::Standard for ThreeSplitOperandsAreDistinctFromThePattern<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -839,14 +841,17 @@ impl<T> Evidence for ThreeSplitOperandsAreDistinctFromThePattern<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -871,6 +876,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier>
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -943,6 +949,7 @@ impl KaniSplitObservation<i32> {
     /// own construction implies, then mint the witness. Consumes `self`
     /// for the same reason [`crate::KaniChannel::demonstrate_delivery`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_split(self, before: i32, after: i32) -> KaniSplitWitnessToken {
         let pieces = self.split();
@@ -1035,6 +1042,7 @@ impl KaniSplitObservation<i32> {
     /// `updated` into the first piece and assert the write is visible in
     /// the underlying data. Consumes `self` for the same reason
     /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn demonstrate_split_mut_write_through(
         mut self,
@@ -1141,6 +1149,7 @@ impl KaniSplitObservation<i32> {
     /// Assert `.split_inclusive()` keeps the matched delimiter at the end
     /// of the first piece. Consumes `self` for the same reason
     /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_split_inclusive(
         self,
@@ -1242,6 +1251,7 @@ impl KaniSplitObservation<i32> {
     /// Assert `.split_inclusive()`'s piece lengths reflect the matched
     /// element staying at the end of the first piece. Consumes `self` for
     /// the same reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_split_inclusive_lengths(self) -> KaniSplitInclusiveLengthsWitnessToken {
         let pieces = self.split_inclusive();
@@ -1341,6 +1351,7 @@ impl KaniSplitNObservation<i32> {
     /// Assert `.splitn_two()` caps at two pieces, leaving the second
     /// delimiter unsplit in the last piece. Consumes `self` for the same
     /// reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_splitn_two(
         self,
@@ -1516,6 +1527,7 @@ impl KaniSplitObservation<i32> {
     /// Assert `.rsplit()` yields the last piece first. Consumes `self`
     /// for the same reason [`crate::KaniChannel::demonstrate_delivery`]
     /// does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_rsplit(self, before: i32, after: i32) -> KaniRSplitWitnessToken {
         let pieces = self.rsplit();
@@ -1609,6 +1621,7 @@ impl KaniSplitObservation<i32> {
     /// `updated` into the rearmost piece and assert the write is visible
     /// in the underlying data. Consumes `self` for the same reason
     /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn demonstrate_rsplit_mut_write_through(
         mut self,
@@ -1719,6 +1732,7 @@ impl KaniSplitNObservation<i32> {
     /// Assert `.rsplitn_two()` caps at two pieces from the back, leaving
     /// the first delimiter unsplit in the last piece. Consumes `self` for
     /// the same reason [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_rsplitn_two(
         self,
@@ -1893,6 +1907,7 @@ impl KaniEscapeAsciiObservation {
     /// trailing newline expands to its two-byte backslash form. Consumes
     /// `self` for the same reason
     /// [`crate::KaniChannel::demonstrate_delivery`] does.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_escaping(self, printable: u8) -> KaniEscapeAsciiWitnessToken {
         assert_eq!(
@@ -1924,6 +1939,7 @@ impl Establish<KaniEscapeAsciiWitnessToken, KaniVerifier>
 {
     type Token = RustStdEscapeAsciiToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniEscapeAsciiWitnessToken) -> Self::Token {
         RustStdEscapeAsciiToken(())
     }
@@ -1958,6 +1974,7 @@ impl KaniWitness for RustStdStandard<GetDisjointMutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds".to_owned(),

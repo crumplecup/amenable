@@ -388,6 +388,7 @@ impl KaniWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIte
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_splice_replaces_a_range_and_yields_what_it_removed".to_owned(),

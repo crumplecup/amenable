@@ -57,6 +57,7 @@ impl KaniWitness for RustStdStandard<BacktraceStatus> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_backtrace_status_reports_captured_after_force_capture".to_owned(),

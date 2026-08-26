@@ -59,6 +59,7 @@ impl crate::KaniStringDrainObservation {
     /// source empty afterward. Consumes `self`: the only way to obtain
     /// the token is to have run this check against a real observation
     /// instance, not to assert it independently.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_whole_string_drain(
         self,
@@ -113,6 +114,7 @@ impl Establish<KaniStringDrainWitnessToken, KaniVerifier>
 {
     type Token = RustStdStringDrainToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniStringDrainWitnessToken) -> Self::Token {
         RustStdStringDrainToken(())
     }
@@ -205,6 +207,7 @@ impl KaniWitness for RustStdStandard<FromUtf8Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_utf8_error_recovers_the_original_bytes".to_owned(),

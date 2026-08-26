@@ -92,6 +92,7 @@ impl KaniWindowsHandle {
     }
 
     /// Model `.as_raw_handle()`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn as_raw_handle(&self) -> KaniRawHandle {
         self.0
@@ -117,6 +118,7 @@ impl KaniWindowsHandleOrInvalid {
 
     /// Model `TryFrom<HandleOrInvalid> for OwnedHandle`: succeeds and
     /// preserves the value unless it's exactly `INVALID_HANDLE_VALUE`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn try_into_owned(self) -> Result<KaniWindowsHandle, KaniWindowsInvalidHandleError> {
         if self.0 == KANI_INVALID_HANDLE_VALUE {
             Err(KaniWindowsInvalidHandleError(()))
@@ -139,6 +141,7 @@ impl KaniWindowsSocket {
     }
 
     /// Model `.as_raw_socket()`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn as_raw_socket(&self) -> u64 {
         self.0
@@ -147,6 +150,7 @@ impl KaniWindowsSocket {
 
 /// Modeled `EncodeWide` semantics for a single BMP Unicode scalar value:
 /// encodes to exactly one `u16` equal to the code point.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 #[must_use]
 pub fn kani_encode_wide_bmp_char(c: char) -> u16 {
     u16::try_from(u32::from(c)).expect("c is a BMP scalar value by this fn's own precondition")
@@ -156,6 +160,7 @@ pub fn kani_encode_wide_bmp_char(c: char) -> u16 {
 /// `std::os::windows` carrier that this crate can't name directly -- see
 /// the module doc for why. Mirrors exactly what `amenable_std`'s own
 /// `#[cfg(windows)]` registration for the same type produces.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn windows_provenance(
     source_module: &str,
     url: &str,
@@ -228,6 +233,7 @@ impl KaniWitness for WindowsHandleOrInvalidRejectsOnlyTheSentinel {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_windows_handle_or_invalid_rejects_only_the_sentinel".to_owned(),
