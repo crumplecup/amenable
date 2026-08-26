@@ -8,7 +8,11 @@
 rustc-ice-*.txt
 
 # Verus: `verus --crate-type=lib` (invoked as a bare compiler, not through
-# Cargo) drops its compiled rlib in the current directory with no way to
+# Cargo) drops its compiled rlib next to the source tree with no way to
 # redirect it -- a throwaway build artifact, not evidence (unlike
-# Creusot's verif/ .coma/proof.json files, which stay tracked).
-/liblib.rlib
+# Creusot's verif/ .coma/proof.json files, which stay tracked). Unanchored
+# (not just `/liblib.rlib` at the root) since the actual drop location has
+# moved before and any stray rlib anywhere in the tree is the same kind of
+# throwaway artifact; `just verify-verus` also deletes it once the run's
+# outcome is printed, this is a backstop.
+*.rlib

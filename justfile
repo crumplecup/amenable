@@ -187,7 +187,7 @@ verify-verus:
     just emit-verus-witnesses
     just generate-verus-gaap-tokens
     just generate-verus-exchange
-    verus --crate-type=lib crates/amenable_verus/src/lib.rs
+    status=0; verus --crate-type=lib crates/amenable_verus/src/lib.rs || status=$?; rm -f liblib.rlib; exit $status
 
 # Cross-checks the Windows-gated std paths (std::os::windows, etc.) that
 # only compile on a matching host otherwise. Requires `cross`
