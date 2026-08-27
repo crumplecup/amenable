@@ -105,6 +105,7 @@ dependencies = [
  "derive-getters",
  "derive-new",
  "inventory",
+ "tracing",
  "uuid",
 ]
 

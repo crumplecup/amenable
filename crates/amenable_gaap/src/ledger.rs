@@ -191,6 +191,7 @@ impl Ledger {
     ///
     /// Generic over `V`, direct contract, no delegating wrapper -- see
     /// `commit`'s own doc comment for the confirmed reasoning.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[cfg_attr(
         kani,
         kani::ensures(|result: &Result<(), i64>| match result {
@@ -211,6 +212,7 @@ impl Ledger {
     /// [`Ledger::check_amount_positive`] for why this is broken out.
     /// Generic over `V`, direct contract, no delegating wrapper -- see
     /// `commit`'s own doc comment for the confirmed reasoning.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[cfg_attr(
         kani,
         kani::ensures(|result: &Result<(), (i64, i64)>| match result {
@@ -246,6 +248,7 @@ impl Ledger {
     /// real `clippy::redundant_closure` failure this project cannot
     /// `#[allow]` away -- this wrapper is the one form both toolchains
     /// accept.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn negative_amount(bad: i64) -> TransferError {
         TransferError::NegativeAmount(bad)
     }
@@ -254,6 +257,7 @@ impl Ledger {
     /// function, not a destructuring closure: Verus's translator
     /// separately does not (yet) support "only variables .. not general
     /// patterns" in a closure parameter position either.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn insufficient_funds(bad: (i64, i64)) -> TransferError {
         TransferError::InsufficientFunds {
             balance: bad.0,
@@ -326,6 +330,7 @@ impl Ledger {
     /// mechanically rather than hand-typed a fourth time, since
     /// `validate`/`commit`/`reject`/`rollback` all converged on the
     /// identical pattern once each stopped restating its own claim.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     pub fn validate<V: amenable_core::Verifier>(
         &self,
         input: Transfer<Pending, PendingToken>,
@@ -419,6 +424,7 @@ impl Ledger {
     /// there. Same `cargo kani`-sets-`--cfg kani`-globally mechanism
     /// `TransferError`'s/`Ledger`'s own `#[cfg_attr(kani, derive(kani::
     /// Arbitrary))]` already relies on.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     pub fn commit<V: amenable_core::Verifier>(
         &self,
         input: Transfer<Validated, ValidatedToken>,
@@ -468,6 +474,7 @@ impl Ledger {
     /// Pending>, ..)`); restating it here too is the identical
     /// anti-pattern `validate`'s own doc comment explains, just with a
     /// shorter claim.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     pub fn reject<V: amenable_core::Verifier>(
         &self,
         input: Transfer<Pending, PendingToken>,
@@ -504,6 +511,7 @@ impl Ledger {
     /// rather than restating `result.is_ok()` inline). Generic over `V`,
     /// direct contract, no delegating wrapper -- see `commit`'s own doc
     /// comment for the confirmed reasoning.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
     pub fn rollback<V: amenable_core::Verifier>(
         &self,
         input: Transfer<Validated, ValidatedToken>,

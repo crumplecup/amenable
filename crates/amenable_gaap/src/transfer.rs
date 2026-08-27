@@ -63,6 +63,7 @@ pub struct AccountId {
 }
 
 impl PartialEq for AccountId {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, other)))]
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
@@ -71,18 +72,27 @@ impl PartialEq for AccountId {
 impl Eq for AccountId {}
 
 impl Hash for AccountId {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, state)))]
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
     }
 }
 
 impl PartialOrd for AccountId {
+    // Deliberately not #[instrument]: clippy::non_canonical_partial_ord_impl
+    // pattern-matches this fn's expanded body against `Some(self.cmp(other))`
+    // exactly, and a proc-macro-instrumented body -- span-entry code wrapped
+    // around the original expression -- no longer matches, so it misfires
+    // as "non-canonical" even though this is the canonical delegation
+    // clippy wants. Confirmed empirically: this is the one function in the
+    // apply run that broke `-D warnings` if instrumented.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl Ord for AccountId {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, other)))]
     fn cmp(&self, other: &Self) -> Ordering {
         self.id.cmp(&other.id)
     }
@@ -102,6 +112,7 @@ impl Amount {
     }
 
     /// The raw amount.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn value(&self) -> i64 {
         self.0
     }
@@ -253,6 +264,7 @@ impl Provenance for Rejected<Pending> {
 impl Provenance for Rejected<Validated> {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",
