@@ -127,6 +127,7 @@ fn concrete_tuple_struct() -> ConcreteDerivedTupleStruct {
 
 #[test]
 fn derive_witness_supports_concrete_generic_enums_for_verus() {
+    amenable_core::init_tracing();
     let _ = concrete_variants();
     let expected_support = mixed_support();
 
@@ -177,6 +178,7 @@ fn derive_witness_supports_concrete_generic_enums_for_verus() {
 
 #[test]
 fn derive_witness_keeps_trivial_members_neutral_for_verus() {
+    amenable_core::init_tracing();
     let _ = concrete_checked_plus_trivial();
     let expected_support = checked_plus_trivial_support();
 
@@ -194,6 +196,7 @@ fn derive_witness_keeps_trivial_members_neutral_for_verus() {
 
 #[test]
 fn derive_witness_supports_tuple_structs_for_verus() {
+    amenable_core::init_tracing();
     let _ = concrete_tuple_struct();
     let expected_support = tuple_struct_support();
 
@@ -210,6 +213,7 @@ fn derive_witness_supports_tuple_structs_for_verus() {
 
 #[test]
 fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let exports = inventory::iter::<WitnessExportRecord>()
         .filter(|record| (record.verifier())() == "verus")
         .map(|record| {
@@ -382,6 +386,7 @@ fn explicit_verus_witness_exports_register_concrete_instantiations() -> miette::
 
 #[test]
 fn live_verus_canary_exports_include_tuple_struct_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -405,6 +410,7 @@ type CanaryEnum = VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExpo
 
 #[test]
 fn verus_export_canary_enum_variants_are_constructible() {
+    amenable_core::init_tracing();
     let balanced = CanaryEnum::Balanced {
         checked: CheckedVerusExportLeaf::new("checked"),
         trusted: TrustedVerusExportLeaf::new("trusted"),
@@ -422,6 +428,7 @@ fn verus_export_canary_enum_variants_are_constructible() {
 
 #[test]
 fn live_verus_canary_exports_include_canary_enum_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -458,6 +465,7 @@ fn live_verus_canary_exports_include_canary_enum_shape() -> miette::Result<()> {
 
 #[test]
 fn verus_export_multi_checked_enum_variants_are_constructible() {
+    amenable_core::init_tracing();
     let active = VerusExportMultiCheckedEnum::Active {
         first: CheckedVerusExportLeaf::new("checked"),
         second: RequiresVerusExportLeaf::new("printable"),
@@ -470,6 +478,7 @@ fn verus_export_multi_checked_enum_variants_are_constructible() {
 
 #[test]
 fn live_verus_canary_exports_include_multi_checked_enum_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -509,6 +518,7 @@ fn live_verus_canary_exports_include_multi_checked_enum_shape() -> miette::Resul
 
 #[test]
 fn requires_verus_export_leaf_is_constructible_and_checked() {
+    amenable_core::init_tracing();
     let leaf = RequiresVerusExportLeaf::new("printable");
 
     assert_eq!(
@@ -520,6 +530,7 @@ fn requires_verus_export_leaf_is_constructible_and_checked() {
 
 #[test]
 fn live_verus_canary_exports_include_requires_struct_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -536,6 +547,7 @@ fn live_verus_canary_exports_include_requires_struct_shape() -> miette::Result<(
 
 #[test]
 fn raw_template_verus_export_leaf_is_constructible_and_checked() {
+    amenable_core::init_tracing();
     let leaf = RawTemplateVerusExportLeaf::new("borrow-state");
 
     assert_eq!(
@@ -547,6 +559,7 @@ fn raw_template_verus_export_leaf_is_constructible_and_checked() {
 
 #[test]
 fn live_verus_canary_exports_include_raw_template_struct_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -563,6 +576,7 @@ fn live_verus_canary_exports_include_raw_template_struct_shape() -> miette::Resu
 
 #[test]
 fn live_verus_canary_exports_include_multi_checked_struct_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {
@@ -582,6 +596,7 @@ fn live_verus_canary_exports_include_multi_checked_struct_shape() -> miette::Res
 
 #[test]
 fn live_verus_canary_exports_include_nested_struct_shape() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let export = amenable_core::witness_exports()
         .into_iter()
         .find(|record| {

@@ -214,6 +214,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[test]
 fn ensures_bound_is_the_real_multi_clause_slice() {
+    amenable_core::init_tracing();
     let clauses: &[&str] = CharRoundtrip::ensures(());
 
     assert_eq!(
@@ -227,6 +228,7 @@ fn ensures_bound_is_the_real_multi_clause_slice() {
 
 #[test]
 fn requires_bound_is_the_real_clause_slice() {
+    amenable_core::init_tracing();
     let clauses: &[&str] = EscapeAsciiModel::requires(());
 
     assert_eq!(
@@ -237,6 +239,7 @@ fn requires_bound_is_the_real_clause_slice() {
 
 #[test]
 fn indexed_subset_claims_only_the_selected_real_clause() {
+    amenable_core::init_tracing();
     let clauses: &[&str] = ValidUnicodeScalarLike::ensures(());
 
     assert_eq!(clauses, ["char_is_valid_unicode_scalar(c)"]);
@@ -244,6 +247,7 @@ fn indexed_subset_claims_only_the_selected_real_clause() {
 
 #[test]
 fn predicate_witness_derives_from_the_predicates_own_declaration() {
+    amenable_core::init_tracing();
     let clauses: &[&str] = WriteStoresNewValueLike::ensures(());
 
     assert_eq!(clauses, ["observed == new_value"]);
@@ -251,6 +255,7 @@ fn predicate_witness_derives_from_the_predicates_own_declaration() {
 
 #[test]
 fn bracketed_predicate_list_derives_one_clause_per_named_predicate() {
+    amenable_core::init_tracing();
     let clauses: &[&str] = MultiplePredicatesLike::ensures(());
 
     assert_eq!(
@@ -264,6 +269,7 @@ fn bracketed_predicate_list_derives_one_clause_per_named_predicate() {
 
 #[test]
 fn one_contract_record_is_registered_per_real_clause() {
+    amenable_core::init_tracing();
     // `inventory::iter` doesn't promise any particular order across
     // separate `submit!` blocks, so compare as sets, not sequences.
     let mut ensures_records = inventory::iter::<ContractRecord>()
@@ -297,6 +303,7 @@ fn one_contract_record_is_registered_per_real_clause() {
 
 #[test]
 fn predicate_body_extracts_the_real_shared_predicate_declaration() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let (_, _, item_fn) =
         amenable_core::verus_find_fn("write_stores_new_value").ok_or_else(|| {
             miette::miette!("write_stores_new_value should be a real, public spec fn")

@@ -91,6 +91,7 @@ amenable_core::register_witness_exports!(verifier = LocalVerifier; LocalEvidence
 
 #[test]
 fn witness_exports_include_concrete_local_registrations() -> miette::Result<()> {
+    amenable::init_tracing();
     let exports = witness_exports();
     let record = exports
         .iter()

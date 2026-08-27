@@ -5,6 +5,7 @@
 
 #[test]
 fn missing_harness_fails_to_compile() {
+    amenable_core::init_tracing();
     let cases = trybuild::TestCases::new();
     cases.compile_fail("tests/ui/verus_ensures_fragments_missing_harness.rs");
 }

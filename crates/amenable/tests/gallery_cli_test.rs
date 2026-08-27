@@ -4,6 +4,7 @@ use miette::{IntoDiagnostic, WrapErr};
 
 #[test]
 fn gallery_list_reports_registered_cases_with_disposition_and_expectation() -> miette::Result<()> {
+    amenable::init_tracing();
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args(["gallery", "list"])
         .output()
@@ -87,6 +88,7 @@ fn gallery_list_reports_registered_cases_with_disposition_and_expectation() -> m
 
 #[test]
 fn gallery_run_rejects_unknown_case_before_spawning_kani() -> miette::Result<()> {
+    amenable::init_tracing();
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
             "gallery",

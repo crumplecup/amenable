@@ -65,6 +65,7 @@ enum VerifyBackend {
 }
 
 fn main() -> ExitCode {
+    amenable::init_tracing();
     match Cli::try_parse() {
         Ok(cli) => match boundary::run(cli) {
             Ok(()) => ExitCode::SUCCESS,

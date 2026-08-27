@@ -12,6 +12,7 @@ use amenable_gaap::{
 
 #[test]
 fn transfer_payload_carries_its_two_accounts_and_amount() {
+    amenable_core::init_tracing();
     let payload = TransferPayload::new(
         AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
         AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
@@ -25,6 +26,7 @@ fn transfer_payload_carries_its_two_accounts_and_amount() {
 
 #[test]
 fn account_id_equality_compares_the_id_not_the_name() {
+    amenable_core::init_tracing();
     let alice_again = AccountId::new(uuid::Uuid::from_u128(1), "Alice (checking)");
     let alice = AccountId::new(uuid::Uuid::from_u128(1), "Alice");
     let bob = AccountId::new(uuid::Uuid::from_u128(2), "Alice");
@@ -35,6 +37,7 @@ fn account_id_equality_compares_the_id_not_the_name() {
 
 #[test]
 fn transfer_payload_is_a_root_evidence_node() {
+    amenable_core::init_tracing();
     assert!(TransferPayload::is_root());
     assert_eq!(
         TransferPayload::chain(),
@@ -44,6 +47,7 @@ fn transfer_payload_is_a_root_evidence_node() {
 
 #[test]
 fn every_transfer_state_is_a_root_standard_claim() {
+    amenable_core::init_tracing();
     assert!(Pending::is_root());
     assert!(Validated::is_root());
     assert!(Committed::is_root());
@@ -53,6 +57,7 @@ fn every_transfer_state_is_a_root_standard_claim() {
 
 #[test]
 fn every_transfer_state_carries_an_asserted_provenance_report() {
+    amenable_core::init_tracing();
     for report in [
         Pending.report().to_string(),
         Validated.report().to_string(),
@@ -66,6 +71,7 @@ fn every_transfer_state_carries_an_asserted_provenance_report() {
 
 #[test]
 fn rejected_from_pending_and_rejected_from_validated_are_distinct_claims() {
+    amenable_core::init_tracing();
     assert_ne!(
         Rejected::<Pending>::default().report().to_string(),
         Rejected::<Validated>::default().report().to_string(),
@@ -74,6 +80,7 @@ fn rejected_from_pending_and_rejected_from_validated_are_distinct_claims() {
 
 #[test]
 fn every_contract_type_is_a_root_evidence_node_with_no_proof_yet() {
+    amenable_core::init_tracing();
     assert!(AmountPositive::is_root());
     assert!(SufficientFunds::is_root());
     assert!(AccountsDistinct::is_root());

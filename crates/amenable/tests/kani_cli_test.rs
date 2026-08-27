@@ -11,6 +11,7 @@ use miette::{IntoDiagnostic, WrapErr};
 
 #[test]
 fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
+    amenable::init_tracing();
     let record = KaniProof::new(
         "amenable_kani::calculator::verify_debit_access_preserves_value".to_owned(),
         "calculator::verify_debit_access_preserves_value".to_owned(),
@@ -50,6 +51,7 @@ fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
 
 #[test]
 fn ledger_replaces_a_previous_result_for_the_same_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     let path =
         std::env::temp_dir().join(format!("amenable-kani-ledger-{}.csv", std::process::id()));
 
@@ -87,6 +89,7 @@ fn ledger_replaces_a_previous_result_for_the_same_proof() -> miette::Result<()> 
 
 #[test]
 fn native_timeout_diagnostics_are_distinct_from_failure() {
+    amenable::init_tracing();
     assert!(is_kani_timeout(
         "VERIFICATION:- SUCCESSFUL\nverification timed out"
     ));
@@ -95,6 +98,7 @@ fn native_timeout_diagnostics_are_distinct_from_failure() {
 
 #[test]
 fn diagnostics_prefer_the_first_error_over_kani_startup_output() {
+    amenable::init_tracing();
     let diagnostics =
         "Kani Rust Verifier 0.67\nCompiling amenable_kani\nerror[E0433]: missing type\n";
 

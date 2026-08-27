@@ -9,6 +9,7 @@
 
 #[test]
 fn opaque_leaf_fails_to_compile_for_export() {
+    amenable_core::init_tracing();
     let cases = trybuild::TestCases::new();
     cases.compile_fail("tests/ui/opaque_leaf_blocks_export.rs");
 }

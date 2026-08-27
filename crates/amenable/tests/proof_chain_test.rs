@@ -42,6 +42,7 @@ fn proof_description<'a>(
 #[test]
 #[cfg_attr(not(all(feature = "creusot", feature = "verus")), ignore)]
 fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<bool>"))?;
 
     let root = report.root();
@@ -63,6 +64,7 @@ fn bool_proof_chain_is_a_single_root_node_with_all_three_verifiers() -> miette::
 
 #[test]
 fn char_proof_chain_carries_the_checked_harness_name_per_verifier() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<char>"))?;
 
     let root = report.root();
@@ -79,6 +81,7 @@ fn char_proof_chain_carries_the_checked_harness_name_per_verifier() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn array_i32_3_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -107,6 +110,7 @@ fn array_i32_3_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn atomic_bool_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -135,6 +139,7 @@ fn atomic_bool_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn atomic_ptr_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -163,6 +168,7 @@ fn atomic_ptr_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn atomic_ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -191,6 +197,7 @@ fn atomic_ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn system_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<System>"))?;
 
@@ -217,6 +224,7 @@ fn system_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn backtrace_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Backtrace>"))?;
 
@@ -245,6 +253,7 @@ fn backtrace_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn backtrace_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<BacktraceStatus>"))?;
 
@@ -279,6 +288,7 @@ fn backtrace_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn seek_from_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SeekFrom>"))?;
 
@@ -305,6 +315,7 @@ fn seek_from_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn shutdown_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Shutdown>"))?;
 
@@ -331,6 +342,7 @@ fn shutdown_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn incoming_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Incoming<'static>>"))?;
 
@@ -349,6 +361,7 @@ fn incoming_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn tcp_listener_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<TcpListener>"))?;
 
@@ -368,6 +381,7 @@ fn tcp_listener_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn tcp_stream_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<TcpStream>"))?;
 
@@ -385,6 +399,7 @@ fn tcp_stream_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn udp_socket_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<UdpSocket>"))?;
 
@@ -404,6 +419,7 @@ fn udp_socket_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn child_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Child>"))?;
 
@@ -422,6 +438,7 @@ fn child_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn child_stderr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChildStderr>"))?;
 
@@ -438,6 +455,7 @@ fn child_stderr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn child_stdin_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChildStdin>"))?;
 
@@ -455,6 +473,7 @@ fn child_stdin_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn child_stdout_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ChildStdout>"))?;
 
@@ -471,6 +490,7 @@ fn child_stdout_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn command_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Command>"))?;
 
@@ -489,6 +509,7 @@ fn command_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn command_args_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<CommandArgs<'static>>"))?;
 
@@ -506,6 +527,7 @@ fn command_args_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn command_envs_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<CommandEnvs<'static>>"))?;
 
@@ -523,6 +545,7 @@ fn command_envs_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn exit_code_proof_chain_reports_the_trusted_kani_and_creusot_provenance() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ExitCode>"))?;
 
@@ -543,6 +566,7 @@ fn exit_code_proof_chain_reports_the_trusted_kani_and_creusot_provenance() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn exit_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<ExitStatus>"))?;
 
@@ -560,6 +584,7 @@ fn exit_status_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn output_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Output>"))?;
 
@@ -578,6 +603,7 @@ fn output_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stdio_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Stdio>"))?;
 
@@ -596,6 +622,7 @@ fn stdio_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ancestors_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Ancestors<'static>>"))?;
 
@@ -614,6 +641,7 @@ fn ancestors_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn component_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Component<'static>>"))?;
 
@@ -632,6 +660,7 @@ fn component_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn components_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Components<'static>>"))?;
 
@@ -652,6 +681,7 @@ fn components_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn path_display_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::path::Display<'static>>"))?;
 
@@ -670,6 +700,7 @@ fn path_display_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn path_iter_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::path::Iter<'static>>"))?;
 
@@ -688,6 +719,7 @@ fn path_iter_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn path_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Path>"))?;
 
@@ -706,6 +738,7 @@ fn path_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn path_buf_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PathBuf>"))?;
 
@@ -725,6 +758,7 @@ fn path_buf_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn prefix_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Prefix<'static>>"))?;
 
@@ -744,6 +778,7 @@ fn prefix_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn prefix_component_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PrefixComponent<'static>>"))?;
 
@@ -762,6 +797,7 @@ fn prefix_component_static_proof_chain_reports_the_kani_and_creusot_harnesses() 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn strip_prefix_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<StripPrefixError>"))?;
 
@@ -779,6 +815,7 @@ fn strip_prefix_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn instant_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Instant>"))?;
 
@@ -797,6 +834,7 @@ fn instant_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn system_time_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SystemTime>"))?;
 
@@ -815,6 +853,7 @@ fn system_time_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn system_time_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<SystemTimeError>"))?;
 
@@ -833,6 +872,7 @@ fn system_time_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn panic_and_sync_lock_proof_chains_report_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -932,6 +972,7 @@ fn panic_and_sync_lock_proof_chains_report_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn sync_mpsc_proof_chains_report_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1003,6 +1044,7 @@ fn sync_mpsc_proof_chains_report_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn thread_proof_chains_report_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1102,6 +1144,7 @@ fn thread_proof_chains_report_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn slice_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1130,6 +1173,7 @@ fn slice_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1159,6 +1203,7 @@ fn str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn core_str_plain_carrier_proof_chains_register_the_kani_and_creusot_proofs() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1227,6 +1272,7 @@ fn core_str_plain_carrier_proof_chains_register_the_kani_and_creusot_proofs() ->
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn core_str_pattern_carrier_proof_chains_register_the_kani_and_creusot_proofs() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1281,6 +1327,7 @@ fn core_str_pattern_carrier_proof_chains_register_the_kani_and_creusot_proofs() 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn slice_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1316,6 +1363,7 @@ fn slice_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn slice_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1356,6 +1404,7 @@ fn slice_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1381,6 +1430,7 @@ fn chunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1406,6 +1456,7 @@ fn chunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1431,6 +1482,7 @@ fn chunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1456,6 +1508,7 @@ fn chunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn windows_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1481,6 +1534,7 @@ fn windows_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rchunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1506,6 +1560,7 @@ fn rchunks_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rchunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1531,6 +1586,7 @@ fn rchunks_exact_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rchunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1556,6 +1612,7 @@ fn rchunks_exact_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rchunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1581,6 +1638,7 @@ fn rchunks_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunk_by_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1606,6 +1664,7 @@ fn chunk_by_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn chunk_by_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1631,6 +1690,7 @@ fn chunk_by_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rsplit_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1656,6 +1716,7 @@ fn rsplit_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rsplit_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1681,6 +1742,7 @@ fn rsplit_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rsplit_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1706,6 +1768,7 @@ fn rsplit_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rsplit_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1731,6 +1794,7 @@ fn rsplit_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1756,6 +1820,7 @@ fn split_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_inclusive_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1782,6 +1847,7 @@ fn split_inclusive_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_inclusive_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1807,6 +1873,7 @@ fn split_inclusive_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1832,6 +1899,7 @@ fn split_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1857,6 +1925,7 @@ fn split_n_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1882,6 +1951,7 @@ fn split_n_mut_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn escape_ascii_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1908,6 +1978,7 @@ fn escape_ascii_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn get_disjoint_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1933,6 +2004,7 @@ fn get_disjoint_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() ->
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn tuple_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1961,6 +2033,7 @@ fn tuple_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fn_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -1989,6 +2062,7 @@ fn fn_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn const_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2017,6 +2091,7 @@ fn const_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn mut_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2045,6 +2120,7 @@ fn mut_pointer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn assert_unwind_safe_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2076,6 +2152,7 @@ fn assert_unwind_safe_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn pin_box_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2098,6 +2175,7 @@ fn pin_box_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn non_null_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2120,6 +2198,7 @@ fn non_null_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn shared_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2148,6 +2227,7 @@ fn shared_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn mutable_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2185,6 +2265,7 @@ fn mutable_reference_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn unit_proof_chain_reports_kani_and_creusot_provenance() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2209,6 +2290,7 @@ fn unit_proof_chain_reports_kani_and_creusot_provenance() -> miette::Result<()> 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn location_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2234,6 +2316,7 @@ fn location_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn panic_info_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2259,6 +2342,7 @@ fn panic_info_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn panic_message_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2284,6 +2368,7 @@ fn panic_message_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn cow_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2315,6 +2400,7 @@ fn cow_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cell<i32>>"))?;
 
     let root = report.root();
@@ -2339,6 +2425,7 @@ fn cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ref_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<RefCell<i32>>"))?;
 
     let root = report.root();
@@ -2363,6 +2450,7 @@ fn ref_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ref_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2393,6 +2481,7 @@ fn ref_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ref_mut_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2423,6 +2512,7 @@ fn ref_mut_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn once_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<OnceCell<i32>>"))?;
 
     let root = report.root();
@@ -2447,6 +2537,7 @@ fn once_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn unsafe_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<UnsafeCell<i32>>"))?;
 
     let root = report.root();
@@ -2474,6 +2565,7 @@ fn unsafe_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn lazy_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2504,6 +2596,7 @@ fn lazy_cell_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn borrow_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<BorrowError>"))?;
 
     let root = report.root();
@@ -2523,6 +2616,7 @@ fn borrow_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn borrow_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<BorrowMutError>"))?;
 
     let root = report.root();
@@ -2542,6 +2636,7 @@ fn borrow_mut_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn char_try_from_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<CharTryFromError>"))?;
 
     let root = report.root();
@@ -2572,6 +2667,7 @@ fn char_try_from_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn decode_utf16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2602,6 +2698,7 @@ fn decode_utf16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn decode_utf16_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<DecodeUtf16Error>"))?;
 
     let root = report.root();
@@ -2629,6 +2726,7 @@ fn decode_utf16_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn char_escape_debug_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2659,6 +2757,7 @@ fn char_escape_debug_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn char_escape_default_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2689,6 +2788,7 @@ fn char_escape_default_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn char_escape_unicode_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2719,6 +2819,7 @@ fn char_escape_unicode_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn parse_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<ParseCharError>"))?;
 
     let root = report.root();
@@ -2746,6 +2847,7 @@ fn parse_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn to_lowercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<ToLowercase>"))?;
 
     let root = report.root();
@@ -2770,6 +2872,7 @@ fn to_lowercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn to_uppercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<ToUppercase>"))?;
 
     let root = report.root();
@@ -2794,6 +2897,7 @@ fn to_uppercase_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn try_from_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryFromCharError>"))?;
 
     let root = report.root();
@@ -2823,6 +2927,7 @@ fn try_from_char_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn btree_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<BTreeMap<i32, i32>>"))?;
 
     let root = report.root();
@@ -2851,6 +2956,7 @@ fn btree_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn btree_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<BTreeSet<i32>>"))?;
 
     let root = report.root();
@@ -2876,6 +2982,7 @@ fn btree_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn binary_heap_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<BinaryHeap<i32>>"))?;
 
     let root = report.root();
@@ -2904,6 +3011,7 @@ fn binary_heap_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn binary_heap_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2938,6 +3046,7 @@ fn binary_heap_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -2974,6 +3083,7 @@ fn binary_heap_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() ->
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn binary_heap_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3007,6 +3117,7 @@ fn binary_heap_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn binary_heap_peek_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3038,6 +3149,7 @@ fn binary_heap_peek_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<LinkedList<i32>>"))?;
 
     let root = report.root();
@@ -3066,6 +3178,7 @@ fn linked_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3097,6 +3210,7 @@ fn linked_list_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3129,6 +3243,7 @@ fn linked_list_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3163,6 +3278,7 @@ fn linked_list_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() ->
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn linked_list_extract_if_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3196,6 +3312,7 @@ fn linked_list_extract_if_proof_chain_reports_the_kani_and_creusot_harnesses() -
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn try_reserve_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryReserveError>"))?;
 
     let root = report.root();
@@ -3224,6 +3341,7 @@ fn try_reserve_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_deque_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<VecDeque<i32>>"))?;
 
     let root = report.root();
@@ -3249,6 +3367,7 @@ fn vec_deque_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_deque_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3282,6 +3401,7 @@ fn vec_deque_into_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_deque_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3313,6 +3433,7 @@ fn vec_deque_drain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_deque_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3344,6 +3465,7 @@ fn vec_deque_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3375,6 +3497,7 @@ fn vec_deque_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Vec<i32>>"))?;
 
     let root = report.root();
@@ -3399,6 +3522,7 @@ fn vec_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3429,6 +3553,7 @@ fn vec_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3459,6 +3584,7 @@ fn vec_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_extract_if_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3489,6 +3615,7 @@ fn vec_extract_if_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vec_splice_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3519,6 +3646,7 @@ fn vec_splice_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn type_id_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<TypeId>"))?;
 
     let root = report.root();
@@ -3545,6 +3673,7 @@ fn type_id_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn layout_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Layout>"))?;
 
     let root = report.root();
@@ -3569,6 +3698,7 @@ fn layout_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn try_from_slice_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<TryFromSliceError>"))?;
 
     let root = report.root();
@@ -3596,6 +3726,7 @@ fn try_from_slice_error_proof_chain_registers_the_kani_and_creusot_proofs() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn array_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<IntoIter<i32, 3>>"))?;
 
     let root = report.root();
@@ -3623,6 +3754,7 @@ fn array_into_iter_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ascii_escape_default_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
         "RustStdStandard<core::ascii::EscapeDefault>",
     ))?;
@@ -3652,6 +3784,7 @@ fn ascii_escape_default_proof_chain_registers_the_kani_and_creusot_proofs() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::cmp::Ordering>"))?;
 
     let root = report.root();
@@ -3680,6 +3813,7 @@ fn ordering_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn reverse_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Reverse<i32>>"))?;
 
     let root = report.root();
@@ -3705,6 +3839,7 @@ fn reverse_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Rc<i32>>"))?;
 
     let root = report.root();
@@ -3726,6 +3861,7 @@ fn rc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn rc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3753,6 +3889,7 @@ fn rc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn string_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3783,6 +3920,7 @@ fn string_drain_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn from_utf16_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<FromUtf16Error>"))?;
 
     let root = report.root();
@@ -3807,6 +3945,7 @@ fn from_utf16_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn from_utf8_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<FromUtf8Error>"))?;
 
     let root = report.root();
@@ -3831,6 +3970,7 @@ fn from_utf8_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn arc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Arc<i32>>"))?;
 
     let root = report.root();
@@ -3852,6 +3992,7 @@ fn arc_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn arc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3879,6 +4020,7 @@ fn arc_weak_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn infallible_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Infallible>"))?;
 
     let root = report.root();
@@ -3900,6 +4042,7 @@ fn infallible_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn layout_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<LayoutError>"))?;
 
     let root = report.root();
@@ -3927,6 +4070,7 @@ fn layout_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn addr_parse_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<AddrParseError>"))?;
 
     let root = report.root();
@@ -3948,6 +4092,7 @@ fn addr_parse_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ip_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -3975,6 +4120,7 @@ fn ip_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ipv4_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4002,6 +4148,7 @@ fn ipv4_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ipv6_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4029,6 +4176,7 @@ fn ipv6_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn socket_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4056,6 +4204,7 @@ fn socket_addr_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn socket_addr_v4_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4083,6 +4232,7 @@ fn socket_addr_v4_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn socket_addr_v6_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4109,6 +4259,7 @@ fn socket_addr_v6_proof_chain_registers_the_kani_and_creusot_proofs() -> miette:
 
 #[test]
 fn nonzero_i8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4132,6 +4283,7 @@ fn nonzero_i8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn nonzero_i16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4159,6 +4311,7 @@ fn nonzero_i16_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 
 #[test]
 fn nonzero_i32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4181,6 +4334,7 @@ fn nonzero_i32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_i64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4203,6 +4357,7 @@ fn nonzero_i64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_i128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4225,6 +4380,7 @@ fn nonzero_i128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_isize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4247,6 +4403,7 @@ fn nonzero_isize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_u8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4269,6 +4426,7 @@ fn nonzero_u8_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_u16_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4291,6 +4449,7 @@ fn nonzero_u16_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_u32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4313,6 +4472,7 @@ fn nonzero_u32_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_u64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4335,6 +4495,7 @@ fn nonzero_u64_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_u128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4357,6 +4518,7 @@ fn nonzero_u128_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 
 #[test]
 fn nonzero_usize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4380,6 +4542,7 @@ fn nonzero_usize_proof_chain_registers_the_kani_proof() -> miette::Result<()> {
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn wrapping_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4408,6 +4571,7 @@ fn wrapping_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn saturating_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4439,6 +4603,7 @@ fn saturating_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn int_error_kind_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4470,6 +4635,7 @@ fn int_error_kind_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn try_from_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4507,6 +4673,7 @@ fn try_from_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mi
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn parse_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4538,6 +4705,7 @@ fn parse_int_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fp_category_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4569,6 +4737,7 @@ fn fp_category_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn parse_float_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4606,6 +4775,7 @@ fn parse_float_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<CString>"))?;
 
     let root = report.root();
@@ -4637,6 +4807,7 @@ fn cstring_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn args_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4665,6 +4836,7 @@ fn args_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn args_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4693,6 +4865,7 @@ fn args_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn join_paths_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4721,6 +4894,7 @@ fn join_paths_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn split_paths_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4752,6 +4926,7 @@ fn split_paths_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn var_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4782,6 +4957,7 @@ fn var_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vars_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4810,6 +4986,7 @@ fn vars_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn vars_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4838,6 +5015,7 @@ fn vars_os_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn dir_builder_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4866,6 +5044,7 @@ fn dir_builder_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn dir_entry_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4894,6 +5073,7 @@ fn dir_entry_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn file_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4922,6 +5102,7 @@ fn file_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn file_times_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4950,6 +5131,7 @@ fn file_times_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn file_type_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -4978,6 +5160,7 @@ fn file_type_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn metadata_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5006,6 +5189,7 @@ fn metadata_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn open_options_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5034,6 +5218,7 @@ fn open_options_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn permissions_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5065,6 +5250,7 @@ fn permissions_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn read_dir_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5093,6 +5279,7 @@ fn read_dir_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fs_try_lock_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5121,6 +5308,7 @@ fn fs_try_lock_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn os_str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5153,6 +5341,7 @@ fn os_str_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn os_string_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5181,6 +5370,7 @@ fn os_string_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn os_str_display_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5221,6 +5411,7 @@ fn os_str_display_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn from_vec_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
         "RustStdStandard<FromVecWithNulError>",
     ))?;
@@ -5253,6 +5444,7 @@ fn from_vec_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn into_string_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<IntoStringError>"))?;
 
     let root = report.root();
@@ -5281,6 +5473,7 @@ fn into_string_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<NulError>"))?;
 
     let root = report.root();
@@ -5306,6 +5499,7 @@ fn nul_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn cstr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<CStr>"))?;
 
     let root = report.root();
@@ -5332,6 +5526,7 @@ fn cstr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn from_bytes_until_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses()
 -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
         "RustStdStandard<FromBytesUntilNulError>",
     ))?;
@@ -5365,6 +5560,7 @@ fn from_bytes_until_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses()
 -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
         "RustStdStandard<FromBytesWithNulError>",
     ))?;
@@ -5399,6 +5595,7 @@ fn from_bytes_with_nul_error_proof_chain_reports_the_kani_and_creusot_harnesses(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn duration_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<Duration>"))?;
 
     let root = report.root();
@@ -5429,6 +5626,7 @@ fn duration_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs()
 -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
         "RustStdStandard<TryFromFloatSecsError>",
     ))?;
@@ -5453,6 +5651,7 @@ fn try_from_float_secs_error_proof_chain_registers_the_kani_and_creusot_proofs()
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn range_to_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5481,6 +5680,7 @@ fn range_to_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn range_full_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5509,6 +5709,7 @@ fn range_full_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn bound_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5537,6 +5738,7 @@ fn bound_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn control_flow_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5568,6 +5770,7 @@ fn control_flow_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> 
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5596,6 +5799,7 @@ fn box_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5621,6 +5825,7 @@ fn c_void_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_alignment_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5653,6 +5858,7 @@ fn fmt_alignment_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_arguments_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5683,6 +5889,7 @@ fn fmt_arguments_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5708,6 +5915,7 @@ fn fmt_error_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_formatter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5738,6 +5946,7 @@ fn fmt_formatter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_debug_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5768,6 +5977,7 @@ fn fmt_debug_list_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_debug_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5798,6 +6008,7 @@ fn fmt_debug_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_debug_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5828,6 +6039,7 @@ fn fmt_debug_set_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_debug_struct_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5858,6 +6070,7 @@ fn fmt_debug_struct_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_debug_tuple_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5888,6 +6101,7 @@ fn fmt_debug_tuple_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5918,6 +6132,7 @@ fn fmt_from_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn option_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5946,6 +6161,7 @@ fn option_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn result_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -5977,6 +6193,7 @@ fn result_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn option_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6012,6 +6229,7 @@ fn option_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn option_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6047,6 +6265,7 @@ fn option_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn result_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6082,6 +6301,7 @@ fn result_iter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6117,6 +6337,7 @@ fn result_iter_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn pending_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6145,6 +6366,7 @@ fn pending_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn poll_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6182,6 +6404,7 @@ fn poll_fn_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resul
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn ready_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6210,6 +6433,7 @@ fn ready_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn context_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6241,6 +6465,7 @@ fn context_static_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn poll_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6269,6 +6494,7 @@ fn poll_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn raw_waker_and_vtable_proof_chains_register_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep each subject literal on its own line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6284,6 +6510,7 @@ fn raw_waker_and_vtable_proof_chains_register_the_kani_and_creusot_proofs() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn waker_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6312,6 +6539,7 @@ fn waker_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_chain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6342,6 +6570,7 @@ fn iter_chain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_cloned_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6372,6 +6601,7 @@ fn iter_cloned_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_copied_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6402,6 +6632,7 @@ fn iter_copied_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_cycle_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6432,6 +6663,7 @@ fn iter_cycle_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_empty_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6462,6 +6694,7 @@ fn iter_empty_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_enumerate_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6492,6 +6725,7 @@ fn iter_enumerate_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_filter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6522,6 +6756,7 @@ fn iter_filter_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_filter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6551,6 +6786,7 @@ fn iter_filter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_flat_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6580,6 +6816,7 @@ fn iter_flat_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_flatten_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6610,6 +6847,7 @@ fn iter_flatten_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6640,6 +6878,7 @@ fn iter_map_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_zip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6670,6 +6909,7 @@ fn iter_zip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_rev_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6700,6 +6940,7 @@ fn iter_rev_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_fuse_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6730,6 +6971,7 @@ fn iter_fuse_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_inspect_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6762,6 +7004,7 @@ fn iter_inspect_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_peekable_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6792,6 +7035,7 @@ fn iter_peekable_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_scan_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6822,6 +7066,7 @@ fn iter_scan_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_skip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6852,6 +7097,7 @@ fn iter_skip_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_skip_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6884,6 +7130,7 @@ fn iter_skip_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_step_by_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6914,6 +7161,7 @@ fn iter_step_by_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_take_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6944,6 +7192,7 @@ fn iter_take_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_take_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -6974,6 +7223,7 @@ fn iter_take_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_map_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7006,6 +7256,7 @@ fn iter_map_while_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_once_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7036,6 +7287,7 @@ fn iter_once_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_once_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7066,6 +7318,7 @@ fn iter_once_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7096,6 +7349,7 @@ fn iter_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_repeat_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7126,6 +7380,7 @@ fn iter_repeat_with_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_repeat_n_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7153,6 +7408,7 @@ fn iter_repeat_n_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette:
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn iter_successors_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7183,6 +7439,7 @@ fn iter_successors_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_default_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7216,6 +7473,7 @@ fn hash_default_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> m
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_random_state_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7249,6 +7507,7 @@ fn hash_random_state_proof_chain_reports_the_kani_and_creusot_harnesses() -> mie
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_build_hasher_default_proof_chain_reports_the_kani_and_creusot_harnesses()
 -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7279,6 +7538,7 @@ fn hash_build_hasher_default_proof_chain_reports_the_kani_and_creusot_harnesses(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_map_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7310,6 +7570,7 @@ fn hash_map_i32_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_set_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7340,6 +7601,7 @@ fn hash_set_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn hash_sip_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7368,6 +7630,7 @@ fn hash_sip_hasher_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn marker_phantom_data_i32_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7393,6 +7656,7 @@ fn marker_phantom_data_i32_proof_chain_registers_the_kani_and_creusot_proofs() -
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn marker_phantom_pinned_proof_chain_registers_the_kani_and_creusot_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7416,6 +7680,7 @@ fn marker_phantom_pinned_proof_chain_registers_the_kani_and_creusot_proofs() -> 
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn mem_manually_drop_i32_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()>
 {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7447,6 +7712,7 @@ fn mem_manually_drop_i32_proof_chain_reports_the_kani_and_creusot_harnesses() ->
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn mem_discriminant_option_i32_proof_chain_reports_the_kani_and_creusot_harnesses()
 -> miette::Result<()> {
+    amenable::init_tracing();
     // Keep the subject literal on this line: `elicit_doc` currently
     // scans proof-chain test subjects line-by-line.
     #[rustfmt::skip]
@@ -7476,6 +7742,7 @@ fn mem_discriminant_option_i32_proof_chain_reports_the_kani_and_creusot_harnesse
 
 #[test]
 fn unregistered_subject_yields_a_not_found_error() {
+    amenable::init_tracing();
     let result = amenable::proof_chain("NoSuchEvidenceType");
     assert!(
         matches!(
@@ -7491,6 +7758,7 @@ fn unregistered_subject_yields_a_not_found_error() {
 
 #[test]
 fn proof_chain_report_renders_as_human_readable_text() -> miette::Result<()> {
+    amenable::init_tracing();
     let report = support::chain(amenable::proof_chain("RustStdStandard<bool>"))?;
     let rendered = report.to_string();
 
@@ -7504,6 +7772,7 @@ fn proof_chain_report_renders_as_human_readable_text() -> miette::Result<()> {
 #[test]
 fn calculation_over_two_arguments_fans_out_into_a_tree_that_bottoms_out_in_std()
 -> miette::Result<()> {
+    amenable::init_tracing();
     // AddEvidence/Debit/Credit only have kani proofs — the default (auto
     // discover every verifier seen anywhere in the tree) would find
     // creusot/verus too (present on the RustStdStandard<i64> leaf) and
@@ -7558,6 +7827,7 @@ fn calculation_over_two_arguments_fans_out_into_a_tree_that_bottoms_out_in_std()
 #[test]
 #[cfg_attr(not(all(feature = "creusot", feature = "verus")), ignore)]
 fn calculation_chain_is_incomplete_for_creusot_and_verus() {
+    amenable::init_tracing();
     for verifier in ["creusot", "verus"] {
         let result = amenable::proof_chain_for_verifiers("AddEvidence", Some(&[verifier]));
         assert!(
@@ -7600,6 +7870,7 @@ fn calculation_chain_is_incomplete_for_creusot_and_verus() {
 #[test]
 #[cfg_attr(not(all(feature = "creusot", feature = "verus")), ignore)]
 fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
+    amenable::init_tracing();
     // Auto-discovery finds kani, creusot, and verus (all present on the
     // std leaf); AddEvidence/Debit/Credit only ever proved kani, so the
     // unscoped lookup must refuse to return a report rather than quietly
@@ -7629,6 +7900,7 @@ fn calculation_chain_with_no_verifier_filter_is_also_incomplete() {
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn buf_reader_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<BufReader<&'static [u8]>>"))?;
 
@@ -7647,6 +7919,7 @@ fn buf_reader_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn buf_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<BufWriter<Vec<u8>>>"))?;
 
@@ -7665,6 +7938,7 @@ fn buf_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_bytes_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Bytes<&'static [u8]>>"))?;
 
@@ -7683,6 +7957,7 @@ fn io_bytes_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_chain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>>"))?;
 
@@ -7704,6 +7979,7 @@ fn io_chain_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn cursor_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Cursor<&'static [u8]>>"))?;
 
@@ -7721,6 +7997,7 @@ fn cursor_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_empty_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Empty>"))?;
 
@@ -7739,6 +8016,7 @@ fn io_empty_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Error>"))?;
 
@@ -7757,6 +8035,7 @@ fn io_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn into_inner_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>>"))?;
 
@@ -7776,6 +8055,7 @@ fn into_inner_error_proof_chain_reports_the_kani_and_creusot_harnesses() -> miet
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_slice_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<IoSlice<'static>>"))?;
 
@@ -7794,6 +8074,7 @@ fn io_slice_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_slice_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<IoSliceMut<'static>>"))?;
 
@@ -7811,6 +8092,7 @@ fn io_slice_mut_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn line_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<LineWriter<Vec<u8>>>"))?;
 
@@ -7830,6 +8112,7 @@ fn line_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_lines_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Lines<&'static [u8]>>"))?;
 
@@ -7848,6 +8131,7 @@ fn io_lines_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn pipe_reader_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PipeReader>"))?;
 
@@ -7866,6 +8150,7 @@ fn pipe_reader_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn pipe_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<PipeWriter>"))?;
 
@@ -7884,6 +8169,7 @@ fn pipe_writer_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Repeat>"))?;
 
@@ -7902,6 +8188,7 @@ fn io_repeat_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Res
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn sink_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Sink>"))?;
 
@@ -7921,6 +8208,7 @@ fn sink_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn io_split_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Split<&'static [u8]>>"))?;
 
@@ -7939,6 +8227,7 @@ fn io_split_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Resu
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stderr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Stderr>"))?;
 
@@ -7957,6 +8246,7 @@ fn stderr_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stderr_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<StderrLock<'static>>"))?;
 
@@ -7975,6 +8265,7 @@ fn stderr_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stdin_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Stdin>"))?;
 
@@ -7993,6 +8284,7 @@ fn stdin_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stdin_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<StdinLock<'static>>"))?;
 
@@ -8011,6 +8303,7 @@ fn stdin_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Re
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stdout_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<Stdout>"))?;
 
@@ -8029,6 +8322,7 @@ fn stdout_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn stdout_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<StdoutLock<'static>>"))?;
 
@@ -8047,6 +8341,7 @@ fn stdout_lock_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::R
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn take_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<std::io::Take<&'static [u8]>>"))?;
 
@@ -8065,6 +8360,7 @@ fn take_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<(
 #[test]
 #[cfg_attr(not(feature = "creusot"), ignore)]
 fn writer_panicked_proof_chain_reports_the_kani_and_creusot_harnesses() -> miette::Result<()> {
+    amenable::init_tracing();
     #[rustfmt::skip]
     let report = support::chain(amenable::proof_chain("RustStdStandard<WriterPanicked>"))?;
 

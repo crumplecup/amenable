@@ -59,7 +59,8 @@ pub use amenable_core::{
     State, StateMachine, Transition, TransitionAudit, Verifier, Witness, WitnessArtifact,
     WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
     WitnessExportRecord, WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind,
-    WitnessSupportSummary, Yellow, proof_chain, proof_chain_for_verifiers, witness_exports,
+    WitnessSupportSummary, Yellow, init_tracing, proof_chain, proof_chain_for_verifiers,
+    witness_exports,
 };
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{

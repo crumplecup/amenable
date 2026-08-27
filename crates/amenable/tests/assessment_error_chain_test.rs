@@ -19,6 +19,7 @@ fn temporary_path(name: &str) -> PathBuf {
 
 #[test]
 fn load_on_a_missing_artifact_returns_an_empty_list() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("missing");
     let assessments = support::library(amenable::assessment::load(&path))?;
     assert!(assessments.is_empty());
@@ -27,6 +28,7 @@ fn load_on_a_missing_artifact_returns_an_empty_list() -> miette::Result<()> {
 
 #[test]
 fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("malformed");
     std::fs::write(&path, "{not valid json\n").into_diagnostic()?;
 

@@ -43,3 +43,29 @@
 [tracing]
 apply_gate_crates = { amenable_kani = "kani" }
 apply_skip_crates = ["amenable_creusot", "amenable_verus"]
+
+# [tracing.subscriber] known_helper_paths -- amenable_core::init_tracing is
+# the one shared subscriber-install helper every test-bearing crate in the
+# family (amenable_core itself, amenable_derive, amenable_gaap,
+# amenable_std, amenable) can reach without a workspace re-export cycle
+# (see amenable_core::tracing_init's own doc comment for why it lives
+# there, not in the amenable facade). A crate-local scan can never see a
+# cross-crate helper's own body, so without this it's invisible: every
+# main/#[test] calling it would be wrongly flagged as never installing a
+# subscriber. amenable's own tests/main.rs call the facade re-export
+# (`amenable::init_tracing`) instead -- both count.
+[tracing.subscriber]
+known_helper_paths = ["amenable_core::init_tracing", "amenable::init_tracing"]
+
+# [cfg_hygiene] crate_verifier -- each verifier backend crate's own real
+# cfg identity. CFG-VERIFIER-MISMATCH-001 only checks these three crates
+# (opt-in, per docs/CFG_HYGIENE_PLAN.md Step 2): does each one's own
+# source ever use a *different* verifier's cfg name than its own? This is
+# the real gap a workspace-wide check-cfg union created and could never
+# self-detect (a misplaced #[cfg(creusot)] landing in amenable_kani was
+# invisible to rustc under the old config). Deliberately doesn't list
+# amenable_core/amenable_gaap/amenable -- those legitimately reference
+# more than one verifier's cfg name, since a verifier's --cfg reaches its
+# whole compiled dependency graph, not just the backend crate itself.
+[cfg_hygiene]
+crate_verifier = { amenable_kani = "kani", amenable_creusot = "creusot", amenable_verus = "verus" }

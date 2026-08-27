@@ -60,6 +60,7 @@ where
 
 #[test]
 fn fixture_inventory_matches_the_registered_fixture_types() {
+    amenable_core::init_tracing();
     assert_eq!(
         DeriveFixtureKind::iter().collect::<Vec<_>>(),
         fixture_kinds()
@@ -68,6 +69,7 @@ fn fixture_inventory_matches_the_registered_fixture_types() {
 
 #[test]
 fn provenance_derive_projects_expected_metadata_for_every_fixture() {
+    amenable_core::init_tracing();
     macro_rules! assert_fixture {
         ($fixture:ty) => {
             assert_provenance_fixture::<$fixture>();

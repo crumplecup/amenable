@@ -4,6 +4,7 @@ use amenable_std::{VerusGalleryExpectation, VerusGalleryRegistration};
 
 #[test]
 fn all_eleven_gallery_findings_are_registered_and_distinct() {
+    amenable_core::init_tracing();
     let cases: Vec<_> = inventory::iter::<VerusGalleryRegistration>()
         .map(|registration| (registration.case())())
         .collect();

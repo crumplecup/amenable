@@ -14,6 +14,7 @@ type LinesAnyStatic = std::str::LinesAny<'static>;
 
 #[test]
 fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<bool> as Witness<VerusVerifier>>::proof(),
         <bool as RustStdType>::provenance()
@@ -26,6 +27,7 @@ fn bool_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<char> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_char_roundtrip");
@@ -38,6 +40,7 @@ fn char_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
+    amenable_core::init_tracing();
     let proof = <ValidUnicodeScalar as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_char_roundtrip");
@@ -50,6 +53,7 @@ fn valid_unicode_scalar_reuses_the_char_roundtrip_spec_and_names_its_bound() {
 
 #[test]
 fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<String> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_string_roundtrip");
@@ -58,6 +62,7 @@ fn string_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cmp::Ordering> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -72,6 +77,7 @@ fn ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn option_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<Option<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -86,6 +92,7 @@ fn option_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<Result<i32, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_result_unwrap_returns_the_ok_value");
@@ -97,6 +104,7 @@ fn result_i32_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::num::Wrapping<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -111,6 +119,7 @@ fn wrapping_i32_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::num::Saturating<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -125,6 +134,7 @@ fn saturating_i32_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cmp::Reverse<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -139,6 +149,7 @@ fn reverse_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::mem::ManuallyDrop<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -153,6 +164,7 @@ fn manually_drop_i32_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::num::FpCategory> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -167,6 +179,7 @@ fn fp_category_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::num::IntErrorKind> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -181,6 +194,7 @@ fn int_error_kind_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn parse_int_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::num::ParseIntError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -195,6 +209,7 @@ fn parse_int_error_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::num::ParseFloatError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -209,6 +224,7 @@ fn parse_float_error_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::num::TryFromIntError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -223,6 +239,7 @@ fn try_from_int_error_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<Box<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_box_derefs_and_writes_through");
@@ -231,6 +248,7 @@ fn box_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn infallible_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::convert::Infallible> as Witness<VerusVerifier>>::proof(),
         <std::convert::Infallible as RustStdType>::provenance()
@@ -239,6 +257,7 @@ fn infallible_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn layout_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::alloc::Layout> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -253,6 +272,7 @@ fn layout_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::alloc::LayoutError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -267,6 +287,7 @@ fn layout_error_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn vec_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<Vec<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_vec_push_pop_round_trips");
@@ -275,6 +296,7 @@ fn vec_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn char_try_from_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::char::CharTryFromError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -289,6 +311,7 @@ fn char_try_from_error_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn try_from_char_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::char::TryFromCharError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -303,6 +326,7 @@ fn try_from_char_error_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<core::ffi::c_void> as Witness<VerusVerifier>>::proof(),
         <core::ffi::c_void as RustStdType>::provenance()
@@ -311,6 +335,7 @@ fn c_void_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn fmt_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::fmt::Error> as Witness<VerusVerifier>>::proof(),
         <std::fmt::Error as RustStdType>::provenance()
@@ -319,6 +344,7 @@ fn fmt_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn phantom_data_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::marker::PhantomData<i32>> as Witness<VerusVerifier>>::proof(),
         <std::marker::PhantomData<i32> as RustStdType>::provenance()
@@ -327,6 +353,7 @@ fn phantom_data_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn phantom_pinned_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::marker::PhantomPinned> as Witness<VerusVerifier>>::proof(),
         <std::marker::PhantomPinned as RustStdType>::provenance()
@@ -335,6 +362,7 @@ fn phantom_pinned_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn addr_parse_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::net::AddrParseError> as Witness<VerusVerifier>>::proof(),
         <std::net::AddrParseError as RustStdType>::provenance()
@@ -343,6 +371,7 @@ fn addr_parse_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn parse_bool_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::str::ParseBoolError> as Witness<VerusVerifier>>::proof(),
         <std::str::ParseBoolError as RustStdType>::provenance()
@@ -351,6 +380,7 @@ fn parse_bool_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::cell::BorrowError> as Witness<VerusVerifier>>::proof(),
         <std::cell::BorrowError as RustStdType>::provenance()
@@ -359,6 +389,7 @@ fn borrow_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn borrow_mut_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::cell::BorrowMutError> as Witness<VerusVerifier>>::proof(),
         <std::cell::BorrowMutError as RustStdType>::provenance()
@@ -367,6 +398,7 @@ fn borrow_mut_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::any::TypeId> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -381,6 +413,7 @@ fn type_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn try_from_slice_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::array::TryFromSliceError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -395,6 +428,7 @@ fn try_from_slice_error_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn from_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::string::FromUtf16Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -409,6 +443,7 @@ fn from_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn cstring_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::CString> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -423,6 +458,7 @@ fn cstring_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::NulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -437,6 +473,7 @@ fn nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::FromVecWithNulError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -451,6 +488,7 @@ fn from_vec_with_nul_error_witness_is_checked_and_still_carries_chain_derived_pr
 
 #[test]
 fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::char::ParseCharError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -465,6 +503,7 @@ fn parse_char_error_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn rc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::rc::Rc<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_rc_derefs_to_the_wrapped_value");
@@ -476,6 +515,7 @@ fn rc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn arc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::Arc<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_arc_derefs_to_the_wrapped_value");
@@ -487,6 +527,7 @@ fn arc_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::IntoStringError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -501,6 +542,7 @@ fn into_string_error_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn from_bytes_until_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::ffi::FromBytesUntilNulError> as Witness<VerusVerifier>>::proof();
 
@@ -516,6 +558,7 @@ fn from_bytes_until_nul_error_witness_is_checked_and_still_carries_chain_derived
 
 #[test]
 fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::ffi::FromBytesWithNulError> as Witness<VerusVerifier>>::proof();
 
@@ -531,6 +574,7 @@ fn from_bytes_with_nul_error_witness_is_checked_and_still_carries_chain_derived_
 
 #[test]
 fn build_hasher_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
     > as Witness<VerusVerifier>>::proof();
@@ -553,6 +597,7 @@ fn build_hasher_default_witness_is_checked_and_still_carries_chain_derived_prove
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 fn sip_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::hash::SipHasher> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -567,6 +612,7 @@ fn sip_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::borrow::Cow<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -582,6 +628,7 @@ fn cow_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn btree_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::BTreeMap<i32, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -597,6 +644,7 @@ fn btree_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::BTreeSet<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -612,6 +660,7 @@ fn btree_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::VecDeque<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -627,6 +676,7 @@ fn vec_deque_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::TryReserveError> as Witness<VerusVerifier>>::proof();
 
@@ -642,6 +692,7 @@ fn try_reserve_error_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn vec_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::vec::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -656,6 +707,7 @@ fn vec_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -672,6 +724,7 @@ fn vec_deque_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn chars_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Chars<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_chars_yields_characters_in_order");
@@ -683,6 +736,7 @@ fn chars_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::BinaryHeap<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -698,6 +752,7 @@ fn binary_heap_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i32) -> i32>> as Witness<
             VerusVerifier,
@@ -715,6 +770,7 @@ fn iter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_filter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -731,6 +787,7 @@ fn iter_filter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_filter_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>,
     > as Witness<VerusVerifier>>::proof();
@@ -747,6 +804,7 @@ fn iter_filter_map_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn iter_map_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>,
     > as Witness<VerusVerifier>>::proof();
@@ -763,6 +821,7 @@ fn iter_map_while_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn iter_cloned_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -779,6 +838,7 @@ fn iter_cloned_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_copied_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -795,6 +855,7 @@ fn iter_copied_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -811,6 +872,7 @@ fn iter_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_zip_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> as Witness<
             VerusVerifier,
@@ -828,6 +890,7 @@ fn iter_zip_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_enumerate_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -844,6 +907,7 @@ fn iter_enumerate_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn iter_rev_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
@@ -856,6 +920,7 @@ fn iter_rev_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_skip_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
@@ -871,6 +936,7 @@ fn iter_skip_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_skip_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -887,6 +953,7 @@ fn iter_skip_while_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn iter_step_by_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -903,6 +970,7 @@ fn iter_step_by_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn iter_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Take<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
@@ -915,6 +983,7 @@ fn iter_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -931,6 +1000,7 @@ fn iter_take_while_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn iter_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Once<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -945,6 +1015,7 @@ fn iter_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_once_with_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::OnceWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
@@ -960,6 +1031,7 @@ fn iter_once_with_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn iter_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Repeat<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -974,6 +1046,7 @@ fn iter_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_repeat_with_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::RepeatWith<fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
@@ -989,6 +1062,7 @@ fn iter_repeat_with_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn iter_repeat_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::RepeatN<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1003,6 +1077,7 @@ fn iter_repeat_n_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn iter_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Empty<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_empty_model_yields_nothing");
@@ -1014,6 +1089,7 @@ fn iter_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_cycle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1030,6 +1106,7 @@ fn iter_cycle_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_fuse_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> as Witness<VerusVerifier>>::proof();
 
@@ -1045,6 +1122,7 @@ fn iter_fuse_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_inspect_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1061,6 +1139,7 @@ fn iter_inspect_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn iter_peekable_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1077,6 +1156,7 @@ fn iter_peekable_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn iter_scan_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>,
     > as Witness<VerusVerifier>>::proof();
@@ -1093,6 +1173,7 @@ fn iter_scan_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn iter_flat_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::iter::FlatMap<
             std::array::IntoIter<i32, 1>,
@@ -1117,6 +1198,7 @@ fn iter_flat_map_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn iter_flatten_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1133,6 +1215,7 @@ fn iter_flatten_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn iter_successors_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Option<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1149,6 +1232,7 @@ fn iter_successors_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn iter_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1165,6 +1249,7 @@ fn iter_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn fmt_alignment_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fmt::Alignment> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1179,6 +1264,7 @@ fn fmt_alignment_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn fmt_formatter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fmt::Formatter<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1193,6 +1279,7 @@ fn fmt_formatter_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn fmt_arguments_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fmt::Arguments<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1207,6 +1294,7 @@ fn fmt_arguments_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn fmt_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>,
     > as Witness<VerusVerifier>>::proof();
@@ -1223,6 +1311,7 @@ fn fmt_from_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn fmt_debug_struct_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fmt::DebugStruct<'static, 'static>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1239,6 +1328,7 @@ fn fmt_debug_struct_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn fmt_debug_tuple_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fmt::DebugTuple<'static, 'static>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1255,6 +1345,7 @@ fn fmt_debug_tuple_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn fmt_debug_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::fmt::DebugList<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
@@ -1270,6 +1361,7 @@ fn fmt_debug_list_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn fmt_debug_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::fmt::DebugSet<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
@@ -1285,6 +1377,7 @@ fn fmt_debug_set_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn fmt_debug_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::fmt::DebugMap<'static, 'static>> as Witness<VerusVerifier>>::proof();
 
@@ -1377,6 +1470,7 @@ non_zero_witness_test!(
 
 #[test]
 fn slice_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1392,6 +1486,7 @@ fn slice_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn slice_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1407,6 +1502,7 @@ fn slice_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::Ipv4Addr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_ipv4_addr_model_octets_round_trip");
@@ -1418,6 +1514,7 @@ fn ipv4_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ipv6_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::Ipv6Addr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1432,6 +1529,7 @@ fn ipv6_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ip_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::IpAddr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1446,6 +1544,7 @@ fn ip_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn socket_addr_v4_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::SocketAddrV4> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1460,6 +1559,7 @@ fn socket_addr_v4_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn socket_addr_v6_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::SocketAddrV6> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1474,6 +1574,7 @@ fn socket_addr_v6_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn socket_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::SocketAddr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1488,6 +1589,7 @@ fn socket_addr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::mem::Discriminant<Option<i32>>> as Witness<VerusVerifier>>::proof();
 
@@ -1503,6 +1605,7 @@ fn discriminant_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> as Witness<
             VerusVerifier,
@@ -1520,6 +1623,7 @@ fn vec_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn linked_list_extract_if_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -1536,6 +1640,7 @@ fn linked_list_extract_if_witness_is_checked_and_still_carries_chain_derived_pro
 
 #[test]
 fn vec_splice_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1552,6 +1657,7 @@ fn vec_splice_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn string_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::string::Drain<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1566,6 +1672,7 @@ fn string_drain_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn binary_heap_peek_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::binary_heap::PeekMut<'static, i32>> as Witness<
             VerusVerifier,
@@ -1583,6 +1690,7 @@ fn binary_heap_peek_mut_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::LinkedList<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1595,6 +1703,7 @@ fn linked_list_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cell::Cell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1609,6 +1718,7 @@ fn cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::array::IntoIter<i32, 3>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1623,6 +1733,7 @@ fn array_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn ref_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cell::RefCell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1637,6 +1748,7 @@ fn ref_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn once_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cell::OnceCell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1651,6 +1763,7 @@ fn once_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn unsafe_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cell::UnsafeCell<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1665,6 +1778,7 @@ fn unsafe_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1680,6 +1794,7 @@ fn lazy_cell_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1695,6 +1810,7 @@ fn lazy_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn vec_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::vec::Drain<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1709,6 +1825,7 @@ fn vec_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::vec_deque::IntoIter<i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1725,6 +1842,7 @@ fn vec_deque_into_iter_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::linked_list::IntoIter<i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1741,6 +1859,7 @@ fn linked_list_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
 
 #[test]
 fn binary_heap_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1757,6 +1876,7 @@ fn binary_heap_drain_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn binary_heap_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::binary_heap::IntoIter<i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1773,6 +1893,7 @@ fn binary_heap_into_iter_witness_is_checked_and_still_carries_chain_derived_prov
 
 #[test]
 fn binary_heap_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::binary_heap::Iter<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1789,6 +1910,7 @@ fn binary_heap_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::linked_list::Iter<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1805,6 +1927,7 @@ fn linked_list_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::vec_deque::IterMut<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -1821,6 +1944,7 @@ fn vec_deque_iter_mut_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn linked_list_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::linked_list::IterMut<'static, i32>> as Witness<
             VerusVerifier,
@@ -1838,6 +1962,7 @@ fn linked_list_iter_mut_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::ffi::CStr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1852,6 +1977,7 @@ fn cstr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ascii_escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::ascii::EscapeDefault> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1866,6 +1992,7 @@ fn ascii_escape_default_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn from_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::string::FromUtf8Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1880,6 +2007,7 @@ fn from_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn rc_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::rc::Weak<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1894,6 +2022,7 @@ fn rc_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn sync_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::Weak<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1908,6 +2037,7 @@ fn sync_weak_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::cell::Ref<'static, i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1922,6 +2052,7 @@ fn ref_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ref_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::cell::RefMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -1937,6 +2068,7 @@ fn ref_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn decode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::char::DecodeUtf16<std::array::IntoIter<u16, 1>>> as Witness<
             VerusVerifier,
@@ -1954,6 +2086,7 @@ fn decode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn decode_utf16_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::DecodeUtf16Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1968,6 +2101,7 @@ fn decode_utf16_error_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn to_lowercase_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::ToLowercase> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1982,6 +2116,7 @@ fn to_lowercase_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn to_uppercase_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::ToUppercase> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -1996,6 +2131,7 @@ fn to_uppercase_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::EscapeDebug> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2010,6 +2146,7 @@ fn escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::EscapeDefault> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2024,6 +2161,7 @@ fn escape_default_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::char::EscapeUnicode> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2038,6 +2176,7 @@ fn escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn slice_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::Chunks<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2053,6 +2192,7 @@ fn slice_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn slice_chunks_exact_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::ChunksExact<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2068,6 +2208,7 @@ fn slice_chunks_exact_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn slice_chunks_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::ChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2083,6 +2224,7 @@ fn slice_chunks_mut_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn slice_chunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::ChunksExactMut<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2099,6 +2241,7 @@ fn slice_chunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_pro
 
 #[test]
 fn slice_rchunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::RChunks<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2111,6 +2254,7 @@ fn slice_rchunks_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn slice_rchunks_exact_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::RChunksExact<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2127,6 +2271,7 @@ fn slice_rchunks_exact_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn slice_rchunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::RChunksExactMut<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2143,6 +2288,7 @@ fn slice_rchunks_exact_mut_witness_is_checked_and_still_carries_chain_derived_pr
 
 #[test]
 fn slice_rchunks_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::RChunksMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2158,6 +2304,7 @@ fn slice_rchunks_mut_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn slice_windows_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::Windows<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -2173,6 +2320,7 @@ fn slice_windows_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn slice_chunk_by_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2190,6 +2338,7 @@ fn slice_chunk_by_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn slice_chunk_by_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -2206,6 +2355,7 @@ fn slice_chunk_by_mut_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn slice_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::Split<'static, i32, fn(&i32) -> bool>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2222,6 +2372,7 @@ fn slice_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn slice_split_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::SplitMut<'static, i32, fn(&i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2239,6 +2390,7 @@ fn slice_split_mut_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn slice_split_inclusive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2256,6 +2408,7 @@ fn slice_split_inclusive_witness_is_checked_and_still_carries_chain_derived_prov
 
 #[test]
 fn slice_split_inclusive_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::slice::SplitInclusiveMut<'static, i32, fn(&i32) -> bool>,
     > as Witness<VerusVerifier>>::proof();
@@ -2273,6 +2426,7 @@ fn slice_split_inclusive_mut_witness_is_checked_and_still_carries_chain_derived_
 
 #[test]
 fn slice_split_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2289,6 +2443,7 @@ fn slice_split_n_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn slice_split_n_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::SplitNMut<'static, i32, fn(&i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2306,6 +2461,7 @@ fn slice_split_n_mut_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn slice_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::RSplit<'static, i32, fn(&i32) -> bool>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2322,6 +2478,7 @@ fn slice_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn slice_rsplit_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::RSplitMut<'static, i32, fn(&i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2339,6 +2496,7 @@ fn slice_rsplit_mut_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn slice_rsplit_n_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) -> bool>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2355,6 +2513,7 @@ fn slice_rsplit_n_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn slice_rsplit_n_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::RSplitNMut<'static, i32, fn(&i32) -> bool>> as Witness<
             VerusVerifier,
@@ -2372,6 +2531,7 @@ fn slice_rsplit_n_mut_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn slice_escape_ascii_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::EscapeAscii<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2387,6 +2547,7 @@ fn slice_escape_ascii_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::slice::GetDisjointMutError> as Witness<VerusVerifier>>::proof();
 
@@ -2402,6 +2563,7 @@ fn slice_get_disjoint_mut_error_witness_is_checked_and_still_carries_chain_deriv
 
 #[test]
 fn str_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Bytes<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2416,6 +2578,7 @@ fn str_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_char_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::CharIndices<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2431,6 +2594,7 @@ fn str_char_indices_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn str_encode_utf16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::EncodeUtf16<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2446,6 +2610,7 @@ fn str_encode_utf16_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn str_escape_debug_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::EscapeDebug<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2461,6 +2626,7 @@ fn str_escape_debug_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn str_escape_default_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::EscapeDefault<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2476,6 +2642,7 @@ fn str_escape_default_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn str_escape_unicode_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::EscapeUnicode<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2491,6 +2658,7 @@ fn str_escape_unicode_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn str_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Lines<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_lines_model_splits_on_line_endings");
@@ -2502,6 +2670,7 @@ fn str_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_lines_any_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<LinesAnyStatic> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2516,6 +2685,7 @@ fn str_lines_any_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn str_split_ascii_whitespace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::SplitAsciiWhitespace<'static>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2532,6 +2702,7 @@ fn str_split_ascii_whitespace_witness_is_checked_and_still_carries_chain_derived
 
 #[test]
 fn str_split_whitespace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::SplitWhitespace<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -2547,6 +2718,7 @@ fn str_split_whitespace_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn str_utf8_chunks_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Utf8Chunks<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2561,6 +2733,7 @@ fn str_utf8_chunks_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn str_utf8_chunk_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Utf8Chunk<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2575,6 +2748,7 @@ fn str_utf8_chunk_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn str_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::Utf8Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2589,6 +2763,7 @@ fn str_utf8_error_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn str_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::Split<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2604,6 +2779,7 @@ fn str_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_splitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::SplitN<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2619,6 +2795,7 @@ fn str_splitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_split_inclusive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::SplitInclusive<'static, char>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2635,6 +2812,7 @@ fn str_split_inclusive_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn str_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::RSplit<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2650,6 +2828,7 @@ fn str_rsplit_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_rsplitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::RSplitN<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2665,6 +2844,7 @@ fn str_rsplitn_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_split_terminator_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::SplitTerminator<'static, char>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2681,6 +2861,7 @@ fn str_split_terminator_witness_is_checked_and_still_carries_chain_derived_prove
 
 #[test]
 fn str_rsplit_terminator_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::RSplitTerminator<'static, char>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2697,6 +2878,7 @@ fn str_rsplit_terminator_witness_is_checked_and_still_carries_chain_derived_prov
 
 #[test]
 fn str_matches_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::Matches<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2712,6 +2894,7 @@ fn str_matches_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn str_rmatches_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::RMatches<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2727,6 +2910,7 @@ fn str_rmatches_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn str_match_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::str::MatchIndices<'static, char>> as Witness<VerusVerifier>>::proof();
 
@@ -2742,6 +2926,7 @@ fn str_match_indices_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn str_rmatch_indices_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::str::RMatchIndices<'static, char>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -2758,6 +2943,7 @@ fn str_rmatch_indices_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn stderr_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::Stderr> as Witness<VerusVerifier>>::proof(),
         <std::io::Stderr as RustStdType>::provenance()
@@ -2766,6 +2952,7 @@ fn stderr_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn stderr_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::StderrLock<'static>> as Witness<VerusVerifier>>::proof(),
         <std::io::StderrLock<'static> as RustStdType>::provenance()
@@ -2774,6 +2961,7 @@ fn stderr_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn stdin_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::Stdin> as Witness<VerusVerifier>>::proof(),
         <std::io::Stdin as RustStdType>::provenance()
@@ -2782,6 +2970,7 @@ fn stdin_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn stdin_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::StdinLock<'static>> as Witness<VerusVerifier>>::proof(),
         <std::io::StdinLock<'static> as RustStdType>::provenance()
@@ -2790,6 +2979,7 @@ fn stdin_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn stdout_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::Stdout> as Witness<VerusVerifier>>::proof(),
         <std::io::Stdout as RustStdType>::provenance()
@@ -2798,6 +2988,7 @@ fn stdout_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn stdout_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::io::StdoutLock<'static>> as Witness<VerusVerifier>>::proof(),
         <std::io::StdoutLock<'static> as RustStdType>::provenance()
@@ -2806,6 +2997,7 @@ fn stdout_lock_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn buf_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::io::BufReader<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
@@ -2821,6 +3013,7 @@ fn buf_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn buf_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::BufWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2835,6 +3028,7 @@ fn buf_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Bytes<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2849,6 +3043,7 @@ fn io_bytes_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn into_inner_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>> as Witness<
             VerusVerifier,
@@ -2866,6 +3061,7 @@ fn into_inner_error_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn line_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::LineWriter<Vec<u8>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2880,6 +3076,7 @@ fn line_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Lines<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2894,6 +3091,7 @@ fn io_lines_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn pipe_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::PipeReader> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2908,6 +3106,7 @@ fn pipe_reader_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn pipe_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::PipeWriter> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2922,6 +3121,7 @@ fn pipe_writer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Split<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2936,6 +3136,7 @@ fn io_split_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn writer_panicked_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::WriterPanicked> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2950,6 +3151,7 @@ fn writer_panicked_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn io_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Empty> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2964,6 +3166,7 @@ fn io_empty_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Repeat> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2978,6 +3181,7 @@ fn io_repeat_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_sink_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Sink> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -2992,6 +3196,7 @@ fn io_sink_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn seek_from_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::SeekFrom> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3006,6 +3211,7 @@ fn seek_from_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -3022,6 +3228,7 @@ fn io_chain_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_cursor_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::io::Cursor<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
@@ -3037,6 +3244,7 @@ fn io_cursor_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Error> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3051,6 +3259,7 @@ fn io_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_slice_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::IoSlice<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3065,6 +3274,7 @@ fn io_slice_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn io_slice_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::IoSliceMut<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3079,6 +3289,7 @@ fn io_slice_mut_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::io::Take<&'static [u8]>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3093,6 +3304,7 @@ fn io_take_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_bool_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicBool> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_bool_model_load_store");
@@ -3104,6 +3316,7 @@ fn atomic_bool_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_i8_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicI8> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_i8_model_load_store");
@@ -3115,6 +3328,7 @@ fn atomic_i8_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicI16> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_i16_model_load_store");
@@ -3126,6 +3340,7 @@ fn atomic_i16_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicI32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_i32_model_load_store");
@@ -3137,6 +3352,7 @@ fn atomic_i32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_i64_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicI64> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_i64_model_load_store");
@@ -3148,6 +3364,7 @@ fn atomic_i64_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_isize_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::atomic::AtomicIsize> as Witness<VerusVerifier>>::proof();
 
@@ -3160,6 +3377,7 @@ fn atomic_isize_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn atomic_u8_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicU8> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_u8_model_load_store");
@@ -3171,6 +3389,7 @@ fn atomic_u8_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_u16_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicU16> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_u16_model_load_store");
@@ -3182,6 +3401,7 @@ fn atomic_u16_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_u32_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicU32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_u32_model_load_store");
@@ -3193,6 +3413,7 @@ fn atomic_u32_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_u64_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::AtomicU64> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_atomic_u64_model_load_store");
@@ -3204,6 +3425,7 @@ fn atomic_u64_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_usize_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::atomic::AtomicUsize> as Witness<VerusVerifier>>::proof();
 
@@ -3216,6 +3438,7 @@ fn atomic_usize_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn atomic_ptr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::atomic::AtomicPtr<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -3231,6 +3454,7 @@ fn atomic_ptr_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn atomic_ordering_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::atomic::Ordering> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3245,6 +3469,7 @@ fn atomic_ordering_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn exit_code_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::process::ExitCode> as Witness<VerusVerifier>>::proof(),
         <std::process::ExitCode as RustStdType>::provenance()
@@ -3253,6 +3478,7 @@ fn exit_code_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn process_child_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::Child> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3267,6 +3493,7 @@ fn process_child_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn child_stderr_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::ChildStderr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3281,6 +3508,7 @@ fn child_stderr_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn child_stdin_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::ChildStdin> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3295,6 +3523,7 @@ fn child_stdin_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn child_stdout_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::ChildStdout> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3309,6 +3538,7 @@ fn child_stdout_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn process_command_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::Command> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3323,6 +3553,7 @@ fn process_command_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn command_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::process::CommandArgs<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -3338,6 +3569,7 @@ fn command_args_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn command_envs_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::process::CommandEnvs<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -3353,6 +3585,7 @@ fn command_envs_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn exit_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::ExitStatus> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3367,6 +3600,7 @@ fn exit_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn process_output_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::Output> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3381,6 +3615,7 @@ fn process_output_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn stdio_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::process::Stdio> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3395,6 +3630,7 @@ fn stdio_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ancestors_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Ancestors<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3409,6 +3645,7 @@ fn ancestors_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn path_component_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Component<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3423,6 +3660,7 @@ fn path_component_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn path_components_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::path::Components<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -3438,6 +3676,7 @@ fn path_components_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn path_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Iter<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3452,6 +3691,7 @@ fn path_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn path_display_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Display<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3466,6 +3706,7 @@ fn path_display_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn path_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Path> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3480,6 +3721,7 @@ fn path_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn path_buf_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::PathBuf> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3494,6 +3736,7 @@ fn path_buf_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn prefix_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::Prefix<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3508,6 +3751,7 @@ fn prefix_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn prefix_component_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::path::PrefixComponent<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -3523,6 +3767,7 @@ fn prefix_component_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn strip_prefix_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::path::StripPrefixError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3537,6 +3782,7 @@ fn strip_prefix_error_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn dir_builder_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::DirBuilder> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3551,6 +3797,7 @@ fn dir_builder_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn dir_entry_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::DirEntry> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3565,6 +3812,7 @@ fn dir_entry_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn read_dir_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::ReadDir> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3579,6 +3827,7 @@ fn read_dir_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn fs_file_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::File> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3593,6 +3842,7 @@ fn fs_file_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn file_times_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::FileTimes> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3607,6 +3857,7 @@ fn file_times_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn fs_metadata_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::Metadata> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3621,6 +3872,7 @@ fn fs_metadata_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn file_type_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::FileType> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3635,6 +3887,7 @@ fn file_type_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn open_options_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::OpenOptions> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3649,6 +3902,7 @@ fn open_options_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn fs_permissions_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::Permissions> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3663,6 +3917,7 @@ fn fs_permissions_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn fs_try_lock_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::fs::TryLockError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3677,6 +3932,7 @@ fn fs_try_lock_error_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn thread_access_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::thread::AccessError> as Witness<VerusVerifier>>::proof(),
         <std::thread::AccessError as RustStdType>::provenance()
@@ -3685,6 +3941,7 @@ fn thread_access_error_witness_is_trusted_and_carries_chain_derived_provenance()
 
 #[test]
 fn thread_builder_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::thread::Builder> as Witness<VerusVerifier>>::proof(),
         <std::thread::Builder as RustStdType>::provenance()
@@ -3693,6 +3950,7 @@ fn thread_builder_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn join_handle_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::thread::JoinHandle<i32>> as Witness<VerusVerifier>>::proof(),
         <std::thread::JoinHandle<i32> as RustStdType>::provenance()
@@ -3701,6 +3959,7 @@ fn join_handle_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn thread_scope_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::thread::Scope<'static, 'static>> as Witness<VerusVerifier>>::proof(),
         <std::thread::Scope<'static, 'static> as RustStdType>::provenance()
@@ -3709,6 +3968,7 @@ fn thread_scope_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn scoped_join_handle_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::thread::ScopedJoinHandle<'static, i32>> as Witness<
             VerusVerifier,
@@ -3719,6 +3979,7 @@ fn scoped_join_handle_witness_is_trusted_and_carries_chain_derived_provenance() 
 
 #[test]
 fn local_key_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -3735,6 +3996,7 @@ fn local_key_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn thread_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::thread::Thread> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3749,6 +4011,7 @@ fn thread_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn thread_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::thread::ThreadId> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3763,6 +4026,7 @@ fn thread_id_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn var_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::env::VarError> as Witness<VerusVerifier>>::proof(),
         <std::env::VarError as RustStdType>::provenance()
@@ -3771,6 +4035,7 @@ fn var_error_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn vars_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::env::Vars> as Witness<VerusVerifier>>::proof(),
         <std::env::Vars as RustStdType>::provenance()
@@ -3779,6 +4044,7 @@ fn vars_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn vars_os_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::env::VarsOs> as Witness<VerusVerifier>>::proof(),
         <std::env::VarsOs as RustStdType>::provenance()
@@ -3787,6 +4053,7 @@ fn vars_os_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn env_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::env::Args> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3801,6 +4068,7 @@ fn env_args_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn env_args_os_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::env::ArgsOs> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3815,6 +4083,7 @@ fn env_args_os_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn join_paths_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::env::JoinPathsError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3829,6 +4098,7 @@ fn join_paths_error_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn split_paths_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::env::SplitPaths<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3843,6 +4113,7 @@ fn split_paths_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn mpsc_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::mpsc::Sender<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3857,6 +4128,7 @@ fn mpsc_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn mpsc_sync_sender_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::mpsc::SyncSender<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -3872,6 +4144,7 @@ fn mpsc_sync_sender_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn mpsc_receiver_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::mpsc::Receiver<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -3887,6 +4160,7 @@ fn mpsc_receiver_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn mpsc_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::mpsc::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -3902,6 +4176,7 @@ fn mpsc_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn mpsc_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::sync::mpsc::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -3917,6 +4192,7 @@ fn mpsc_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn mpsc_try_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -3933,6 +4209,7 @@ fn mpsc_try_iter_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn sync_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::Once> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3947,6 +4224,7 @@ fn sync_once_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn once_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::OnceState> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3961,6 +4239,7 @@ fn once_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn once_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::OnceLock<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3975,6 +4254,7 @@ fn once_lock_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn barrier_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::Barrier> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -3989,6 +4269,7 @@ fn barrier_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn barrier_wait_result_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::BarrierWaitResult> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4003,6 +4284,7 @@ fn barrier_wait_result_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn wait_timeout_result_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::sync::WaitTimeoutResult> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4017,6 +4299,7 @@ fn wait_timeout_result_witness_is_checked_and_still_carries_chain_derived_proven
 
 #[test]
 fn incoming_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::Incoming<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4031,6 +4314,7 @@ fn incoming_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn shutdown_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::Shutdown> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4045,6 +4329,7 @@ fn shutdown_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn tcp_listener_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::TcpListener> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4059,6 +4344,7 @@ fn tcp_listener_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn tcp_stream_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::TcpStream> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4073,6 +4359,7 @@ fn tcp_stream_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn udp_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::net::UdpSocket> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4087,6 +4374,7 @@ fn udp_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn raw_waker_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::task::RawWaker> as Witness<VerusVerifier>>::proof(),
         <std::task::RawWaker as RustStdType>::provenance()
@@ -4095,6 +4383,7 @@ fn raw_waker_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn raw_waker_vtable_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<std::task::RawWakerVTable> as Witness<VerusVerifier>>::proof(),
         <std::task::RawWakerVTable as RustStdType>::provenance()
@@ -4103,6 +4392,7 @@ fn raw_waker_vtable_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn task_context_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::task::Context<'static>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4117,6 +4407,7 @@ fn task_context_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn poll_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::task::Poll<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4131,6 +4422,7 @@ fn poll_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn waker_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::task::Waker> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4145,6 +4437,7 @@ fn waker_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn panic_info_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<core::panic::PanicInfo<'static>> as Witness<VerusVerifier>>::proof(),
         <core::panic::PanicInfo<'static> as RustStdType>::provenance()
@@ -4153,6 +4446,7 @@ fn panic_info_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn panic_message_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<core::panic::PanicMessage<'static>> as Witness<VerusVerifier>>::proof(),
         <core::panic::PanicMessage<'static> as RustStdType>::provenance()
@@ -4161,6 +4455,7 @@ fn panic_message_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn assert_unwind_safe_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::panic::AssertUnwindSafe<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4176,6 +4471,7 @@ fn assert_unwind_safe_witness_is_checked_and_still_carries_chain_derived_provena
 
 #[test]
 fn panic_location_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::panic::Location<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -4191,6 +4487,7 @@ fn panic_location_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn range_to_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ops::RangeTo<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4205,6 +4502,7 @@ fn range_to_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ops::RangeFull> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4219,6 +4517,7 @@ fn range_full_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn bound_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ops::Bound<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4233,6 +4532,7 @@ fn bound_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn control_flow_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::ops::ControlFlow<i32, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4248,6 +4548,7 @@ fn control_flow_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn try_from_float_secs_error_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<core::time::TryFromFloatSecsError> as Witness<VerusVerifier>>::proof(),
         <core::time::TryFromFloatSecsError as RustStdType>::provenance()
@@ -4256,6 +4557,7 @@ fn try_from_float_secs_error_witness_is_trusted_and_carries_chain_derived_proven
 
 #[test]
 fn instant_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::time::Instant> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4270,6 +4572,7 @@ fn instant_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn system_time_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::time::SystemTime> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4284,6 +4587,7 @@ fn system_time_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn system_time_error_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::time::SystemTimeError> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4298,6 +4602,7 @@ fn system_time_error_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::time::Duration> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4312,6 +4617,7 @@ fn duration_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn option_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::option::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4326,6 +4632,7 @@ fn option_into_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn result_into_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<core::result::IntoIter<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4340,6 +4647,7 @@ fn result_into_iter_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn option_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::option::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4355,6 +4663,7 @@ fn option_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn result_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::result::Iter<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4370,6 +4679,7 @@ fn result_iter_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn option_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::option::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4382,6 +4692,7 @@ fn option_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<core::result::IterMut<'static, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4394,6 +4705,7 @@ fn result_iter_mut_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn pending_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::future::Pending<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_pending_model_never_resolves");
@@ -4405,6 +4717,7 @@ fn pending_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn ready_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::future::Ready<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4419,6 +4732,7 @@ fn ready_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn poll_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<
         std::future::PollFn<fn(&mut std::task::Context<'_>) -> std::task::Poll<i32>>,
     > as Witness<VerusVerifier>>::proof();
@@ -4435,6 +4749,7 @@ fn poll_fn_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn unit_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_eq!(
         <RustStdStandard<()> as Witness<VerusVerifier>>::proof(),
         <() as RustStdType>::provenance()
@@ -4443,6 +4758,7 @@ fn unit_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn array_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<[i32; 3]> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_array_model_indexing_and_length");
@@ -4451,6 +4767,7 @@ fn array_primitive_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn slice_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<[i32]> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_slice_model_indexing_and_length");
@@ -4459,6 +4776,7 @@ fn slice_primitive_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn str_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<str> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_str_model_byte_length_and_content");
@@ -4467,6 +4785,7 @@ fn str_primitive_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn tuple_primitive_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<(i32, i32)> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(proof.harness(), "verify_tuple_model_field_access");
@@ -4478,6 +4797,7 @@ fn tuple_primitive_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<fn(i32) -> i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4492,6 +4812,7 @@ fn fn_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn const_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<*const i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4506,6 +4827,7 @@ fn const_pointer_witness_is_checked_and_still_carries_chain_derived_provenance()
 
 #[test]
 fn mut_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<*mut i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4517,6 +4839,7 @@ fn mut_pointer_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn shared_reference_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<&'static i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4531,6 +4854,7 @@ fn shared_reference_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn mutable_reference_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<&'static mut i32> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4545,6 +4869,7 @@ fn mutable_reference_witness_is_checked_and_still_carries_chain_derived_provenan
 
 #[test]
 fn default_hasher_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::hash::DefaultHasher> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4559,6 +4884,7 @@ fn default_hasher_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn random_state_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::hash::RandomState> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4573,6 +4899,7 @@ fn random_state_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn os_str_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::OsStr> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4587,6 +4914,7 @@ fn os_str_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn os_string_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ffi::OsString> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4601,6 +4929,7 @@ fn os_string_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn os_str_display_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::ffi::os_str::Display<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -4616,6 +4945,7 @@ fn os_str_display_witness_is_checked_and_still_carries_chain_derived_provenance(
 
 #[test]
 fn hash_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::HashMap<i32, i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4631,6 +4961,7 @@ fn hash_map_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn hash_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::collections::HashSet<i32>> as Witness<VerusVerifier>>::proof();
 
@@ -4646,6 +4977,7 @@ fn hash_set_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn pin_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::pin::Pin<Box<i32>>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4660,6 +4992,7 @@ fn pin_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn non_null_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::ptr::NonNull<i32>> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4674,6 +5007,7 @@ fn non_null_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn system_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::alloc::System> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4688,6 +5022,7 @@ fn system_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn backtrace_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::backtrace::Backtrace> as Witness<VerusVerifier>>::proof();
 
     assert_eq!(
@@ -4702,6 +5037,7 @@ fn backtrace_witness_is_checked_and_still_carries_chain_derived_provenance() {
 
 #[test]
 fn backtrace_status_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::backtrace::BacktraceStatus> as Witness<VerusVerifier>>::proof();
 
@@ -4717,6 +5053,7 @@ fn backtrace_status_witness_is_checked_and_still_carries_chain_derived_provenanc
 
 #[test]
 fn panic_hook_info_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof =
         <RustStdStandard<std::panic::PanicHookInfo<'static>> as Witness<VerusVerifier>>::proof();
 
@@ -4732,6 +5069,7 @@ fn panic_hook_info_witness_is_checked_and_still_carries_chain_derived_provenance
 
 #[test]
 fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     let proof = <RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> as Witness<
         VerusVerifier,
     >>::proof();
@@ -4756,6 +5094,7 @@ fn vec_deque_drain_witness_is_checked_and_still_carries_chain_derived_provenance
 #[cfg(windows)]
 #[test]
 fn encode_wide_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::ffi::EncodeWide;
 
     let proof = <RustStdStandard<EncodeWide<'static>> as Witness<VerusVerifier>>::proof();
@@ -4770,6 +5109,7 @@ fn encode_wide_witness_is_checked_and_still_carries_chain_derived_provenance() {
 #[cfg(windows)]
 #[test]
 fn borrowed_handle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::io::BorrowedHandle;
 
     let proof = <RustStdStandard<BorrowedHandle<'static>> as Witness<VerusVerifier>>::proof();
@@ -4787,6 +5127,7 @@ fn borrowed_handle_witness_is_checked_and_still_carries_chain_derived_provenance
 #[cfg(windows)]
 #[test]
 fn borrowed_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::io::BorrowedSocket;
 
     let proof = <RustStdStandard<BorrowedSocket<'static>> as Witness<VerusVerifier>>::proof();
@@ -4804,6 +5145,7 @@ fn borrowed_socket_witness_is_checked_and_still_carries_chain_derived_provenance
 #[cfg(windows)]
 #[test]
 fn handle_or_invalid_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::io::HandleOrInvalid;
 
     let proof = <RustStdStandard<HandleOrInvalid> as Witness<VerusVerifier>>::proof();
@@ -4821,6 +5163,7 @@ fn handle_or_invalid_witness_is_checked_and_still_carries_chain_derived_provenan
 #[cfg(windows)]
 #[test]
 fn owned_handle_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::io::OwnedHandle;
 
     let proof = <RustStdStandard<OwnedHandle> as Witness<VerusVerifier>>::proof();
@@ -4838,6 +5181,7 @@ fn owned_handle_witness_is_checked_and_still_carries_chain_derived_provenance() 
 #[cfg(windows)]
 #[test]
 fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     use std::os::windows::io::OwnedSocket;
 
     let proof = <RustStdStandard<OwnedSocket> as Witness<VerusVerifier>>::proof();
@@ -4854,6 +5198,7 @@ fn owned_socket_witness_is_checked_and_still_carries_chain_derived_provenance() 
 
 #[test]
 fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let shape = verus_call_shape("verify_char_roundtrip")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
@@ -4894,6 +5239,7 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
 
 #[test]
 fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let shape = verus_call_shape("verify_ref_cell_model_dynamic_borrow_rules")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
@@ -4925,5 +5271,6 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
 
 #[test]
 fn verus_call_shape_is_absent_for_an_unregistered_harness() {
+    amenable_core::init_tracing();
     assert!(verus_call_shape("verify_something_never_registered").is_none());
 }

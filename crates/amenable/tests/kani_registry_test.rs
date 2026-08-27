@@ -12,6 +12,7 @@ use amenable::{KaniProof, KaniProofRegistration};
 
 #[test]
 fn kani_harnesses_self_register_with_stable_fully_qualified_ids() {
+    amenable::init_tracing();
     let records: Vec<KaniProof> = inventory::iter::<KaniProofRegistration>()
         .map(|registration| (registration.proof())())
         .collect();
@@ -41,6 +42,7 @@ fn kani_harnesses_self_register_with_stable_fully_qualified_ids() {
 
 #[test]
 fn tracked_proof_registry_never_includes_a_gallery_case() {
+    amenable::init_tracing();
     let tracked: Vec<KaniProof> = inventory::iter::<KaniProofRegistration>()
         .map(|registration| (registration.proof())())
         .collect();

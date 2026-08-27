@@ -148,11 +148,13 @@ impl Verifier for ManualVerifier {
 
 #[test]
 fn verifier_metadata_marker_is_zero_sized() {
+    amenable_core::init_tracing();
     assert_eq!(std::mem::size_of::<ManualVerifierMetadata>(), 0);
 }
 
 #[test]
 fn verifier_metadata_iterates_lazily_generated_entries() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let metadata = ManualVerifier::metadata();
 
     assert!(!metadata.is_empty());
@@ -171,6 +173,7 @@ fn verifier_metadata_iterates_lazily_generated_entries() -> miette::Result<()> {
 
 #[test]
 fn provenance_exposes_rich_projected_metadata_views() {
+    amenable_core::init_tracing();
     let provenance = ManualProvenance {
         authority_kind: "local_design".to_string(),
         authority: "UI Working Group".to_string(),
@@ -189,6 +192,7 @@ fn provenance_exposes_rich_projected_metadata_views() {
 
 #[test]
 fn scalar_provenance_exposes_leaf_value_metadata() {
+    amenable_core::init_tracing();
     let string_value = "Rust Project Developers".to_string();
     let integer_value = 32_i32;
 
@@ -209,6 +213,7 @@ fn scalar_provenance_exposes_leaf_value_metadata() {
 
 #[test]
 fn provenance_report_renders_metadata_as_human_readable_lines() {
+    amenable_core::init_tracing();
     let provenance = ManualProvenance {
         authority_kind: "external_standard".to_string(),
         authority: "Rust Project Developers".to_string(),
@@ -225,6 +230,7 @@ source: https://doc.rust-lang.org/std/primitive.i32.html"
 
 #[test]
 fn registry_issues_standard_certificates_through_the_standard_surface() {
+    amenable_core::init_tracing();
     let mut registry = ManualRegistry::new();
     let standard = ManualStandard {
         provenance: ManualProvenance {
@@ -246,6 +252,7 @@ source: https://doc.rust-lang.org/std/primitive.i32.html"
 
 #[test]
 fn registry_issues_and_tracks_provenance_certificates() {
+    amenable_core::init_tracing();
     let mut registry = ManualRegistry::new();
     let provenance = ManualProvenance {
         authority_kind: "external_standard".to_string(),

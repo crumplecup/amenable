@@ -122,6 +122,7 @@ fn assessment_record(record: AssessmentRecord<'_>) -> String {
 
 #[test]
 fn assessment_appends_multiline_comment_as_one_json_record() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-record")?;
     let comment_path = temporary_path("assessment-comment")?;
     let comment = "The arithmetic claim is exact under the stated precondition.\nAdd a boundary-focused proof next.";
@@ -214,6 +215,7 @@ fn assessment_appends_multiline_comment_as_one_json_record() -> miette::Result<(
 #[test]
 fn report_aggregates_independent_assessments_by_recommendation_and_resolution_path()
 -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-report")?;
     record(
         &path,
@@ -267,6 +269,7 @@ fn report_aggregates_independent_assessments_by_recommendation_and_resolution_pa
 
 #[test]
 fn summary_counts_assessments_by_recommendation() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-summary")?;
     write_assessment_artifact(
         &path,
@@ -349,6 +352,7 @@ fn summary_counts_assessments_by_recommendation() -> miette::Result<()> {
 
 #[test]
 fn summary_can_group_by_resolution_path_and_emit_json() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-summary-resolution-path")?;
     let legacy_record = format!(
         "{{\"schema_version\":1,\"proof_id\":\"{SECOND_PROOF_ID}\",\"reviewer\":\"legacy-reviewer\",\"timestamp_unix_seconds\":1785357757,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":4,\"adversarial_coverage\":2,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Legacy record.\"}}\n"
@@ -409,6 +413,7 @@ fn summary_can_group_by_resolution_path_and_emit_json() -> miette::Result<()> {
 
 #[test]
 fn list_filters_assessments_by_recommendation_and_resolution_path() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-list")?;
     write_assessment_artifact(
         &path,
@@ -477,6 +482,7 @@ fn list_filters_assessments_by_recommendation_and_resolution_path() -> miette::R
 
 #[test]
 fn list_json_emits_full_structured_assessments() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-list-json")?;
     write_assessment_artifact(
         &path,
@@ -536,6 +542,7 @@ fn list_json_emits_full_structured_assessments() -> miette::Result<()> {
 
 #[test]
 fn failures_list_nonpassing_latest_kani_results() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-failures")?;
     write_kani_results_artifact(
         &path,
@@ -579,6 +586,7 @@ fn failures_list_nonpassing_latest_kani_results() -> miette::Result<()> {
 
 #[test]
 fn failures_can_filter_by_status_and_emit_json() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-failures-json")?;
     write_kani_results_artifact(
         &path,
@@ -630,6 +638,7 @@ fn failures_can_filter_by_status_and_emit_json() -> miette::Result<()> {
 
 #[test]
 fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() -> miette::Result<()> {
+    amenable::init_tracing();
     let results_path = temporary_path("assessment-failures-needs-assessment-results")?;
     let assessments_path = temporary_path("assessment-failures-needs-assessment-assessments")?;
     write_kani_results_artifact(
@@ -708,6 +717,7 @@ fn failures_can_list_only_unassessed_failing_proofs_for_a_fresh_sweep() -> miett
 
 #[test]
 fn score_outside_the_rubric_range_is_rejected_before_recording() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-invalid-score")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -753,6 +763,7 @@ fn score_outside_the_rubric_range_is_rejected_before_recording() -> miette::Resu
 
 #[test]
 fn incompatible_resolution_path_is_rejected_before_recording() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-invalid-resolution-path")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -798,6 +809,7 @@ fn incompatible_resolution_path_is_rejected_before_recording() -> miette::Result
 
 #[test]
 fn replace_can_record_an_accommodation_reroute() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-replace-accommodation-reroute")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -849,6 +861,7 @@ fn replace_can_record_an_accommodation_reroute() -> miette::Result<()> {
 
 #[test]
 fn document_verifier_limitation_is_not_a_valid_resolution_path() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-invalid-documented-limitation")?;
     let output = Command::new(env!("CARGO_BIN_EXE_amenable"))
         .args([
@@ -895,6 +908,7 @@ fn document_verifier_limitation_is_not_a_valid_resolution_path() -> miette::Resu
 #[test]
 fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() -> miette::Result<()>
 {
+    amenable::init_tracing();
     let path = temporary_path("assessment-queue")?;
     record(
         &path,
@@ -936,6 +950,7 @@ fn queue_omits_assessed_proofs_and_keeps_other_registered_proofs_actionable() ->
 
 #[test]
 fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-queue-since")?;
     write_assessment_artifact(
         &path,
@@ -997,6 +1012,7 @@ fn queue_since_treats_older_assessments_as_out_of_scope_for_a_fresh_sweep() -> m
 
 #[test]
 fn queue_json_reports_structured_unassessed_proofs() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-queue-json")?;
     record(
         &path,
@@ -1046,6 +1062,7 @@ fn queue_json_reports_structured_unassessed_proofs() -> miette::Result<()> {
 
 #[test]
 fn report_accepts_legacy_assessment_records_for_back_compatibility() -> miette::Result<()> {
+    amenable::init_tracing();
     let path = temporary_path("assessment-legacy-report")?;
     let legacy_record = format!(
         "{{\"schema_version\":1,\"proof_id\":\"{PROOF_ID}\",\"reviewer\":\"legacy-reviewer\",\"timestamp_unix_seconds\":1785357757,\"rubric\":{{\"claim_alignment\":4,\"assumption_adequacy\":3,\"model_fidelity\":3,\"assertion_strength\":4,\"adversarial_coverage\":2,\"clarity\":4}},\"recommendation\":\"accept\",\"comment\":\"Legacy record.\"}}\n"

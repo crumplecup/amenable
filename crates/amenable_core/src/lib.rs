@@ -36,6 +36,7 @@ mod roles;
 mod state;
 mod state_machine;
 mod stoplight;
+mod tracing_init;
 mod verifier;
 #[cfg(feature = "verus")]
 mod verus_carrier;
@@ -58,6 +59,7 @@ pub use roles::{AsStandard, Standard};
 pub use state::State;
 pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};
 pub use stoplight::{Green, Red, Yellow};
+pub use tracing_init::init_tracing;
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]
 pub use verus_carrier::PredicateBodyError;

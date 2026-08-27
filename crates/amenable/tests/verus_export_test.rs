@@ -384,6 +384,7 @@ fn read_file(path: &Path) -> miette::Result<String> {
 /// process).
 #[test]
 fn write_verus_witness_modules_materializes_shape_specific_modules() -> miette::Result<()> {
+    amenable::init_tracing();
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|error| miette::miette!("system time should be after the Unix epoch: {error}"))?

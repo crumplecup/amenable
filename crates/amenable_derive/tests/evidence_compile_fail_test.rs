@@ -5,6 +5,7 @@
 
 #[test]
 fn evidence_with_arguments_fails_to_compile() {
+    amenable_core::init_tracing();
     let cases = trybuild::TestCases::new();
     cases.compile_fail("tests/ui/evidence_rejects_arguments.rs");
 }

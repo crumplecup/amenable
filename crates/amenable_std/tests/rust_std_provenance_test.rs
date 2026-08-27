@@ -11,6 +11,7 @@ use std::path::Path;
 
 #[test]
 fn rust_std_types_emit_derived_provenance_records() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let provenance: RustStdProvenance = <i32 as RustStdType>::provenance();
 
     assert_eq!(
@@ -47,6 +48,7 @@ fn rust_std_types_emit_derived_provenance_records() -> miette::Result<()> {
 #[test]
 fn fixed_width_integer_types_share_rust_language_provenance_but_vary_type_specific_facts()
 -> miette::Result<()> {
+    amenable_core::init_tracing();
     let i8_provenance = <i8 as RustStdType>::provenance();
     let i32_provenance = <i32 as RustStdType>::provenance();
 
@@ -95,6 +97,7 @@ fn fixed_width_integer_types_share_rust_language_provenance_but_vary_type_specif
 
 #[test]
 fn rust_std_type_report_renders_a_default_human_readable_audit_surface() {
+    amenable_core::init_tracing();
     assert_eq!(
         <i32 as RustStdType>::report().to_string(),
         "rust.authority_kind: external_standard\n\
@@ -109,6 +112,7 @@ semantic_summary: The signed 32-bit integer carrier stores values in the i32 ran
 
 #[test]
 fn rust_std_type_certification_is_issued_through_the_registry() {
+    amenable_core::init_tracing();
     let mut registry = CertRegistry::new();
 
     assert_eq!(
@@ -127,6 +131,7 @@ semantic_summary: The signed 32-bit integer carrier stores values in the i32 ran
 
 #[test]
 fn rust_std_standard_wrapper_implements_standard() {
+    amenable_core::init_tracing();
     let standard = RustStdStandard::<i32>::new();
     let mut registry = CertRegistry::new();
 
@@ -156,6 +161,7 @@ semantic_summary: The signed 32-bit integer carrier stores values in the i32 ran
 #[test]
 fn rust_std_certificate_artifacts_are_emitted_to_the_workspace_artifacts_directory()
 -> miette::Result<()> {
+    amenable_core::init_tracing();
     let artifact_directory =
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts/std-certificates");
     let paths = support::library(write_rust_std_certificate_artifacts(&artifact_directory))?;

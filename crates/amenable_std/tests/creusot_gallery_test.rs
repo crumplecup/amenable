@@ -2,6 +2,7 @@ use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
 fn all_twenty_eight_gallery_findings_are_registered_and_distinct() {
+    amenable_core::init_tracing();
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case())())
         .collect();

@@ -8,6 +8,7 @@ use miette::{IntoDiagnostic, WrapErr};
 
 #[test]
 fn dump_registry_emits_witness_export_records_section() -> miette::Result<()> {
+    amenable::init_tracing();
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .into_diagnostic()

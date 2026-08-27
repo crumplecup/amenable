@@ -203,6 +203,7 @@ struct ShapeOverrideStruct {
 
 #[test]
 fn witness_derive_projects_expected_structure_for_every_fixture() -> miette::Result<()> {
+    amenable_core::init_tracing();
     macro_rules! assert_fixture {
         ($fixture:ty) => {
             assert_witness_fixture::<$fixture>()?;
@@ -215,6 +216,7 @@ fn witness_derive_projects_expected_structure_for_every_fixture() -> miette::Res
 
 #[test]
 fn witness_proofs_remember_enclosing_shape_not_just_leaf_multiset() {
+    amenable_core::init_tracing();
     let _ = ShapeMirrorEnum::Alpha(WitnessLeaf::default());
     let _ = ShapeMirrorEnum::Beta(WitnessLeaf::default());
 
@@ -237,6 +239,7 @@ fn witness_proofs_remember_enclosing_shape_not_just_leaf_multiset() {
 
 #[test]
 fn witness_derive_exposes_default_verus_destination_contract() {
+    amenable_core::init_tracing();
     type ShapeMirrorStructProof = <ShapeMirrorStruct as Witness<FixtureVerifier>>::ProofArtifact;
     type ShapeMirrorEnumProof = <ShapeMirrorEnum as Witness<FixtureVerifier>>::ProofArtifact;
 
@@ -252,6 +255,7 @@ fn witness_derive_exposes_default_verus_destination_contract() {
 
 #[test]
 fn witness_derive_respects_explicit_verus_destination_override() {
+    amenable_core::init_tracing();
     type ShapeOverrideStructProof =
         <ShapeOverrideStruct as Witness<FixtureVerifier>>::ProofArtifact;
 

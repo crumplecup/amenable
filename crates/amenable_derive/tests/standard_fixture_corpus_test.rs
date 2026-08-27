@@ -99,6 +99,7 @@ fn expects_registered_root_link(kind: DeriveFixtureKind) -> bool {
 
 #[test]
 fn standard_derive_projects_expected_metadata_for_every_fixture() {
+    amenable_core::init_tracing();
     macro_rules! assert_fixture {
         ($fixture:ty) => {
             assert_standard_fixture::<$fixture>();

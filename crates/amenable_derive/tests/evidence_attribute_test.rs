@@ -21,5 +21,6 @@ impl Evidence for RootEvidence {
 
 #[test]
 fn bare_evidence_attribute_computes_is_root_from_basis() {
+    amenable_core::init_tracing();
     assert!(RootEvidence::is_root());
 }

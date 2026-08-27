@@ -4,6 +4,7 @@ use amenable::{
 
 #[test]
 fn kani_gallery_cases_self_register_with_stable_ids_and_expectations() {
+    amenable::init_tracing();
     let cases: Vec<KaniGalleryCase> = inventory::iter::<KaniGalleryRegistration>()
         .map(|registration| (registration.case())())
         .collect();
