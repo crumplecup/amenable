@@ -41,24 +41,34 @@ pub fn expand_kani_compose(input: &DeriveInput) -> syn::Result<TokenStream> {
     };
 
     Ok(quote! {
-        #[cfg(kani)]
-        impl #impl_generics ::amenable_kani::KaniCompose for #name #ty_generics #where_clause {
-            fn kani_depth0() -> Self {
-                #depth0
-            }
+        // `#[cfg(kani)]` here is meaningless to any downstream consumer
+        // that never declares the `kani` cfg name -- the `allow`+`const`
+        // wrapper is the only placement that suppresses `unexpected_cfgs`
+        // there without affecting what actually compiles under a real
+        // `kani` build (confirmed against this exact generic/where-clause
+        // shape in an isolated scratch crate before landing here; see
+        // `docs/CFG_HYGIENE_PLAN.md`'s Step 1).
+        #[allow(unexpected_cfgs)]
+        const _: () = {
+            #[cfg(kani)]
+            impl #impl_generics ::amenable_kani::KaniCompose for #name #ty_generics #where_clause {
+                fn kani_depth0() -> Self {
+                    #depth0
+                }
 
-            fn kani_depth1() -> Self {
-                #depth1
-            }
+                fn kani_depth1() -> Self {
+                    #depth1
+                }
 
-            fn kani_depth2() -> Self {
-                #depth2
-            }
+                fn kani_depth2() -> Self {
+                    #depth2
+                }
 
-            fn kani_any() -> Self {
-                #any
+                fn kani_any() -> Self {
+                    #any
+                }
             }
-        }
+        };
     })
 }
 

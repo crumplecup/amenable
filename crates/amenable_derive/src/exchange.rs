@@ -306,7 +306,22 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
     });
 
     Ok(quote! {
-        #contracted_impl
+        // `#cfg` here is meaningless to a downstream consumer that
+        // never declares that cfg name (it's caller-parameterized, not
+        // fixed to `kani`) -- the `allow`+`const` wrapper is the only
+        // placement that suppresses `unexpected_cfgs` there without
+        // affecting what actually compiles under the real cfg. An
+        // inherent-impl method stays resolvable at its original
+        // `#self_ty::#method_ident` path regardless of the enclosing
+        // impl block's own `const` nesting (confirmed with a real
+        // external call site in an isolated scratch crate before
+        // landing here -- unlike a free function extracted from its
+        // module, an inherent impl's methods are found via type, not
+        // path; see `docs/CFG_HYGIENE_PLAN.md`'s Step 1).
+        #[allow(unexpected_cfgs)]
+        const _: () = {
+            #contracted_impl
+        };
 
         impl ::amenable_core::Witness<#verifier> for #evidence {
             type SupportingEvidence = Self;

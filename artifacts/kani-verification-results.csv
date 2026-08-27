@@ -7,7 +7,7 @@ amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1787759174,passed
 amenable_kani::gaap_ledger::verify_gaap_commit_always_balances,1787759272,passed
 amenable_kani::gaap_ledger::verify_gaap_reject_always_succeeds,1787759332,passed
 amenable_kani::gaap_ledger::verify_gaap_rollback_always_succeeds,1787759384,passed
-amenable_kani::gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer,1787759490,passed
+amenable_kani::gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer,1787867774,passed
 amenable_kani::gaap_ledger::verify_gaap_validate_rejects_the_same_account,1787759606,passed
 amenable_kani::os_windows_model::verify_encode_wide_encodes_a_bmp_char_as_one_code_unit,1787759633,passed
 amenable_kani::os_windows_model::verify_windows_handle_as_raw_handle_recovers_the_wrapped_value,1787759643,passed
@@ -350,7 +350,7 @@ amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_val
 amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1787763342,passed
 amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1787763351,passed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1787763359,passed
-amenable_kani::stoplight::verify_full_cycle_composes,1787764413,passed
+amenable_kani::stoplight::verify_full_cycle_composes,1787867795,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1787763370,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1787763379,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1787763388,passed

@@ -409,7 +409,7 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
         }
     };
 
-    quote! {
+    let state_machine_impl = quote! {
         impl #impl_generics ::amenable_core::StateMachine<#verifier> for #self_ty {
             fn states() -> &'static [&'static str] {
                 &[#(#state_names),*]
@@ -423,6 +423,30 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
             #audit_surface
             #root_entries
         }
+    };
+
+    // Only `translator_cfg = Some(..)` ever splices a real `#[cfg(..)]`
+    // token into `audit_surface`'s two-branch split above -- no
+    // wrapper needed (and none added) for the common case with no cfg
+    // tokens at all, matching elicitation's own `needs_compat_mod`
+    // discipline: wrap only when there's something to suppress. When it
+    // is set, `#[cfg(..)]` here is meaningless to a downstream consumer
+    // that never declares that cfg name -- the `allow`+`const` wrapper
+    // is the only placement that suppresses `unexpected_cfgs` there
+    // without affecting what actually compiles under the real cfg
+    // (confirmed against this exact "cfg-gated associated fns alongside
+    // ungated ones, all inside one impl" shape in an isolated scratch
+    // crate before landing here; see `docs/CFG_HYGIENE_PLAN.md`'s
+    // Step 1).
+    if block.translator_cfg.is_some() {
+        quote! {
+            #[allow(unexpected_cfgs)]
+            const _: () = {
+                #state_machine_impl
+            };
+        }
+    } else {
+        state_machine_impl
     }
 }
 

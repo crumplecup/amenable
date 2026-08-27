@@ -1,8 +1,10 @@
 # cfg Hygiene Plan
 
-**Status:** ✅ Step 0 done and verified. ✅ Step 3 done: per-crate tracing
-policy implemented + tested in cordial, and a real `amenable_kani`
-`--apply` (396 functions, 83 files) is now landed and fully verified —
+**Status:** ✅ Step 0 done and verified. ✅ Step 1 done and verified
+(real Kani/Creusot/Verus checks all clean — see "Step 1" below). ✅ Step
+3 done and committed:
+per-crate tracing policy implemented + tested in cordial, and the real
+`amenable_kani` `--apply` (396 functions, 83 files) is landed —
 `cargo check`/`clippy -D warnings`/`fmt --check`/`test` all clean, plus
 two real `cargo kani` proof harnesses (including one exercising the
 tuple-destructuring fix directly) still verify successfully with the
@@ -18,9 +20,13 @@ every real Kani proof harness in the crate -- with it fixed, **every**
 correctly excluded, not just the ones that happened to be called
 outside a `harness!` block.
 `amenable_creusot`/`amenable_verus` correctly received zero changes
-(Skip policy). Not yet done: committing the `amenable_kani` apply
-result, or generalizing `--apply` beyond tracing (Phase 1). Steps 1–2
-not started at all.
+(Skip policy). Committed as two commits on `dev`: `46b3ba7` (a separate,
+real Kani gallery-registry-leak bug found and fixed along the way --
+see `project_kani_gallery_registry_leak_fixed` memory) and `11e53b2`
+(the tracing-apply rollout itself). Not yet done: generalizing `--apply`
+beyond tracing (Phase 1, mentioned only in passing in this plan's own
+discussion, not itself a numbered step here). Step 2 (cordial
+`cfg-hygiene` etiquette) not started.
 
 ## Why this exists
 
@@ -99,39 +105,47 @@ both (verus never runs build scripts at all; check-cfg only controls
 whether a warning fires, never what a `#[cfg(...)]` block compiles to,
 so it can't affect Kani's real proof behavior either).
 
-## Step 1 — fix the four confirmed live macro-injection sites
+## Step 1 — fix the four confirmed live macro-injection sites ✅
 
-Not started. Each needs one of `~/repos/elicitation`'s two proven
-wrapper patterns from `UNEXPECTED_CFGS.md` (read directly before
-starting, not summarized from memory — the gallery test
-(`crates/elicitation_derive/tests/cfg_allow_gallery_test.rs`) is the
-source of truth for which placements actually suppress the lint; sibling
-allow does NOT work, confirmed there via 13 real test cases):
+Done. Each site's wrapper pattern was first confirmed in a throwaway
+scratch crate outside `~/repos/amenable` (per this project's "no
+scratchpad proof probing" convention — the isolation boundary is a
+disposable crate, not a file inside this repo), then applied to the
+real macro:
 
-| Macro | Injection | Real site | Fix shape |
+| Macro | Injection | Real site | Fix shape actually used |
 | --- | --- | --- | --- |
-| `#[amenable_derive::exchange(cfg = ..., ...)]` | `#[cfg_attr(#cfg, #cfg::ensures(...))]` on the transformed method — `#cfg` is caller-parameterized | `crates/amenable_derive/src/exchange.rs:296-306` | Pattern 2 (`#[allow(unexpected_cfgs)] mod _compat { ... } + pub use`) — transforms an existing function that must stay reachable at its original path |
-| `#[amenable_derive::capture_exchange_body(...)]` | `#[cfg_attr(kani, kani::requires(...))]` + `#[cfg_attr(kani, kani::ensures(...))]`, hardcoded to `kani` | `crates/amenable_derive/src/capture_exchange_body.rs:280-296` | Pattern 2, same shape as `exchange` |
-| `#[derive(amenable_derive::StateMachine)]` | `#[cfg(not(#cfg_ident))]` / `#[cfg(#cfg_ident)]`, two-branch `audit_surface()` | `crates/amenable_derive/src/state_machine.rs:358-373` | Pattern 1 (`#[allow(unexpected_cfgs)] const _: () = { ... };`) if the two branches can live in a `const` block (need to confirm `audit_surface()`'s trait-impl-method placement tolerates this — a derive emits a whole `impl` block, closer to Pattern 1's designed use case than Pattern 2's) |
-| `#[derive(amenable_derive::KaniCompose)]` | `#[cfg(kani)]` on the generated `impl KaniCompose for #name` block | `crates/amenable_derive/src/kani_compose.rs:43-62` | Pattern 1 — textbook case, matches elicitation's own `enum_impl.rs`/`struct_impl.rs` precedent exactly |
+| `#[amenable_derive::exchange(cfg = ..., ...)]` | `#[cfg_attr(#cfg, #cfg::ensures(...))]` on the transformed method — `#cfg` is caller-parameterized | `crates/amenable_derive/src/exchange.rs` | Pattern 1 (`#[allow(unexpected_cfgs)] const _: () = { #contracted_impl };`) — the plan's original Pattern 2 guess was wrong: the macro transforms a whole *inherent impl block*, not a bare free function, so inherent-impl methods resolve fine from outside the `const` wrapper; confirmed with a real external call site in the scratch crate before landing here |
+| `#[amenable_derive::capture_exchange_body(...)]` | `#[cfg_attr(kani, kani::requires(...))]` + `#[cfg_attr(kani, kani::ensures(...))]`, hardcoded to `kani` | `crates/amenable_derive/src/capture_exchange_body.rs` | Pattern 1, same correction as `exchange` — both conditional branches unified to `TokenStream` via `ToTokens` |
+| `#[derive(amenable_derive::StateMachine)]` | `#[cfg(not(#cfg_ident))]` / `#[cfg(#cfg_ident)]`, two-branch `audit_surface()`, only when `translator_cfg` is set | `crates/amenable_derive/src/state_machine.rs` | Pattern 1, applied conditionally — only wrapped when `block.translator_cfg.is_some()`; the unconditional case (no `translator_cfg`) emits the plain `impl` unwrapped |
+| `#[derive(amenable_derive::KaniCompose)]` | `#[cfg(kani)]` on the generated `impl KaniCompose for #name` block | `crates/amenable_derive/src/kani_compose.rs` | Pattern 1 — textbook case, matches elicitation's own `enum_impl.rs`/`struct_impl.rs` precedent exactly |
 
 `#[derive(amenable_derive::Witness)]`, `#[amenable_derive::establish(...)]`,
 and `#[amenable_derive::proof_token]` were checked and are clean — no
 raw cfg token injection, nothing to fix there.
 
-For each site: isolate in a throwaway local test crate first (mirroring
-elicitation's own gallery-test discipline — do NOT test proof-macro
-`cfg` wrapper syntax in this repo's own scratch files per this project's
-established "no scratchpad proof probing" convention; a fresh, disposable
-crate outside `~/repos/amenable` is the right isolation boundary here,
-not a file inside it), confirm the wrapper actually suppresses
-`unexpected_cfgs` for an unregistered cfg name, then apply to the real
-macro and re-verify the real `Stoplight`/`Ledger` call sites still
-compile and (for `exchange`/`capture_exchange_body`) still pass their
-real `cargo kani`/`cargo creusot prove` checks non-vacuously (the
-existing injected-panic regression-check discipline this workspace
-already uses throughout `EXCHANGE_PROOF_DERIVATION_PLAN.md`/
-`VERUS_EXCHANGE_PROOF_DERIVATION_PLAN.md`).
+Real, non-vacuous re-verification (not just `cargo check`/`clippy`/
+`fmt`/`test`, all of which were clean throughout):
+
+- **Kani**: `amenable_kani::gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer`
+  (exercises `capture_exchange_body`-generated code through
+  `Ledger::validate`) and `amenable_kani::stoplight::verify_full_cycle_composes`
+  (exercises `exchange`-generated code) both pass.
+- **Creusot**: `just verify-creusot` — 150 files proved, 0 errors. This
+  is also the only real (non-gallery) `translator_cfg` call site
+  (`amenable_creusot::stoplight`'s own `StateMachine` derive), so it
+  exercises `state_machine.rs`'s conditional-wrap branch directly. The
+  `const` wrapper shifted that impl's generated module path in the
+  tracked `verif/` proof artifacts (`impl_StateMachine_for_Stoplight` →
+  `_2/impl_StateMachine_for_Stoplight`, same three `.coma` files,
+  captured as a `git mv`-equivalent rename) — an expected, harmless
+  side effect of nesting the impl inside an anonymous `const` item, not
+  a coverage change.
+- **Verus**: `just verify-verus` — 491 verified, 0 errors; no stray
+  `.rlib` left behind, no drift in the regenerated witness/companion
+  files (`amenable_verus` never invokes any of these four macros
+  directly, but depends on `amenable_gaap`/`amenable_kani` compiling
+  cleanly).
 
 ## Step 2 — cordial: new `cfg-hygiene` etiquette
 

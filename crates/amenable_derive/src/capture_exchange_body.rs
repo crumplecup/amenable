@@ -303,9 +303,26 @@ pub fn expand_capture_exchange_body(
                 )
             )]
         });
-        contracted_impl
+        // `kani` here is meaningless to a downstream consumer that
+        // never declares that cfg name -- the `allow`+`const` wrapper
+        // is the only placement that suppresses `unexpected_cfgs`
+        // there without affecting what actually compiles under a real
+        // `kani` build. The method stays resolvable at its original
+        // `#self_ty::#method_ident` path regardless of the enclosing
+        // impl block's own `const` nesting (confirmed with a real
+        // external call site in an isolated scratch crate for
+        // `#[exchange(..)]`'s identical shape; see `docs/
+        // CFG_HYGIENE_PLAN.md`'s Step 1 -- this macro's only structural
+        // difference is the method's own extra `V` type parameter,
+        // which the impl block itself doesn't carry).
+        quote! {
+            #[allow(unexpected_cfgs)]
+            const _: () = {
+                #contracted_impl
+            };
+        }
     } else {
-        item_impl.clone()
+        item_impl.clone().to_token_stream()
     };
 
     Ok(quote! {

@@ -30,8 +30,13 @@ now landed and fully verified: `check`/`clippy -D warnings`/
 zero remaining `Ensures`/`Requires` rows, plus two real `cargo kani`
 proofs re-confirmed passing non-vacuously.
 `amenable_creusot`/`amenable_verus` received zero changes, as Skip
-policy requires. Not yet committed (user's call). Steps 1–2 still not
-started.
+policy requires. Committed (`46b3ba7`, `11e53b2`). ✅ Step 1 done: all
+four confirmed live macro-injection sites (`exchange.rs`,
+`capture_exchange_body.rs`, `state_machine.rs`, `kani_compose.rs`) fixed
+with `elicitation`'s proven `#[allow(unexpected_cfgs)] const _: () = { ... };`
+wrapper pattern, each confirmed in an isolated scratch crate first, then
+re-verified against real Kani (2 proofs), Creusot (150 files proved),
+and Verus (491 verified) checks. Step 2 still not started.
 
 **Description:** Surfaced while investigating why cordial's tracing
 `--apply` couldn't run blind against this workspace. Problem 1 (fixed):
