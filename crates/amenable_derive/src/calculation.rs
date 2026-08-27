@@ -15,6 +15,7 @@ pub struct CalculationArgs {
 }
 
 impl Parse for CalculationArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut token = None;
         let pairs = Punctuated::<MetaNameValue, Token![,]>::parse_terminated(input)?;
@@ -44,6 +45,7 @@ impl Parse for CalculationArgs {
 
 /// Expand a `#[calculation(token = TokenType)]`-decorated function into its
 /// evidence-chain wiring.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(args, input)))]
 pub fn expand_calculation(args: &CalculationArgs, input: &ItemFn) -> syn::Result<TokenStream> {
     if !input.sig.generics.params.is_empty() {
         return Err(Error::new_spanned(
@@ -183,6 +185,7 @@ pub fn expand_calculation(args: &CalculationArgs, input: &ItemFn) -> syn::Result
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn to_pascal_case(input: &str) -> String {
     input
         .split('_')

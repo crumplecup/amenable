@@ -22,6 +22,7 @@ struct StandardArgs {
 }
 
 /// Expand `#[derive(Standard)]` for a struct carrying `#[standard(...)]`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_standard(input: &DeriveInput) -> syn::Result<TokenStream> {
     let args = parse_standard_args(&input.attrs)?;
     let name = &input.ident;
@@ -129,6 +130,7 @@ pub fn expand_standard(input: &DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_standard_args(attrs: &[syn::Attribute]) -> syn::Result<StandardArgs> {
     let mut basis = None;
     let mut basis_ctor = None;

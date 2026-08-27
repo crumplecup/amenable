@@ -88,6 +88,7 @@ impl Parse for VerusWitnessArgs {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub(crate) fn expand_verus_witness(
     input: proc_macro2::TokenStream,
     ensures: bool,
@@ -150,6 +151,7 @@ struct VerusPredicateWitnessArgs {
 }
 
 impl Parse for VerusPredicateWitnessArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let ty: Type = input.parse()?;
         input.parse::<Token![,]>()?;
@@ -175,6 +177,7 @@ impl Parse for VerusPredicateWitnessArgs {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub(crate) fn expand_verus_predicate_witness(
     input: proc_macro2::TokenStream,
     ensures: bool,
@@ -213,6 +216,7 @@ pub(crate) fn expand_verus_predicate_witness(
     codegen(&args.ty, &args.evidence, ensures, &clauses)
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(ty, evidence)))]
 fn codegen(
     ty: &Type,
     evidence: &Expr,

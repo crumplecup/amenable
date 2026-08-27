@@ -81,6 +81,7 @@ pub struct EstablishArgs {
 }
 
 impl Parse for EstablishArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut credential = None;
         let mut verifier = None;
@@ -111,6 +112,7 @@ impl Parse for EstablishArgs {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(value)))]
 fn require<T>(value: Option<T>, name: &str) -> syn::Result<T> {
     value.ok_or_else(|| {
         Error::new(
@@ -120,6 +122,7 @@ fn require<T>(value: Option<T>, name: &str) -> syn::Result<T> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(expr)))]
 fn expect_path(expr: &Expr) -> syn::Result<Path> {
     let Expr::Lit(expr_lit) = expr else {
         return Err(Error::new_spanned(expr, "expected a string literal"));
@@ -131,6 +134,7 @@ fn expect_path(expr: &Expr) -> syn::Result<Path> {
 }
 
 /// Expand `#[establish(..)]` on `struct TokenName(());`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(args, item)))]
 pub fn expand_establish(args: &EstablishArgs, item: &ItemStruct) -> syn::Result<TokenStream> {
     let Fields::Unnamed(fields) = &item.fields else {
         return Err(Error::new_spanned(

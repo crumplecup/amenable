@@ -37,6 +37,7 @@ use syn::{
 };
 
 /// Expand `#[evidence]` on an `impl Evidence for ...` block.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_evidence(mut input: ItemImpl) -> syn::Result<TokenStream> {
     let already_has_is_root = input
         .items
@@ -59,6 +60,7 @@ pub fn expand_evidence(mut input: ItemImpl) -> syn::Result<TokenStream> {
     Ok(quote! { #input })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 fn find_basis_type(input: &ItemImpl) -> syn::Result<&Type> {
     input
         .items
@@ -73,6 +75,7 @@ fn find_basis_type(input: &ItemImpl) -> syn::Result<&Type> {
 /// Whether a `Basis`/`type` reference is literally the token `Self` —
 /// shared with the `Standard` derive, which computes `is_root` the same
 /// syntactic way.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(ty), ret))]
 pub(crate) fn is_literally_self(ty: &Type) -> bool {
     matches!(
         ty,
@@ -93,6 +96,7 @@ struct EvidenceDeriveArgs {
 /// default's-actually-used discipline for generic types), just without
 /// the `Standard`/`Provenance` half, and with `Audit` fixed to `()` —
 /// a provable claim has no citation to audit.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_evidence_derive(input: &DeriveInput) -> syn::Result<TokenStream> {
     let args = parse_evidence_derive_args(&input.attrs)?;
     let name = &input.ident;
@@ -156,6 +160,7 @@ pub fn expand_evidence_derive(input: &DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_evidence_derive_args(attrs: &[syn::Attribute]) -> syn::Result<EvidenceDeriveArgs> {
     let mut basis = None;
     let mut basis_ctor = None;

@@ -18,6 +18,7 @@ use crate::{
     parse_provenance_container_options, parse_witness_container_options,
 };
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     let evidence_ident = &input.ident;
     let proof_ident = format_ident!("{evidence_ident}WitnessProof");
@@ -147,6 +148,7 @@ struct ProofTypeContext<'a> {
     verus_module_path: &'a str,
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(ctx, data)))]
 fn expand_struct_proof_type(
     ctx: &ProofTypeContext<'_>,
     data: &DataStruct,
@@ -274,6 +276,10 @@ fn expand_struct_proof_type(
     })
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "info", skip(ctx, variant_prefix, data))
+)]
 fn expand_enum_proof_types(
     ctx: &ProofTypeContext<'_>,
     variant_prefix: &syn::Ident,
@@ -434,6 +440,20 @@ fn expand_enum_proof_types(
     })
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(
+        level = "debug",
+        skip(
+            variant_prefix,
+            evidence_generics,
+            proof_generics,
+            display_generics,
+            artifact_generics,
+            variant
+        )
+    )
+)]
 fn expand_enum_variant_proof_type(
     variant_prefix: &syn::Ident,
     evidence_generics: &Generics,
@@ -548,6 +568,7 @@ fn expand_enum_variant_proof_type(
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(fields)))]
 fn expand_proof_fields(fields: &Fields) -> syn::Result<Vec<ProofField>> {
     match fields {
         Fields::Named(fields) => fields
@@ -572,6 +593,7 @@ fn expand_proof_fields(fields: &Fields) -> syn::Result<Vec<ProofField>> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field, ident)))]
 fn expand_proof_field(
     field: &syn::Field,
     position: Option<usize>,
@@ -594,12 +616,14 @@ fn expand_proof_field(
     }))
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field)))]
 fn named_proof_field_ident(field: &syn::Field) -> syn::Result<syn::Ident> {
     field.ident.clone().ok_or_else(|| {
         syn::Error::new_spanned(field, "named proof field generation requires identifiers")
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]
 fn collect_witness_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     match data {
         Data::Struct(data) => collect_field_types_from_fields(&data.fields),
@@ -616,6 +640,10 @@ fn collect_witness_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     }
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(generics, field_types))
+)]
 fn add_witness_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
     let where_clause = generics.make_where_clause();
     where_clause
@@ -631,6 +659,10 @@ fn add_witness_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Res
     Ok(())
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(generics, field_types))
+)]
 fn add_classified_witness_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
     let where_clause = generics.make_where_clause();
     where_clause
@@ -646,6 +678,10 @@ fn add_classified_witness_bounds(generics: &mut Generics, field_types: &[Type]) 
     Ok(())
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(generics, field_types))
+)]
 fn add_display_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
     let where_clause = generics.make_where_clause();
 
@@ -658,6 +694,10 @@ fn add_display_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Res
     Ok(())
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(generics, field_types))
+)]
 fn add_witness_artifact_bounds(generics: &mut Generics, field_types: &[Type]) -> syn::Result<()> {
     let where_clause = generics.make_where_clause();
 
@@ -670,6 +710,10 @@ fn add_witness_artifact_bounds(generics: &mut Generics, field_types: &[Type]) ->
     Ok(())
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(evidence_generics))
+)]
 fn expand_generics_marker(evidence_generics: &Generics) -> TokenStream {
     let marker_type = generics_marker_type(evidence_generics);
 
@@ -678,6 +722,10 @@ fn expand_generics_marker(evidence_generics: &Generics) -> TokenStream {
     }
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(evidence_generics))
+)]
 fn generics_marker_type(evidence_generics: &Generics) -> TokenStream {
     let marker_members = evidence_generics
         .params
@@ -692,6 +740,7 @@ fn generics_marker_type(evidence_generics: &Generics) -> TokenStream {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(param)))]
 fn generic_marker_member(param: &GenericParam) -> TokenStream {
     match param {
         GenericParam::Type(type_param) => {
@@ -709,6 +758,7 @@ fn generic_marker_member(param: &GenericParam) -> TokenStream {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(evidence_ident)))]
 fn default_verus_module_path(evidence_ident: &syn::Ident) -> String {
     format!(
         "crate::derived_witness::{}_witness",
@@ -716,6 +766,7 @@ fn default_verus_module_path(evidence_ident: &syn::Ident) -> String {
     )
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn to_snake_case(name: &str) -> String {
     let chars = name.chars().collect::<Vec<_>>();
     let mut snake = String::new();

@@ -52,6 +52,7 @@ use witness::expand_witness;
 /// hand-maintained description could. Falls back to reconstructing the
 /// source from tokens (losing original formatting) if `source_text` is
 /// unavailable for the span.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro]
 pub fn harness(input: TokenStream) -> TokenStream {
     match expand_harness(input.into(), HarnessRegistration::Tracked) {
@@ -68,6 +69,7 @@ pub fn harness(input: TokenStream) -> TokenStream {
 /// separately-registered `KaniGalleryRegistration` and run only via the
 /// dedicated `amenable gallery` subcommand. See `harness.rs`'s own doc
 /// comment for the real incident this split exists to prevent.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro]
 pub fn gallery_harness(input: TokenStream) -> TokenStream {
     match expand_harness(input.into(), HarnessRegistration::GalleryOnly) {
@@ -76,6 +78,7 @@ pub fn gallery_harness(input: TokenStream) -> TokenStream {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Provenance, attributes(provenance))]
 pub fn derive_provenance(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -88,6 +91,7 @@ pub fn derive_provenance(input: TokenStream) -> TokenStream {
 
 /// Turn a method into a chain link in the evidence graph: it knows it has a
 /// method, knows it yields a token (named here), and registers itself.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr, item)))]
 #[proc_macro_attribute]
 pub fn calculation(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(attr as CalculationArgs);
@@ -157,6 +161,7 @@ pub fn capture_exchange_body(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// attribute shares this exact name with real arguments (`#[evidence(
 /// basis = "..", ..)]`), a realistic mistake to make on this macro's own
 /// bare `#[evidence]` form.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr, item)))]
 #[proc_macro_attribute]
 pub fn evidence(attr: TokenStream, item: TokenStream) -> TokenStream {
     parse_macro_input!(attr as syn::parse::Nothing);
@@ -175,6 +180,7 @@ pub fn evidence(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// [`derive_standard`] already does for its own root, non-generic case —
 /// see `evidence.rs`'s own doc comment for the full rationale and the real
 /// duplication (and missing registry entries) this closes.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Evidence, attributes(evidence))]
 pub fn derive_evidence(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -187,6 +193,7 @@ pub fn derive_evidence(input: TokenStream) -> TokenStream {
 
 /// Generate both `Standard` and `Evidence` impls from a `#[standard(...)]`
 /// attribute, since they always share the same provenance value.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Standard, attributes(standard))]
 pub fn derive_standard(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -200,6 +207,7 @@ pub fn derive_standard(input: TokenStream) -> TokenStream {
 /// Generate `impl ProofToken for X { type Proposition = Y; }` from a
 /// `#[proof_token(proposition = "Y")]` attribute -- see [`proof_token`]'s
 /// own doc comment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(ProofToken, attributes(proof_token))]
 pub fn derive_proof_token(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -214,6 +222,7 @@ pub fn derive_proof_token(input: TokenStream) -> TokenStream {
 /// from a `#[establish(credential = .., verifier = .., proposition = ..)]`
 /// attribute on the token struct -- see [`establish`]'s own doc comment
 /// for why this is an attribute macro, not a derive.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr, item)))]
 #[proc_macro_attribute]
 pub fn establish(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(attr as EstablishArgs);
@@ -229,6 +238,7 @@ pub fn establish(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// from `#[sidecar(verifier = .., proposition = .., constructor = ..)]`
 /// and `#[sidecar(primary)]`/`#[sidecar(token)]` field markers -- see
 /// [`sidecar`]'s own doc comment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Sidecar, attributes(sidecar))]
 pub fn derive_sidecar(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -243,6 +253,7 @@ pub fn derive_sidecar(input: TokenStream) -> TokenStream {
 /// for the full `#[state_machine(verifier = .., state(..), edge(..))]`
 /// syntax. Step 1 of `docs/STATE_MACHINE_DERIVATION_PLAN.md`: emits only
 /// the compiler-enforced static assertions, one per declared edge.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(StateMachine, attributes(state_machine))]
 pub fn derive_state_machine(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -253,6 +264,7 @@ pub fn derive_state_machine(input: TokenStream) -> TokenStream {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(KaniCompose)]
 pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -263,6 +275,7 @@ pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Witness, attributes(provenance, witness))]
 pub fn derive_witness(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -277,6 +290,7 @@ pub fn derive_witness(input: TokenStream) -> TokenStream {
 /// literal of its real `ensures` clauses, extracted from the real
 /// carrier source at compile time -- a missing harness or clause is a
 /// real compile error here, not a runtime failure discovered later.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_ensures_fragments(input: TokenStream) -> TokenStream {
@@ -288,6 +302,7 @@ pub fn verus_ensures_fragments(input: TokenStream) -> TokenStream {
 
 /// Like [`verus_ensures_fragments!`], for a harness's real `requires`
 /// clauses instead.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_requires_fragments(input: TokenStream) -> TokenStream {
@@ -303,6 +318,7 @@ pub fn verus_requires_fragments(input: TokenStream) -> TokenStream {
 /// `ContractRecord` registration per clause -- see
 /// [`verus_contract`]'s own doc comment for why `Bound` is a slice
 /// and why the registration is generated rather than hand-written.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_ensures_witness(input: TokenStream) -> TokenStream {
@@ -313,6 +329,7 @@ pub fn verus_ensures_witness(input: TokenStream) -> TokenStream {
 }
 
 /// Like [`verus_ensures_witness!`], for `Requires` instead.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_requires_witness(input: TokenStream) -> TokenStream {
@@ -327,6 +344,7 @@ pub fn verus_requires_witness(input: TokenStream) -> TokenStream {
 /// named `pub open spec fn`'s own declaration (shared across several
 /// different harnesses/carrier files) rather than any one harness's own
 /// clause list. See [`verus_contract`]'s own doc comment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_ensures_predicate(input: TokenStream) -> TokenStream {
@@ -337,6 +355,7 @@ pub fn verus_ensures_predicate(input: TokenStream) -> TokenStream {
 }
 
 /// Like [`verus_ensures_predicate!`], for `Requires` instead.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]
 pub fn verus_requires_predicate(input: TokenStream) -> TokenStream {
@@ -352,6 +371,7 @@ struct ProvenanceContainerOptions {
 }
 
 impl Default for ProvenanceContainerOptions {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self {
             crate_path: parse_quote!(amenable_core),
@@ -371,6 +391,7 @@ struct MemberOptions {
     skip: bool,
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_provenance_container_options(&input.attrs)?;
     let name = &input.ident;
@@ -408,6 +429,7 @@ fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStrea
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]
 fn expand_struct_metadata(
     crate_path: &Path,
     data: &DataStruct,
@@ -421,6 +443,7 @@ fn expand_struct_metadata(
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data, options)))]
 fn expand_enum_metadata(
     crate_path: &Path,
     data: &DataEnum,
@@ -440,6 +463,7 @@ fn expand_enum_metadata(
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(variant)))]
 fn expand_variant_arm(
     crate_path: &Path,
     variant: &Variant,
@@ -555,6 +579,7 @@ fn expand_variant_arm(
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(fields)))]
 fn expand_struct_field_pushes(
     crate_path: &Path,
     fields: &Fields,
@@ -583,6 +608,10 @@ fn expand_struct_field_pushes(
     }
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(field, field_access))
+)]
 fn expand_struct_field_push(
     crate_path: &Path,
     field: &Field,
@@ -601,6 +630,7 @@ fn expand_struct_field_push(
     ))
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field_access)))]
 fn expand_field_entries(
     crate_path: &Path,
     field_name: String,
@@ -622,6 +652,7 @@ fn expand_field_entries(
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]
 fn collect_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     match data {
         Data::Struct(data) => collect_field_types_from_fields(&data.fields),
@@ -638,6 +669,7 @@ fn collect_field_types(data: &Data) -> syn::Result<Vec<Type>> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(fields)))]
 fn collect_field_types_from_fields(fields: &Fields) -> syn::Result<Vec<Type>> {
     match fields {
         Fields::Named(fields) => fields
@@ -656,6 +688,7 @@ fn collect_field_types_from_fields(fields: &Fields) -> syn::Result<Vec<Type>> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field)))]
 fn collect_field_type(field: &Field) -> syn::Result<Option<Type>> {
     let options = parse_member_options(&field.attrs)?;
 
@@ -666,6 +699,7 @@ fn collect_field_type(field: &Field) -> syn::Result<Option<Type>> {
     Ok(Some(field.ty.clone()))
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field)))]
 fn field_name(field: &Field, position: Option<usize>) -> syn::Result<String> {
     let options = parse_member_options(&field.attrs)?;
     if let Some(rename) = options.rename {
@@ -682,6 +716,7 @@ fn field_name(field: &Field, position: Option<usize>) -> syn::Result<String> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_provenance_container_options(
     attrs: &[syn::Attribute],
 ) -> syn::Result<ProvenanceContainerOptions> {
@@ -711,6 +746,7 @@ fn parse_provenance_container_options(
     Ok(options)
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_witness_container_options(
     attrs: &[syn::Attribute],
 ) -> syn::Result<WitnessContainerOptions> {
@@ -739,6 +775,7 @@ fn parse_witness_container_options(
     Ok(options)
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_member_options(attrs: &[syn::Attribute]) -> syn::Result<MemberOptions> {
     let mut options = MemberOptions::default();
 

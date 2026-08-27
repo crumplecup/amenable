@@ -39,6 +39,10 @@ pub enum HarnessRegistration {
 /// verbatim source text. When `registration` is [`HarnessRegistration::
 /// Tracked`], a `kani` invocation additionally registers the contained
 /// function as a tracked [`amenable_kani::KaniProof`].
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(input, registration))
+)]
 pub fn expand_harness(
     input: TokenStream,
     registration: HarnessRegistration,
@@ -108,6 +112,7 @@ pub fn expand_harness(
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(tokens)))]
 fn expect_ident(
     tokens: &mut std::iter::Peekable<impl Iterator<Item = TokenTree>>,
 ) -> syn::Result<Ident> {
@@ -121,6 +126,7 @@ fn expect_ident(
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(tokens)))]
 fn expect_comma(
     tokens: &mut std::iter::Peekable<impl Iterator<Item = TokenTree>>,
 ) -> syn::Result<()> {
@@ -131,6 +137,7 @@ fn expect_comma(
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(tokens)))]
 fn expect_brace_group(
     tokens: &mut std::iter::Peekable<impl Iterator<Item = TokenTree>>,
 ) -> syn::Result<proc_macro2::Group> {
@@ -146,6 +153,7 @@ fn expect_brace_group(
 
 /// Strip the outer `{`/`}` a brace group's own `source_text()` includes,
 /// along with the whitespace immediately inside them.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn trim_braces(text: &str) -> &str {
     text.trim()
         .strip_prefix('{')

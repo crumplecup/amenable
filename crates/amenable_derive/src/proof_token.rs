@@ -24,6 +24,7 @@ use syn::{DeriveInput, Error, LitStr, Type};
 /// that record's own doc comment) filters down to whichever tokens it
 /// actually cares about; every `ProofToken`-derived type in the workspace
 /// registering here costs nothing unused.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_proof_token(input: &DeriveInput) -> syn::Result<TokenStream> {
     let proposition = parse_proof_token_args(&input.attrs)?;
     let name = &input.ident;
@@ -44,6 +45,7 @@ pub fn expand_proof_token(input: &DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_proof_token_args(attrs: &[syn::Attribute]) -> syn::Result<Type> {
     let mut proposition = None;
 

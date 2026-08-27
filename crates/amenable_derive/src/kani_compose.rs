@@ -6,6 +6,7 @@ use quote::quote;
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Error, Fields, Type, parse_quote};
 
 /// Expand `#[derive(KaniCompose)]` for structs and enums.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_kani_compose(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
     let mut generics = input.generics.clone();
@@ -72,6 +73,7 @@ pub fn expand_kani_compose(input: &DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]
 fn collect_field_types(data: &Data) -> Vec<Type> {
     let mut field_types = Vec::new();
 
@@ -88,10 +90,12 @@ fn collect_field_types(data: &Data) -> Vec<Type> {
     field_types
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data, method)))]
 fn struct_ctor(data: &DataStruct, method: syn::Ident) -> syn::Result<TokenStream> {
     fields_ctor(&data.fields, method, None)
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data, method)))]
 fn enum_ctor(data: &DataEnum, method: syn::Ident, fixed_variant: bool) -> syn::Result<TokenStream> {
     let variants = data.variants.iter().collect::<Vec<_>>();
     if variants.is_empty() {
@@ -136,6 +140,10 @@ fn enum_ctor(data: &DataEnum, method: syn::Ident, fixed_variant: bool) -> syn::R
     }})
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(variant, method, self_ty))
+)]
 fn variant_ctor(
     variant: &syn::Variant,
     method: syn::Ident,
@@ -149,6 +157,10 @@ fn variant_ctor(
     fields_ctor(&variant.fields, method, Some(prefix))
 }
 
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(fields, method, prefix))
+)]
 fn fields_ctor(
     fields: &Fields,
     method: syn::Ident,
@@ -185,6 +197,7 @@ fn fields_ctor(
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn compose_method(name: &str) -> syn::Ident {
     syn::Ident::new(name, proc_macro2::Span::call_site())
 }

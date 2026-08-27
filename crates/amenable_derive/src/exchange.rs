@@ -93,6 +93,7 @@ pub struct ExchangeArgs {
 }
 
 impl Parse for ExchangeArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut cfg = None;
         let mut verifier = None;
@@ -143,6 +144,7 @@ impl Parse for ExchangeArgs {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(value)))]
 fn require<T>(value: Option<T>, name: &str) -> syn::Result<T> {
     value.ok_or_else(|| {
         Error::new(
@@ -152,6 +154,7 @@ fn require<T>(value: Option<T>, name: &str) -> syn::Result<T> {
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(expr)))]
 fn expect_ident(expr: &Expr) -> syn::Result<Ident> {
     let Expr::Path(expr_path) = expr else {
         return Err(Error::new_spanned(expr, "expected an identifier"));
@@ -163,6 +166,7 @@ fn expect_ident(expr: &Expr) -> syn::Result<Ident> {
         .ok_or_else(|| Error::new_spanned(expr, "expected a single identifier, not a path"))
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(expr)))]
 fn expect_path(expr: &Expr) -> syn::Result<Path> {
     let Expr::Path(expr_path) = expr else {
         return Err(Error::new_spanned(expr, "expected a type path"));
@@ -171,6 +175,7 @@ fn expect_path(expr: &Expr) -> syn::Result<Path> {
 }
 
 /// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(expr)))]
 pub(crate) fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
     let Expr::Lit(expr_lit) = expr else {
         return Err(Error::new_spanned(expr, "expected a string literal"));
@@ -182,6 +187,7 @@ pub(crate) fn expect_path_lit(expr: &Expr) -> syn::Result<Path> {
 }
 
 /// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(expr)))]
 pub(crate) fn expect_lit_str(expr: &Expr) -> syn::Result<LitStr> {
     let Expr::Lit(expr_lit) = expr else {
         return Err(Error::new_spanned(expr, "expected a string literal"));
@@ -194,6 +200,7 @@ pub(crate) fn expect_lit_str(expr: &Expr) -> syn::Result<LitStr> {
 
 /// Expand `#[exchange(..)]` on `impl SelfType { fn method(&self, input:
 /// Input) -> Result<Output, Error> { .. } }`.
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(args, item_impl)))]
 pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result<TokenStream> {
     if item_impl.trait_.is_some() {
         return Err(Error::new_spanned(
@@ -390,6 +397,7 @@ pub fn expand_exchange(args: &ExchangeArgs, item_impl: &ItemImpl) -> syn::Result
 /// `pub(crate)`: `capture_exchange_body.rs` reuses this verbatim rather
 /// than duplicating it -- the identical span-capture technique, applied
 /// to a method with no injected contract/`Witness`/`Exchange` bundle.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub(crate) fn trim_braces(text: &str) -> &str {
     text.trim()
         .strip_prefix('{')
@@ -400,6 +408,7 @@ pub(crate) fn trim_braces(text: &str) -> &str {
 
 /// Extract `(T, E)` from a `Result<T, E>` return type. `pub(crate)`: see
 /// [`trim_braces`]'s own doc comment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(ty)))]
 pub(crate) fn extract_result_generics(ty: &Type) -> syn::Result<(Type, Type)> {
     let Type::Path(type_path) = ty else {
         return Err(Error::new_spanned(ty, "expected `Result<Output, Error>`"));

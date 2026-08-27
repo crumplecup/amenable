@@ -52,6 +52,7 @@ struct SidecarArgs {
     constructor: Visibility,
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(input)))]
 pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
     let args = parse_sidecar_args(&input.attrs)?;
     let name = &input.ident;
@@ -224,6 +225,10 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
 /// Only add an `Evidence`/`Witness<V>` bound for a type that's actually a
 /// generic parameter of this struct -- a concrete primary type
 /// (`TransferPayload`) needs no bound restated here at all.
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(generics, primary_ty, proposition_ty, verifier))
+)]
 fn evidence_bound(
     generics: &syn::Generics,
     primary_ty: &Type,
@@ -257,10 +262,12 @@ fn evidence_bound(
 /// `syn::Type` carries no `PartialEq` impl without the `extra-traits`
 /// feature (not enabled here) -- compare by token text instead, the
 /// common workaround for this exact situation.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(left, right)))]
 fn types_match(left: &Type, right: &Type) -> bool {
     quote!(#left).to_string() == quote!(#right).to_string()
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 fn struct_fields(input: &DeriveInput) -> syn::Result<&Fields> {
     match &input.data {
         syn::Data::Struct(data) => Ok(&data.fields),
@@ -271,6 +278,7 @@ fn struct_fields(input: &DeriveInput) -> syn::Result<&Fields> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(fields)))]
 fn find_marked_field<'a>(fields: &'a syn::FieldsNamed, marker: &str) -> syn::Result<&'a Field> {
     let mut found = None;
     for field in &fields.named {
@@ -293,6 +301,7 @@ fn find_marked_field<'a>(fields: &'a syn::FieldsNamed, marker: &str) -> syn::Res
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(field)))]
 fn has_marker(field: &Field, marker: &str) -> syn::Result<bool> {
     let mut found = false;
     for attr in field
@@ -314,6 +323,7 @@ fn has_marker(field: &Field, marker: &str) -> syn::Result<bool> {
     Ok(found)
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field)))]
 fn require_phantom_data(field: &Field) -> syn::Result<()> {
     let is_phantom = matches!(
         &field.ty,
@@ -331,6 +341,7 @@ fn require_phantom_data(field: &Field) -> syn::Result<()> {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attrs)))]
 fn parse_sidecar_args(attrs: &[syn::Attribute]) -> syn::Result<SidecarArgs> {
     let mut verifier = None;
     let mut proposition = None;

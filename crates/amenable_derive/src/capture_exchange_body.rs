@@ -89,6 +89,7 @@ pub struct CaptureExchangeBodyArgs {
 }
 
 impl Parse for CaptureExchangeBodyArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut evidence = None;
         let mut creusot_ensures = None;
@@ -151,6 +152,7 @@ impl Parse for CaptureExchangeBodyArgs {
 /// supported; generics on the *method* -- `Ledger::validate<V: Verifier>`
 /// -- are unaffected, since only the impl block's own generics are
 /// checked here).
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(args, item_impl)))]
 pub fn expand_capture_exchange_body(
     args: &CaptureExchangeBodyArgs,
     item_impl: &ItemImpl,

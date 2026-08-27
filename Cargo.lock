@@ -91,6 +91,7 @@ dependencies = [
  "quote",
  "strum",
  "syn 3.0.3",
+ "tracing",
  "trybuild",
  "verus_syn",
 ]

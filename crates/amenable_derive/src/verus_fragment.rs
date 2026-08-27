@@ -12,6 +12,7 @@
 use amenable_core::{verus_find_fn, verus_literal_clauses};
 use syn::LitStr;
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub(crate) fn expand_verus_fragments(
     input: proc_macro2::TokenStream,
     ensures: bool,

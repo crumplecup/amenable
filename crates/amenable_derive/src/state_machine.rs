@@ -166,6 +166,7 @@ struct StateMachineBlock {
 
 /// Expand `#[derive(StateMachine)]` for a type carrying one or more
 /// `#[state_machine(..)]` attributes.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 pub fn expand_state_machine(input: &DeriveInput) -> syn::Result<TokenStream> {
     let self_ty = &input.ident;
 
@@ -191,6 +192,7 @@ pub fn expand_state_machine(input: &DeriveInput) -> syn::Result<TokenStream> {
     Ok(quote! { #(#expansions)* })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self_ty, block)))]
 fn expand_block(self_ty: &syn::Ident, block: &StateMachineBlock) -> syn::Result<TokenStream> {
     let assertions = expand_block_assertions(self_ty, block)?;
     let state_machine_impl = expand_block_state_machine_impl(self_ty, block);
@@ -219,6 +221,7 @@ fn expand_block(self_ty: &syn::Ident, block: &StateMachineBlock) -> syn::Result<
 /// Exchange<Input, Output, Verifier>` to hold, exactly like a direct
 /// call would -- without whatever specific nesting shape `creusot-rustc`
 /// can't translate.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self_ty, block)))]
 fn expand_block_assertions(
     self_ty: &syn::Ident,
     block: &StateMachineBlock,
@@ -297,6 +300,7 @@ fn expand_block_assertions(
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self_ty, block)))]
 fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlock) -> TokenStream {
     let self_ty_str = self_ty.to_string();
 
@@ -450,6 +454,7 @@ fn expand_block_state_machine_impl(self_ty: &syn::Ident, block: &StateMachineBlo
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(states, name)))]
 fn find_state_carrier<'a>(states: &'a [StateDecl], name: &LitStr) -> syn::Result<&'a Type> {
     states
         .iter()
@@ -466,6 +471,7 @@ fn find_state_carrier<'a>(states: &'a [StateDecl], name: &LitStr) -> syn::Result
         })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr)))]
 fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock> {
     let mut verifier: Option<Type> = None;
     let mut generic_over_verifier = false;
@@ -528,6 +534,7 @@ fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock>
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(meta)))]
 fn parse_state_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<StateDecl> {
     let content;
     syn::parenthesized!(content in meta.input);
@@ -576,6 +583,7 @@ fn parse_state_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<StateDecl>
     })
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(meta)))]
 fn parse_edge_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<EdgeDecl> {
     let content;
     syn::parenthesized!(content in meta.input);
