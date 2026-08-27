@@ -36,7 +36,12 @@ four confirmed live macro-injection sites (`exchange.rs`,
 with `elicitation`'s proven `#[allow(unexpected_cfgs)] const _: () = { ... };`
 wrapper pattern, each confirmed in an isolated scratch crate first, then
 re-verified against real Kani (2 proofs), Creusot (150 files proved),
-and Verus (491 verified) checks. Step 2 still not started.
+and Verus (491 verified) checks. ✅ Step 2 done: cordial's new
+`cfg-hygiene` etiquette (`UNEXPECTED-CFG-001`, `CFG-VERIFIER-MISMATCH-001`)
+implemented, tested (6 tests), and dogfooded against `amenable` itself
+with the real `crate_verifier` config — zero findings on either rule.
+Committed in `~/repos/cordial` (`e5c5059`, `5fd8ad5`). All four numbered
+steps of this plan are now done.
 
 **Description:** Surfaced while investigating why cordial's tracing
 `--apply` couldn't run blind against this workspace. Problem 1 (fixed):

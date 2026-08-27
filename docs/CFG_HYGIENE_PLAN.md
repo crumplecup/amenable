@@ -25,8 +25,14 @@ real Kani gallery-registry-leak bug found and fixed along the way --
 see `project_kani_gallery_registry_leak_fixed` memory) and `11e53b2`
 (the tracing-apply rollout itself). Not yet done: generalizing `--apply`
 beyond tracing (Phase 1, mentioned only in passing in this plan's own
-discussion, not itself a numbered step here). Step 2 (cordial
-`cfg-hygiene` etiquette) not started.
+discussion, not itself a numbered step here). ✅ Step 2 done: the new
+cordial `cfg-hygiene` etiquette (`UNEXPECTED-CFG-001`,
+`CFG-VERIFIER-MISMATCH-001`) is implemented, tested (6 tests), and
+dogfooded against `amenable` itself — zero findings on either rule (see
+"Step 2" below). Committed in `~/repos/cordial` as two commits on
+`dev`: `e5c5059` (unrelated pre-existing rustfmt drift, split out) and
+`5fd8ad5` (the etiquette itself). All four numbered steps in this plan
+are now done.
 
 ## Why this exists
 
@@ -147,36 +153,52 @@ Real, non-vacuous re-verification (not just `cargo check`/`clippy`/
   directly, but depends on `amenable_gaap`/`amenable_kani` compiling
   cleanly).
 
-## Step 2 — cordial: new `cfg-hygiene` etiquette
+## Step 2 — cordial: new `cfg-hygiene` etiquette ✅
 
-Not started. Two rules, own `mod.rs`/`scan.rs`/`assessor.rs`/etc. file
-layout matching the existing `cfg_scatter` etiquette's precedent
-(`~/repos/cordial/src/etiquettes/cfg_scatter/`) — a sibling, not an
-extension of it (different concern: `cfg_scatter` is about
-organizational DRY-ness, this is about lint-hygiene correctness):
+Done. Two rules, own `mod.rs`/`scan.rs`/`declared.rs`/`scan_crate.rs`/
+`enricher.rs`/`probe.rs`/`assessor.rs`/`reporter.rs` file layout closer to
+`antipatterns`' multi-rule shape than `cfg_scatter`'s single-rule one
+(`~/repos/cordial/src/etiquettes/cfg_hygiene/`) — a sibling to
+`cfg_scatter`, not an extension of it (different concern: `cfg_scatter`
+is about organizational DRY-ness, this is about lint-hygiene
+correctness); full design rationale in cordial's own
+`docs/planning/cfg-hygiene-etiquette.md`:
 
 - **UNEXPECTED-CFG-001**: any `cfg(X)`/`cfg_attr(X, ...)` (including
   nested in `all()`/`any()`/`not()`) where `X` isn't declared in any
-  check-cfg source reachable by that crate (workspace `[lints.rust]`,
-  crate-local `[lints.rust]`, or `build.rs`-emitted). The literal
-  elicitation-flavor bug, generalized for any cordial-scanned project —
-  finds nothing in `amenable` today (everything's declared after Step
-  0), but protects it going forward and is directly reusable by
-  `elicitation` itself or any other cordial-scanned proof-heavy project.
-- **CFG-VERIFIER-MISMATCH-001**: a crate using a verifier cfg name that
-  isn't its own — the real gap a union-based check-cfg list creates and
-  can never self-detect (confirmed: `creusot` is declared "expected"
-  workspace-wide in `amenable`'s old config, so `rustc` itself could
-  never catch a misplaced `#[cfg(creusot)]` in `amenable_kani`). Needs a
-  config table, e.g. `[cfg_hygiene] crate_verifier = { amenable_kani =
-  "kani", amenable_creusot = "creusot", amenable_verus = "verus" }`, so
-  cordial knows each crate's expected identity.
+  check-cfg source reachable by that crate — rustc's own ~32 built-in
+  names (verified against a real `nightly` `rustc --print=check-cfg`
+  run), Cargo's three injected extras (`test`/`feature`/`docsrs`,
+  verified empirically), this crate's own `Cargo.toml [lints.rust]`/
+  `build.rs`, the workspace's `[workspace.lints.rust]` if opted in via
+  `[lints] workspace = true`, plus `cordial.toml`'s `extra_known_names`
+  escape hatch. The literal elicitation-flavor bug, generalized for any
+  cordial-scanned project.
+- **CFG-VERIFIER-MISMATCH-001**: a crate *registered in `cordial.toml`'s
+  `[cfg_hygiene] crate_verifier` table* using a *different* verifier's
+  cfg name than its own configured identity — the real gap a
+  union-based check-cfg list creates and can never self-detect
+  (confirmed: `creusot` was declared "expected" workspace-wide in
+  `amenable`'s old config, so `rustc` itself could never catch a
+  misplaced `#[cfg(creusot)]` in `amenable_kani`). Deliberately narrow
+  and opt-in per crate, not "flag any crate using a name it doesn't
+  own" — a verifier's `--cfg` reaches its whole compiled dependency
+  graph, so upstream crates shared across backends (`amenable_core`,
+  `amenable_gaap`) legitimately reference more than one verifier's name
+  on purpose; only crates actually listed in `crate_verifier` are
+  checked at all.
 
-This etiquette is also the safety net for cordial's own apply pipeline
-(tracing `--apply` and any future `derives --apply`): it can validate
-whatever a code-insertion feature just wrote, rather than needing a
-one-off manual `Cargo.toml` read the way this plan's own Step 0
-investigation did by hand.
+Dogfooded against `amenable` itself with the real config
+(`crate_verifier = { amenable_kani = "kani", amenable_creusot =
+"creusot", amenable_verus = "verus" }`): **zero findings on either
+rule** — confirms Step 0's per-crate `build.rs` declarations are
+complete, and Step 1's `unexpected_cfgs`-suppression fix never leaked a
+verifier cfg name into the wrong backend crate. This etiquette is also
+the safety net for cordial's own apply pipeline (tracing `--apply` and
+any future `derives --apply`): it can validate whatever a
+code-insertion feature just wrote, rather than needing a one-off manual
+`Cargo.toml` read the way this plan's own Step 0 investigation did by
+hand.
 
 ## Step 3 — cordial: `--apply` generalization + verifier-safety gating for tracing
 
