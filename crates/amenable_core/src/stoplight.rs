@@ -143,6 +143,7 @@ pub struct Red;
 impl Provenance for Red {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new(
             vec![MetadataEntry::new(
@@ -157,6 +158,7 @@ impl Provenance for Red {
 impl Standard for Red {
     type Provenance = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         *self
     }
@@ -166,14 +168,17 @@ impl Evidence for Red {
     type Basis = Self;
     type Audit = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         Self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         *self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         true
     }

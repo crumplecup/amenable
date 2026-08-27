@@ -17,7 +17,7 @@ use tracing_subscriber::EnvFilter;
 /// Safe to call more than once: `try_init` silently no-ops if a subscriber
 /// is already installed, so `fn main` and every `#[test]` under `tests/`
 /// can call this unconditionally rather than coordinating who goes first.
-#[tracing::instrument(level = "debug")]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub fn init_tracing() {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     let _ = tracing_subscriber::fmt().with_env_filter(filter).try_init();

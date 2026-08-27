@@ -45,6 +45,7 @@ pub struct ChainNode {
 
 impl ChainNode {
     /// Whether this node is a root: it rests on no further basis.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn is_root(&self) -> bool {
         self.bases.is_empty()
     }
@@ -85,6 +86,7 @@ impl Display for ProofChainReport {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(f, node)))]
 fn write_node(f: &mut Formatter<'_>, node: &ChainNode, depth: usize) -> fmt::Result {
     let indent = "  ".repeat(depth);
 
@@ -163,6 +165,7 @@ impl NotFoundSource {
     /// Name the subject that was searched for, recording the caller's
     /// location.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(subject)))]
     fn new(subject: impl Into<String>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -199,6 +202,7 @@ impl IncompleteSource {
     /// Name the subject, the required verifiers, and every gap found,
     /// recording the caller's location.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(subject, gaps)))]
     fn new(subject: impl Into<String>, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -212,6 +216,7 @@ impl IncompleteSource {
 }
 
 impl Display for IncompleteSource {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
@@ -265,6 +270,7 @@ impl ChainError {
     /// Construct an error from an already-classified kind, recording the
     /// caller's location.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(kind)))]
     fn new(kind: ChainErrorKind) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -277,6 +283,7 @@ impl ChainError {
     /// Construct a [`ChainErrorKind::NotFound`] error naming the subject
     /// that was searched for.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(subject)))]
     fn not_found(subject: impl Into<String>) -> Self {
         Self::new(ChainErrorKind::NotFound(NotFoundSource::new(subject)))
     }
@@ -284,6 +291,7 @@ impl ChainError {
     /// Construct a [`ChainErrorKind::Incomplete`] error naming the
     /// subject, the required verifiers, and every gap found.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(subject, gaps)))]
     fn incomplete(subject: impl Into<String>, required: Vec<String>, gaps: Vec<ChainGap>) -> Self {
         Self::new(ChainErrorKind::Incomplete(IncompleteSource::new(
             subject, required, gaps,
@@ -300,6 +308,7 @@ impl ChainError {
 /// if any node lacks a proof for any verifier present elsewhere in the
 /// tree. Only ever reads statically-registered descriptors — never
 /// constructs a value, evaluates a calculation, or runs a verifier.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", err(level = "warn")))]
 pub fn proof_chain(subject: &str) -> Result<ProofChainReport, ChainError> {
     proof_chain_for_verifiers(subject, None)
 }
@@ -308,6 +317,7 @@ pub fn proof_chain(subject: &str) -> Result<ProofChainReport, ChainError> {
 /// require completeness against exactly the named `verifiers` (e.g.
 /// `&["kani"]`) rather than every verifier discovered in the tree — pass
 /// `None` to match [`proof_chain`]'s auto-discovered behavior.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", err(level = "warn")))]
 pub fn proof_chain_for_verifiers(
     subject: &str,
     verifiers: Option<&[&str]>,
@@ -341,6 +351,7 @@ pub fn proof_chain_for_verifiers(
 /// Narrow a node's (already-complete) proofs down to just `required`, so
 /// a chain explicitly scoped to one verifier doesn't also print proofs
 /// for others that happen to be registered alongside it.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(node)))]
 fn filter_node(node: ChainNode, required: &[String]) -> ChainNode {
     let (evidence, proofs, bases) = node.dissolve();
     ChainNode::new(
@@ -356,6 +367,7 @@ fn filter_node(node: ChainNode, required: &[String]) -> ChainNode {
     )
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(links, visiting)))]
 fn build_node(
     name: &'static str,
     links: &[&EvidenceLink],
@@ -390,12 +402,14 @@ fn build_node(
 }
 
 /// Every distinct verifier with a registered proof anywhere in the tree.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(node)))]
 fn discover_verifiers(node: &ChainNode) -> Vec<String> {
     let mut found = Vec::new();
     collect_verifiers(node, &mut found);
     found
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(node)))]
 fn collect_verifiers(node: &ChainNode, found: &mut Vec<String>) {
     for (verifier, _) in node.proofs() {
         if !found.iter().any(|seen| seen == verifier) {
@@ -408,6 +422,7 @@ fn collect_verifiers(node: &ChainNode, found: &mut Vec<String>) {
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(node, gaps)))]
 fn collect_gaps(node: &ChainNode, required: &[String], gaps: &mut Vec<ChainGap>) {
     for verifier in required {
         if !node.proofs().iter().any(|(v, _)| v == verifier) {

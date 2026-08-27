@@ -84,6 +84,7 @@ impl WitnessSupportSummary {
     /// Combine the support surface from child witnesses.
     ///
     /// An empty product or unit variant is itself trivial.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(parts)))]
     pub fn compose(parts: &[Self]) -> Self {
         if parts.is_empty() {
             return Self::trivial_leaf();
@@ -143,6 +144,7 @@ impl WitnessSupportSummary {
 }
 
 impl std::fmt::Display for WitnessSupportSummary {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -252,6 +254,10 @@ pub struct WitnessArtifactNode {
 
 impl WitnessArtifactNode {
     /// Construct one leaf node.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(kind, support, detail))
+    )]
     pub fn leaf(
         kind: WitnessSupportKind,
         support: WitnessSupportSummary,
@@ -261,6 +267,10 @@ impl WitnessArtifactNode {
     }
 
     /// Construct one leaf node with structured metadata facts.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(kind, support, detail, metadata))
+    )]
     pub fn leaf_with_metadata(
         kind: WitnessSupportKind,
         support: WitnessSupportSummary,
@@ -281,6 +291,10 @@ impl WitnessArtifactNode {
     }
 
     /// Construct one composite node with named child members.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "trace", skip(shape, support, members))
+    )]
     pub fn with_members(
         shape: WitnessArtifactShape,
         support: WitnessSupportSummary,
@@ -301,6 +315,10 @@ impl WitnessArtifactNode {
     }
 
     /// Construct one enum root node with named variants.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(support, tag, variants))
+    )]
     pub fn enum_variants(
         support: WitnessSupportSummary,
         tag: impl Into<String>,
@@ -430,6 +448,7 @@ pub struct WitnessExportSnapshot {
 ///
 /// The result is sorted by `(verifier, evidence, destination_module)` so
 /// downstream tooling and tests can consume it deterministically.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub fn witness_exports() -> Vec<WitnessExportSnapshot> {
     let mut exports: Vec<_> = inventory::iter::<WitnessExportRecord>()
         .map(|record| {

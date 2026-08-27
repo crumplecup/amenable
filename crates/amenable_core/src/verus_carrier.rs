@@ -48,6 +48,7 @@ struct Items {
 }
 
 impl Parse for Items {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> verus_syn::parse::Result<Items> {
         let mut items = Vec::new();
         while !input.is_empty() {
@@ -62,11 +63,13 @@ impl Parse for Items {
 /// `amenable::paths::verus_source_directory` already uses for the
 /// sibling crate (`amenable_core`, like `amenable`, sits directly under
 /// `crates/`).
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn carrier_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src")
 }
 
 /// Every `.rs` file under `root`, recursively.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn rust_files(root: &Path) -> Vec<PathBuf> {
     let mut files = Vec::new();
     let Ok(entries) = fs::read_dir(root) else {
@@ -87,6 +90,7 @@ fn rust_files(root: &Path) -> Vec<PathBuf> {
 
 /// Parse one real carrier file's `verus! { ... }` body into a sequence
 /// of `verus_syn` items.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
 fn parse_carrier_items(path: &Path) -> Option<Vec<verus_syn::Item>> {
     let source = fs::read_to_string(path).ok()?;
     let file: syn::File = syn::parse_file(&source).ok()?;
@@ -105,6 +109,7 @@ fn parse_carrier_items(path: &Path) -> Option<Vec<verus_syn::Item>> {
 /// Find the real, public `pub fn`/`pub open spec fn` named `name`
 /// anywhere under `amenable_verus/src`, returning its defining file and
 /// crate-relative module path.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
     let root = carrier_root();
 
@@ -136,6 +141,7 @@ pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
 
 /// `.../amenable_verus/src/rust_std/char_carrier.rs` (relative to
 /// `root`) to `crate::rust_std::char_carrier`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
 fn module_path_for(root: &Path, path: &Path) -> Result<String, std::path::StripPrefixError> {
     let relative = path.strip_prefix(root)?.with_extension("");
 
@@ -149,6 +155,7 @@ fn module_path_for(root: &Path, path: &Path) -> Result<String, std::path::StripP
 
 /// The bound identifier a simple `pat` names, if it's a plain
 /// identifier pattern (not a tuple/struct destructure).
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pat)))]
 pub fn param_name(pat: &verus_syn::Pat) -> Option<String> {
     match pat {
         verus_syn::Pat::Ident(pat_ident) => Some(pat_ident.ident.to_string()),
@@ -185,6 +192,7 @@ enum PrintKind {
     OtherPunct,
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(last, next)))]
 fn needs_space_before(last: PrintKind, next: PrintKind) -> bool {
     !matches!(
         (last, next),
@@ -204,6 +212,10 @@ fn needs_space_before(last: PrintKind, next: PrintKind) -> bool {
 /// Render `tokens` back to text, `$`-prefixing any identifier in
 /// `placeholders` and collecting call-like identifiers into `calls` --
 /// see this module's own doc comment for the full rationale.
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(tokens, placeholders))
+)]
 pub fn walk_tokens(
     tokens: proc_macro2::TokenStream,
     placeholders: &HashSet<String>,
@@ -216,6 +228,10 @@ pub fn walk_tokens(
 
 /// Returns the [`PrintKind`] of the last token actually emitted, so a
 /// caller resuming after a nested group knows what came before it.
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(tokens, placeholders, start))
+)]
 fn walk_tokens_into(
     tokens: proc_macro2::TokenStream,
     placeholders: &HashSet<String>,
@@ -307,6 +323,7 @@ fn walk_tokens_into(
 /// Extract a harness's real `requires` or `ensures` clauses as literal
 /// text (no `$placeholder` substitution) -- for the compile-time
 /// `verus_ensures_fragments!`/`verus_requires_fragments!` macros.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(item_fn)))]
 pub fn literal_clauses(item_fn: &verus_syn::ItemFn, ensures: bool) -> Vec<String> {
     let spec = if ensures {
         item_fn.sig.spec.ensures.as_ref().map(|e| &e.exprs)
@@ -352,6 +369,10 @@ pub enum PredicateBodyError {
 /// this codebase; a body with intermediate `let`s or other statements
 /// would need a human decision about which part *is* the claim, which
 /// this deliberately doesn't guess at).
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(item_fn), err(level = "warn"))
+)]
 pub fn predicate_body(item_fn: &verus_syn::ItemFn) -> Result<String, PredicateBodyError> {
     match item_fn.block.stmts.as_slice() {
         [verus_syn::Stmt::Expr(expr, None)] => Ok(walk_tokens(

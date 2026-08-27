@@ -36,10 +36,12 @@ where
     V: Verifier,
     T: Evidence + Witness<V>,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn type_name(&self) -> &'static str {
         std::any::type_name::<T>()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn is_root(&self) -> bool {
         T::is_root()
     }
