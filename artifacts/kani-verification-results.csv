@@ -120,7 +120,7 @@ amenable_kani::rust_std::io::verify_io_slice_mut_derefs_to_and_permits_mutating_
 amenable_kani::rust_std::io::verify_line_writer_flushes_on_a_newline_but_not_before_one,1787760918,passed
 amenable_kani::rust_std::io::verify_lines_splits_on_newlines_and_drops_the_terminator,1787760927,passed
 amenable_kani::rust_std::io::verify_pipe_reader_reads_what_the_paired_writer_wrote,1787760942,passed
-amenable_kani::rust_std::io::verify_pipe_writer_writes_arrive_at_the_paired_reader,1787760957,passed
+amenable_kani::rust_std::io::verify_pipe_writer_writes_arrive_at_the_paired_reader,1787874147,passed
 amenable_kani::rust_std::io::verify_repeat_fills_the_buffer_with_the_given_byte,1787760971,passed
 amenable_kani::rust_std::io::verify_seek_from_round_trips_each_variants_offset,1787760980,passed
 amenable_kani::rust_std::io::verify_sink_write_reports_full_length_and_discards_content,1787760993,passed
@@ -273,8 +273,8 @@ amenable_kani::rust_std::std_hash::verify_random_state_gives_the_same_hasher_see
 amenable_kani::rust_std::std_net::verify_incoming_yields_an_already_queued_connection,1787765671,passed
 amenable_kani::rust_std::std_net::verify_shutdown_write_prevents_further_writes,1787765774,passed
 amenable_kani::rust_std::std_net::verify_tcp_listener_accepts_a_connecting_stream,1787765788,passed
-amenable_kani::rust_std::std_net::verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer,1787765807,passed
-amenable_kani::rust_std::std_net::verify_udp_socket_send_to_recv_from_round_trips_a_datagram,1787766434,passed
+amenable_kani::rust_std::std_net::verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer,1787874116,passed
+amenable_kani::rust_std::std_net::verify_udp_socket_send_to_recv_from_round_trips_a_datagram,1787874128,passed
 amenable_kani::rust_std::std_panic::verify_panic_hook_info_reports_the_panics_own_message,1787762550,passed
 amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing,1787762559,passed
 amenable_kani::rust_std::std_time::verify_system_time_duration_since_computes_the_elapsed_span,1787762570,passed

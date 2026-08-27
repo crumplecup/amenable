@@ -43,6 +43,13 @@
 [tracing]
 apply_gate_crates = { amenable_kani = "kani" }
 apply_skip_crates = ["amenable_creusot", "amenable_verus"]
+# extra_skip -- large-buffer parameter names this workspace uses that
+# cordial's own built-in DEFAULT_SKIP_PARAMS list (generic, cordial-repo-
+# scoped) doesn't cover: `payload`/`bytes` (real byte buffers, e.g.
+# amenable_kani::net_model's modeled TCP/UDP writes) and `body` (String/
+# &str content, e.g. rendered report text). Recorded per real occurrence
+# in this workspace, confirmed via grep before adding -- not a guess.
+extra_skip = ["payload", "bytes", "body"]
 
 # [tracing.subscriber] known_helper_paths -- amenable_core::init_tracing is
 # the one shared subscriber-install helper every test-bearing crate in the

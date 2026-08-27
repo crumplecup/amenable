@@ -429,7 +429,7 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     /// Returns `KaniUtf8BufferError::TooLong` if `len > MAX_LEN`, or
     /// `KaniUtf8BufferError::InvalidUtf8` if the modeled content is not
     /// valid UTF-8.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(bytes)))]
     pub fn new(bytes: [u8; MAX_LEN], len: usize) -> Result<Self, KaniUtf8BufferError> {
         if len > MAX_LEN {
             return Err(KaniUtf8BufferError::TooLong);
@@ -589,7 +589,7 @@ fn symbolic_ascii_byte() -> u8 {
     byte
 }
 
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(bytes)))]
 fn is_valid_utf8(bytes: &[u8]) -> bool {
     let len = bytes.len();
     let mut i = 0;

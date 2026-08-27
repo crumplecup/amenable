@@ -264,7 +264,7 @@ impl KaniFileContentObservation {
     /// `self` for the same reason
     /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, bytes)))]
     #[must_use]
     pub fn demonstrate_round_trip(self, bytes: [u8; 4]) -> KaniFileContentWitnessToken {
         assert_eq!(

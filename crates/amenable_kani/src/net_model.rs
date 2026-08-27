@@ -83,7 +83,6 @@ impl KaniTcpListener {
     /// Construct a fixed, deterministic bound listener at loopback port
     /// 0, resource id 0 -- no non-deterministic construction, so (like
     /// `KaniPipe::minimal`) this stays available outside `cfg(kani)`.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn minimal() -> Self {
         Self {
             local_addr: loopback(0),
@@ -97,7 +96,7 @@ impl KaniTcpListener {
     /// backlog behavior -- a `connect()` queues before any `accept()`
     /// runs, which is exactly what
     /// `verify_incoming_yields_an_already_queued_connection` checks.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn connect(&mut self, client_port: u16) -> KaniTcpClient {
         assert!(
             self.connection.is_none(),
@@ -129,7 +128,7 @@ impl KaniTcpListener {
 
     /// Model `.accept()`: pop the queued connection and hand back its
     /// server-side handle plus the client's address.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn accept(&mut self) -> (KaniTcpServer, SocketAddr) {
         let connection = self
             .connection
@@ -151,7 +150,7 @@ impl KaniTcpListener {
     /// [`Self::accept`] -- real `Incoming::next()` never returns `None`,
     /// it loops until a connection is ready, so this asserts one is
     /// already queued rather than modeling the non-blocking case.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn incoming_next(&mut self) -> KaniTcpServer {
         self.accept().0
     }
@@ -160,7 +159,7 @@ impl KaniTcpListener {
     /// that client's write half has been shut down.
     #[cfg_attr(
         not(kani),
-        tracing::instrument(level = "info", skip(self, client, payload))
+        tracing::instrument(level = "debug", skip(self, client, payload))
     )]
     pub fn client_write(
         &mut self,
@@ -191,7 +190,7 @@ impl KaniTcpListener {
     }
 
     /// Drain all bytes buffered for the given accepted server handle.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self, server)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, server)))]
     pub fn server_read(&mut self, server: KaniTcpServer) -> Vec<u8> {
         let connection = self
             .connection
@@ -247,6 +246,7 @@ impl KaniWriteHalfClosed {
 
 impl Default for KaniWriteHalfClosed {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }
@@ -270,7 +270,6 @@ impl KaniUdpSocket {
     /// Construct a fixed, deterministic bound socket at the given
     /// loopback port -- no non-deterministic construction, so this
     /// stays available outside `cfg(kani)`.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn bind(port: u16) -> Self {
         Self {
             local_addr: loopback(port),
@@ -292,7 +291,7 @@ impl KaniUdpSocket {
     /// multi-datagram inbox.
     #[cfg_attr(
         not(kani),
-        tracing::instrument(level = "info", skip(self, target, payload))
+        tracing::instrument(level = "trace", skip(self, target, payload))
     )]
     pub fn send_to(&self, target: &mut KaniUdpSocket, payload: Vec<u8>) {
         assert!(
@@ -304,7 +303,7 @@ impl KaniUdpSocket {
 
     /// Model `.recv_from()`: take the queued datagram along with its
     /// real sender address.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn recv_from(&mut self) -> (Vec<u8>, SocketAddr) {
         let (from, payload) = self
             .inbox

@@ -152,7 +152,10 @@ impl KaniPipe {
     }
 
     /// Append bytes written by the paired writer.
-    #[cfg_attr(not(kani), tracing::instrument(level = "info", skip(self, writer)))]
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "info", skip(self, writer, payload))
+    )]
     pub fn write_all(&mut self, writer: KaniPipeWriter, payload: Vec<u8>) {
         assert!(
             self.reader_open,

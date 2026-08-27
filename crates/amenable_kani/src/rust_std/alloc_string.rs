@@ -59,7 +59,7 @@ impl crate::KaniStringDrainObservation {
     /// source empty afterward. Consumes `self`: the only way to obtain
     /// the token is to have run this check against a real observation
     /// instance, not to assert it independently.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, bytes)))]
     #[must_use]
     pub fn demonstrate_whole_string_drain(
         self,

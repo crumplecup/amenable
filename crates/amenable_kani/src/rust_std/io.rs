@@ -78,7 +78,7 @@ impl KaniBufferedReadObservation {
     /// bytes. Consumes `self`: the only way to obtain the token is to
     /// have run this check against a real observation instance, not to
     /// assert it independently.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, payload)))]
     #[must_use]
     pub fn demonstrate_read_through(self, payload: [u8; 2]) -> KaniBufferedReadWitnessToken {
         assert_eq!(self.read_to_end(), payload);
