@@ -47,20 +47,24 @@ pub struct ProvenanceCertificate {
 impl Certificate for ProvenanceCertificate {
     type Id = CertId;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn id(&self) -> &Self::Id {
         &self.id
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn subject(&self) -> &str {
         &self.subject
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn entries(&self) -> impl Iterator<Item = &MetadataEntry> {
         self.entries.iter()
     }
 }
 
 impl Display for ProvenanceCertificate {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "Provenance certificate {} for {}", self.id, self.subject)?;
 
@@ -92,6 +96,10 @@ impl CertRegistry {
 impl Registry for CertRegistry {
     type Certificate = ProvenanceCertificate;
 
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "trace", skip(self, subject, provenance))
+    )]
     fn issue_provenance_certificate<P>(
         &mut self,
         subject: impl Display,
@@ -112,6 +120,7 @@ impl Registry for CertRegistry {
         certificate
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn issued(&self) -> impl Iterator<Item = &Self::Certificate> {
         self.issued.iter()
     }

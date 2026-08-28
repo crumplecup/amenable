@@ -110,14 +110,17 @@ impl_rust_std_type!(
     reason = "LinesAny is stable, only deprecated in favor of Lines; covering it is a coverage-completeness question, not a call to use it"
 )]
 impl<'a> crate::RustStdType for std::str::LinesAny<'a> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::str")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/str/struct.LinesAny.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The LinesAny carrier lazily yields the lines of a str split on any of \\n, \\r\\n; deprecated in favor of Lines, but still a real, stable carrier."
     }

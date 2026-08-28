@@ -16,14 +16,17 @@ impl_rust_std_type!(
 );
 
 impl<I: Iterator<Item = u16>> crate::RustStdType for DecodeUtf16<I> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::char")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/char/struct.DecodeUtf16.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The DecodeUtf16 carrier lazily decodes an iterator of UTF-16 code units into chars, yielding an error for unpaired surrogates."
     }

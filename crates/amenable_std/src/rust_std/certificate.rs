@@ -7,6 +7,7 @@ use amenable_core::{Registry as _, Standard as _};
 
 use crate::{AmenableStdError, AmenableStdResult, RustStdStandard, RustStdType};
 
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(registry)))]
 fn write_standard_certificate_artifact<T>(
     directory: &Path,
     registry: &mut crate::CertRegistry,
@@ -26,6 +27,7 @@ where
 }
 
 /// Emit provenance certificate artifacts for every built-in Rust standard type registration.
+#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(directory)))]
 pub fn write_rust_std_certificate_artifacts(
     directory: impl AsRef<Path>,
 ) -> AmenableStdResult<Vec<PathBuf>> {

@@ -78,6 +78,7 @@ pub struct VerusVerifierMetadata;
 impl Provenance for VerusVerifierMetadata {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "verus"),
@@ -104,6 +105,7 @@ impl Provenance for VerusVerifierMetadata {
 impl Verifier for VerusVerifier {
     type Metadata = VerusVerifierMetadata;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn name() -> &'static str {
         "verus"
     }
@@ -276,12 +278,14 @@ pub struct VerusCheckedProof {
 }
 
 impl VerusProofArtifactSupport for VerusCheckedProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
     }
 }
 
 impl WitnessArtifact for VerusCheckedProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn witness_artifact(&self) -> WitnessArtifactNode {
         WitnessArtifactNode::leaf_with_metadata(
             WitnessSupportKind::Checked,
@@ -297,6 +301,7 @@ impl WitnessArtifact for VerusCheckedProof {
 }
 
 impl std::fmt::Display for VerusCheckedProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "harness: {}", self.harness)?;
         writeln!(f, "claim: {}", self.claim)?;
@@ -449,6 +454,7 @@ inventory::collect!(VerusCallShapeRecord);
 /// parsing the harness's real carrier source directly -- the single
 /// source of truth for every real harness, with nothing to keep in sync
 /// by hand. See `verus_call_shape_derive`'s own doc comment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
     inventory::iter::<VerusCallShapeRecord>()
         .find(|record| record.harness == harness)
@@ -9719,6 +9725,7 @@ impl VerusWitness for RustStdStandard<OwnedSocket> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "<OwnedSocket as AsRawSocket>::as_raw_socket".to_owned(),

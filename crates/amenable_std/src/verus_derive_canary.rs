@@ -172,10 +172,12 @@ impl Witness<VerusVerifier> for RawTemplateVerusExportLeaf {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <RustStdStandard<std::cell::RefCell<i32>> as Witness<VerusVerifier>>::proof()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
     }

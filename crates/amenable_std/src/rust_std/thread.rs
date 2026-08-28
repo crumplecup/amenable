@@ -44,14 +44,17 @@ impl_rust_std_type_generic1!(
 // Scope<'scope, 'env> — two lifetimes, no type parameter, the same shape
 // as core::fmt's Debug*-builder family.
 impl<'scope, 'env> crate::RustStdType for Scope<'scope, 'env> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("std", "std::thread")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/std/thread/struct.Scope.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Scope carrier lets a thread::scope call spawn threads that can safely borrow from the enclosing scope."
     }

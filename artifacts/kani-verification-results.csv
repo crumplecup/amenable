@@ -40,7 +40,7 @@ amenable_kani::rust_std::alloc_ffi::verify_nul_error_reports_the_interior_nuls_p
 amenable_kani::rust_std::alloc_rc::verify_rc_strong_count_tracks_clones,1787760019,passed
 amenable_kani::rust_std::alloc_rc::verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero,1787760030,passed
 amenable_kani::rust_std::alloc_string::verify_from_utf16_rejects_a_lone_surrogate,1787760041,passed
-amenable_kani::rust_std::alloc_string::verify_from_utf8_error_recovers_the_original_bytes,1787760055,passed
+amenable_kani::rust_std::alloc_string::verify_from_utf8_error_recovers_the_original_bytes,1787875222,passed
 amenable_kani::rust_std::alloc_string::verify_string_drain_removes_and_yields_the_content,1787760066,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_strong_count_tracks_clones,1787760077,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero,1787760089,passed

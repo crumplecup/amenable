@@ -81,14 +81,17 @@ impl_rust_std_primitive!(
 );
 
 impl RustStdType for String {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> RustLanguageProvenance {
         RustLanguageProvenance::alloc_string()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/std/string/struct.String.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The String carrier stores owned UTF-8 text as defined by Rust's standard library."
     }

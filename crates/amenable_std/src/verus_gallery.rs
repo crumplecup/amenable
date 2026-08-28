@@ -31,6 +31,7 @@ pub enum VerusGalleryDisposition {
 
 impl VerusGalleryDisposition {
     /// Stable snake-case rendering used in CLI output and ledgers.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Hypothesis => "hypothesis",
@@ -40,6 +41,7 @@ impl VerusGalleryDisposition {
     }
 
     /// Parse a stable snake-case rendering from a persisted artifact.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn parse(value: &str) -> Option<Self> {
         match value {
             "hypothesis" => Some(Self::Hypothesis),
@@ -83,6 +85,7 @@ pub enum VerusGalleryExpectation {
 
 impl VerusGalleryExpectation {
     /// Stable snake-case rendering used in CLI output and ledgers.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Proved => "proved",
@@ -94,6 +97,7 @@ impl VerusGalleryExpectation {
     }
 
     /// Parse a stable snake-case rendering from a persisted artifact.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn parse(value: &str) -> Option<Self> {
         match value {
             "proved" => Some(Self::Proved),

@@ -129,14 +129,17 @@ iter_adapter2!(
     "The Inspect carrier lazily calls a closure on each item of an underlying iterator without changing it."
 );
 impl<I: Iterator> crate::RustStdType for Peekable<I> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::iter")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/iter/struct.Peekable.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Peekable carrier lets an underlying iterator's next item be inspected without consuming it."
     }

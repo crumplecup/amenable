@@ -19,14 +19,17 @@ impl_rust_std_type_generic1!(
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 impl crate::RustStdType for std::hash::SipHasher {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::hash")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/hash/struct.SipHasher.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The SipHasher carrier implements the SipHash 2-4 algorithm; deprecated in favor of DefaultHasher, but still a real, stable carrier."
     }

@@ -53,14 +53,17 @@ impl<T, F: FnMut(&mut T) -> bool> crate::RustStdType for VecExtractIf<'_, T, F> 
 }
 
 impl<I: Iterator> crate::RustStdType for std::vec::Splice<'_, I> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::vec")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/vec/struct.Splice.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Splice carrier removes a range from a Vec and replaces it with a given iterator's elements, yielding the removed elements."
     }

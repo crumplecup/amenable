@@ -22,6 +22,7 @@ use crate::{VerusCallKind, VerusCallShape, VerusImport, VerusParam};
 /// Derive one harness's real [`VerusCallShape`] by locating and parsing
 /// its defining carrier file -- `None` if no real carrier defines a
 /// public function with this exact name.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub(crate) fn derive_call_shape(harness: &str) -> Option<VerusCallShape> {
     let (_path, module_path, item_fn) = verus_find_fn(harness)?;
 

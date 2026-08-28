@@ -30,6 +30,7 @@ pub struct IoSource {
 
 impl IoSource {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source, path)))]
     fn new(source: std::io::Error, path: impl Into<PathBuf>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -70,6 +71,7 @@ pub struct AmenableStdError {
 
 impl AmenableStdError {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(kind)))]
     fn new(kind: AmenableStdErrorKind) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -82,6 +84,7 @@ impl AmenableStdError {
     /// Construct an [`AmenableStdErrorKind::Io`] error naming the
     /// artifact path that failed.
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path, source)))]
     pub fn io(path: impl Into<PathBuf>, source: std::io::Error) -> Self {
         Self::new(AmenableStdErrorKind::Io(IoSource::new(source, path)))
     }

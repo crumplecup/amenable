@@ -18,14 +18,17 @@ impl_rust_std_type!(
 );
 
 impl<T, const N: usize> crate::RustStdType for IntoIter<T, N> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::array")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/array/struct.IntoIter.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The IntoIter carrier owns a fixed-size array and yields its elements by value."
     }

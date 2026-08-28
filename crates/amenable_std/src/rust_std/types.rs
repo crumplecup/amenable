@@ -23,6 +23,7 @@ pub struct RustLanguageProvenance {
 
 impl RustLanguageProvenance {
     /// Provenance for Rust's primitive carriers as documented through `core`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn core_primitive() -> Self {
         RustLanguageProvenanceBuilder::default()
             .authority_kind("external_standard")
@@ -34,6 +35,7 @@ impl RustLanguageProvenance {
     }
 
     /// Provenance for `String` as documented through `alloc`.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn alloc_string() -> Self {
         RustLanguageProvenanceBuilder::default()
             .authority_kind("external_standard")
@@ -45,6 +47,10 @@ impl RustLanguageProvenance {
     }
 
     /// Provenance for a type documented through `source_crate`/`source_module`.
+    #[cfg_attr(
+        not(kani),
+        tracing::instrument(level = "debug", skip(source_crate, source_module))
+    )]
     pub fn for_source(source_crate: impl Into<String>, source_module: impl Into<String>) -> Self {
         RustLanguageProvenanceBuilder::default()
             .authority_kind("external_standard")
@@ -72,6 +78,7 @@ pub struct RustStdProvenance {
 }
 
 impl Display for RustStdProvenance {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", OwnedProvenanceReport::new(self.clone()))
     }
