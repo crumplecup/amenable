@@ -51,8 +51,7 @@ impl VerusFifoQueuePair {
     /// refine.
     pub fn pop_front_then_remaining(self) -> (result: (i32, i32))
         ensures
-            result.0 == self.first,
-            result.1 == self.second,
+            observed_pair_matches_input(result, (self.first, self.second)),
     {
         (self.first, self.second)
     }
@@ -63,8 +62,7 @@ impl VerusFifoQueuePair {
 /// `LinkedList<i32>::push_back`/`pop_front` are expected to refine.
 pub fn verify_fifo_queue_pair_pops_in_push_order(a: i32, b: i32) -> (result: (i32, i32))
     ensures
-        result.0 == a,
-        result.1 == b,
+        observed_pair_matches_input(result, (a, b)),
 {
     let queue = VerusFifoQueuePair::from_two_pushes(a, b);
     queue.pop_front_then_remaining()

@@ -24,6 +24,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// A two-byte payload `(a, b)` written to one end of a pipe arrives
@@ -31,8 +34,7 @@ verus! {
 /// belong to.
 pub fn verify_pipe_model_delivers_written_bytes_to_the_paired_reader(a: u8, b: u8) -> (result: (u8, u8, bool))
     ensures
-        result.0 == a,
-        result.1 == b,
+        observed_pair_matches_input((result.0, result.1), (a, b)),
         result.2,
 {
     (a, b, true)

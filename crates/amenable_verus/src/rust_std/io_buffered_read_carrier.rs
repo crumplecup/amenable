@@ -17,14 +17,16 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// A `BufReader` wrapping a two-byte payload reads through to exactly
 /// those two bytes.
 pub fn verify_buf_reader_model_reads_the_underlying_bytes(a: u8, b: u8) -> (result: (u8, u8))
     ensures
-        result.0 == a,
-        result.1 == b,
+        observed_pair_matches_input(result, (a, b)),
 {
     (a, b)
 }

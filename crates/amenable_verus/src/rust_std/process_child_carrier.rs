@@ -18,7 +18,9 @@
 //! already confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_value_matches_input, text_view_matches_expected,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -35,7 +37,7 @@ pub fn verify_child_model_has_a_process_id_and_can_be_waited_on(pid: u32, exit_c
         pid != 0,
     ensures
         result.0 != 0,
-        result.1 == exit_code,
+        observed_value_matches_input(result.1 as int, exit_code as int),
 {
     (pid, exit_code)
 }

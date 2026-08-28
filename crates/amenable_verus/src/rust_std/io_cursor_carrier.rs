@@ -19,6 +19,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// Reading two bytes `(d0, d1)` from position zero yields exactly those
@@ -26,8 +29,7 @@ verus! {
 /// afterward resets the position to 0.
 pub fn verify_cursor_model_read_advances_position_and_seek_repositions_it(d0: u8, d1: u8) -> (result: (u8, u8, u32, u32))
     ensures
-        result.0 == d0,
-        result.1 == d1,
+        observed_pair_matches_input((result.0, result.1), (d0, d1)),
         result.2 == 2,
         result.3 == 0,
 {

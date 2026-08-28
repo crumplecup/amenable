@@ -18,7 +18,9 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_value_matches_input, text_view_matches_expected,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -42,7 +44,7 @@ pub fn verify_prefix_model_disk_identifies_the_drive_letter(letter: u8) -> (resu
 pub fn verify_prefix_component_model_pairs_raw_text_with_parsed_prefix(text: &str, letter: u8) -> (result: (bool, u8))
     ensures
         result.0,
-        result.1 == letter,
+        observed_value_matches_input(result.1 as int, letter as int),
 {
     let raw_text: &str = text;
     assert(text_view_matches_expected(raw_text@, text@));

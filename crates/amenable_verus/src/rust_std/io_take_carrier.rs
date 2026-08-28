@@ -19,13 +19,16 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// A read against a source with at least `limit` bytes remaining yields
 /// exactly `limit` bytes, and the allowance afterward is exhausted (0).
 pub fn verify_take_model_caps_reads_at_the_remaining_limit(limit: u64) -> (result: (u64, u64))
     ensures
-        result.0 == limit,
+        observed_value_matches_input(result.0 as int, limit as int),
         result.1 == 0,
 {
     (limit, 0)

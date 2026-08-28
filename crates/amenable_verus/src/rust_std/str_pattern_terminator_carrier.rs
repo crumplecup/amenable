@@ -21,7 +21,7 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
+use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_pair_matches_input};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -43,8 +43,7 @@ pub fn verify_str_split_terminator_model_suppresses_a_trailing_empty_substring(a
         a != pattern,
         b != pattern,
     ensures
-        result.0 == a,
-        result.1 == b,
+        observed_pair_matches_input((result.0, result.1), (a, b)),
 {
     // `pattern` plays no role beyond appearing in the window's `requires`
     // (distinct from `a`/`b`) — the claim doesn't depend on its value.
@@ -62,8 +61,7 @@ pub fn verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_
         a != pattern,
         b != pattern,
     ensures
-        result.0 == b,
-        result.1 == a,
+        observed_pair_matches_input((result.0, result.1), (b, a)),
 {
     // `pattern` plays no role beyond appearing in the window's `requires`
     // (distinct from `a`/`b`) — the claim doesn't depend on its value.

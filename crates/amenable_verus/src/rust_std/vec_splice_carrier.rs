@@ -22,6 +22,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// Splicing out the middle element of `[a, b, c]` and replacing it with
@@ -30,7 +33,7 @@ verus! {
 /// expected to refine.
 pub fn verify_splice_model_replaces_a_range_and_yields_what_it_removed(a: i32, b: i32, c: i32, x: i32, y: i32) -> (result: (i32, Vec<i32>))
     ensures
-        result.0 == b,
+        observed_value_matches_input(result.0 as int, b as int),
         result.1@ == seq![a, x, y, c],
 {
     let removed = b;

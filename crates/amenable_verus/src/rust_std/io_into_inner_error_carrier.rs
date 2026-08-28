@@ -20,6 +20,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// When flushing fails with a two-byte buffer `(a, b)` still pending,
@@ -28,8 +31,7 @@ verus! {
 pub fn verify_into_inner_error_model_recovers_the_writer_and_the_flush_error(a: u8, b: u8) -> (result: (bool, u8, u8))
     ensures
         result.0,
-        result.1 == a,
-        result.2 == b,
+        observed_pair_matches_input((result.1, result.2), (a, b)),
 {
     (true, a, b)
 }

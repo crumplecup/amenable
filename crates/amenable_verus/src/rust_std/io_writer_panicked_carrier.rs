@@ -20,6 +20,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// With a two-byte buffer `(a, b)` pending when the inner writer
@@ -28,8 +31,7 @@ verus! {
 pub fn verify_writer_panicked_model_recovers_the_buffered_data(a: u8, b: u8) -> (result: (bool, u8, u8))
     ensures
         result.0,
-        result.1 == a,
-        result.2 == b,
+        observed_pair_matches_input((result.1, result.2), (a, b)),
 {
     (true, a, b)
 }

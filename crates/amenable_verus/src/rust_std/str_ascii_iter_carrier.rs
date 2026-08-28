@@ -22,6 +22,8 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
 use verus_builtin_macros::verus;
 #[allow(
@@ -50,7 +52,7 @@ pub fn verify_char_indices_model_pairs_each_char_with_its_byte_offset(c: char) -
         is_ascii_byte(c as u32),
     ensures
         result.0 == 0,
-        result.1 == c,
+        char_roundtrip_preserves_value(result.1, c),
 {
     (0, c)
 }

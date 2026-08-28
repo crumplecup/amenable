@@ -24,6 +24,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// A process that exits with any nonzero code reports `!success()` and
@@ -33,7 +36,7 @@ pub fn verify_exit_status_model_reports_a_nonzero_exit_code(exit_code: i32) -> (
         exit_code != 0,
     ensures
         !result.0,
-        result.1 == exit_code,
+        observed_value_matches_input(result.1 as int, exit_code as int),
 {
     (false, exit_code)
 }

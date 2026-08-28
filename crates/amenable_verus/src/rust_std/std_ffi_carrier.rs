@@ -25,7 +25,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_value_matches_input, text_view_matches_expected,
+};
 
 verus! {
 
@@ -38,9 +40,9 @@ pub fn verify_os_str_model_valid_utf8_content_round_trips_through_to_str(len: u8
     requires
         len <= 2,
     ensures
-        result.0 == len,
-        result.1 == b0,
-        result.2 == b1,
+        observed_value_matches_input(result.0 as int, len as int),
+        observed_value_matches_input(result.1 as int, b0 as int),
+        observed_value_matches_input(result.2 as int, b1 as int),
 {
     (len, b0, b1)
 }
