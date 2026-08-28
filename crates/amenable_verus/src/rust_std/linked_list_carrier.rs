@@ -25,6 +25,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// Models the FIFO push-back/pop-front order law a queue must satisfy —
@@ -38,8 +41,7 @@ impl VerusFifoQueuePair {
     /// Push two values onto the back, in order.
     pub fn from_two_pushes(a: i32, b: i32) -> (result: Self)
         ensures
-            result.first == a,
-            result.second == b,
+            observed_pair_matches_input((result.first, result.second), (a, b)),
     {
         Self { first: a, second: b }
     }

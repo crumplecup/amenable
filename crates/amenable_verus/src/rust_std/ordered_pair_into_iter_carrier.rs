@@ -45,6 +45,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+
 verus! {
 
 /// Models the "yields two owned values in order, then `None`" law —
@@ -61,8 +64,7 @@ impl VerusOrderedPairIntoIterModel {
     /// before the first.
     pub fn from_pair(first: i32, second: i32) -> (result: Self)
         ensures
-            result.first == first,
-            result.second == second,
+            observed_pair_matches_input((result.first, result.second), (first, second)),
             result.position == 0,
     {
         Self { first, second, position: 0 }

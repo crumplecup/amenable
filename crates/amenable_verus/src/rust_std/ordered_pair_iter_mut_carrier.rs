@@ -31,6 +31,8 @@ use vstd::prelude::*;
 // registers for plain slot-update laws across several carriers.
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::cell_carrier::write_stores_new_value;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 
 verus! {
 
@@ -44,8 +46,7 @@ pub struct VerusOrderedPairIterMutModel {
 impl VerusOrderedPairIterMutModel {
     pub fn from_pair(first: i32, second: i32) -> (result: Self)
         ensures
-            result.first == first,
-            result.second == second,
+            observed_pair_matches_input((result.first, result.second), (first, second)),
     {
         Self { first, second }
     }
