@@ -24,12 +24,20 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// A singleton claim: a `Take`'s remaining allowance is always
+/// exhausted (0) once a read consumes it in full. Named, not inlined,
+/// so the assumption has an explicit source even though nothing else
+/// calls it.
+pub open spec fn take_allowance_is_exhausted(remaining: u64) -> bool {
+    remaining == 0
+}
+
 /// A read against a source with at least `limit` bytes remaining yields
 /// exactly `limit` bytes, and the allowance afterward is exhausted (0).
 pub fn verify_take_model_caps_reads_at_the_remaining_limit(limit: u64) -> (result: (u64, u64))
     ensures
         observed_value_matches_input(result.0 as int, limit as int),
-        result.1 == 0,
+        take_allowance_is_exhausted(result.1),
 {
     (limit, 0)
 }

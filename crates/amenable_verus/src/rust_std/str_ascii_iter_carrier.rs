@@ -46,12 +46,20 @@ pub fn verify_bytes_model_yields_the_utf8_encoding(c: char) -> (result: u8)
     c as u8
 }
 
+/// A singleton claim: the first (and only) char in a one-character
+/// `str` is always at byte offset `0`. Named, not inlined, so the
+/// assumption has an explicit source even though nothing else calls
+/// it.
+pub open spec fn char_indices_first_offset_is_zero(offset: u32) -> bool {
+    offset == 0
+}
+
 /// `.char_indices()` pairs the first (and only) char with byte offset 0.
 pub fn verify_char_indices_model_pairs_each_char_with_its_byte_offset(c: char) -> (result: (u32, char))
     requires
         is_ascii_byte(c as u32),
     ensures
-        result.0 == 0,
+        char_indices_first_offset_is_zero(result.0),
         char_roundtrip_preserves_value(result.1, c),
 {
     (0, c)

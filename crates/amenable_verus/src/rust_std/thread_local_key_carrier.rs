@@ -24,12 +24,19 @@ use vstd::prelude::*;
 
 verus! {
 
+/// A singleton claim: this fixed example's initial value is always the
+/// literal `5`, and its value after one mutation is always the literal
+/// `42`. Named, not inlined, so the assumption has an explicit source
+/// even though nothing else calls it.
+pub open spec fn local_key_observes_initial_then_updated(initial: i32, updated: i32) -> bool {
+    initial == 5 && updated == 42
+}
+
 /// `.with()` on a `LocalKey<Cell<i32>>` initialized to `5` reads `5`;
 /// after `.with(|c| c.set(42))`, a later `.with()` reads `42`.
 pub fn verify_local_key_model_with_reads_the_initialized_value() -> (result: (i32, i32))
     ensures
-        result.0 == 5,
-        result.1 == 42,
+        local_key_observes_initial_then_updated(result.0, result.1),
 {
     (5, 42)
 }

@@ -1122,6 +1122,17 @@ bridge_verus_witness!(RustStdStandard<Vec<i32>>);
     )
 }
 
+// A singleton contract: this len-after-one-push fact is never restated
+// anywhere else, but still gets a real, named, callable predicate
+// rather than staying an unnamed raw literal -- a named contract's
+// whole point is giving an assumption an explicit, auditable source,
+// not just deduplicating repeated text.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<Vec<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Vec<i32>>",
+    "vec_len_after_one_push_is_one"
+);
+
 const VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
 
@@ -5658,6 +5669,14 @@ impl_str_ascii_iter_verus_witness!(
     "verify_char_indices_model_pairs_each_char_with_its_byte_offset",
     VERIFY_CHAR_INDICES_MODEL_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC
 );
+
+// Singleton contract: the sole char's byte offset in a one-character
+// str is always 0.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::str::CharIndices<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::CharIndices<'static>>",
+    "char_indices_first_offset_is_zero"
+);
 impl_str_ascii_iter_verus_witness!(
     std::str::EncodeUtf16<'static>,
     "verify_encode_utf16_model_yields_utf16_code_units",
@@ -5847,10 +5866,27 @@ impl_str_utf8_chunks_verus_witness!(
     "verify_utf8_chunk_model_separates_the_valid_prefix_from_invalid_bytes",
     VERIFY_UTF8_CHUNK_MODEL_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC
 );
+
+// Singleton contract: the one bad byte is always exactly 0xFF in this
+// fixed example.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::str::Utf8Chunk<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Utf8Chunk<'static>>",
+    "utf8_chunk_invalid_byte_is_0xff"
+);
+
 impl_str_utf8_chunks_verus_witness!(
     std::str::Utf8Error,
     "verify_utf8_error_model_reports_the_valid_prefix_length_and_error_span",
     VERIFY_UTF8_ERROR_MODEL_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC
+);
+
+// Singleton contract: the fixed example's valid-prefix length (2) and
+// error span (1).
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::str::Utf8Error>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Utf8Error>",
+    "utf8_error_reports_length_and_span"
 );
 
 macro_rules! impl_str_pattern_split_verus_witness {
@@ -6494,6 +6530,15 @@ bridge_verus_witness!(RustStdStandard<std::io::Cursor<&'static [u8]>>);
     )
 }
 
+// Singleton contract: reading two bytes from position zero advances the
+// position to exactly 2, and seeking back to `Start(0)` resets it to
+// exactly 0.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::io::Cursor<&'static [u8]>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Cursor<&'static [u8]>>",
+    "cursor_positions_after_read_then_seek"
+);
+
 const VERIFY_ERROR_MODEL_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_error_carrier.rs");
 
@@ -6606,6 +6651,14 @@ bridge_verus_witness!(RustStdStandard<std::io::Take<&'static [u8]>>);
         },
     )
 }
+
+// Singleton contract: the allowance is always exactly exhausted (0)
+// after a read that consumes the whole limit.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::io::Take<&'static [u8]>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Take<&'static [u8]>>",
+    "take_allowance_is_exhausted"
+);
 
 /// Every width's Verus accommodation model states the identical claim
 /// (`result == (initial, next)`) since the model function is a plain
@@ -7061,6 +7114,14 @@ bridge_verus_witness!(RustStdStandard<std::process::Output>);
     )
 }
 
+// Singleton contract: this fixed example's exit code is always 0
+// (success).
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::process::Output>,
+    "amenable_std::rust_std::RustStdStandard<std::process::Output>",
+    "output_exit_code_is_success"
+);
+
 const VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/process_stdio_carrier.rs");
 
@@ -7200,6 +7261,14 @@ bridge_verus_witness!(RustStdStandard<std::path::Iter<'static>>);
         },
     )
 }
+
+// Singleton contract: `.iter()` over the fixed example `"/a/b"` always
+// yields exactly 3 segments.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::path::Iter<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::path::Iter<'static>>",
+    "path_iter_yields_three_segments"
+);
 
 const VERIFY_DISPLAY_MODEL_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/path_display_carrier.rs");
@@ -7785,6 +7854,14 @@ bridge_verus_witness!(RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>
         },
     )
 }
+
+// Singleton contract: the fixed example's initial value (5) and its
+// value after one mutation (42).
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>>>",
+    "local_key_observes_initial_then_updated"
+);
 
 const VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/thread_current_carrier.rs");

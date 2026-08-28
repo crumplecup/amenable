@@ -45,11 +45,18 @@ pub fn verify_components_model_yields_root_then_named_segments_in_order() -> (re
     (true, "a", "b")
 }
 
+/// A singleton claim: this fixed example's `.iter()` always yields
+/// exactly 3 segments. Named, not inlined, so the assumption has an
+/// explicit source even though nothing else calls it.
+pub open spec fn path_iter_yields_three_segments(count: u32) -> bool {
+    count == 3
+}
+
 /// `.iter()` over `"/a/b"` yields three segments (root, then two named):
 /// the second is `"a"`, the third is `"b"`.
 pub fn verify_iter_model_yields_the_named_segments() -> (result: (u32, &'static str, &'static str))
     ensures
-        result.0 == 3,
+        path_iter_yields_three_segments(result.0),
         text_view_matches_expected(result.1@, "a"@),
         text_view_matches_expected(result.2@, "b"@),
 {

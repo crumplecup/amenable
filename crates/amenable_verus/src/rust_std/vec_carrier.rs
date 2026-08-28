@@ -20,13 +20,20 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// A singleton claim: a `Vec`'s length after exactly one push is always
+/// the literal `1`. Named, not inlined, so the assumption has an
+/// explicit source even though nothing else calls it.
+pub open spec fn vec_len_after_one_push_is_one(len: usize) -> bool {
+    len == 1
+}
+
 /// `push` appends, `len`/indexing observe the pushed value, `pop`
 /// returns the last pushed value and leaves the `Vec` empty, and
 /// popping an exhausted `Vec` returns `None` — the push/pop/len/index
 /// half of the claim the Kani harness checks.
 pub fn verify_vec_push_pop_round_trips(value: i32) -> (result: (usize, i32, Option<i32>, bool, Option<i32>))
     ensures
-        result.0 == 1,
+        vec_len_after_one_push_is_one(result.0),
         observed_value_matches_input(result.1 as int, value as int),
         result.2 == Some(value),
         result.3,

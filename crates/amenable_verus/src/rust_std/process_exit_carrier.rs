@@ -41,13 +41,20 @@ pub fn verify_exit_status_model_reports_a_nonzero_exit_code(exit_code: i32) -> (
     (false, exit_code)
 }
 
+/// A singleton claim: this fixed example's exit code is always the
+/// literal `0` (success). Named, not inlined, so the assumption has an
+/// explicit source even though nothing else calls it.
+pub open spec fn output_exit_code_is_success(code: i32) -> bool {
+    code == 0
+}
+
 /// `.output()` bundles a command's exit status (code 0, success) with
 /// the stdout it produced — the text claim modeled abstractly as a
 /// boolean.
 pub fn verify_output_model_captures_stdout_and_the_exit_status() -> (result: (bool, i32, bool))
     ensures
         result.0,
-        result.1 == 0,
+        output_exit_code_is_success(result.1),
         result.2,
 {
     (true, 0, true)

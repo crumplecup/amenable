@@ -43,15 +43,30 @@ pub fn verify_utf8_chunks_model_yields_one_chunk_for_wholly_valid_input() -> (re
     ("ab", true, false)
 }
 
+/// A singleton claim: this fixed example's one bad byte is always the
+/// literal `0xFF`. Named, not inlined, so the assumption has an
+/// explicit source even though nothing else calls it.
+pub open spec fn utf8_chunk_invalid_byte_is_0xff(byte: u8) -> bool {
+    byte == 0xFFu8
+}
+
 /// For `b"ab\xFFcd"`, the first chunk's `valid()` is the UTF-8 prefix
 /// `"ab"` before the bad byte, and `invalid()` is that one bad byte
 /// (`0xFF`).
 pub fn verify_utf8_chunk_model_separates_the_valid_prefix_from_invalid_bytes() -> (result: (&'static str, u8))
     ensures
         text_view_matches_expected(result.0@, "ab"@),
-        result.1 == 0xFFu8,
+        utf8_chunk_invalid_byte_is_0xff(result.1),
 {
     ("ab", 0xFFu8)
+}
+
+/// A singleton claim: this fixed example's valid-prefix length is
+/// always the literal `2`, and its error span is always the literal
+/// `1`. Named, not inlined, so the assumption has an explicit source
+/// even though nothing else calls it.
+pub open spec fn utf8_error_reports_length_and_span(valid_up_to: u8, error_len: u8) -> bool {
+    valid_up_to == 2 && error_len == 1
 }
 
 /// For `[b'a', b'b', invalid, b'c']` with `invalid` in `0xF5..=0xFF`
@@ -62,8 +77,7 @@ pub fn verify_utf8_error_model_reports_the_valid_prefix_length_and_error_span(in
     requires
         invalid >= 0xF5u8,
     ensures
-        result.0 == 2,
-        result.1 == 1,
+        utf8_error_reports_length_and_span(result.0, result.1),
 {
     // `invalid` plays no role beyond appearing in the `requires` bound
     // (`0xF5..=0xFF` is a lone one-byte error regardless of its exact
