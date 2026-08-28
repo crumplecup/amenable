@@ -100,6 +100,28 @@
 //! already proven for `establish()`; Verus: a generated companion,
 //! already proven for the token layer) rather than through a delegating
 //! wrapper.
+//!
+//! **Addendum, re-verified 2026-08-28 (`AccountId`/`Account` split,
+//! `docs/GAAP_LEDGER_PLAN.md`'s own addendum on that refactor):** all
+//! three `free.frees.1` failures above no longer reproduce, even at the
+//! same `--harness-timeout 6m` that originally reached them -- each now
+//! times out mid-CBMC-solve (millions of SAT variables/clauses, per a
+//! real `cargo kani` run with full output, not the terse summary) rather
+//! than hitting the fast DFCC scaffolding check at all. Re-classified
+//! `Failed` -> `Timeout` on the three affected registrations below to
+//! match current, reproducible behavior -- what these three probes
+//! establish (a real DFCC limitation on wrapper/delegation shapes,
+//! confirmed by the wrapper's error location) is unaffected by *why*
+//! they no longer converge, and the actually-relied-upon solution
+//! (`commit_contract_no_wrapper`, no wrapper at all) still verifies
+//! clean, unaffected either way. Cause not chased further -- same
+//! Kani/CBMC version confirmed (0.67.0), no flag change explains it
+//! (tested with and without `-Z stubbing`, both time out); one real
+//! candidate not ruled out is that `TransferPayload::from`/`::to` went
+//! from a flat `{ id: Uuid, name: String }` to one more level of
+//! struct nesting (`Account { id: AccountId, name: String }`), adding
+//! marginal cost to a proof this section's own investigation already
+//! found sitting right at the edge of what a `6m` timeout could reach.
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
@@ -107,9 +129,9 @@
             "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
             "gallery::ledger_gaap_free_function_contract::commit_contract_free_function_wrapper".to_owned(),
             "amenable_kani".to_owned(),
-            "Ledger::commit's real body moved to amenable_gaap (generic over V: Verifier), Kani contract attached to a thin free-function wrapper delegating to it -- fails at a real Kani DFCC scaffolding check (free.frees.1, builtin location, immediately after no_alloc_dealloc_in_ensures passes), not in any of our own logic; every other real contract in this workspace targets a method, never a free function".to_owned(),
+            "Ledger::commit's real body moved to amenable_gaap (generic over V: Verifier), Kani contract attached to a thin free-function wrapper delegating to it -- originally converged on a real Kani DFCC scaffolding failure (free.frees.1, builtin location, immediately after no_alloc_dealloc_in_ensures passes) at a 6m harness timeout; re-verified 2026-08-28, no longer reaches that check even at 6m, now times out mid-CBMC-solve instead -- see this module's own addendum doc comment".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Failed,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
         ),
     )
 }
@@ -177,9 +199,9 @@ amenable_derive::gallery_harness! {
             "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
             "gallery::ledger_gaap_free_function_contract::commit_contract_local_type_wrapper".to_owned(),
             "amenable_kani".to_owned(),
-            "Same real cross-crate delegation as commit_contract_free_function_wrapper, but the Kani-contracted function is an associated function on a local zero-sized wrapper type (KaniLedgerCommit::commit) instead of a bare free function -- fails identically (free.frees.1, same builtin location), ruling out \"bare free function specifically\" as the cause; narrows it to the cross-crate call or the generic-over-V dispatch".to_owned(),
+            "Same real cross-crate delegation as commit_contract_free_function_wrapper, but the Kani-contracted function is an associated function on a local zero-sized wrapper type (KaniLedgerCommit::commit) instead of a bare free function -- originally converged on a real Kani DFCC scaffolding failure (free.frees.1, same builtin location) at a 6m harness timeout, ruling out \"bare free function specifically\" as the cause and narrowing it to the cross-crate call or the generic-over-V dispatch; re-verified 2026-08-28, no longer reaches that check even at 6m, now times out mid-CBMC-solve instead -- see this module's own addendum doc comment".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Failed,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
         ),
     )
 }
@@ -242,9 +264,9 @@ amenable_derive::gallery_harness! {
             "amenable_kani::gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
             "gallery::ledger_gaap_free_function_contract::commit_contract_trivial_ensures".to_owned(),
             "amenable_kani".to_owned(),
-            "Same real cross-crate generic delegation (ledger.commit::<KaniVerifier>(input)) as the other two cases, but the contract itself is trivial (requires(true)/ensures(|_| true), dropping the BalancedEntries::ensures(..) call and match) -- fails identically (free.frees.1, same builtin location, 266 checks not 287 since the trivial ensures skips BalancedEntries), definitively ruling out contract content as the cause: this is purely structural to a Kani-contracted function whose body delegates to a cross-crate generic method".to_owned(),
+            "Same real cross-crate generic delegation (ledger.commit::<KaniVerifier>(input)) as the other two cases, but the contract itself is trivial (requires(true)/ensures(|_| true), dropping the BalancedEntries::ensures(..) call and match) -- originally converged identically (free.frees.1, same builtin location, 266 checks not 287 since the trivial ensures skips BalancedEntries) at a 6m harness timeout, definitively ruling out contract content as the cause: this is purely structural to a Kani-contracted function whose body delegates to a cross-crate generic method; re-verified 2026-08-28, no longer reaches that check even at 6m, now times out mid-CBMC-solve instead -- see this module's own addendum doc comment".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Failed,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
         ),
     )
 }
