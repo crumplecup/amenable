@@ -12,6 +12,7 @@ use crate::{AmenableError, AmenableResult, KaniProof, KaniProofRegistration};
 use clap::{Args, ValueEnum};
 use serde::Serialize;
 
+use tracing::instrument;
 const LEDGER_HEADER: &str = "proof_id,timestamp,status";
 
 /// Selection and execution options for `amenable verify kani`.
@@ -37,15 +38,18 @@ pub struct VerifyKaniArgs {
     harness_timeout: String,
 }
 
+#[instrument(level = "debug")]
 pub(super) fn default_results_path() -> std::path::PathBuf {
     crate::paths::artifacts_directory().join("kani-verification-results.csv")
 }
 
+#[instrument(level = "info", skip(path))]
 pub(super) fn load_results(path: &Path) -> AmenableResult<Vec<VerificationResult>> {
     Ok(Ledger::load(path)?.into_results())
 }
 
 /// List or run the selected Kani harnesses.
+#[instrument(level = "debug", skip(args))]
 pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     let records = registered_proofs();
     if args.list {
@@ -99,6 +103,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     }
 }
 
+#[instrument(level = "debug")]
 fn registered_proofs() -> Vec<KaniProof> {
     let mut records: Vec<_> = inventory::iter::<KaniProofRegistration>()
         .map(|registration| (registration.proof())())
@@ -107,6 +112,7 @@ fn registered_proofs() -> Vec<KaniProof> {
     records
 }
 
+#[instrument(level = "debug", skip(records, ledger, args))]
 fn select_records<'a>(
     records: &'a [KaniProof],
     ledger: &Ledger,
@@ -145,6 +151,7 @@ fn select_records<'a>(
         .collect())
 }
 
+#[instrument(level = "info", skip(record))]
 fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
     let output = kani_command(record, harness_timeout)
         .stdout(Stdio::piped())
@@ -184,6 +191,7 @@ fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
 /// harness that doesn't (this is the one canonical invocation, so it
 /// has to handle both without the caller needing to know which kind of
 /// harness they're running).
+#[instrument(level = "debug", skip(record))]
 pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
     command.args([
@@ -209,6 +217,7 @@ pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
 
 /// Whether `cargo kani`'s combined stdout/stderr names a verification
 /// timeout rather than a genuine proof failure.
+#[instrument(level = "trace", ret)]
 pub fn is_kani_timeout(diagnostics: &str) -> bool {
     let diagnostics = diagnostics.to_ascii_lowercase();
     diagnostics.contains("verification timed out")
@@ -219,6 +228,7 @@ pub fn is_kani_timeout(diagnostics: &str) -> bool {
 /// The first `error`-prefixed line in `cargo kani`'s combined output, or
 /// (failing that) the first non-empty line -- preferred over whatever
 /// Kani's own startup banner printed first.
+#[instrument(level = "debug")]
 pub fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
     diagnostics
         .lines()
@@ -246,6 +256,7 @@ pub enum ProofStatus {
 }
 
 impl ProofStatus {
+    #[instrument(level = "debug", skip(self))]
     pub(super) fn as_str(self) -> &'static str {
         match self {
             Self::Passed => "passed",
@@ -254,6 +265,7 @@ impl ProofStatus {
         }
     }
 
+    #[instrument(level = "debug")]
     fn parse(value: &str) -> Option<Self> {
         match value {
             "passed" => Some(Self::Passed),
@@ -270,6 +282,7 @@ struct ProofRun {
 }
 
 impl ProofRun {
+    #[instrument(level = "debug")]
     fn passed() -> Self {
         Self {
             status: ProofStatus::Passed,
@@ -299,22 +312,26 @@ pub(super) struct VerificationResult {
 
 impl Ledger {
     /// Number of proofs with a recorded result.
+    #[instrument(level = "trace", skip(self))]
     pub fn len(&self) -> usize {
         self.rows.len()
     }
 
     /// Whether the ledger has no recorded results.
+    #[instrument(level = "trace", skip(self))]
     pub fn is_empty(&self) -> bool {
         self.rows.is_empty()
     }
 
     /// The latest recorded status for `proof_id`, if any.
+    #[instrument(level = "trace", skip(self))]
     pub fn status_for(&self, proof_id: &str) -> Option<ProofStatus> {
         self.rows.get(proof_id).map(|row| row.status)
     }
 
     /// Load the ledger from `path`, or an empty ledger if it doesn't
     /// exist yet.
+    #[instrument(level = "debug", skip(path))]
     pub fn load(path: &Path) -> AmenableResult<Self> {
         if !path.exists() {
             return Ok(Self {
@@ -361,6 +378,7 @@ impl Ledger {
 
     /// Record `status` as the latest result for `proof_id`, timestamped
     /// now, replacing any previous entry.
+    #[instrument(level = "debug", skip(self, status))]
     pub fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> AmenableResult<()> {
         let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
         self.rows
@@ -369,6 +387,7 @@ impl Ledger {
     }
 
     /// Write the ledger to `path` atomically (write, then rename).
+    #[instrument(level = "debug", skip(self, path))]
     pub fn persist(&self, path: &Path) -> AmenableResult<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
@@ -389,6 +408,7 @@ impl Ledger {
         fs::rename(&temporary, path).map_err(|error| AmenableError::io(path, error))
     }
 
+    #[instrument(level = "debug", skip(self))]
     fn into_results(self) -> Vec<VerificationResult> {
         self.rows
             .into_iter()

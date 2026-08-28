@@ -21,6 +21,7 @@
 
 use std::path::PathBuf;
 
+use tracing::instrument;
 /// Preserved `std::io::Error` source, naming the artifact path that failed.
 #[derive(Debug, derive_more::Display, derive_more::Error)]
 #[display("IO error at {}: {source}", path.display())]
@@ -39,6 +40,7 @@ impl IoSource {
     /// Preserve an IO error alongside the artifact path it failed on and
     /// the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source, path))]
     pub fn new(source: std::io::Error, path: impl Into<PathBuf>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -65,6 +67,7 @@ pub struct SerdeSource {
 impl SerdeSource {
     /// Preserve a serde JSON error alongside the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: serde_json::Error) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -100,6 +103,7 @@ impl JsonLineSource {
     /// Preserve a serde JSON error alongside the artifact path, the
     /// 1-indexed JSON line that failed, and the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source, path))]
     pub fn new(source: serde_json::Error, path: impl Into<PathBuf>, json_line: usize) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -127,6 +131,7 @@ pub struct SystemTimeSource {
 impl SystemTimeSource {
     /// Preserve a system-clock error alongside the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: std::time::SystemTimeError) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -153,6 +158,7 @@ impl TimeFormatDescriptionSource {
     /// Preserve a format-description error alongside the caller's
     /// location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: time::error::InvalidFormatDescription) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -178,6 +184,7 @@ pub struct TimeParseSource {
 impl TimeParseSource {
     /// Preserve a date/time parse error alongside the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: time::error::Parse) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -210,6 +217,7 @@ impl InvalidUtcDateSource {
     /// Preserve a date/time parse error alongside the rejected value and
     /// the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source, value))]
     pub fn new(source: time::error::Parse, value: impl Into<String>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -240,6 +248,7 @@ impl InvalidScoreSource {
     /// Preserve an integer parse error alongside the rejected value and
     /// the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source, value))]
     pub fn new(source: std::num::ParseIntError, value: impl Into<String>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -276,6 +285,7 @@ impl PreEpochDateSource {
     /// Preserve an int-conversion error alongside the rejected date and
     /// the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source, date))]
     pub fn new(source: std::num::TryFromIntError, date: impl Into<String>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -307,6 +317,7 @@ impl TimestampTooLargeSource {
     /// Preserve an int-conversion error alongside the rejected timestamp
     /// and the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: std::num::TryFromIntError, timestamp: u64) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -339,6 +350,7 @@ impl AssessmentCountSource {
     /// Preserve an int-conversion error alongside the rejected count and
     /// the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: std::num::TryFromIntError, count: usize) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -366,6 +378,7 @@ impl TimeComponentRangeSource {
     /// Preserve a date/time component-range error alongside the caller's
     /// location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: time::error::ComponentRange) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -391,6 +404,7 @@ pub struct TimeFormatSource {
 impl TimeFormatSource {
     /// Preserve a date/time format error alongside the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: time::error::Format) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -425,6 +439,7 @@ impl InvariantSource {
     /// Wrap a human-readable description of the violated invariant,
     /// recording the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(detail))]
     pub fn new(detail: impl Into<String>) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -456,6 +471,7 @@ impl ChainSource {
     /// Preserve a proof-chain lookup failure alongside the caller's
     /// location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: crate::ChainError) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -485,6 +501,7 @@ pub struct StdSource {
 impl StdSource {
     /// Preserve an `amenable_std` error alongside the caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn new(source: amenable_std::AmenableStdError) -> Self {
         let loc = std::panic::Location::caller();
         Self {

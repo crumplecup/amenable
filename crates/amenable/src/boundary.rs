@@ -8,17 +8,21 @@ use miette::{Diagnostic, Report};
 
 use crate::Cli;
 
+use tracing::instrument;
 /// Run the CLI and render failures with miette.
+#[instrument(level = "info", skip(cli))]
 pub(crate) fn run(cli: Cli) -> Result<(), Report> {
     install_hook();
     crate::dispatch(cli).map_err(|err| Report::from(CliError(err)))
 }
 
 /// Print a diagnostic report to stderr.
+#[instrument(level = "debug", skip(report))]
 pub(crate) fn exit_on_error(report: &Report) {
     eprintln!("{report:?}");
 }
 
+#[instrument(level = "debug")]
 fn install_hook() {
     let _ = miette::set_hook(Box::new(|_| {
         Box::new(
@@ -36,18 +40,21 @@ fn install_hook() {
 struct CliError(AmenableError);
 
 impl std::fmt::Display for CliError {
+    #[instrument(level = "trace", skip(self, formatter))]
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(formatter)
     }
 }
 
 impl std::error::Error for CliError {
+    #[instrument(level = "trace", skip(self))]
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         Some(&self.0)
     }
 }
 
 impl Diagnostic for CliError {
+    #[instrument(level = "trace", skip(self))]
     fn code<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
         Some(Box::new(format!(
             "amenable::{}",
@@ -55,6 +62,7 @@ impl Diagnostic for CliError {
         )))
     }
 
+    #[instrument(level = "trace", skip(self))]
     fn help<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
         Some(Box::new(
             "See the CSV/JSONL ledgers under artifacts/ for verification and assessment history.",
@@ -62,6 +70,7 @@ impl Diagnostic for CliError {
     }
 }
 
+#[instrument(level = "debug", skip(kind))]
 fn error_kind_code(kind: &AmenableErrorKind) -> &'static str {
     use AmenableErrorKind::{
         AssessmentCount, Chain, InvalidScore, InvalidUtcDate, Invariant, Io, JsonLine,

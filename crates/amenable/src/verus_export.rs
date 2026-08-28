@@ -46,7 +46,9 @@ use amenable_std::verus_call_shape;
 
 use crate::{AmenableError, AmenableResult};
 
+use tracing::instrument;
 /// Write one Verus proof module per registered `verus` witness export.
+#[instrument(level = "info")]
 pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> {
     fs::create_dir_all(root).map_err(|error| AmenableError::io(root, error))?;
 
@@ -84,6 +86,7 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
     Ok(written_paths)
 }
 
+#[instrument(level = "debug", skip(export))]
 fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> AmenableResult<PathBuf> {
     let (parent_segments, final_segment) = parse_destination_module(export.destination_module())?;
     let output_path = ensure_module_tree(root, &parent_segments, &final_segment)?;
@@ -97,6 +100,7 @@ fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> Amena
 /// segments (`a`, `b`) and final segment (`c`), so callers that only need
 /// the final segment carry that guarantee in the type instead of
 /// re-deriving it with `.last().expect(...)`.
+#[instrument(level = "debug")]
 fn parse_destination_module(destination_module: &str) -> AmenableResult<(Vec<String>, String)> {
     let mut parts = destination_module.split("::");
     let crate_root = parts.next().ok_or_else(|| {
@@ -129,6 +133,7 @@ fn parse_destination_module(destination_module: &str) -> AmenableResult<(Vec<Str
     Ok((segments, final_segment))
 }
 
+#[instrument(level = "trace")]
 fn is_valid_module_segment(segment: &str) -> bool {
     let mut chars = segment.chars();
     let Some(first) = chars.next() else {
@@ -139,6 +144,7 @@ fn is_valid_module_segment(segment: &str) -> bool {
         && chars.all(|ch| ch == '_' || ch.is_ascii_alphanumeric())
 }
 
+#[instrument(level = "debug")]
 fn ensure_module_tree(
     root: &Path,
     parent_segments: &[String],
@@ -159,6 +165,7 @@ fn ensure_module_tree(
     Ok(current_dir.join(format!("{final_segment}.rs")))
 }
 
+#[instrument(level = "debug")]
 fn ensure_module_declaration(module_file: &Path, module_name: &str) -> AmenableResult<()> {
     if let Some(parent) = module_file.parent() {
         fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
@@ -220,6 +227,7 @@ struct PendingClause {
 }
 
 impl PendingClause {
+    #[instrument(level = "debug", skip(self))]
     fn rebase(self, base: usize) -> Self {
         PendingClause {
             template: self.template,
@@ -233,6 +241,7 @@ impl PendingClause {
     /// result is `result.N`. A no-op if the template never referenced
     /// `$result` at all (some don't -- e.g. a precondition purely about
     /// a parameter).
+    #[instrument(level = "debug", skip(self))]
     fn render(&self, checked_call_count: usize) -> String {
         let result_ref = if checked_call_count <= 1 {
             "result".to_owned()
@@ -248,6 +257,7 @@ impl PendingClause {
     /// enum composition, where `$result` resolves to a locally bound
     /// name (`r`, or `r0`/`r1`/... for a multi-call variant) inside a
     /// `match result { ... }` arm instead.
+    #[instrument(level = "trace", skip(self))]
     fn render_with(&self, result_ref: &str) -> String {
         substitute_placeholder(&self.template, "result", result_ref)
     }
@@ -270,6 +280,7 @@ struct RenderedNode {
 }
 
 impl RenderedNode {
+    #[instrument(level = "debug", skip(self, other))]
     fn merge(&mut self, other: RenderedNode) {
         let base = self.checked_calls.len();
         self.params.extend(other.params);
@@ -287,6 +298,7 @@ impl RenderedNode {
 /// leaving anything else (including other `$other` placeholders)
 /// untouched. Placeholders are `$` followed by ASCII alphanumeric/`_`
 /// characters; a bare `$` not followed by an identifier is left as-is.
+#[instrument(level = "debug")]
 fn substitute_placeholder(template: &str, name: &str, replacement: &str) -> String {
     let chars: Vec<char> = template.chars().collect();
     let mut output = String::new();
@@ -334,6 +346,7 @@ struct NameAllocator {
 }
 
 impl NameAllocator {
+    #[instrument(level = "debug", skip(self))]
     fn allocate(&mut self, preferred: &str, route_hint: &str) -> String {
         if self.used.insert(preferred.to_owned()) {
             return preferred.to_owned();
@@ -345,6 +358,7 @@ impl NameAllocator {
     }
 }
 
+#[instrument(level = "debug", skip(export))]
 fn render_verus_module(
     export: &WitnessExportSnapshot,
     module_name: &str,
@@ -436,6 +450,7 @@ fn render_verus_module(
 /// support/audit comments — identical for the flat (struct/tuple-
 /// struct) and enum-composite render paths, so both build onto the same
 /// `source` buffer via this helper rather than duplicating it.
+#[instrument(level = "info", skip(source, export))]
 fn write_module_header(
     source: &mut String,
     export: &WitnessExportSnapshot,
@@ -489,6 +504,7 @@ fn write_module_header(
 /// Verus spec predicates need an explicit `use`, unlike ordinary
 /// functions (which resolve fine via a fully qualified call path) —
 /// confirmed against the real `verus` tool while building this.
+#[instrument(level = "debug")]
 fn predicate_import_lines(imports: &[(String, String)]) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let mut lines = Vec::new();
@@ -519,6 +535,7 @@ fn predicate_import_lines(imports: &[(String, String)]) -> Vec<String> {
 /// composed claim and `false` for every other (structurally
 /// unreachable, but syntactically required for exhaustiveness) result
 /// shape.
+#[instrument(level = "debug", skip(export, names))]
 fn render_enum_module(
     export: &WitnessExportSnapshot,
     module_stem: &str,
@@ -686,6 +703,7 @@ fn render_enum_module(
 /// local type names (`{Stem}Selector`/`{Stem}Result`) that need to look
 /// like real Rust type identifiers, not the `snake_case` function name
 /// they're derived from.
+#[instrument(level = "debug")]
 fn to_pascal_case(snake_case: &str) -> String {
     snake_case
         .split('_')
@@ -700,6 +718,7 @@ fn to_pascal_case(snake_case: &str) -> String {
         .collect()
 }
 
+#[instrument(level = "debug", skip(node, route, names))]
 fn render_node(
     node: &WitnessArtifactNode,
     route: &[RouteSegment],
@@ -731,6 +750,7 @@ fn render_node(
     }
 }
 
+#[instrument(level = "debug", skip(node, route, names))]
 fn render_leaf_node(
     node: &WitnessArtifactNode,
     route: &[RouteSegment],
@@ -755,6 +775,7 @@ fn render_leaf_node(
     }
 }
 
+#[instrument(level = "debug", skip(node, route, names))]
 fn render_checked_leaf(
     node: &WitnessArtifactNode,
     route: &[RouteSegment],
@@ -850,6 +871,7 @@ fn render_checked_leaf(
 /// resolved already, no rebasing needed. `$result` is left literal for
 /// [`PendingClause::render`] to resolve once the final checked-call
 /// count is known.
+#[instrument(level = "debug", skip(local_names))]
 fn pending_clause(
     template: &str,
     local_names: &std::collections::HashMap<String, String>,
@@ -867,6 +889,7 @@ fn pending_clause(
     }
 }
 
+#[instrument(level = "debug", skip(node, route))]
 fn render_trust_comment(node: &WitnessArtifactNode, route: &[RouteSegment]) -> String {
     let mut line = format!("// trusted leaf at {}", route_display(route));
 
@@ -885,6 +908,7 @@ fn render_trust_comment(node: &WitnessArtifactNode, route: &[RouteSegment]) -> S
     line
 }
 
+#[instrument(level = "debug", skip(metadata))]
 fn metadata_value<'a>(metadata: &'a [MetadataEntry], key: &str) -> Option<&'a str> {
     metadata
         .iter()
@@ -892,6 +916,7 @@ fn metadata_value<'a>(metadata: &'a [MetadataEntry], key: &str) -> Option<&'a st
         .map(MetadataEntry::value)
 }
 
+#[instrument(level = "debug", skip(route))]
 fn route_display(route: &[RouteSegment]) -> String {
     if route.is_empty() {
         return "root".to_owned();
@@ -907,6 +932,7 @@ fn route_display(route: &[RouteSegment]) -> String {
         .join(" -> ")
 }
 
+#[instrument(level = "debug", skip(route))]
 fn route_hint_name(route: &[RouteSegment]) -> String {
     if route.is_empty() {
         return "root".to_owned();
@@ -919,12 +945,14 @@ fn route_hint_name(route: &[RouteSegment]) -> String {
         .join("_")
 }
 
+#[instrument(level = "debug", skip(segment))]
 fn route_segment_name(segment: &RouteSegment) -> String {
     match segment {
         RouteSegment::Member(label) | RouteSegment::Variant(label) => normalize_identifier(label),
     }
 }
 
+#[instrument(level = "debug")]
 fn normalize_identifier(value: &str) -> String {
     let mut normalized = String::new();
     let mut previous_was_underscore = false;

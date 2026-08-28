@@ -63,6 +63,7 @@ use amenable_core::ExchangeEdgeRecord;
 
 use crate::{AmenableError, AmenableResult};
 
+use tracing::instrument;
 /// Write one generated Creusot companion file per real, explicitly-
 /// allowed `Exchange` edge registered via `amenable_core::
 /// ExchangeEdgeRecord`, under `root` (e.g. `amenable_creusot/src/
@@ -85,6 +86,7 @@ use crate::{AmenableError, AmenableResult};
 /// asymmetry was worth closing once the underlying capture mechanism
 /// (`#[amenable_derive::capture_exchange_body(..)]`) was proven out on
 /// `validate`/`commit`.
+#[instrument(level = "info")]
 pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<PathBuf>> {
     fs::create_dir_all(root).map_err(|error| AmenableError::io(root, error))?;
 
@@ -120,6 +122,7 @@ pub fn write_creusot_exchange_companions(root: &Path) -> AmenableResult<Vec<Path
 /// (and whose evidence-registry path it reports under), or `None` if
 /// that edge isn't connected here yet -- see this module's own doc
 /// comment for why this is an explicit table.
+#[instrument(level = "debug")]
 fn edge_module(self_ty: &str, method_name: &str) -> Option<&'static str> {
     static EDGES: &[(&str, &str, &str)] = &[
         ("Stoplight", "green_to_yellow", "stoplight"),
@@ -136,6 +139,7 @@ fn edge_module(self_ty: &str, method_name: &str) -> Option<&'static str> {
         .map(|(_, _, module)| *module)
 }
 
+#[instrument(level = "debug", skip(record))]
 fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
     let const_name = format!(
         "VERIFY_{}_EXCHANGE_SRC",
@@ -254,6 +258,7 @@ fn render_companion(record: &ExchangeEdgeRecord, module: &str) -> String {
 /// through two passes, not assumed correct on the first attempt: an
 /// earlier version only stripped the space *after* `<`, leaving
 /// `Established <Green, GreenToken>`'s space *before* `<` untouched.
+#[instrument(level = "debug")]
 fn tidy_stringified_type(stringified: &str) -> String {
     let mut tidied = String::with_capacity(stringified.len());
     let mut chars = stringified.chars().peekable();
@@ -304,6 +309,7 @@ fn tidy_stringified_type(stringified: &str) -> String {
 ///    LEDGER_PLAN.md`'s Step 6, so a captured body referencing `self`/
 ///    `Self` -- `Ledger::validate`'s own real body, the first captured
 ///    body to need this -- has something to resolve against).
+#[instrument(level = "debug", skip(body))]
 fn indent_body(body: &str) -> String {
     let lines: Vec<&str> = body.lines().collect();
     let dedent_width = lines
@@ -339,6 +345,7 @@ fn indent_body(body: &str) -> String {
 /// boundary in *this* line, which nothing here guarantees for arbitrary
 /// captured source text even though real Rust indentation is ASCII
 /// whitespace in practice.
+#[instrument(level = "debug")]
 fn dedent_line(line: &str, dedent_width: usize) -> &str {
     let target = dedent_width.min(line.len());
     let boundary = (0..=target)

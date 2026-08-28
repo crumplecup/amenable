@@ -33,6 +33,7 @@ inventory = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 time = { workspace = true }
+tracing = { workspace = true }
 
 [dependencies.miette]
 workspace = true

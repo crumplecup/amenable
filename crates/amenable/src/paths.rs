@@ -2,9 +2,11 @@
 
 use std::path::{Path, PathBuf};
 
+use tracing::instrument;
 /// The workspace's `artifacts/` directory, resolved relative to this
 /// crate's manifest so it works regardless of the caller's current
 /// working directory.
+#[instrument(level = "debug")]
 #[must_use]
 pub fn artifacts_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../artifacts")
@@ -13,6 +15,7 @@ pub fn artifacts_directory() -> PathBuf {
 /// The `amenable_verus` crate's `src/` directory, resolved relative to
 /// this crate's manifest so CLI entrypoints can emit proof modules
 /// without depending on the caller's current working directory.
+#[instrument(level = "debug")]
 #[must_use]
 pub fn verus_source_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src")
@@ -20,6 +23,7 @@ pub fn verus_source_directory() -> PathBuf {
 
 /// The `amenable_creusot` crate's generated-companion directory, resolved
 /// the same way `verus_source_directory` is.
+#[instrument(level = "debug")]
 #[must_use]
 pub fn creusot_generated_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_creusot/src/generated")
@@ -31,6 +35,7 @@ pub fn creusot_generated_directory() -> PathBuf {
 /// `ledger_exchange/`, ...), matching the `include!("generated/
 /// {group}/{name}.rs")` paths already written into each gallery module
 /// (relative to `amenable_verus/src/gallery/`).
+#[instrument(level = "debug")]
 #[must_use]
 pub fn verus_exchange_generated_directory() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../amenable_verus/src/gallery/generated")
@@ -41,6 +46,7 @@ pub fn verus_exchange_generated_directory() -> PathBuf {
 /// directory, unlike `verus_exchange_generated_directory`), matching the
 /// `include!("generated/ledger_tokens.rs")` path written into `gallery::
 /// ledger_exchange` (relative to `amenable_verus/src/gallery/`).
+#[instrument(level = "debug")]
 #[must_use]
 pub fn verus_gaap_ledger_tokens_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))

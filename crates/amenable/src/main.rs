@@ -3,6 +3,7 @@
 
 #![forbid(unsafe_code)]
 
+use tracing::instrument;
 mod boundary;
 
 use amenable::{AmenableResult, assessment, gallery, kani};
@@ -64,6 +65,7 @@ enum VerifyBackend {
     Kani(kani::VerifyKaniArgs),
 }
 
+#[instrument(level = "info")]
 fn main() -> ExitCode {
     amenable::init_tracing();
     match Cli::try_parse() {
@@ -84,6 +86,7 @@ fn main() -> ExitCode {
 /// Dispatch a parsed [`Cli`] to its subcommand, returning a single unified
 /// result type so `boundary::run` has one place to convert failures into a
 /// presented [`miette::Report`].
+#[instrument(level = "debug", skip(cli))]
 fn dispatch(cli: Cli) -> AmenableResult<()> {
     match cli.command {
         Some(Commands::Audit(args)) => run_audit(args),
@@ -107,6 +110,7 @@ fn dispatch(cli: Cli) -> AmenableResult<()> {
     }
 }
 
+#[instrument(level = "info")]
 fn run_certify() -> AmenableResult<()> {
     let directory = amenable::paths::artifacts_directory().join("std-certificates");
     let paths = amenable::write_rust_std_certificate_artifacts(&directory)
@@ -125,6 +129,7 @@ fn run_certify() -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "info", skip(args))]
 fn run_audit(args: AuditArgs) -> AmenableResult<()> {
     let verifiers: Vec<&str> = args.verifiers.iter().map(String::as_str).collect();
     let filter = if verifiers.is_empty() {
@@ -162,6 +167,7 @@ fn run_audit(args: AuditArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "info", skip(args))]
 #[cfg(feature = "verus")]
 fn run_emit_verus_witnesses(args: EmitVerusWitnessesArgs) -> AmenableResult<()> {
     let root = args
@@ -181,6 +187,7 @@ fn run_emit_verus_witnesses(args: EmitVerusWitnessesArgs) -> AmenableResult<()> 
     Ok(())
 }
 
+#[instrument(level = "info", skip(args))]
 #[cfg(feature = "creusot")]
 fn run_emit_creusot_companions(args: EmitCreusotCompanionsArgs) -> AmenableResult<()> {
     let root = args
@@ -208,6 +215,7 @@ struct EmitCreusotCompanionsArgs {
     root: Option<PathBuf>,
 }
 
+#[instrument(level = "info", skip(args))]
 #[cfg(feature = "verus")]
 fn run_emit_verus_exchange_companions(args: EmitVerusExchangeCompanionsArgs) -> AmenableResult<()> {
     let root = args
@@ -235,6 +243,7 @@ struct EmitVerusExchangeCompanionsArgs {
     root: Option<PathBuf>,
 }
 
+#[instrument(level = "info", skip(args))]
 #[cfg(feature = "verus")]
 fn run_emit_verus_gaap_tokens(args: EmitVerusGaapTokensArgs) -> AmenableResult<()> {
     let path = args
@@ -381,6 +390,7 @@ struct KaniProofDump {
     package: String,
 }
 
+#[instrument(level = "debug", skip(node))]
 fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifactNodeDump {
     let (shape, support, kind, tag, variant, detail, metadata, members, variants) = node.dissolve();
 
@@ -425,6 +435,7 @@ fn dump_witness_artifact(node: amenable::WitnessArtifactNode) -> WitnessArtifact
     }
 }
 
+#[instrument(level = "info", skip(args))]
 fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
     let dump = RegistryDump {
         evidence_links: inventory::iter::<amenable::EvidenceLink>()

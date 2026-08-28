@@ -16,6 +16,7 @@ use crate::error::sources::{
     TimestampTooLargeSource,
 };
 
+use tracing::instrument;
 /// Crate-level result alias.
 pub type AmenableResult<T> = Result<T, AmenableError>;
 
@@ -45,6 +46,7 @@ impl AmenableError {
     /// Construct an error from an already-classified kind, recording the
     /// caller's location.
     #[track_caller]
+    #[instrument(level = "debug", skip(kind))]
     pub fn new(kind: AmenableErrorKind) -> Self {
         let loc = std::panic::Location::caller();
         Self {
@@ -56,6 +58,7 @@ impl AmenableError {
 
     /// Construct an [`AmenableErrorKind::Invariant`] business-rule error.
     #[track_caller]
+    #[instrument(level = "debug", skip(detail))]
     pub fn invariant(detail: impl Into<String>) -> Self {
         Self::new(AmenableErrorKind::Invariant(InvariantSource::new(detail)))
     }
@@ -63,6 +66,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::Io`] error naming the artifact
     /// path that failed.
     #[track_caller]
+    #[instrument(level = "debug", skip(path, source))]
     pub fn io(path: impl Into<PathBuf>, source: std::io::Error) -> Self {
         Self::new(AmenableErrorKind::Io(IoSource::new(source, path)))
     }
@@ -70,6 +74,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::JsonLine`] error naming the file
     /// and 1-indexed line that failed to parse.
     #[track_caller]
+    #[instrument(level = "debug", skip(path, source))]
     pub fn json_line(path: impl Into<PathBuf>, line: usize, source: serde_json::Error) -> Self {
         Self::new(AmenableErrorKind::JsonLine(JsonLineSource::new(
             source, path, line,
@@ -79,6 +84,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::InvalidUtcDate`] error naming the
     /// rejected date string.
     #[track_caller]
+    #[instrument(level = "debug", skip(value, source))]
     pub fn invalid_utc_date(value: impl Into<String>, source: time::error::Parse) -> Self {
         Self::new(AmenableErrorKind::InvalidUtcDate(
             InvalidUtcDateSource::new(source, value),
@@ -88,6 +94,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::Chain`] error preserving a
     /// proof-chain lookup failure.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn chain(source: crate::ChainError) -> Self {
         Self::new(AmenableErrorKind::Chain(ChainSource::new(source)))
     }
@@ -95,6 +102,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::Std`] error preserving an
     /// `amenable_std` operation failure.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn std(source: amenable_std::AmenableStdError) -> Self {
         Self::new(AmenableErrorKind::Std(StdSource::new(source)))
     }
@@ -102,6 +110,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::InvalidScore`] error naming the
     /// rejected score string.
     #[track_caller]
+    #[instrument(level = "debug", skip(value, source))]
     pub fn invalid_score(value: impl Into<String>, source: std::num::ParseIntError) -> Self {
         Self::new(AmenableErrorKind::InvalidScore(InvalidScoreSource::new(
             source, value,
@@ -111,6 +120,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::PreEpochDate`] error naming the
     /// rejected date.
     #[track_caller]
+    #[instrument(level = "debug", skip(date, source))]
     pub fn pre_epoch_date(date: impl Into<String>, source: std::num::TryFromIntError) -> Self {
         Self::new(AmenableErrorKind::PreEpochDate(PreEpochDateSource::new(
             source, date,
@@ -120,6 +130,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::TimestampTooLarge`] error naming
     /// the rejected timestamp.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn timestamp_too_large(timestamp: u64, source: std::num::TryFromIntError) -> Self {
         Self::new(AmenableErrorKind::TimestampTooLarge(
             TimestampTooLargeSource::new(source, timestamp),
@@ -129,6 +140,7 @@ impl AmenableError {
     /// Construct an [`AmenableErrorKind::AssessmentCount`] error naming
     /// the rejected count.
     #[track_caller]
+    #[instrument(level = "debug", skip(source))]
     pub fn assessment_count(count: usize, source: std::num::TryFromIntError) -> Self {
         Self::new(AmenableErrorKind::AssessmentCount(
             AssessmentCountSource::new(source, count),
@@ -138,6 +150,7 @@ impl AmenableError {
 
 impl From<AmenableErrorKind> for AmenableError {
     #[track_caller]
+    #[instrument(level = "debug", skip(kind))]
     fn from(kind: AmenableErrorKind) -> Self {
         Self::new(kind)
     }

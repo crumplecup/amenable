@@ -17,6 +17,7 @@ use time::{
     format_description::{self, well_known::Rfc3339},
 };
 
+use tracing::instrument;
 const CURRENT_ASSESSMENT_VERSION: &str = "0.1.0";
 const LEGACY_ASSESSMENT_VERSION: &str = "legacy-1";
 const LEGACY_SCHEMA_VERSION: u8 = 1;
@@ -206,6 +207,7 @@ enum Recommendation {
 }
 
 impl Recommendation {
+    #[instrument(level = "debug", skip(self))]
     fn as_str(self) -> &'static str {
         match self {
             Self::Accept => "accept",
@@ -238,6 +240,7 @@ enum ResolutionPath {
 }
 
 impl ResolutionPath {
+    #[instrument(level = "debug", skip(self))]
     fn as_str(self) -> &'static str {
         match self {
             Self::KeepCurrentProof => "keep_current_proof",
@@ -260,6 +263,7 @@ enum SummaryDimension {
 }
 
 impl SummaryDimension {
+    #[instrument(level = "debug", skip(self))]
     fn as_str(self) -> &'static str {
         match self {
             Self::Recommendation => "recommendation",
@@ -280,6 +284,7 @@ struct Rubric {
 }
 
 impl Rubric {
+    #[instrument(level = "debug", skip(self))]
     fn validate(self) -> AmenableResult<()> {
         for (name, score) in [
             ("claim_alignment", self.claim_alignment),
@@ -299,6 +304,7 @@ impl Rubric {
         Ok(())
     }
 
+    #[instrument(level = "debug", skip(self))]
     fn values(self) -> [(String, u8); 6] {
         [
             ("claim alignment".to_owned(), self.claim_alignment),
@@ -326,6 +332,7 @@ pub struct ProofAssessment {
 }
 
 impl ProofAssessment {
+    #[instrument(level = "debug", skip(self))]
     fn validate(&self) -> AmenableResult<()> {
         if self.version != CURRENT_ASSESSMENT_VERSION && self.version != LEGACY_ASSESSMENT_VERSION {
             return Err(AmenableError::invariant(format!(
@@ -383,6 +390,7 @@ struct StoredProofAssessment {
 }
 
 impl StoredProofAssessment {
+    #[instrument(level = "debug", skip(self))]
     fn into_assessment(self) -> AmenableResult<ProofAssessment> {
         let proof_id = self.proof_id;
         let version = match (self.version, self.schema_version) {
@@ -435,6 +443,7 @@ impl StoredProofAssessment {
 }
 
 impl From<&ProofAssessment> for StoredProofAssessment {
+    #[instrument(level = "debug", skip(assessment))]
     fn from(assessment: &ProofAssessment) -> Self {
         Self {
             version: Some(assessment.version.clone()),
@@ -490,6 +499,7 @@ struct ListedVerificationFailure {
 }
 
 /// Execute an assessment command.
+#[instrument(level = "info", skip(args))]
 pub fn run(args: AssessArgs) -> AmenableResult<()> {
     match args.command {
         AssessCommand::Proof(args) => record(args),
@@ -501,10 +511,12 @@ pub fn run(args: AssessArgs) -> AmenableResult<()> {
     }
 }
 
+#[instrument(level = "debug")]
 fn default_assessment_path() -> PathBuf {
     crate::paths::artifacts_directory().join("proof-assessments.jsonl")
 }
 
+#[instrument(level = "debug")]
 fn parse_score(value: &str) -> AmenableResult<u8> {
     let score: u8 = value
         .parse()
@@ -518,11 +530,13 @@ fn parse_score(value: &str) -> AmenableResult<u8> {
     Ok(score)
 }
 
+#[instrument(level = "debug")]
 fn parse_utc_date(value: &str) -> AmenableResult<Date> {
     let format = format_description::parse_borrowed::<2>("[year]-[month]-[day]")?;
     Date::parse(value, &format).map_err(|error| AmenableError::invalid_utc_date(value, error))
 }
 
+#[instrument(level = "debug", skip(args))]
 fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
     ensure_registered(&args.proof)?;
     let comment = read_comment(args.comment, args.comment_file)?;
@@ -556,6 +570,7 @@ fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "debug", skip(args))]
 fn summary(args: AssessmentSummaryArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
@@ -639,6 +654,7 @@ fn summary(args: AssessmentSummaryArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "debug", skip(args))]
 fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
@@ -718,6 +734,7 @@ fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "info")]
 fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> AmenableResult<String> {
     match (comment, comment_file) {
         (Some(comment), None) => Ok(comment),
@@ -733,6 +750,7 @@ fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> Amena
     }
 }
 
+#[instrument(level = "debug", skip(args))]
 fn list(args: AssessmentListArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
@@ -794,6 +812,7 @@ fn list(args: AssessmentListArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "debug", skip(args))]
 fn report(args: AssessmentReportArgs) -> AmenableResult<()> {
     if let Some(proof) = &args.proof {
         ensure_registered(proof)?;
@@ -825,6 +844,7 @@ fn report(args: AssessmentReportArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "debug", skip(args))]
 fn queue(args: AssessmentQueueArgs) -> AmenableResult<()> {
     let since_timestamp = args.since.map(start_of_utc_date_timestamp).transpose()?;
     let assessed = assessed_proof_ids(&args.assessments, since_timestamp)?;
@@ -854,6 +874,7 @@ fn queue(args: AssessmentQueueArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "debug", skip(assessments, recommendation, resolution_path))]
 fn filtered_assessments(
     assessments: Vec<ProofAssessment>,
     proof: Option<&str>,
@@ -876,6 +897,7 @@ fn filtered_assessments(
         .collect()
 }
 
+#[instrument(level = "debug", skip(path))]
 fn assessed_proof_ids(
     path: &Path,
     since_timestamp: Option<u64>,
@@ -889,6 +911,7 @@ fn assessed_proof_ids(
         .collect())
 }
 
+#[instrument(level = "debug", skip(status, filter))]
 fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> bool {
     match filter {
         Some(wanted) => status == wanted,
@@ -896,6 +919,7 @@ fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> b
     }
 }
 
+#[instrument(level = "debug", skip(entries))]
 fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<()> {
     println!("{proof_id}: {} assessment(s)", entries.len());
 
@@ -956,6 +980,7 @@ struct RegisteredProof {
     id: String,
 }
 
+#[instrument(level = "debug")]
 fn registered_proofs() -> Vec<RegisteredProof> {
     let mut proofs: Vec<RegisteredProof> = inventory::iter::<KaniProofRegistration>()
         .map(|registration| RegisteredProof {
@@ -979,6 +1004,7 @@ fn registered_proofs() -> Vec<RegisteredProof> {
 /// independently review) are excluded -- there is no proof there to
 /// assess, the same reason Kani's own registry only ever contains real
 /// `#[kani::proof]` harnesses.
+#[instrument(level = "debug")]
 fn registered_checked_proofs(verifier: &str) -> Vec<RegisteredProof> {
     let harnesses: BTreeSet<String> = inventory::iter::<ProofRecord>()
         .filter(|record| record.verifier() == verifier)
@@ -999,6 +1025,7 @@ fn registered_checked_proofs(verifier: &str) -> Vec<RegisteredProof> {
         .collect()
 }
 
+#[instrument(level = "debug")]
 fn ensure_registered(proof_id: &str) -> AmenableResult<()> {
     registered_proofs()
         .into_iter()
@@ -1007,20 +1034,24 @@ fn ensure_registered(proof_id: &str) -> AmenableResult<()> {
         .ok_or_else(|| AmenableError::invariant(format!("unknown registered proof ID: {proof_id}")))
 }
 
+#[instrument(level = "debug")]
 fn timestamp() -> AmenableResult<u64> {
     Ok(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs())
 }
 
+#[instrument(level = "debug")]
 fn assessment_id() -> AmenableResult<String> {
     let duration = SystemTime::now().duration_since(UNIX_EPOCH)?;
     Ok(format!("assessment-{}", duration.as_nanos()))
 }
 
+#[instrument(level = "debug", skip(date))]
 fn start_of_utc_date_timestamp(date: Date) -> AmenableResult<u64> {
     let timestamp = date.midnight().assume_utc().unix_timestamp();
     u64::try_from(timestamp).map_err(|error| AmenableError::pre_epoch_date(date.to_string(), error))
 }
 
+#[instrument(level = "debug")]
 fn format_timestamp(timestamp: u64) -> AmenableResult<String> {
     let seconds = i64::try_from(timestamp)
         .map_err(|error| AmenableError::timestamp_too_large(timestamp, error))?;
@@ -1028,6 +1059,7 @@ fn format_timestamp(timestamp: u64) -> AmenableResult<String> {
     Ok(recorded_at.format(&Rfc3339)?)
 }
 
+#[instrument(level = "debug", skip(recommendation, resolution_path))]
 fn validate_resolution_path(
     recommendation: Recommendation,
     resolution_path: ResolutionPath,
@@ -1052,6 +1084,7 @@ fn validate_resolution_path(
     })
 }
 
+#[instrument(level = "debug", skip(value))]
 fn print_json<T: Serialize>(value: &T) -> AmenableResult<()> {
     let json = serde_json::to_string_pretty(value)?;
     println!("{json}");
@@ -1065,6 +1098,7 @@ fn print_json<T: Serialize>(value: &T) -> AmenableResult<()> {
 ///
 /// Returns an [`amenable::AmenableError`] if the artifact can't be read,
 /// or if any line is invalid JSON or fails assessment validation.
+#[instrument(level = "debug", skip(path))]
 pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {
     if !path.exists() {
         return Ok(Vec::new());
@@ -1097,6 +1131,7 @@ pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {
         .collect()
 }
 
+#[instrument(level = "debug", skip(path, assessment))]
 fn append(path: &Path, assessment: &ProofAssessment) -> AmenableResult<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;

@@ -13,6 +13,7 @@ use crate::{
 };
 use clap::{Args, Subcommand};
 
+use tracing::instrument;
 const LEDGER_HEADER: &str =
     "case_id,timestamp,disposition,expected_status,observed_status,matched_expectation";
 
@@ -45,11 +46,13 @@ struct RunGalleryArgs {
     harness_timeout: String,
 }
 
+#[instrument(level = "debug")]
 fn default_results_path() -> PathBuf {
     crate::paths::artifacts_directory().join("kani-gallery-results.csv")
 }
 
 /// Execute a proof-gallery command.
+#[instrument(level = "info", skip(args))]
 pub fn run(args: GalleryArgs) -> AmenableResult<()> {
     match args.command {
         GalleryCommand::List => list_cases(),
@@ -57,6 +60,7 @@ pub fn run(args: GalleryArgs) -> AmenableResult<()> {
     }
 }
 
+#[instrument(level = "debug")]
 fn list_cases() -> AmenableResult<()> {
     let cases = registered_cases();
     if cases.is_empty() {
@@ -78,6 +82,7 @@ fn list_cases() -> AmenableResult<()> {
     Ok(())
 }
 
+#[instrument(level = "info", skip(args))]
 fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     let cases = registered_cases();
     let selected = select_cases(&cases, args.case.as_deref())?;
@@ -123,6 +128,7 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     }
 }
 
+#[instrument(level = "debug")]
 fn registered_cases() -> Vec<KaniGalleryCase> {
     let mut cases: Vec<_> = inventory::iter::<KaniGalleryRegistration>()
         .map(|registration| (registration.case())())
@@ -131,6 +137,7 @@ fn registered_cases() -> Vec<KaniGalleryCase> {
     cases
 }
 
+#[instrument(level = "debug", skip(cases))]
 fn select_cases<'a>(
     cases: &'a [KaniGalleryCase],
     id: Option<&str>,
@@ -147,6 +154,7 @@ fn select_cases<'a>(
     }
 }
 
+#[instrument(level = "info", skip(case))]
 fn run_case(case: &KaniGalleryCase, harness_timeout: &str) -> GalleryRun {
     let output = kani_command(case, harness_timeout)
         .stdout(Stdio::piped())
@@ -181,6 +189,7 @@ fn run_case(case: &KaniGalleryCase, harness_timeout: &str) -> GalleryRun {
     }
 }
 
+#[instrument(level = "debug", skip(case))]
 fn kani_command(case: &KaniGalleryCase, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
     command.args([
@@ -200,6 +209,7 @@ fn kani_command(case: &KaniGalleryCase, harness_timeout: &str) -> Command {
     command
 }
 
+#[instrument(level = "trace", ret)]
 fn is_kani_timeout(diagnostics: &str) -> bool {
     let diagnostics = diagnostics.to_ascii_lowercase();
     diagnostics.contains("verification timed out")
@@ -207,6 +217,7 @@ fn is_kani_timeout(diagnostics: &str) -> bool {
         || diagnostics.contains("timed out")
 }
 
+#[instrument(level = "debug")]
 fn first_diagnostic_line(diagnostics: &str) -> Option<String> {
     diagnostics
         .lines()
@@ -239,6 +250,7 @@ struct Ledger {
 }
 
 impl Ledger {
+    #[instrument(level = "debug", skip(path))]
     fn load(path: &Path) -> AmenableResult<Self> {
         if !path.exists() {
             return Ok(Self {
@@ -300,6 +312,7 @@ impl Ledger {
         Ok(Self { rows })
     }
 
+    #[instrument(level = "debug", skip(self, case, observed))]
     fn upsert(
         &mut self,
         case: &KaniGalleryCase,
@@ -322,6 +335,7 @@ impl Ledger {
         Ok(())
     }
 
+    #[instrument(level = "debug", skip(self, path))]
     fn persist(&self, path: &Path) -> AmenableResult<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
@@ -349,6 +363,7 @@ impl Ledger {
     }
 }
 
+#[instrument(level = "debug")]
 fn parse_bool(value: &str) -> Option<bool> {
     match value {
         "true" => Some(true),
