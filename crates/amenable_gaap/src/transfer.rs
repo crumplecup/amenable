@@ -22,29 +22,67 @@
 //! it belongs with the real transition logic that captures it (Step 1),
 //! not speculated on before any transition exists to need it.
 
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
-
 use amenable_core::{MetadataEntry, Provenance};
 use amenable_derive::Standard;
 use uuid::Uuid;
 
-/// Identifies an account by a stable id, alongside a human-readable
-/// name.
+/// An account's stable identity — nothing else.
 ///
-/// Equality, ordering, and hashing all compare `id` only, never `name`
-/// — `amenable_kani::gallery::ledger_account_id_comparison`'s own
-/// investigation (`GAAP_LEDGER_PLAN.md`'s Step 1) found that comparing
-/// two independently-constructed `String`s for equality inside a
+/// `Equal`/`Ord`/`Hash` are plain derives, not hand-written: this type
+/// used to be a single struct also carrying a display `name`, with
+/// hand-written `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord` impls that
+/// compared `id` and ignored `name`. That worked, but fought two other
+/// tools at once. First, functionally: `amenable_kani::gallery::
+/// ledger_account_id_comparison`'s own investigation
+/// (`GAAP_LEDGER_PLAN.md`'s Step 1) found that comparing two
+/// independently-constructed `String`s for equality inside a
 /// `#[kani::ensures]` closure is expensive for CBMC regardless of
 /// content or length, while comparing a fixed-size value (an integer, a
 /// UUID's 16 bytes) is cheap — and, critically, that a fixed-*capacity*
 /// but still variable-*length* string (a bounded buffer plus a length
 /// field) is exactly as expensive as an unbounded `String`, so
-/// truncating/capping the name would not have helped. A `Uuid` was
-/// chosen over a bare integer because it's a real, dedicated identity
-/// type (globally unique without a central allocator) rather than a
-/// proxy repurposing an arbitrary numeric type.
+/// truncating/capping the name would not have helped; that investigation's
+/// own closing recommendation was "give it a cheap-to-compare identity
+/// alongside whatever human-readable name it already carries." Second,
+/// mechanically: once every function got `#[instrument]` (this
+/// workspace's tracing rollout), the hand-written `PartialOrd::
+/// partial_cmp`'s `Some(self.cmp(other))` body — the textbook canonical
+/// delegation to `Ord::cmp` — started tripping `clippy::
+/// non_canonical_partial_ord_impl`: instrumenting wraps the body in
+/// span-entry code, so it no longer literally matches the shape clippy's
+/// lint pattern-matches against, and clippy has no way to see through a
+/// proc-macro's expansion to recognize its own canonical form
+/// underneath. Splitting the identity out into its own field-less-but-one
+/// type turns the whole comparison chain into ordinary derives — nothing
+/// hand-written for either tool to trip on. See [`Account`] for the
+/// combined id+name record this type used to be.
+///
+/// A `Uuid` was chosen over a bare integer because it's a real,
+/// dedicated identity type (globally unique without a central
+/// allocator) rather than a proxy repurposing an arbitrary numeric type.
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Default,
+    derive_more::From,
+    derive_getters::Getters,
+    derive_new::new,
+)]
+pub struct AccountId {
+    /// The account's stable id.
+    #[getter(copy)]
+    id: Uuid,
+}
+
+/// An account: its stable [`AccountId`] alongside a human-readable
+/// display name that never participates in identity comparisons — see
+/// `AccountId`'s own doc comment for why the two are separate types.
 ///
 /// `id` must be supplied explicitly, not generated fresh on every call:
 /// the same real-world account (e.g. two separate references to
@@ -52,50 +90,15 @@ use uuid::Uuid;
 /// only holds if its id is stable across reconstructions — the same
 /// reason a real chart of accounts assigns an id once, at account
 /// creation, rather than re-deriving one per lookup.
-#[derive(Debug, Clone, Default, derive_getters::Getters, derive_new::new)]
-pub struct AccountId {
-    /// The account's stable id — what identity checks compare.
+#[derive(Debug, Clone, Default, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
+pub struct Account {
+    /// The account's stable identity — what identity checks compare.
     #[getter(copy)]
-    id: Uuid,
+    #[new(into)]
+    id: AccountId,
     /// The account's human-readable name — display only, never compared.
     #[new(into)]
     name: String,
-}
-
-impl PartialEq for AccountId {
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, other)))]
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for AccountId {}
-
-impl Hash for AccountId {
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, state)))]
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-impl PartialOrd for AccountId {
-    // Deliberately not #[instrument]: clippy::non_canonical_partial_ord_impl
-    // pattern-matches this fn's expanded body against `Some(self.cmp(other))`
-    // exactly, and a proc-macro-instrumented body -- span-entry code wrapped
-    // around the original expression -- no longer matches, so it misfires
-    // as "non-canonical" even though this is the canonical delegation
-    // clippy wants. Confirmed empirically: this is the one function in the
-    // apply run that broke `-D warnings` if instrumented.
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for AccountId {
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, other)))]
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.id.cmp(&other.id)
-    }
 }
 
 /// A transfer amount, in the ledger's smallest denomination.
@@ -135,9 +138,9 @@ impl Amount {
 #[evidence(basis = "Self")]
 pub struct TransferPayload {
     /// The source account.
-    from: AccountId,
+    from: Account,
     /// The destination account.
-    to: AccountId,
+    to: Account,
     /// The transfer amount.
     #[getter(copy)]
     amount: Amount,

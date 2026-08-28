@@ -11,8 +11,8 @@
 //! Inputs route through `crate::ledger`'s `KaniCompose` impls
 //! (`docs/STATE_MACHINE_DERIVATION_PLAN.md`'s "Reusing `KaniCompose`
 //! for non-trivial carriers" follow-on) rather than the two fixed
-//! `AccountId`s ("Alice"/"Bob") and ad hoc `kani::any()` calls this file
-//! used to hand-construct: every `AccountId`/`Amount`/`TransferPayload`
+//! `Account`s ("Alice"/"Bob") and ad hoc `kani::any()` calls this file
+//! used to hand-construct: every `Account`/`Amount`/`TransferPayload`
 //! below is now genuinely bounded-symbolic, exploring real varying
 //! identities instead of only ever exercising the same two literal
 //! accounts. Each harness still controls exactly what it needs to
@@ -24,7 +24,7 @@
 //! properties each harness deliberately holds fixed.
 
 #[cfg(kani)]
-use amenable_gaap::{AccountId, Amount, Ledger, Transfer, TransferPayload, Validated};
+use amenable_gaap::{Account, Amount, Ledger, Transfer, TransferPayload, Validated};
 
 #[cfg(kani)]
 use crate::{KaniCompose, KaniVerifier};
@@ -59,8 +59,8 @@ amenable_derive::harness! {
         fn verify_gaap_validate_accepts_a_lawful_transfer() {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
-            let from = AccountId::kani_any();
-            let to = AccountId::kani_any();
+            let from = Account::kani_any();
+            let to = Account::kani_any();
             kani::assume(from.id() != to.id());
             let payload = TransferPayload::new(from, to, Amount::kani_any());
             let input = amenable_gaap::Transfer::pending(payload);
@@ -77,7 +77,7 @@ amenable_derive::harness! {
         fn verify_gaap_validate_rejects_the_same_account() {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
-            let account = AccountId::kani_any();
+            let account = Account::kani_any();
             let payload =
                 TransferPayload::new(account.clone(), account, Amount::kani_any());
             let input = amenable_gaap::Transfer::pending(payload);
@@ -95,8 +95,8 @@ amenable_derive::harness! {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
             let payload = TransferPayload::new(
-                AccountId::kani_any(),
-                AccountId::kani_any(),
+                Account::kani_any(),
+                Account::kani_any(),
                 Amount::new(amount),
             );
             let pending = Transfer::pending(payload.clone());

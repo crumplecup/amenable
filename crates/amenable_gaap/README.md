@@ -35,7 +35,7 @@ example would be built in (see
 [`amenable_derive`](../amenable_derive/README.md#onboarding-building-a-new-worked-example)'s
 own onboarding walkthrough for the general recipe this crate follows):
 
-1. **[`transfer.rs`](src/transfer.rs)** — `AccountId`, `Amount`,
+1. **[`transfer.rs`](src/transfer.rs)** — `AccountId`, `Account`, `Amount`,
    `TransferPayload` (the real data), and the four typestate markers
    (`Pending`/`Validated`/`Committed`/`Rejected<T>`), each a
    `#[derive(Standard)]` root claim — asserted by construction, not

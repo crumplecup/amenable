@@ -7,7 +7,7 @@ use amenable_core::{
     ContractRecord, ExchangeEdgeRecord, Requires, RootEntry, Sidecar, StateMachine,
 };
 use amenable_gaap::{
-    AccountId, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
+    Account, Amount, Committed, CommittedToken, Ledger, Pending, Rejected,
     RejectedFromPendingToken, RejectedFromValidatedToken, Transfer, TransferError, TransferPayload,
     Validated, ValidatedToken,
 };
@@ -17,8 +17,8 @@ use amenable_kani::KaniVerifier;
 fn validate_accepts_a_lawful_transfer() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -34,8 +34,8 @@ fn validate_accepts_a_lawful_transfer() -> miette::Result<()> {
 fn validate_rejects_a_negative_amount() {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(-1),
     );
     let input = Transfer::pending(payload);
@@ -50,8 +50,8 @@ fn validate_rejects_a_negative_amount() {
 fn validate_rejects_insufficient_funds() {
     let ledger = Ledger::new(10);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -72,8 +72,8 @@ fn validate_rejects_insufficient_funds() {
 fn validate_rejects_the_same_account() {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -88,8 +88,8 @@ fn validate_rejects_the_same_account() {
 fn commit_always_succeeds_and_carries_the_same_amount() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -109,8 +109,8 @@ fn commit_always_succeeds_and_carries_the_same_amount() -> miette::Result<()> {
 fn reject_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -126,8 +126,8 @@ fn reject_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
 fn rollback_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let input = Transfer::pending(payload);
@@ -151,8 +151,8 @@ fn rollback_always_succeeds_and_preserves_the_payload() -> miette::Result<()> {
 fn validated_requires_holds_for_a_lawfully_validated_transfer() -> miette::Result<()> {
     let ledger = Ledger::new(100);
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
     let validated: Transfer<Validated, ValidatedToken> = ledger

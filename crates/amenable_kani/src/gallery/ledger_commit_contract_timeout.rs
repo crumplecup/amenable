@@ -40,8 +40,8 @@ amenable_derive::gallery_harness! {
 
             let ledger = amenable_gaap::Ledger::new(100);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(50),
             );
             let pending = amenable_gaap::Transfer::pending(payload.clone());
@@ -86,8 +86,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();
@@ -125,8 +125,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let validated_token = amenable_gaap::ValidatedToken::diagnostic_only();

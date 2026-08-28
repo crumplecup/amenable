@@ -156,8 +156,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = Transfer::pending(payload.clone());
@@ -221,8 +221,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = Transfer::pending(payload.clone());
@@ -277,8 +277,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = Transfer::pending(payload.clone());
@@ -314,8 +314,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = Transfer::pending(payload.clone());

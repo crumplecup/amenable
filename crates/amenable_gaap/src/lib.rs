@@ -22,4 +22,6 @@ pub use tokens::{
     CommittedToken, PendingToken, RejectedFromPendingToken, RejectedFromValidatedToken,
     ValidatedToken,
 };
-pub use transfer::{AccountId, Amount, Committed, Pending, Rejected, TransferPayload, Validated};
+pub use transfer::{
+    Account, AccountId, Amount, Committed, Pending, Rejected, TransferPayload, Validated,
+};

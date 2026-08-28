@@ -189,6 +189,15 @@ fn run_case(case: &KaniGalleryCase, harness_timeout: &str) -> GalleryRun {
     }
 }
 
+/// `-Z function-contracts`/`-Z stubbing` are always enabled -- required
+/// for any case using `kani::requires`/`kani::ensures`/`kani::
+/// proof_for_contract`/`kani::stub_verified`, and harmless for a case
+/// that doesn't, matching `kani::kani_command`'s own identical
+/// canonical-invocation rationale (missing here found the hard way:
+/// `commit_contract_no_wrapper`, a real `#[kani::proof_for_contract]`
+/// gallery case, failed with "requires activating the unstable
+/// `function-contracts` feature" via `gallery run` even though the
+/// identical harness shape verifies clean through `verify kani`).
 #[instrument(level = "debug", skip(case))]
 fn kani_command(case: &KaniGalleryCase, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
@@ -203,6 +212,10 @@ fn kani_command(case: &KaniGalleryCase, harness_timeout: &str) -> Command {
         case.harness().as_str(),
         "-Z",
         "unstable-options",
+        "-Z",
+        "function-contracts",
+        "-Z",
+        "stubbing",
         "--harness-timeout",
         harness_timeout,
     ]);

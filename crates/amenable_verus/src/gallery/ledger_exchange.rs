@@ -439,7 +439,8 @@ impl Amount {
 /// file's own doc comment for why `from`/`to` are bare `u64`, not a
 /// wrapping `AccountId`. `Clone`, not `Copy`, even though nothing here
 /// stops it from being `Copy`: the real `TransferPayload` genuinely
-/// isn't (a `String`-backed `AccountId`), and the real captured body's
+/// isn't (its `from`/`to` are a `String`-backed `Account`, not the bare
+/// `Copy` `AccountId` identity alone), and the real captured body's
 /// own `.clone()` call needs a `Clone` type to land on -- deriving
 /// `Copy` here too would make that same, legitimate `.clone()` trip a
 /// real, un-`#[allow]`-able `clippy::clone_on_copy` failure.

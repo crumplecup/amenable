@@ -116,6 +116,23 @@
 //! one) that `PartialEq` actually uses, alongside whatever human-
 //! readable name it already carries. See `GAAP_LEDGER_PLAN.md`'s Step 1
 //! for the write-up.
+//!
+//! **Addendum, landed:** at the time of this investigation `AccountId`
+//! was one struct carrying both `id`/`name`, with hand-written
+//! `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord` comparing `id` alone —
+//! exactly the shape this file's recommendation describes. It's since
+//! split into two real types: `AccountId` (bare `Uuid` identity, every
+//! comparison trait a plain derive) and `Account` (`id: AccountId,
+//! name: String`, the record this file's own harnesses below still
+//! construct). The split wasn't driven by a further CBMC finding —
+//! this investigation's own fix already worked — but by a second,
+//! unrelated tool conflict once this workspace's tracing rollout
+//! reached the hand-written `PartialOrd::partial_cmp`: `#[instrument]`
+//! wrapping its body in span-entry code made `clippy::
+//! non_canonical_partial_ord_impl` misfire on the canonical `Some(self.
+//! cmp(other))` delegation it could no longer pattern-match. Deriving
+//! instead of hand-writing sidesteps that too, since a derived impl
+//! has no source-visible function body for either tool to see.
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
@@ -137,8 +154,8 @@ amenable_derive::gallery_harness! {
         /// `String`-backed comparison `Ledger::validate` performs.
         #[kani::proof]
         fn account_id_inequality_over_concrete_strings_passes() {
-            let alice = amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice");
-            let bob = amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob");
+            let alice = amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice");
+            let bob = amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob");
             assert!(alice != bob);
         }
     }
@@ -169,8 +186,8 @@ amenable_derive::gallery_harness! {
         fn validate_with_concrete_amounts_passes() {
             let ledger = amenable_gaap::Ledger::new(100);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(50),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -208,8 +225,8 @@ amenable_derive::gallery_harness! {
             let amount: i64 = kani::any();
             let ledger = amenable_gaap::Ledger::new(1_000_000);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -249,8 +266,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -294,8 +311,8 @@ amenable_derive::gallery_harness! {
                     Err(amount)
                 } else {
                     Ok(amenable_gaap::TransferPayload::new(
-                        amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                        amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                        amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                        amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                         amenable_gaap::Amount::new(amount),
                     ))
                 }
@@ -339,8 +356,8 @@ amenable_derive::gallery_harness! {
             // isolates the `#[track_caller]` call itself, not whether
             // allocation happens conditionally.
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -391,8 +408,8 @@ amenable_derive::gallery_harness! {
             use amenable_core::Sidecar;
 
             let pending_payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
             let pending = amenable_gaap::Transfer::pending(pending_payload);
@@ -401,8 +418,8 @@ amenable_derive::gallery_harness! {
             let amount: i64 = kani::any();
             if amount > 0 {
                 let payload = amenable_gaap::TransferPayload::new(
-                    amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                    amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                    amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                    amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                     amenable_gaap::Amount::new(amount),
                 );
                 let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
@@ -454,8 +471,8 @@ amenable_derive::gallery_harness! {
                     return Err(amenable_gaap::TransferError::NegativeAmount(amount));
                 }
                 let payload = amenable_gaap::TransferPayload::new(
-                    amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                    amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                    amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                    amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                     amenable_gaap::Amount::new(amount),
                 );
                 let token = <amenable_gaap::Validated as amenable_core::Establish<_, amenable_kani::KaniVerifier>>::establish(credential);
@@ -463,8 +480,8 @@ amenable_derive::gallery_harness! {
             }
 
             let pending_payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(1),
             );
             let pending = amenable_gaap::Transfer::pending(pending_payload);
@@ -505,8 +522,8 @@ amenable_derive::gallery_harness! {
 
             let amount: i64 = kani::any();
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = amenable_gaap::Transfer::pending(payload);
@@ -553,8 +570,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
 
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = amenable_gaap::Transfer::pending(payload);
@@ -637,8 +654,8 @@ amenable_derive::gallery_harness! {
             let amount: i64 = kani::any();
             let balance: i64 = kani::any();
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let pending = amenable_gaap::Transfer::pending(payload);
@@ -680,8 +697,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = amenable_gaap::Ledger::new(balance);
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -771,8 +788,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = TwinLedger { balance };
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -857,8 +874,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = TrivialClaimLedger { balance };
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -945,8 +962,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = AmountOnlyClaimLedger { balance };
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -1033,8 +1050,8 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let ledger = StringCheckClaimLedger { balance };
             let payload = amenable_gaap::TransferPayload::new(
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-                amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
+                amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
                 amenable_gaap::Amount::new(amount),
             );
             let input = amenable_gaap::Transfer::pending(payload);
@@ -1231,7 +1248,7 @@ amenable_derive::gallery_harness! {
         /// comparison the `#[kani::ensures]` closure performs.
         #[kani::proof]
         fn ensures_closure_with_id_plus_name_hybrid_passes() {
-            // Not `kani::Arbitrary` -- `amenable_gaap::AccountId` is
+            // Not `kani::Arbitrary` -- `amenable_gaap::Account` is
             // `String`-backed and doesn't implement it (see `KANI_FOR_
             // VSMS.md`'s own warning: "do not add `#[cfg_attr(kani,
             // derive(kani::Arbitrary))]` to any struct containing
@@ -1240,7 +1257,7 @@ amenable_derive::gallery_harness! {
             #[derive(Debug, Clone)]
             struct HybridAccountId {
                 id: u64,
-                name: amenable_gaap::AccountId,
+                name: amenable_gaap::Account,
             }
 
             impl PartialEq for HybridAccountId {
@@ -1292,11 +1309,11 @@ amenable_derive::gallery_harness! {
             let balance: i64 = kani::any();
             let from = HybridAccountId {
                 id: kani::any(),
-                name: amenable_gaap::AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
+                name: amenable_gaap::Account::new(uuid::Uuid::from_u128(1), "Alice"),
             };
             let to = HybridAccountId {
                 id: kani::any(),
-                name: amenable_gaap::AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+                name: amenable_gaap::Account::new(uuid::Uuid::from_u128(2), "Bob"),
             };
             let ledger = HybridIdentityLedger { balance };
             let payload = HybridPayload { from, to, amount };

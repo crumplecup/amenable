@@ -6,7 +6,7 @@
 
 use amenable_core::{Evidence, Standard};
 use amenable_gaap::{
-    AccountId, AccountingEquationHolds, AccountsDistinct, Amount, AmountPositive, BalancedEntries,
+    Account, AccountingEquationHolds, AccountsDistinct, Amount, AmountPositive, BalancedEntries,
     Committed, Pending, Rejected, SufficientFunds, TransferPayload, Validated,
 };
 
@@ -14,8 +14,8 @@ use amenable_gaap::{
 fn transfer_payload_carries_its_two_accounts_and_amount() {
     amenable_core::init_tracing();
     let payload = TransferPayload::new(
-        AccountId::new(uuid::Uuid::from_u128(1), "Alice"),
-        AccountId::new(uuid::Uuid::from_u128(2), "Bob"),
+        Account::new(uuid::Uuid::from_u128(1), "Alice"),
+        Account::new(uuid::Uuid::from_u128(2), "Bob"),
         Amount::new(50),
     );
 
@@ -27,12 +27,20 @@ fn transfer_payload_carries_its_two_accounts_and_amount() {
 #[test]
 fn account_id_equality_compares_the_id_not_the_name() {
     amenable_core::init_tracing();
-    let alice_again = AccountId::new(uuid::Uuid::from_u128(1), "Alice (checking)");
-    let alice = AccountId::new(uuid::Uuid::from_u128(1), "Alice");
-    let bob = AccountId::new(uuid::Uuid::from_u128(2), "Alice");
+    let alice_again = Account::new(uuid::Uuid::from_u128(1), "Alice (checking)");
+    let alice = Account::new(uuid::Uuid::from_u128(1), "Alice");
+    let bob = Account::new(uuid::Uuid::from_u128(2), "Alice");
 
-    assert_eq!(alice, alice_again, "same id, different name: still equal");
-    assert_ne!(alice, bob, "different id, same name: still distinct");
+    assert_eq!(
+        alice.id(),
+        alice_again.id(),
+        "same id, different name: still the same identity"
+    );
+    assert_ne!(
+        alice.id(),
+        bob.id(),
+        "different id, same name: still distinct identities"
+    );
 }
 
 #[test]

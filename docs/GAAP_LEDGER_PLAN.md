@@ -376,6 +376,25 @@ investigation file were updated mechanically (`AccountId::new("Alice")`
 per name, preserving every existing test's same-account/distinct-
 account semantics).
 
+**Addendum, this workspace's tracing rollout:** `AccountId` (as
+described just above, `{ id: Uuid, name: String }` in one struct) has
+since split into two types — `AccountId` (bare `Uuid` identity, every
+comparison trait a plain `#[derive(...)]`) and `Account` (`id:
+AccountId, name: String`, the record `TransferPayload::from`/`::to`
+now carry). Not a further CBMC finding — this section's own fix
+already worked — but a second, unrelated tool conflict: once
+`#[instrument]` reached the hand-written `PartialOrd::partial_cmp`
+(`Some(self.cmp(other))`, the textbook canonical delegation), its
+span-entry-wrapped expansion no longer matched clippy::
+non_canonical_partial_ord_impl's literal pattern, so a correct impl
+started tripping a real correctness lint. Splitting the identity into
+its own type turns every comparison into a plain derive, so neither
+tool has a hand-written body left to trip on. Every call site renamed
+mechanically the same way (`AccountId::new(uuid, name)` →
+`Account::new(uuid, name)`), `AccountsDistinct::ensures` now takes
+`(payload.from().id(), payload.to().id())` instead of cloning the
+whole record.
+
 **A second real bug, found only once the timeout stopped masking
 it.** With the CBMC cost gone, `verify_validate_accepts_a_lawful_
 transfer` (`#[kani::proof_for_contract(Ledger::validate)]` composed

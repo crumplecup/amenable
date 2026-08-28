@@ -9,12 +9,14 @@
 //! DFCC mechanism, not something a neutral crate could host), and
 //! `Pending`'s own trivial `Witness<KaniVerifier>` impl.
 //!
-//! `AccountId` carries a `Uuid` identity (not the `String` it started
-//! with in `GAAP_LEDGER_PLAN.md`'s Step 0) precisely because of a real
-//! CBMC cost the first version of this proof hit: comparing two
-//! independently-constructed `String`s for equality *inside a
-//! `#[kani::ensures]` closure* is expensive regardless of content or
-//! length -- fully root-caused via `amenable_kani::gallery::
+//! `AccountId` is a bare `Uuid` identity (not the `String` it started
+//! with in `GAAP_LEDGER_PLAN.md`'s Step 0, and not the combined id+name
+//! struct it became after that: see `amenable_gaap::transfer::AccountId`'s
+//! own doc comment for why it's now split from `Account`) precisely
+//! because of a real CBMC cost the first version of this proof hit:
+//! comparing two independently-constructed `String`s for equality
+//! *inside a `#[kani::ensures]` closure* is expensive regardless of
+//! content or length -- fully root-caused via `amenable_kani::gallery::
 //! ledger_account_id_comparison`'s own investigation, which also
 //! confirmed a *fixed-capacity* string (bounded buffer + a length
 //! field) is exactly as expensive, so bounding the name wouldn't have
@@ -24,13 +26,13 @@
 #[cfg(kani)]
 use amenable_core::Establish;
 use amenable_core::{Ensures, Sidecar, Witness};
+#[cfg(kani)]
+use amenable_gaap::{Account, Amount, PendingToken, TransferPayload};
 use amenable_gaap::{
     AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
     Pending, Rejected, RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds,
     Transfer, TransferError, Validated, ValidatedToken,
 };
-#[cfg(kani)]
-use amenable_gaap::{Amount, PendingToken, TransferPayload};
 #[cfg(kani)]
 use uuid::Uuid;
 
@@ -46,7 +48,7 @@ use crate::{CalculationProof, KaniVerifier};
 /// `#[derive(KaniCompose)]` on the struct definitions themselves, the
 /// same neutral-crate reason `Ensures<KaniVerifier>`/`Witness<
 /// KaniVerifier>` for these same types live here rather than in
-/// `amenable_gaap`: deriving directly on `AccountId`/`Amount`/
+/// `amenable_gaap`: deriving directly on `AccountId`/`Account`/`Amount`/
 /// `TransferPayload` would force `amenable_gaap` to depend on
 /// `amenable_kani` (where `KaniCompose` itself lives), the identical
 /// backend-inversion this project has already caught and reverted
@@ -55,41 +57,61 @@ use crate::{CalculationProof, KaniVerifier};
 /// boundary -- `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s "Reusing
 /// `KaniCompose` for non-trivial carriers" follow-on.
 ///
-/// `AccountId`'s own doc comment already establishes why `id: Uuid` is
-/// cheap to carry fully symbolic at every depth (fixed-size, compared
-/// by `id` alone -- see `AccountId`'s `PartialEq`). `name: String` is a
-/// real, separate CBMC-cost finding, though, not the free pass a first
-/// pass at this impl assumed: field-by-field delegation (`String::
-/// kani_depth1/2/any()`, a real heap-backed, bounded-loop construction)
-/// made `gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer`
-/// (two independently-constructed `AccountId`s) time out, confirmed by
-/// isolating the change to exactly this field: swapping `kani_any()`
-/// for `kani_depth0()` (empty name, `id` still fully symbolic) took
-/// that harness from a CBMC timeout to `0 of 507 failed` in ~97s, with
-/// nothing else touched. `name` is never compared (display-only) and
-/// participates in zero real claim this worked example checks, so a
-/// constant empty name at every depth is exactly as strong a proof as
-/// a varying one here -- `id`'s own depth still governs real identity
-/// variation, matching `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s
+/// `id: Uuid` is cheap to carry fully symbolic at every depth
+/// (fixed-size, and the only thing `AccountId`'s derived `PartialEq`
+/// compares at all now -- see that type's own doc comment).
+#[cfg(kani)]
+impl KaniCompose for AccountId {
+    fn kani_depth0() -> Self {
+        Self::new(Uuid::kani_depth0())
+    }
+
+    fn kani_depth1() -> Self {
+        Self::new(Uuid::kani_depth1())
+    }
+
+    fn kani_depth2() -> Self {
+        Self::new(Uuid::kani_depth2())
+    }
+
+    fn kani_any() -> Self {
+        Self::new(Uuid::kani_any())
+    }
+}
+
+/// `name: String` is a real, separate CBMC-cost finding, not the free
+/// pass a first pass at this impl assumed: field-by-field delegation
+/// (`String::kani_depth1/2/any()`, a real heap-backed, bounded-loop
+/// construction) made `gaap_ledger::
+/// verify_gaap_validate_accepts_a_lawful_transfer` (two independently-
+/// constructed accounts) time out, confirmed by isolating the change to
+/// exactly this field: swapping `kani_any()` for `kani_depth0()` (empty
+/// name, `id` still fully symbolic) took that harness from a CBMC
+/// timeout to `0 of 507 failed` in ~97s, with nothing else touched.
+/// `name` is never compared (display-only, see `Account`'s own doc
+/// comment) and participates in zero real claim this worked example
+/// checks, so a constant empty name at every depth is exactly as strong
+/// a proof as a varying one here -- `id`'s own depth still governs real
+/// identity variation, matching `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s
 /// "Reusing `KaniCompose`" follow-on without reintroducing the
 /// construction cost `AccountId`'s own history already paid once to
 /// avoid.
 #[cfg(kani)]
-impl KaniCompose for AccountId {
+impl KaniCompose for Account {
     fn kani_depth0() -> Self {
-        Self::new(Uuid::kani_depth0(), String::new())
+        Self::new(AccountId::kani_depth0(), String::new())
     }
 
     fn kani_depth1() -> Self {
-        Self::new(Uuid::kani_depth1(), String::new())
+        Self::new(AccountId::kani_depth1(), String::new())
     }
 
     fn kani_depth2() -> Self {
-        Self::new(Uuid::kani_depth2(), String::new())
+        Self::new(AccountId::kani_depth2(), String::new())
     }
 
     fn kani_any() -> Self {
-        Self::new(Uuid::kani_any(), String::new())
+        Self::new(AccountId::kani_any(), String::new())
     }
 }
 
@@ -116,34 +138,30 @@ impl KaniCompose for Amount {
 impl KaniCompose for TransferPayload {
     fn kani_depth0() -> Self {
         Self::new(
-            AccountId::kani_depth0(),
-            AccountId::kani_depth0(),
+            Account::kani_depth0(),
+            Account::kani_depth0(),
             Amount::kani_depth0(),
         )
     }
 
     fn kani_depth1() -> Self {
         Self::new(
-            AccountId::kani_depth1(),
-            AccountId::kani_depth1(),
+            Account::kani_depth1(),
+            Account::kani_depth1(),
             Amount::kani_depth1(),
         )
     }
 
     fn kani_depth2() -> Self {
         Self::new(
-            AccountId::kani_depth2(),
-            AccountId::kani_depth2(),
+            Account::kani_depth2(),
+            Account::kani_depth2(),
             Amount::kani_depth2(),
         )
     }
 
     fn kani_any() -> Self {
-        Self::new(
-            AccountId::kani_any(),
-            AccountId::kani_any(),
-            Amount::kani_any(),
-        )
+        Self::new(Account::kani_any(), Account::kani_any(), Amount::kani_any())
     }
 }
 
@@ -346,7 +364,7 @@ kani_ensures!(
         Ok(validated) => {
             let payload = validated.primary();
             AmountPositive::ensures(payload.amount().value())
-                && AccountsDistinct::ensures((payload.from().clone(), payload.to().clone()))
+                && AccountsDistinct::ensures((payload.from().id(), payload.to().id()))
         }
         Err(TransferError::NegativeAmount(amount)) => !AmountPositive::ensures(amount),
         Err(TransferError::InsufficientFunds { balance, required }) => {

@@ -105,6 +105,7 @@ dependencies = [
  "amenable_derive",
  "derive-getters",
  "derive-new",
+ "derive_more",
  "inventory",
  "tracing",
  "uuid",
