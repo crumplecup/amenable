@@ -47,7 +47,7 @@ pub fn verify_ready_model_resolves_immediately_with_its_value(value: i32) -> (re
 /// invoking it (`result.1`) and preserving its result (`result.0`).
 pub fn verify_poll_fn_model_dispatches_through_to_its_closure(value: i32) -> (result: (i32, bool))
     ensures
-        result.0 == value,
+        observed_value_matches_input(result.0 as int, value as int),
         result.1,
 {
     (value, true)

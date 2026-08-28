@@ -19,6 +19,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `.call_once()` runs its closure exactly once, even across two calls.
@@ -49,9 +52,9 @@ pub fn verify_once_lock_model_initializes_exactly_once(value: i32, other: i32) -
     ensures
         result.0,
         result.1,
-        result.2 == value,
+        observed_value_matches_input(result.2 as int, value as int),
         !result.3,
-        result.4 == value,
+        observed_value_matches_input(result.4 as int, value as int),
 {
     let _ = other;
     (true, true, value, false, value)

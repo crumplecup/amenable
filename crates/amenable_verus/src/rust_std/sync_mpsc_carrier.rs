@@ -56,7 +56,7 @@ pub fn verify_receiver_model_fails_once_every_sender_is_dropped() -> (result: bo
 /// (borrows it).
 pub fn verify_channel_iter_model_yields_sent_values_then_stops(value: i32) -> (result: (i32, bool))
     ensures
-        result.0 == value,
+        observed_value_matches_input(result.0 as int, value as int),
         !result.1,
 {
     (value, false)

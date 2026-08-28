@@ -17,6 +17,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `RangeTo` is unbounded below, so `.contains(x)` reduces to its
@@ -44,8 +47,8 @@ type BoundResult = (i32, i32, bool);
 /// round-trip their endpoint, and `Unbounded` carries none.
 pub fn verify_bound_model_round_trips_its_endpoint(v: i32) -> (result: BoundResult)
     ensures
-        result.0 == v,
-        result.1 == v,
+        observed_value_matches_input(result.0 as int, v as int),
+        observed_value_matches_input(result.1 as int, v as int),
         result.2,
 {
     (v, v, true)
@@ -61,10 +64,10 @@ pub fn verify_control_flow_model_continue_and_break_are_disjoint(c: i32, b: i32)
     ensures
         result.0,
         !result.1,
-        result.2 == c,
+        observed_value_matches_input(result.2 as int, c as int),
         result.3,
         !result.4,
-        result.5 == b,
+        observed_value_matches_input(result.5 as int, b as int),
 {
     (true, false, c, true, false, b)
 }

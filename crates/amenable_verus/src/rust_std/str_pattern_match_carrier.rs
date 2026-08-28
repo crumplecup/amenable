@@ -25,6 +25,8 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_pair_matches_input};
 use verus_builtin_macros::verus;
 #[allow(
@@ -43,8 +45,8 @@ pub fn verify_str_matches_model_yields_every_non_overlapping_occurrence(pattern:
     requires
         is_ascii_byte(pattern as u32),
     ensures
-        result.0 == pattern,
-        result.1 == pattern,
+        char_roundtrip_preserves_value(result.0, pattern),
+        char_roundtrip_preserves_value(result.1, pattern),
 {
     (pattern, pattern)
 }

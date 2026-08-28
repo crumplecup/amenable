@@ -39,8 +39,8 @@ pub fn verify_iter_model_yields_shared_references_in_order(value: i32) -> (resul
 /// — modeled via an explicit write rather than a returned `&mut i32`.
 pub fn verify_iter_mut_model_yields_mutable_references_that_write_through(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        result.0 == value,
-        result.1 == updated,
+        observed_value_matches_input(result.0 as int, value as int),
+        observed_value_matches_input(result.1 as int, updated as int),
 {
     let exposed = value;
     let written_back = updated;

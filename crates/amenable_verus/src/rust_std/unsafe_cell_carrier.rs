@@ -30,6 +30,8 @@ use vstd::prelude::*;
 // Verus keeps ghost/spec items.
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::cell_carrier::write_stores_new_value;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
@@ -42,7 +44,7 @@ pub struct VerusUnsafeCellModel {
 impl VerusUnsafeCellModel {
     pub fn new(initial: i32) -> (result: Self)
         ensures
-            result.value == initial,
+            observed_value_matches_input(result.value as int, initial as int),
     {
         Self { value: initial }
     }
@@ -80,7 +82,7 @@ impl VerusUnsafeCellModel {
 pub fn verify_unsafe_cell_model_get_mut_and_into_inner_round_trip(initial: i32, updated: i32) -> (result: (bool, i32))
     ensures
         result.0,
-        result.1 == updated,
+        observed_value_matches_input(result.1 as int, updated as int),
 {
     let mut cell = VerusUnsafeCellModel::new(initial);
     let exposes_initial = cell.read_through() == initial;

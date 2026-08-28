@@ -51,8 +51,8 @@ pub fn verify_iter_model_yields_zero_or_one_reference(value: i32) -> (result: i3
 /// a write through it is visible afterward.
 pub fn verify_iter_mut_model_writes_through(value: i32, updated: i32) -> (result: (i32, i32))
     ensures
-        result.0 == value,
-        result.1 == updated,
+        observed_value_matches_input(result.0 as int, value as int),
+        observed_value_matches_input(result.1 as int, updated as int),
 {
     (value, updated)
 }

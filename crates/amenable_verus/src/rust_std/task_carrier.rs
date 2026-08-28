@@ -22,6 +22,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `Context::from_waker` just bundles the `&Waker` it's given;
@@ -46,7 +49,7 @@ pub fn verify_poll_model_ready_and_pending_are_disjoint(value: i32) -> (result: 
     ensures
         result.0,
         !result.1,
-        result.2 == value,
+        observed_value_matches_input(result.2 as int, value as int),
         result.3,
         !result.4,
 {
