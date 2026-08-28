@@ -342,6 +342,24 @@ shape-clustering is a hint to investigate, not an automatic merge.
   regenerate). If a scan doesn't move after a fix that should obviously
   matter, don't conclude the fix was wrong before checking `~/.cordial/
   {project}/cache/amenable-registry.dump.json`'s own mtime.
+- **The fully-qualified Kani call form, `<Type as Ensures<V>>::ensures(
+  ...)`, wasn't recognized at all** — a real, separate bug from the two
+  above, in `cordial`'s Kani matching path itself (`matches_named_call`,
+  `contract_bounds/index.rs`), not in any `amenable`-side macro. This
+  form isn't a stylistic variant of `Type::ensures(...)`: it's the
+  documented fix for a real ambiguity ("bare named-contract calls
+  become ambiguous, silently, the moment a second verifier registers a
+  competing impl for the same type", noted earlier in this doc's own
+  status history) — real sites using it correctly, on purpose, were
+  being flagged as unnamed forever, since `syn` represents `<Type as
+  Trait>::method` with `qself: Some(..)`, not extra leading path
+  segments, and the matcher only ever read `path`'s own segments (which
+  name the *trait*, never the `Self` type). Fixed in `~/repos/cordial`
+  commit `cefd489` (dropped `amenable_kani`'s `unnamed_contract_bound`
+  count by 44 in one commit, again zero new proof content). If a
+  cluster's raw snippet starts with a literal `<` immediately before the
+  type — not just `Type::ensures(...)` — check this fix landed before
+  assuming the site is genuinely unnamed.
 - **One `evidence` can carry more than one real fragment.** Creusot/Verus
   matching ignores `evidence` entirely — it only cares whether *some*
   registered fragment's extracted name matches the call site. This means

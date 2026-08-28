@@ -173,8 +173,17 @@ confirmed via `cordial quality`: `unnamed_contract_bound` dropped from
 284 sites was already correctly wired. A related, separate `cordial`
 bug found in the same pass (its own `amenable-registry.dump.json`
 cache never invalidated, hiding this exact fix's effect until deleted
-by hand) was fixed in `~/repos/cordial` (commit `12536b8`). See the
-linked doc's own new Gotchas entries for both.
+by hand) was fixed in `~/repos/cordial` (commit `12536b8`). A third
+real bug, same pattern, found immediately after: `cordial`'s Kani
+matcher didn't recognize the fully-qualified `<Type as Ensures<V>>::
+ensures(...)` call form at all (`qself`-typed paths, not the plain
+`Type::ensures(...)` shape it already handled) — the exact form this
+sweep's own earlier ambiguity-bug fix pushed real sites toward using.
+Fixed in `~/repos/cordial` (commit `cefd489`), dropping `amenable_
+kani`'s count by another 44. Combined, all three fixes moved
+`unnamed_contract_bound` from 952 to 624 — about a third of the whole
+backlog — with zero new proof content. See the linked doc's own new
+Gotchas entries for all three.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
