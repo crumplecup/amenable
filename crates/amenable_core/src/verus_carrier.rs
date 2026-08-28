@@ -384,3 +384,21 @@ pub fn predicate_body(item_fn: &verus_syn::ItemFn) -> Result<String, PredicateBo
         _ => Err(PredicateBodyError::NotASingleExpression),
     }
 }
+
+/// Render a real predicate's own `fn NAME(...) -> ReturnType` signature
+/// as literal text -- real, derived from the same parsed `item_fn` as
+/// [`predicate_body`], never hand-typed. Exists so a registered
+/// `ContractRecord` fragment can carry a literal `fn` token immediately
+/// followed by the predicate's real name: `cordial`'s own Creusot/Verus
+/// call-shape recognition (`fragment_fn_name`, scoped to this workspace's
+/// `~/repos/cordial`) scans a registered fragment's text for exactly that
+/// pair to confirm a fragment is a real function definition, not a raw
+/// restated clause coincidentally resembling one -- `predicate_body`
+/// alone (the bare clause, `observed == input`) can never contain it,
+/// which is why every `verus_ensures_predicate!`/`verus_requires_
+/// predicate!` real site went on recognizing nothing until this existed.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(item_fn)))]
+pub fn predicate_signature(item_fn: &verus_syn::ItemFn) -> String {
+    let signature = &item_fn.sig;
+    walk_tokens(quote::quote!(#signature), &HashSet::new(), &mut Vec::new())
+}

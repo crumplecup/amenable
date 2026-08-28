@@ -254,6 +254,38 @@ fn predicate_witness_derives_from_the_predicates_own_declaration() {
 }
 
 #[test]
+fn predicate_registration_carries_a_real_fn_signature_not_the_bare_clause() {
+    amenable_core::init_tracing();
+    // `verus_ensures_witness!`'s own registration (`CharRoundtrip`, see
+    // `one_contract_record_is_registered_per_real_clause` above) stays
+    // the bare clause -- only `verus_ensures_predicate!`'s registration
+    // differs, and only in the registered `ContractRecord.fragment()`,
+    // never in the trait's own `Bound` (already covered above). A bare
+    // clause with no `fn` token can never be recognized by `cordial`'s
+    // real call-shape scanner (`fragment_fn_name`, `~/repos/cordial`) as
+    // naming `write_stores_new_value` -- this is the literal defect that
+    // left every `verus_ensures_predicate!`/`verus_requires_predicate!`
+    // real site permanently unrecognized until this fix landed.
+    let record = inventory::iter::<ContractRecord>()
+        .find(|record| {
+            record.evidence() == "verus_contract_test::WriteStoresNewValueLike"
+                && record.kind() == "ensures"
+        })
+        .expect("WriteStoresNewValueLike registers a real ContractRecord");
+    let fragment = (record.fragment())();
+
+    assert!(
+        fragment.contains("fn write_stores_new_value"),
+        "registered fragment {fragment:?} should carry the real predicate's own `fn` \
+         signature, not just its bare clause"
+    );
+    assert!(
+        fragment.contains("observed == new_value"),
+        "registered fragment {fragment:?} should still carry the real clause body"
+    );
+}
+
+#[test]
 fn bracketed_predicate_list_derives_one_clause_per_named_predicate() {
     amenable_core::init_tracing();
     let clauses: &[&str] = MultiplePredicatesLike::ensures(());
@@ -272,6 +304,14 @@ fn one_contract_record_is_registered_per_real_clause() {
     amenable_core::init_tracing();
     // `inventory::iter` doesn't promise any particular order across
     // separate `submit!` blocks, so compare as sets, not sequences.
+    // Both of `CharRoundtrip`'s real clauses are themselves bare calls
+    // to a real, separately-shared spec fn -- `expand_verus_witness`
+    // resolves that callee and wraps its own real `fn NAME(..) ->
+    // ReturnType` signature around the clause (see `bare_call_name`'s
+    // own doc comment), so the registered fragment carries both the
+    // callee's real signature and the real call, not just the bare
+    // call the trait's own `Bound` still returns unchanged (covered by
+    // `ensures_bound_is_the_real_multi_clause_slice` above).
     let mut ensures_records = inventory::iter::<ContractRecord>()
         .filter(|record| {
             record.evidence() == "verus_contract_test::CharRoundtrip" && record.kind() == "ensures"
@@ -281,8 +321,10 @@ fn one_contract_record_is_registered_per_real_clause() {
     ensures_records.sort_unstable();
 
     let mut expected_ensures = vec![
-        "char_roundtrip_preserves_value(result, c)",
-        "char_is_valid_unicode_scalar(c)",
+        "open spec fn char_roundtrip_preserves_value(result : char, input : char) -> bool { \
+         char_roundtrip_preserves_value(result, c) }",
+        "open spec fn char_is_valid_unicode_scalar(value : char) -> bool { \
+         char_is_valid_unicode_scalar(c) }",
     ];
     expected_ensures.sort_unstable();
     assert_eq!(ensures_records, expected_ensures);
@@ -297,7 +339,10 @@ fn one_contract_record_is_registered_per_real_clause() {
 
     assert_eq!(
         requires_records,
-        vec!["escape_ascii_input_is_printable_ascii(printable)"]
+        vec![
+            "open spec fn escape_ascii_input_is_printable_ascii(printable : u8) -> bool { \
+             escape_ascii_input_is_printable_ascii(printable) }"
+        ]
     );
 }
 

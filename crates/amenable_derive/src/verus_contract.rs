@@ -32,7 +32,9 @@
 //! just one -- each contributes its own real clause the same way a
 //! harness's own multiple clauses do.
 
-use amenable_core::{verus_find_fn, verus_literal_clauses, verus_predicate_body};
+use amenable_core::{
+    verus_find_fn, verus_literal_clauses, verus_predicate_body, verus_predicate_signature,
+};
 use quote::{format_ident, quote};
 use syn::{
     Expr, LitInt, LitStr, Token, Type, bracketed,
@@ -135,7 +137,49 @@ pub(crate) fn expand_verus_witness(
         })
         .collect::<syn::Result<Vec<_>>>()?;
 
-    codegen(&args.ty, &args.evidence, ensures, &clauses)
+    // A harness's own clause is often itself a bare call to a real,
+    // separately-shared `pub open spec fn` -- `char_roundtrip_preserves_
+    // value(result, c)`, not an inline boolean expression. When it is,
+    // resolve and carry the *called* predicate's own real signature
+    // alongside it (same reasoning `expand_verus_predicate_witness`
+    // already applies, just discovered per-clause here instead of
+    // named up front) -- a clause that isn't a bare call, or whose
+    // callee isn't a real spec fn under `amenable_verus/src` (an inline
+    // expression, or a genuinely harness-local claim), is left alone.
+    let signatures: Vec<Option<String>> = clauses
+        .iter()
+        .map(|clause| {
+            let callee = bare_call_name(clause)?;
+            let (_, _, item_fn) = verus_find_fn(&callee)?;
+            Some(verus_predicate_signature(&item_fn))
+        })
+        .collect();
+
+    codegen(&args.ty, &args.evidence, ensures, &clauses, &signatures)
+}
+
+/// Recognize a whole-clause bare call `name(...)` (a leading `!` is
+/// stripped first) -- mirrors `cordial`'s own `bare_named_call_name`
+/// exactly (the same shape it later scans a real proof site's clause
+/// for), so a clause this function credits with a real callee is
+/// guaranteed to be exactly what `cordial`'s scanner will later
+/// recognize too.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(clause)))]
+fn bare_call_name(clause: &str) -> Option<String> {
+    let tokens: proc_macro2::TokenStream = clause.parse().ok()?;
+    let items: Vec<proc_macro2::TokenTree> = tokens.into_iter().collect();
+    let items = match items.as_slice() {
+        [proc_macro2::TokenTree::Punct(punct), rest @ ..] if punct.as_char() == '!' => rest,
+        rest => rest,
+    };
+
+    match items {
+        [
+            proc_macro2::TokenTree::Ident(name),
+            proc_macro2::TokenTree::Group(group),
+        ] if group.delimiter() == proc_macro2::Delimiter::Parenthesis => Some(name.to_string()),
+        _ => None,
+    }
 }
 
 struct VerusPredicateWitnessArgs {
@@ -184,7 +228,7 @@ pub(crate) fn expand_verus_predicate_witness(
 ) -> syn::Result<proc_macro2::TokenStream> {
     let args: VerusPredicateWitnessArgs = syn::parse2(input)?;
 
-    let clauses = args
+    let (signatures, clauses): (Vec<Option<String>>, Vec<String>) = args
         .predicates
         .iter()
         .map(|predicate| {
@@ -201,7 +245,7 @@ pub(crate) fn expand_verus_predicate_witness(
                 )
             })?;
 
-            verus_predicate_body(&item_fn).map_err(|reason| {
+            let body = verus_predicate_body(&item_fn).map_err(|reason| {
                 syn::Error::new(
                     predicate.span(),
                     format!(
@@ -209,26 +253,66 @@ pub(crate) fn expand_verus_predicate_witness(
                          verbatim"
                     ),
                 )
-            })
-        })
-        .collect::<syn::Result<Vec<_>>>()?;
+            })?;
 
-    codegen(&args.ty, &args.evidence, ensures, &clauses)
+            Ok((Some(verus_predicate_signature(&item_fn)), body))
+        })
+        .collect::<syn::Result<Vec<_>>>()?
+        .into_iter()
+        .unzip();
+
+    codegen(&args.ty, &args.evidence, ensures, &clauses, &signatures)
 }
 
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(ty, evidence)))]
+/// `signatures[i]` is `Some` whenever `clauses[i]`'s own real callee is
+/// known -- always, for a real [`expand_verus_predicate_witness`] call
+/// (the predicate's own real `fn NAME(...) -> ReturnType` signature,
+/// `amenable_core::verus_predicate_signature`, derived from the same
+/// parsed declaration `clauses`' own body came from); sometimes, for a
+/// real [`expand_verus_witness`] call, when that particular clause
+/// happens to itself be a bare call to a real, separately-shared spec
+/// fn (see its own `bare_call_name` discovery). `None` (a genuinely
+/// inline clause, or a harness-local claim with no real callee to
+/// resolve) leaves that one registration exactly as before.
+///
+/// Necessary, not cosmetic: `cordial`'s call-shape recognition only
+/// credits a registered fragment containing a literal `fn` token
+/// immediately followed by the callee's own name (see
+/// `verus_predicate_signature`'s own doc comment) -- a bare clause can
+/// never satisfy that, no matter how genuinely it's wired to a real
+/// shared predicate. The trait's own `Bound` stays the bare clause
+/// either way (unaffected -- still what real proof-composition callers
+/// read); only the registration text differs.
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(ty, evidence, signatures))
+)]
 fn codegen(
     ty: &Type,
     evidence: &Expr,
     ensures: bool,
     clauses: &[String],
+    signatures: &[Option<String>],
 ) -> syn::Result<proc_macro2::TokenStream> {
     let kind = if ensures { "ensures" } else { "requires" };
     let trait_ident = format_ident!("{}", if ensures { "Ensures" } else { "Requires" });
     let method_ident = format_ident!("{}", kind);
 
-    let registrations = (0..clauses.len()).map(|index| {
-        quote! {
+    let registrations = (0..clauses.len()).map(|index| match &signatures[index] {
+        Some(signature) => {
+            let fragment = format!("{signature} {{ {} }}", clauses[index]);
+            quote! {
+                ::amenable_core::__inventory::submit! {
+                    ::amenable_core::ContractRecord::new(
+                        #evidence,
+                        "verus",
+                        #kind,
+                        || #fragment,
+                    )
+                }
+            }
+        }
+        None => quote! {
             ::amenable_core::__inventory::submit! {
                 ::amenable_core::ContractRecord::new(
                     #evidence,
@@ -237,7 +321,7 @@ fn codegen(
                     || <#ty as ::amenable_core::#trait_ident<crate::VerusVerifier>>::#method_ident(())[#index],
                 )
             }
-        }
+        },
     });
 
     Ok(quote! {
