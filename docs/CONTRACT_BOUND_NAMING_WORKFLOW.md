@@ -360,6 +360,33 @@ shape-clustering is a hint to investigate, not an automatic merge.
   cluster's raw snippet starts with a literal `<` immediately before the
   type — not just `Type::ensures(...)` — check this fix landed before
   assuming the site is genuinely unnamed.
+- **A singleton (one real caller) fact still needs a real callable
+  predicate for Verus — registering it via `verus_ensures_witness!`
+  alone does nothing.** Singleton contracts are part of the intended
+  design (they give an assumption an explicit, auditable source, not
+  just deduplicated text), but for Verus specifically the *only* way a
+  site can ever satisfy `cordial`'s recognition is to literally call a
+  real, named `pub open spec fn` — there is no Kani-style `<Type as
+  Trait>::ensures(...)` escape hatch, because Verus proof code has no
+  Cargo dependency on `amenable_core` and can never reach its traits at
+  all. `verus_ensures_witness!` registers a `ContractRecord` connecting
+  a real type to an *existing* harness clause without touching the
+  clause itself — that only clears a finding when the clause already
+  happens to be a bare call in the source (as it is for `ValidUnicodeScalar`/
+  `CharRoundtrip`-style bounds, which reuse an already-callable spec
+  fn). For a genuinely inline literal (`result.2 == 2`), registering
+  metadata about it changes nothing at the site; confirmed the hard
+  way — a batch of 9 such registrations compiled clean and re-verified
+  clean under `just verify-verus`, but a real `cordial quality` re-run
+  showed zero movement. The fix is the same recipe as any other named
+  bound: mint a small, real `pub open spec fn` next to the site (a
+  legitimate one-caller predicate, documented as a deliberate
+  singleton), rewrite the site to call it, and register it via
+  `verus_ensures_predicate!` (not `verus_ensures_witness!` — the
+  predicate macro captures the real `fn` signature `fragment_fn_name`
+  needs; the witness macro's registered fragment is bare clause text
+  with no `fn` token, the same gap the two prior Gotchas entries
+  describe for the multi-site case).
 - **One `evidence` can carry more than one real fragment.** Creusot/Verus
   matching ignores `evidence` entirely — it only cares whether *some*
   registered fragment's extracted name matches the call site. This means

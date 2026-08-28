@@ -180,10 +180,32 @@ ensures(...)` call form at all (`qself`-typed paths, not the plain
 `Type::ensures(...)` shape it already handled) — the exact form this
 sweep's own earlier ambiguity-bug fix pushed real sites toward using.
 Fixed in `~/repos/cordial` (commit `cefd489`), dropping `amenable_
-kani`'s count by another 44. Combined, all three fixes moved
-`unnamed_contract_bound` from 952 to 624 — about a third of the whole
-backlog — with zero new proof content. See the linked doc's own new
-Gotchas entries for all three.
+kani`'s count by another 44. Real bound-naming work followed, on
+direct user correction each time the reasoning went wrong: the ranked
+`X . X == X` cluster (70 sites) was not one shared bound (several
+sites were already-rejected coincidental "constructor echoes its own
+arg" text matches — genuinely different domains), but the correct
+reading of that old finding is narrower than first applied — "no new
+type spanning unrelated domains" never meant "leave raw"; each site
+still gets whichever *existing*, domain-agnostic predicate
+(`observed_value_matches_input`/`observed_pair_matches_input`/
+`char_roundtrip_preserves_value`) fits its real value type, called
+independently. Applied to 39 sites across three commits, all re-
+verified via `just verify-verus` (`491 verified, 0 errors` throughout).
+The 12 sites left over were genuinely singular harness facts (no
+argument to echo) — a further correction: singleton contracts (one
+real caller) are still part of the intended design, not an exemption,
+since they give an assumption an explicit source. First attempt
+(`verus_ensures_witness!` registering the fact without touching the
+site) compiled clean but moved nothing, since Verus recognition needs
+a real call at the site and there's no Kani-style qualified-call
+escape hatch for Verus. Real fix: mint a small dedicated `pub open
+spec fn` per fact, rewrite the site to call it, register via
+`verus_ensures_predicate!` — 9 more sites closed this way. Combined,
+all fixes and namings moved `unnamed_contract_bound` from 952 to 554 —
+over 40% of the whole backlog — with `just verify-verus` unchanged at
+`491 verified, 0 errors` throughout. See the linked doc's own Gotchas
+entries for the full mechanism detail on each.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
