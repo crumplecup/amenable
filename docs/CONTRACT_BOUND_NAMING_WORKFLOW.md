@@ -312,7 +312,36 @@ shape-clustering is a hint to investigate, not an automatic merge.
   — text that merely *reads like* a call — extracts no name and can
   never match anything, Kani-style call-shape aside. Always point
   `fragment` at a `harness!`-captured `_SRC` constant (or, for Kani, let
-  `kani_ensures!`/`kani_requires!` generate it via `stringify!`).
+  `kani_ensures!`/`kani_requires!` generate it via `stringify!`). **This
+  rule was violated by the tooling itself, not just by hand-written
+  registrations, for a long stretch**: `verus_ensures_predicate!`/
+  `verus_requires_predicate!`/`verus_ensures_witness!`/`verus_requires_
+  witness!` (`amenable_derive::verus_contract`) registered a `fragment`
+  that was always just the bare clause (`observed == input`,
+  `char_roundtrip_preserves_value(result, c)`) — no `fn` token, ever, no
+  matter how genuinely the type was wired to a real, shared, already-
+  verified predicate. Confirmed to have hidden real, already-correct
+  work at real scale: fixing it (`amenable_core::verus_predicate_
+  signature`, wrapping the registered fragment in the callee's own real
+  `fn NAME(...) -> ReturnType` signature — see that fn's own doc
+  comment, and `amenable_derive::verus_contract`'s `bare_call_name`
+  helper for the witness-macro half) dropped `unnamed_contract_bound`
+  from 952 to 668 in one commit, zero new proof content. If a future
+  session finds a whole cluster of call sites to an *already-real,
+  already-shared* spec fn that cordial still won't recognize, check
+  whether its registration goes through one of these four macros before
+  assuming the bound needs re-homing from scratch — the macros
+  themselves might be the gap, not the call sites.
+- **A checklist scan can be stale for a reason that has nothing to do
+  with the real tree.** `cordial`'s `contract_bounds::registry::
+  fetch_contract_records` used to cache `amenable dump-registry`'s
+  output on disk forever, never regenerating it once written — a real
+  `amenable`-side fix could land, compile clean, and still show the old
+  counts in the next `cordial quality` run until the cache file was
+  deleted by hand (fixed in `~/repos/cordial` commit `12536b8`: always
+  regenerate). If a scan doesn't move after a fix that should obviously
+  matter, don't conclude the fix was wrong before checking `~/.cordial/
+  {project}/cache/amenable-registry.dump.json`'s own mtime.
 - **One `evidence` can carry more than one real fragment.** Creusot/Verus
   matching ignores `evidence` entirely — it only cares whether *some*
   registered fragment's extracted name matches the call site. This means

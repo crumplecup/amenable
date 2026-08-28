@@ -159,7 +159,22 @@ moment a second verifier registers a competing impl for the same type,
 and the routine check-all-package sweep can never catch it since it
 never runs `cargo kani` at all. Worth a real `cargo kani --all-features`
 sanity check after any future bare-call rewrite in this sweep, not
-just `cargo check`/`clippy`.
+just `cargo check`/`clippy`. A second real bug, found while resuming
+this sweep: every `verus_ensures_predicate!`/`verus_requires_predicate!`/
+`verus_ensures_witness!`/`verus_requires_witness!`-registered
+`ContractRecord` (`amenable_derive::verus_contract`) had registered a
+bare clause with no literal `fn` token, ever — meaning `cordial` could
+never recognize a real call site as compliant, no matter how correctly
+the contract type was wired, for every bound named through those four
+macros. Fixed (`amenable_core::verus_predicate_signature` plus a
+per-clause `bare_call_name` resolution in `codegen`) — real-world
+confirmed via `cordial quality`: `unnamed_contract_bound` dropped from
+952 to 668 in one commit, zero new proof content, every one of those
+284 sites was already correctly wired. A related, separate `cordial`
+bug found in the same pass (its own `amenable-registry.dump.json`
+cache never invalidated, hiding this exact fix's effect until deleted
+by hand) was fixed in `~/repos/cordial` (commit `12536b8`). See the
+linked doc's own new Gotchas entries for both.
 
 **Description:** Every `requires`/`ensures` bound should be a named
 `amenable_core::{Ensures, Requires}` contract type with one real,
