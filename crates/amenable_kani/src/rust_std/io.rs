@@ -34,9 +34,13 @@ use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::EmptiedContainerReportsEmpty;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
 use crate::ValueIsAtLeast;
+#[cfg(kani)]
+use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{
     bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
 };
@@ -165,11 +169,14 @@ amenable_derive::harness! {
             let mut writer = BufWriter::new(Vec::new());
             writer.write_all(b"hello").unwrap();
             assert!(
-                writer.get_ref().is_empty(),
+                EmptiedContainerReportsEmpty::ensures(writer.get_ref().is_empty()),
                 "a small write remains buffered before flush"
             );
             writer.flush().unwrap();
-            assert_eq!(writer.into_inner().unwrap(), b"hello");
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                writer.into_inner().unwrap(),
+                b"hello".to_vec()
+            )));
         }
     }
 }
@@ -636,7 +643,10 @@ amenable_derive::harness! {
 
             let collected = pipe.read_to_end(reader.clone());
             assert!(RustStdStandard::<PipeReader>::ensures((collected, expected)));
-            assert_eq!(reader.resource_id(), pipe.resource_id());
+            assert!(RustStdStandard::<u64>::ensures((
+                reader.resource_id(),
+                pipe.resource_id()
+            )));
         }
     }
 }
@@ -692,7 +702,10 @@ amenable_derive::harness! {
 
             let collected = pipe.read_to_end(reader.clone());
             assert!(RustStdStandard::<PipeWriter>::ensures((collected, expected)));
-            assert_eq!(writer_resource, reader.resource_id());
+            assert!(RustStdStandard::<u64>::ensures((
+                writer_resource,
+                reader.resource_id()
+            )));
         }
     }
 }
@@ -1269,6 +1282,50 @@ bridge_kani_witness!(RustStdStandard<std::io::Error>);
     )
 }
 
+/// An `(actual, expected)` pair of `io::ErrorKind` values known to
+/// agree -- `std::io::ErrorKind` has no `amenable_std::RustStdType`
+/// registration to hang an `Ensures` impl on `RustStdStandard<ErrorKind>`
+/// from (unlike `core::num::FpCategory`/`IntErrorKind`), so this is a
+/// local, `amenable_kani`-only marker type instead.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct ErrorKindMatchesExpected;
+
+impl KaniWitness for ErrorKindMatchesExpected {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_error_from_error_kind_preserves_the_kind".to_owned(),
+            VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(ErrorKindMatchesExpected);
+
+kani_ensures!(
+    ErrorKindMatchesExpected,
+    "amenable_kani::ErrorKindMatchesExpected",
+    (std::io::ErrorKind, std::io::ErrorKind),
+    |(actual, expected)| actual == expected
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ErrorKindMatchesExpected",
+        "kani",
+        || <ErrorKindMatchesExpected as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC, {
         /// `Error::from(kind)` preserves the given `ErrorKind`, recoverable
@@ -1287,13 +1344,12 @@ amenable_derive::harness! {
                 ErrorKind::InvalidInput,
             ];
             let index: usize = kani::any();
-            kani::assume(index < kinds.len());
+            kani::assume(ValueIsWithinInclusiveRange::requires((index, 0, kinds.len() - 1)));
             let kind = kinds[index];
 
             let error = std::io::Error::from(kind);
-            assert_eq!(
-                error.kind(),
-                kind,
+            assert!(
+                ErrorKindMatchesExpected::ensures((error.kind(), kind)),
                 "Error::from(kind).kind() recovers the given kind"
             );
         }

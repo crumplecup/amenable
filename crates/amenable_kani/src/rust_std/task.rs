@@ -42,6 +42,49 @@ bridge_kani_witness!(RustStdStandard<Context<'static>>);
     )
 }
 
+/// A `bool` known to be the `true` `Waker::will_wake` reports when the
+/// two wakers really would wake the same task -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct WillWakeReportsTrue;
+
+impl KaniWitness for WillWakeReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_context_from_waker_exposes_the_same_waker".to_owned(),
+            VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(WillWakeReportsTrue);
+
+kani_ensures!(
+    WillWakeReportsTrue,
+    "amenable_kani::WillWakeReportsTrue",
+    bool,
+    |will_wake| will_wake
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::WillWakeReportsTrue",
+        "kani",
+        || <WillWakeReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CONTEXT_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC, {
         /// `Context::from_waker` just bundles the `&Waker` it's given;
@@ -58,7 +101,7 @@ amenable_derive::harness! {
             let waker = Waker::from(std::sync::Arc::new(NoopWake));
             let cx = Context::from_waker(&waker);
             assert!(
-                cx.waker().will_wake(&waker),
+                WillWakeReportsTrue::ensures(cx.waker().will_wake(&waker)),
                 "Context::from_waker exposes the waker it was built from"
             );
         }
@@ -95,6 +138,90 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+/// A `bool` known to be the `true` `Poll::is_ready()` reports when the
+/// poll is actually the `Ready` variant -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct PollIsReadyReportsTrue;
+
+impl KaniWitness for PollIsReadyReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_poll_ready_and_pending_are_disjoint".to_owned(),
+            VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(PollIsReadyReportsTrue);
+
+kani_ensures!(
+    PollIsReadyReportsTrue,
+    "amenable_kani::PollIsReadyReportsTrue",
+    bool,
+    |is_ready| is_ready
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PollIsReadyReportsTrue",
+        "kani",
+        || <PollIsReadyReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
+/// The `.is_pending()` sibling of [`PollIsReadyReportsTrue`], same
+/// reasoning.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct PollIsPendingReportsTrue;
+
+impl KaniWitness for PollIsPendingReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_poll_ready_and_pending_are_disjoint".to_owned(),
+            VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(PollIsPendingReportsTrue);
+
+kani_ensures!(
+    PollIsPendingReportsTrue,
+    "amenable_kani::PollIsPendingReportsTrue",
+    bool,
+    |is_pending| is_pending
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PollIsPendingReportsTrue",
+        "kani",
+        || <PollIsPendingReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_POLL_READY_AND_PENDING_ARE_DISJOINT_SRC, {
         /// `Ready` and `Pending` are mutually exclusive, and `Ready`
@@ -103,8 +230,14 @@ amenable_derive::harness! {
         fn verify_poll_ready_and_pending_are_disjoint() {
             let value: i32 = kani::any();
             let poll: Poll<i32> = Poll::Ready(value);
-            assert!(poll.is_ready(), "Ready reports is_ready");
-            assert!(!poll.is_pending(), "Ready reports !is_pending");
+            assert!(
+                PollIsReadyReportsTrue::ensures(poll.is_ready()),
+                "Ready reports is_ready"
+            );
+            assert!(
+                !PollIsPendingReportsTrue::ensures(poll.is_pending()),
+                "Ready reports !is_pending"
+            );
             match poll {
                 Poll::Ready(inner) => assert!(
                     RustStdStandard::<Poll<i32>>::ensures((inner, value)),
@@ -114,8 +247,14 @@ amenable_derive::harness! {
             }
 
             let poll: Poll<i32> = Poll::Pending;
-            assert!(poll.is_pending(), "Pending reports is_pending");
-            assert!(!poll.is_ready(), "Pending reports !is_ready");
+            assert!(
+                PollIsPendingReportsTrue::ensures(poll.is_pending()),
+                "Pending reports is_pending"
+            );
+            assert!(
+                !PollIsReadyReportsTrue::ensures(poll.is_ready()),
+                "Pending reports !is_ready"
+            );
         }
     }
 }
@@ -165,9 +304,11 @@ amenable_derive::harness! {
             let inner = std::sync::Arc::new(CountingWake(std::sync::atomic::AtomicUsize::new(0)));
             let waker = Waker::from(inner.clone());
             waker.wake_by_ref();
-            assert_eq!(
-                inner.0.load(std::sync::atomic::Ordering::SeqCst),
-                1,
+            assert!(
+                RustStdStandard::<usize>::ensures((
+                    inner.0.load(std::sync::atomic::Ordering::SeqCst),
+                    1
+                )),
                 "wake_by_ref invokes the Wake impl exactly once"
             );
         }
