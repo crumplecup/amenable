@@ -19,6 +19,12 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
@@ -56,14 +62,16 @@ amenable_derive::harness! {
         fn verify_ancestors_yields_self_then_each_parent_up_to_root() {
             let path = Path::new("/a/b/c");
             let ancestors: Vec<&Path> = path.ancestors().collect();
-            assert_eq!(
-                ancestors,
-                vec![
-                    Path::new("/a/b/c"),
-                    Path::new("/a/b"),
-                    Path::new("/a"),
-                    Path::new("/"),
-                ],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    ancestors,
+                    vec![
+                        Path::new("/a/b/c"),
+                        Path::new("/a/b"),
+                        Path::new("/a"),
+                        Path::new("/"),
+                    ]
+                )),
                 "ancestors runs from the path itself up to the root"
             );
         }
@@ -338,6 +346,49 @@ bridge_kani_witness!(RustStdStandard<Path>);
     )
 }
 
+/// A `bool` known to be the `true` `Path::has_root()` reports when the
+/// path's text actually starts with a root separator -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct PathHasRootReportsTrue;
+
+impl KaniWitness for PathHasRootReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_path_derives_extension_file_name_and_parent".to_owned(),
+            VERIFY_PATH_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(PathHasRootReportsTrue);
+
+kani_ensures!(
+    PathHasRootReportsTrue,
+    "amenable_kani::PathHasRootReportsTrue",
+    bool,
+    |has_root| has_root
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PathHasRootReportsTrue",
+        "kani",
+        || <PathHasRootReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PATH_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC, {
         /// `.extension()`, `.file_name()`, `.parent()`, and `.has_root()`
@@ -345,10 +396,22 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_path_derives_extension_file_name_and_parent() {
             let path = Path::new("/a/b/c.txt");
-            assert_eq!(path.extension(), Some(std::ffi::OsStr::new("txt")));
-            assert_eq!(path.file_name(), Some(std::ffi::OsStr::new("c.txt")));
-            assert_eq!(path.parent(), Some(Path::new("/a/b")));
-            assert!(path.has_root(), "a leading separator gives the path a root");
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                path.extension(),
+                Some(std::ffi::OsStr::new("txt"))
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                path.file_name(),
+                Some(std::ffi::OsStr::new("c.txt"))
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                path.parent(),
+                Some(Path::new("/a/b"))
+            )));
+            assert!(
+                PathHasRootReportsTrue::ensures(path.has_root()),
+                "a leading separator gives the path a root"
+            );
         }
     }
 }
@@ -674,12 +737,16 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_strip_prefix_error_reports_a_non_matching_prefix() {
             assert!(
-                Path::new("/a/b").strip_prefix("/x").is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    Path::new("/a/b").strip_prefix("/x").is_err()
+                ),
                 "strip_prefix fails on a non-matching prefix"
             );
-            assert_eq!(
-                Path::new("/a/b").strip_prefix("/a").unwrap(),
-                Path::new("b"),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((
+                    Path::new("/a/b").strip_prefix("/a").unwrap(),
+                    Path::new("b")
+                )),
                 "strip_prefix succeeds and removes a matching prefix"
             );
         }

@@ -66,6 +66,13 @@ impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
 
 bridge_kani_witness!(RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>);
 
+kani_ensures!(
+    RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>,
+    "amenable_std::rust_std::RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<Map<Range<i32>, fn(i32) -> i32>>",
@@ -86,9 +93,11 @@ amenable_derive::harness! {
             }
             let x: i32 = kani::any();
             kani::assume(FirstValueIsLessThanTheSecond::requires((x, i32::MAX)));
-            assert_eq!(
-                (x..x + 1).map(add_one).next(),
-                Some(add_one(x)),
+            assert!(
+                RustStdStandard::<Map<Range<i32>, fn(i32) -> i32>>::ensures((
+                    (x..x + 1).map(add_one).next(),
+                    Some(add_one(x))
+                )),
                 "map applies its closure to the underlying item"
             );
         }
@@ -109,6 +118,13 @@ impl KaniWitness for RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i3
 }
 
 bridge_kani_witness!(RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>);
+
+kani_ensures!(
+    RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
@@ -142,9 +158,11 @@ amenable_derive::harness! {
             }
             let x: i32 = kani::any();
             let expected = if is_even(&x) { Some(x) } else { None };
-            assert_eq!(
-                [x].into_iter().filter(is_even).next(),
-                expected,
+            assert!(
+                RustStdStandard::<Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>::ensures((
+                    [x].into_iter().filter(is_even).next(),
+                    expected
+                )),
                 "filter yields the item only when the predicate holds"
             );
         }
@@ -168,6 +186,13 @@ impl KaniWitness
 
 bridge_kani_witness!(
     RustStdStandard<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>
+);
+
+kani_ensures!(
+    RustStdStandard<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
 );
 
 ::inventory::submit! {
@@ -194,9 +219,11 @@ amenable_derive::harness! {
                 if x == 0 { None } else { Some(x) }
             }
             let x: i32 = kani::any();
-            assert_eq!(
-                [x].into_iter().filter_map(filter_map_fn).next(),
-                filter_map_fn(x),
+            assert!(
+                RustStdStandard::<FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>::ensures((
+                    [x].into_iter().filter_map(filter_map_fn).next(),
+                    filter_map_fn(x)
+                )),
                 "filter_map's result matches its closure applied to the item"
             );
         }
@@ -1058,7 +1085,7 @@ amenable_derive::harness! {
                 Some(*acc)
             }
             let a: i32 = kani::any();
-            kani::assume((-1000..=1000).contains(&a));
+            kani::assume(ValueIsWithinInclusiveRange::requires((a, -1000, 1000)));
             let mut s = (a..a + 2).scan(0i32, running_sum);
             assert!(
                 RustStdStandard::<Scan<Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>::ensures((
@@ -1351,6 +1378,13 @@ impl KaniWitness for RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>
 
 bridge_kani_witness!(RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>);
 
+kani_ensures!(
+    RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>",
@@ -1372,11 +1406,13 @@ amenable_derive::harness! {
                 if x % 2 == 0 { Some(x * 2) } else { None }
             }
             let a: i32 = kani::any();
-            kani::assume((-1000..1000).contains(&a));
+            kani::assume(ValueIsWithinInclusiveRange::requires((a, -1000, 999)));
             let expected = map_while_fn(a);
-            assert_eq!(
-                (a..a + 1).map_while(map_while_fn).next(),
-                expected,
+            assert!(
+                RustStdStandard::<MapWhile<Range<i32>, fn(i32) -> Option<i32>>>::ensures((
+                    (a..a + 1).map_while(map_while_fn).next(),
+                    expected
+                )),
                 "map_while's result matches its closure applied to the item"
             );
         }
@@ -1455,6 +1491,50 @@ bridge_kani_witness!(RustStdStandard<OnceWith<fn() -> i32>>);
     )
 }
 
+/// A `bool` known to be the `true` an iterator's `.next().is_some()`
+/// reports when it actually still had a value to yield -- the
+/// positive counterpart to `IteratorYieldsNoneWhenExhausted`, named
+/// separately since it's its own claim ("still has a value"), not
+/// merely the boolean negation of exhaustion.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct IteratorYieldsAValue;
+
+impl KaniWitness for IteratorYieldsAValue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_once_with_calls_its_closure_exactly_once".to_owned(),
+            VERIFY_ONCE_WITH_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(IteratorYieldsAValue);
+
+kani_ensures!(
+    IteratorYieldsAValue,
+    "amenable_kani::IteratorYieldsAValue",
+    bool,
+    |is_some| is_some
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IteratorYieldsAValue",
+        "kani",
+        || <IteratorYieldsAValue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ONCE_WITH_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC, {
         /// `once_with` calls its closure to produce exactly one value,
@@ -1465,7 +1545,10 @@ amenable_derive::harness! {
                 kani::any()
             }
             let mut o = std::iter::once_with(produce as fn() -> i32);
-            assert!(o.next().is_some(), "once_with yields one value");
+            assert!(
+                IteratorYieldsAValue::ensures(o.next().is_some()),
+                "once_with yields one value"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(o.next()),
                 "once_with yields nothing after its one value"

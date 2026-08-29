@@ -12,6 +12,12 @@ use amenable_std::NonNulByte;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -48,16 +54,36 @@ amenable_derive::harness! {
             let byte: u8 = kani::any();
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let cstring = CString::new(vec![byte]).unwrap();
-            assert_eq!(cstring.as_bytes(), &[byte], "as_bytes excludes the terminator");
-            assert_eq!(
-                cstring.as_bytes_with_nul(),
-                &[byte, 0],
+            // Decomposed into a length check plus per-index byte checks
+            // rather than a whole-slice `AccessorRecoversTheExpectedValue`
+            // comparison: coercing `.as_bytes()` (a `&[u8]`) and a fixed
+            // array literal to the same slice type for a generic `(T, T)`
+            // equality forces CBMC into a symbolic-length memcmp, timing
+            // out where the original `PartialEq<[u8; N]>`-specialized
+            // `assert_eq!` (with the length known at compile time on one
+            // side) did not -- confirmed empirically, the documented
+            // "symbolic-length memcmp" CBMC failure pattern.
+            assert!(RustStdStandard::<usize>::ensures((cstring.as_bytes().len(), 1)));
+            assert!(
+                IndexRecoversTheStoredElement::ensures((cstring.as_bytes()[0], byte)),
+                "as_bytes excludes the terminator"
+            );
+            assert!(RustStdStandard::<usize>::ensures((
+                cstring.as_bytes_with_nul().len(),
+                2
+            )));
+            assert!(
+                IndexRecoversTheStoredElement::ensures((cstring.as_bytes_with_nul()[0], byte)),
                 "as_bytes_with_nul retains exactly the appended terminator"
             );
+            assert!(IndexRecoversTheStoredElement::ensures((
+                cstring.as_bytes_with_nul()[1],
+                0u8
+            )));
 
             let with_interior_nul = vec![byte, 0, byte];
             assert!(
-                CString::new(with_interior_nul).is_err(),
+                FallibleOperationReportsFailure::ensures(CString::new(with_interior_nul).is_err()),
                 "an interior nul byte is rejected"
             );
         }
@@ -97,15 +123,21 @@ amenable_derive::harness! {
             let byte: u8 = kani::any();
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             assert!(
-                CString::from_vec_with_nul(vec![byte, 0]).is_ok(),
+                FallibleOperationReportsSuccess::ensures(
+                    CString::from_vec_with_nul(vec![byte, 0]).is_ok()
+                ),
                 "a nul as the last byte is accepted"
             );
             assert!(
-                CString::from_vec_with_nul(vec![byte, byte]).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    CString::from_vec_with_nul(vec![byte, byte]).is_err()
+                ),
                 "no nul byte at all is rejected"
             );
             assert!(
-                CString::from_vec_with_nul(vec![byte, 0, byte]).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    CString::from_vec_with_nul(vec![byte, 0, byte]).is_err()
+                ),
                 "a nul before the final byte is rejected"
             );
         }
@@ -145,11 +177,19 @@ amenable_derive::harness! {
             let invalid = CString::new(vec![0xFFu8, b'x']).unwrap();
             let err = invalid.into_string().unwrap_err();
             let recovered = err.into_cstring();
-            assert_eq!(
-                recovered.as_bytes(),
-                &[0xFFu8, b'x'],
+            // Decomposed the same way as `verify_cstring_excludes_the_
+            // terminator_and_rejects_interior_nul` -- see that harness's
+            // comment for why a whole-slice `AccessorRecoversTheExpectedValue`
+            // comparison here times out under CBMC.
+            assert!(RustStdStandard::<usize>::ensures((recovered.as_bytes().len(), 2)));
+            assert!(
+                IndexRecoversTheStoredElement::ensures((recovered.as_bytes()[0], 0xFFu8)),
                 "into_cstring recovers the original CString"
             );
+            assert!(IndexRecoversTheStoredElement::ensures((
+                recovered.as_bytes()[1],
+                b'x'
+            )));
         }
     }
 }
