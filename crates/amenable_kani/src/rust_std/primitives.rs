@@ -65,6 +65,20 @@ kani_requires!(
     |(a, b)| a.checked_add(b).is_some()
 );
 
+// `i32` equality is independently restated at several real sites
+// spanning `rust_std::os_unix`'s raw-fd round-trips and
+// `rust_std::num`'s `Wrapping`/`Saturating` inner-operation matches.
+// Deliberately registered here rather than in `os_unix.rs` (its first
+// real use): that file is `#![cfg(unix)]`-gated, and `rust_std::num`'s
+// own sites (not platform-gated) would otherwise depend on a
+// registration that silently disappears on a non-unix build.
+kani_ensures!(
+    RustStdStandard<i32>,
+    "amenable_std::rust_std::RustStdStandard<i32>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
 // A read/write count matching the buffer's own length is independently
 // restated at 5 real sites across `rust_std::io`'s `Repeat`/`Sink`/
 // `Chain`/`Cursor` harnesses (`assert_eq!(count, buffer.len(), ...)`).

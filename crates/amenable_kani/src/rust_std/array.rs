@@ -9,6 +9,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
@@ -50,7 +52,7 @@ amenable_derive::harness! {
             let matching: &[i32] = &[a, b];
             let arr: Result<[i32; 2], TryFromSliceError> = matching.try_into();
             assert!(
-                matches!(arr, Ok([first, second]) if first == a && second == b),
+                CollectedSequenceMatchesExpected::ensures((arr.unwrap(), [a, b])),
                 "a matching-length slice round-trips into the array"
             );
 

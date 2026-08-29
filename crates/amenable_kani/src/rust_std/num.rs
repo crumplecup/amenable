@@ -23,6 +23,8 @@ use super::CheckedProof;
 use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -857,9 +859,8 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let result = Wrapping(a) + Wrapping(b);
-            assert_eq!(
-                result.0,
-                a.wrapping_add(b),
+            assert!(
+                RustStdStandard::<i32>::ensures((result.0, a.wrapping_add(b))),
                 "Wrapping<T>'s + operator matches the inner type's wrapping_add"
             );
         }
@@ -898,9 +899,8 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
             let result = Saturating(a) + Saturating(b);
-            assert_eq!(
-                result.0,
-                a.saturating_add(b),
+            assert!(
+                RustStdStandard::<i32>::ensures((result.0, a.saturating_add(b))),
                 "Saturating<T>'s + operator matches the inner type's saturating_add"
             );
         }
@@ -1059,9 +1059,8 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_parse_int_error_reports_the_kind_of_the_failure() {
             let err = "not a number".parse::<i32>().expect_err("non-digit input must fail to parse");
-            assert_eq!(
-                err.kind(),
-                &IntErrorKind::InvalidDigit,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((*err.kind(), IntErrorKind::InvalidDigit)),
                 "ParseIntError::kind() reports the specific parse failure reason"
             );
         }
@@ -1105,7 +1104,7 @@ amenable_derive::harness! {
                 "a non-numeric string fails to parse as f64"
             );
             assert!(
-                "3.14".parse::<f64>().is_ok(),
+                FallibleOperationReportsSuccess::ensures("3.14".parse::<f64>().is_ok()),
                 "a valid numeric string parses as f64 successfully"
             );
         }

@@ -58,7 +58,10 @@ amenable_derive::harness! {
 
             let stdout = std::io::stdout();
             let borrowed = stdout.as_fd();
-            assert_eq!(borrowed.as_raw_fd(), stdout.as_raw_fd());
+            assert!(RustStdStandard::<i32>::ensures((
+                borrowed.as_raw_fd(),
+                stdout.as_raw_fd()
+            )));
             assert!(
                 NonNegativeFd::ensures(stdout.as_raw_fd()),
                 "a live fd is never negative"
@@ -125,6 +128,49 @@ bridge_kani_witness!(RustStdStandard<OwnedFd>);
     )
 }
 
+/// A `bool` known to be the `true` a modeled fd's `.is_live()` reports
+/// when the descriptor is actually still open -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct FdIsLiveReportsTrue;
+
+impl KaniWitness for FdIsLiveReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_owned_fd_preserves_the_raw_value_across_conversion".to_owned(),
+            VERIFY_OWNED_FD_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(FdIsLiveReportsTrue);
+
+kani_ensures!(
+    FdIsLiveReportsTrue,
+    "amenable_kani::FdIsLiveReportsTrue",
+    bool,
+    |is_live| is_live
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::FdIsLiveReportsTrue",
+        "kani",
+        || <FdIsLiveReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_OWNED_FD_PRESERVES_THE_RAW_VALUE_ACROSS_CONVERSION_SRC, {
         /// Modeled accommodation: if the real borrowed-fd duplication and
@@ -144,9 +190,15 @@ amenable_derive::harness! {
 
             let owned = file.into_owned_fd();
 
-            assert_eq!(owned.raw_fd(), raw_before);
-            assert_eq!(owned.resource_id(), resource_before);
-            assert!(owned.is_live(), "modeled ownership transfer keeps the fd live");
+            assert!(RustStdStandard::<i32>::ensures((owned.raw_fd(), raw_before)));
+            assert!(RustStdStandard::<u64>::ensures((
+                owned.resource_id(),
+                resource_before
+            )));
+            assert!(
+                FdIsLiveReportsTrue::ensures(owned.is_live()),
+                "modeled ownership transfer keeps the fd live"
+            );
         }
     }
 }
