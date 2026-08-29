@@ -23,7 +23,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    invoked_exactly_once, observed_value_matches_input,
+};
 
 verus! {
 
@@ -61,7 +63,7 @@ pub fn verify_poll_model_ready_and_pending_are_disjoint(value: i32) -> (result: 
 /// type's `wake_by_ref` exactly once.
 pub fn verify_waker_model_wake_by_ref_invokes_the_wake_impl() -> (result: u32)
     ensures
-        result == 1,
+        invoked_exactly_once(result),
 {
     1
 }

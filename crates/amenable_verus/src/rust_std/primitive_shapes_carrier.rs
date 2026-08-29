@@ -106,6 +106,16 @@ pub open spec fn values_are_distinct<T>(a: T, b: T) -> bool {
     a != b
 }
 
+/// A shared "exactly once" invocation-count postcondition for
+/// accommodation models whose whole claim is that a callback ran a
+/// single time — `Once::call_once`'s closure, `Waker::wake_by_ref`'s
+/// dispatch to the wrapped `Wake` impl, and so on. Different real
+/// mechanisms, but the same observable shape each one's law reduces to:
+/// a plain invocation counter equals exactly `1`.
+pub open spec fn invoked_exactly_once(count: u32) -> bool {
+    count == 1
+}
+
 /// `[a, b, c].len() == 3`, and each index recovers the element the
 /// array was constructed with.
 pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))

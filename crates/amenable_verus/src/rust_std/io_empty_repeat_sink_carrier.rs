@@ -22,13 +22,23 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
+
+/// A singleton claim: `Empty::read` always reports the literal `0`
+/// bytes read. Named, not inlined, so the assumption has an explicit
+/// source even though nothing else calls it.
+pub open spec fn empty_read_reports_zero_bytes(bytes_read: u32) -> bool {
+    bytes_read == 0
+}
 
 /// `Empty::read` always reports zero bytes read, regardless of the
 /// length of the buffer offered to it.
 pub fn verify_empty_model_read_reports_end_of_file(requested_len: u32) -> (result: u32)
     ensures
-        result == 0,
+        empty_read_reports_zero_bytes(result),
 {
     let _ = requested_len;
     0
@@ -47,7 +57,7 @@ pub fn verify_repeat_model_fills_the_buffer_with_the_given_byte(byte: u8) -> (re
 /// regardless of content.
 pub fn verify_sink_model_write_reports_full_length_and_discards_content(requested_len: u32) -> (result: u32)
     ensures
-        result == requested_len,
+        observed_value_matches_input(result as int, requested_len as int),
 {
     requested_len
 }

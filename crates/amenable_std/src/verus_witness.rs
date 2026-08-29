@@ -6522,6 +6522,14 @@ impl_io_empty_repeat_sink_verus_witness!(
     "verify_empty_model_read_reports_end_of_file",
     VERIFY_EMPTY_MODEL_READ_REPORTS_END_OF_FILE_SRC
 );
+
+// Singleton contract: `Empty::read` always reports the literal `0`
+// bytes read.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::io::Empty>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Empty>",
+    "empty_read_reports_zero_bytes"
+);
 impl_io_empty_repeat_sink_verus_witness!(
     std::io::Repeat,
     "verify_repeat_model_fills_the_buffer_with_the_given_byte",
@@ -8270,6 +8278,14 @@ bridge_verus_witness!(RustStdStandard<std::sync::Once>);
     )
 }
 
+// The shared "exactly once" invocation-count postcondition `amenable_
+// std::verus_witness` registers for `Once`/`Waker`.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::sync::Once>,
+    "amenable_std::rust_std::RustStdStandard<std::sync::Once>",
+    "invoked_exactly_once"
+);
+
 const VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/sync_once_carrier.rs");
 
@@ -8630,6 +8646,12 @@ bridge_verus_witness!(RustStdStandard<std::task::Waker>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::task::Waker>,
+    "amenable_std::rust_std::RustStdStandard<std::task::Waker>",
+    "invoked_exactly_once"
+);
 
 const VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/panic_carrier.rs");

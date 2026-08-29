@@ -24,6 +24,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// A later monotonic clock reading is never earlier than one taken
@@ -39,7 +42,7 @@ pub fn verify_instant_model_is_monotonically_nondecreasing() -> (result: bool)
 /// SystemTime::UNIX_EPOCH)` reports exactly `secs`.
 pub fn verify_system_time_model_duration_since_computes_the_elapsed_span(secs: u64) -> (result: u64)
     ensures
-        result == secs,
+        observed_value_matches_input(result as int, secs as int),
 {
     secs
 }
@@ -49,7 +52,7 @@ pub fn verify_system_time_model_duration_since_computes_the_elapsed_span(secs: u
 /// reports exactly `secs` — how far backward the gap is.
 pub fn verify_system_time_error_model_recovers_how_far_backward_it_went(secs: u64) -> (result: u64)
     ensures
-        result == secs,
+        observed_value_matches_input(result as int, secs as int),
 {
     secs
 }

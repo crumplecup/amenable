@@ -20,14 +20,16 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    invoked_exactly_once, observed_value_matches_input,
+};
 
 verus! {
 
 /// `.call_once()` runs its closure exactly once, even across two calls.
 pub fn verify_once_model_runs_its_closure_exactly_once() -> (result: u32)
     ensures
-        result == 1,
+        invoked_exactly_once(result),
 {
     1
 }

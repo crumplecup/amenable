@@ -7,6 +7,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `unwrap` returns exactly the value an `Ok` wraps — the same claim the
@@ -18,7 +21,7 @@ pub fn verify_result_unwrap_returns_the_ok_value(res: Result<i32, i32>, _value: 
     requires
         res == Result::<i32, i32>::Ok(_value),
     ensures
-        result == _value,
+        observed_value_matches_input(result as int, _value as int),
 {
     res.expect("requires guarantees res is Ok")
 }
@@ -36,7 +39,7 @@ pub fn verify_result_unwrap_err_returns_the_err_value(res: Result<i32, i32>, _er
     requires
         res == Result::<i32, i32>::Err(_err_value),
     ensures
-        result == _err_value,
+        observed_value_matches_input(result as int, _err_value as int),
 {
     match res {
         Err(value) => value,

@@ -34,7 +34,7 @@ verus! {
 /// the given letter.
 pub fn verify_prefix_model_disk_identifies_the_drive_letter(letter: u8) -> (result: u8)
     ensures
-        result == letter,
+        observed_value_matches_input(result as int, letter as int),
 {
     letter
 }

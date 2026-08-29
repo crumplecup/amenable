@@ -21,6 +21,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `Error::from(kind).kind()` recovers exactly the given kind, over any
@@ -30,7 +33,7 @@ pub fn verify_error_model_from_error_kind_preserves_the_kind(kind_index: u8) -> 
     requires
         kind_index < 4,
     ensures
-        result == kind_index,
+        observed_value_matches_input(result as int, kind_index as int),
 {
     kind_index
 }

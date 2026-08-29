@@ -7,6 +7,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+
 verus! {
 
 /// `unwrap` returns exactly the value a `Some` wraps — the same claim the
@@ -26,7 +29,7 @@ pub fn verify_option_unwrap_returns_the_wrapped_value(some: Option<i32>, _value:
     requires
         some == Some::<i32>(_value),
     ensures
-        result == _value,
+        observed_value_matches_input(result as int, _value as int),
 {
     some.expect("requires guarantees some is Some")
 }
@@ -37,7 +40,7 @@ pub fn verify_option_unwrap_or_falls_back_to_the_default(none: Option<i32>, defa
     requires
         none is None,
     ensures
-        result == default,
+        observed_value_matches_input(result as int, default as int),
 {
     none.unwrap_or(default)
 }
