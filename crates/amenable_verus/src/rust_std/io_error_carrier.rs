@@ -26,12 +26,21 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// A singleton claim: this model represents exactly the four
+/// representative `ErrorKind` variants (`NotFound`/`PermissionDenied`/
+/// `AlreadyExists`/`InvalidInput`) as a tag `0..4`. Named, not inlined,
+/// so the assumption has an explicit source even though nothing else
+/// calls it.
+pub open spec fn error_kind_index_is_representative(index: u8) -> bool {
+    index < 4
+}
+
 /// `Error::from(kind).kind()` recovers exactly the given kind, over any
 /// of the four representative kinds (modeled as a tag `0..4`, standing
 /// in for `NotFound`/`PermissionDenied`/`AlreadyExists`/`InvalidInput`).
 pub fn verify_error_model_from_error_kind_preserves_the_kind(kind_index: u8) -> (result: u8)
     requires
-        kind_index < 4,
+        error_kind_index_is_representative(kind_index),
     ensures
         observed_value_matches_input(result as int, kind_index as int),
 {

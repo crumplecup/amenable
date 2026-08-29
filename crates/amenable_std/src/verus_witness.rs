@@ -6682,6 +6682,14 @@ bridge_verus_witness!(RustStdStandard<std::io::Error>);
     )
 }
 
+// Singleton contract: this model represents exactly the four
+// representative `ErrorKind` variants as a tag `0..4`.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::io::Error>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Error>",
+    "error_kind_index_is_representative"
+);
+
 const VERIFY_IO_SLICE_MODEL_DEREFS_TO_THE_WRAPPED_BYTES_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_slice_carrier.rs");
 

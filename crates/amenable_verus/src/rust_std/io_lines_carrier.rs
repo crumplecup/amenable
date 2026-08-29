@@ -18,6 +18,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
+
 verus! {
 
 /// A shared line-terminator-exclusion precondition for the `.lines()`/
@@ -41,9 +44,9 @@ pub open spec fn is_not_a_newline_byte(byte: u8) -> bool {
 /// terminator attached.
 pub fn verify_lines_model_splits_on_newlines_and_drops_the_terminator(first: u8, second: u8, third: u8) -> (result: (u8, u8, u8))
     requires
-        first < 128,
-        second < 128,
-        third < 128,
+        is_ascii_byte(first as u32),
+        is_ascii_byte(second as u32),
+        is_ascii_byte(third as u32),
         is_not_a_line_terminator_byte(first),
         is_not_a_line_terminator_byte(second),
         is_not_a_line_terminator_byte(third),

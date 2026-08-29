@@ -160,7 +160,7 @@ pub fn verify_flatten_model_concatenates_the_inner_iterators() -> (result: (Opti
 /// computes each later item from the previous one.
 pub fn verify_successors_model_generates_from_the_previous_item(seed: i32) -> (result: (Option<i32>, Option<i32>))
     requires
-        seed < 100,
+        single_increment_headroom_holds(seed),
     ensures
         observed_option_matches_input(result.0, seed),
         observed_option_matches_input(result.1, (seed + 1) as i32),
