@@ -118,6 +118,15 @@ pub open spec fn values_are_equal<T>(a: T, b: T) -> bool {
     a == b
 }
 
+/// A shared sequence-length precondition for accommodation models that
+/// need a specific, symbolic-independent element count — an empty
+/// input, a fixed two-byte buffer, a matching (or mismatched) array
+/// length, and so on. Generic over any element type, the same total
+/// `Seq::len()` reasoning every real site already relies on.
+pub open spec fn has_length<T>(sequence: Seq<T>, expected_len: nat) -> bool {
+    sequence.len() == expected_len
+}
+
 /// A shared "exactly once" invocation-count postcondition for
 /// accommodation models whose whole claim is that a callback ran a
 /// single time — `Once::call_once`'s closure, `Waker::wake_by_ref`'s

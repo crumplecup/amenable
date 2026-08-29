@@ -10,6 +10,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::has_length;
+
 verus! {
 
 #[cfg(verus_keep_ghost)]
@@ -38,8 +41,8 @@ pub assume_specification [<char as std::str::FromStr>::from_str] (s: &str) -> (r
 /// `int_error_kind_carrier.rs`).
 pub fn verify_parse_char_error_occurs_for_empty_or_multi_character_strings(empty: &str, two_chars: &str) -> (result: (bool, bool, bool))
     requires
-        empty@.len() == 0,
-        two_chars@.len() == 2,
+        has_length(empty@, 0),
+        has_length(two_chars@, 2),
     ensures
         result.0,
         result.1,

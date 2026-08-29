@@ -20,6 +20,8 @@ use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
 use super::cstring_carrier::cstring_bytes_spec;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::has_length;
 
 verus! {
 
@@ -63,7 +65,7 @@ pub assume_specification [CString::as_bytes] (s: &CString) -> (result: &[u8])
 /// `vec![0xFFu8, b'x']` Kani constructs inline.
 pub fn verify_into_string_error_recovers_the_original_cstring(bytes: Vec<u8>) -> (result: bool)
     requires
-        bytes@.len() == 2,
+        has_length(bytes@, 2),
         bytes@[0] == 0xFFu8,
         bytes@[1] != 0,
     ensures

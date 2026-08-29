@@ -11,6 +11,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::has_length;
+
 verus! {
 
 #[cfg(verus_keep_ghost)]
@@ -55,7 +58,7 @@ pub assume_specification [<i32 as std::str::FromStr>::from_str] (s: &str) -> (re
 /// doesn't connect to `s@.len() == 0` automatically.
 pub fn verify_int_error_kind_classifies_parse_failures(s: &str) -> (result: IntErrorKind)
     requires
-        s@.len() == 0,
+        has_length(s@, 0),
     ensures
         result == IntErrorKind::Empty,
 {

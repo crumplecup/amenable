@@ -938,6 +938,15 @@ bridge_verus_witness!(RustStdStandard<core::num::IntErrorKind>);
     )
 }
 
+// The shared sequence-length precondition `amenable_std::verus_witness`
+// registers for several accommodation models that need a specific,
+// symbolic-independent element count.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<core::num::IntErrorKind>,
+    "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+    "has_length"
+);
+
 const VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/int_error_kind_carrier.rs");
 

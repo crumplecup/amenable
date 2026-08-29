@@ -27,6 +27,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::has_length;
+
 verus! {
 
 #[cfg(verus_keep_ghost)]
@@ -48,7 +51,7 @@ pub assume_specification<'a, T: Copy, const N: usize> [<[T; N] as core::convert:
 /// arrays Kani constructs inline.
 pub fn verify_try_from_slice_rejects_a_length_mismatch(matching: &[i32], mismatched: &[i32]) -> (result: (bool, bool))
     requires
-        matching@.len() == 2,
+        has_length(matching@, 2),
         mismatched@.len() != 2,
     ensures
         result.0,
