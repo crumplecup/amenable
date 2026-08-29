@@ -1086,9 +1086,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrRSplitObservation::new(before as char, pattern as char, after as char);
-            assert_eq!(
-                observation.rsplit(),
-                [after as char, before as char],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.rsplit(),
+                    [after as char, before as char]
+                )),
                 "rsplit yields the piece after the match, then the piece before it"
             );
         }
@@ -1144,10 +1146,15 @@ amenable_derive::harness! {
             let observation =
                 crate::KaniStrRSplitNObservationBuilder::default().a(a as char).pattern(pattern as char).b(b as char).c(c as char).build().expect("all fields set");
             let (first, rest) = observation.rsplitn_two();
-            assert_eq!(first, c as char, "rsplitn's first piece is everything after the last match");
-            assert_eq!(
-                rest,
-                [a as char, pattern as char, b as char],
+            assert!(
+                RustStdStandard::<char>::ensures((first, c as char)),
+                "rsplitn's first piece is everything after the last match"
+            );
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    rest,
+                    [a as char, pattern as char, b as char]
+                )),
                 "rsplitn's second piece is everything before the last match, uncut"
             );
         }
@@ -1204,9 +1211,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
-            assert_eq!(
-                observation.split_terminator(),
-                [a as char, b as char],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.split_terminator(),
+                    [a as char, b as char]
+                )),
                 "no trailing empty substring after the terminal match"
             );
         }
@@ -1258,9 +1267,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrSplitTerminatorObservation::new(a as char, pattern as char, b as char);
-            assert_eq!(
-                observation.rsplit_terminator(),
-                [b as char, a as char],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.rsplit_terminator(),
+                    [b as char, a as char]
+                )),
                 "no trailing empty substring after the terminal match, traversed from the back"
             );
         }
@@ -1316,9 +1327,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
-            assert_eq!(
-                observation.matches(),
-                [pattern as char, pattern as char],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.matches(),
+                    [pattern as char, pattern as char]
+                )),
                 "matches finds every non-overlapping occurrence"
             );
         }
@@ -1369,9 +1382,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
-            assert_eq!(
-                observation.rmatches(),
-                [pattern as char, pattern as char],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.rmatches(),
+                    [pattern as char, pattern as char]
+                )),
                 "rmatches finds every non-overlapping occurrence"
             );
         }
@@ -1423,9 +1438,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
-            assert_eq!(
-                observation.match_indices(),
-                [(1, pattern as char), (3, pattern as char)],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.match_indices(),
+                    [(1, pattern as char), (3, pattern as char)]
+                )),
                 "match_indices pairs each match with its byte offset, forward"
             );
         }
@@ -1481,9 +1498,11 @@ amenable_derive::harness! {
             )));
             let observation =
                 crate::KaniStrMatchObservationBuilder::default().f0(f0 as char).pattern(pattern as char).f1(f1 as char).f2(f2 as char).build().expect("all fields set");
-            assert_eq!(
-                observation.rmatch_indices(),
-                [(3, pattern as char), (1, pattern as char)],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    observation.rmatch_indices(),
+                    [(3, pattern as char), (1, pattern as char)]
+                )),
                 "rmatch_indices pairs each match with its byte offset, in reverse"
             );
         }

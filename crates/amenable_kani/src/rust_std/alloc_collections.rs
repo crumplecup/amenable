@@ -128,14 +128,12 @@ amenable_derive::harness! {
             let v2: i32 = kani::any();
 
             let mut map = crate::KaniBTreeMap::new(k2, v2, k1, v1);
-            assert_eq!(
-                map.first_entry(),
-                Some((&k1, &v1)),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((map.first_entry(), Some((&k1, &v1)))),
                 "iteration is in ascending key order despite insertion order"
             );
-            assert_eq!(
-                map.second_entry(),
-                Some((&k2, &v2)),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((map.second_entry(), Some((&k2, &v2)))),
                 "iteration preserves the higher key and its value after the lower one"
             );
             assert!(
