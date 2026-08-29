@@ -47,6 +47,8 @@ use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::PeekRevealsTheStoredReference;
+#[cfg(kani)]
+use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
@@ -83,7 +85,7 @@ amenable_derive::harness! {
                 x + 1
             }
             let x: i32 = kani::any();
-            kani::assume(x < i32::MAX);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((x, i32::MAX)));
             assert_eq!(
                 (x..x + 1).map(add_one).next(),
                 Some(add_one(x)),
@@ -246,7 +248,7 @@ amenable_derive::harness! {
                 0..x
             }
             let x: i32 = kani::any();
-            kani::assume((0..=4).contains(&x));
+            kani::assume(ValueIsWithinInclusiveRange::requires((x, 0, 4)));
             let mut flattened = [x].into_iter().flat_map(flat_map_fn);
             let mut direct = flat_map_fn(x);
             assert!(
@@ -500,7 +502,8 @@ amenable_derive::harness! {
         fn verify_chain_sequences_two_iterators_end_to_end() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a < i32::MAX && b < i32::MAX);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX)));
+            kani::assume(FirstValueIsLessThanTheSecond::requires((b, i32::MAX)));
             let mut c = (a..a + 1).chain(b..b + 1);
             assert!(
                 RustStdStandard::<std::iter::Chain<Range<i32>, Range<i32>>>::ensures((
@@ -563,7 +566,8 @@ amenable_derive::harness! {
         fn verify_zip_pairs_items_from_two_iterators() {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
-            kani::assume(a < i32::MAX && b < i32::MAX);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX)));
+            kani::assume(FirstValueIsLessThanTheSecond::requires((b, i32::MAX)));
             let mut z = (a..a + 1).zip(b..b + 1);
             assert!(
                 RustStdStandard::<Zip<Range<i32>, Range<i32>>>::ensures((z.next(), Some((a, b)))),
@@ -878,7 +882,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_fuse_keeps_returning_none_once_exhausted() {
             let a: i32 = kani::any();
-            kani::assume(a < i32::MAX);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX)));
             let mut f = (a..a + 1).fuse();
             assert!(RustStdStandard::<Fuse<Range<i32>>>::ensures((f.next(), Some(a))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(f.next()));
@@ -928,7 +932,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_inspect_calls_once_per_item_without_changing_values() {
             let value: i32 = kani::any();
-            kani::assume(value < i32::MAX);
+            kani::assume(FirstValueIsLessThanTheSecond::requires((value, i32::MAX)));
             let calls = Cell::new(0usize);
             let mut inspected = (value..value + 1).inspect(|_| calls.set(calls.get() + 1));
 

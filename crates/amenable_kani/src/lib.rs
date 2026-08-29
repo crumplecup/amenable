@@ -112,8 +112,8 @@ pub use rust_std::{
     NonZeroGetRoundTrips, PeekRevealsTheStoredReference, PopRecoversTheStoredValue,
     RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,
     StrongCountTracksLiveReferences, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
-    WeakUpgradeReturnsNone,
+    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsWithinInclusiveRange,
+    VecLengthTracksPushesAndPops, WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{

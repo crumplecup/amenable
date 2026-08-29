@@ -549,6 +549,96 @@ kani_requires!(
     )
 }
 
+/// A `(value, low, high)` triple known to satisfy the precondition
+/// every proof over a small, symbolic-but-bounded value assumes: the
+/// value falls within the inclusive range `low..=high`.
+///
+/// Independently hand-written as `kani::assume((low..=high).contains(&value))`
+/// at 2 real sites (`rust_std::iter`'s `FlatMap` over `0..=4`,
+/// `rust_std::slice`'s printable-ASCII bound over `0x20..=0x7e`) --
+/// the identical range-membership precondition regardless of the
+/// concrete bounds or element type. Generic over the element type
+/// rather than one registration per bound, the same reasoning (and the
+/// same reason it needs a hand-written `Witness`/`Requires` impl
+/// instead of the `bridge_kani_witness!`/`kani_requires!` macros) as
+/// `SplitOperandsAreDistinctFromThePattern` (`rust_std::slice`).
+pub struct ValueIsWithinInclusiveRange<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ValueIsWithinInclusiveRange<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ValueIsWithinInclusiveRange<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ValueIsWithinInclusiveRange<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_flat_map_flattens_each_generated_iterator".to_owned(),
+            crate::rust_std::iter::VERIFY_FLAT_MAP_FLATTENS_EACH_GENERATED_ITERATOR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsWithinInclusiveRange<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier>
+    for ValueIsWithinInclusiveRange<T>
+{
+    type Input = (T, T, T);
+    type Bound = bool;
+
+    fn requires((value, low, high): (T, T, T)) -> bool {
+        low <= value && value <= high
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsWithinInclusiveRange",
+        "kani",
+        "requires",
+        || stringify!(low <= value && value <= high),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ValueIsWithinInclusiveRange",
+        "kani",
+        || <ValueIsWithinInclusiveRange<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

@@ -30,6 +30,8 @@ use crate::IteratorYieldsAReferenceToTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniChunkByObservation, KaniEscapeAsciiObservation, KaniSplitNObservation,
@@ -1961,7 +1963,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_escape_ascii_leaves_printable_bytes_unescaped() {
             let printable: u8 = kani::any();
-            kani::assume((0x20..=0x7e).contains(&printable));
+            kani::assume(ValueIsWithinInclusiveRange::requires((printable, 0x20, 0x7e)));
             let observation = KaniEscapeAsciiObservation::new(printable);
             let demonstration = observation.demonstrate_escaping(printable);
 
