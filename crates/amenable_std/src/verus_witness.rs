@@ -700,6 +700,12 @@ bridge_verus_witness!(RustStdStandard<Option<i32>>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<Option<i32>>,
+    "amenable_std::rust_std::RustStdStandard<Option<i32>>",
+    ["option_wraps_the_given_value", "option_is_none"]
+);
+
 const VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/result_carrier.rs");
 
@@ -975,6 +981,29 @@ bridge_verus_witness!(RustStdStandard<core::num::ParseIntError>);
     )
 }
 
+// `ParseIntError::kind()`'s own postcondition, plus `i32::from_str`'s
+// own `Empty`/lowercase-`InvalidDigit` conjuncts -- all three real
+// claims this file's own `int_error_kind_carrier.rs` states about
+// `ParseIntError`, named once each.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::num::ParseIntError>,
+    "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+    [
+        "parse_int_error_kind_matches",
+        "from_str_empty_reports_empty_kind",
+        "from_str_lowercase_reports_invalid_digit_kind",
+    ]
+);
+
+// The shared "string starts with a lowercase ASCII letter" precondition
+// `int_error_kind_carrier.rs` states once, reused by both its own
+// `from_str` assume_specification and its own harness fn's `requires`.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<core::num::ParseIntError>,
+    "amenable_std::rust_std::RustStdStandard<core::num::ParseIntError>",
+    "starts_with_lowercase_ascii_letter"
+);
+
 const VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/parse_float_error_carrier.rs");
 
@@ -1096,6 +1125,12 @@ bridge_verus_witness!(RustStdStandard<core::alloc::Layout>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<core::alloc::Layout>,
+    "amenable_std::rust_std::RustStdStandard<core::alloc::Layout>",
+    "is_power_of_two_spec"
+);
+
 impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -1120,6 +1155,12 @@ bridge_verus_witness!(RustStdStandard<core::alloc::LayoutError>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::alloc::LayoutError>,
+    "amenable_std::rust_std::RustStdStandard<core::alloc::LayoutError>",
+    "from_size_align_rejects_a_non_power_of_two_alignment"
+);
 
 const VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/vec_carrier.rs");
@@ -1707,6 +1748,26 @@ bridge_verus_witness!(RustStdStandard<std::ffi::IntoStringError>);
         },
     )
 }
+
+// `CString::into_string`'s/`::as_bytes`'s own real postconditions --
+// named once each, this file's own `into_string_error_carrier.rs`.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::ffi::IntoStringError>,
+    "amenable_std::rust_std::RustStdStandard<std::ffi::IntoStringError>",
+    [
+        "into_string_rejects_a_leading_0xff_byte",
+        "into_string_error_recovers_the_original_bytes",
+        "as_bytes_matches_cstring_bytes_spec",
+    ]
+);
+
+// The two-byte probe input `verify_into_string_error_recovers_the_
+// original_cstring`'s own harness constructs a `CString` from.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::ffi::IntoStringError>,
+    "amenable_std::rust_std::RustStdStandard<std::ffi::IntoStringError>",
+    "probe_starts_with_0xff_and_second_byte_nonzero"
+);
 
 const VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cstr_carrier.rs");
@@ -2548,10 +2609,19 @@ bridge_verus_witness!(RustStdStandard<std::cell::OnceCell<i32>>);
 // `observed_value_matches_input`/`observed_pair_matches_input`'s more
 // specific typed shape fits an `Option<i32>`-vs-`Option<i32>` read-back,
 // so this uses the generic positive-equality predicate instead.
+// `empty()`'s/`set()`'s own postconditions ride along in the same
+// registration -- this type's Ensures slot is already claimed by the
+// `values_are_equal` call above, so every real postcondition this file
+// states has to share it.
 amenable_derive::verus_ensures_predicate!(
     RustStdStandard<std::cell::OnceCell<i32>>,
     "amenable_std::rust_std::RustStdStandard<std::cell::OnceCell<i32>>",
-    "values_are_equal"
+    [
+        "values_are_equal",
+        "once_cell_empty_has_no_value",
+        "once_cell_set_succeeds_when_empty",
+        "once_cell_set_rejected_when_occupied",
+    ]
 );
 
 const VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
@@ -2616,6 +2686,16 @@ bridge_verus_witness!(RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>>",
+    [
+        "lazy_cell_uninitialized_has_no_cached_value",
+        "force_caches_on_first_call",
+        "force_returns_cached_value_on_later_calls",
+    ]
+);
 
 impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
     type SupportingEvidence = Self;
@@ -3253,6 +3333,18 @@ bridge_verus_witness!(
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>",
+    "is_within_map_while_doubling_headroom"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>",
+    "map_while_closure_result_matches"
+);
+
 const VERIFY_CLONED_MODEL_CLONES_EACH_REFERENCED_ITEM_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
 
@@ -3446,7 +3538,9 @@ amenable_derive::verus_requires_predicate!(
     [
         "increment_headroom_holds",
         "single_increment_headroom_holds",
-        "ten_increment_headroom_holds"
+        "ten_increment_headroom_holds",
+        "two_increment_headroom_holds",
+        "four_increment_headroom_holds"
     ]
 );
 
@@ -4062,6 +4156,12 @@ bridge_verus_witness!(
         },
     )
 }
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Scan<std::ops::Range<i32>, i32, fn(&mut i32, i32) -> Option<i32>>>",
+    "is_within_scan_sum_headroom"
+);
 
 const VERIFY_FLAT_MAP_MODEL_FLATTENS_EACH_GENERATED_ITERATOR_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
@@ -6586,6 +6686,15 @@ impl_io_empty_repeat_sink_verus_witness!(
     "verify_repeat_model_fills_the_buffer_with_the_given_byte",
     VERIFY_REPEAT_MODEL_FILLS_THE_BUFFER_WITH_THE_GIVEN_BYTE_SRC
 );
+
+// The four-element counterpart to `observed_pair_matches_input`/
+// `observed_triple_matches_input`, registered once here for all its
+// real call sites.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::io::Repeat>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Repeat>",
+    "observed_quad_matches_input"
+);
 impl_io_empty_repeat_sink_verus_witness!(
     std::io::Sink,
     "verify_sink_model_write_reports_full_length_and_discards_content",
@@ -9032,6 +9141,12 @@ macro_rules! impl_option_result_into_iter_verus_witness {
 impl_option_result_into_iter_verus_witness!(core::option::IntoIter<i32>);
 impl_option_result_into_iter_verus_witness!(core::result::IntoIter<i32>);
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::option::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<core::option::IntoIter<i32>>",
+    "into_iter_yields_zero_or_one_owned_value"
+);
+
 const VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
 
@@ -9459,6 +9574,15 @@ bridge_verus_witness!(RustStdStandard<std::hash::DefaultHasher>);
         },
     )
 }
+
+// `DefaultHasher::default()`'s own real postcondition -- named once,
+// called from `hash_carrier.rs`'s own `assume_specification` rather than
+// restated inline.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::hash::DefaultHasher>,
+    "amenable_std::rust_std::RustStdStandard<DefaultHasher>",
+    "default_hasher_new_view_is_empty"
+);
 
 const VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/std_hash_carrier.rs");

@@ -39,14 +39,24 @@ pub struct ExBuildHasherDefault<H>(BuildHasherDefault<H>);
 
 pub assume_specification<H> [<BuildHasherDefault<H> as core::default::Default>::default] () -> (result: BuildHasherDefault<H>);
 
+// `H::default.ensures((), result)` is Verus's own builtin function-item
+// contract-inspection syntax (specifying `build_hasher`'s result in
+// terms of whatever `H::default`'s own real `ensures` resolves to for
+// the concrete `H` a caller instantiates) -- not a call to any
+// `amenable_core::Ensures` predicate, so there is no named fn to point
+// this clause at; deliberately left as the literal builtin form.
 pub assume_specification<H: core::default::Default + Hasher> [<BuildHasherDefault<H> as BuildHasher>::build_hasher] (builder: &BuildHasherDefault<H>) -> (result: H)
     ensures
         H::default.ensures((), result),
 ;
 
+pub open spec fn default_hasher_new_view_is_empty(result: DefaultHasher) -> bool {
+    result@ == Seq::<Seq<u8>>::empty()
+}
+
 pub assume_specification [<DefaultHasher as core::default::Default>::default] () -> (result: DefaultHasher)
     ensures
-        result@ == Seq::<Seq<u8>>::empty(),
+        default_hasher_new_view_is_empty(result),
 ;
 
 /// `BuildHasherDefault` fulfils `BuildHasher`'s core contract: two

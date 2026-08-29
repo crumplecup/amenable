@@ -34,9 +34,8 @@ pub enum VerusExportCanaryEnumWitnessResult {
     Closed,
 }
 
-pub fn verify_verus_export_canary_enum_witness(selector: VerusExportCanaryEnumWitnessSelector, c: char) -> (result: VerusExportCanaryEnumWitnessResult)
-    ensures
-        match selector {
+pub open spec fn verus_export_canary_enum_witness_ensures_holds(selector: VerusExportCanaryEnumWitnessSelector, result: VerusExportCanaryEnumWitnessResult, c: char) -> bool {
+    match selector {
             VerusExportCanaryEnumWitnessSelector::Balanced => match result {
                 VerusExportCanaryEnumWitnessResult::Balanced(r) => char_roundtrip_preserves_value(r, c) && char_is_valid_unicode_scalar(c),
                 _ => false,
@@ -49,7 +48,12 @@ pub fn verify_verus_export_canary_enum_witness(selector: VerusExportCanaryEnumWi
                 VerusExportCanaryEnumWitnessResult::Closed => true,
                 _ => false,
             },
-        },
+    }
+}
+
+pub fn verify_verus_export_canary_enum_witness(selector: VerusExportCanaryEnumWitnessSelector, c: char) -> (result: VerusExportCanaryEnumWitnessResult)
+    ensures
+        verus_export_canary_enum_witness_ensures_holds(selector, result, c),
 {
     match selector {
         VerusExportCanaryEnumWitnessSelector::Balanced => VerusExportCanaryEnumWitnessResult::Balanced(crate::rust_std::char_carrier::verify_char_roundtrip(c)),

@@ -19,7 +19,8 @@
 
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{
-    observed_pair_matches_input, observed_triple_matches_input, observed_value_matches_input,
+    observed_pair_matches_input, observed_quad_matches_input, observed_triple_matches_input,
+    observed_value_matches_input,
 };
 use verus_builtin_macros::verus;
 #[allow(
@@ -46,7 +47,7 @@ type IpAddrVariantResult = (bool, bool, Octets, bool, bool);
 /// constructor bytes.
 pub fn verify_ipv4_addr_model_octets_round_trip(a: u8, b: u8, c: u8, d: u8) -> (result: Octets)
     ensures
-        result == (a, b, c, d),
+        observed_quad_matches_input(result, (a, b, c, d)),
 {
     (a, b, c, d)
 }

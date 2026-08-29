@@ -15,6 +15,10 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::iter_sequence_carrier::{
+    four_increment_headroom_holds, two_increment_headroom_holds,
+};
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
 use verus_builtin_macros::verus;
 #[allow(
@@ -29,7 +33,7 @@ verus! {
 /// range, yielding the third.
 pub fn verify_skip_model_discards_the_first_n_items(a: i32) -> (result: Option<i32>)
     requires
-        a < i32::MAX - 2,
+        two_increment_headroom_holds(a),
     ensures
         observed_option_matches_input(result, (a + 2) as i32),
 {
@@ -50,7 +54,7 @@ pub fn verify_skip_while_model_discards_items_while_the_predicate_holds() -> (re
 /// starting from the first.
 pub fn verify_step_by_model_yields_every_nth_item(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
-        a < i32::MAX - 4,
+        four_increment_headroom_holds(a),
     ensures
         observed_option_matches_input(result.0, a),
         observed_option_matches_input(result.1, (a + 2) as i32),
@@ -63,7 +67,7 @@ pub fn verify_step_by_model_yields_every_nth_item(a: i32) -> (result: (Option<i3
 /// five-element source has more.
 pub fn verify_take_model_yields_at_most_n_items(a: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     requires
-        a < i32::MAX - 4,
+        four_increment_headroom_holds(a),
     ensures
         observed_option_matches_input(result.0, a),
         observed_option_matches_input(result.1, (a + 1) as i32),

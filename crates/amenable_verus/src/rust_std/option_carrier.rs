@@ -12,6 +12,18 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// The precondition `verify_option_unwrap_returns_the_wrapped_value`
+/// assumes: `some` is exactly `Some(value)`.
+pub open spec fn option_wraps_the_given_value(some: Option<i32>, value: i32) -> bool {
+    some == Some::<i32>(value)
+}
+
+/// The precondition `verify_option_unwrap_or_falls_back_to_the_default`
+/// assumes: the receiver is the `None` variant.
+pub open spec fn option_is_none(opt: Option<i32>) -> bool {
+    opt is None
+}
+
 /// `unwrap` returns exactly the value a `Some` wraps — the same claim the
 /// Kani/Creusot harnesses check, restated as a real `verus`-checked
 /// postcondition. Takes `some`/`value` as parameters constrained by
@@ -27,7 +39,7 @@ verus! {
 /// contract avoids it instead).
 pub fn verify_option_unwrap_returns_the_wrapped_value(some: Option<i32>, _value: i32) -> (result: i32)
     requires
-        some == Some::<i32>(_value),
+        option_wraps_the_given_value(some, _value),
     ensures
         observed_value_matches_input(result as int, _value as int),
 {
@@ -38,7 +50,7 @@ pub fn verify_option_unwrap_returns_the_wrapped_value(some: Option<i32>, _value:
 /// receiver is `None` — the same claim the Kani/Creusot harnesses check.
 pub fn verify_option_unwrap_or_falls_back_to_the_default(none: Option<i32>, default: i32) -> (result: i32)
     requires
-        none is None,
+        option_is_none(none),
     ensures
         observed_value_matches_input(result as int, default as int),
 {

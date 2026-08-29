@@ -20,6 +20,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::values_are_equal;
+
 verus! {
 
 /// `get_disjoint_mut([i, j])` on a slice of length `len` succeeds
@@ -28,7 +31,7 @@ verus! {
 /// overlapping (`i == j`) or out-of-bounds indices.
 pub fn verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds(len: u8, i: u8, j: u8) -> (result: bool)
     ensures
-        result == (i != j && i < len && j < len),
+        values_are_equal(result, i != j && i < len && j < len),
 {
     i != j && i < len && j < len
 }

@@ -90,6 +90,14 @@ pub open spec fn observed_triple_matches_input<A, B, C>(observed: (A, B, C), inp
     observed == input
 }
 
+/// The four-element counterpart to `observed_pair_matches_input`/
+/// `observed_triple_matches_input`, same reasoning: accommodation models
+/// whose observed four-tuple should match the input four-tuple exactly,
+/// generic over all four slots.
+pub open spec fn observed_quad_matches_input<A, B, C, D>(observed: (A, B, C, D), input: (A, B, C, D)) -> bool {
+    observed == input
+}
+
 /// A shared ASCII-range precondition for Verus accommodation models
 /// that need a genuinely symbolic single-character `str`/`char` window
 /// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot

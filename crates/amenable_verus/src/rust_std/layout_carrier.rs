@@ -16,6 +16,8 @@
 
 use std::alloc::Layout;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::values_are_equal;
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -42,12 +44,16 @@ pub open spec fn is_power_of_two_spec(value: usize) -> bool {
 #[verifier::when_used_as_spec(is_power_of_two_spec)]
 pub assume_specification [usize::is_power_of_two] (value: usize) -> (result: bool)
     ensures
-        result == is_power_of_two_spec(value),
+        values_are_equal(result, is_power_of_two_spec(value)),
 ;
+
+pub open spec fn from_size_align_rejects_a_non_power_of_two_alignment(align: usize, result: Result<Layout, std::alloc::LayoutError>) -> bool {
+    !is_power_of_two_spec(align) ==> result is Err
+}
 
 pub assume_specification [Layout::from_size_align] (size: usize, align: usize) -> (result: Result<Layout, std::alloc::LayoutError>)
     ensures
-        !is_power_of_two_spec(align) ==> result is Err,
+        from_size_align_rejects_a_non_power_of_two_alignment(align, result),
 ;
 
 /// `Layout::from_size_align` rejects an alignment that isn't a power of

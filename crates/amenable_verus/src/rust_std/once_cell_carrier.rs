@@ -28,11 +28,28 @@ pub struct VerusOnceCellModel {
     pub value: Option<i32>,
 }
 
+/// A freshly-constructed model has no stored value.
+pub open spec fn once_cell_empty_has_no_value(result: VerusOnceCellModel) -> bool {
+    result.value is None
+}
+
+/// `set`'s success conjunct: an empty cell accepts the new value and
+/// stores it.
+pub open spec fn once_cell_set_succeeds_when_empty(old_value: Option<i32>, new_value: i32, result: bool, final_value: Option<i32>) -> bool {
+    old_value is None ==> result && final_value == Some(new_value)
+}
+
+/// `set`'s rejection conjunct: an already-occupied cell rejects the new
+/// value, leaving the original undisturbed.
+pub open spec fn once_cell_set_rejected_when_occupied(old_value: Option<i32>, result: bool, final_value: Option<i32>) -> bool {
+    old_value is Some ==> !result && final_value == old_value
+}
+
 impl VerusOnceCellModel {
     /// A fresh cell has no value.
     pub fn empty() -> (result: Self)
         ensures
-            result.value is None,
+            once_cell_empty_has_no_value(result),
     {
         Self { value: None }
     }
@@ -49,8 +66,8 @@ impl VerusOnceCellModel {
     /// leaves the original value undisturbed.
     pub fn set(&mut self, new_value: i32) -> (result: bool)
         ensures
-            old(self).value is None ==> result && final(self).value == Some(new_value),
-            old(self).value is Some ==> !result && final(self).value == old(self).value,
+            once_cell_set_succeeds_when_empty(old(self).value, new_value, result, final(self).value),
+            once_cell_set_rejected_when_occupied(old(self).value, result, final(self).value),
     {
         if self.value.is_none() {
             self.value = Some(new_value);

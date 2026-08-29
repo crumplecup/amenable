@@ -86,6 +86,18 @@ pub fn verify_filter_map_model_applies_and_filters_in_one_step(x: i32) -> (resul
     if x == 0 { None } else { Some(x) }
 }
 
+/// A margin narrow enough that `x * 2` (`MapWhile`'s own doubling
+/// closure) never overflows `i32`.
+pub open spec fn is_within_map_while_doubling_headroom(x: int) -> bool {
+    -1000 < x < 1000
+}
+
+/// `MapWhile`'s own closure result: `Some(x * 2)` for even `x`, `None`
+/// otherwise.
+pub open spec fn map_while_closure_result_matches(x: i32, result: Option<i32>) -> bool {
+    (x % 2 == 0 ==> result == Some((x * 2) as i32)) && (x % 2 != 0 ==> result is None)
+}
+
 /// `MapWhile::next` matches its closure applied to the item — modeled
 /// here as `amenable_kani`'s own
 /// `verify_map_while_maps_items_while_the_closure_returns_some`
@@ -93,10 +105,9 @@ pub fn verify_filter_map_model_applies_and_filters_in_one_step(x: i32) -> (resul
 /// otherwise).
 pub fn verify_map_while_model_maps_items_while_the_closure_returns_some(x: i32) -> (result: Option<i32>)
     requires
-        -1000 < x < 1000,
+        is_within_map_while_doubling_headroom(x as int),
     ensures
-        x % 2 == 0 ==> result == Some((x * 2) as i32),
-        x % 2 != 0 ==> result is None,
+        map_while_closure_result_matches(x, result),
 {
     if x % 2 == 0 { Some(x * 2) } else { None }
 }

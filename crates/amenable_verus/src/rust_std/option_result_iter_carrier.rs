@@ -27,13 +27,19 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `.into_iter()`'s whole postcondition: when a value is present
+/// (`Some(value)`/`Ok(value)`), it yields exactly that value once, then
+/// stops; when absent (`None`/`Err(_)`), it yields nothing at all.
+pub open spec fn into_iter_yields_zero_or_one_owned_value(present: bool, value: i32, result: (bool, i32)) -> bool {
+    (present ==> result.0 && result.1 == value) && (!present ==> !result.0)
+}
+
 /// When a value is present (`Some(value)`/`Ok(value)`), `.into_iter()`
 /// yields exactly that value once, then stops; when absent (`None`/
 /// `Err(_)`), it yields nothing at all.
 pub fn verify_into_iter_model_yields_zero_or_one_owned_value(value: i32, present: bool) -> (result: (bool, i32))
     ensures
-        present ==> result.0 && result.1 == value,
-        !present ==> !result.0,
+        into_iter_yields_zero_or_one_owned_value(present, value, result),
 {
     if present { (true, value) } else { (false, 0) }
 }

@@ -35,14 +35,8 @@ pub enum VerusExportMultiCheckedEnumWitnessResult {
     Idle,
 }
 
-pub fn verify_verus_export_multi_checked_enum_witness(selector: VerusExportMultiCheckedEnumWitnessSelector, c: char, printable: u8) -> (result: VerusExportMultiCheckedEnumWitnessResult)
-    requires
-        match selector {
-            VerusExportMultiCheckedEnumWitnessSelector::Active => escape_ascii_input_is_printable_ascii(printable),
-            VerusExportMultiCheckedEnumWitnessSelector::Idle => true,
-        },
-    ensures
-        match selector {
+pub open spec fn verus_export_multi_checked_enum_witness_ensures_holds(selector: VerusExportMultiCheckedEnumWitnessSelector, result: VerusExportMultiCheckedEnumWitnessResult, c: char, printable: u8) -> bool {
+    match selector {
             VerusExportMultiCheckedEnumWitnessSelector::Active => match result {
                 VerusExportMultiCheckedEnumWitnessResult::Active(r0, r1) => char_roundtrip_preserves_value(r0, c) && char_is_valid_unicode_scalar(c) && escape_ascii_result_matches_printable_plus_newline_escape(printable, r1),
                 _ => false,
@@ -51,7 +45,21 @@ pub fn verify_verus_export_multi_checked_enum_witness(selector: VerusExportMulti
                 VerusExportMultiCheckedEnumWitnessResult::Idle => true,
                 _ => false,
             },
-        },
+    }
+}
+
+pub open spec fn verus_export_multi_checked_enum_witness_requires_holds(selector: VerusExportMultiCheckedEnumWitnessSelector, c: char, printable: u8) -> bool {
+    match selector {
+            VerusExportMultiCheckedEnumWitnessSelector::Active => escape_ascii_input_is_printable_ascii(printable),
+            VerusExportMultiCheckedEnumWitnessSelector::Idle => true,
+    }
+}
+
+pub fn verify_verus_export_multi_checked_enum_witness(selector: VerusExportMultiCheckedEnumWitnessSelector, c: char, printable: u8) -> (result: VerusExportMultiCheckedEnumWitnessResult)
+    requires
+        verus_export_multi_checked_enum_witness_requires_holds(selector, c, printable),
+    ensures
+        verus_export_multi_checked_enum_witness_ensures_holds(selector, result, c, printable),
 {
     match selector {
         VerusExportMultiCheckedEnumWitnessSelector::Active => VerusExportMultiCheckedEnumWitnessResult::Active(crate::rust_std::char_carrier::verify_char_roundtrip(c), crate::rust_std::escape_ascii_carrier::verify_escape_ascii_model_leaves_printable_bytes_unescaped(printable)),

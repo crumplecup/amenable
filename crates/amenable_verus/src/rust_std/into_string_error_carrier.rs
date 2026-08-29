@@ -21,7 +21,7 @@ use vstd::prelude::*;
 #[cfg(verus_keep_ghost)]
 use super::cstring_carrier::cstring_bytes_spec;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::has_length;
+use crate::rust_std::primitive_shapes_carrier::{has_length, values_are_equal};
 
 verus! {
 
@@ -36,25 +36,44 @@ pub struct ExIntoStringError(IntoStringError);
 /// either needing to reconstruct a real `CString`.
 pub uninterp spec fn into_cstring_spec(err: IntoStringError) -> CString;
 
+// 0xFF is never a valid leading byte in UTF-8 (outside the encoding's
+// valid range entirely) -- a real, sufficient condition for this
+// claim's specific input, not a full UTF-8 validity check over
+// arbitrary byte content.
+pub open spec fn into_string_rejects_a_leading_0xff_byte(s: CString, result: Result<String, IntoStringError>) -> bool {
+    (cstring_bytes_spec(s).len() > 0 && cstring_bytes_spec(s)[0] == 0xFFu8) ==> result is Err
+}
+
+pub open spec fn into_string_error_recovers_the_original_bytes(s: CString, result: Result<String, IntoStringError>) -> bool {
+    result is Err ==> cstring_bytes_spec(into_cstring_spec(result->Err_0)) == cstring_bytes_spec(s)
+}
+
 pub assume_specification [CString::into_string] (s: CString) -> (result: Result<String, IntoStringError>)
     ensures
-        // 0xFF is never a valid leading byte in UTF-8 (outside the
-        // encoding's valid range entirely) -- a real, sufficient
-        // condition for this claim's specific input, not a full UTF-8
-        // validity check over arbitrary byte content.
-        (cstring_bytes_spec(s).len() > 0 && cstring_bytes_spec(s)[0] == 0xFFu8) ==> result is Err,
-        result is Err ==> cstring_bytes_spec(into_cstring_spec(result->Err_0)) == cstring_bytes_spec(s),
+        into_string_rejects_a_leading_0xff_byte(s, result),
+        into_string_error_recovers_the_original_bytes(s, result),
 ;
 
 pub assume_specification [IntoStringError::into_cstring] (err: IntoStringError) -> (result: CString)
     ensures
-        result == into_cstring_spec(err),
+        values_are_equal(result, into_cstring_spec(err)),
 ;
+
+pub open spec fn as_bytes_matches_cstring_bytes_spec(result: Seq<u8>, s: CString) -> bool {
+    result == cstring_bytes_spec(s)
+}
 
 pub assume_specification [CString::as_bytes] (s: &CString) -> (result: &[u8])
     ensures
-        result@ == cstring_bytes_spec(*s),
+        as_bytes_matches_cstring_bytes_spec(result@, *s),
 ;
+
+/// The two-byte probe input this file's own harness constructs a
+/// `CString` from: a leading `0xFF` byte (never valid UTF-8) followed
+/// by a non-nul second byte (so `CString::new` itself accepts it).
+pub open spec fn probe_starts_with_0xff_and_second_byte_nonzero(bytes: Seq<u8>) -> bool {
+    bytes[0] == 0xFFu8 && bytes[1] != 0
+}
 
 /// `CString::into_string` fails when the bytes aren't valid UTF-8, and
 /// the error doesn't discard them: `.into_cstring()` recovers exactly
@@ -66,8 +85,7 @@ pub assume_specification [CString::as_bytes] (s: &CString) -> (result: &[u8])
 pub fn verify_into_string_error_recovers_the_original_cstring(bytes: Vec<u8>) -> (result: bool)
     requires
         has_length(bytes@, 2),
-        bytes@[0] == 0xFFu8,
-        bytes@[1] != 0,
+        probe_starts_with_0xff_and_second_byte_nonzero(bytes@),
     ensures
         result,
 {

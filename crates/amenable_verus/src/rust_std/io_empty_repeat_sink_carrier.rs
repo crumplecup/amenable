@@ -23,7 +23,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_quad_matches_input, observed_value_matches_input,
+};
 
 verus! {
 
@@ -48,7 +50,7 @@ pub fn verify_empty_model_read_reports_end_of_file(requested_len: u32) -> (resul
 /// given byte.
 pub fn verify_repeat_model_fills_the_buffer_with_the_given_byte(byte: u8) -> (result: (u8, u8, u8, u8))
     ensures
-        result == (byte, byte, byte, byte),
+        observed_quad_matches_input(result, (byte, byte, byte, byte)),
 {
     (byte, byte, byte, byte)
 }

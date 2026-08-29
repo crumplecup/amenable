@@ -254,6 +254,12 @@ pub enum VerusExportCanaryEnum<
     Closed,
 }
 
+amenable_derive::verus_ensures_predicate!(
+    ConcreteVerusExportCanaryEnum,
+    "amenable_std::verus_derive_canary::VerusExportCanaryEnum<CheckedVerusExportLeaf, TrustedVerusExportLeaf>",
+    "verus_export_canary_enum_witness_ensures_holds"
+);
+
 /// One enum variant carrying two checked leaves with different real
 /// harnesses — exercises `render_enum_module`'s multi-checked-call
 /// bind-name path (`r0`/`r1`, not the single-`r` path) against the real
@@ -275,3 +281,15 @@ pub enum VerusExportMultiCheckedEnum {
     #[default]
     Idle,
 }
+
+amenable_derive::verus_requires_predicate!(
+    VerusExportMultiCheckedEnum,
+    "amenable_std::verus_derive_canary::VerusExportMultiCheckedEnum",
+    "verus_export_multi_checked_enum_witness_requires_holds"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    VerusExportMultiCheckedEnum,
+    "amenable_std::verus_derive_canary::VerusExportMultiCheckedEnum",
+    "verus_export_multi_checked_enum_witness_ensures_holds"
+);

@@ -663,6 +663,11 @@ fn render_enum_module(
         result_variant_decls.join("\n")
     ));
 
+    let param_names = per_variant
+        .iter()
+        .flat_map(|(_, rendered)| rendered.params.iter())
+        .map(|param| param.local_name.clone())
+        .collect::<Vec<_>>();
     let params = per_variant
         .iter()
         .flat_map(|(_, rendered)| rendered.params.iter())
@@ -674,22 +679,51 @@ fn render_enum_module(
     } else {
         format!("selector: {selector_ty}, {params}")
     };
+    // Trailing `, {params}` / `, {param_names}` for the two named-predicate
+    // helpers below -- empty when the export has no per-variant params at
+    // all (the canary enum's `Fallback`/`Closed` case).
+    let params_suffix = if params.is_empty() {
+        String::new()
+    } else {
+        format!(", {params}")
+    };
+    let param_names_suffix = if param_names.is_empty() {
+        String::new()
+    } else {
+        format!(", {}", param_names.join(", "))
+    };
+
+    // Named once, called from `ensures` below, rather than restated
+    // inline: `cordial`'s own unnamed-contract-bound scanner only
+    // recognizes a whole-clause bare call `name(...)`, never a raw
+    // `match` expression, regardless of how genuinely composed its own
+    // arms are -- naming this the same way every hand-written carrier's
+    // own multi-arm postcondition already does.
+    source.push_str(&format!(
+        "pub open spec fn {module_stem}_ensures_holds(selector: {selector_ty}, result: {result_ty}{params_suffix}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
+        ensures_arms.join("\n")
+    ));
+
+    if any_requires {
+        source.push_str(&format!(
+            "pub open spec fn {module_stem}_requires_holds(selector: {selector_ty}{params_suffix}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
+            requires_arms.join("\n")
+        ));
+    }
 
     source.push_str(&format!(
         "pub fn verify_{module_stem}({full_params}) -> (result: {result_ty})\n"
     ));
 
     if any_requires {
-        source.push_str("    requires\n");
-        source.push_str("        match selector {\n");
-        source.push_str(&requires_arms.join("\n"));
-        source.push_str("\n        },\n");
+        source.push_str(&format!(
+            "    requires\n        {module_stem}_requires_holds(selector{param_names_suffix}),\n"
+        ));
     }
 
-    source.push_str("    ensures\n");
-    source.push_str("        match selector {\n");
-    source.push_str(&ensures_arms.join("\n"));
-    source.push_str("\n        },\n");
+    source.push_str(&format!(
+        "    ensures\n        {module_stem}_ensures_holds(selector, result{param_names_suffix}),\n"
+    ));
 
     source.push_str("{\n    match selector {\n");
     source.push_str(&body_arms.join("\n"));

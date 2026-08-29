@@ -18,7 +18,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{observed_value_matches_input, values_are_equal};
 
 verus! {
 
@@ -26,7 +26,7 @@ verus! {
 /// single exclusive upper bound.
 pub fn verify_range_to_model_contains_matches_bound(end: i32, x: i32) -> (result: bool)
     ensures
-        result == (x < end),
+        values_are_equal(result, x < end),
 {
     x < end
 }

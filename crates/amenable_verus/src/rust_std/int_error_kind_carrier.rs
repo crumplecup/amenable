@@ -12,7 +12,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::has_length;
+use crate::rust_std::primitive_shapes_carrier::{has_length, values_are_equal};
 
 verus! {
 
@@ -32,16 +32,44 @@ pub struct ExParseIntError(ParseIntError);
 /// about it.
 pub uninterp spec fn parse_int_error_kind_spec(err: ParseIntError) -> IntErrorKind;
 
+/// `ParseIntError::kind()`'s own real postcondition: the accessor
+/// recovers exactly the classification `parse_int_error_kind_spec`
+/// (its own uninterpreted, axiom-backed spec) assigns the error.
+pub open spec fn parse_int_error_kind_matches(result: IntErrorKind, err: ParseIntError) -> bool {
+    result == parse_int_error_kind_spec(err)
+}
+
 pub assume_specification [ParseIntError::kind] (err: &ParseIntError) -> (result: &IntErrorKind)
     ensures
-        *result == parse_int_error_kind_spec(*err),
+        parse_int_error_kind_matches(*result, *err),
 ;
+
+/// A precondition shared by this file's own lowercase-start claim below
+/// and `verify_parse_int_error_model_reports_the_kind_of_the_failure`'s
+/// own `requires` clause: the string is non-empty and its first
+/// character is a lowercase ASCII letter (`a`..=`z`).
+pub open spec fn starts_with_lowercase_ascii_letter(s: Seq<char>) -> bool {
+    s.len() > 0 && s[0] as u8 >= 97 && s[0] as u8 <= 122
+}
+
+/// The `i32::from_str` real postcondition's `Empty` conjunct: an
+/// empty string fails to parse, classified exactly `IntErrorKind::Empty`.
+pub open spec fn from_str_empty_reports_empty_kind(s: Seq<char>, result: Result<i32, ParseIntError>) -> bool {
+    s.len() == 0 ==> result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::Empty
+}
+
+/// The `i32::from_str` real postcondition's `InvalidDigit` conjunct: a
+/// string starting with a lowercase ASCII letter fails to parse,
+/// classified exactly `IntErrorKind::InvalidDigit`.
+pub open spec fn from_str_lowercase_reports_invalid_digit_kind(s: Seq<char>, result: Result<i32, ParseIntError>) -> bool {
+    starts_with_lowercase_ascii_letter(s) ==>
+        result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::InvalidDigit
+}
 
 pub assume_specification [<i32 as std::str::FromStr>::from_str] (s: &str) -> (result: Result<i32, ParseIntError>)
     ensures
-        s@.len() == 0 ==> result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::Empty,
-        (s@.len() > 0 && s@[0] as u8 >= 97 && s@[0] as u8 <= 122) ==>
-            result is Err && parse_int_error_kind_spec(result->Err_0) == IntErrorKind::InvalidDigit,
+        from_str_empty_reports_empty_kind(s@, result),
+        from_str_lowercase_reports_invalid_digit_kind(s@, result),
 ;
 
 /// An empty string fails to parse as `i32` with exactly
@@ -60,7 +88,7 @@ pub fn verify_int_error_kind_classifies_parse_failures(s: &str) -> (result: IntE
     requires
         has_length(s@, 0),
     ensures
-        result == IntErrorKind::Empty,
+        values_are_equal(result, IntErrorKind::Empty),
 {
     match <i32 as std::str::FromStr>::from_str(s) {
         #[cfg(verus_keep_ghost)]
@@ -81,11 +109,9 @@ pub fn verify_int_error_kind_classifies_parse_failures(s: &str) -> (result: IntE
 /// failures` above, for the same reason.
 pub fn verify_parse_int_error_model_reports_the_kind_of_the_failure(s: &str) -> (result: IntErrorKind)
     requires
-        s@.len() > 0,
-        s@[0] as u8 >= 97,
-        s@[0] as u8 <= 122,
+        starts_with_lowercase_ascii_letter(s@),
     ensures
-        result == IntErrorKind::InvalidDigit,
+        values_are_equal(result, IntErrorKind::InvalidDigit),
 {
     match <i32 as std::str::FromStr>::from_str(s) {
         #[cfg(verus_keep_ghost)]

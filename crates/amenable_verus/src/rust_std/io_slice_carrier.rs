@@ -14,7 +14,9 @@
 //! claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_quad_matches_input, observed_value_matches_input,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -28,7 +30,7 @@ verus! {
 /// yields exactly the wrapped four bytes.
 pub fn verify_io_slice_model_derefs_to_the_wrapped_bytes(a: u8, b: u8, c: u8, d: u8) -> (result: (u8, u8, u8, u8))
     ensures
-        result == (a, b, c, d),
+        observed_quad_matches_input(result, (a, b, c, d)),
 {
     (a, b, c, d)
 }

@@ -28,7 +28,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{observed_option_matches_input, values_are_equal};
 
 verus! {
 
@@ -63,7 +63,7 @@ pub fn verify_zip_model_pairs_items_from_two_iterators(a: i32, b: i32) -> (resul
         single_increment_headroom_holds(a),
         single_increment_headroom_holds(b),
     ensures
-        result.0 == Some((a, b)),
+        values_are_equal(result.0, Some((a, b))),
         result.1 is None,
 {
     (Some((a, b)), None)
@@ -94,14 +94,29 @@ pub open spec fn ten_increment_headroom_holds(a: i32) -> bool {
     a <= i32::MAX - 10
 }
 
+/// The two-increment-headroom precondition -- still the same
+/// `amenable_std::IncrementHeadroom` bound, at the margin
+/// `iter_window_carrier`'s own `Skip(2)` model needs before it adds `2`.
+pub open spec fn two_increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX - 2
+}
+
+/// The four-increment-headroom precondition -- still the same
+/// `amenable_std::IncrementHeadroom` bound, at the margin
+/// `iter_window_carrier`'s own `StepBy(2)`/`Take(2)` models need before
+/// they add up to `4`.
+pub open spec fn four_increment_headroom_holds(a: i32) -> bool {
+    a < i32::MAX - 4
+}
+
 /// `Enumerate::next` pairs each item with its index, starting at `0` —
 /// modeled here over the two-element range `a..a+2`.
 pub fn verify_enumerate_model_pairs_each_item_with_its_index(a: i32) -> (result: EnumerateResult)
     requires
         increment_headroom_holds(a),
     ensures
-        result.0 == Some((0usize, a)),
-        result.1 == Some((1usize, (a + 1) as i32)),
+        values_are_equal(result.0, Some((0usize, a))),
+        values_are_equal(result.1, Some((1usize, (a + 1) as i32))),
         result.2 is None,
 {
     (Some((0usize, a)), Some((1usize, a + 1)), None)
@@ -113,7 +128,7 @@ pub fn verify_rev_model_reverses_iteration_order(a: i32) -> (result: (Option<i32
     requires
         increment_headroom_holds(a),
     ensures
-        result.0 == Some((a + 1) as i32),
+        values_are_equal(result.0, Some((a + 1) as i32)),
         observed_option_matches_input(result.1, a),
         result.2 is None,
 {

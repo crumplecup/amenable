@@ -43,11 +43,29 @@ pub struct VerusLazyCellModel {
     pub cached: Option<i32>,
 }
 
+/// A freshly-constructed model has no cached value yet.
+pub open spec fn lazy_cell_uninitialized_has_no_cached_value(result: VerusLazyCellModel) -> bool {
+    result.cached is None
+}
+
+/// `force`'s first-call conjunct: an uncached cell stores and returns
+/// exactly the given `computed` value.
+pub open spec fn force_caches_on_first_call(old_cached: Option<i32>, computed: i32, result: i32, new_cached: Option<i32>) -> bool {
+    old_cached is None ==> result == computed && new_cached == Some(computed)
+}
+
+/// `force`'s later-call conjunct: an already-cached cell returns the
+/// cached value unchanged, ignoring whatever `computed` argument this
+/// call passed.
+pub open spec fn force_returns_cached_value_on_later_calls(old_cached: Option<i32>, result: i32, new_cached: Option<i32>) -> bool {
+    old_cached is Some ==> result == old_cached->0 && new_cached == old_cached
+}
+
 impl VerusLazyCellModel {
     /// An unforced cell has no cached value yet.
     pub fn uninitialized() -> (result: Self)
         ensures
-            result.cached is None,
+            lazy_cell_uninitialized_has_no_cached_value(result),
     {
         Self { cached: None }
     }
@@ -57,11 +75,8 @@ impl VerusLazyCellModel {
     /// first call cached instead.
     pub fn force(&mut self, computed: i32) -> (result: i32)
         ensures
-            old(self).cached is None ==> result == computed && final(self).cached == Some(
-                computed,
-            ),
-            old(self).cached is Some ==> result == old(self).cached->0 && final(self).cached
-                == old(self).cached,
+            force_caches_on_first_call(old(self).cached, computed, result, final(self).cached),
+            force_returns_cached_value_on_later_calls(old(self).cached, result, final(self).cached),
     {
         match self.cached {
             Some(value) => value,

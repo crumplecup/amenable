@@ -114,12 +114,18 @@ pub fn verify_peekable_model_peek_does_not_consume(a: i32) -> (result: (Option<i
     (Some(a), Some(a), Some(a + 1))
 }
 
+/// A margin narrow enough that `a + (a + 1)` (`Scan`'s own running-sum
+/// closure, applied twice) never overflows `i32`.
+pub open spec fn is_within_scan_sum_headroom(a: int) -> bool {
+    -1000 <= a <= 1000
+}
+
 /// `Scan::next` threads its mutable state from one call into the next —
 /// a running-sum closure's second result includes the first item's
 /// contribution.
 pub fn verify_scan_model_threads_state_through_its_closure(a: i32) -> (result: (Option<i32>, Option<i32>))
     requires
-        -1000 <= a <= 1000,
+        is_within_scan_sum_headroom(a as int),
     ensures
         observed_option_matches_input(result.0, a),
         observed_option_matches_input(result.1, (a + (a + 1)) as i32),
