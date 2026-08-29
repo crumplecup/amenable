@@ -29,6 +29,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
+
 verus! {
 
 /// `push_back`/`push_front` add to their respective ends, `pop_front`/
@@ -37,8 +40,8 @@ verus! {
 /// the push/pop-both-ends half of the claim the Kani harness checks.
 pub fn verify_vec_deque_pushes_and_pops_from_both_ends(a: i32, b: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>, Option<i32>, bool))
     ensures
-        result.0 == Some(b),
-        result.1 == Some(a),
+        observed_option_matches_input(result.0, b),
+        observed_option_matches_input(result.1, a),
         result.2 is None,
         result.3 is None,
         result.4,

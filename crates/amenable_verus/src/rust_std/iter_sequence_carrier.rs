@@ -27,6 +27,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
+
 verus! {
 
 /// Two zipped pairs' worth of `next()` results: the paired items, then
@@ -45,8 +48,8 @@ pub fn verify_chain_model_sequences_two_iterators_end_to_end(a: i32, b: i32) -> 
         single_increment_headroom_holds(a),
         single_increment_headroom_holds(b),
     ensures
-        result.0 == Some(a),
-        result.1 == Some(b),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, b),
         result.2 is None,
 {
     (Some(a), Some(b), None)
@@ -111,7 +114,7 @@ pub fn verify_rev_model_reverses_iteration_order(a: i32) -> (result: (Option<i32
         increment_headroom_holds(a),
     ensures
         result.0 == Some((a + 1) as i32),
-        result.1 == Some(a),
+        observed_option_matches_input(result.1, a),
         result.2 is None,
 {
     (Some(a + 1), Some(a), None)

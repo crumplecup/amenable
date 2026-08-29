@@ -16,7 +16,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_option_matches_input, observed_value_matches_input,
+};
 
 verus! {
 
@@ -35,7 +37,7 @@ pub fn verify_vec_push_pop_round_trips(value: i32) -> (result: (usize, i32, Opti
     ensures
         vec_len_after_one_push_is_one(result.0),
         observed_value_matches_input(result.1 as int, value as int),
-        result.2 == Some(value),
+        observed_option_matches_input(result.2, value),
         result.3,
         result.4 is None,
 {

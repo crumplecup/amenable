@@ -18,6 +18,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
+
 verus! {
 
 /// Models `OnceCell`'s set-exactly-once rule — not `OnceCell` itself.
@@ -66,9 +69,9 @@ pub fn verify_once_cell_model_initializes_exactly_once(value: i32, other: i32) -
     ensures
         result.0,
         result.1,
-        result.2 == Some(value),
+        observed_option_matches_input(result.2, value),
         !result.3,
-        result.4 == Some(value),
+        observed_option_matches_input(result.4, value),
 {
     let mut cell = VerusOnceCellModel::empty();
     let starts_empty = cell.get().is_none();

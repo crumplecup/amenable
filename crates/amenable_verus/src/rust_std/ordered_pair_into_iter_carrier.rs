@@ -46,7 +46,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_option_matches_input, observed_pair_matches_input,
+};
 
 verus! {
 
@@ -115,8 +117,8 @@ impl VerusOrderedPairIntoIterModel {
 /// expected to refine.
 pub fn verify_ordered_pair_into_iter_model_yields_owned_values_in_order(a: i32, b: i32) -> (result: (Option<i32>, Option<i32>, Option<i32>))
     ensures
-        result.0 == Some(a),
-        result.1 == Some(b),
+        observed_option_matches_input(result.0, a),
+        observed_option_matches_input(result.1, b),
         result.2 is None,
 {
     let mut it = VerusOrderedPairIntoIterModel::from_pair(a, b);
