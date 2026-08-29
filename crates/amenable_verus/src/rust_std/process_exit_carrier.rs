@@ -29,11 +29,20 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// A singleton claim: this harness's own precondition, a nonzero exit
+/// code — distinct from `output_exit_code_is_success`'s opposite claim
+/// below, about a different real type's own fixed example. Named, not
+/// inlined, so the assumption has an explicit source even though
+/// nothing else calls it.
+pub open spec fn exit_code_is_nonzero(code: i32) -> bool {
+    code != 0
+}
+
 /// A process that exits with any nonzero code reports `!success()` and
 /// exactly that code.
 pub fn verify_exit_status_model_reports_a_nonzero_exit_code(exit_code: i32) -> (result: (bool, i32))
     requires
-        exit_code != 0,
+        exit_code_is_nonzero(exit_code),
     ensures
         !result.0,
         observed_value_matches_input(result.1 as int, exit_code as int),

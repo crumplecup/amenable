@@ -23,7 +23,9 @@
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_pair_matches_input};
+use crate::rust_std::primitive_shapes_carrier::{
+    is_ascii_byte, observed_pair_matches_input, values_are_distinct,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -41,8 +43,8 @@ pub fn verify_str_rsplit_model_yields_substrings_from_the_back(before: char, pat
         is_ascii_byte(before as u32),
         is_ascii_byte(pattern as u32),
         is_ascii_byte(after as u32),
-        before != pattern,
-        after != pattern,
+        values_are_distinct(before, pattern),
+        values_are_distinct(after, pattern),
     ensures
         observed_pair_matches_input((result.0, result.1), (after, before)),
 {
@@ -62,9 +64,9 @@ pub fn verify_str_rsplitn_model_limits_to_n_substrings_from_the_back(a: char, pa
         is_ascii_byte(pattern as u32),
         is_ascii_byte(b as u32),
         is_ascii_byte(c as u32),
-        a != pattern,
-        b != pattern,
-        c != pattern,
+        values_are_distinct(a, pattern),
+        values_are_distinct(b, pattern),
+        values_are_distinct(c, pattern),
     ensures
         char_roundtrip_preserves_value(result.0, c),
         result.1 == (a, pattern, b),

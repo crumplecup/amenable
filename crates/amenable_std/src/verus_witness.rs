@@ -6011,10 +6011,23 @@ impl_str_pattern_reverse_verus_witness!(
     "verify_str_rsplit_model_yields_substrings_from_the_back",
     VERIFY_STR_RSPLIT_MODEL_YIELDS_SUBSTRINGS_FROM_THE_BACK_SRC
 );
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::str::RSplit<'static, char>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::RSplit<'static, char>>",
+    "values_are_distinct"
+);
+
 impl_str_pattern_reverse_verus_witness!(
     std::str::RSplitN<'static, char>,
     "verify_str_rsplitn_model_limits_to_n_substrings_from_the_back",
     VERIFY_STR_RSPLITN_MODEL_LIMITS_TO_N_SUBSTRINGS_FROM_THE_BACK_SRC
+);
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::str::RSplitN<'static, char>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::RSplitN<'static, char>>",
+    "values_are_distinct"
 );
 
 macro_rules! impl_str_pattern_terminator_verus_witness {
@@ -6052,10 +6065,23 @@ impl_str_pattern_terminator_verus_witness!(
     "verify_str_split_terminator_model_suppresses_a_trailing_empty_substring",
     VERIFY_STR_SPLIT_TERMINATOR_MODEL_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_SRC
 );
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::str::SplitTerminator<'static, char>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::SplitTerminator<'static, char>>",
+    "values_are_distinct"
+);
+
 impl_str_pattern_terminator_verus_witness!(
     std::str::RSplitTerminator<'static, char>,
     "verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_from_the_back",
     VERIFY_STR_RSPLIT_TERMINATOR_MODEL_SUPPRESSES_A_TRAILING_EMPTY_SUBSTRING_FROM_THE_BACK_SRC
+);
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::str::RSplitTerminator<'static, char>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::RSplitTerminator<'static, char>>",
+    "values_are_distinct"
 );
 
 const VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC: &str =
@@ -6323,6 +6349,12 @@ bridge_verus_witness!(RustStdStandard<std::io::LineWriter<Vec<u8>>>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::io::LineWriter<Vec<u8>>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::LineWriter<Vec<u8>>>",
+    "is_not_a_newline_byte"
+);
+
 const VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_lines_carrier.rs");
 
@@ -6350,6 +6382,12 @@ bridge_verus_witness!(RustStdStandard<std::io::Lines<&'static [u8]>>);
         },
     )
 }
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::io::Lines<&'static [u8]>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Lines<&'static [u8]>>",
+    "is_not_a_line_terminator_byte"
+);
 
 const VERIFY_PIPE_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_PAIRED_READER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_pipe_carrier.rs");
@@ -6411,6 +6449,15 @@ bridge_verus_witness!(RustStdStandard<std::io::Split<&'static [u8]>>);
         },
     )
 }
+
+// The shared pairwise-distinctness precondition `amenable_std::
+// verus_witness` registers for several accommodation models that build
+// a symbolic non-overlapping match/split window.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::io::Split<&'static [u8]>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::Split<&'static [u8]>>",
+    "values_are_distinct"
+);
 
 const VERIFY_WRITER_PANICKED_MODEL_RECOVERS_THE_BUFFERED_DATA_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_writer_panicked_carrier.rs");
@@ -6929,6 +6976,12 @@ bridge_verus_witness!(RustStdStandard<std::process::Child>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::process::Child>,
+    "amenable_std::rust_std::RustStdStandard<std::process::Child>",
+    "process_id_is_nonzero"
+);
+
 const VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/process_child_carrier.rs");
 
@@ -7126,6 +7179,12 @@ bridge_verus_witness!(RustStdStandard<std::process::ExitStatus>);
         },
     )
 }
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::process::ExitStatus>,
+    "amenable_std::rust_std::RustStdStandard<std::process::ExitStatus>",
+    "exit_code_is_nonzero"
+);
 
 const VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/process_exit_carrier.rs");
@@ -8628,6 +8687,12 @@ bridge_verus_witness!(RustStdStandard<core::panic::Location<'static>>);
         },
     )
 }
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<core::panic::Location<'static>>,
+    "amenable_std::rust_std::RustStdStandard<core::panic::Location<'static>>",
+    "values_are_distinct"
+);
 
 const VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ops_carrier.rs");

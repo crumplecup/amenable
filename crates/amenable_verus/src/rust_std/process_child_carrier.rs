@@ -30,11 +30,18 @@ use vstd::prelude::*;
 
 verus! {
 
+/// A singleton claim: a real process id is never `0`. Named, not
+/// inlined, so the assumption has an explicit source even though
+/// nothing else calls it.
+pub open spec fn process_id_is_nonzero(pid: u32) -> bool {
+    pid != 0
+}
+
 /// A `Child` with a nonzero process id, waited on, reports exactly the
 /// exit code it completed with.
 pub fn verify_child_model_has_a_process_id_and_can_be_waited_on(pid: u32, exit_code: i32) -> (result: (u32, i32))
     requires
-        pid != 0,
+        process_id_is_nonzero(pid),
     ensures
         result.0 != 0,
         observed_value_matches_input(result.1 as int, exit_code as int),

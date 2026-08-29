@@ -14,6 +14,8 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
+use crate::rust_std::io_lines_carrier::is_not_a_newline_byte;
+#[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 use verus_builtin_macros::verus;
 #[allow(
@@ -35,8 +37,8 @@ type LineWriterResult = ((u8, u8), (u8, u8), (u8, u8, u8));
 /// trailing_byte)`.
 pub fn verify_line_writer_model_flushes_on_a_newline_but_not_before_one(line_byte: u8, trailing_byte: u8) -> (result: LineWriterResult)
     requires
-        line_byte != 10,
-        trailing_byte != 10,
+        is_not_a_newline_byte(line_byte),
+        is_not_a_newline_byte(trailing_byte),
     ensures
         observed_pair_matches_input(result.0, (line_byte, 10u8)),
         observed_pair_matches_input(result.1, (line_byte, 10u8)),

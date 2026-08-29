@@ -20,6 +20,22 @@ use vstd::prelude::*;
 
 verus! {
 
+/// A shared line-terminator-exclusion precondition for the `.lines()`/
+/// `LineWriter` family: a byte carrying ordinary line content must not
+/// itself be one of the two ASCII bytes that end a line, `\n` (10) or
+/// `\r` (13).
+pub open spec fn is_not_a_line_terminator_byte(byte: u8) -> bool {
+    byte != 10 && byte != 13
+}
+
+/// The narrower half of [`is_not_a_line_terminator_byte`]: `LineWriter`
+/// only flushes on `\n` specifically (unlike `.lines()`, which also
+/// treats `\r` as ending a line), so its own precondition only needs to
+/// exclude the one byte its real behavior actually keys on.
+pub open spec fn is_not_a_newline_byte(byte: u8) -> bool {
+    byte != 10
+}
+
 /// Over three ASCII bytes that are each neither `\n` (10) nor `\r`
 /// (13), `.lines()` yields each byte unchanged as its own line, with no
 /// terminator attached.
@@ -28,12 +44,9 @@ pub fn verify_lines_model_splits_on_newlines_and_drops_the_terminator(first: u8,
         first < 128,
         second < 128,
         third < 128,
-        first != 10,
-        first != 13,
-        second != 10,
-        second != 13,
-        third != 10,
-        third != 13,
+        is_not_a_line_terminator_byte(first),
+        is_not_a_line_terminator_byte(second),
+        is_not_a_line_terminator_byte(third),
     ensures
         result == (first, second, third),
 {

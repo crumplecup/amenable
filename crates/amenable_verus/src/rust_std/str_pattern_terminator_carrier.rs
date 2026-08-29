@@ -21,7 +21,9 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_pair_matches_input};
+use crate::rust_std::primitive_shapes_carrier::{
+    is_ascii_byte, observed_pair_matches_input, values_are_distinct,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -40,8 +42,8 @@ pub fn verify_str_split_terminator_model_suppresses_a_trailing_empty_substring(a
         is_ascii_byte(a as u32),
         is_ascii_byte(pattern as u32),
         is_ascii_byte(b as u32),
-        a != pattern,
-        b != pattern,
+        values_are_distinct(a, pattern),
+        values_are_distinct(b, pattern),
     ensures
         observed_pair_matches_input((result.0, result.1), (a, b)),
 {
@@ -58,8 +60,8 @@ pub fn verify_str_rsplit_terminator_model_suppresses_a_trailing_empty_substring_
         is_ascii_byte(a as u32),
         is_ascii_byte(pattern as u32),
         is_ascii_byte(b as u32),
-        a != pattern,
-        b != pattern,
+        values_are_distinct(a, pattern),
+        values_are_distinct(b, pattern),
     ensures
         observed_pair_matches_input((result.0, result.1), (b, a)),
 {

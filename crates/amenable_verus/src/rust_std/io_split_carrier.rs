@@ -18,6 +18,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::values_are_distinct;
+
 verus! {
 
 /// Over three bytes each distinct from the delimiter, `.split(
@@ -25,9 +28,9 @@ verus! {
 /// delimiter dropped.
 pub fn verify_split_model_segments_on_the_given_byte_and_drops_it(first: u8, delimiter: u8, second: u8, third: u8) -> (result: (u8, u8, u8))
     requires
-        first != delimiter,
-        second != delimiter,
-        third != delimiter,
+        values_are_distinct(first, delimiter),
+        values_are_distinct(second, delimiter),
+        values_are_distinct(third, delimiter),
     ensures
         result == (first, second, third),
 {

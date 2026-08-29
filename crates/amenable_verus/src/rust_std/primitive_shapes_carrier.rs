@@ -92,6 +92,20 @@ pub open spec fn is_ascii_byte(value: u32) -> bool {
     value < 128
 }
 
+/// A shared pairwise-distinctness precondition for accommodation models
+/// that build a symbolic non-overlapping match/split window: the model
+/// only makes sense (a matched region can be told apart from what
+/// surrounds it) when its two symbolic construction inputs are actually
+/// distinct — a delimiter byte from ordinary content, a matched pattern
+/// character from its window neighbors, two call-site line numbers from
+/// each other, and so on. Generic over any type, the same reasoning
+/// `observed_pair_matches_input` already applies to equality: Verus
+/// spec inequality is total over any type, so this covers every
+/// concrete type these models need without a cast on either side.
+pub open spec fn values_are_distinct<T>(a: T, b: T) -> bool {
+    a != b
+}
+
 /// `[a, b, c].len() == 3`, and each index recovers the element the
 /// array was constructed with.
 pub fn verify_array_model_indexing_and_length(a: i32, b: i32, c: i32) -> (result: (u32, i32, i32, i32))

@@ -25,6 +25,8 @@ use vstd::prelude::*;
 use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::text_view_matches_expected;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::values_are_distinct;
 
 verus! {
 
@@ -46,7 +48,7 @@ pub fn verify_assert_unwind_safe_model_derefs_transparently(value: i32, updated:
 /// own same-file-distinct-lines shape.
 pub fn verify_location_model_caller_reflects_the_immediate_call_site(file: &str, line_a: u32, line_b: u32) -> (result: bool)
     requires
-        line_a != line_b,
+        values_are_distinct(line_a, line_b),
     ensures
         result,
 {
