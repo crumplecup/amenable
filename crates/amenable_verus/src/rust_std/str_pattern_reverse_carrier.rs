@@ -24,7 +24,7 @@
 use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{
-    is_ascii_byte, observed_pair_matches_input, values_are_distinct,
+    is_ascii_byte, observed_pair_matches_input, observed_triple_matches_input, values_are_distinct,
 };
 use verus_builtin_macros::verus;
 #[allow(
@@ -69,7 +69,7 @@ pub fn verify_str_rsplitn_model_limits_to_n_substrings_from_the_back(a: char, pa
         values_are_distinct(c, pattern),
     ensures
         char_roundtrip_preserves_value(result.0, c),
-        result.1 == (a, pattern, b),
+        observed_triple_matches_input(result.1, (a, pattern, b)),
 {
     (c, (a, pattern, b))
 }

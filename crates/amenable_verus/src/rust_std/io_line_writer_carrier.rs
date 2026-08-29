@@ -16,7 +16,9 @@
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::io_lines_carrier::is_not_a_newline_byte;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_pair_matches_input, observed_triple_matches_input,
+};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -42,7 +44,7 @@ pub fn verify_line_writer_model_flushes_on_a_newline_but_not_before_one(line_byt
     ensures
         observed_pair_matches_input(result.0, (line_byte, 10u8)),
         observed_pair_matches_input(result.1, (line_byte, 10u8)),
-        result.2 == (line_byte, 10u8, trailing_byte),
+        observed_triple_matches_input(result.2, (line_byte, 10u8, trailing_byte)),
 {
     ((line_byte, 10), (line_byte, 10), (line_byte, 10, trailing_byte))
 }

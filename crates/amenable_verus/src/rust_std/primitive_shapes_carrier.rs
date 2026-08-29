@@ -83,6 +83,13 @@ pub open spec fn observed_pair_matches_input<A, B>(observed: (A, B), input: (A, 
     observed == input
 }
 
+/// The three-element counterpart to `observed_pair_matches_input`, same
+/// reasoning: accommodation models whose observed three-tuple should
+/// match the input three-tuple exactly, generic over all three slots.
+pub open spec fn observed_triple_matches_input<A, B, C>(observed: (A, B, C), input: (A, B, C)) -> bool {
+    observed == input
+}
+
 /// A shared ASCII-range precondition for Verus accommodation models
 /// that need a genuinely symbolic single-character `str`/`char` window
 /// (the same claim `amenable_std::AsciiByte` names on the Kani/Creusot

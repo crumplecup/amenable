@@ -6398,6 +6398,14 @@ amenable_derive::verus_requires_predicate!(
     "is_not_a_newline_byte"
 );
 
+// The three-element counterpart to `observed_pair_matches_input`,
+// registered once here for all its real call sites.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::io::LineWriter<Vec<u8>>>,
+    "amenable_std::rust_std::RustStdStandard<std::io::LineWriter<Vec<u8>>>",
+    "observed_triple_matches_input"
+);
+
 const VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/io_lines_carrier.rs");
 

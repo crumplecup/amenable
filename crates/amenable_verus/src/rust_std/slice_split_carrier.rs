@@ -26,7 +26,7 @@
 
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{
-    observed_pair_matches_input, observed_value_matches_input,
+    observed_pair_matches_input, observed_triple_matches_input, observed_value_matches_input,
 };
 use verus_builtin_macros::verus;
 #[allow(
@@ -88,7 +88,7 @@ pub fn verify_split_inclusive_mut_model_keeps_the_match_at_the_end_of_each_piece
 pub fn verify_split_n_model_caps_the_number_of_pieces(first: i32, middle: i32, last: i32) -> (result: (i32, (i32, i32, i32)))
     ensures
         observed_value_matches_input(result.0 as int, first as int),
-        result.1 == (middle, 0i32, last),
+        observed_triple_matches_input(result.1, (middle, 0i32, last)),
 {
     (first, (middle, 0i32, last))
 }
@@ -121,7 +121,7 @@ pub fn verify_rsplit_mut_model_writes_through_the_rearmost_piece(before: i32, af
 pub fn verify_rsplit_n_model_caps_the_number_of_pieces_from_the_back(first: i32, middle: i32, last: i32) -> (result: (i32, (i32, i32, i32)))
     ensures
         observed_value_matches_input(result.0 as int, last as int),
-        result.1 == (first, 0i32, middle),
+        observed_triple_matches_input(result.1, (first, 0i32, middle)),
 {
     (last, (first, 0i32, middle))
 }
