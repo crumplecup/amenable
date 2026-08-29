@@ -47,7 +47,7 @@ use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{
-    observed_option_matches_input, observed_pair_matches_input,
+    observed_option_matches_input, observed_pair_matches_input, value_unchanged,
 };
 
 verus! {
@@ -92,8 +92,8 @@ impl VerusOrderedPairIntoIterModel {
                 == 2,
             old(self).position >= 2 ==> result is None && final(self).position
                 == old(self).position,
-            final(self).first == old(self).first,
-            final(self).second == old(self).second,
+            value_unchanged(old(self).first as int, final(self).first as int),
+            value_unchanged(old(self).second as int, final(self).second as int),
     {
         let result = if self.position == 0 {
             Some(self.first)

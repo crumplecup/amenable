@@ -32,7 +32,7 @@ use vstd::prelude::*;
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::cell_carrier::write_stores_new_value;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{observed_pair_matches_input, value_unchanged};
 
 verus! {
 
@@ -56,7 +56,7 @@ impl VerusOrderedPairIterMutModel {
     pub fn write_first(&mut self, value: i32)
         ensures
             write_stores_new_value(value as int, final(self).first as int),
-            final(self).second == old(self).second,
+            value_unchanged(old(self).second as int, final(self).second as int),
     {
         self.first = value;
     }
@@ -66,7 +66,7 @@ impl VerusOrderedPairIterMutModel {
     pub fn write_second(&mut self, value: i32)
         ensures
             write_stores_new_value(value as int, final(self).second as int),
-            final(self).first == old(self).first,
+            value_unchanged(old(self).first as int, final(self).first as int),
     {
         self.second = value;
     }
