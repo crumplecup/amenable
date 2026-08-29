@@ -203,7 +203,7 @@ pub fn verify_fn_pointer_model_calls_the_underlying_function(value: i32) -> (res
     requires
         single_increment_headroom_holds(value),
     ensures
-        result.0 == result.1,
+        values_are_equal(result.0, result.1),
 {
     let via_pointer = value + 1;
     let via_function = value + 1;

@@ -34,6 +34,8 @@ use vstd::prelude::*;
 // ordinary `cargo check`.
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::iter_sequence_carrier::single_increment_headroom_holds;
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::values_are_equal;
 
 verus! {
 
@@ -44,7 +46,7 @@ pub fn verify_map_model_applies_its_closure_to_each_item(x: i32) -> (result: (i3
     requires
         single_increment_headroom_holds(x),
     ensures
-        result.0 == result.1,
+        values_are_equal(result.0, result.1),
 {
     let mapped = x + 1;
     let expected = x + 1;
@@ -103,7 +105,7 @@ pub fn verify_map_while_model_maps_items_while_the_closure_returns_some(x: i32) 
 /// `i32` (a `Copy` type), cloning is the identity.
 pub fn verify_cloned_model_clones_each_referenced_item(value: i32) -> (result: (i32, i32))
     ensures
-        result.0 == result.1,
+        values_are_equal(result.0, result.1),
 {
     (value, value)
 }
@@ -112,7 +114,7 @@ pub fn verify_cloned_model_clones_each_referenced_item(value: i32) -> (result: (
 /// identity, for `i32`.
 pub fn verify_copied_model_copies_each_referenced_item(value: i32) -> (result: (i32, i32))
     ensures
-        result.0 == result.1,
+        values_are_equal(result.0, result.1),
 {
     (value, value)
 }
