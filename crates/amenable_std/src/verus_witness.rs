@@ -2528,6 +2528,16 @@ bridge_verus_witness!(RustStdStandard<std::cell::OnceCell<i32>>);
     )
 }
 
+// `get()` reads back exactly the stored `Option<i32>` -- neither
+// `observed_value_matches_input`/`observed_pair_matches_input`'s more
+// specific typed shape fits an `Option<i32>`-vs-`Option<i32>` read-back,
+// so this uses the generic positive-equality predicate instead.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::cell::OnceCell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::OnceCell<i32>>",
+    "values_are_equal"
+);
+
 const VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/unsafe_cell_carrier.rs");
 

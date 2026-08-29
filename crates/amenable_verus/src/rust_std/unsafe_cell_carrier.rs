@@ -53,7 +53,7 @@ impl VerusUnsafeCellModel {
     /// position.
     pub fn read_through(&self) -> (result: i32)
         ensures
-            result == self.value,
+            observed_value_matches_input(result as int, self.value as int),
     {
         self.value
     }
@@ -69,7 +69,7 @@ impl VerusUnsafeCellModel {
     /// Consumes the model and returns the current value.
     pub fn into_inner(self) -> (result: i32)
         ensures
-            result == self.value,
+            observed_value_matches_input(result as int, self.value as int),
     {
         self.value
     }

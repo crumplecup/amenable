@@ -106,6 +106,18 @@ pub open spec fn values_are_distinct<T>(a: T, b: T) -> bool {
     a != b
 }
 
+/// The positive counterpart to `values_are_distinct`: a shared generic
+/// equality claim for accommodation models whose two sides don't fit
+/// any of `observed_value_matches_input`/`observed_pair_matches_input`/
+/// `observed_option_matches_input`'s more specific typed shapes — most
+/// commonly, a getter reading back exactly the value already stored in
+/// `self`, when that value's own type (e.g. `Option<i32>`) isn't one of
+/// theirs. Generic over any type, the same total-equality reasoning
+/// `observed_pair_matches_input` already relies on.
+pub open spec fn values_are_equal<T>(a: T, b: T) -> bool {
+    a == b
+}
+
 /// A shared "exactly once" invocation-count postcondition for
 /// accommodation models whose whole claim is that a callback ran a
 /// single time — `Once::call_once`'s closure, `Waker::wake_by_ref`'s

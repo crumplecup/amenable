@@ -2,7 +2,7 @@
 
 (* <ledger::Ledger as amenable_core::Exchange<ledger::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, ledger::Transfer<amenable_gaap::Committed, amenable_gaap::CommittedToken>, witness::CreusotVerifier>> *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 779 24 779 49
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 848 24 848 49
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 58 8 58 26
 let%span scommit'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 56 8 56 13
 let%span scommit'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 52 15 52 19
@@ -63,7 +63,7 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 778 8 778 58] (amount'0: Int64.t) =
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 847 8 847 58] (amount'0: Int64.t) =
   [%#sledger] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
 
 let rec commit (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)

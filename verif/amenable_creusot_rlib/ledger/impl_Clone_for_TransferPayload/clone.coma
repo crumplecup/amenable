@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 291 9 291 14 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 360 9 360 14 *)
 
 (* <ledger::TransferPayload as std::clone::Clone> *)
 
@@ -14,7 +14,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 291 9 291 14]
+let rec clone_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 360 9 360 14]
   (self: t_TransferPayload) (return (x: t_TransferPayload)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferPayload = Any.any_l () | & self: t_TransferPayload = self ])

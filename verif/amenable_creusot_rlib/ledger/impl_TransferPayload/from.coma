@@ -1,9 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 304 4 304 25 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 373 4 373 25 *)
 
 (* ledger::TransferPayload *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 302 15 302 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 303 14 303 33
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 371 15 371 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 372 14 372 63
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 331 24 331 41
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -13,13 +14,17 @@ type t_Amount = { f0: Int64.t }
 
 type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
 
+predicate transfer_payload_field_matches [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 330 8 330 80] (observed: UInt64.t) (field: UInt64.t) =
+  [%#sledger'1] observed = field
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec from'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 304 4 304 25]
+let rec from'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 373 4 373 25]
   (self: t_TransferPayload) (return (x: UInt64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self.from ] s1 | s1 = return {_ret} ] ]
   [ & _ret: UInt64.t = Any.any_l () | & self: t_TransferPayload = self ])
-  [ return (result: UInt64.t) -> {[@stop_split] [@expl:from ensures] [%#sledger'0] result = self.from}
+  [ return (result: UInt64.t) ->
+  {[@stop_split] [@expl:from ensures] [%#sledger'0] transfer_payload_field_matches result self.from}
     (! return {result}) ]

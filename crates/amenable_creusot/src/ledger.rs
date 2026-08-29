@@ -243,6 +243,48 @@ pub struct Transfer<S, Token> {
     _state: std::marker::PhantomData<S>,
 }
 
+amenable_derive::harness! {
+    creusot, AMOUNT_VALUE_MATCHES_FIELD_SRC, {
+        /// `Amount::value`'s own accessor postcondition, named once
+        /// instead of restated -- real, callable Pearlite content: an
+        /// accessor returns exactly the field it wraps. Plain `i64`
+        /// logic, no dependency on `Amount` itself, so (like
+        /// `amount_positive_holds` above) it compiles the same in
+        /// ordinary and Creusot-translated builds alike.
+        #[logic(open)]
+        pub fn amount_value_matches_field(observed: i64, field: i64) -> bool {
+            pearlite! { observed == field }
+        }
+    }
+}
+
+// `Amount` only exists under `#[cfg(creusot)]` (a sanitized mirror, not
+// the real `amenable_gaap::Amount`), so it can never carry a real
+// `impl Ensures<CreusotVerifier>` the way `AmountPositive` does --
+// `inventory::submit!` needs to run in an ordinary (non-translated)
+// build to ever reach `amenable dump-registry`, and this type doesn't
+// exist there at all. A bare `ContractRecord` submission sidesteps
+// that: the registry entry only needs a descriptive `evidence` label
+// and a real fragment, not a trait impl on a real `Self` type --
+// `cordial`'s own Creusot/Verus call-shape recognition never consults
+// `evidence` for these two verifiers anyway (see `CONTRACT_BOUND_
+// NAMING_WORKFLOW.md`'s own Gotchas). `#[cfg(not(creusot))]` is
+// required, not optional -- confirmed the hard way: without it,
+// `creusot-rustc`'s translator sweeps this crate's own `inventory::
+// submit!`-generated static and ICEs on it directly ("unsupported
+// definition kind ... Static"), the identical real class `amenable_
+// creusot::stoplight`'s own `ProofRecord` registrations already gate
+// the same way (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 8).
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::Amount",
+        "creusot",
+        "ensures",
+        || AMOUNT_VALUE_MATCHES_FIELD_SRC,
+    )
+}
+
 /// Sanitized mirror of `amenable_gaap::Amount` -- the real captured
 /// `validate`/`commit` bodies call `.amount().value()`, so this needs
 /// the same two-method chain, not just a bare `i64`. The field is `pub`,
@@ -271,10 +313,37 @@ impl Amount {
     // without these, even after `Transfer::new`'s own `#[derive(Sidecar)]`
     // -generated `ensures` was fixed).
     #[requires(true)]
-    #[ensures(result == self.0)]
+    #[ensures(amount_value_matches_field(result, self.0))]
     fn value(&self) -> i64 {
         self.0
     }
+}
+
+amenable_derive::harness! {
+    creusot, TRANSFER_PAYLOAD_FIELD_MATCHES_SRC, {
+        /// `TransferPayload::from`/`::to`'s shared accessor
+        /// postcondition -- same real reason as `amount_value_matches_
+        /// field`, above, generalized to the one other field type this
+        /// struct's own accessors need. Plain `u64` logic, same
+        /// unconditional-compile reasoning.
+        #[logic(open)]
+        pub fn transfer_payload_field_matches(observed: u64, field: u64) -> bool {
+            pearlite! { observed == field }
+        }
+    }
+}
+
+// See `Amount`'s own bare `ContractRecord` submission, above, for why
+// this can't be a real `impl Ensures<CreusotVerifier>` on
+// `TransferPayload` itself.
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::TransferPayload",
+        "creusot",
+        "ensures",
+        || TRANSFER_PAYLOAD_FIELD_MATCHES_SRC,
+    )
 }
 
 /// Sanitized mirror of `amenable_gaap::TransferPayload` -- `from`/`to`
@@ -300,13 +369,13 @@ impl TransferPayload {
     // `#[ensures(..)]` throughout this impl -- same real reason as
     // [`Amount::value`], above.
     #[requires(true)]
-    #[ensures(result == self.from)]
+    #[ensures(transfer_payload_field_matches(result, self.from))]
     fn from(&self) -> u64 {
         self.from
     }
 
     #[requires(true)]
-    #[ensures(result == self.to)]
+    #[ensures(transfer_payload_field_matches(result, self.to))]
     fn to(&self) -> u64 {
         self.to
     }

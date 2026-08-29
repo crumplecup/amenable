@@ -19,7 +19,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::observed_option_matches_input;
+use crate::rust_std::primitive_shapes_carrier::{observed_option_matches_input, values_are_equal};
 
 verus! {
 
@@ -40,7 +40,7 @@ impl VerusOnceCellModel {
     /// Reads back the currently stored value, if any.
     pub fn get(&self) -> (result: Option<i32>)
         ensures
-            result == self.value,
+            values_are_equal(result, self.value),
     {
         self.value
     }

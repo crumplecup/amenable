@@ -2,9 +2,9 @@
 
 (* <ledger::Ledger as amenable_core::Exchange<ledger::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>, ledger::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, witness::CreusotVerifier>> *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 475 24 475 48
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 585 24 585 47
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 56
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 544 24 544 48
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 654 24 654 47
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 605 24 605 56
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/validate.rs" 67 8 67 47
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/validate.rs" 65 8 65 13
 let%span svalidate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/validate.rs" 61 15 61 19
@@ -65,13 +65,13 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 474 8 474 72] (amount'0: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 543 8 543 72] (amount'0: Int64.t) (outcome: bool) =
   [%#sledger] outcome = (Int64.to_int amount'0 > 0)
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 584 8 584 81] (from'0: UInt64.t) (to''0: UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 653 8 653 81] (from'0: UInt64.t) (to''0: UInt64.t) (outcome: bool) =
   [%#sledger'0] outcome = (from'0 <> to''0)
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 87] (balance'0: Int64.t) (amount'0: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 604 8 604 87] (balance'0: Int64.t) (amount'0: Int64.t) (outcome: bool) =
   [%#sledger'1] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'0)
 
 let rec validate_CreusotVerifier (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)

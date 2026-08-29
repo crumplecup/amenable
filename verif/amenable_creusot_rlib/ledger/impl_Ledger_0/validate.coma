@@ -3,30 +3,32 @@
 (* ledger::Ledger *)
 
 let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 217 9 217 33
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 314 15 314 19
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 315 14 315 39
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 273 15 273 19
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 274 14 274 30
-let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 414 15 414 19
-let%span sledger'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 415 14 418 5
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 383 15 383 19
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 384 14 384 39
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 315 15 315 19
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 316 14 316 56
+let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 483 15 483 19
+let%span sledger'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 484 14 487 5
 let%span sledger'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 109 19 112 9
 let%span sledger'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 113 18 116 9
-let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 424 15 424 19
-let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 425 14 428 5
-let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 302 15 302 19
-let%span sledger'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 303 14 303 33
-let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 308 15 308 19
-let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 309 14 309 31
+let%span sledger'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 493 15 493 19
+let%span sledger'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 494 14 497 5
+let%span sledger'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 371 15 371 19
+let%span sledger'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 372 14 372 63
+let%span sledger'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 377 15 377 19
+let%span sledger'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 378 14 378 61
 let%span sledger'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 162 21 162 31
 let%span sledger'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 161 18 161 22
 let%span sledger'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 242 8 242 13
-let%span sledger'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 475 24 475 48
-let%span sledger'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 585 24 585 47
-let%span sledger'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 536 24 536 56
-let%span sledger'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 451 4 451 49
-let%span sledger'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 447 14 450 5
-let%span sledger'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 460 4 460 59
-let%span sledger'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 456 14 459 5
+let%span sledger'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 544 24 544 48
+let%span sledger'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 654 24 654 47
+let%span sledger'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 605 24 605 56
+let%span sledger'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 256 24 256 41
+let%span sledger'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 520 4 520 49
+let%span sledger'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 516 14 519 5
+let%span sledger'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 529 4 529 59
+let%span sledger'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 525 14 528 5
+let%span sledger'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 331 24 331 41
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/validate.rs" 18 30 18 45
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/validate.rs" 18 30 18 53
@@ -109,13 +111,17 @@ let rec amount'0 (self: t_TransferPayload) (return (x: t_Amount)) = any
   [ return (result: t_Amount) -> {[@stop_split] [@expl:amount ensures] [%#sledger'1] result.f0 = self.amount.f0}
     (! return {result}) ]
 
+predicate amount_value_matches_field [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 255 8 255 76] (observed: Int64.t) (field: Int64.t) =
+  [%#sledger'20] observed = field
+
 let rec value (self: t_Amount) (return (x: Int64.t)) = any
-  [ return (result: Int64.t) -> {[@stop_split] [@expl:value ensures] [%#sledger'3] result = self.f0}
+  [ return (result: Int64.t) ->
+  {[@stop_split] [@expl:value ensures] [%#sledger'3] amount_value_matches_field result self.f0}
     (! return {result}) ]
 
 type t_Result_unit_i64 = Ok () | Err Int64.t
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 474 8 474 72] (amount'1: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 543 8 543 72] (amount'1: Int64.t) (outcome: bool) =
   [%#sledger'17] outcome = (Int64.to_int amount'1 > 0)
 
 let rec check_amount_positive_V (amount'1: Int64.t) (return (x: t_Result_unit_i64)) = any
@@ -131,12 +137,12 @@ type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.
 type t_Result_unit_TransferError = Ok'0 () | Err'0 t_TransferError
 
 predicate precondition_negative_amount [@inline:trivial] (self: ()) (args: Int64.t) =
-  [%#sledger'20] let bad = args in true
+  [%#sledger'21] let bad = args in true
 
 meta "rewrite_def" predicate precondition_negative_amount
 
 predicate postcondition_once_negative_amount [@inline:trivial] (self: ()) (args: Int64.t) (result: t_TransferError) =
-  [%#sledger'20] let bad = args in [%#sledger'21] match result with
+  [%#sledger'21] let bad = args in [%#sledger'22] match result with
     | NegativeAmount actual -> actual = bad
     | _ -> false
     end
@@ -321,7 +327,7 @@ type tup2_i64_i64 = { f0'1: Int64.t; f1'1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok'3 () | Err'3 tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 535 8 535 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 604 8 604 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
   [%#sledger'19] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'1)
 
 let rec check_sufficient_funds_V (self: t_Ledger) (amount'1: Int64.t) (return (x: t_Result_unit_tup2_i64_i64)) = any
@@ -334,12 +340,12 @@ let rec check_sufficient_funds_V (self: t_Ledger) (amount'1: Int64.t) (return (x
     (! return {result}) ]
 
 predicate precondition_insufficient_funds [@inline:trivial] (self: ()) (args: tup2_i64_i64) =
-  [%#sledger'22] let bad = args in true
+  [%#sledger'23] let bad = args in true
 
 meta "rewrite_def" predicate precondition_insufficient_funds
 
 predicate postcondition_once_insufficient_funds [@inline:trivial] (self: ()) (args: tup2_i64_i64) (result: t_TransferError) =
-  [%#sledger'22] let bad = args in [%#sledger'23] match result with
+  [%#sledger'23] let bad = args in [%#sledger'24] match result with
     | InsufficientFunds balance'0 required -> balance'0 = bad.f0'1 /\ required = bad.f1'1
     | _ -> false
     end
@@ -359,12 +365,17 @@ let rec map_err_unit'0 (self_: t_Result_unit_tup2_i64_i64) (op: ()) (return (x: 
       end}
     (! return {result}) ]
 
+predicate transfer_payload_field_matches [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 330 8 330 80] (observed: UInt64.t) (field: UInt64.t) =
+  [%#sledger'25] observed = field
+
 let rec from'0 (self: t_TransferPayload) (return (x: UInt64.t)) = any
-  [ return (result: UInt64.t) -> {[@stop_split] [@expl:from ensures] [%#sledger'11] result = self.from}
+  [ return (result: UInt64.t) ->
+  {[@stop_split] [@expl:from ensures] [%#sledger'11] transfer_payload_field_matches result self.from}
     (! return {result}) ]
 
 let rec to''0 (self: t_TransferPayload) (return (x: UInt64.t)) = any
-  [ return (result: UInt64.t) -> {[@stop_split] [@expl:to ensures] [%#sledger'13] result = self.to'}
+  [ return (result: UInt64.t) ->
+  {[@stop_split] [@expl:to ensures] [%#sledger'13] transfer_payload_field_matches result self.to'}
     (! return {result}) ]
 
 let rec sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_PendingToken)) =
@@ -390,7 +401,7 @@ let rec new_Validated (payload'1: t_TransferPayload) (token'1: t_ValidatedToken)
     /\ ([@stop_split] [@expl:new ensures] [%#sledger] result.payload'0 = payload'1)}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 584 8 584 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 653 8 653 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
   [%#sledger'18] outcome = (from'1 <> to''1)
 
 meta "compute_max_steps" 1000000

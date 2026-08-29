@@ -1,23 +1,23 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 792 8 792 53 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 861 8 861 53 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 795 12 795 26
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 795 30 795 31
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 790 19 790 30
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 791 18 791 65
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 755 24 755 58
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 864 12 864 26
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 864 30 864 31
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 859 19 859 30
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 860 18 860 65
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 824 24 824 58
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 754 8 754 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
+predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 823 8 823 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
   [%#sledger'3] outcome = (Int64.to_int debit + Int64.to_int credit = 0)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_commit_balances [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 792 8 792 53]
+let rec check_commit_balances [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 861 8 861 53]
   (amount: Int64.t) (return (x: bool)) =
   {[@stop_split] [@expl:check_commit_balances requires] [%#sledger'1] Int64.to_int amount > 0}
   (! bb0
