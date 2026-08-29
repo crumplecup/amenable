@@ -86,5 +86,5 @@ pub use primitives::{
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,
 };
-pub use str::CollectedSequenceMatchesExpected;
+pub use str::{AccessorRecoversTheExpectedValue, CollectedSequenceMatchesExpected};
 pub use sync_atomic::AtomicLoadReflectsTheLastWrite;

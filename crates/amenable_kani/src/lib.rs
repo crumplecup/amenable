@@ -103,16 +103,17 @@ pub use registry::{
 };
 pub use runtime_model::{KaniCurrentThreadObservation, KaniInstantObservation};
 pub use rust_std::{
-    AtomicLoadReflectsTheLastWrite, CheckedProof, CollectedSequenceMatchesExpected,
-    DerefReflectsTheStoredValue, EmptiedContainerReportsEmpty, FallibleOperationReportsFailure,
-    FieldAccessRecoversTheStoredValue, FirstValueIsLessThanTheSecond, FourBytesAreEachAscii,
-    GetterRecoversTheStoredReference, IndexRecoversTheStoredElement,
-    IteratorMatchesReferenceStepByStep, IteratorYieldsAReferenceToTheStoredValue,
-    IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, PeekRevealsTheStoredReference,
-    PopRecoversTheStoredValue, RenderedKindMatchesTheBuildingOperation,
-    SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
-    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern,
-    VecLengthTracksPushesAndPops, WeakUpgradeReturnsNone,
+    AccessorRecoversTheExpectedValue, AtomicLoadReflectsTheLastWrite, CheckedProof,
+    CollectedSequenceMatchesExpected, DerefReflectsTheStoredValue, EmptiedContainerReportsEmpty,
+    FallibleOperationReportsFailure, FieldAccessRecoversTheStoredValue,
+    FirstValueIsLessThanTheSecond, FourBytesAreEachAscii, GetterRecoversTheStoredReference,
+    IndexRecoversTheStoredElement, IteratorMatchesReferenceStepByStep,
+    IteratorYieldsAReferenceToTheStoredValue, IteratorYieldsNoneWhenExhausted,
+    NonZeroGetRoundTrips, PeekRevealsTheStoredReference, PopRecoversTheStoredValue,
+    RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,
+    StrongCountTracksLiveReferences, ThreeBytesAreEachAscii,
+    ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
+    WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{

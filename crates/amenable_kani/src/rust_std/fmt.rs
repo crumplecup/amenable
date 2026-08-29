@@ -20,6 +20,8 @@ use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -58,7 +60,13 @@ amenable_derive::harness! {
             struct Probe;
             impl std::fmt::Display for Probe {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    assert_eq!(f.align(), Some(core::fmt::Alignment::Left), "the spec's alignment reaches the Formatter");
+                    assert!(
+                        AccessorRecoversTheExpectedValue::ensures((
+                            f.align(),
+                            Some(core::fmt::Alignment::Left)
+                        )),
+                        "the spec's alignment reaches the Formatter"
+                    );
                     write!(f, "x")
                 }
             }
@@ -158,7 +166,10 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::Arguments
             )));
-            assert_eq!(rendered.display_token(), Some(atom.display_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.display_token(),
+                Some(atom.display_token())
+            )));
         }
     }
 }
@@ -199,8 +210,14 @@ amenable_derive::harness! {
             struct Probe;
             impl std::fmt::Display for Probe {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    assert_eq!(f.width(), Some(10), "the spec's width reaches the Formatter");
-                    assert_eq!(f.precision(), Some(2), "the spec's precision reaches the Formatter");
+                    assert!(
+                        AccessorRecoversTheExpectedValue::ensures((f.width(), Some(10))),
+                        "the spec's width reaches the Formatter"
+                    );
+                    assert!(
+                        AccessorRecoversTheExpectedValue::ensures((f.precision(), Some(2))),
+                        "the spec's precision reaches the Formatter"
+                    );
                     write!(f, "x")
                 }
             }
@@ -251,9 +268,18 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::DebugStructOneField
             )));
-            assert_eq!(rendered.type_label(), Some(type_label));
-            assert_eq!(rendered.field_label(), Some(field_label));
-            assert_eq!(rendered.value_debug_token(), Some(atom.debug_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.type_label(),
+                Some(type_label)
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.field_label(),
+                Some(field_label)
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.value_debug_token(),
+                Some(atom.debug_token())
+            )));
         }
     }
 }
@@ -295,8 +321,14 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::DebugTupleOneField
             )));
-            assert_eq!(rendered.type_label(), Some(type_label));
-            assert_eq!(rendered.value_debug_token(), Some(atom.debug_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.type_label(),
+                Some(type_label)
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.value_debug_token(),
+                Some(atom.debug_token())
+            )));
         }
     }
 }
@@ -338,8 +370,14 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::DebugListTwoEntries
             )));
-            assert_eq!(rendered.first_debug_token(), Some(first.debug_token()));
-            assert_eq!(rendered.second_debug_token(), Some(second.debug_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.first_debug_token(),
+                Some(first.debug_token())
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.second_debug_token(),
+                Some(second.debug_token())
+            )));
         }
     }
 }
@@ -382,8 +420,14 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::DebugSetTwoEntries
             )));
-            assert_eq!(rendered.first_debug_token(), Some(first.debug_token()));
-            assert_eq!(rendered.second_debug_token(), Some(second.debug_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.first_debug_token(),
+                Some(first.debug_token())
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.second_debug_token(),
+                Some(second.debug_token())
+            )));
         }
     }
 }
@@ -426,8 +470,14 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::DebugMapOneEntry
             )));
-            assert_eq!(rendered.key_debug_label(), Some(key_label));
-            assert_eq!(rendered.value_debug_token(), Some(value.debug_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.key_debug_label(),
+                Some(key_label)
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.value_debug_token(),
+                Some(value.debug_token())
+            )));
         }
     }
 }
@@ -479,7 +529,10 @@ amenable_derive::harness! {
                 rendered.kind(),
                 crate::KaniRenderedKind::Arguments
             )));
-            assert_eq!(rendered.display_token(), Some(atom.display_token()));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                rendered.display_token(),
+                Some(atom.display_token())
+            )));
         }
     }
 }
