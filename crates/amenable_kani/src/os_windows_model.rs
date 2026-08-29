@@ -63,6 +63,8 @@
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::Requires;
 use amenable_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdProvenanceBuilder,
     WindowsHandleOrInvalidRejectsOnlyTheSentinel,
@@ -71,7 +73,11 @@ use amenable_std::{
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::ValueIsBelow;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 /// Modeled raw HANDLE value -- see the module doc for why this is a plain
@@ -278,9 +284,11 @@ amenable_derive::harness! {
                     "the sentinel value is rejected"
                 );
             } else {
-                assert_eq!(
-                    result,
-                    Ok(crate::KaniWindowsHandle::new(value)),
+                assert!(
+                    CollectedSequenceMatchesExpected::ensures((
+                        result,
+                        Ok(crate::KaniWindowsHandle::new(value))
+                    )),
                     "any non-sentinel value converts, preserving itself"
                 );
             }
@@ -366,10 +374,12 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_encode_wide_encodes_a_bmp_char_as_one_code_unit() {
             let c: char = kani::any();
-            kani::assume((c as u32) < 0x10000);
-            assert_eq!(
-                crate::kani_encode_wide_bmp_char(c),
-                c as u32 as u16,
+            kani::assume(ValueIsBelow::requires((c as u32, 0x10000)));
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((
+                    crate::kani_encode_wide_bmp_char(c),
+                    c as u32 as u16
+                )),
                 "a BMP character encodes to one code unit equal to its code point"
             );
         }

@@ -9,10 +9,14 @@
 
 use std::time::{Instant, SystemTime, SystemTimeError};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniInstantObservation, KaniVerifier, KaniWitness};
 
@@ -138,7 +142,10 @@ amenable_derive::harness! {
 
             let later = SystemTime::UNIX_EPOCH + Duration::from_secs(100);
             let elapsed = later.duration_since(SystemTime::UNIX_EPOCH).unwrap();
-            assert_eq!(elapsed, Duration::from_secs(100));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                elapsed,
+                Duration::from_secs(100)
+            )));
         }
     }
 }
@@ -179,7 +186,10 @@ amenable_derive::harness! {
             let earlier = SystemTime::UNIX_EPOCH;
             let later = SystemTime::UNIX_EPOCH + Duration::from_secs(100);
             match earlier.duration_since(later) {
-                Err(err) => assert_eq!(err.duration(), Duration::from_secs(100)),
+                Err(err) => assert!(AccessorRecoversTheExpectedValue::ensures((
+                    err.duration(),
+                    Duration::from_secs(100)
+                ))),
                 Ok(_) => panic!("expected duration_since to fail going backward"),
             }
         }

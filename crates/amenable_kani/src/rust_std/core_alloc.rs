@@ -9,6 +9,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -42,8 +44,14 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_layout_new_reports_the_types_size_and_alignment() {
             let layout = Layout::new::<i32>();
-            assert_eq!(layout.size(), 4, "Layout::new::<i32>() reports i32's size");
-            assert_eq!(layout.align(), 4, "Layout::new::<i32>() reports i32's alignment");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((layout.size(), 4)),
+                "Layout::new::<i32>() reports i32's size"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((layout.align(), 4)),
+                "Layout::new::<i32>() reports i32's alignment"
+            );
         }
     }
 }

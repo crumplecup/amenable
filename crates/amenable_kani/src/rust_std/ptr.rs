@@ -2,11 +2,19 @@
 
 use std::ptr::NonNull;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::OptionIsNoneReportsTrue;
+#[cfg(kani)]
+use crate::OptionIsSomeReportsTrue;
 use crate::rust_std::macros::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<NonNull<i32>> {
@@ -46,16 +54,19 @@ amenable_derive::harness! {
             let mut value: i32 = kani::any();
             let ptr: *mut i32 = &mut value;
             assert!(
-                NonNull::new(ptr).is_some(),
+                OptionIsSomeReportsTrue::ensures(NonNull::new(ptr).is_some()),
                 "a valid pointer is accepted"
             );
             assert!(
-                NonNull::new(std::ptr::null_mut::<i32>()).is_none(),
+                OptionIsNoneReportsTrue::ensures(NonNull::new(std::ptr::null_mut::<i32>()).is_none()),
                 "the null pointer is rejected"
             );
 
             let nn = NonNull::from(&mut value);
-            assert_eq!(nn.as_ptr(), ptr, "NonNull::from preserves the address");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((nn.as_ptr(), ptr)),
+                "NonNull::from preserves the address"
+            );
         }
     }
 }

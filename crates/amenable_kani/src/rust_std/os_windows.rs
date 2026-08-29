@@ -21,6 +21,8 @@ use super::CheckedProof;
 use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -100,7 +102,10 @@ amenable_derive::harness! {
             let file = std::fs::File::create(base.join("data.txt")).unwrap();
 
             let borrowed = file.as_handle();
-            assert_eq!(borrowed.as_raw_handle(), file.as_raw_handle());
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                borrowed.as_raw_handle(),
+                file.as_raw_handle()
+            )));
 
             drop(file);
             std::fs::remove_dir_all(&base).unwrap();
@@ -142,7 +147,10 @@ amenable_derive::harness! {
 
             let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
             let borrowed = listener.as_socket();
-            assert_eq!(borrowed.as_raw_socket(), listener.as_raw_socket());
+            assert!(RustStdStandard::<u64>::ensures((
+                borrowed.as_raw_socket(),
+                listener.as_raw_socket()
+            )));
         }
     }
 }
@@ -188,7 +196,7 @@ amenable_derive::harness! {
 
             let real = unsafe { HandleOrInvalid::from_raw_handle(raw) };
             let converted: Result<OwnedHandle, _> = real.try_into();
-            assert!(converted.is_ok());
+            assert!(FallibleOperationReportsSuccess::ensures(converted.is_ok()));
 
             let sentinel = unsafe { HandleOrInvalid::from_raw_handle(-1isize as RawHandle) };
             let converted_sentinel: Result<OwnedHandle, _> = sentinel.try_into();
@@ -240,7 +248,10 @@ amenable_derive::harness! {
 
             let raw_before = file.as_raw_handle();
             let owned: OwnedHandle = file.into();
-            assert_eq!(owned.as_raw_handle(), raw_before);
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                owned.as_raw_handle(),
+                raw_before
+            )));
 
             drop(owned);
             std::fs::remove_dir_all(&base).unwrap();
@@ -283,7 +294,10 @@ amenable_derive::harness! {
             let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
             let raw_before = listener.as_raw_socket();
             let owned: OwnedSocket = listener.into();
-            assert_eq!(owned.as_raw_socket(), raw_before);
+            assert!(RustStdStandard::<u64>::ensures((
+                owned.as_raw_socket(),
+                raw_before
+            )));
         }
     }
 }

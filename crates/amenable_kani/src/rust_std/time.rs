@@ -2,12 +2,16 @@
 
 use std::time::{Duration, TryFromFloatSecsError};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::Requires;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
 
@@ -52,14 +56,15 @@ amenable_derive::harness! {
             kani::assume(RustStdStandard::<u64>::requires((secs, carry)));
 
             let d = Duration::new(secs, nanos);
-            assert_eq!(
-                d.as_secs(),
-                secs + carry,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((d.as_secs(), secs + carry)),
                 "Duration::new carries a nanos overflow into secs"
             );
-            assert_eq!(
-                d.subsec_nanos(),
-                nanos % 1_000_000_000,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((
+                    d.subsec_nanos(),
+                    nanos % 1_000_000_000
+                )),
                 "Duration::new normalizes nanos to below one second"
             );
         }

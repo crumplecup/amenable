@@ -10,6 +10,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsAReferenceToTheStoredValue;
@@ -41,6 +43,90 @@ bridge_kani_witness!(RustStdStandard<Option<i32>>);
     )
 }
 
+/// A `bool` known to be the `true` `.is_some()` reports when an
+/// `Option` is actually the `Some` variant -- following
+/// `IsContinueVariantReportsTrue`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct OptionIsSomeReportsTrue;
+
+impl KaniWitness for OptionIsSomeReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_option_some_and_none_are_disjoint".to_owned(),
+            VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(OptionIsSomeReportsTrue);
+
+kani_ensures!(
+    OptionIsSomeReportsTrue,
+    "amenable_kani::OptionIsSomeReportsTrue",
+    bool,
+    |is_some| is_some
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::OptionIsSomeReportsTrue",
+        "kani",
+        || <OptionIsSomeReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
+/// The `.is_none()` sibling of [`OptionIsSomeReportsTrue`], same
+/// reasoning.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct OptionIsNoneReportsTrue;
+
+impl KaniWitness for OptionIsNoneReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_option_some_and_none_are_disjoint".to_owned(),
+            VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(OptionIsNoneReportsTrue);
+
+kani_ensures!(
+    OptionIsNoneReportsTrue,
+    "amenable_kani::OptionIsNoneReportsTrue",
+    bool,
+    |is_none| is_none
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::OptionIsNoneReportsTrue",
+        "kani",
+        || <OptionIsNoneReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_OPTION_SOME_AND_NONE_ARE_DISJOINT_SRC, {
         /// `Some` round-trips its value through `unwrap`, and `None`
@@ -49,12 +135,18 @@ amenable_derive::harness! {
         fn verify_option_some_and_none_are_disjoint() {
             let value: i32 = kani::any();
             let some: Option<i32> = Some(value);
-            assert!(some.is_some());
-            assert_eq!(some.unwrap(), value, "Some round-trips its value");
+            assert!(OptionIsSomeReportsTrue::ensures(some.is_some()));
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((some.unwrap(), value)),
+                "Some round-trips its value"
+            );
 
             let none: Option<i32> = None;
-            assert!(none.is_none());
-            assert_eq!(none.unwrap_or(0), 0, "None falls back to the default");
+            assert!(OptionIsNoneReportsTrue::ensures(none.is_none()));
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((none.unwrap_or(0), 0)),
+                "None falls back to the default"
+            );
         }
     }
 }
@@ -340,7 +432,10 @@ amenable_derive::harness! {
                 *first = updated;
                 assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }
-            assert_eq!(opt, Some(updated), "the write through iter_mut is visible");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((opt, Some(updated))),
+                "the write through iter_mut is visible"
+            );
         }
     }
 }

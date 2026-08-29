@@ -10,12 +10,16 @@
 
 use std::collections::{HashMap, HashSet};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<HashMap<i32, i32>> {
     type SupportingEvidence = Self;
@@ -52,7 +56,10 @@ amenable_derive::harness! {
             let key: i32 = kani::any();
             let value: i32 = kani::any();
             let map = crate::KaniHashMap::new(key, value);
-            assert_eq!(map.get(&key), Some(&value), "insert then get recovers the same value");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((map.get(&key), Some(&value))),
+                "insert then get recovers the same value"
+            );
         }
     }
 }
@@ -81,6 +88,13 @@ bridge_kani_witness!(RustStdStandard<HashSet<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<HashSet<i32>>,
+    "amenable_std::rust_std::RustStdStandard<HashSet<i32>>",
+    bool,
+    |contains| contains
+);
+
 amenable_derive::harness! {
     kani, VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC, {
         /// Inserting a value makes the set report it as a member. This
@@ -90,7 +104,10 @@ amenable_derive::harness! {
         fn verify_hash_set_insert_then_contains_reports_membership() {
             let value: i32 = kani::any();
             let set = crate::KaniHashSet::new(value);
-            assert!(set.contains(&value), "insert makes the set report the value as a member");
+            assert!(
+                RustStdStandard::<HashSet<i32>>::ensures(set.contains(&value)),
+                "insert makes the set report the value as a member"
+            );
         }
     }
 }

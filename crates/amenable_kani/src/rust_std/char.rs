@@ -22,14 +22,20 @@ use std::char::{
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
+#[cfg(kani)]
+use amenable_core::Requires;
 use amenable_std::{RustStdStandard, ValidUnicodeScalar};
 
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::ValueIsOutsideInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<CharTryFromError> {
@@ -203,16 +209,15 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_decode_utf16_round_trips_a_bmp_code_unit() {
             let unit: u16 = kani::any();
-            kani::assume(!(0xD800..=0xDFFF).contains(&unit));
+            kani::assume(ValueIsOutsideInclusiveRange::requires((unit, 0xD800, 0xDFFF)));
 
             let mut iter = char::decode_utf16([unit]);
             let decoded = iter
                 .next()
                 .expect("a one-element iterator yields exactly one result")
                 .expect("a non-surrogate BMP code unit always decodes successfully");
-            assert_eq!(
-                decoded as u32,
-                u32::from(unit),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((decoded as u32, u32::from(unit))),
                 "decoding a BMP code unit yields the char with that same scalar value"
             );
         }
@@ -254,9 +259,11 @@ amenable_derive::harness! {
                 .next()
                 .expect("a one-element iterator yields exactly one result");
             let err = result.expect_err("a lone surrogate with no pair must fail to decode");
-            assert_eq!(
-                err.unpaired_surrogate(),
-                lone_surrogate,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((
+                    err.unpaired_surrogate(),
+                    lone_surrogate
+                )),
                 "DecodeUtf16Error reports the exact unpaired code unit"
             );
         }
@@ -301,9 +308,8 @@ amenable_derive::harness! {
                 FallibleOperationReportsFailure::ensures("ab".parse::<char>().is_err()),
                 "a multi-character string fails to parse as char"
             );
-            assert_eq!(
-                "a".parse::<char>(),
-                Ok('a'),
+            assert!(
+                CollectedSequenceMatchesExpected::ensures(("a".parse::<char>(), Ok('a'))),
                 "a single-character string parses as that char"
             );
         }

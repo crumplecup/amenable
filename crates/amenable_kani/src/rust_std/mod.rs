@@ -78,11 +78,14 @@ pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use num::NonZeroGetRoundTrips;
-pub use option_result::{FallibleOperationReportsFailure, FallibleOperationReportsSuccess};
+pub use option_result::{
+    FallibleOperationReportsFailure, FallibleOperationReportsSuccess, OptionIsNoneReportsTrue,
+    OptionIsSomeReportsTrue,
+};
 pub use primitives::{
     DerefReflectsTheStoredValue, EmptinessTracksZeroLength, FieldAccessRecoversTheStoredValue,
     FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsAtLeast,
-    ValueIsWithinInclusiveRange,
+    ValueIsBelow, ValueIsOutsideInclusiveRange, ValueIsWithinInclusiveRange,
 };
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,

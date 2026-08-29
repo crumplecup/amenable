@@ -9,6 +9,10 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -51,9 +55,8 @@ amenable_derive::harness! {
                 DerefReflectsTheStoredValue::ensures((*wrapped, value)),
                 "deref exposes the wrapped value"
             );
-            assert_eq!(
-                ManuallyDrop::into_inner(wrapped),
-                value,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((ManuallyDrop::into_inner(wrapped), value)),
                 "into_inner returns the wrapped value"
             );
         }
@@ -95,9 +98,11 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
 
-            assert_eq!(
-                std::mem::discriminant(&Some(a)),
-                std::mem::discriminant(&Some(b)),
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    std::mem::discriminant(&Some(a)),
+                    std::mem::discriminant(&Some(b))
+                )),
                 "same variant, different payloads, share a discriminant"
             );
             assert_ne!(

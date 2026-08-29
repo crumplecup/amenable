@@ -305,7 +305,7 @@ bridge_kani_witness!(RustStdStandard<std::ops::RangeFull>);
 
 kani_ensures!(
     RustStdStandard<std::ops::RangeFull>,
-    "amenable_std::rust_std::RustStdStandard<RangeFull>",
+    "amenable_std::rust_std::RustStdStandard<std::ops::RangeFull>",
     bool,
     |contains| contains
 );

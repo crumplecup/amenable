@@ -112,15 +112,27 @@ impl KaniCompose for KaniBacktrace {
 // constructors return belongs here, not in an ordinary #[test].
 #[cfg(kani)]
 mod proofs {
+    use amenable_core::Ensures;
+
     use super::{KaniBacktraceStatus, KaniCompose};
+    use crate::CollectedSequenceMatchesExpected;
 
     amenable_derive::harness! {
         kani, VERIFY_KANI_COMPOSE_BACKTRACE_STATUS_DEPTHS_SRC, {
             #[kani::proof]
             fn verify_kani_compose_backtrace_status_depths() {
-                assert_eq!(KaniBacktraceStatus::kani_depth0(), KaniBacktraceStatus::Disabled);
-                assert_eq!(KaniBacktraceStatus::kani_depth1(), KaniBacktraceStatus::Captured);
-                assert_eq!(KaniBacktraceStatus::kani_depth2(), KaniBacktraceStatus::Unsupported);
+                assert!(CollectedSequenceMatchesExpected::ensures((
+                    KaniBacktraceStatus::kani_depth0(),
+                    KaniBacktraceStatus::Disabled,
+                )));
+                assert!(CollectedSequenceMatchesExpected::ensures((
+                    KaniBacktraceStatus::kani_depth1(),
+                    KaniBacktraceStatus::Captured,
+                )));
+                assert!(CollectedSequenceMatchesExpected::ensures((
+                    KaniBacktraceStatus::kani_depth2(),
+                    KaniBacktraceStatus::Unsupported,
+                )));
             }
         }
     }

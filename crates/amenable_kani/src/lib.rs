@@ -109,11 +109,13 @@ pub use rust_std::{
     FieldAccessRecoversTheStoredValue, FirstValueIsLessThanTheSecond, FourBytesAreEachAscii,
     GetterRecoversTheStoredReference, IndexRecoversTheStoredElement,
     IteratorMatchesReferenceStepByStep, IteratorYieldsAReferenceToTheStoredValue,
-    IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, PeekRevealsTheStoredReference,
-    PopRecoversTheStoredValue, RenderedKindMatchesTheBuildingOperation,
-    SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
-    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
-    ValueIsWithinInclusiveRange, VecLengthTracksPushesAndPops, WeakUpgradeReturnsNone,
+    IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, OptionIsNoneReportsTrue,
+    OptionIsSomeReportsTrue, PeekRevealsTheStoredReference, PopRecoversTheStoredValue,
+    RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,
+    StrongCountTracksLiveReferences, ThreeBytesAreEachAscii,
+    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast, ValueIsBelow,
+    ValueIsOutsideInclusiveRange, ValueIsWithinInclusiveRange, VecLengthTracksPushesAndPops,
+    WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{

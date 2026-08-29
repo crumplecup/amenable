@@ -22,6 +22,8 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -61,9 +63,11 @@ amenable_derive::harness! {
             let client = listener.connect(1);
 
             let server = listener.incoming_next();
-            assert_eq!(
-                server.peer_addr(),
-                client.local_addr(),
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    server.peer_addr(),
+                    client.local_addr()
+                )),
                 "incoming should yield the already-queued client's connection"
             );
         }
@@ -108,9 +112,11 @@ amenable_derive::harness! {
 
             listener.client_shutdown_write(client);
             assert!(
-                listener
-                    .client_write(client, b"more data".to_vec())
-                    .is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    listener
+                        .client_write(client, b"more data".to_vec())
+                        .is_err()
+                ),
                 "a write after shutdown(Write) should fail"
             );
         }
@@ -154,7 +160,10 @@ amenable_derive::harness! {
             let _client = listener.connect(1);
 
             let (_server_side, peer_addr) = listener.accept();
-            assert_eq!(peer_addr.ip(), addr.ip());
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                peer_addr.ip(),
+                addr.ip()
+            )));
         }
     }
 }

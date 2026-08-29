@@ -7,10 +7,14 @@
 
 use std::backtrace::{Backtrace, BacktraceStatus};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -48,7 +52,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_backtrace_force_capture_always_actually_captures() {
             let backtrace = crate::KaniBacktrace::force_capture();
-            assert_eq!(backtrace.status(), crate::KaniBacktraceStatus::Captured);
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                backtrace.status(),
+                crate::KaniBacktraceStatus::Captured
+            )));
         }
     }
 }
@@ -85,7 +92,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_backtrace_status_reports_captured_after_force_capture() {
             let status = crate::KaniBacktrace::force_capture().status();
-            assert_eq!(status, crate::KaniBacktraceStatus::Captured);
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                status,
+                crate::KaniBacktraceStatus::Captured
+            )));
         }
     }
 }

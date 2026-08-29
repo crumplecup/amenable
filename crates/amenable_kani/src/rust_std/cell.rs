@@ -14,6 +14,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
@@ -94,9 +96,8 @@ amenable_derive::harness! {
                 <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((taken, replacement)),
                 "take returns the stored value"
             );
-            assert_eq!(
-                cell.get(),
-                i32::default(),
+            assert!(
+                <RustStdStandard<Cell<i32>> as Ensures<crate::KaniVerifier>>::ensures((cell.get(), i32::default())),
                 "take leaves the default value behind"
             );
         }
@@ -510,13 +511,15 @@ amenable_derive::harness! {
         fn verify_unsafe_cell_get_mut_and_into_inner_round_trip() {
             let initial: i32 = kani::any();
             let mut cell = UnsafeCell::new(initial);
-            assert_eq!(*cell.get_mut(), initial, "get_mut exposes the stored value");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*cell.get_mut(), initial)),
+                "get_mut exposes the stored value"
+            );
 
             let updated: i32 = kani::any();
             *cell.get_mut() = updated;
-            assert_eq!(
-                cell.into_inner(),
-                updated,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((cell.into_inner(), updated)),
                 "into_inner returns the current value"
             );
         }

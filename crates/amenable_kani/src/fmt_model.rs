@@ -328,15 +328,18 @@ impl KaniCompose for KaniFormatLabel {
 // constructors return belongs here, not in an ordinary #[test].
 #[cfg(kani)]
 mod proofs {
+    use amenable_core::Ensures;
+
     use super::{KaniCompose, KaniFormatAtom};
+    use crate::AccessorRecoversTheExpectedValue;
 
     amenable_derive::harness! {
         kani, VERIFY_KANI_COMPOSE_FORMAT_ATOM_DEPTH2_SRC, {
             #[kani::proof]
             fn verify_kani_compose_format_atom_depth2() {
                 let atom = KaniFormatAtom::kani_depth2();
-                assert_eq!(atom.display_token(), 'a');
-                assert_eq!(atom.debug_token(), 'A');
+                assert!(AccessorRecoversTheExpectedValue::ensures((atom.display_token(), 'a')));
+                assert!(AccessorRecoversTheExpectedValue::ensures((atom.debug_token(), 'A')));
             }
         }
     }

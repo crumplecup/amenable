@@ -15,6 +15,8 @@ use amenable_core::Ensures;
 #[cfg(kani)]
 use amenable_core::Requires;
 use amenable_core::{Establish, Evidence, ProofToken};
+#[cfg(kani)]
+use amenable_std::ValidUnicodeScalar;
 use amenable_std::{AsciiByte, RustStdStandard};
 
 use super::CheckedProof;
@@ -62,6 +64,13 @@ kani_requires!(
     RustStdStandard<u64>,
     "amenable_std::rust_std::RustStdStandard<u64>",
     (u64, u64),
+    |(a, b)| a.checked_add(b).is_some()
+);
+
+kani_requires!(
+    RustStdStandard<i64>,
+    "amenable_std::rust_std::RustStdStandard<i64>",
+    (i64, i64),
     |(a, b)| a.checked_add(b).is_some()
 );
 
@@ -162,7 +171,7 @@ amenable_derive::harness! {
             let u = c as u32;
 
             assert!(
-                u <= 0xD7FF || (0xE000..=0x10FFFF).contains(&u),
+                <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures(u),
                 "char is a valid Unicode scalar value"
             );
 
@@ -487,7 +496,7 @@ amenable_derive::harness! {
                 <RustStdStandard<str> as Ensures<crate::KaniVerifier>>::ensures((s.len(), 1)),
                 "a single ASCII char is exactly one UTF-8 byte"
             );
-            assert_eq!(s.as_bytes()[0], byte);
+            assert!(IndexRecoversTheStoredElement::ensures((s.as_bytes()[0], byte)));
         }
     }
 }
@@ -704,6 +713,92 @@ impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier>
     )
 }
 
+/// The negation of [`ValueIsWithinInclusiveRange`]: a `(value, low,
+/// high)` triple known to satisfy the precondition a proof over a
+/// symbolic value assumes when it must fall *outside* an excluded
+/// inclusive range -- e.g. a UTF-16 code unit that isn't a surrogate.
+/// Generic and hand-written for the same reason.
+///
+/// Independently hand-written as
+/// `kani::assume(!(0xD800..=0xDFFF).contains(&unit))` at 1 real site
+/// (`rust_std::char`'s non-surrogate UTF-16 code unit bound).
+pub struct ValueIsOutsideInclusiveRange<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ValueIsOutsideInclusiveRange<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ValueIsOutsideInclusiveRange<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ValueIsOutsideInclusiveRange<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_decode_utf16_round_trips_a_bmp_code_unit".to_owned(),
+            crate::rust_std::char::VERIFY_DECODE_UTF16_ROUND_TRIPS_A_BMP_CODE_UNIT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsOutsideInclusiveRange<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier>
+    for ValueIsOutsideInclusiveRange<T>
+{
+    type Input = (T, T, T);
+    type Bound = bool;
+
+    fn requires((value, low, high): (T, T, T)) -> bool {
+        value < low || value > high
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsOutsideInclusiveRange",
+        "kani",
+        "requires",
+        || stringify!(value < low || value > high),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ValueIsOutsideInclusiveRange",
+        "kani",
+        || <ValueIsOutsideInclusiveRange<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 /// A `(value, minimum)` pair known to satisfy the precondition every
 /// proof over a symbolic value with a one-sided lower bound assumes:
 /// the value is at least the given minimum.
@@ -815,6 +910,90 @@ impl<T: PartialOrd> amenable_core::Ensures<crate::KaniVerifier> for ValueIsAtLea
     )
 }
 
+/// A `(value, bound)` pair known to satisfy the precondition every
+/// proof over a symbolic value with a one-sided upper bound assumes:
+/// the value is strictly below the given bound. The mirror image of
+/// `ValueIsAtLeast`, generic and hand-written for the same reason.
+///
+/// Independently hand-written as `kani::assume((c as u32) < 0x10000)`
+/// at 1 real site (`os_windows_model`'s BMP-character bound for
+/// `EncodeWide`).
+pub struct ValueIsBelow<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ValueIsBelow<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ValueIsBelow<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ValueIsBelow<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
+            crate::os_windows_model::VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CHAR_AS_ONE_CODE_UNIT_SRC
+                .to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsBelow<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier> for ValueIsBelow<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn requires((value, bound): (T, T)) -> bool {
+        value < bound
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsBelow",
+        "kani",
+        "requires",
+        || stringify!(value < bound),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ValueIsBelow",
+        "kani",
+        || <ValueIsBelow<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -887,7 +1066,10 @@ amenable_derive::harness! {
             }
             let f: fn(i32) -> i32 = increment;
             let value: i32 = kani::any();
-            assert_eq!(f(value), increment(value), "the fn pointer calls the function it was assigned from");
+            assert!(
+                RustStdStandard::<i32>::ensures((f(value), increment(value))),
+                "the fn pointer calls the function it was assigned from"
+            );
         }
     }
 }

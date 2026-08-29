@@ -18,6 +18,8 @@ use super::CheckedProof;
 use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
 
@@ -75,16 +77,31 @@ amenable_derive::harness! {
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let bytes = [byte, 0];
             let cstr = CStr::from_bytes_with_nul(&bytes).unwrap();
-            assert_eq!(
-                cstr.to_bytes(),
-                &[byte],
+            // Decomposed into a length check plus per-index byte checks
+            // rather than a whole-slice equality comparison: coercing a
+            // `&[u8]` and a fixed array to the same slice type for a
+            // generic `(T, T)` equality forces CBMC into a
+            // symbolic-length memcmp, timing out where the original
+            // `PartialEq<[u8; N]>`-specialized `assert_eq!` did not --
+            // the documented "symbolic-length memcmp" CBMC failure
+            // pattern (see `alloc_ffi.rs`'s identical decomposition).
+            assert!(RustStdStandard::<usize>::ensures((cstr.to_bytes().len(), 1)));
+            assert!(
+                IndexRecoversTheStoredElement::ensures((cstr.to_bytes()[0], byte)),
                 "to_bytes excludes the terminating nul"
             );
-            assert_eq!(
-                cstr.to_bytes_with_nul(),
-                &bytes,
+            assert!(RustStdStandard::<usize>::ensures((
+                cstr.to_bytes_with_nul().len(),
+                2
+            )));
+            assert!(
+                IndexRecoversTheStoredElement::ensures((cstr.to_bytes_with_nul()[0], byte)),
                 "the retained representation includes the original terminator"
             );
+            assert!(IndexRecoversTheStoredElement::ensures((
+                cstr.to_bytes_with_nul()[1],
+                0u8
+            )));
         }
     }
 }
@@ -125,13 +142,17 @@ amenable_derive::harness! {
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let with_nul = [byte, 0, byte];
             assert!(
-                CStr::from_bytes_until_nul(&with_nul).is_ok(),
+                FallibleOperationReportsSuccess::ensures(
+                    CStr::from_bytes_until_nul(&with_nul).is_ok()
+                ),
                 "a nul byte anywhere in the input is accepted"
             );
 
             let without_nul = [byte, byte, byte];
             assert!(
-                CStr::from_bytes_until_nul(&without_nul).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    CStr::from_bytes_until_nul(&without_nul).is_err()
+                ),
                 "no nul byte at all is rejected"
             );
         }

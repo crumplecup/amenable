@@ -14,6 +14,8 @@
 
 #[cfg(kani)]
 use amenable_core::Ensures;
+#[cfg(kani)]
+use amenable_core::Requires;
 use amenable_core::{Establish, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::{Standard, calculation};
 use amenable_std::RustStdStandard;
@@ -274,11 +276,14 @@ amenable_derive::harness! {
             let a = Debit { value: kani::any() };
             let b = Credit { value: kani::any() };
 
-            kani::assume(a.value.checked_add(b.value).is_some());
+            kani::assume(RustStdStandard::<i64>::requires((a.value, b.value)));
 
             let sum = add_impl(a.clone(), b.clone());
 
-            assert_eq!(sum.value, a.value + b.value);
+            assert!(FieldAccessRecoversTheStoredValue::ensures((
+                sum.value,
+                a.value + b.value
+            )));
         }
     }
 }

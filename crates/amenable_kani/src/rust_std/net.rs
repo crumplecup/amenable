@@ -13,6 +13,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
@@ -50,9 +52,8 @@ amenable_derive::harness! {
             let c: u8 = kani::any();
             let d: u8 = kani::any();
             let addr = Ipv4Addr::new(a, b, c, d);
-            assert_eq!(
-                addr.octets(),
-                [a, b, c, d],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((addr.octets(), [a, b, c, d])),
                 "Ipv4Addr::octets round-trips its constructor arguments"
             );
         }
@@ -97,9 +98,11 @@ amenable_derive::harness! {
             let g: u16 = kani::any();
             let h: u16 = kani::any();
             let addr = Ipv6Addr::new(a, b, c, d, e, f, g, h);
-            assert_eq!(
-                addr.segments(),
-                [a, b, c, d, e, f, g, h],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((
+                    addr.segments(),
+                    [a, b, c, d, e, f, g, h]
+                )),
                 "Ipv6Addr::segments round-trips its constructor arguments"
             );
         }

@@ -60,8 +60,9 @@ use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 #[cfg(kani)]
 use crate::{
-    FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
-    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
+    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
+    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
+    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
 };
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
@@ -253,9 +254,8 @@ amenable_derive::harness! {
             kani::assume(<AsciiByte as Requires<crate::KaniVerifier>>::requires(byte));
             let s = (byte as char).to_string();
             let mut it = s.encode_utf16();
-            assert_eq!(
-                it.next(),
-                Some(byte as u16),
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((it.next(), Some(byte as u16))),
                 "an ASCII character's UTF-16 code unit equals its byte value"
             );
         }
@@ -657,7 +657,10 @@ amenable_derive::harness! {
             let mut chunks = bytes.utf8_chunks();
             let first = chunks.next().unwrap();
             assert!(AccessorRecoversTheExpectedValue::ensures((first.valid(), "ab")));
-            assert!(first.invalid().is_empty(), "wholly valid input has no invalid bytes");
+            assert!(
+                EmptiedContainerReportsEmpty::ensures(first.invalid().is_empty()),
+                "wholly valid input has no invalid bytes"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(chunks.next()),
                 "wholly valid input is exactly one chunk"

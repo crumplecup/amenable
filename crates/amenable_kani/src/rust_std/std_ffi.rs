@@ -9,6 +9,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -159,7 +161,10 @@ amenable_derive::harness! {
         fn verify_os_string_push_appends_to_the_existing_content() {
             let mut os_string = OsString::from("hello");
             os_string.push(", world");
-            assert_eq!(os_string.as_os_str(), OsStr::new("hello, world"));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                os_string.as_os_str(),
+                OsStr::new("hello, world")
+            )));
         }
     }
 }
@@ -196,7 +201,13 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_os_str_display_renders_valid_utf8_content_unchanged() {
             let os_str = OsStr::new("hello");
-            assert_eq!(os_str.display().to_string(), "hello", "display renders valid UTF-8 content unchanged");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((
+                    os_str.display().to_string(),
+                    "hello".to_owned()
+                )),
+                "display renders valid UTF-8 content unchanged"
+            );
         }
     }
 }
