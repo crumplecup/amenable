@@ -17,9 +17,9 @@ amenable_kani::rust_std::alloc_borrow::verify_cow_borrowed_and_owned_agree_on_th
 amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through,1787759681,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_drain_yields_every_pushed_element_once,1787759705,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_into_iter_yields_every_pushed_element_once,1787759727,passed
-amenable_kani::rust_std::alloc_collections::verify_binary_heap_iter_yields_every_pushed_element_once,1787759745,passed
-amenable_kani::rust_std::alloc_collections::verify_binary_heap_peek_mut_exposes_the_maximum,1787759758,passed
-amenable_kani::rust_std::alloc_collections::verify_binary_heap_pop_yields_the_maximum_first,1787759774,passed
+amenable_kani::rust_std::alloc_collections::verify_binary_heap_iter_yields_every_pushed_element_once,1788023732,passed
+amenable_kani::rust_std::alloc_collections::verify_binary_heap_peek_mut_exposes_the_maximum,1788023751,passed
+amenable_kani::rust_std::alloc_collections::verify_binary_heap_pop_yields_the_maximum_first,1788023706,passed
 amenable_kani::rust_std::alloc_collections::verify_btree_map_iterates_in_key_order,1787759784,passed
 amenable_kani::rust_std::alloc_collections::verify_btree_set_iterates_in_sorted_order,1787759793,passed
 amenable_kani::rust_std::alloc_collections::verify_linked_list_extract_if_partitions_by_the_predicate,1788023237,passed
@@ -48,7 +48,7 @@ amenable_kani::rust_std::alloc_vec::verify_splice_replaces_a_range_and_yields_wh
 amenable_kani::rust_std::alloc_vec::verify_vec_drain_removes_and_yields_in_order,1787760129,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_extract_if_partitions_by_the_predicate,1787760143,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_into_iter_yields_owned_values_in_order,1787760158,passed
-amenable_kani::rust_std::alloc_vec::verify_vec_push_pop_round_trips,1787760170,passed
+amenable_kani::rust_std::alloc_vec::verify_vec_push_pop_round_trips,1788023784,passed
 amenable_kani::rust_std::any::verify_type_id_is_reflexive_and_distinguishes_distinct_types,1787760180,passed
 amenable_kani::rust_std::array::verify_array_into_iter_yields_elements_in_order,1787760189,passed
 amenable_kani::rust_std::array::verify_try_from_slice_rejects_a_length_mismatch,1787760199,passed
@@ -144,7 +144,7 @@ amenable_kani::rust_std::iter::verify_map_applies_its_closure_to_each_item,17877
 amenable_kani::rust_std::iter::verify_map_while_maps_items_while_the_closure_returns_some,1787761175,passed
 amenable_kani::rust_std::iter::verify_once_with_calls_its_closure_exactly_once,1787761184,passed
 amenable_kani::rust_std::iter::verify_once_yields_exactly_one_value,1787761192,passed
-amenable_kani::rust_std::iter::verify_peekable_peek_does_not_consume,1787761201,passed
+amenable_kani::rust_std::iter::verify_peekable_peek_does_not_consume,1788023766,passed
 amenable_kani::rust_std::iter::verify_repeat_n_yields_the_value_exactly_n_times,1787761210,passed
 amenable_kani::rust_std::iter::verify_repeat_with_calls_its_closure_once_per_item,1787761219,passed
 amenable_kani::rust_std::iter::verify_repeat_yields_the_same_value_forever,1787761229,passed

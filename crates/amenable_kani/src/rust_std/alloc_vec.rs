@@ -106,6 +106,91 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+/// An `(actual, expected)` pair of `.pop()` results known to agree: a
+/// container's pop accessor recovers exactly the owned value known to
+/// be there, transferring ownership out -- the owned-value counterpart
+/// to `PeekRevealsTheStoredReference` (`.peek()`, borrows without
+/// consuming), same reasoning for keeping the two separate despite an
+/// identical `Ensures` impl body.
+///
+/// Independently hand-written as `assert_eq!(container.pop(),
+/// Some(value), ...)` at 3 real sites spanning `Vec::pop()` and
+/// `BinaryHeap::pop()`.
+pub struct PopRecoversTheStoredValue<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for PopRecoversTheStoredValue<T> {
+    type Provenance = RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for PopRecoversTheStoredValue<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for PopRecoversTheStoredValue<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_vec_push_pop_round_trips".to_owned(),
+            VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for PopRecoversTheStoredValue<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier> for PopRecoversTheStoredValue<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::PopRecoversTheStoredValue",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PopRecoversTheStoredValue",
+        "kani",
+        || <PopRecoversTheStoredValue<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC, {
         /// `push` appends and is indexable, and `pop` removes and
@@ -125,12 +210,18 @@ amenable_derive::harness! {
                 IndexRecoversTheStoredElement::ensures((v[0], value)),
                 "the pushed value is indexable"
             );
-            assert_eq!(v.pop(), Some(value), "pop returns the last pushed value");
+            assert!(
+                PopRecoversTheStoredValue::ensures((v.pop(), Some(value))),
+                "pop returns the last pushed value"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(v.is_empty()),
                 "pop leaves the Vec empty"
             );
-            assert_eq!(v.pop(), None, "popping an exhausted Vec returns None");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(v.pop()),
+                "popping an exhausted Vec returns None"
+            );
 
             struct DropWitness {
                 drop_count: std::rc::Rc<Cell<u32>>,

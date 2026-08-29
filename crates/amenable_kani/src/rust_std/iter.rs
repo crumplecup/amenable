@@ -45,6 +45,8 @@ use crate::AtomicLoadReflectsTheLastWrite;
 #[cfg(kani)]
 use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::PeekRevealsTheStoredReference;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
@@ -992,7 +994,10 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut p = (a..a + 2).peekable();
-            assert_eq!(p.peek(), Some(&a), "peek previews the next item");
+            assert!(
+                PeekRevealsTheStoredReference::ensures((p.peek(), Some(&a))),
+                "peek previews the next item"
+            );
             assert!(
                 RustStdStandard::<Peekable<Range<i32>>>::ensures((p.next(), Some(a))),
                 "next still returns the peeked item"

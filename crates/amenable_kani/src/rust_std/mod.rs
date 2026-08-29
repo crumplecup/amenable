@@ -69,10 +69,10 @@ mod time;
 
 pub use alloc_collections::{
     EmptiedContainerReportsEmpty, FirstValueIsLessThanTheSecond,
-    IteratorYieldsAReferenceToTheStoredValue,
+    IteratorYieldsAReferenceToTheStoredValue, PeekRevealsTheStoredReference,
 };
 pub use alloc_rc::{StrongCountTracksLiveReferences, WeakUpgradeReturnsNone};
-pub use alloc_vec::VecLengthTracksPushesAndPops;
+pub use alloc_vec::{PopRecoversTheStoredValue, VecLengthTracksPushesAndPops};
 pub use cell::GetterRecoversTheStoredReference;
 pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};

@@ -29,6 +29,8 @@ use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::PopRecoversTheStoredValue;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures, kani_requires};
 
 /// A `(first, second)` pair known to satisfy `first < second`.
@@ -312,8 +314,14 @@ amenable_derive::harness! {
             let mut heap = BinaryHeap::new();
             heap.push(a);
             heap.push(b);
-            assert_eq!(heap.pop(), Some(a.max(b)), "pop returns the greatest element first");
-            assert_eq!(heap.pop(), Some(a.min(b)), "the second pop returns the remaining element");
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a.max(b)))),
+                "pop returns the greatest element first"
+            );
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a.min(b)))),
+                "the second pop returns the remaining element"
+            );
 
             struct OrderedDropWitness {
                 id: i32,
@@ -882,8 +890,14 @@ amenable_derive::harness! {
                 )),
                 "iteration leaves every heap element in place"
             );
-            assert_eq!(heap.pop(), Some(a.max(b)), "iteration preserves the heap maximum");
-            assert_eq!(heap.pop(), Some(a.min(b)), "iteration preserves the remaining element");
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a.max(b)))),
+                "iteration preserves the heap maximum"
+            );
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a.min(b)))),
+                "iteration preserves the remaining element"
+            );
         }
     }
 }
@@ -912,6 +926,95 @@ bridge_kani_witness!(RustStdStandard<std::collections::binary_heap::PeekMut<'sta
     )
 }
 
+/// An `(actual, expected)` pair of `.peek()` results known to agree: a
+/// container's peek accessor reveals a reference to the exact value
+/// known to be there, without consuming it -- distinct from
+/// `IteratorYieldsAReferenceToTheStoredValue` (`.next()`, consumes)
+/// and `GetterRecoversTheStoredReference` (`OnceCell`/`OnceLock`'s
+/// `.get()`) even though the `Ensures` impl body and the
+/// lifetime-generic design are identical, same reasoning as keeping
+/// those two separate from each other.
+///
+/// Independently hand-written as `assert_eq!(container.peek(),
+/// Some(&value), ...)` at 3 real sites spanning `BinaryHeap::peek()`
+/// and `Peekable::peek()`.
+pub struct PeekRevealsTheStoredReference<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for PeekRevealsTheStoredReference<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for PeekRevealsTheStoredReference<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for PeekRevealsTheStoredReference<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
+            VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for PeekRevealsTheStoredReference<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for PeekRevealsTheStoredReference<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::PeekRevealsTheStoredReference",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PeekRevealsTheStoredReference",
+        "kani",
+        || <PeekRevealsTheStoredReference<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC, {
         /// `.peek_mut()` derefs to the greatest element. Leaving it
@@ -934,7 +1037,10 @@ amenable_derive::harness! {
                     "peek_mut derefs to the greatest element"
                 );
             }
-            assert_eq!(heap.peek(), Some(&b), "the maximum is still on top afterward");
+            assert!(
+                PeekRevealsTheStoredReference::ensures((heap.peek(), Some(&b))),
+                "the maximum is still on top afterward"
+            );
             {
                 let mut peek = heap.peek_mut().unwrap();
                 *peek = a;
@@ -943,9 +1049,18 @@ amenable_derive::harness! {
                     "peek_mut writes through to the guarded maximum"
                 );
             }
-            assert_eq!(heap.peek(), Some(&a), "releasing a modified guard re-establishes the heap maximum");
-            assert_eq!(heap.pop(), Some(a), "the re-heapified first value is available");
-            assert_eq!(heap.pop(), Some(a), "the re-heapified remaining value is available");
+            assert!(
+                PeekRevealsTheStoredReference::ensures((heap.peek(), Some(&a))),
+                "releasing a modified guard re-establishes the heap maximum"
+            );
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a))),
+                "the re-heapified first value is available"
+            );
+            assert!(
+                PopRecoversTheStoredValue::ensures((heap.pop(), Some(a))),
+                "the re-heapified remaining value is available"
+            );
         }
     }
 }
