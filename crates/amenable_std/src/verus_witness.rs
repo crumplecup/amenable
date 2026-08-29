@@ -734,6 +734,15 @@ bridge_verus_witness!(RustStdStandard<Result<i32, i32>>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<Result<i32, i32>>,
+    "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+    [
+        "result_wraps_the_given_ok_value",
+        "result_wraps_the_given_err_value"
+    ]
+);
+
 const VERIFY_WRAPPING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/wrapping_carrier.rs");
 
@@ -2574,7 +2583,21 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefCell<i32>>);
 amenable_derive::verus_ensures_predicate!(
     RustStdStandard<std::cell::RefCell<i32>>,
     "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
-    "write_stores_new_value"
+    [
+        "write_stores_new_value",
+        "try_borrow_result_matches",
+        "try_borrow_mut_result_matches",
+        "release_shared_decrements_borrow_state",
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::cell::RefCell<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::cell::RefCell<i32>>",
+    [
+        "try_borrow_headroom_holds",
+        "release_shared_requires_a_live_shared_borrow"
+    ]
 );
 
 const VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
@@ -2750,6 +2773,21 @@ bridge_verus_witness!(RustStdStandard<std::rc::Weak<i32>>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::rc::Weak<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
+    [
+        "weak_upgrade_result_matches",
+        "drop_strong_decrements_strong_count"
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::rc::Weak<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::rc::Weak<i32>>",
+    "drop_strong_requires_a_live_strong_reference"
+);
 
 impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
     type SupportingEvidence = Self;
@@ -9985,6 +10023,13 @@ bridge_verus_witness!(RustStdStandard<EncodeWide<'static>>);
 }
 
 #[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<EncodeWide<'static>>,
+    "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+    "encode_wide_next_matches"
+);
+
+#[cfg(windows)]
 const VERIFY_BORROWED_HANDLE_AXIOM_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/os_windows_carrier.rs");
 
@@ -10013,6 +10058,13 @@ bridge_verus_witness!(RustStdStandard<BorrowedHandle<'static>>);
         || { <RustStdStandard<BorrowedHandle<'static>> as VerusWitness>::proof().to_string() },
     )
 }
+
+#[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<BorrowedHandle<'static>>,
+    "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+    "as_raw_handle_addr_matches"
+);
 
 #[cfg(windows)]
 const VERIFY_BORROWED_SOCKET_AXIOM_SRC: &str =
@@ -10045,6 +10097,13 @@ bridge_verus_witness!(RustStdStandard<BorrowedSocket<'static>>);
 }
 
 #[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<BorrowedSocket<'static>>,
+    "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+    "as_raw_socket_matches"
+);
+
+#[cfg(windows)]
 const VERIFY_HANDLE_OR_INVALID_AXIOM_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/os_windows_carrier.rs");
 
@@ -10073,6 +10132,13 @@ bridge_verus_witness!(RustStdStandard<HandleOrInvalid>);
         || { <RustStdStandard<HandleOrInvalid> as VerusWitness>::proof().to_string() },
     )
 }
+
+#[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<HandleOrInvalid>,
+    "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+    "handle_or_invalid_try_from_matches"
+);
 
 #[cfg(windows)]
 const VERIFY_OWNED_HANDLE_AXIOM_SRC: &str =
@@ -10105,6 +10171,13 @@ bridge_verus_witness!(RustStdStandard<OwnedHandle>);
 }
 
 #[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<OwnedHandle>,
+    "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+    "owned_as_raw_handle_addr_matches"
+);
+
+#[cfg(windows)]
 const VERIFY_OWNED_SOCKET_AXIOM_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/os_windows_carrier.rs");
 
@@ -10134,3 +10207,10 @@ bridge_verus_witness!(RustStdStandard<OwnedSocket>);
         || { <RustStdStandard<OwnedSocket> as VerusWitness>::proof().to_string() },
     )
 }
+
+#[cfg(windows)]
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<OwnedSocket>,
+    "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+    "owned_as_raw_socket_matches"
+);

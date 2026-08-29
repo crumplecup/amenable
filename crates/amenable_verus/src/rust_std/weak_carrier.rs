@@ -41,6 +41,24 @@ pub struct VerusWeakModel {
     pub strong_count: u32,
 }
 
+/// `upgrade`'s whole postcondition: succeeds, exposing the stored value,
+/// while a strong reference is alive; fails once the strong count has
+/// reached zero.
+pub open spec fn weak_upgrade_result_matches(strong_count: u32, value: i32, result: Option<i32>) -> bool {
+    (strong_count > 0 ==> result == Some(value)) && (strong_count == 0 ==> result is None)
+}
+
+/// `drop_strong`'s precondition: at least one strong reference is live
+/// to drop.
+pub open spec fn drop_strong_requires_a_live_strong_reference(strong_count: u32) -> bool {
+    strong_count > 0
+}
+
+/// `drop_strong`'s strong-count postcondition.
+pub open spec fn drop_strong_decrements_strong_count(old_count: u32, new_count: u32) -> bool {
+    new_count == old_count - 1
+}
+
 impl VerusWeakModel {
     /// A fresh model starts with one live strong reference.
     pub fn new(value: i32) -> (result: Self)
@@ -55,8 +73,7 @@ impl VerusWeakModel {
     /// alive; fails once the strong count has reached zero.
     pub fn upgrade(&self) -> (result: Option<i32>)
         ensures
-            self.strong_count > 0 ==> result == Some(self.value),
-            self.strong_count == 0 ==> result is None,
+            weak_upgrade_result_matches(self.strong_count, self.value, result),
     {
         if self.strong_count > 0 {
             Some(self.value)
@@ -68,9 +85,9 @@ impl VerusWeakModel {
     /// Drops the single strong reference this model tracks.
     pub fn drop_strong(&mut self)
         requires
-            old(self).strong_count > 0,
+            drop_strong_requires_a_live_strong_reference(old(self).strong_count),
         ensures
-            final(self).strong_count == old(self).strong_count - 1,
+            drop_strong_decrements_strong_count(old(self).strong_count, final(self).strong_count),
             value_unchanged(old(self).value as int, final(self).value as int),
     {
         self.strong_count -= 1;

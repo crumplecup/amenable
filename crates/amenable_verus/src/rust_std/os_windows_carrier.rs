@@ -110,32 +110,44 @@ pub struct ExEncodeWide<'a>(EncodeWide<'a>);
 /// `int_error_kind_carrier.rs`'s `parse_int_error_kind_spec` pattern.
 pub uninterp spec fn borrowed_handle_addr_spec(h: BorrowedHandle) -> usize;
 
+pub open spec fn as_raw_handle_addr_matches(result: RawHandle, h: BorrowedHandle) -> bool {
+    result.addr() == borrowed_handle_addr_spec(h)
+}
+
 pub assume_specification<'a> [<BorrowedHandle<'a> as AsRawHandle>::as_raw_handle] (h: &BorrowedHandle<'a>) -> (result: RawHandle)
     ensures
-        result.addr() == borrowed_handle_addr_spec(*h),
+        as_raw_handle_addr_matches(result, *h),
 ;
 
 /// Same shape as `borrowed_handle_addr_spec`, for `OwnedHandle`'s
 /// private raw value.
 pub uninterp spec fn owned_handle_addr_spec(h: OwnedHandle) -> usize;
 
+pub open spec fn owned_as_raw_handle_addr_matches(result: RawHandle, h: OwnedHandle) -> bool {
+    result.addr() == owned_handle_addr_spec(h)
+}
+
 pub assume_specification [<OwnedHandle as AsRawHandle>::as_raw_handle] (h: &OwnedHandle) -> (result: RawHandle)
     ensures
-        result.addr() == owned_handle_addr_spec(*h),
+        owned_as_raw_handle_addr_matches(result, *h),
 ;
 
 /// Same shape, for `HandleOrInvalid`'s private raw value.
 pub uninterp spec fn handle_or_invalid_addr_spec(h: HandleOrInvalid) -> usize;
 
-/// `TryFrom<HandleOrInvalid> for OwnedHandle` succeeds and preserves the
-/// wrapped value exactly unless it equals the sentinel
-/// `INVALID_HANDLE_VALUE` (`-1` as `HANDLE`, whose exposed address is
-/// `usize::MAX` under strict provenance) — `handle.rs`'s own
+/// `TryFrom<HandleOrInvalid> for OwnedHandle`'s whole postcondition:
+/// succeeds and preserves the wrapped value exactly unless it equals the
+/// sentinel `INVALID_HANDLE_VALUE` (`-1` as `HANDLE`, whose exposed
+/// address is `usize::MAX` under strict provenance) — `handle.rs`'s own
 /// `is_valid()`: `self.0 != sys::c::INVALID_HANDLE_VALUE`.
+pub open spec fn handle_or_invalid_try_from_matches(handle_or_invalid: HandleOrInvalid, result: Result<OwnedHandle, <OwnedHandle as core::convert::TryFrom<HandleOrInvalid>>::Error>) -> bool {
+    (handle_or_invalid_addr_spec(handle_or_invalid) == usize::MAX <==> result is Err)
+        && (result is Ok ==> owned_handle_addr_spec(result->Ok_0) == handle_or_invalid_addr_spec(handle_or_invalid))
+}
+
 pub assume_specification [<OwnedHandle as core::convert::TryFrom<HandleOrInvalid>>::try_from] (handle_or_invalid: HandleOrInvalid) -> (result: Result<OwnedHandle, <OwnedHandle as core::convert::TryFrom<HandleOrInvalid>>::Error>)
     ensures
-        handle_or_invalid_addr_spec(handle_or_invalid) == usize::MAX <==> result is Err,
-        result is Ok ==> owned_handle_addr_spec(result->Ok_0) == handle_or_invalid_addr_spec(handle_or_invalid),
+        handle_or_invalid_try_from_matches(handle_or_invalid, result),
 ;
 
 /// The raw socket value a `BorrowedSocket` carries — opaque
@@ -144,17 +156,25 @@ pub assume_specification [<OwnedHandle as core::convert::TryFrom<HandleOrInvalid
 /// runs), so no pointer-address indirection is needed here.
 pub uninterp spec fn borrowed_socket_value_spec(s: BorrowedSocket) -> RawSocket;
 
+pub open spec fn as_raw_socket_matches(result: RawSocket, s: BorrowedSocket) -> bool {
+    result == borrowed_socket_value_spec(s)
+}
+
 pub assume_specification<'a> [<BorrowedSocket<'a> as AsRawSocket>::as_raw_socket] (s: &BorrowedSocket<'a>) -> (result: RawSocket)
     ensures
-        result == borrowed_socket_value_spec(*s),
+        as_raw_socket_matches(result, *s),
 ;
 
 /// Same shape, for `OwnedSocket`'s private raw value.
 pub uninterp spec fn owned_socket_value_spec(s: OwnedSocket) -> RawSocket;
 
+pub open spec fn owned_as_raw_socket_matches(result: RawSocket, s: OwnedSocket) -> bool {
+    result == owned_socket_value_spec(s)
+}
+
 pub assume_specification [<OwnedSocket as AsRawSocket>::as_raw_socket] (s: &OwnedSocket) -> (result: RawSocket)
     ensures
-        result == owned_socket_value_spec(*s),
+        owned_as_raw_socket_matches(result, *s),
 ;
 
 /// The code units an `EncodeWide` iterator has left to yield — opaque
@@ -164,13 +184,17 @@ pub assume_specification [<OwnedSocket as AsRawSocket>::as_raw_socket] (s: &Owne
 /// relates to the `OsStr` it was built from. See the module doc comment.
 pub uninterp spec fn encode_wide_view(iter: EncodeWide) -> Seq<u16>;
 
+/// `EncodeWide::next`'s whole postcondition: an exhausted view yields
+/// `None` and leaves the view unchanged; a non-empty view yields its
+/// first code unit and advances past it.
+pub open spec fn encode_wide_next_matches(before: Seq<u16>, after: Seq<u16>, result: Option<u16>) -> bool {
+    (before.len() == 0 ==> result is None && after == before)
+        && (before.len() > 0 ==> result == Some(before[0]) && after == before.subrange(1, before.len() as int))
+}
+
 pub assume_specification<'a> [<EncodeWide<'a> as Iterator>::next] (iter: &mut EncodeWide<'a>) -> (result: Option<u16>)
     ensures
-        encode_wide_view(*old(iter)).len() == 0 ==> result is None
-            && encode_wide_view(*iter) == encode_wide_view(*old(iter)),
-        encode_wide_view(*old(iter)).len() > 0 ==> result == Some(encode_wide_view(*old(iter))[0])
-            && encode_wide_view(*iter)
-                == encode_wide_view(*old(iter)).subrange(1, encode_wide_view(*old(iter)).len() as int),
+        encode_wide_next_matches(encode_wide_view(*old(iter)), encode_wide_view(*iter), result),
 ;
 
 } // verus!

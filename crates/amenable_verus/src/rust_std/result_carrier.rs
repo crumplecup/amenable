@@ -12,6 +12,18 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// The precondition `verify_result_unwrap_returns_the_ok_value` assumes:
+/// `res` is exactly `Ok(value)`.
+pub open spec fn result_wraps_the_given_ok_value(res: Result<i32, i32>, value: i32) -> bool {
+    res == Result::<i32, i32>::Ok(value)
+}
+
+/// The precondition `verify_result_unwrap_err_returns_the_err_value`
+/// assumes: `res` is exactly `Err(err_value)`.
+pub open spec fn result_wraps_the_given_err_value(res: Result<i32, i32>, err_value: i32) -> bool {
+    res == Result::<i32, i32>::Err(err_value)
+}
+
 /// `unwrap` returns exactly the value an `Ok` wraps — the same claim the
 /// Kani/Creusot harnesses check. Same "parameter, not inline literal"
 /// shape as `option_carrier.rs`'s proofs, for the same reason: avoids a
@@ -19,7 +31,7 @@ verus! {
 /// equally real, more general claim.
 pub fn verify_result_unwrap_returns_the_ok_value(res: Result<i32, i32>, _value: i32) -> (result: i32)
     requires
-        res == Result::<i32, i32>::Ok(_value),
+        result_wraps_the_given_ok_value(res, _value),
     ensures
         observed_value_matches_input(result as int, _value as int),
 {
@@ -37,7 +49,7 @@ pub fn verify_result_unwrap_returns_the_ok_value(res: Result<i32, i32>, _value: 
 /// doesn't set.
 pub fn verify_result_unwrap_err_returns_the_err_value(res: Result<i32, i32>, _err_value: i32) -> (result: i32)
     requires
-        res == Result::<i32, i32>::Err(_err_value),
+        result_wraps_the_given_err_value(res, _err_value),
     ensures
         observed_value_matches_input(result as int, _err_value as int),
 {

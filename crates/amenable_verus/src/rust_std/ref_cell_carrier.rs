@@ -44,6 +44,39 @@ pub struct VerusRefCellModel {
     pub borrow_state: i32,
 }
 
+/// `try_borrow`'s precondition: the live shared-borrow count has room
+/// for one more without overflowing `i32`.
+pub open spec fn try_borrow_headroom_holds(borrow_state: i32) -> bool {
+    borrow_state < i32::MAX
+}
+
+/// `try_borrow`'s whole postcondition: succeeds and increments the
+/// shared-borrow count unless an exclusive borrow is live, in which case
+/// it fails and leaves the state untouched.
+pub open spec fn try_borrow_result_matches(old_state: i32, result: bool, new_state: i32) -> bool {
+    (old_state >= 0 ==> result && new_state == old_state + 1)
+        && (old_state < 0 ==> !result && new_state == old_state)
+}
+
+/// `try_borrow_mut`'s whole postcondition: succeeds and enters the
+/// exclusive state only while completely unborrowed, otherwise fails and
+/// leaves the state untouched.
+pub open spec fn try_borrow_mut_result_matches(old_state: i32, result: bool, new_state: i32) -> bool {
+    (old_state == 0 ==> result && new_state == -1)
+        && (old_state != 0 ==> !result && new_state == old_state)
+}
+
+/// `release_shared`'s precondition: at least one shared borrow is live
+/// to release.
+pub open spec fn release_shared_requires_a_live_shared_borrow(borrow_state: i32) -> bool {
+    borrow_state > 0
+}
+
+/// `release_shared`'s borrow-count postcondition.
+pub open spec fn release_shared_decrements_borrow_state(old_state: i32, new_state: i32) -> bool {
+    new_state == old_state - 1
+}
+
 impl VerusRefCellModel {
     pub fn new(initial: i32) -> (result: Self)
         ensures
@@ -59,13 +92,9 @@ impl VerusRefCellModel {
     /// explicit rather than modeling unbounded borrow counts.
     pub fn try_borrow(&mut self) -> (result: bool)
         requires
-            old(self).borrow_state < i32::MAX,
+            try_borrow_headroom_holds(old(self).borrow_state),
         ensures
-            old(self).borrow_state >= 0 ==> result && final(self).borrow_state == old(
-                self,
-            ).borrow_state + 1,
-            old(self).borrow_state < 0 ==> !result && final(self).borrow_state
-                == old(self).borrow_state,
+            try_borrow_result_matches(old(self).borrow_state, result, final(self).borrow_state),
             value_unchanged(old(self).value as int, final(self).value as int),
     {
         if self.borrow_state >= 0 {
@@ -80,9 +109,7 @@ impl VerusRefCellModel {
     /// unborrowed.
     pub fn try_borrow_mut(&mut self) -> (result: bool)
         ensures
-            old(self).borrow_state == 0 ==> result && final(self).borrow_state == -1,
-            old(self).borrow_state != 0 ==> !result && final(self).borrow_state
-                == old(self).borrow_state,
+            try_borrow_mut_result_matches(old(self).borrow_state, result, final(self).borrow_state),
             value_unchanged(old(self).value as int, final(self).value as int),
     {
         if self.borrow_state == 0 {
@@ -96,9 +123,9 @@ impl VerusRefCellModel {
     /// Releases one live shared borrow.
     pub fn release_shared(&mut self)
         requires
-            old(self).borrow_state > 0,
+            release_shared_requires_a_live_shared_borrow(old(self).borrow_state),
         ensures
-            final(self).borrow_state == old(self).borrow_state - 1,
+            release_shared_decrements_borrow_state(old(self).borrow_state, final(self).borrow_state),
             value_unchanged(old(self).value as int, final(self).value as int),
     {
         self.borrow_state -= 1;
