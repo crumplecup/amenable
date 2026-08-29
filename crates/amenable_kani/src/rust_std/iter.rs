@@ -1101,6 +1101,13 @@ bridge_kani_witness!(RustStdStandard<Skip<Range<i32>>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<Skip<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Skip<Range<i32>>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SKIP_DISCARDS_THE_FIRST_N_ITEMS_SRC, {
         /// `Skip(n)` discards exactly the first `n` items.
@@ -1109,7 +1116,10 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 2)));
             let mut s = (a..a + 3).skip(2);
-            assert_eq!(s.next(), Some(a + 2), "skip discards exactly the first n items");
+            assert!(
+                RustStdStandard::<Skip<Range<i32>>>::ensures((s.next(), Some(a + 2))),
+                "skip discards exactly the first n items"
+            );
         }
     }
 }
@@ -1138,6 +1148,13 @@ bridge_kani_witness!(RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SKIP_WHILE_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC, {
         /// `SkipWhile` discards items until the predicate first fails,
@@ -1150,9 +1167,11 @@ amenable_derive::harness! {
             }
             let a: i32 = 4;
             let mut s = (a..a + 2).skip_while(is_even);
-            assert_eq!(
-                s.next(),
-                Some(a + 1),
+            assert!(
+                RustStdStandard::<SkipWhile<Range<i32>, fn(&i32) -> bool>>::ensures((
+                    s.next(),
+                    Some(a + 1)
+                )),
                 "skip_while discards items until the predicate first fails"
             );
         }

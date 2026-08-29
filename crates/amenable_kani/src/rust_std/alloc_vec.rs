@@ -358,6 +358,13 @@ bridge_kani_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::vec::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::IntoIter<i32>>",
+    (Option<i32>, Option<i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_VEC_INTO_ITER_YIELDS_OWNED_VALUES_IN_ORDER_SRC, {
         /// `.into_iter()` consumes the Vec, yielding its owned elements
@@ -366,8 +373,14 @@ amenable_derive::harness! {
         fn verify_vec_into_iter_yields_owned_values_in_order() {
             let expected = <Vec<i32> as crate::KaniCompose>::kani_depth2();
             let mut it = expected.clone().into_iter();
-            assert_eq!(it.next(), Some(expected[0]));
-            assert_eq!(it.next(), Some(expected[1]));
+            assert!(RustStdStandard::<std::vec::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(expected[0])
+            )));
+            assert!(RustStdStandard::<std::vec::IntoIter<i32>>::ensures((
+                it.next(),
+                Some(expected[1])
+            )));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
 
             struct DropWitness {

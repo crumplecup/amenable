@@ -24,6 +24,10 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
 use crate::IteratorYieldsAReferenceToTheStoredValue;
@@ -2008,15 +2012,15 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             let mut data = [a, b, 0, 0];
             assert!(
-                data.get_disjoint_mut([0, 2]).is_ok(),
+                FallibleOperationReportsSuccess::ensures(data.get_disjoint_mut([0, 2]).is_ok()),
                 "disjoint, in-bounds indices succeed"
             );
             assert!(
-                data.get_disjoint_mut([0, 0]).is_err(),
+                FallibleOperationReportsFailure::ensures(data.get_disjoint_mut([0, 0]).is_err()),
                 "overlapping indices are rejected"
             );
             assert!(
-                data.get_disjoint_mut([0, 10]).is_err(),
+                FallibleOperationReportsFailure::ensures(data.get_disjoint_mut([0, 10]).is_err()),
                 "out-of-bounds indices are rejected"
             );
         }

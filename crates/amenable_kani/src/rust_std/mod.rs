@@ -78,7 +78,7 @@ pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
 pub use num::NonZeroGetRoundTrips;
-pub use option_result::FallibleOperationReportsFailure;
+pub use option_result::{FallibleOperationReportsFailure, FallibleOperationReportsSuccess};
 pub use primitives::{
     DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, FourBytesAreEachAscii,
     IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsWithinInclusiveRange,

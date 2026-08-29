@@ -10,9 +10,9 @@ amenable_kani::gaap_ledger::verify_gaap_rollback_always_succeeds,1787929502,pass
 amenable_kani::gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer,1787929228,passed
 amenable_kani::gaap_ledger::verify_gaap_validate_rejects_the_same_account,1787929316,passed
 amenable_kani::os_windows_model::verify_encode_wide_encodes_a_bmp_char_as_one_code_unit,1787759633,passed
-amenable_kani::os_windows_model::verify_windows_handle_as_raw_handle_recovers_the_wrapped_value,1787759643,passed
+amenable_kani::os_windows_model::verify_windows_handle_as_raw_handle_recovers_the_wrapped_value,1788026790,passed
 amenable_kani::os_windows_model::verify_windows_handle_or_invalid_rejects_only_the_sentinel,1787759652,passed
-amenable_kani::os_windows_model::verify_windows_socket_as_raw_socket_recovers_the_wrapped_value,1787759661,passed
+amenable_kani::os_windows_model::verify_windows_socket_as_raw_socket_recovers_the_wrapped_value,1788026801,passed
 amenable_kani::rust_std::alloc_borrow::verify_cow_borrowed_and_owned_agree_on_their_value,1787759671,passed
 amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through,1787759681,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_drain_yields_every_pushed_element_once,1787759705,passed
@@ -47,7 +47,7 @@ amenable_kani::rust_std::alloc_sync::verify_arc_weak_upgrade_fails_once_the_stro
 amenable_kani::rust_std::alloc_vec::verify_splice_replaces_a_range_and_yields_what_it_removed,1787760110,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_drain_removes_and_yields_in_order,1787760129,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_extract_if_partitions_by_the_predicate,1787760143,passed
-amenable_kani::rust_std::alloc_vec::verify_vec_into_iter_yields_owned_values_in_order,1787760158,passed
+amenable_kani::rust_std::alloc_vec::verify_vec_into_iter_yields_owned_values_in_order,1788026898,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_push_pop_round_trips,1788023784,passed
 amenable_kani::rust_std::any::verify_type_id_is_reflexive_and_distinguishes_distinct_types,1787760180,passed
 amenable_kani::rust_std::array::verify_array_into_iter_yields_elements_in_order,1787760189,passed
@@ -57,7 +57,7 @@ amenable_kani::rust_std::backtrace::verify_backtrace_force_capture_always_actual
 amenable_kani::rust_std::backtrace::verify_backtrace_status_reports_captured_after_force_capture,1787760234,passed
 amenable_kani::rust_std::cell::verify_cell_get_set_replace_take_round_trip,1787760243,passed
 amenable_kani::rust_std::cell::verify_lazy_cell_caches_its_initializer_result,1787760252,passed
-amenable_kani::rust_std::cell::verify_once_cell_initializes_exactly_once,1787760262,passed
+amenable_kani::rust_std::cell::verify_once_cell_initializes_exactly_once,1788026813,passed
 amenable_kani::rust_std::cell::verify_ref_cell_dynamic_borrow_rules,1788025812,passed
 amenable_kani::rust_std::cell::verify_ref_derefs_to_the_borrowed_value,1787760282,passed
 amenable_kani::rust_std::cell::verify_ref_mut_derefs_and_writes_through_to_the_cell,1788025824,passed
@@ -150,8 +150,8 @@ amenable_kani::rust_std::iter::verify_repeat_with_calls_its_closure_once_per_ite
 amenable_kani::rust_std::iter::verify_repeat_yields_the_same_value_forever,1787761229,passed
 amenable_kani::rust_std::iter::verify_rev_reverses_iteration_order,1787761238,passed
 amenable_kani::rust_std::iter::verify_scan_threads_state_through_its_closure,1787761248,passed
-amenable_kani::rust_std::iter::verify_skip_discards_the_first_n_items,1787761257,passed
-amenable_kani::rust_std::iter::verify_skip_while_discards_items_while_the_predicate_holds,1787761266,passed
+amenable_kani::rust_std::iter::verify_skip_discards_the_first_n_items,1788026869,passed
+amenable_kani::rust_std::iter::verify_skip_while_discards_items_while_the_predicate_holds,1788026881,passed
 amenable_kani::rust_std::iter::verify_step_by_yields_every_nth_item,1787761276,passed
 amenable_kani::rust_std::iter::verify_successors_generates_from_the_previous_item,1787761285,passed
 amenable_kani::rust_std::iter::verify_take_while_yields_items_while_the_predicate_holds,1787761294,passed
@@ -199,7 +199,7 @@ amenable_kani::rust_std::option_result::verify_option_some_and_none_are_disjoint
 amenable_kani::rust_std::option_result::verify_result_into_iter_yields_the_ok_value_only,1787761677,passed
 amenable_kani::rust_std::option_result::verify_result_iter_mut_writes_through_to_the_result,1787761686,passed
 amenable_kani::rust_std::option_result::verify_result_iter_yields_a_reference_to_the_ok_value,1787761695,passed
-amenable_kani::rust_std::option_result::verify_result_ok_and_err_are_disjoint,1787761706,passed
+amenable_kani::rust_std::option_result::verify_result_ok_and_err_are_disjoint,1788026858,passed
 amenable_kani::rust_std::os_unix::verify_borrowed_fd_reports_the_same_raw_value_as_the_owner,1787761722,passed
 amenable_kani::rust_std::os_unix::verify_owned_fd_preserves_the_raw_value_across_conversion,1787761731,passed
 amenable_kani::rust_std::panic::verify_assert_unwind_safe_derefs_transparently,1787761739,passed
@@ -209,7 +209,7 @@ amenable_kani::rust_std::path::verify_component_distinguishes_root_from_normal_s
 amenable_kani::rust_std::path::verify_components_yields_root_then_named_segments_in_order,1788023213,passed
 amenable_kani::rust_std::path::verify_display_renders_a_valid_utf8_path_verbatim,1787761799,passed
 amenable_kani::rust_std::path::verify_iter_yields_the_named_segments,1787761812,passed
-amenable_kani::rust_std::path::verify_path_buf_push_pop_and_join_build_the_expected_path,1787761835,passed
+amenable_kani::rust_std::path::verify_path_buf_push_pop_and_join_build_the_expected_path,1788026778,passed
 amenable_kani::rust_std::path::verify_path_derives_extension_file_name_and_parent,1787761851,passed
 amenable_kani::rust_std::path::verify_prefix_component_pairs_raw_text_with_parsed_prefix,1787761860,passed
 amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,1787761870,passed
@@ -244,7 +244,7 @@ amenable_kani::rust_std::slice::verify_chunks_exact_mut_leaves_the_remainder_unt
 amenable_kani::rust_std::slice::verify_chunks_mut_writes_through_every_chunk,1787762161,passed
 amenable_kani::rust_std::slice::verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk,1787762170,passed
 amenable_kani::rust_std::slice::verify_escape_ascii_leaves_printable_bytes_unescaped,1788024941,passed
-amenable_kani::rust_std::slice::verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds,1787762191,passed
+amenable_kani::rust_std::slice::verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds,1788026845,passed
 amenable_kani::rust_std::slice::verify_iter_mut_yields_mutable_references_that_write_through,1787762199,passed
 amenable_kani::rust_std::slice::verify_iter_yields_shared_references_in_order,1787762208,passed
 amenable_kani::rust_std::slice::verify_rchunks_exact_discards_a_short_remainder_at_the_front,1787762217,passed
@@ -323,7 +323,7 @@ amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_o
 amenable_kani::rust_std::sync_lock::verify_lazy_lock_caches_its_initializer_result,1787763032,passed
 amenable_kani::rust_std::sync_lock::verify_mutex_excludes_a_second_lock_while_held,1787763041,passed
 amenable_kani::rust_std::sync_lock::verify_mutex_guard_writes_through,1787763055,passed
-amenable_kani::rust_std::sync_lock::verify_once_lock_initializes_exactly_once,1787763071,passed
+amenable_kani::rust_std::sync_lock::verify_once_lock_initializes_exactly_once,1788026831,passed
 amenable_kani::rust_std::sync_lock::verify_once_runs_its_closure_exactly_once,1787763087,passed
 amenable_kani::rust_std::sync_lock::verify_once_state_reports_not_poisoned_on_a_clean_run,1787763102,passed
 amenable_kani::rust_std::sync_lock::verify_poison_error_still_recovers_the_guards_value,1787763111,passed

@@ -8,6 +8,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IteratorYieldsAReferenceToTheStoredValue;
@@ -111,6 +113,48 @@ kani_ensures!(
     )
 }
 
+/// The positive counterpart to [`FallibleOperationReportsFailure`]:
+/// a `bool` known to be the `true` a fallible operation's own success
+/// check reports when it actually succeeded.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct FallibleOperationReportsSuccess;
+
+impl KaniWitness for FallibleOperationReportsSuccess {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_result_ok_and_err_are_disjoint".to_owned(),
+            VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(FallibleOperationReportsSuccess);
+
+kani_ensures!(
+    FallibleOperationReportsSuccess,
+    "amenable_kani::FallibleOperationReportsSuccess",
+    bool,
+    |is_ok| is_ok
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::FallibleOperationReportsSuccess",
+        "kani",
+        || <FallibleOperationReportsSuccess as KaniWitness>::proof().to_string(),
+    )
+}
+
 impl KaniWitness for RustStdStandard<Result<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
@@ -142,13 +186,19 @@ amenable_derive::harness! {
         fn verify_result_ok_and_err_are_disjoint() {
             let value: i32 = kani::any();
             let ok: Result<i32, i32> = Ok(value);
-            assert!(ok.is_ok());
-            assert_eq!(ok.unwrap(), value, "Ok round-trips its value");
+            assert!(FallibleOperationReportsSuccess::ensures(ok.is_ok()));
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((ok.unwrap(), value)),
+                "Ok round-trips its value"
+            );
 
             let err_value: i32 = kani::any();
             let err: Result<i32, i32> = Err(err_value);
             assert!(FallibleOperationReportsFailure::ensures(err.is_err()));
-            assert_eq!(err.unwrap_err(), err_value, "Err round-trips its value");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((err.unwrap_err(), err_value)),
+                "Err round-trips its value"
+            );
         }
     }
 }

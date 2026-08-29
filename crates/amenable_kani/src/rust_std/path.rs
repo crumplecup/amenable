@@ -368,6 +368,58 @@ bridge_kani_witness!(RustStdStandard<PathBuf>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<PathBuf>,
+    "amenable_std::rust_std::RustStdStandard<PathBuf>",
+    (PathBuf, PathBuf),
+    |(actual, expected)| actual == expected
+);
+
+/// A `bool` known to be the `true` `PathBuf::pop()` reports when it
+/// actually removed the last component -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim, but a distinct claim from it: this is about the
+/// pop *operation's own outcome*, not the container's emptiness
+/// afterward.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct PopRemovedASegment;
+
+impl KaniWitness for PopRemovedASegment {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_path_buf_push_pop_and_join_build_the_expected_path".to_owned(),
+            VERIFY_PATH_BUF_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(PopRemovedASegment);
+
+kani_ensures!(
+    PopRemovedASegment,
+    "amenable_kani::PopRemovedASegment",
+    bool,
+    |removed| removed
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::PopRemovedASegment",
+        "kani",
+        || <PopRemovedASegment as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_PATH_BUF_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC, {
         /// `.push()` appends a segment, `.pop()` removes the last one, and
@@ -377,13 +429,25 @@ amenable_derive::harness! {
             let mut built = PathBuf::from("/a");
             built.push("b");
             built.push("c.txt");
-            assert_eq!(built.as_path(), Path::new("/a/b/c.txt"));
+            assert!(RustStdStandard::<PathBuf>::ensures((
+                built.clone(),
+                PathBuf::from("/a/b/c.txt")
+            )));
 
-            assert!(built.pop(), "pop removes the last pushed segment");
-            assert_eq!(built.as_path(), Path::new("/a/b"));
+            assert!(
+                PopRemovedASegment::ensures(built.pop()),
+                "pop removes the last pushed segment"
+            );
+            assert!(RustStdStandard::<PathBuf>::ensures((
+                built.clone(),
+                PathBuf::from("/a/b")
+            )));
 
             let joined = Path::new("/a").join("b").join("c.txt");
-            assert_eq!(joined, PathBuf::from("/a/b/c.txt"));
+            assert!(RustStdStandard::<PathBuf>::ensures((
+                joined,
+                PathBuf::from("/a/b/c.txt")
+            )));
         }
     }
 }

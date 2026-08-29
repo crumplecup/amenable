@@ -25,6 +25,8 @@ use crate::AtomicLoadReflectsTheLastWrite;
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::GetterRecoversTheStoredReference;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,
@@ -421,7 +423,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_once_lock_initializes_exactly_once() {
             let cell: OnceLock<i32> = OnceLock::new();
-            assert!(cell.get().is_none());
+            assert!(IteratorYieldsNoneWhenExhausted::ensures(cell.get()));
 
             let value: i32 = kani::any();
             assert!(cell.set(value).is_ok(), "the first set succeeds");

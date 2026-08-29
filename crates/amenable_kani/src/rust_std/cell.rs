@@ -15,6 +15,8 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
+use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -442,7 +444,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_once_cell_initializes_exactly_once() {
             let cell: OnceCell<i32> = OnceCell::new();
-            assert!(cell.get().is_none(), "a fresh OnceCell has no value");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(cell.get()),
+                "a fresh OnceCell has no value"
+            );
 
             let value: i32 = kani::any();
             assert!(cell.set(value).is_ok(), "the first set succeeds");

@@ -69,6 +69,8 @@ use amenable_std::{
 };
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -184,7 +186,10 @@ amenable_derive::harness! {
         fn verify_windows_handle_as_raw_handle_recovers_the_wrapped_value() {
             let value: isize = kani::any();
             let handle = crate::KaniWindowsHandle::new(value);
-            assert_eq!(handle.as_raw_handle(), value, "as_raw_handle recovers the wrapped value");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((handle.as_raw_handle(), value)),
+                "as_raw_handle recovers the wrapped value"
+            );
         }
     }
 }
@@ -309,7 +314,10 @@ amenable_derive::harness! {
         fn verify_windows_socket_as_raw_socket_recovers_the_wrapped_value() {
             let value: u64 = kani::any();
             let socket = crate::KaniWindowsSocket::new(value);
-            assert_eq!(socket.as_raw_socket(), value, "as_raw_socket recovers the wrapped value");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((socket.as_raw_socket(), value)),
+                "as_raw_socket recovers the wrapped value"
+            );
         }
     }
 }
