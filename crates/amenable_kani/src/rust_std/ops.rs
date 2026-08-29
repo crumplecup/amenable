@@ -8,6 +8,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -34,6 +36,13 @@ bridge_kani_witness!(RustStdStandard<std::ops::Range<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::ops::Range<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::ops::Range<i32>>",
+    (bool, bool),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_CONTAINS_MATCHES_BOUNDS_SRC, {
         /// `Range::contains` and `Range::is_empty` are both defined in
@@ -47,14 +56,15 @@ amenable_derive::harness! {
             let x: i32 = kani::any();
             let r = start..end;
 
-            assert_eq!(
-                r.contains(&x),
-                x >= start && x < end,
+            assert!(
+                RustStdStandard::<std::ops::Range<i32>>::ensures((
+                    r.contains(&x),
+                    x >= start && x < end
+                )),
                 "Range::contains matches its half-open bounds"
             );
-            assert_eq!(
-                r.is_empty(),
-                !(start < end),
+            assert!(
+                RustStdStandard::<std::ops::Range<i32>>::ensures((r.is_empty(), !(start < end))),
                 "Range::is_empty holds exactly when start is not less than end"
             );
         }
@@ -84,6 +94,13 @@ bridge_kani_witness!(RustStdStandard<std::ops::RangeFrom<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::ops::RangeFrom<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::ops::RangeFrom<i32>>",
+    (bool, bool),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_FROM_CONTAINS_MATCHES_BOUND_SRC, {
         /// `RangeFrom` is unbounded above, so `contains` reduces to its
@@ -94,9 +111,8 @@ amenable_derive::harness! {
             let x: i32 = kani::any();
             let r = start..;
 
-            assert_eq!(
-                r.contains(&x),
-                x >= start,
+            assert!(
+                RustStdStandard::<std::ops::RangeFrom<i32>>::ensures((r.contains(&x), x >= start)),
                 "RangeFrom::contains matches its lower bound"
             );
         }
@@ -126,6 +142,13 @@ bridge_kani_witness!(RustStdStandard<RangeTo<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<RangeTo<i32>>,
+    "amenable_std::rust_std::RustStdStandard<RangeTo<i32>>",
+    (bool, bool),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_TO_CONTAINS_MATCHES_BOUND_SRC, {
         /// `RangeTo` is unbounded below, so `contains` reduces to its
@@ -136,9 +159,8 @@ amenable_derive::harness! {
             let x: i32 = kani::any();
             let r = ..end;
 
-            assert_eq!(
-                r.contains(&x),
-                x < end,
+            assert!(
+                RustStdStandard::<RangeTo<i32>>::ensures((r.contains(&x), x < end)),
                 "RangeTo::contains matches its exclusive upper bound"
             );
         }
@@ -168,6 +190,13 @@ bridge_kani_witness!(RustStdStandard<std::ops::RangeToInclusive<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::ops::RangeToInclusive<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::ops::RangeToInclusive<i32>>",
+    (bool, bool),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_TO_INCLUSIVE_CONTAINS_MATCHES_BOUND_SRC, {
         /// `RangeToInclusive` is unbounded below, so `contains` reduces to
@@ -178,9 +207,11 @@ amenable_derive::harness! {
             let x: i32 = kani::any();
             let r = ..=end;
 
-            assert_eq!(
-                r.contains(&x),
-                x <= end,
+            assert!(
+                RustStdStandard::<std::ops::RangeToInclusive<i32>>::ensures((
+                    r.contains(&x),
+                    x <= end
+                )),
                 "RangeToInclusive::contains matches its inclusive upper bound"
             );
         }
@@ -210,6 +241,13 @@ bridge_kani_witness!(RustStdStandard<std::ops::RangeInclusive<i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::ops::RangeInclusive<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::ops::RangeInclusive<i32>>",
+    (bool, bool),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_INCLUSIVE_CONTAINS_AND_EMPTINESS_SRC, {
         /// `RangeInclusive::contains` matches its closed bounds. Its
@@ -224,14 +262,18 @@ amenable_derive::harness! {
             let x: i32 = kani::any();
             let r = start..=end;
 
-            assert_eq!(
-                r.contains(&x),
-                x >= start && x <= end,
+            assert!(
+                RustStdStandard::<std::ops::RangeInclusive<i32>>::ensures((
+                    r.contains(&x),
+                    x >= start && x <= end
+                )),
                 "RangeInclusive::contains matches its closed bounds"
             );
-            assert_eq!(
-                r.is_empty(),
-                !(start <= end),
+            assert!(
+                RustStdStandard::<std::ops::RangeInclusive<i32>>::ensures((
+                    r.is_empty(),
+                    !(start <= end)
+                )),
                 "a freshly constructed RangeInclusive is empty iff start > end"
             );
         }
@@ -261,6 +303,13 @@ bridge_kani_witness!(RustStdStandard<std::ops::RangeFull>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::ops::RangeFull>,
+    "amenable_std::rust_std::RustStdStandard<RangeFull>",
+    bool,
+    |contains| contains
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RANGE_FULL_CONTAINS_EVERYTHING_SRC, {
         /// `RangeFull` carries no fields but still has real behavior:
@@ -269,7 +318,10 @@ amenable_derive::harness! {
         fn verify_range_full_contains_everything() {
             let x: i32 = kani::any();
             assert!(
-                std::ops::RangeBounds::contains(&(..), &x),
+                RustStdStandard::<std::ops::RangeFull>::ensures(std::ops::RangeBounds::contains(
+                    &(..),
+                    &x
+                )),
                 "RangeFull contains every value"
             );
         }
@@ -306,6 +358,49 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+/// A `bool` known to be the `true` a `matches!(bound, Bound::Unbounded)`
+/// check reports when the bound really is `Unbounded`, carrying no
+/// endpoint -- following `EmptiedContainerReportsEmpty`'s established
+/// shape for a raw boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct BoundHasNoEndpoint;
+
+impl KaniWitness for BoundHasNoEndpoint {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_bound_round_trips_its_endpoint".to_owned(),
+            VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(BoundHasNoEndpoint);
+
+kani_ensures!(
+    BoundHasNoEndpoint,
+    "amenable_kani::BoundHasNoEndpoint",
+    bool,
+    |is_unbounded| is_unbounded
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::BoundHasNoEndpoint",
+        "kani",
+        || <BoundHasNoEndpoint as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BOUND_ROUND_TRIPS_ITS_ENDPOINT_SRC, {
         /// `Bound` has exactly three inhabitants, two of which carry an
@@ -340,7 +435,7 @@ amenable_derive::harness! {
 
             let unbounded: Bound<i32> = Bound::Unbounded;
             assert!(
-                matches!(unbounded, Bound::Unbounded),
+                BoundHasNoEndpoint::ensures(matches!(unbounded, Bound::Unbounded)),
                 "Unbounded carries no endpoint"
             );
         }
@@ -371,6 +466,90 @@ bridge_kani_witness!(RustStdStandard<ControlFlow<i32, i32>>);
     )
 }
 
+/// A `bool` known to be the `true` `ControlFlow::is_continue()` reports
+/// when the flow is actually the `Continue` variant -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct IsContinueVariantReportsTrue;
+
+impl KaniWitness for IsContinueVariantReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_control_flow_continue_and_break_are_disjoint".to_owned(),
+            VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(IsContinueVariantReportsTrue);
+
+kani_ensures!(
+    IsContinueVariantReportsTrue,
+    "amenable_kani::IsContinueVariantReportsTrue",
+    bool,
+    |is_continue| is_continue
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IsContinueVariantReportsTrue",
+        "kani",
+        || <IsContinueVariantReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
+/// The `.is_break()` sibling of [`IsContinueVariantReportsTrue`], same
+/// reasoning.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct IsBreakVariantReportsTrue;
+
+impl KaniWitness for IsBreakVariantReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_control_flow_continue_and_break_are_disjoint".to_owned(),
+            VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(IsBreakVariantReportsTrue);
+
+kani_ensures!(
+    IsBreakVariantReportsTrue,
+    "amenable_kani::IsBreakVariantReportsTrue",
+    bool,
+    |is_break| is_break
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IsBreakVariantReportsTrue",
+        "kani",
+        || <IsBreakVariantReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_CONTROL_FLOW_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC, {
         /// `Continue` and `Break` are mutually exclusive, and each
@@ -381,20 +560,40 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
 
             let flow: ControlFlow<i32, i32> = ControlFlow::Continue(c);
-            assert!(flow.is_continue(), "Continue reports is_continue");
-            assert!(!flow.is_break(), "Continue reports !is_break");
-            assert_eq!(
-                flow.continue_value(),
-                Some(c),
+            assert!(
+                IsContinueVariantReportsTrue::ensures(flow.is_continue()),
+                "Continue reports is_continue"
+            );
+            assert!(
+                !IsBreakVariantReportsTrue::ensures(flow.is_break()),
+                "Continue reports !is_break"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((flow.continue_value(), Some(c))),
                 "Continue round-trips its value"
             );
-            assert_eq!(flow.break_value(), None, "Continue has no break value");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((flow.break_value(), None)),
+                "Continue has no break value"
+            );
 
             let flow: ControlFlow<i32, i32> = ControlFlow::Break(b);
-            assert!(flow.is_break(), "Break reports is_break");
-            assert!(!flow.is_continue(), "Break reports !is_continue");
-            assert_eq!(flow.break_value(), Some(b), "Break round-trips its value");
-            assert_eq!(flow.continue_value(), None, "Break has no continue value");
+            assert!(
+                IsBreakVariantReportsTrue::ensures(flow.is_break()),
+                "Break reports is_break"
+            );
+            assert!(
+                !IsContinueVariantReportsTrue::ensures(flow.is_continue()),
+                "Break reports !is_continue"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((flow.break_value(), Some(b))),
+                "Break round-trips its value"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((flow.continue_value(), None)),
+                "Break has no continue value"
+            );
         }
     }
 }
