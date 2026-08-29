@@ -532,8 +532,14 @@ amenable_derive::harness! {
             let c: i32 = kani::any();
             let mut v = vec![a, b, c];
             let removed: Vec<i32> = v.splice(1..2, vec![9, 8]).collect();
-            assert_eq!(removed, vec![b], "splice yields exactly the elements it removed");
-            assert_eq!(v, vec![a, 9, 8, c], "splice replaces the range with the given elements");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((removed, vec![b])),
+                "splice yields exactly the elements it removed"
+            );
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((v, vec![a, 9, 8, c])),
+                "splice replaces the range with the given elements"
+            );
 
             let mut early_drop = vec![a, b, c];
             let mut splice = early_drop.splice(1..2, vec![9, 8]);
@@ -545,9 +551,8 @@ amenable_derive::harness! {
                 "splice first yields the removed element"
             );
             drop(splice);
-            assert_eq!(
-                early_drop,
-                vec![a, 9, 8, c],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((early_drop, vec![a, 9, 8, c])),
                 "dropping an unfinished splice still completes replacement"
             );
         }

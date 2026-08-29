@@ -35,6 +35,8 @@ use crate::CollectedSequenceMatchesExpected;
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
+#[cfg(kani)]
+use crate::ValueIsAtLeast;
 use crate::rust_std::macros::{
     bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
 };
@@ -1421,7 +1423,7 @@ amenable_derive::harness! {
 
             let data: [u8; 4] = kani::any();
             let limit: u64 = kani::any();
-            kani::assume(limit <= data.len() as u64);
+            kani::assume(ValueIsAtLeast::requires((data.len() as u64, limit)));
 
             let mut reader = (&data[..]).take(limit);
             let mut buffer = [0u8; 4];
@@ -1429,13 +1431,12 @@ amenable_derive::harness! {
                 .read(&mut buffer)
                 .expect("Take::read over an in-memory slice never errors");
 
-            assert_eq!(
-                read as u64, limit,
+            assert!(
+                RustStdStandard::<u64>::ensures((read as u64, limit)),
                 "Take::read yields exactly the remaining limit when the source has enough bytes"
             );
-            assert_eq!(
-                reader.limit(),
-                0,
+            assert!(
+                RustStdStandard::<u64>::ensures((reader.limit(), 0)),
                 "Take::limit reaches zero once a read consumes the whole allowance"
             );
         }

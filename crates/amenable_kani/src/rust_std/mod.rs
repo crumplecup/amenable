@@ -81,7 +81,7 @@ pub use num::NonZeroGetRoundTrips;
 pub use option_result::{FallibleOperationReportsFailure, FallibleOperationReportsSuccess};
 pub use primitives::{
     DerefReflectsTheStoredValue, EmptinessTracksZeroLength, FieldAccessRecoversTheStoredValue,
-    FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii,
+    FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsAtLeast,
     ValueIsWithinInclusiveRange,
 };
 pub use slice::{

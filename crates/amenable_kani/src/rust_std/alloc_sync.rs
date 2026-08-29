@@ -145,7 +145,10 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let arc = Arc::new(value);
             let weak = Arc::downgrade(&arc);
-            assert_eq!(Arc::weak_count(&arc), 1, "downgrade increments weak_count");
+            assert!(
+                RustStdStandard::<usize>::ensures((Arc::weak_count(&arc), 1)),
+                "downgrade increments weak_count"
+            );
             let upgraded = weak
                 .upgrade()
                 .expect("upgrade succeeds while a strong reference is alive");

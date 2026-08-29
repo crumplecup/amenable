@@ -26,6 +26,8 @@ use amenable_std::{RustStdStandard, ValidUnicodeScalar};
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -53,6 +55,13 @@ bridge_kani_witness!(RustStdStandard<CharTryFromError>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<u32>,
+    "amenable_std::rust_std::RustStdStandard<u32>",
+    (u32, u32),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC, {
         /// `char::try_from(u32)` succeeds exactly for valid Unicode scalar
@@ -68,8 +77,8 @@ amenable_derive::harness! {
                 <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures(value);
             if is_valid_scalar {
                 let parsed = result.expect("a valid Unicode scalar value must convert");
-                assert_eq!(
-                    parsed as u32, value,
+                assert!(
+                    RustStdStandard::<u32>::ensures((parsed as u32, value)),
                     "char::try_from preserves the scalar value"
                 );
             } else {
@@ -149,9 +158,8 @@ amenable_derive::harness! {
             let c: char = kani::any();
             let result = u8::try_from(c);
             if (c as u32) <= u32::from(u8::MAX) {
-                assert_eq!(
-                    result,
-                    Ok(c as u8),
+                assert!(
+                    AccessorRecoversTheExpectedValue::ensures((result, Ok(c as u8))),
                     "try_from succeeds and preserves the value when it fits u8"
                 );
             } else {

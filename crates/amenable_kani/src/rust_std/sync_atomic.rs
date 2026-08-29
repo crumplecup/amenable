@@ -19,6 +19,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -805,9 +807,8 @@ amenable_derive::harness! {
                 std::sync::atomic::Ordering::SeqCst,
                 std::sync::atomic::Ordering::SeqCst,
             );
-            assert_eq!(
-                success_result,
-                Ok(swapped_in),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((success_result, Ok(swapped_in))),
                 "compare_exchange succeeds and returns the previous value when current matches"
             );
             assert!(

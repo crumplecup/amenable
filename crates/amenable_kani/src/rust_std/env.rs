@@ -14,6 +14,8 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -180,9 +182,18 @@ amenable_derive::harness! {
             let split = crate::KaniEnvPaths::split_semantic(joined);
 
             assert!(RustStdStandard::<SplitPaths<'static>>::ensures((split.len(), 3)));
-            assert_eq!(split.paths()[0].as_str(), "one");
-            assert_eq!(split.paths()[1].as_str(), "two");
-            assert_eq!(split.paths()[2].as_str(), "three");
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                split.paths()[0].as_str(),
+                "one"
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                split.paths()[1].as_str(),
+                "two"
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                split.paths()[2].as_str(),
+                "three"
+            )));
         }
     }
 }

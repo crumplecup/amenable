@@ -61,7 +61,7 @@ use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, ka
 #[cfg(kani)]
 use crate::{
     FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
-    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern,
+    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
 };
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
@@ -839,11 +839,17 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_utf8_error_reports_the_valid_prefix_length_and_error_span() {
             let invalid: u8 = kani::any();
-            kani::assume(invalid >= 0xF5);
+            kani::assume(ValueIsAtLeast::requires((invalid, 0xF5)));
             let bytes = [b'a', b'b', invalid, b'c'];
             let err = crate::KaniUtf8::error_position(&bytes).unwrap_err();
-            assert_eq!(err.valid_up_to(), 2, "two leading bytes were valid UTF-8");
-            assert_eq!(err.error_len(), Some(1), "the single bad byte has error_len 1");
+            assert!(
+                RustStdStandard::<usize>::ensures((err.valid_up_to(), 2)),
+                "two leading bytes were valid UTF-8"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((err.error_len(), Some(1))),
+                "the single bad byte has error_len 1"
+            );
         }
     }
 }

@@ -690,6 +690,93 @@ impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier>
     )
 }
 
+/// A `(value, minimum)` pair known to satisfy the precondition every
+/// proof over a symbolic value with a one-sided lower bound assumes:
+/// the value is at least the given minimum.
+///
+/// Independently hand-written as `kani::assume(value >= minimum)` at 1
+/// real site (`rust_std::str`'s UTF-8 lead-byte lower bound, `0xF5`) --
+/// a singleton today, named for the same reason every other bound in
+/// this worklist is: it makes the assumption explicit and auditable,
+/// not because it's shared across multiple sites. Generic over the
+/// element type and hand-written for the same reason
+/// `ValueIsWithinInclusiveRange` is.
+pub struct ValueIsAtLeast<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ValueIsAtLeast<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ValueIsAtLeast<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ValueIsAtLeast<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_utf8_error_reports_the_valid_prefix_length_and_error_span".to_owned(),
+            crate::rust_std::str::VERIFY_UTF8_ERROR_REPORTS_THE_VALID_PREFIX_LENGTH_AND_ERROR_SPAN_SRC
+                .to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsAtLeast<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier> for ValueIsAtLeast<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn requires((value, minimum): (T, T)) -> bool {
+        value >= minimum
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsAtLeast",
+        "kani",
+        "requires",
+        || stringify!(value >= minimum),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ValueIsAtLeast",
+        "kani",
+        || <ValueIsAtLeast<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

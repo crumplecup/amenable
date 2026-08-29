@@ -178,6 +178,13 @@ bridge_kani_witness!(RustStdStandard<Result<i32, i32>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<Result<i32, i32>>,
+    "amenable_std::rust_std::RustStdStandard<Result<i32, i32>>",
+    (Result<i32, i32>, Result<i32, i32>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_RESULT_OK_AND_ERR_ARE_DISJOINT_SRC, {
         /// `Ok` round-trips its value through `unwrap`, and `Err`
@@ -470,7 +477,10 @@ amenable_derive::harness! {
                 *first = updated;
                 assert!(IteratorYieldsNoneWhenExhausted::ensures(it.next()));
             }
-            assert_eq!(res, Ok(updated), "the write through iter_mut is visible");
+            assert!(
+                RustStdStandard::<Result<i32, i32>>::ensures((res, Ok(updated))),
+                "the write through iter_mut is visible"
+            );
         }
     }
 }

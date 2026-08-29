@@ -19,6 +19,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::IndexRecoversTheStoredElement;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniPathDisplayObservation, KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
@@ -301,8 +303,14 @@ amenable_derive::harness! {
                 RustStdStandard::<std::path::Iter<'static>>::ensures((segments.len(), 3)),
                 "root, then two named segments"
             );
-            assert_eq!(segments[1], std::ffi::OsStr::new("a"));
-            assert_eq!(segments[2], std::ffi::OsStr::new("b"));
+            assert!(IndexRecoversTheStoredElement::ensures((
+                segments[1],
+                std::ffi::OsStr::new("a")
+            )));
+            assert!(IndexRecoversTheStoredElement::ensures((
+                segments[2],
+                std::ffi::OsStr::new("b")
+            )));
         }
     }
 }

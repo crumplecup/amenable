@@ -24,6 +24,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
@@ -265,7 +267,7 @@ amenable_derive::harness! {
                     *x += 10;
                 }
             }
-            assert_eq!(data, [a + 10, b + 10]);
+            assert!(CollectedSequenceMatchesExpected::ensures((data, [a + 10, b + 10])));
         }
     }
 }
@@ -498,7 +500,7 @@ amenable_derive::harness! {
                     *x += 10;
                 }
             }
-            assert_eq!(data, [a + 10, b + 10]);
+            assert!(CollectedSequenceMatchesExpected::ensures((data, [a + 10, b + 10])));
         }
     }
 }

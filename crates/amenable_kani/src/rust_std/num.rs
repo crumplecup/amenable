@@ -20,6 +20,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -938,9 +940,8 @@ amenable_derive::harness! {
             let value: i32 = kani::any();
             let result = u8::try_from(value);
             if (0..=i32::from(u8::MAX)).contains(&value) {
-                assert_eq!(
-                    result,
-                    Ok(value as u8),
+                assert!(
+                    AccessorRecoversTheExpectedValue::ensures((result, Ok(value as u8))),
                     "try_from succeeds and preserves the value when it fits the target type"
                 );
             } else {
@@ -970,7 +971,7 @@ bridge_kani_witness!(RustStdStandard<IntErrorKind>);
 
 kani_ensures!(
     RustStdStandard<IntErrorKind>,
-    "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+    "amenable_std::rust_std::RustStdStandard<IntErrorKind>",
     (IntErrorKind, IntErrorKind),
     |(actual, expected)| actual == expected
 );
@@ -1137,7 +1138,7 @@ bridge_kani_witness!(RustStdStandard<FpCategory>);
 
 kani_ensures!(
     RustStdStandard<FpCategory>,
-    "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+    "amenable_std::rust_std::RustStdStandard<FpCategory>",
     (FpCategory, FpCategory),
     |(actual, expected)| actual == expected
 );

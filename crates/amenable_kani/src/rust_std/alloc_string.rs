@@ -11,6 +11,10 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
 use crate::KaniUtf8Buffer;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniVerifier, KaniWitness};
@@ -186,17 +190,24 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_from_utf16_rejects_a_lone_surrogate() {
             let valid: [u16; 1] = [0x61];
-            assert!(String::from_utf16(&valid).is_ok(), "a valid code unit is accepted");
+            assert!(
+                FallibleOperationReportsSuccess::ensures(String::from_utf16(&valid).is_ok()),
+                "a valid code unit is accepted"
+            );
 
             let lone_surrogate: [u16; 1] = [0xD800];
             assert!(
-                String::from_utf16(&lone_surrogate).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    String::from_utf16(&lone_surrogate).is_err()
+                ),
                 "a lone surrogate half is rejected"
             );
 
             let lone_low_surrogate: [u16; 1] = [0xDC00];
             assert!(
-                String::from_utf16(&lone_low_surrogate).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    String::from_utf16(&lone_low_surrogate).is_err()
+                ),
                 "a lone low surrogate half is rejected"
             );
         }

@@ -112,7 +112,7 @@ pub use rust_std::{
     IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, PeekRevealsTheStoredReference,
     PopRecoversTheStoredValue, RenderedKindMatchesTheBuildingOperation,
     SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
-    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern,
+    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
     ValueIsWithinInclusiveRange, VecLengthTracksPushesAndPops, WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
