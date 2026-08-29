@@ -61,6 +61,16 @@ pub fn verify_ipv6_addr_model_segments_round_trip(first_four: SegmentsHalf, last
     (first_four, last_four)
 }
 
+/// A singleton claim: `IpAddr`'s `V4` variant always round-trips its
+/// wrapped octets exactly. `observed_pair_matches_input` doesn't fit
+/// (`Octets` is a 4-tuple, not a 2-element pair) and
+/// `observed_value_matches_input` doesn't either (it's `int`-typed, not
+/// a compound value), so this claim gets its own dedicated predicate
+/// rather than a risky cast onto either existing one.
+pub open spec fn ip_addr_model_v4_octets_match_input(observed: Octets, input: Octets) -> bool {
+    observed == input
+}
+
 /// `IpAddr`'s `is_ipv4`/`is_ipv6` agree with its constructing variant,
 /// and each variant round-trips its wrapped address — modeled with a
 /// `bool` variant tag (`true` for `V4`) standing in for the real
@@ -69,7 +79,7 @@ pub fn verify_ip_addr_model_variant_matches_its_kind(v4_octets: Octets) -> (resu
     ensures
         result.0,
         !result.1,
-        result.2 == v4_octets,
+        ip_addr_model_v4_octets_match_input(result.2, v4_octets),
         result.4,
         !result.3,
 {

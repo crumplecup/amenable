@@ -2856,6 +2856,15 @@ bridge_verus_witness!(RustStdStandard<std::vec::Drain<'static, i32>>);
     )
 }
 
+// Singleton contract, registered once per real type this carrier backs
+// (matching the harness registration above): a freshly-constructed
+// model always starts positioned before the first element.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::vec::Drain<'static, i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::Drain<'static, i32>>",
+    "ordered_pair_into_iter_model_starts_at_position_zero"
+);
+
 impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2881,6 +2890,12 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::IntoIter<i32>
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::collections::vec_deque::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::vec_deque::IntoIter<i32>>",
+    "ordered_pair_into_iter_model_starts_at_position_zero"
+);
 
 impl VerusWitness for RustStdStandard<std::collections::linked_list::IntoIter<i32>> {
     type SupportingEvidence = Self;
@@ -2908,6 +2923,12 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IntoIter<i3
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::collections::linked_list::IntoIter<i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::IntoIter<i32>>",
+    "ordered_pair_into_iter_model_starts_at_position_zero"
+);
+
 impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2934,6 +2955,12 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::Iter<'stati
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::collections::linked_list::Iter<'static, i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::linked_list::Iter<'static, i32>>",
+    "ordered_pair_into_iter_model_starts_at_position_zero"
+);
+
 impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -2958,6 +2985,12 @@ bridge_verus_witness!(RustStdStandard<std::string::Drain<'static>>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::string::Drain<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::string::Drain<'static>>",
+    "ordered_pair_into_iter_model_starts_at_position_zero"
+);
 
 const VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/vec_extract_if_carrier.rs");
@@ -4705,6 +4738,14 @@ bridge_verus_witness!(RustStdStandard<std::net::IpAddr>);
         },
     )
 }
+
+// Singleton contract: `IpAddr`'s `V4` variant always round-trips its
+// wrapped octets exactly.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::net::IpAddr>,
+    "amenable_std::rust_std::RustStdStandard<std::net::IpAddr>",
+    "ip_addr_model_v4_octets_match_input"
+);
 
 const VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/net_carrier.rs");

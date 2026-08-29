@@ -50,6 +50,16 @@ use crate::rust_std::primitive_shapes_carrier::observed_pair_matches_input;
 
 verus! {
 
+/// A singleton claim, shared identically by all five real types this
+/// carrier backs (`Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::
+/// IntoIter`/`LinkedList::Iter`/`String::Drain`) even though nothing
+/// else in this crate ever calls it again: a freshly-constructed model
+/// is always positioned before the first element. Named, not inlined,
+/// so the assumption has an explicit, auditable source.
+pub open spec fn ordered_pair_into_iter_model_starts_at_position_zero(position: u8) -> bool {
+    position == 0
+}
+
 /// Models the "yields two owned values in order, then `None`" law —
 /// not `Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::IntoIter`
 /// themselves.
@@ -65,7 +75,7 @@ impl VerusOrderedPairIntoIterModel {
     pub fn from_pair(first: i32, second: i32) -> (result: Self)
         ensures
             observed_pair_matches_input((result.first, result.second), (first, second)),
-            result.position == 0,
+            ordered_pair_into_iter_model_starts_at_position_zero(result.position),
     {
         Self { first, second, position: 0 }
     }
