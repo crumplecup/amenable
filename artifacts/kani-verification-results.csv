@@ -102,9 +102,9 @@ amenable_kani::rust_std::fs::verify_open_options_create_new_rejects_an_existing_
 amenable_kani::rust_std::fs::verify_permissions_readonly_round_trips_through_set_permissions,1787760712,passed
 amenable_kani::rust_std::fs::verify_read_dir_iterates_every_entry_in_the_directory,1787760721,passed
 amenable_kani::rust_std::fs::verify_try_lock_error_reports_a_lock_already_held,1787760732,passed
-amenable_kani::rust_std::future::verify_pending_never_resolves,1787760742,passed
-amenable_kani::rust_std::future::verify_poll_fn_dispatches_through_to_its_closure,1787760751,passed
-amenable_kani::rust_std::future::verify_ready_resolves_immediately_with_its_value,1787760761,passed
+amenable_kani::rust_std::future::verify_pending_never_resolves,1788026274,passed
+amenable_kani::rust_std::future::verify_poll_fn_dispatches_through_to_its_closure,1788026298,passed
+amenable_kani::rust_std::future::verify_ready_resolves_immediately_with_its_value,1788026285,passed
 amenable_kani::rust_std::hash::verify_build_hasher_default_produces_consistent_hashers,1787760773,passed
 amenable_kani::rust_std::hash::verify_sip_hasher_produces_consistent_hashes,1787760785,passed
 amenable_kani::rust_std::io::verify_buf_reader_reads_the_underlying_bytes,1787760794,passed
