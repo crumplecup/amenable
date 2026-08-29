@@ -22,6 +22,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
@@ -215,7 +217,10 @@ amenable_derive::harness! {
                 IteratorYieldsNoneWhenExhausted::ensures(ch.next()),
                 "the short remainder is not yielded as a chunk"
             );
-            assert_eq!(ch.remainder(), &[c], "the short remainder is still reachable directly");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((ch.remainder(), &[c][..])),
+                "the short remainder is still reachable directly"
+            );
         }
     }
 }
@@ -396,7 +401,10 @@ amenable_derive::harness! {
             let mut ch = data.rchunks_exact(2);
             assert!(IteratorYieldsAReferenceToTheStoredValue::ensures((ch.next(), Some(&[b, c][..]))));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
-            assert_eq!(ch.remainder(), &[a], "the short remainder sits at the front");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((ch.remainder(), &[a][..])),
+                "the short remainder sits at the front"
+            );
         }
     }
 }

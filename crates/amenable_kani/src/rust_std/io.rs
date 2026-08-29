@@ -1224,23 +1224,20 @@ amenable_derive::harness! {
                 RustStdStandard::<usize>::ensures((read, buffer.len())),
                 "Cursor::read fills the requested buffer"
             );
-            assert_eq!(
-                buffer,
-                [data[0], data[1]],
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((buffer, [data[0], data[1]])),
                 "Cursor::read yields bytes starting from position zero"
             );
-            assert_eq!(
-                cursor.position(),
-                2,
+            assert!(
+                RustStdStandard::<u64>::ensures((cursor.position(), 2)),
                 "Cursor::read advances position by the number of bytes read"
             );
 
             cursor
                 .seek(SeekFrom::Start(0))
                 .expect("Cursor::seek to a valid offset never errors");
-            assert_eq!(
-                cursor.position(),
-                0,
+            assert!(
+                RustStdStandard::<u64>::ensures((cursor.position(), 0)),
                 "Cursor::seek(Start(0)) resets position to zero"
             );
         }

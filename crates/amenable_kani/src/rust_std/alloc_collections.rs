@@ -21,6 +21,8 @@ use std::cell::Cell;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
@@ -136,14 +138,12 @@ amenable_derive::harness! {
                 Some((&k2, &v2)),
                 "iteration preserves the higher key and its value after the lower one"
             );
-            assert_eq!(
-                map.remove(&k1),
-                Some(v1),
+            assert!(
+                PopRecoversTheStoredValue::ensures((map.remove(&k1), Some(v1))),
                 "observing iteration leaves the lower key and its value in the map"
             );
-            assert_eq!(
-                map.remove(&k2),
-                Some(v2),
+            assert!(
+                PopRecoversTheStoredValue::ensures((map.remove(&k2), Some(v2))),
                 "iteration leaves the higher key and its value in the map"
             );
             assert!(
@@ -229,6 +229,52 @@ bridge_kani_witness!(RustStdStandard<BTreeSet<i32>>);
     )
 }
 
+/// A `bool` known to be the `true` a set's `.remove()` reports when the
+/// element was actually present -- following
+/// `EmptiedContainerReportsEmpty`'s established shape for a raw
+/// boolean claim, but its own distinct claim: this is about the
+/// remove *operation's own outcome*, not the container's emptiness
+/// afterward (the same reasoning `PopRemovedASegment` already applies
+/// to `PathBuf::pop()`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct RemoveReportsElementWasPresent;
+
+impl KaniWitness for RemoveReportsElementWasPresent {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_btree_set_iterates_in_sorted_order".to_owned(),
+            VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(RemoveReportsElementWasPresent);
+
+kani_ensures!(
+    RemoveReportsElementWasPresent,
+    "amenable_kani::RemoveReportsElementWasPresent",
+    bool,
+    |was_present| was_present
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::RemoveReportsElementWasPresent",
+        "kani",
+        || <RemoveReportsElementWasPresent as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_BTREE_SET_ITERATES_IN_SORTED_ORDER_SRC, {
         /// Same ordering guarantee as `BTreeMap`, for a set: `iter`
@@ -244,18 +290,22 @@ amenable_derive::harness! {
             kani::assume(FirstValueIsLessThanTheSecond::requires((a, b)));
 
             let mut set = crate::KaniBTreeSet::new(b, a);
-            assert_eq!(
-                set.first_item(),
-                Some(&a),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((set.first_item(), Some(&a))),
                 "iteration is in ascending order despite insertion order"
             );
-            assert_eq!(
-                set.second_item(),
-                Some(&b),
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((set.second_item(), Some(&b))),
                 "iteration preserves the higher element after the lower one"
             );
-            assert!(set.remove(&a), "iteration leaves the lower element in the set");
-            assert!(set.remove(&b), "iteration leaves the higher element in the set");
+            assert!(
+                RemoveReportsElementWasPresent::ensures(set.remove(&a)),
+                "iteration leaves the lower element in the set"
+            );
+            assert!(
+                RemoveReportsElementWasPresent::ensures(set.remove(&b)),
+                "iteration leaves the higher element in the set"
+            );
             assert!(
                 EmptiedContainerReportsEmpty::ensures(set.is_empty()),
                 "removing both elements after iteration empties the set"

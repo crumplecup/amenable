@@ -20,8 +20,8 @@ amenable_kani::rust_std::alloc_collections::verify_binary_heap_into_iter_yields_
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_iter_yields_every_pushed_element_once,1788023732,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_peek_mut_exposes_the_maximum,1788023751,passed
 amenable_kani::rust_std::alloc_collections::verify_binary_heap_pop_yields_the_maximum_first,1788023706,passed
-amenable_kani::rust_std::alloc_collections::verify_btree_map_iterates_in_key_order,1787759784,passed
-amenable_kani::rust_std::alloc_collections::verify_btree_set_iterates_in_sorted_order,1787759793,passed
+amenable_kani::rust_std::alloc_collections::verify_btree_map_iterates_in_key_order,1788027757,passed
+amenable_kani::rust_std::alloc_collections::verify_btree_set_iterates_in_sorted_order,1788027769,passed
 amenable_kani::rust_std::alloc_collections::verify_linked_list_extract_if_partitions_by_the_predicate,1788023237,passed
 amenable_kani::rust_std::alloc_collections::verify_linked_list_into_iter_yields_owned_values_in_order,1787759826,passed
 amenable_kani::rust_std::alloc_collections::verify_linked_list_is_fifo_through_back_and_front,1787759839,passed
@@ -36,7 +36,7 @@ amenable_kani::rust_std::alloc_collections::verify_vec_deque_pushes_and_pops_fro
 amenable_kani::rust_std::alloc_ffi::verify_cstring_excludes_the_terminator_and_rejects_interior_nul,1787759964,passed
 amenable_kani::rust_std::alloc_ffi::verify_from_vec_with_nul_requires_the_nul_only_at_the_end,1787759977,passed
 amenable_kani::rust_std::alloc_ffi::verify_into_string_error_recovers_the_original_cstring,1787759994,passed
-amenable_kani::rust_std::alloc_ffi::verify_nul_error_reports_the_interior_nuls_position,1787760008,passed
+amenable_kani::rust_std::alloc_ffi::verify_nul_error_reports_the_interior_nuls_position,1788027705,passed
 amenable_kani::rust_std::alloc_rc::verify_rc_strong_count_tracks_clones,1787760019,passed
 amenable_kani::rust_std::alloc_rc::verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero,1787760030,passed
 amenable_kani::rust_std::alloc_string::verify_from_utf16_rejects_a_lone_surrogate,1787760041,passed
@@ -111,7 +111,7 @@ amenable_kani::rust_std::io::verify_buf_reader_reads_the_underlying_bytes,178776
 amenable_kani::rust_std::io::verify_buf_writer_flushes_to_the_underlying_writer,1787760812,passed
 amenable_kani::rust_std::io::verify_bytes_yields_one_byte_at_a_time,1788025426,passed
 amenable_kani::rust_std::io::verify_chain_reads_the_first_source_then_the_second,1787760841,passed
-amenable_kani::rust_std::io::verify_cursor_read_advances_position_and_seek_repositions_it,1787760855,passed
+amenable_kani::rust_std::io::verify_cursor_read_advances_position_and_seek_repositions_it,1788027721,passed
 amenable_kani::rust_std::io::verify_empty_read_reports_end_of_file,1787760869,passed
 amenable_kani::rust_std::io::verify_error_from_error_kind_preserves_the_kind,1787760879,passed
 amenable_kani::rust_std::io::verify_into_inner_error_recovers_the_writer_and_the_flush_error,1787760889,passed
@@ -239,7 +239,7 @@ amenable_kani::rust_std::process::verify_stdio_null_discards_the_childs_output_h
 amenable_kani::rust_std::ptr::verify_non_null_rejects_the_null_pointer,1787762112,passed
 amenable_kani::rust_std::slice::verify_chunk_by_groups_adjacent_elements_matching_the_predicate,1787762121,passed
 amenable_kani::rust_std::slice::verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate,1787762132,passed
-amenable_kani::rust_std::slice::verify_chunks_exact_discards_a_short_remainder,1787762142,passed
+amenable_kani::rust_std::slice::verify_chunks_exact_discards_a_short_remainder,1788027733,passed
 amenable_kani::rust_std::slice::verify_chunks_exact_mut_leaves_the_remainder_untouched,1788021413,passed
 amenable_kani::rust_std::slice::verify_chunks_mut_writes_through_every_chunk,1787762161,passed
 amenable_kani::rust_std::slice::verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk,1787762170,passed
@@ -247,7 +247,7 @@ amenable_kani::rust_std::slice::verify_escape_ascii_leaves_printable_bytes_unesc
 amenable_kani::rust_std::slice::verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds,1788026845,passed
 amenable_kani::rust_std::slice::verify_iter_mut_yields_mutable_references_that_write_through,1787762199,passed
 amenable_kani::rust_std::slice::verify_iter_yields_shared_references_in_order,1787762208,passed
-amenable_kani::rust_std::slice::verify_rchunks_exact_discards_a_short_remainder_at_the_front,1787762217,passed
+amenable_kani::rust_std::slice::verify_rchunks_exact_discards_a_short_remainder_at_the_front,1788027745,passed
 amenable_kani::rust_std::slice::verify_rchunks_exact_mut_leaves_the_front_remainder_untouched,1788021425,passed
 amenable_kani::rust_std::slice::verify_rchunks_groups_from_the_back,1787762236,passed
 amenable_kani::rust_std::slice::verify_rchunks_mut_writes_through_every_chunk,1787762245,passed
@@ -346,7 +346,7 @@ amenable_kani::rust_std::sync_mpsc::verify_try_send_error_full_recovers_the_unse
 amenable_kani::rust_std::task::verify_context_from_waker_exposes_the_same_waker,1787763305,passed
 amenable_kani::rust_std::task::verify_poll_ready_and_pending_are_disjoint,1787763314,passed
 amenable_kani::rust_std::task::verify_waker_wake_by_ref_invokes_the_wake_impl,1787763324,passed
-amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_value,1787763333,passed
+amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_value,1788027781,passed
 amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1787763342,passed
 amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1787763351,passed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1787763359,passed

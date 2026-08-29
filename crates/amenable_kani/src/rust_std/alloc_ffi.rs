@@ -2,6 +2,8 @@
 
 use std::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::Requires;
@@ -185,12 +187,14 @@ amenable_derive::harness! {
             let byte: u8 = kani::any();
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             let err = CString::new(vec![byte, 0, byte]).unwrap_err();
-            assert_eq!(err.nul_position(), 1, "nul_position reports the nul's index");
+            assert!(
+                RustStdStandard::<usize>::ensures((err.nul_position(), 1)),
+                "nul_position reports the nul's index"
+            );
 
             let first_of_two = CString::new(vec![byte, 0, 0, byte]).unwrap_err();
-            assert_eq!(
-                first_of_two.nul_position(),
-                1,
+            assert!(
+                RustStdStandard::<usize>::ensures((first_of_two.nul_position(), 1)),
                 "nul_position reports the first interior nul"
             );
         }

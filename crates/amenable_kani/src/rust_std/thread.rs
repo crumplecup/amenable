@@ -15,11 +15,13 @@ use std::thread::{
     AccessError, Builder, JoinHandle, LocalKey, Scope, ScopedJoinHandle, Thread, ThreadId,
 };
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 use crate::{KaniCurrentThreadObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {
@@ -47,6 +49,13 @@ bridge_kani_witness!(RustStdStandard<LocalKey<std::cell::Cell<i32>>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<LocalKey<std::cell::Cell<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<LocalKey<std::cell::Cell<i32>>>",
+    (i32, i32),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_LOCAL_KEY_WITH_READS_THE_INITIALIZED_VALUE_SRC, {
         /// `.with()` gives access to the lazily-initialized value, and a
@@ -60,9 +69,15 @@ amenable_derive::harness! {
                 static COUNTER: std::cell::Cell<i32> = std::cell::Cell::new(5);
             }
 
-            assert_eq!(COUNTER.with(|c| c.get()), 5);
+            assert!(RustStdStandard::<LocalKey<std::cell::Cell<i32>>>::ensures((
+                COUNTER.with(|c| c.get()),
+                5
+            )));
             COUNTER.with(|c| c.set(42));
-            assert_eq!(COUNTER.with(|c| c.get()), 42);
+            assert!(RustStdStandard::<LocalKey<std::cell::Cell<i32>>>::ensures((
+                COUNTER.with(|c| c.get()),
+                42
+            )));
         }
     }
 }
