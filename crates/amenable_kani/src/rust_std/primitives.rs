@@ -777,6 +777,30 @@ impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier> for ValueIsAtLe
     )
 }
 
+/// The postcondition counterpart to `ValueIsAtLeast`'s own
+/// `Requires` impl, same body, for real sites that assert this shape
+/// as an `Ensures` claim rather than assume it as a `Requires`
+/// precondition -- both directions register their own `ContractRecord`
+/// (Kani's `(verifier, kind)` lookup is keyed separately for
+/// `"requires"` vs `"ensures"` clauses), so one type can carry both.
+impl<T: PartialOrd> amenable_core::Ensures<crate::KaniVerifier> for ValueIsAtLeast<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((value, minimum): (T, T)) -> bool {
+        value >= minimum
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsAtLeast",
+        "kani",
+        "ensures",
+        || stringify!(value >= minimum),
+    )
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;

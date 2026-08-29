@@ -168,9 +168,8 @@ amenable_derive::harness! {
                 assert!(DerefReflectsTheStoredValue::ensures((*guard, value)));
                 *guard = updated;
             }
-            assert_eq!(
-                *mutex.lock().unwrap(),
-                updated,
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*mutex.lock().unwrap(), updated)),
                 "a write through the guard is visible after it's dropped"
             );
         }
@@ -218,12 +217,12 @@ amenable_derive::harness! {
                     "two read guards can be held concurrently"
                 );
                 assert!(
-                    lock.try_write().is_err(),
+                    FallibleOperationReportsFailure::ensures(lock.try_write().is_err()),
                     "a write is rejected while readers are held"
                 );
             }
             assert!(
-                lock.try_write().is_ok(),
+                FallibleOperationReportsSuccess::ensures(lock.try_write().is_ok()),
                 "a write succeeds once the readers are dropped"
             );
         }
@@ -305,7 +304,7 @@ amenable_derive::harness! {
                 assert!(DerefReflectsTheStoredValue::ensures((*guard, value)));
                 *guard = updated;
             }
-            assert_eq!(*lock.read().unwrap(), updated);
+            assert!(DerefReflectsTheStoredValue::ensures((*lock.read().unwrap(), updated)));
         }
     }
 }
@@ -381,6 +380,49 @@ bridge_kani_witness!(RustStdStandard<OnceState>);
     )
 }
 
+/// A `bool` known to be the `true` `OnceState::is_poisoned()` reports
+/// when the `Once` really was poisoned by a panicking closure --
+/// following `EmptiedContainerReportsEmpty`'s established shape for a
+/// raw boolean claim.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct OnceStateIsPoisonedReportsTrue;
+
+impl KaniWitness for OnceStateIsPoisonedReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_once_state_reports_not_poisoned_on_a_clean_run".to_owned(),
+            VERIFY_ONCE_STATE_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(OnceStateIsPoisonedReportsTrue);
+
+kani_ensures!(
+    OnceStateIsPoisonedReportsTrue,
+    "amenable_kani::OnceStateIsPoisonedReportsTrue",
+    bool,
+    |is_poisoned| is_poisoned
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::OnceStateIsPoisonedReportsTrue",
+        "kani",
+        || <OnceStateIsPoisonedReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_ONCE_STATE_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC, {
         /// `.call_once_force()` hands its closure an `OnceState`
@@ -390,7 +432,10 @@ amenable_derive::harness! {
         fn verify_once_state_reports_not_poisoned_on_a_clean_run() {
             let once = std::sync::Once::new();
             once.call_once_force(|state| {
-                assert!(!state.is_poisoned(), "a clean Once reports not poisoned");
+                assert!(
+                    !OnceStateIsPoisonedReportsTrue::ensures(state.is_poisoned()),
+                    "a clean Once reports not poisoned"
+                );
             });
         }
     }

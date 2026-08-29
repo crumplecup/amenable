@@ -16,7 +16,11 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
+#[cfg(kani)]
+use crate::ValueIsAtLeast;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Args> {
@@ -52,8 +56,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_args_reports_at_least_the_program_path() {
             let argv = <crate::KaniArgv as crate::KaniCompose>::kani_any();
-            assert!(argv.args_count() >= 1);
-            assert_eq!(argv.args_count(), 1 + usize::from(argv.extra_count()));
+            assert!(ValueIsAtLeast::ensures((argv.args_count(), 1)));
+            assert!(RustStdStandard::<usize>::ensures((
+                argv.args_count(),
+                1 + usize::from(argv.extra_count())
+            )));
         }
     }
 }
@@ -87,8 +94,11 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_args_os_reports_at_least_the_program_path() {
             let argv = <crate::KaniArgv as crate::KaniCompose>::kani_any();
-            assert!(argv.args_os_count() >= 1);
-            assert_eq!(argv.args_os_count(), 1 + usize::from(argv.extra_count()));
+            assert!(ValueIsAtLeast::ensures((argv.args_os_count(), 1)));
+            assert!(RustStdStandard::<usize>::ensures((
+                argv.args_os_count(),
+                1 + usize::from(argv.extra_count())
+            )));
         }
     }
 }
@@ -126,8 +136,14 @@ amenable_derive::harness! {
         fn verify_join_paths_error_reports_an_unjoinable_path() {
             let bad_path = if cfg!(windows) { "a\"b" } else { "a:b" }.to_owned();
             let err = crate::KaniEnvPath::new(bad_path.clone()).unwrap_err();
-            assert_eq!(*err.offending_path(), bad_path);
-            assert_eq!(err.into_offending_path(), bad_path);
+            assert!(DerefReflectsTheStoredValue::ensures((
+                err.offending_path().clone(),
+                bad_path.clone()
+            )));
+            assert!(AccessorRecoversTheExpectedValue::ensures((
+                err.into_offending_path(),
+                bad_path
+            )));
         }
     }
 }
