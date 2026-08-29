@@ -19,6 +19,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
+#[cfg(verus_keep_ghost)]
+use crate::rust_std::primitive_shapes_carrier::observed_triple_matches_input;
+
 verus! {
 
 /// `SeekFrom::Start(start_offset)`, `SeekFrom::End(end_offset)`, and
@@ -26,7 +29,7 @@ verus! {
 /// were constructed with.
 pub fn verify_seek_from_model_round_trips_each_variants_offset(start_offset: u64, end_offset: i64, current_offset: i64) -> (result: (u64, i64, i64))
     ensures
-        result == (start_offset, end_offset, current_offset),
+        observed_triple_matches_input(result, (start_offset, end_offset, current_offset)),
 {
     (start_offset, end_offset, current_offset)
 }

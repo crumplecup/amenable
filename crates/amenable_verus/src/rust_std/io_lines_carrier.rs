@@ -19,7 +19,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::is_ascii_byte;
+use crate::rust_std::primitive_shapes_carrier::{is_ascii_byte, observed_triple_matches_input};
 
 verus! {
 
@@ -51,7 +51,7 @@ pub fn verify_lines_model_splits_on_newlines_and_drops_the_terminator(first: u8,
         is_not_a_line_terminator_byte(second),
         is_not_a_line_terminator_byte(third),
     ensures
-        result == (first, second, third),
+        observed_triple_matches_input(result, (first, second, third)),
 {
     (first, second, third)
 }

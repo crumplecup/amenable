@@ -19,7 +19,7 @@
 
 #[cfg(verus_keep_ghost)]
 use crate::rust_std::primitive_shapes_carrier::{
-    observed_pair_matches_input, observed_value_matches_input,
+    observed_pair_matches_input, observed_triple_matches_input, observed_value_matches_input,
 };
 use verus_builtin_macros::verus;
 #[allow(
@@ -100,7 +100,7 @@ pub fn verify_socket_addr_v4_model_round_trips_ip_and_port(ip_octets: Octets, po
 /// trip` already covers).
 pub fn verify_socket_addr_v6_model_round_trips_all_fields(port: u16, flowinfo: u32, scope_id: u32) -> (result: (u16, u32, u32))
     ensures
-        result == (port, flowinfo, scope_id),
+        observed_triple_matches_input(result, (port, flowinfo, scope_id)),
 {
     (port, flowinfo, scope_id)
 }

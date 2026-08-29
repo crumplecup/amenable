@@ -19,7 +19,9 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::values_are_distinct;
+use crate::rust_std::primitive_shapes_carrier::{
+    observed_triple_matches_input, values_are_distinct,
+};
 
 verus! {
 
@@ -32,7 +34,7 @@ pub fn verify_split_model_segments_on_the_given_byte_and_drops_it(first: u8, del
         values_are_distinct(second, delimiter),
         values_are_distinct(third, delimiter),
     ensures
-        result == (first, second, third),
+        observed_triple_matches_input(result, (first, second, third)),
 {
     // `delimiter` plays no role beyond appearing in the `requires`
     // (distinct from `first`/`second`/`third`) — the claim doesn't depend
