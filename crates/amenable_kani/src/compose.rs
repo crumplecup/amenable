@@ -535,12 +535,12 @@ mod proofs {
                 assert!(ComposeDepthZeroIsEmpty::ensures(depth0.flags.len()));
 
                 let depth1 = DerivedNode::kani_depth1();
-                assert_eq!(depth1.name.len(), 1);
+                assert!(ComposeArrayLengthIsFixed::ensures((depth1.name.len(), 1)));
                 assert!(ComposeFieldPresenceTracksDepth::ensures((
                     depth1.maybe_child.is_some(),
                     1
                 )));
-                assert_eq!(depth1.flags.len(), 1);
+                assert!(ComposeArrayLengthIsFixed::ensures((depth1.flags.len(), 1)));
             }
         }
     }

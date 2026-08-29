@@ -214,9 +214,8 @@ amenable_derive::harness! {
                 );
                 *borrow = updated;
             }
-            assert_eq!(
-                *cell.borrow(),
-                updated,
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*cell.borrow(), updated)),
                 "borrow_mut's write is visible to a later borrow"
             );
         }
@@ -307,9 +306,8 @@ amenable_derive::harness! {
                 );
                 *borrow = updated;
             }
-            assert_eq!(
-                *cell.borrow(),
-                updated,
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*cell.borrow(), updated)),
                 "RefMut's write through deref_mut is visible after the borrow ends"
             );
         }

@@ -32,6 +32,8 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 use crate::rust_std::macros::{
     bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
@@ -1330,7 +1332,10 @@ amenable_derive::harness! {
         fn verify_io_slice_derefs_to_the_wrapped_bytes() {
             let bytes: [u8; 4] = kani::any();
             let slice = IoSlice::new(&bytes);
-            assert_eq!(&*slice, &bytes, "IoSlice derefs to exactly the wrapped bytes");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((&*slice, &bytes)),
+                "IoSlice derefs to exactly the wrapped bytes"
+            );
         }
     }
 }
@@ -1370,7 +1375,10 @@ amenable_derive::harness! {
             let new_value: u8 = kani::any();
 
             let mut slice = IoSliceMut::new(&mut bytes);
-            assert_eq!(&*slice, &original, "IoSliceMut derefs to exactly the wrapped bytes");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((&*slice, &original)),
+                "IoSliceMut derefs to exactly the wrapped bytes"
+            );
             slice[0] = new_value;
             drop(slice);
             assert!(

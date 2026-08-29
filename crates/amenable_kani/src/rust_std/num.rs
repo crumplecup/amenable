@@ -968,6 +968,13 @@ impl KaniWitness for RustStdStandard<IntErrorKind> {
 
 bridge_kani_witness!(RustStdStandard<IntErrorKind>);
 
+kani_ensures!(
+    RustStdStandard<IntErrorKind>,
+    "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
+    (IntErrorKind, IntErrorKind),
+    |(actual, expected)| actual == expected
+);
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<core::num::IntErrorKind>",
@@ -982,29 +989,39 @@ amenable_derive::harness! {
         /// matching `IntErrorKind` variant.
         #[kani::proof]
         fn verify_int_error_kind_classifies_parse_failures() {
-            assert_eq!(
-                "".parse::<i32>().unwrap_err().kind(),
-                &IntErrorKind::Empty,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((
+                    *"".parse::<i32>().unwrap_err().kind(),
+                    IntErrorKind::Empty
+                )),
                 "an empty string parses with IntErrorKind::Empty"
             );
-            assert_eq!(
-                "not a number".parse::<i32>().unwrap_err().kind(),
-                &IntErrorKind::InvalidDigit,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((
+                    *"not a number".parse::<i32>().unwrap_err().kind(),
+                    IntErrorKind::InvalidDigit
+                )),
                 "a non-digit string parses with IntErrorKind::InvalidDigit"
             );
-            assert_eq!(
-                "99999999999999999999".parse::<i32>().unwrap_err().kind(),
-                &IntErrorKind::PosOverflow,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((
+                    *"99999999999999999999".parse::<i32>().unwrap_err().kind(),
+                    IntErrorKind::PosOverflow
+                )),
                 "a value above i32::MAX parses with IntErrorKind::PosOverflow"
             );
-            assert_eq!(
-                "-99999999999999999999".parse::<i32>().unwrap_err().kind(),
-                &IntErrorKind::NegOverflow,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((
+                    *"-99999999999999999999".parse::<i32>().unwrap_err().kind(),
+                    IntErrorKind::NegOverflow
+                )),
                 "a value below i32::MIN parses with IntErrorKind::NegOverflow"
             );
-            assert_eq!(
-                "0".parse::<NonZero<i32>>().unwrap_err().kind(),
-                &IntErrorKind::Zero,
+            assert!(
+                RustStdStandard::<IntErrorKind>::ensures((
+                    *"0".parse::<NonZero<i32>>().unwrap_err().kind(),
+                    IntErrorKind::Zero
+                )),
                 "zero parses as NonZero<i32> with IntErrorKind::Zero"
             );
         }
