@@ -81,7 +81,7 @@ pub use num::NonZeroGetRoundTrips;
 pub use option_result::FallibleOperationReportsFailure;
 pub use primitives::{
     DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, FourBytesAreEachAscii,
-    IndexRecoversTheStoredElement,
+    IndexRecoversTheStoredElement, ThreeBytesAreEachAscii,
 };
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,

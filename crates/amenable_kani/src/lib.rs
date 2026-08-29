@@ -110,8 +110,8 @@ pub use rust_std::{
     IteratorMatchesReferenceStepByStep, IteratorYieldsAReferenceToTheStoredValue,
     IteratorYieldsNoneWhenExhausted, NonZeroGetRoundTrips, RenderedKindMatchesTheBuildingOperation,
     SplitOperandsAreDistinctFromThePattern, StrongCountTracksLiveReferences,
-    ThreeSplitOperandsAreDistinctFromThePattern, VecLengthTracksPushesAndPops,
-    WeakUpgradeReturnsNone,
+    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern,
+    VecLengthTracksPushesAndPops, WeakUpgradeReturnsNone,
 };
 pub use slice_escape_ascii_model::KaniEscapeAsciiObservation;
 pub use slice_split_model::{

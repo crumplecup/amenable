@@ -61,7 +61,7 @@ use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, ka
 #[cfg(kani)]
 use crate::{
     FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted, SplitOperandsAreDistinctFromThePattern,
-    ThreeSplitOperandsAreDistinctFromThePattern,
+    ThreeBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern,
 };
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
@@ -959,7 +959,7 @@ amenable_derive::harness! {
             let after: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(before < 128 && pattern < 128 && after < 128);
+            kani::assume(ThreeBytesAreEachAscii::requires((before, pattern, after)));
             kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
                 before, pattern, after,
             )));
@@ -1077,7 +1077,7 @@ amenable_derive::harness! {
             let b: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(a < 128 && pattern < 128 && b < 128);
+            kani::assume(ThreeBytesAreEachAscii::requires((a, pattern, b)));
             kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
                 a, pattern, b,
             )));
@@ -1131,7 +1131,7 @@ amenable_derive::harness! {
             let b: u8 = kani::any();
             // Canonical home: amenable_std::AsciiByte's Requires<KaniVerifier>
             // impl (rust_std::primitives, supplementary fragment) names this exact fragment.
-            kani::assume(a < 128 && pattern < 128 && b < 128);
+            kani::assume(ThreeBytesAreEachAscii::requires((a, pattern, b)));
             kani::assume(SplitOperandsAreDistinctFromThePattern::requires((
                 a, pattern, b,
             )));

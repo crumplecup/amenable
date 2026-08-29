@@ -500,6 +500,55 @@ kani_requires!(
     )
 }
 
+/// Three bytes each known to satisfy [`AsciiByte`]'s own precondition
+/// (`< 128`), combined into a single callable predicate — the
+/// three-operand sibling of [`FourBytesAreEachAscii`], same reasoning.
+///
+/// Independently hand-written as `kani::assume(before < 128 && pattern
+/// < 128 && after < 128)` at 3 real sites in `rust_std::str`'s
+/// `rsplit`/`split_terminator`/`rsplit_terminator` family -- the same
+/// three-way ASCII bound applied to all three symbolic bytes a real
+/// site needs at once, for the same call-shape-scanner reason
+/// `FourBytesAreEachAscii` documents.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<u8>",
+    basis_ctor = "RustStdStandard::<u8>::new()",
+    provenance = "<u8 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct ThreeBytesAreEachAscii;
+
+impl KaniWitness for ThreeBytesAreEachAscii {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_str_byte_length_and_content".to_owned(),
+            VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(ThreeBytesAreEachAscii);
+
+kani_requires!(
+    ThreeBytesAreEachAscii,
+    "amenable_kani::ThreeBytesAreEachAscii",
+    (u8, u8, u8),
+    |(before, pattern, after)| before < 128 && pattern < 128 && after < 128
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ThreeBytesAreEachAscii",
+        "kani",
+        || <ThreeBytesAreEachAscii as KaniWitness>::proof().to_string(),
+    )
+}
+
 impl KaniWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
