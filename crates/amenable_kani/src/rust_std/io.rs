@@ -30,6 +30,8 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 #[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 use crate::rust_std::macros::{
     bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
@@ -200,7 +202,10 @@ amenable_derive::harness! {
             use std::io::Read;
 
             let collected: Vec<u8> = (b"abc"[..]).bytes().map(|b| b.unwrap()).collect();
-            assert_eq!(collected, vec![b'a', b'b', b'c']);
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                collected,
+                vec![b'a', b'b', b'c']
+            )));
         }
     }
 }

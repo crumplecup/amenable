@@ -10,6 +10,10 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::AccessorRecoversTheExpectedValue;
+#[cfg(kani)]
+use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 
@@ -139,6 +143,95 @@ kani_ensures!(
     |(actual, expected)| actual == expected
 );
 
+/// A `bool` known to be the `true` a `.is_ipv4()` kind-check reports
+/// when the address was actually constructed as the V4 variant --
+/// following `EmptiedContainerReportsEmpty`'s established shape for a
+/// raw boolean claim: the bound is the identity function, since the
+/// claim itself *is* "this boolean is true."
+///
+/// Independently hand-written as `assert!(x.is_ipv4(), ...)` /
+/// `assert!(!x.is_ipv4(), ...)` at 4 real sites split between
+/// `IpAddr` and `SocketAddr` -- the identical claim regardless of
+/// which type's own `.is_ipv4()` is being checked.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct IsIpv4KindReportsTrue;
+
+impl KaniWitness for IsIpv4KindReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_ip_addr_variant_matches_its_kind".to_owned(),
+            VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(IsIpv4KindReportsTrue);
+
+kani_ensures!(
+    IsIpv4KindReportsTrue,
+    "amenable_kani::IsIpv4KindReportsTrue",
+    bool,
+    |is_ipv4| is_ipv4
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IsIpv4KindReportsTrue",
+        "kani",
+        || <IsIpv4KindReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
+/// The `.is_ipv6()` sibling of [`IsIpv4KindReportsTrue`], same reasoning.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct IsIpv6KindReportsTrue;
+
+impl KaniWitness for IsIpv6KindReportsTrue {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_ip_addr_variant_matches_its_kind".to_owned(),
+            VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(IsIpv6KindReportsTrue);
+
+kani_ensures!(
+    IsIpv6KindReportsTrue,
+    "amenable_kani::IsIpv6KindReportsTrue",
+    bool,
+    |is_ipv6| is_ipv6
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::IsIpv6KindReportsTrue",
+        "kani",
+        || <IsIpv6KindReportsTrue as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_IP_ADDR_VARIANT_MATCHES_ITS_KIND_SRC, {
         /// `IpAddr::is_ipv4`/`is_ipv6` agree with the constructing variant,
@@ -158,8 +251,8 @@ amenable_derive::harness! {
             let d: u8 = kani::any();
             let v4 = Ipv4Addr::new(a, b, c, d);
             let ip = IpAddr::V4(v4);
-            assert!(ip.is_ipv4(), "V4 reports is_ipv4");
-            assert!(!ip.is_ipv6(), "V4 reports !is_ipv6");
+            assert!(IsIpv4KindReportsTrue::ensures(ip.is_ipv4()), "V4 reports is_ipv4");
+            assert!(!IsIpv6KindReportsTrue::ensures(ip.is_ipv6()), "V4 reports !is_ipv6");
             match ip {
                 IpAddr::V4(inner) => assert!(
                     RustStdStandard::<Ipv4Addr>::ensures((inner, v4)),
@@ -170,8 +263,8 @@ amenable_derive::harness! {
 
             let v6 = Ipv6Addr::LOCALHOST;
             let ip = IpAddr::V6(v6);
-            assert!(ip.is_ipv6(), "V6 reports is_ipv6");
-            assert!(!ip.is_ipv4(), "V6 reports !is_ipv4");
+            assert!(IsIpv6KindReportsTrue::ensures(ip.is_ipv6()), "V6 reports is_ipv6");
+            assert!(!IsIpv4KindReportsTrue::ensures(ip.is_ipv4()), "V6 reports !is_ipv4");
             match ip {
                 IpAddr::V6(inner) => assert!(
                     RustStdStandard::<Ipv6Addr>::ensures((inner, v6)),
@@ -220,7 +313,10 @@ amenable_derive::harness! {
             let port: u16 = kani::any();
             let ip = Ipv4Addr::new(a, b, c, d);
             let addr = SocketAddrV4::new(ip, port);
-            assert_eq!(*addr.ip(), ip, "SocketAddrV4::ip round-trips its address");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*addr.ip(), ip)),
+                "SocketAddrV4::ip round-trips its address"
+            );
             assert!(
                 RustStdStandard::<u16>::ensures((addr.port(), port)),
                 "SocketAddrV4::port round-trips its port"
@@ -266,19 +362,20 @@ amenable_derive::harness! {
             let scope_id: u32 = kani::any();
             let ip = Ipv6Addr::LOCALHOST;
             let addr = SocketAddrV6::new(ip, port, flowinfo, scope_id);
-            assert_eq!(*addr.ip(), ip, "SocketAddrV6::ip round-trips its address");
+            assert!(
+                DerefReflectsTheStoredValue::ensures((*addr.ip(), ip)),
+                "SocketAddrV6::ip round-trips its address"
+            );
             assert!(
                 RustStdStandard::<u16>::ensures((addr.port(), port)),
                 "SocketAddrV6::port round-trips its port"
             );
-            assert_eq!(
-                addr.flowinfo(),
-                flowinfo,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((addr.flowinfo(), flowinfo)),
                 "SocketAddrV6::flowinfo round-trips"
             );
-            assert_eq!(
-                addr.scope_id(),
-                scope_id,
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((addr.scope_id(), scope_id)),
                 "SocketAddrV6::scope_id round-trips"
             );
         }
@@ -309,6 +406,13 @@ bridge_kani_witness!(RustStdStandard<SocketAddr>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<SocketAddr>,
+    "amenable_std::rust_std::RustStdStandard<SocketAddr>",
+    (SocketAddr, SocketAddr),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_SOCKET_ADDR_VARIANT_MATCHES_ITS_KIND_SRC, {
         /// `SocketAddr::is_ipv4`/`is_ipv6` agree with the constructing
@@ -320,8 +424,8 @@ amenable_derive::harness! {
 
             let v4 = SocketAddrV4::new(Ipv4Addr::LOCALHOST, port);
             let addr = SocketAddr::V4(v4);
-            assert!(addr.is_ipv4(), "V4 reports is_ipv4");
-            assert!(!addr.is_ipv6(), "V4 reports !is_ipv6");
+            assert!(IsIpv4KindReportsTrue::ensures(addr.is_ipv4()), "V4 reports is_ipv4");
+            assert!(!IsIpv6KindReportsTrue::ensures(addr.is_ipv6()), "V4 reports !is_ipv6");
             assert!(
                 RustStdStandard::<u16>::ensures((addr.port(), port)),
                 "SocketAddr::port dispatches through V4"
@@ -329,8 +433,8 @@ amenable_derive::harness! {
 
             let v6 = SocketAddrV6::new(Ipv6Addr::LOCALHOST, port, 0, 0);
             let addr = SocketAddr::V6(v6);
-            assert!(addr.is_ipv6(), "V6 reports is_ipv6");
-            assert!(!addr.is_ipv4(), "V6 reports !is_ipv4");
+            assert!(IsIpv6KindReportsTrue::ensures(addr.is_ipv6()), "V6 reports is_ipv6");
+            assert!(!IsIpv4KindReportsTrue::ensures(addr.is_ipv4()), "V6 reports !is_ipv4");
             assert!(
                 RustStdStandard::<u16>::ensures((addr.port(), port)),
                 "SocketAddr::port dispatches through V6"

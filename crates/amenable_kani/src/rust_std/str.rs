@@ -948,7 +948,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_split_yields_substrings_between_pattern_matches() {
             let parts: Vec<&str> = "a,b,c".split(',').collect();
-            assert_eq!(parts, vec!["a", "b", "c"], "split yields substrings between matches, forward");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((parts, vec!["a", "b", "c"])),
+                "split yields substrings between matches, forward"
+            );
         }
     }
 }
@@ -1022,7 +1025,10 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_split_inclusive_keeps_the_delimiter_attached() {
             let parts: Vec<&str> = "a,b,c".split_inclusive(',').collect();
-            assert_eq!(parts, vec!["a,", "b,", "c"], "split_inclusive keeps the delimiter attached to each substring");
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((parts, vec!["a,", "b,", "c"])),
+                "split_inclusive keeps the delimiter attached to each substring"
+            );
         }
     }
 }

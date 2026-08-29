@@ -10,12 +10,18 @@
 //! conforms to `net_model`'s laws, the modeled proof carries the
 //! intended Rust-facing claim.
 
+#[cfg(kani)]
+use std::net::SocketAddr;
 use std::net::{Incoming, Shutdown, TcpListener, TcpStream, UdpSocket};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -193,7 +199,10 @@ amenable_derive::harness! {
                 .client_write(client, b"hello, server".to_vec())
                 .unwrap();
             let delivered = listener.server_read(server);
-            assert_eq!(delivered, b"hello, server");
+            assert!(CollectedSequenceMatchesExpected::ensures((
+                delivered,
+                b"hello, server".to_vec()
+            )));
         }
     }
 }
@@ -238,8 +247,8 @@ amenable_derive::harness! {
             socket_b.send_to(&mut socket_a, b"ping".to_vec());
 
             let (payload, from) = socket_a.recv_from();
-            assert_eq!(payload, b"ping");
-            assert_eq!(from, addr_b);
+            assert!(CollectedSequenceMatchesExpected::ensures((payload, b"ping".to_vec())));
+            assert!(RustStdStandard::<SocketAddr>::ensures((from, addr_b)));
         }
     }
 }
