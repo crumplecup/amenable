@@ -98,11 +98,14 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_component_distinguishes_root_from_normal_segments() {
             let mut components = Path::new("/a").components();
-            assert_eq!(components.next(), Some(Component::RootDir));
-            assert_eq!(
+            assert!(RustStdStandard::<Components<'static>>::ensures((
+                components.next(),
+                Some(Component::RootDir)
+            )));
+            assert!(RustStdStandard::<Components<'static>>::ensures((
                 components.next(),
                 Some(Component::Normal(std::ffi::OsStr::new("a")))
-            );
+            )));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(components.next()));
         }
     }
@@ -131,6 +134,13 @@ bridge_kani_witness!(RustStdStandard<Components<'static>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<Components<'static>>,
+    "amenable_std::rust_std::RustStdStandard<Components<'static>>",
+    (Option<Component<'static>>, Option<Component<'static>>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_COMPONENTS_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC, {
         /// `.components()` yields a root component followed by each named
@@ -143,15 +153,18 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_components_yields_root_then_named_segments_in_order() {
             let mut components = Path::new("/a/b").components();
-            assert_eq!(components.next(), Some(Component::RootDir));
-            assert_eq!(
+            assert!(RustStdStandard::<Components<'static>>::ensures((
+                components.next(),
+                Some(Component::RootDir)
+            )));
+            assert!(RustStdStandard::<Components<'static>>::ensures((
                 components.next(),
                 Some(Component::Normal(std::ffi::OsStr::new("a")))
-            );
-            assert_eq!(
+            )));
+            assert!(RustStdStandard::<Components<'static>>::ensures((
                 components.next(),
                 Some(Component::Normal(std::ffi::OsStr::new("b")))
-            );
+            )));
             assert!(IteratorYieldsNoneWhenExhausted::ensures(components.next()));
         }
     }
