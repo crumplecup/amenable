@@ -490,8 +490,8 @@ mod proofs {
             #[kani::proof]
             fn verify_kani_compose_string_depths() {
                 assert!(ComposeDepthZeroIsEmpty::ensures(String::kani_depth0().len()));
-                assert_eq!(String::kani_depth1().len(), 1);
-                assert_eq!(String::kani_depth2().len(), 2);
+                assert!(ComposeArrayLengthIsFixed::ensures((String::kani_depth1().len(), 1)));
+                assert!(ComposeArrayLengthIsFixed::ensures((String::kani_depth2().len(), 2)));
             }
         }
     }
@@ -501,8 +501,8 @@ mod proofs {
             #[kani::proof]
             fn verify_kani_compose_vec_depths() {
                 assert!(ComposeDepthZeroIsEmpty::ensures(Vec::<u8>::kani_depth0().len()));
-                assert_eq!(Vec::<u8>::kani_depth1().len(), 1);
-                assert_eq!(Vec::<u8>::kani_depth2().len(), 2);
+                assert!(ComposeArrayLengthIsFixed::ensures((Vec::<u8>::kani_depth1().len(), 1)));
+                assert!(ComposeArrayLengthIsFixed::ensures((Vec::<u8>::kani_depth2().len(), 2)));
             }
         }
     }
