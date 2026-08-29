@@ -1,25 +1,29 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 861 8 861 53 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1041 8 1041 53 *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 864 12 864 26
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 864 30 864 31
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 859 19 859 30
-let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 860 18 860 65
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 824 24 824 58
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1044 12 1044 26
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1044 30 1044 31
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1039 19 1039 54
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1040 18 1040 65
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 657 24 657 48
+let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 994 24 994 58
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 823 8 823 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
-  [%#sledger'3] outcome = (Int64.to_int debit + Int64.to_int credit = 0)
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 656 8 656 72] (amount: Int64.t) (outcome: bool) =
+  [%#sledger'3] outcome = (Int64.to_int amount > 0)
+
+predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 993 8 993 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
+  [%#sledger'4] outcome = (Int64.to_int debit + Int64.to_int credit = 0)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_commit_balances [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 861 8 861 53]
+let rec check_commit_balances [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1041 8 1041 53]
   (amount: Int64.t) (return (x: bool)) =
-  {[@stop_split] [@expl:check_commit_balances requires] [%#sledger'1] Int64.to_int amount > 0}
+  {[@stop_split] [@expl:check_commit_balances requires] [%#sledger'1] amount_positive_holds amount true}
   (! bb0
   [ bb0 = s0
     [ s0 = Int64.neg {amount} (fun (_x: Int64.t) -> [ &debit <- _x ] s1)

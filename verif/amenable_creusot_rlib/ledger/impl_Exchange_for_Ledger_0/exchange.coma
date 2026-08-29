@@ -2,16 +2,17 @@
 
 (* <ledger::Ledger as amenable_core::Exchange<ledger::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, ledger::Transfer<amenable_gaap::Committed, amenable_gaap::CommittedToken>, witness::CreusotVerifier>> *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 848 24 848 49
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1187 16 1190 17
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1028 24 1028 49
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 58 8 58 26
 let%span scommit'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 56 8 56 13
 let%span scommit'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 52 15 52 19
 let%span scommit'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 57 9 57 80
-let%span scommit'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 53 14 53 116
+let%span scommit'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 53 14 53 44
 let%span scommit'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 17 29 17 34
 let%span scommit'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 15 23 15 27
 let%span scommit'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 17 76 17 134
-let%span scommit'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 16 22 16 124
+let%span scommit'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 16 22 16 52
 
 use creusot.int.Int64
 use creusot.int.UInt64
@@ -63,8 +64,14 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 847 8 847 58] (amount'0: Int64.t) =
-  [%#sledger] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1027 8 1027 58] (amount'0: Int64.t) =
+  [%#sledger'0] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
+
+predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1183 8 1185 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
+  [%#sledger] match outcome with
+    | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
+    | Err _ -> false
+    end
 
 let rec commit (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   (return (x: t_Result_Transfer_Committed_CommittedToken_TransferError)) =
@@ -72,10 +79,7 @@ let rec commit (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   any
   [ return (result: t_Result_Transfer_Committed_CommittedToken_TransferError) ->
   {[@stop_split] [@expl:commit ensures] ([@stop_split] [@expl:commit result type invariant] [%#scommit'6] inv_Result_Transfer_Committed_CommittedToken_TransferError result)
-    /\ ([@stop_split] [@expl:commit ensures] [%#scommit'7] match result with
-      | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
-      | Err _ -> false
-      end)}
+    /\ ([@stop_split] [@expl:commit ensures] [%#scommit'7] committed_result_holds result)}
     (! return {result}) ]
 
 meta "compute_max_steps" 1000000
@@ -96,8 +100,5 @@ let rec exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src
   | & input: t_Transfer_Validated_ValidatedToken = input ])
   [ return (result: t_Result_Transfer_Committed_CommittedToken_TransferError) ->
   {[@stop_split] [@expl:exchange_Ledger ensures] ([@stop_split] [@expl:exchange result type invariant] [%#scommit'2] inv_Result_Transfer_Committed_CommittedToken_TransferError result)
-    /\ ([@stop_split] [@expl:exchange ensures] [%#scommit'3] match result with
-      | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
-      | Err _ -> false
-      end)}
+    /\ ([@stop_split] [@expl:exchange ensures] [%#scommit'3] committed_result_holds result)}
     (! return {result}) ]

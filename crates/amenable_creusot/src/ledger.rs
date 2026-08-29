@@ -381,7 +381,7 @@ impl TransferPayload {
     }
 
     #[requires(true)]
-    #[ensures(result.0 == self.amount.0)]
+    #[ensures(amount_value_matches_field(result.0, self.amount.0))]
     fn amount(&self) -> Amount {
         self.amount
     }
@@ -464,6 +464,131 @@ pub struct Ledger {
     balance: i64,
 }
 
+amenable_derive::harness! {
+    creusot, CHECK_AMOUNT_POSITIVE_RESULT_HOLDS_SRC, {
+        /// `Ledger::check_amount_positive`'s whole-`Result` postcondition,
+        /// named once rather than restated inline in its own
+        /// `#[ensures(..)]` clause -- composes `amount_positive_holds`
+        /// (already named) with the `Err` arm's own extra `bad == amount`
+        /// conjunct.
+        #[logic(open)]
+        fn check_amount_positive_result_holds(amount: i64, outcome: Result<(), i64>) -> bool {
+            pearlite! {
+                match outcome {
+                    Ok(()) => amount_positive_holds(amount, true),
+                    Err(bad) => bad == amount && amount_positive_holds(amount, false),
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::Ledger::check_amount_positive",
+        "creusot",
+        "ensures",
+        || CHECK_AMOUNT_POSITIVE_RESULT_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, CHECK_SUFFICIENT_FUNDS_RESULT_HOLDS_SRC, {
+        /// `Ledger::check_sufficient_funds`'s whole-`Result` postcondition
+        /// -- same reasoning as `check_amount_positive_result_holds`,
+        /// composing `sufficient_funds_holds` with the `Err` arm's own
+        /// extra conjuncts. Takes `balance` as a plain argument rather
+        /// than `&self`: a `#[logic(open)] fn` at module scope has no
+        /// receiver to name, matching `sufficient_funds_holds`'s own
+        /// free-function shape above.
+        #[logic(open)]
+        fn check_sufficient_funds_result_holds(
+            balance: i64,
+            amount: i64,
+            outcome: Result<(), (i64, i64)>,
+        ) -> bool {
+            pearlite! {
+                match outcome {
+                    Ok(()) => sufficient_funds_holds(balance, amount, true),
+                    Err((observed_balance, required)) => {
+                        observed_balance == balance
+                            && required == amount
+                            && sufficient_funds_holds(balance, amount, false)
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::Ledger::check_sufficient_funds",
+        "creusot",
+        "ensures",
+        || CHECK_SUFFICIENT_FUNDS_RESULT_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, NEGATIVE_AMOUNT_HOLDS_SRC, {
+        /// `Ledger::negative_amount`'s postcondition: the constructed
+        /// `TransferError` is exactly the `NegativeAmount` variant
+        /// wrapping the given value, never any other variant.
+        #[logic(open)]
+        fn negative_amount_holds(bad: i64, outcome: TransferError) -> bool {
+            pearlite! {
+                match outcome {
+                    TransferError::NegativeAmount(actual) => actual == bad,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::Ledger::negative_amount",
+        "creusot",
+        "ensures",
+        || NEGATIVE_AMOUNT_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, INSUFFICIENT_FUNDS_HOLDS_SRC, {
+        /// `Ledger::insufficient_funds`'s postcondition: the constructed
+        /// `TransferError` is exactly the `InsufficientFunds` variant
+        /// carrying the given `(balance, required)` pair, never any other
+        /// variant.
+        #[logic(open)]
+        fn insufficient_funds_holds(bad: (i64, i64), outcome: TransferError) -> bool {
+            pearlite! {
+                match outcome {
+                    TransferError::InsufficientFunds { balance, required } => {
+                        balance == bad.0 && required == bad.1
+                    }
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::Ledger::insufficient_funds",
+        "creusot",
+        "ensures",
+        || INSUFFICIENT_FUNDS_HOLDS_SRC,
+    )
+}
+
 #[cfg(creusot)]
 impl Ledger {
     /// `<V>`: unconstrained, no bound, never referenced in this body --
@@ -481,20 +606,14 @@ impl Ledger {
     /// `V` is the honest mirror of "the real call needs some type in this
     /// position," nothing more.
     #[requires(true)]
-    #[ensures(match result {
-        Ok(()) => amount_positive_holds(amount, true),
-        Err(bad) => bad == amount && amount_positive_holds(amount, false),
-    })]
+    #[ensures(check_amount_positive_result_holds(amount, result))]
     fn check_amount_positive<V>(amount: i64) -> Result<(), i64> {
         if amount > 0 { Ok(()) } else { Err(amount) }
     }
 
     /// `<V>`: see [`Ledger::check_amount_positive`]'s own doc comment.
     #[requires(true)]
-    #[ensures(match result {
-        Ok(()) => sufficient_funds_holds(self.balance, amount, true),
-        Err((balance, required)) => balance == self.balance && required == amount && sufficient_funds_holds(self.balance, amount, false),
-    })]
+    #[ensures(check_sufficient_funds_result_holds(self.balance, amount, result))]
     fn check_sufficient_funds<V>(&self, amount: i64) -> Result<(), (i64, i64)> {
         if self.balance < amount {
             Err((self.balance, amount))
@@ -513,19 +632,13 @@ impl Ledger {
     /// rather than inlining an equivalent that would silently diverge
     /// from what's actually captured.
     #[requires(true)]
-    #[ensures(match result {
-        TransferError::NegativeAmount(actual) => actual == bad,
-        _ => false,
-    })]
+    #[ensures(negative_amount_holds(bad, result))]
     fn negative_amount(bad: i64) -> TransferError {
         TransferError::NegativeAmount(bad)
     }
 
     #[requires(true)]
-    #[ensures(match result {
-        TransferError::InsufficientFunds { balance, required } => balance == bad.0 && required == bad.1,
-        _ => false,
-    })]
+    #[ensures(insufficient_funds_holds(bad, result))]
     fn insufficient_funds(bad: (i64, i64)) -> TransferError {
         TransferError::InsufficientFunds {
             balance: bad.0,
@@ -544,6 +657,33 @@ amenable_derive::harness! {
             pearlite! { outcome == (amount@ > 0) }
         }
     }
+}
+
+// Two call shapes reuse this same fn: `check_amount_positive`'s own
+// `#[ensures(amount_positive_holds(amount, result))]` below, and
+// `check_commit_balances`'s own `#[requires(amount_positive_holds(amount,
+// true))]` further down -- separate `ContractRecord`s since Kani's
+// `(verifier, kind)` lookup (mirrored here for Creusot/Verus by
+// `cordial`'s own scanner) is keyed separately for `"ensures"` vs
+// `"requires"` clauses.
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::amount_positive_holds",
+        "creusot",
+        "ensures",
+        || AMOUNT_POSITIVE_HOLDS_SRC,
+    )
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::amount_positive_holds",
+        "creusot",
+        "requires",
+        || AMOUNT_POSITIVE_HOLDS_SRC,
+    )
 }
 
 amenable_derive::harness! {
@@ -607,6 +747,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::sufficient_funds_holds",
+        "creusot",
+        "ensures",
+        || SUFFICIENT_FUNDS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CHECK_SUFFICIENT_FUNDS_SRC, {
         /// Mirrors `amenable_kani::ledger::Ledger::check_sufficient_funds`'s
@@ -654,6 +804,16 @@ amenable_derive::harness! {
             pearlite! { outcome == (from != to) }
         }
     }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::accounts_distinct_holds",
+        "creusot",
+        "ensures",
+        || ACCOUNTS_DISTINCT_HOLDS_SRC,
+    )
 }
 
 amenable_derive::harness! {
@@ -734,6 +894,16 @@ amenable_derive::harness! {
             }
         }
     }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::validated_holds",
+        "creusot",
+        "ensures",
+        || VALIDATED_HOLDS_SRC,
+    )
 }
 
 amenable_derive::harness! {
@@ -826,6 +996,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::balanced_entries_holds",
+        "creusot",
+        "ensures",
+        || BALANCED_ENTRIES_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, COMMITTED_AMOUNT_HOLDS_SRC, {
         /// Real captured `commit` companion's own postcondition (`GAAP_
@@ -856,7 +1036,7 @@ amenable_derive::harness! {
         /// -- see the real edge's own doc comment for why `amount > 0`
         /// is a genuine precondition, not an artifact of what a harness
         /// happens to assume.
-        #[requires(amount@ > 0)]
+        #[requires(amount_positive_holds(amount, true))]
         #[ensures(balanced_entries_holds(-amount, amount, result))]
         fn check_commit_balances(amount: i64) -> bool {
             let debit = -amount;
@@ -937,6 +1117,90 @@ impl Witness<CreusotVerifier> for Rejected<Validated> {
     type ProofArtifact = ();
 
     fn proof() -> Self::ProofArtifact {}
+}
+
+amenable_derive::harness! {
+    creusot, VALIDATED_RESULT_HOLDS_SRC, {
+        /// `Ledger::validate`'s real generated `Exchange` companion's own
+        /// whole-`Result` postcondition (`amenable_gaap::ledger`'s
+        /// `capture_exchange_body(creusot_ensures = ..)` attribute) --
+        /// named once here rather than restated inline in the generated
+        /// companion's own `#[ensures(..)]` clause, composing
+        /// `amount_positive_holds`/`accounts_distinct_holds`/
+        /// `sufficient_funds_holds` (each already named) the same way
+        /// `validated_holds` composes them for the isolated `validate`
+        /// proof function above -- a distinct fn since this one matches
+        /// over the real `Result<Transfer<..>, TransferError>` shape the
+        /// generated companion actually returns, not `TransferOutcome`.
+        /// `pub`, not private: Creusot's proof-transparency check
+        /// requires everything an `#[ensures(..)]` clause touches to be
+        /// at least as visible as the function carrying it, and the
+        /// generated companion's clause sits on the real, `pub`
+        /// `Exchange::exchange` trait method (see `Amount::value`'s own
+        /// doc comment for the same real constraint hit earlier in this
+        /// file).
+        #[logic(open)]
+        pub fn validated_result_holds(
+            outcome: Result<Transfer<Validated, ValidatedToken>, TransferError>,
+        ) -> bool {
+            pearlite! {
+                match outcome {
+                    Ok(validated) => {
+                        amount_positive_holds(validated.payload.amount.0, true)
+                            && accounts_distinct_holds(validated.payload.from, validated.payload.to, true)
+                    }
+                    Err(TransferError::NegativeAmount(bad)) => amount_positive_holds(bad, false),
+                    Err(TransferError::InsufficientFunds { balance, required }) => {
+                        sufficient_funds_holds(balance, required, false)
+                    }
+                    Err(TransferError::SameAccount) => true,
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::generated::validate",
+        "creusot",
+        "ensures",
+        || VALIDATED_RESULT_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, COMMITTED_RESULT_HOLDS_SRC, {
+        /// `Ledger::commit`'s real generated `Exchange` companion's own
+        /// whole-`Result` postcondition -- same reasoning as
+        /// `validated_result_holds`, composing `committed_amount_holds`
+        /// (already named) with the `Err` arm's own `false` (`commit`
+        /// never actually fails, matching `amenable_kani::ledger::
+        /// Ledger::commit`'s own claim). `pub`, not private: see
+        /// `validated_result_holds`'s own doc comment for why.
+        #[logic(open)]
+        pub fn committed_result_holds(
+            outcome: Result<Transfer<Committed, CommittedToken>, TransferError>,
+        ) -> bool {
+            pearlite! {
+                match outcome {
+                    Ok(committed) => committed_amount_holds(committed.payload.amount.0),
+                    Err(_) => false,
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ledger::generated::commit",
+        "creusot",
+        "ensures",
+        || COMMITTED_RESULT_HOLDS_SRC,
+    )
 }
 
 // `Ledger::validate`'s/`::commit`'s/`::reject`'s/`::rollback`'s real

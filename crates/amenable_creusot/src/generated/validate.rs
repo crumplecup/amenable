@@ -13,7 +13,7 @@ amenable_derive::harness! {
     creusot, VERIFY_VALIDATE_EXCHANGE_SRC, {
         impl Ledger {
             #[requires(true)]
-            #[ensures(match result { Ok(validated) => amount_positive_holds(validated.payload.amount.0, true) && accounts_distinct_holds(validated.payload.from, validated.payload.to, true), Err(TransferError::NegativeAmount(bad)) => amount_positive_holds(bad, false), Err(TransferError::InsufficientFunds { balance, required }) => sufficient_funds_holds(balance, required, false), Err(TransferError::SameAccount) => true, })]
+            #[ensures(validated_result_holds(result))]
             fn validate<V>(&self, input: Transfer<Pending, PendingToken>) -> Result<Transfer<Validated, ValidatedToken>, TransferError> {
                 let payload = input.primary().clone();
                 let amount = payload.amount().value();
@@ -59,7 +59,7 @@ impl
     type Error = TransferError;
 
     #[requires(true)]
-    #[ensures(match result { Ok(validated) => amount_positive_holds(validated.payload.amount.0, true) && accounts_distinct_holds(validated.payload.from, validated.payload.to, true), Err(TransferError::NegativeAmount(bad)) => amount_positive_holds(bad, false), Err(TransferError::InsufficientFunds { balance, required }) => sufficient_funds_holds(balance, required, false), Err(TransferError::SameAccount) => true, })]
+    #[ensures(validated_result_holds(result))]
     fn exchange(
         &self,
         input: Transfer<Pending, PendingToken>,

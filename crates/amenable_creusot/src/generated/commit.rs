@@ -13,7 +13,7 @@ amenable_derive::harness! {
     creusot, VERIFY_COMMIT_EXCHANGE_SRC, {
         impl Ledger {
             #[requires(true)]
-            #[ensures(match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, })]
+            #[ensures(committed_result_holds(result))]
             fn commit(&self, input: Transfer<Validated, ValidatedToken>) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
                 let payload = input.primary().clone();
                 let token = Committed::establish(input.sidecar());
@@ -50,7 +50,7 @@ impl
     type Error = TransferError;
 
     #[requires(true)]
-    #[ensures(match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, })]
+    #[ensures(committed_result_holds(result))]
     fn exchange(
         &self,
         input: Transfer<Validated, ValidatedToken>,

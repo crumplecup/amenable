@@ -1,10 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 498 4 498 78 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 617 4 617 78 *)
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 493 15 493 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 494 14 497 5
-let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 605 24 605 56
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 615 15 615 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 616 14 616 79
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 512 16 519 17
+let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 745 24 745 56
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -16,14 +17,21 @@ type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok () | Err tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 604 8 604 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
-  [%#sledger'1] outcome = (Int64.to_int balance'0 >= Int64.to_int amount)
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 744 8 744 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
+  [%#sledger'2] outcome = (Int64.to_int balance'0 >= Int64.to_int amount)
+
+predicate check_sufficient_funds_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 506 8 510 17] (balance'0: Int64.t) (amount: Int64.t) (outcome: t_Result_unit_tup2_i64_i64) =
+  [%#sledger'1] match outcome with
+    | Ok () -> sufficient_funds_holds balance'0 amount true
+    | Err {f0 = observed_balance; f1 = required} -> observed_balance = balance'0
+    /\ required = amount /\ sufficient_funds_holds balance'0 amount false
+    end
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_sufficient_funds_V [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 498 4 498 78]
+let rec check_sufficient_funds_V [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 617 4 617 78]
   (self: t_Ledger) (amount: Int64.t) (return (x: t_Result_unit_tup2_i64_i64)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Int64.lt self.balance amount ] s1 | s1 = any [ br0 -> {_7 = false} (! bb2) | br1 -> {_7} (! bb1) ] ]
@@ -37,9 +45,5 @@ let rec check_sufficient_funds_V [#"/home/erik/repos/amenable/crates/amenable_cr
   | & _10: tup2_i64_i64 = Any.any_l ()
   | & _13: () = Any.any_l () ])
   [ return (result: t_Result_unit_tup2_i64_i64) ->
-  {[@stop_split] [@expl:check_sufficient_funds ensures] [%#sledger'0] match result with
-      | Ok () -> sufficient_funds_holds self.balance amount true
-      | Err {f0 = balance'0; f1 = required} -> balance'0 = self.balance
-      /\ required = amount /\ sufficient_funds_holds self.balance amount false
-      end}
+  {[@stop_split] [@expl:check_sufficient_funds ensures] [%#sledger'0] check_sufficient_funds_result_holds self.balance amount result}
     (! return {result}) ]

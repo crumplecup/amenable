@@ -284,7 +284,7 @@ impl Ledger {
 
 #[amenable_derive::capture_exchange_body(
     evidence = "Validated",
-    creusot_ensures = "match result { Ok(validated) => amount_positive_holds(validated.payload.amount.0, true) && accounts_distinct_holds(validated.payload.from, validated.payload.to, true), Err(TransferError::NegativeAmount(bad)) => amount_positive_holds(bad, false), Err(TransferError::InsufficientFunds { balance, required }) => sufficient_funds_holds(balance, required, false), Err(TransferError::SameAccount) => true, }",
+    creusot_ensures = "validated_result_holds(result)",
     method_generics = "V",
     kani_ensures = "true"
 )]
@@ -366,7 +366,7 @@ impl Ledger {
 
 #[amenable_derive::capture_exchange_body(
     evidence = "Committed",
-    creusot_ensures = "match result { Ok(committed) => committed_amount_holds(committed.payload.amount.0), Err(_) => false, }",
+    creusot_ensures = "committed_result_holds(result)",
     kani_ensures = "true",
     kani_requires_evidence = "Validated"
 )]

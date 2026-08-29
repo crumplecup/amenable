@@ -1,25 +1,30 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 520 4 520 49 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 636 4 636 49 *)
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 515 15 515 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 516 14 519 5
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 634 15 634 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 635 14 635 48
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 543 16 546 17
 
 use creusot.int.Int64
 use creusot.prelude.Any
 
 type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
 
+predicate negative_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 541 8 541 74] (bad: Int64.t) (outcome: t_TransferError) =
+  [%#sledger'1] match outcome with
+    | NegativeAmount actual -> actual = bad
+    | _ -> false
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec negative_amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 520 4 520 49] (bad: Int64.t)
+let rec negative_amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 636 4 636 49] (bad: Int64.t)
   (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- NegativeAmount bad ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: Int64.t = bad ])
-  [ return (result: t_TransferError) -> {[@stop_split] [@expl:negative_amount ensures] [%#sledger'0] match result with
-      | NegativeAmount actual -> actual = bad
-      | _ -> false
-      end}
+  [ return (result: t_TransferError) ->
+  {[@stop_split] [@expl:negative_amount ensures] [%#sledger'0] negative_amount_holds bad result}
     (! return {result}) ]

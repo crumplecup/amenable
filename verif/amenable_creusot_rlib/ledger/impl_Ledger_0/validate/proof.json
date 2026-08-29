@@ -30,7 +30,7 @@
         "time": 0.018
       },
       "vc_to''0": { "prover": "alt-ergo", "time": 0.017 },
-      "vc_validate_V": { "prover": "alt-ergo", "time": 0.107 },
+      "vc_validate_V": { "prover": "cvc4", "time": 0.102 },
       "vc_value": { "prover": "alt-ergo", "time": 0.019 }
     }
   }

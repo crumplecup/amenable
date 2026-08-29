@@ -1,9 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 529 4 529 59 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 642 4 642 59 *)
 
 (* ledger::Ledger *)
 
-let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 524 15 524 19
-let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 525 14 528 5
+let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 640 15 640 19
+let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 641 14 641 51
+let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 571 16 576 17
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -12,17 +13,20 @@ type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
 
 type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
 
+predicate insufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 569 8 569 84] (bad: tup2_i64_i64) (outcome: t_TransferError) =
+  [%#sledger'1] match outcome with
+    | InsufficientFunds balance required -> balance = bad.f0 /\ required = bad.f1
+    | _ -> false
+    end
+
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec insufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 529 4 529 59]
+let rec insufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 642 4 642 59]
   (bad: tup2_i64_i64) (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- InsufficientFunds (bad.f0) (bad.f1) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: tup2_i64_i64 = bad ])
   [ return (result: t_TransferError) ->
-  {[@stop_split] [@expl:insufficient_funds ensures] [%#sledger'0] match result with
-      | InsufficientFunds balance required -> balance = bad.f0 /\ required = bad.f1
-      | _ -> false
-      end}
+  {[@stop_split] [@expl:insufficient_funds ensures] [%#sledger'0] insufficient_funds_holds bad result}
     (! return {result}) ]

@@ -6,7 +6,8 @@ let%span sledger = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger
 let%span sledger'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 170 21 170 31
 let%span sledger'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 169 18 169 22
 let%span sledger'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 242 8 242 13
-let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 848 24 848 49
+let%span sledger'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1187 16 1190 17
+let%span sledger'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1028 24 1028 49
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 95 0 95 87
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 18 30 18 45
@@ -17,7 +18,7 @@ let%span scommit'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/gene
 let%span scommit'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 17 29 17 34
 let%span scommit'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 15 23 15 27
 let%span scommit'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 17 76 17 134
-let%span scommit'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 16 22 16 124
+let%span scommit'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/commit.rs" 16 22 16 52
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -121,8 +122,14 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 847 8 847 58] (amount'0: Int64.t) =
-  [%#sledger'3] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1027 8 1027 58] (amount'0: Int64.t) =
+  [%#sledger'4] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
+
+predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger.rs" 1183 8 1185 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
+  [%#sledger'3] match outcome with
+    | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
+    | Err _ -> false
+    end
 
 meta "compute_max_steps" 1000000
 
@@ -155,8 +162,5 @@ let rec commit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generate
   | & _12: t_Transfer_Committed_CommittedToken = Any.any_l () ])
   [ return (result: t_Result_Transfer_Committed_CommittedToken_TransferError) ->
   {[@stop_split] [@expl:commit ensures] ([@stop_split] [@expl:commit result type invariant] [%#scommit'6] inv_Result_Transfer_Committed_CommittedToken_TransferError result)
-    /\ ([@stop_split] [@expl:commit ensures] [%#scommit'7] match result with
-      | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
-      | Err _ -> false
-      end)}
+    /\ ([@stop_split] [@expl:commit ensures] [%#scommit'7] committed_result_holds result)}
     (! return {result}) ]
