@@ -23,10 +23,19 @@ verus! {
 #[verifier::external_body]
 pub struct ExParseFloatError(ParseFloatError);
 
+/// The two fixed examples this file's whole claim rests on, named
+/// once instead of restated: `f64::from_str` fails on `"not a float"`
+/// and succeeds on `"3.14"`.
+pub open spec fn parse_float_examples_match_expected_outcome(
+    s: &str,
+    result: Result<f64, ParseFloatError>,
+) -> bool {
+    (s == "not a float" ==> result is Err) && (s == "3.14" ==> result is Ok)
+}
+
 pub assume_specification [<f64 as std::str::FromStr>::from_str] (s: &str) -> (result: Result<f64, ParseFloatError>)
     ensures
-        s == "not a float" ==> result is Err,
-        s == "3.14" ==> result is Ok,
+        parse_float_examples_match_expected_outcome(s, result),
 ;
 
 /// A non-numeric string fails to parse as `f64`, and a valid numeric

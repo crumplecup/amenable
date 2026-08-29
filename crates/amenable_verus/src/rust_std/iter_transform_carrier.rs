@@ -51,14 +51,24 @@ pub fn verify_map_model_applies_its_closure_to_each_item(x: i32) -> (result: (i3
     (mapped, expected)
 }
 
+/// `Filter`'s predicate and `FilterMap`'s closure are two different
+/// real mechanisms landing on the identical law over this shared
+/// symbolic item: "is nonzero" (`Filter`'s own predicate) and "`None`
+/// for `0`, `Some(x)` otherwise" (`FilterMap`'s own closure) are the
+/// same function, so both `verify_filter_model_...`/`verify_filter_
+/// map_model_...` below state it once by calling this instead of
+/// restating it twice.
+pub open spec fn nonzero_item_survives_filtering(x: i32, result: Option<i32>) -> bool {
+    (x != 0 ==> result == Some(x)) && (x == 0 ==> result is None)
+}
+
 /// `Filter::next` yields the item only when the predicate holds —
 /// modeled here as "is nonzero", the exact predicate
 /// `amenable_kani`'s own `verify_filter_yields_only_items_matching_
 /// the_predicate` harness uses.
 pub fn verify_filter_model_yields_only_items_matching_the_predicate(x: i32) -> (result: Option<i32>)
     ensures
-        x != 0 ==> result == Some(x),
-        x == 0 ==> result is None,
+        nonzero_item_survives_filtering(x, result),
 {
     if x != 0 { Some(x) } else { None }
 }
@@ -69,8 +79,7 @@ pub fn verify_filter_model_yields_only_items_matching_the_predicate(x: i32) -> (
 /// closure (`None` for `0`, `Some(x)` otherwise).
 pub fn verify_filter_map_model_applies_and_filters_in_one_step(x: i32) -> (result: Option<i32>)
     ensures
-        x == 0 ==> result is None,
-        x != 0 ==> result == Some(x),
+        nonzero_item_survives_filtering(x, result),
 {
     if x == 0 { None } else { Some(x) }
 }

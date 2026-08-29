@@ -1003,6 +1003,13 @@ bridge_verus_witness!(RustStdStandard<core::num::ParseFloatError>);
     )
 }
 
+// The two fixed examples this file's whole claim rests on.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::num::ParseFloatError>,
+    "amenable_std::rust_std::RustStdStandard<core::num::ParseFloatError>",
+    "parse_float_examples_match_expected_outcome"
+);
+
 const VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/try_from_int_error_carrier.rs");
 
@@ -3171,6 +3178,14 @@ bridge_verus_witness!(
         },
     )
 }
+
+// `Filter`'s predicate and `FilterMap`'s closure land on the identical
+// law -- named once, called from both.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>",
+    "nonzero_item_survives_filtering"
+);
 
 const VERIFY_FILTER_MAP_MODEL_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
