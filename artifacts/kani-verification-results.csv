@@ -57,8 +57,8 @@ amenable_kani::rust_std::backtrace::verify_backtrace_force_capture_always_actual
 amenable_kani::rust_std::backtrace::verify_backtrace_status_reports_captured_after_force_capture,1787760234,passed
 amenable_kani::rust_std::cell::verify_cell_get_set_replace_take_round_trip,1787760243,passed
 amenable_kani::rust_std::cell::verify_lazy_cell_caches_its_initializer_result,1787760252,passed
-amenable_kani::rust_std::cell::verify_once_cell_initializes_exactly_once,1788026813,passed
-amenable_kani::rust_std::cell::verify_ref_cell_dynamic_borrow_rules,1788025812,passed
+amenable_kani::rust_std::cell::verify_once_cell_initializes_exactly_once,1788027269,passed
+amenable_kani::rust_std::cell::verify_ref_cell_dynamic_borrow_rules,1788027258,passed
 amenable_kani::rust_std::cell::verify_ref_derefs_to_the_borrowed_value,1787760282,passed
 amenable_kani::rust_std::cell::verify_ref_mut_derefs_and_writes_through_to_the_cell,1788025824,passed
 amenable_kani::rust_std::cell::verify_unsafe_cell_get_mut_and_into_inner_round_trip,1787760301,passed
@@ -82,7 +82,7 @@ amenable_kani::rust_std::env::verify_join_paths_error_reports_an_unjoinable_path
 amenable_kani::rust_std::env::verify_split_paths_recovers_paths_joined_by_join_paths,1787760503,passed
 amenable_kani::rust_std::ffi::verify_cstr_excludes_the_terminating_nul_from_to_bytes,1787760515,passed
 amenable_kani::rust_std::ffi::verify_from_bytes_until_nul_requires_a_nul_byte_somewhere,1787760526,passed
-amenable_kani::rust_std::ffi::verify_from_bytes_with_nul_requires_the_nul_only_at_the_end,1787760537,passed
+amenable_kani::rust_std::ffi::verify_from_bytes_with_nul_requires_the_nul_only_at_the_end,1788027302,passed
 amenable_kani::rust_std::fmt::verify_alignment_reaches_the_formatter_from_the_format_spec,1788024146,passed
 amenable_kani::rust_std::fmt::verify_arguments_renders_the_same_as_the_value_itself,1788024158,passed
 amenable_kani::rust_std::fmt::verify_debug_list_renders_entries_in_brackets,1788024217,passed
@@ -224,7 +224,7 @@ amenable_kani::rust_std::primitives::verify_mutable_reference_dereferences_to_an
 amenable_kani::rust_std::primitives::verify_shared_reference_dereferences_to_the_referent,1787761957,passed
 amenable_kani::rust_std::primitives::verify_slice_indexing_and_length,1787761966,passed
 amenable_kani::rust_std::primitives::verify_str_byte_length_and_content,1787761977,passed
-amenable_kani::rust_std::primitives::verify_string_utf8_valid,1787761988,passed
+amenable_kani::rust_std::primitives::verify_string_utf8_valid,1788027316,passed
 amenable_kani::rust_std::primitives::verify_tuple_field_access,1787761989,passed
 amenable_kani::rust_std::process::verify_child_has_a_process_id_and_can_be_waited_on,1787761998,passed
 amenable_kani::rust_std::process::verify_child_stderr_captures_what_the_child_wrote_to_stderr,1787762014,passed
@@ -323,7 +323,7 @@ amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_o
 amenable_kani::rust_std::sync_lock::verify_lazy_lock_caches_its_initializer_result,1787763032,passed
 amenable_kani::rust_std::sync_lock::verify_mutex_excludes_a_second_lock_while_held,1787763041,passed
 amenable_kani::rust_std::sync_lock::verify_mutex_guard_writes_through,1787763055,passed
-amenable_kani::rust_std::sync_lock::verify_once_lock_initializes_exactly_once,1788026831,passed
+amenable_kani::rust_std::sync_lock::verify_once_lock_initializes_exactly_once,1788027289,passed
 amenable_kani::rust_std::sync_lock::verify_once_runs_its_closure_exactly_once,1787763087,passed
 amenable_kani::rust_std::sync_lock::verify_once_state_reports_not_poisoned_on_a_clean_run,1787763102,passed
 amenable_kani::rust_std::sync_lock::verify_poison_error_still_recovers_the_guards_value,1787763111,passed
@@ -354,4 +354,4 @@ amenable_kani::stoplight::verify_full_cycle_composes,1787874232,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1787763370,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1787875414,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1787763388,passed
-amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1787763399,passed
+amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788027332,passed

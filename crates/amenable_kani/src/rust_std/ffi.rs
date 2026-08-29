@@ -6,12 +6,18 @@
 
 use std::ffi::{CStr, FromBytesUntilNulError, FromBytesWithNulError};
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::Requires;
 use amenable_std::{NonNulByte, RustStdStandard};
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
 
@@ -167,15 +173,21 @@ amenable_derive::harness! {
             let byte: u8 = kani::any();
             kani::assume(<NonNulByte as Requires<crate::KaniVerifier>>::requires(byte));
             assert!(
-                CStr::from_bytes_with_nul(&[byte, 0]).is_ok(),
+                FallibleOperationReportsSuccess::ensures(
+                    CStr::from_bytes_with_nul(&[byte, 0]).is_ok()
+                ),
                 "a nul as the last byte is accepted"
             );
             assert!(
-                CStr::from_bytes_with_nul(&[byte, byte]).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    CStr::from_bytes_with_nul(&[byte, byte]).is_err()
+                ),
                 "no nul byte at all is rejected"
             );
             assert!(
-                CStr::from_bytes_with_nul(&[0, byte]).is_err(),
+                FallibleOperationReportsFailure::ensures(
+                    CStr::from_bytes_with_nul(&[0, byte]).is_err()
+                ),
                 "an interior nul with trailing data is rejected"
             );
         }

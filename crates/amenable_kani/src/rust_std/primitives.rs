@@ -205,6 +205,54 @@ impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for RustStdStandard<String> {
     }
 }
 
+/// An `(is_empty, length)` pair known to agree: a buffer's own
+/// emptiness check reports `true` exactly when its tracked length is
+/// zero.
+///
+/// Independently hand-written as `assert_eq!(buffer.is_empty(), len ==
+/// 0, ...)` at 2 real sites (`rust_std::primitives`'s own `String`
+/// buffer bookkeeping, `utf8_model`'s `KaniUtf8Buffer` bookkeeping) --
+/// the identical claim regardless of which owned-buffer type is being
+/// checked.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<i32>",
+    basis_ctor = "RustStdStandard::<i32>::new()",
+    provenance = "<i32 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct EmptinessTracksZeroLength;
+
+impl KaniWitness for EmptinessTracksZeroLength {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_string_utf8_valid".to_owned(),
+            VERIFY_STRING_UTF8_VALID_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(EmptinessTracksZeroLength);
+
+kani_ensures!(
+    EmptinessTracksZeroLength,
+    "amenable_kani::EmptinessTracksZeroLength",
+    (bool, usize),
+    |(is_empty, length)| is_empty == (length == 0)
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::EmptinessTracksZeroLength",
+        "kani",
+        || <EmptinessTracksZeroLength as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_STRING_UTF8_VALID_SRC, {
         /// `String`'s length and emptiness are consistent with its byte
@@ -243,7 +291,10 @@ amenable_derive::harness! {
                         KaniUtf8Buffer::<2>::ensures((buffer.len(), len)),
                         "length tracks the stored bytes"
                     );
-                    assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
+                    assert!(
+                        EmptinessTracksZeroLength::ensures((buffer.is_empty(), len)),
+                        "emptiness tracks a zero length"
+                    );
                     assert!(KaniUtf8Buffer::<2>::ensures((buffer.as_bytes().len(), len)));
                 }
                 Err(KaniUtf8BufferError::InvalidUtf8) => {

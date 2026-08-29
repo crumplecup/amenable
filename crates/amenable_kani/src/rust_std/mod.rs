@@ -80,8 +80,9 @@ pub use macros::CheckedProof;
 pub use num::NonZeroGetRoundTrips;
 pub use option_result::{FallibleOperationReportsFailure, FallibleOperationReportsSuccess};
 pub use primitives::{
-    DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, FourBytesAreEachAscii,
-    IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsWithinInclusiveRange,
+    DerefReflectsTheStoredValue, EmptinessTracksZeroLength, FieldAccessRecoversTheStoredValue,
+    FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii,
+    ValueIsWithinInclusiveRange,
 };
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,

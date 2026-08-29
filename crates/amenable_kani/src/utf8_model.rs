@@ -18,6 +18,8 @@ use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, 
 use amenable_derive::Standard;
 
 #[cfg(kani)]
+use crate::EmptinessTracksZeroLength;
+#[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
 use crate::KaniCompose;
@@ -539,7 +541,10 @@ amenable_derive::harness! {
                     KaniUtf8Buffer::<2>::ensures((buffer.len(), len)),
                     "length tracks the stored bytes"
                 );
-                assert_eq!(buffer.is_empty(), len == 0, "emptiness tracks a zero length");
+                assert!(
+                    EmptinessTracksZeroLength::ensures((buffer.is_empty(), len)),
+                    "emptiness tracks a zero length"
+                );
                 let recovered = buffer.as_bytes();
                 assert!(KaniUtf8Buffer::<2>::ensures((recovered.len(), len)));
                 if len >= 1 {

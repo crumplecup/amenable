@@ -16,6 +16,10 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
@@ -194,12 +198,12 @@ amenable_derive::harness! {
                     "borrow reads the stored value"
                 );
                 assert!(
-                    cell.try_borrow_mut().is_err(),
+                    FallibleOperationReportsFailure::ensures(cell.try_borrow_mut().is_err()),
                     "mutable borrow rejected while a shared borrow is live"
                 );
             }
             assert!(
-                cell.try_borrow_mut().is_ok(),
+                FallibleOperationReportsSuccess::ensures(cell.try_borrow_mut().is_ok()),
                 "mutable borrow allowed once the shared borrow is dropped"
             );
 
@@ -207,11 +211,11 @@ amenable_derive::harness! {
             {
                 let mut borrow = cell.borrow_mut();
                 assert!(
-                    cell.try_borrow().is_err(),
+                    FallibleOperationReportsFailure::ensures(cell.try_borrow().is_err()),
                     "shared borrow rejected while a mutable borrow is live"
                 );
                 assert!(
-                    cell.try_borrow_mut().is_err(),
+                    FallibleOperationReportsFailure::ensures(cell.try_borrow_mut().is_err()),
                     "a second mutable borrow is rejected while the first is live"
                 );
                 *borrow = updated;
@@ -450,14 +454,20 @@ amenable_derive::harness! {
             );
 
             let value: i32 = kani::any();
-            assert!(cell.set(value).is_ok(), "the first set succeeds");
+            assert!(
+                FallibleOperationReportsSuccess::ensures(cell.set(value).is_ok()),
+                "the first set succeeds"
+            );
             assert!(
                 GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
                 "get returns the set value"
             );
 
             let other: i32 = kani::any();
-            assert!(cell.set(other).is_err(), "a second set is rejected");
+            assert!(
+                FallibleOperationReportsFailure::ensures(cell.set(other).is_err()),
+                "a second set is rejected"
+            );
             assert!(
                 GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
                 "the original value survives a rejected second set"

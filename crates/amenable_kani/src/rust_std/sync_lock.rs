@@ -24,6 +24,10 @@ use crate::AtomicLoadReflectsTheLastWrite;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
+use crate::FallibleOperationReportsFailure;
+#[cfg(kani)]
+use crate::FallibleOperationReportsSuccess;
+#[cfg(kani)]
 use crate::GetterRecoversTheStoredReference;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
@@ -426,11 +430,17 @@ amenable_derive::harness! {
             assert!(IteratorYieldsNoneWhenExhausted::ensures(cell.get()));
 
             let value: i32 = kani::any();
-            assert!(cell.set(value).is_ok(), "the first set succeeds");
+            assert!(
+                FallibleOperationReportsSuccess::ensures(cell.set(value).is_ok()),
+                "the first set succeeds"
+            );
             assert!(GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))));
 
             let other: i32 = kani::any();
-            assert!(cell.set(other).is_err(), "a second set is rejected");
+            assert!(
+                FallibleOperationReportsFailure::ensures(cell.set(other).is_err()),
+                "a second set is rejected"
+            );
             assert!(
                 GetterRecoversTheStoredReference::ensures((cell.get(), Some(&value))),
                 "the original value survives a rejected second set"
