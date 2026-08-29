@@ -546,6 +546,13 @@ bridge_kani_witness!(RustStdStandard<Zip<Range<i32>, Range<i32>>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<Zip<Range<i32>, Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Zip<Range<i32>, Range<i32>>>",
+    (Option<(i32, i32)>, Option<(i32, i32)>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ZIP_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC, {
         /// `Zip` pairs up items from its two sources and stops as soon
@@ -556,7 +563,10 @@ amenable_derive::harness! {
             let b: i32 = kani::any();
             kani::assume(a < i32::MAX && b < i32::MAX);
             let mut z = (a..a + 1).zip(b..b + 1);
-            assert_eq!(z.next(), Some((a, b)), "zip pairs the two iterators' items");
+            assert!(
+                RustStdStandard::<Zip<Range<i32>, Range<i32>>>::ensures((z.next(), Some((a, b)))),
+                "zip pairs the two iterators' items"
+            );
             assert!(
                 IteratorYieldsNoneWhenExhausted::ensures(z.next()),
                 "zip stops once either input is exhausted"
@@ -588,6 +598,13 @@ bridge_kani_witness!(RustStdStandard<Enumerate<Range<i32>>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<Enumerate<Range<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<Enumerate<Range<i32>>>",
+    (Option<(usize, i32)>, Option<(usize, i32)>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ENUMERATE_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC, {
         /// `Enumerate` pairs each item with a 0-based index that
@@ -597,10 +614,12 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             kani::assume(FirstValueIsLessThanTheSecond::requires((a, i32::MAX - 1)));
             let mut e = (a..a + 2).enumerate();
-            assert_eq!(e.next(), Some((0, a)), "enumerate starts indexing at 0");
-            assert_eq!(
-                e.next(),
-                Some((1, a + 1)),
+            assert!(
+                RustStdStandard::<Enumerate<Range<i32>>>::ensures((e.next(), Some((0, a)))),
+                "enumerate starts indexing at 0"
+            );
+            assert!(
+                RustStdStandard::<Enumerate<Range<i32>>>::ensures((e.next(), Some((1, a + 1)))),
                 "enumerate increments the index alongside the item"
             );
             assert!(

@@ -132,7 +132,7 @@ amenable_kani::rust_std::iter::verify_cloned_clones_each_referenced_item,1787761
 amenable_kani::rust_std::iter::verify_copied_copies_each_referenced_item,1787761057,passed
 amenable_kani::rust_std::iter::verify_cycle_repeats_its_sequence_forever,1787761067,passed
 amenable_kani::rust_std::iter::verify_empty_yields_nothing,1787761076,passed
-amenable_kani::rust_std::iter::verify_enumerate_pairs_each_item_with_its_index,1787761086,passed
+amenable_kani::rust_std::iter::verify_enumerate_pairs_each_item_with_its_index,1788022750,passed
 amenable_kani::rust_std::iter::verify_filter_map_applies_and_filters_in_one_step,1787761096,passed
 amenable_kani::rust_std::iter::verify_filter_yields_only_items_matching_the_predicate,1787761105,passed
 amenable_kani::rust_std::iter::verify_flat_map_flattens_each_generated_iterator,1787761116,passed
@@ -156,7 +156,7 @@ amenable_kani::rust_std::iter::verify_step_by_yields_every_nth_item,1787761276,p
 amenable_kani::rust_std::iter::verify_successors_generates_from_the_previous_item,1787761285,passed
 amenable_kani::rust_std::iter::verify_take_while_yields_items_while_the_predicate_holds,1787761294,passed
 amenable_kani::rust_std::iter::verify_take_yields_at_most_n_items,1787761304,passed
-amenable_kani::rust_std::iter::verify_zip_pairs_items_from_two_iterators,1787761313,passed
+amenable_kani::rust_std::iter::verify_zip_pairs_items_from_two_iterators,1788022736,passed
 amenable_kani::rust_std::mem::verify_discriminant_identifies_variant_not_payload,1787761322,passed
 amenable_kani::rust_std::mem::verify_manually_drop_derefs_and_into_inner_round_trip,1787761331,passed
 amenable_kani::rust_std::net::verify_ip_addr_variant_matches_its_kind,1787761340,passed
@@ -280,7 +280,7 @@ amenable_kani::rust_std::std_time::verify_instant_is_monotonically_nondecreasing
 amenable_kani::rust_std::std_time::verify_system_time_duration_since_computes_the_elapsed_span,1787762570,passed
 amenable_kani::rust_std::std_time::verify_system_time_error_recovers_how_far_backward_it_went,1787762579,passed
 amenable_kani::rust_std::str::verify_bytes_yields_the_utf8_encoding,1787762592,passed
-amenable_kani::rust_std::str::verify_char_indices_pairs_each_char_with_its_byte_offset,1787762604,passed
+amenable_kani::rust_std::str::verify_char_indices_pairs_each_char_with_its_byte_offset,1788022773,passed
 amenable_kani::rust_std::str::verify_chars_yields_the_str_characters,1787762616,passed
 amenable_kani::rust_std::str::verify_encode_utf16_yields_utf16_code_units,1787762629,passed
 amenable_kani::rust_std::str::verify_escape_debug_escapes_control_characters,1787762644,passed

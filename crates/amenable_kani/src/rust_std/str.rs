@@ -137,6 +137,13 @@ bridge_kani_witness!(RustStdStandard<CharIndices<'static>>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<CharIndices<'static>>,
+    "amenable_std::rust_std::RustStdStandard<CharIndices<'static>>",
+    (Option<(usize, char)>, Option<(usize, char)>),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_CHAR_INDICES_PAIRS_EACH_CHAR_WITH_ITS_BYTE_OFFSET_SRC, {
         /// `.char_indices()` pairs the first char with byte offset 0.
@@ -149,7 +156,10 @@ amenable_derive::harness! {
             let c = byte as char;
             let s = c.to_string();
             let mut it = s.char_indices();
-            assert_eq!(it.next(), Some((0, c)), "the first char is paired with byte offset 0");
+            assert!(
+                RustStdStandard::<CharIndices<'static>>::ensures((it.next(), Some((0, c)))),
+                "the first char is paired with byte offset 0"
+            );
         }
     }
 }
