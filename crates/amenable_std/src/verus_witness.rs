@@ -665,6 +665,15 @@ bridge_verus_witness!(RustStdStandard<std::cmp::Ordering>);
     )
 }
 
+// The real law `.reverse()` obeys -- named once, called from both the
+// trusted `assume_specification` on the real method and its own
+// re-derivation, instead of restated at each.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::cmp::Ordering>,
+    "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+    "ordering_reverse_swaps_less_and_greater"
+);
+
 const VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/option_carrier.rs");
 

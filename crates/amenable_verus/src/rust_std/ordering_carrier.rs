@@ -9,6 +9,15 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The real, single law `.reverse()` obeys, named once instead of
+/// restated at both the trusted axiom below and its own re-derivation:
+/// `Less`/`Greater` swap, `Equal` is fixed.
+pub open spec fn ordering_reverse_swaps_less_and_greater(o: core::cmp::Ordering, result: core::cmp::Ordering) -> bool {
+    (o == core::cmp::Ordering::Less ==> result == core::cmp::Ordering::Greater)
+        && (o == core::cmp::Ordering::Equal ==> result == core::cmp::Ordering::Equal)
+        && (o == core::cmp::Ordering::Greater ==> result == core::cmp::Ordering::Less)
+}
+
 // `Ordering::reverse`'s real body isn't visible to Verus (a plain `match`
 // over three variants, same as the Kani/Creusot harnesses check, but
 // Verus reports "not supported" for it directly — same class of "trust
@@ -18,9 +27,7 @@ verus! {
 // `std::cmp::Ordering::reverse`, not a shadow/local reimplementation.
 pub assume_specification [core::cmp::Ordering::reverse] (o: core::cmp::Ordering) -> (result: core::cmp::Ordering)
     ensures
-        o == core::cmp::Ordering::Less ==> result == core::cmp::Ordering::Greater,
-        o == core::cmp::Ordering::Equal ==> result == core::cmp::Ordering::Equal,
-        o == core::cmp::Ordering::Greater ==> result == core::cmp::Ordering::Less,
+        ordering_reverse_swaps_less_and_greater(o, result),
 ;
 
 /// `Ordering` has exactly three inhabitants, and `.reverse()` swaps
@@ -31,9 +38,7 @@ pub assume_specification [core::cmp::Ordering::reverse] (o: core::cmp::Ordering)
 /// crate has to the real method it exercises.
 pub fn verify_ordering_reverse_swaps_less_and_greater(o: core::cmp::Ordering) -> (result: core::cmp::Ordering)
     ensures
-        o == core::cmp::Ordering::Less ==> result == core::cmp::Ordering::Greater,
-        o == core::cmp::Ordering::Equal ==> result == core::cmp::Ordering::Equal,
-        o == core::cmp::Ordering::Greater ==> result == core::cmp::Ordering::Less,
+        ordering_reverse_swaps_less_and_greater(o, result),
 {
     o.reverse()
 }
