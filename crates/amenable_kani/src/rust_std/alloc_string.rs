@@ -249,9 +249,8 @@ amenable_derive::harness! {
                 CollectedSequenceMatchesExpected::ensures((err0.as_bytes(), &depth0[..])),
                 "depth0 as_bytes recovers the original bytes"
             );
-            assert_eq!(
-                err0.into_bytes(),
-                depth0,
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err0.into_bytes(), depth0)),
                 "depth0 into_bytes recovers the original bytes"
             );
 
@@ -260,9 +259,8 @@ amenable_derive::harness! {
                 CollectedSequenceMatchesExpected::ensures((err1.as_bytes(), &depth1[..])),
                 "depth1 as_bytes recovers the original bytes"
             );
-            assert_eq!(
-                err1.into_bytes(),
-                depth1,
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err1.into_bytes(), depth1)),
                 "depth1 into_bytes recovers the original bytes"
             );
 
@@ -271,9 +269,8 @@ amenable_derive::harness! {
                 CollectedSequenceMatchesExpected::ensures((err2.as_bytes(), &depth2[..])),
                 "depth2 as_bytes recovers the original bytes"
             );
-            assert_eq!(
-                err2.into_bytes(),
-                depth2,
+            assert!(
+                CollectedSequenceMatchesExpected::ensures((err2.into_bytes(), depth2)),
                 "depth2 into_bytes recovers the original bytes"
             );
         }

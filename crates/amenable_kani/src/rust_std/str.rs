@@ -441,8 +441,10 @@ amenable_derive::harness! {
 /// ...)` at 8 real sites spanning `Vec<i32>` (a drained `VecDeque`, a
 /// rejected `try_reserve`'s untouched content, `Vec::extract_if`'s two
 /// halves), `Vec<u16>` (`encode_wide`'s UTF-16 units), and `Vec<&str>`
-/// (`split_ascii_whitespace`/`split_whitespace`/`splitn`'s parts) -- the
-/// identical claim regardless of collected element type. Generic over
+/// (`split_ascii_whitespace`/`split_whitespace`/`splitn`'s parts), plus
+/// 3 more sites in `rust_std::alloc_string` over `Vec<u8>`
+/// (`FromUtf8Error::into_bytes` recovering the original owned bytes) --
+/// the identical claim regardless of collected element type. Generic over
 /// the collected sequence type rather than one registration per
 /// producer, the same reasoning (and the same reason it needs a
 /// hand-written `Witness`/`Ensures` impl instead of the
@@ -644,11 +646,102 @@ amenable_derive::harness! {
             let bytes = b"ab";
             let mut chunks = bytes.utf8_chunks();
             let first = chunks.next().unwrap();
-            assert_eq!(first.valid(), "ab");
+            assert!(AccessorRecoversTheExpectedValue::ensures((first.valid(), "ab")));
             assert!(first.invalid().is_empty(), "wholly valid input has no invalid bytes");
-            assert!(chunks.next().is_none(), "wholly valid input is exactly one chunk");
+            assert!(
+                IteratorYieldsNoneWhenExhausted::ensures(chunks.next()),
+                "wholly valid input is exactly one chunk"
+            );
         }
     }
+}
+
+/// An `(actual, expected)` pair known to agree: a plain accessor
+/// method call recovers exactly the expected value -- distinct from a
+/// field access (`FieldAccessRecoversTheStoredValue`), an index
+/// (`IndexRecoversTheStoredElement`), or an iterator's `.next()`
+/// (`IteratorYieldsAReferenceToTheStoredValue`) even though the
+/// `Ensures` impl body is identical trivial equality either way, same
+/// reasoning as keeping those types separate from each other.
+///
+/// Independently hand-written as `assert_eq!(chunk.valid(), "ab", ...)`
+/// / `assert_eq!(chunk.invalid(), &[0xFFu8][..], ...)` at 2 real sites
+/// in `Utf8Chunk`'s own `.valid()`/`.invalid()` accessors.
+pub struct AccessorRecoversTheExpectedValue<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for AccessorRecoversTheExpectedValue<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for AccessorRecoversTheExpectedValue<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for AccessorRecoversTheExpectedValue<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
+            VERIFY_UTF8_CHUNK_SEPARATES_THE_VALID_PREFIX_FROM_INVALID_BYTES_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for AccessorRecoversTheExpectedValue<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialEq> amenable_core::Ensures<crate::KaniVerifier>
+    for AccessorRecoversTheExpectedValue<T>
+{
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn ensures((actual, expected): (T, T)) -> bool {
+        actual == expected
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::AccessorRecoversTheExpectedValue",
+        "kani",
+        "ensures",
+        || stringify!(actual == expected),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::AccessorRecoversTheExpectedValue",
+        "kani",
+        || <AccessorRecoversTheExpectedValue<i32> as KaniWitness>::proof().to_string(),
+    )
 }
 
 impl KaniWitness for RustStdStandard<Utf8Chunk<'static>> {
@@ -684,8 +777,14 @@ amenable_derive::harness! {
             let bytes = b"ab\xFFcd";
             let mut chunks = bytes.utf8_chunks();
             let first = chunks.next().unwrap();
-            assert_eq!(first.valid(), "ab", "the chunk's valid() is the UTF-8 prefix before the bad byte");
-            assert_eq!(first.invalid(), &[0xFFu8][..], "the chunk's invalid() is the bad byte itself");
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((first.valid(), "ab")),
+                "the chunk's valid() is the UTF-8 prefix before the bad byte"
+            );
+            assert!(
+                AccessorRecoversTheExpectedValue::ensures((first.invalid(), &[0xFFu8][..])),
+                "the chunk's invalid() is the bad byte itself"
+            );
         }
     }
 }

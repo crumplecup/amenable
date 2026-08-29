@@ -505,6 +505,52 @@ impl Establish<KaniLinesWitnessToken, KaniVerifier>
     }
 }
 
+/// A `u8` known to be ASCII and neither `\n` nor `\r` -- ordinary line
+/// content that can never itself be mistaken for a line terminator.
+///
+/// Independently hand-written as `kani::assume(byte.is_ascii() && byte
+/// != b'\n' && byte != b'\r')` at 3 real sites in
+/// `verify_lines_splits_on_newlines_and_drops_the_terminator` (one per
+/// symbolic line-content byte).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, amenable_derive::Standard)]
+#[standard(
+    basis = "RustStdStandard<u8>",
+    basis_ctor = "RustStdStandard::<u8>::new()",
+    provenance = "<u8 as amenable_std::RustStdType>::provenance()",
+    provenance_type = "amenable_std::RustStdProvenance"
+)]
+pub struct ByteIsAsciiAndNotALineTerminator;
+
+impl KaniWitness for ByteIsAsciiAndNotALineTerminator {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),
+            VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_kani_witness!(ByteIsAsciiAndNotALineTerminator);
+
+kani_requires!(
+    ByteIsAsciiAndNotALineTerminator,
+    "amenable_kani::ByteIsAsciiAndNotALineTerminator",
+    u8,
+    |byte| byte.is_ascii() && byte != b'\n' && byte != b'\r'
+);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ByteIsAsciiAndNotALineTerminator",
+        "kani",
+        || <ByteIsAsciiAndNotALineTerminator as KaniWitness>::proof().to_string(),
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_LINES_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC, {
         /// `.lines()` yields each line without its trailing `\n`.
@@ -520,9 +566,9 @@ amenable_derive::harness! {
             let first: u8 = kani::any();
             let second: u8 = kani::any();
             let third: u8 = kani::any();
-            kani::assume(first.is_ascii() && first != b'\n' && first != b'\r');
-            kani::assume(second.is_ascii() && second != b'\n' && second != b'\r');
-            kani::assume(third.is_ascii() && third != b'\n' && third != b'\r');
+            kani::assume(ByteIsAsciiAndNotALineTerminator::requires(first));
+            kani::assume(ByteIsAsciiAndNotALineTerminator::requires(second));
+            kani::assume(ByteIsAsciiAndNotALineTerminator::requires(third));
             let observation = crate::KaniLinesObservation::new(first, second, third);
             let demonstration = observation.demonstrate_line_split(first, second, third);
 

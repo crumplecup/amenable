@@ -300,7 +300,7 @@ amenable_derive::harness! {
                 let first = ch.next().unwrap();
                 first[0] += 10;
                 first[1] += 10;
-                assert!(ch.next().is_none());
+                assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
             }
             assert_eq!(data, [a + 10, b + 10, c], "the remainder element c is untouched");
         }
@@ -437,7 +437,7 @@ amenable_derive::harness! {
                 let first = ch.next().unwrap();
                 first[0] += 10;
                 first[1] += 10;
-                assert!(ch.next().is_none());
+                assert!(IteratorYieldsNoneWhenExhausted::ensures(ch.next()));
             }
             assert_eq!(data, [a, b + 10, c + 10], "the front remainder element a is untouched");
         }
