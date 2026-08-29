@@ -22,7 +22,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<NonZero<i8>> {
     type SupportingEvidence = Self;
@@ -1118,28 +1118,47 @@ bridge_kani_witness!(RustStdStandard<FpCategory>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<FpCategory>,
+    "amenable_std::rust_std::RustStdStandard<core::num::FpCategory>",
+    (FpCategory, FpCategory),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC, {
         /// Each representative floating-point value classifies into the
         /// `FpCategory` variant matching its own `is_*` predicates.
         #[kani::proof]
         fn verify_fp_category_matches_the_value_it_classifies() {
-            assert_eq!(f64::NAN.classify(), FpCategory::Nan, "NaN classifies as FpCategory::Nan");
-            assert_eq!(
-                f64::INFINITY.classify(),
-                FpCategory::Infinite,
+            assert!(
+                RustStdStandard::<FpCategory>::ensures((f64::NAN.classify(), FpCategory::Nan)),
+                "NaN classifies as FpCategory::Nan"
+            );
+            assert!(
+                RustStdStandard::<FpCategory>::ensures((
+                    f64::INFINITY.classify(),
+                    FpCategory::Infinite
+                )),
                 "infinity classifies as FpCategory::Infinite"
             );
-            assert_eq!(0.0f64.classify(), FpCategory::Zero, "zero classifies as FpCategory::Zero");
-            assert_eq!(
-                f64::MIN_POSITIVE.classify(),
-                FpCategory::Normal,
+            assert!(
+                RustStdStandard::<FpCategory>::ensures((0.0f64.classify(), FpCategory::Zero)),
+                "zero classifies as FpCategory::Zero"
+            );
+            assert!(
+                RustStdStandard::<FpCategory>::ensures((
+                    f64::MIN_POSITIVE.classify(),
+                    FpCategory::Normal
+                )),
                 "the smallest positive normal value classifies as FpCategory::Normal"
             );
             let subnormal = f64::MIN_POSITIVE / 2.0;
-            assert_eq!(
-                subnormal.classify(),
-                FpCategory::Subnormal,
+            assert!(
+                RustStdStandard::<FpCategory>::ensures((
+                    subnormal.classify(),
+                    FpCategory::Subnormal
+                )),
                 "a value smaller than the smallest normal value classifies as FpCategory::Subnormal"
             );
         }

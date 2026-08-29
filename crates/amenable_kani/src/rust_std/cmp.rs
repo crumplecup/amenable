@@ -2,12 +2,16 @@
 
 use std::cmp::Reverse;
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+#[cfg(kani)]
+use crate::FieldAccessRecoversTheStoredValue;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::cmp::Ordering> {
     type SupportingEvidence = Self;
@@ -32,6 +36,13 @@ bridge_kani_witness!(RustStdStandard<std::cmp::Ordering>);
     )
 }
 
+kani_ensures!(
+    RustStdStandard<std::cmp::Ordering>,
+    "amenable_std::rust_std::RustStdStandard<std::cmp::Ordering>",
+    (std::cmp::Ordering, std::cmp::Ordering),
+    |(actual, expected)| actual == expected
+);
+
 amenable_derive::harness! {
     kani, VERIFY_ORDERING_REVERSE_INVOLUTION_SRC, {
         /// `Ordering` has exactly three inhabitants, and `.reverse()` is an
@@ -45,21 +56,30 @@ amenable_derive::harness! {
                 std::cmp::Ordering::Equal,
                 std::cmp::Ordering::Greater,
             ] {
-                assert_eq!(o.reverse().reverse(), o, "reverse is an involution");
+                assert!(
+                    RustStdStandard::<std::cmp::Ordering>::ensures((o.reverse().reverse(), o)),
+                    "reverse is an involution"
+                );
             }
-            assert_eq!(
-                std::cmp::Ordering::Less.reverse(),
-                std::cmp::Ordering::Greater,
+            assert!(
+                RustStdStandard::<std::cmp::Ordering>::ensures((
+                    std::cmp::Ordering::Less.reverse(),
+                    std::cmp::Ordering::Greater
+                )),
                 "Less reverses to Greater"
             );
-            assert_eq!(
-                std::cmp::Ordering::Greater.reverse(),
-                std::cmp::Ordering::Less,
+            assert!(
+                RustStdStandard::<std::cmp::Ordering>::ensures((
+                    std::cmp::Ordering::Greater.reverse(),
+                    std::cmp::Ordering::Less
+                )),
                 "Greater reverses to Less"
             );
-            assert_eq!(
-                std::cmp::Ordering::Equal.reverse(),
-                std::cmp::Ordering::Equal,
+            assert!(
+                RustStdStandard::<std::cmp::Ordering>::ensures((
+                    std::cmp::Ordering::Equal.reverse(),
+                    std::cmp::Ordering::Equal
+                )),
                 "Equal reverses to itself"
             );
         }
@@ -99,12 +119,17 @@ amenable_derive::harness! {
             let a: i32 = kani::any();
             let b: i32 = kani::any();
 
-            assert_eq!(
-                Reverse(a).cmp(&Reverse(b)),
-                b.cmp(&a),
+            assert!(
+                RustStdStandard::<std::cmp::Ordering>::ensures((
+                    Reverse(a).cmp(&Reverse(b)),
+                    b.cmp(&a)
+                )),
                 "Reverse inverts comparison direction"
             );
-            assert_eq!(Reverse(a).0, a, "Reverse round-trips its wrapped value");
+            assert!(
+                FieldAccessRecoversTheStoredValue::ensures((Reverse(a).0, a)),
+                "Reverse round-trips its wrapped value"
+            );
         }
     }
 }

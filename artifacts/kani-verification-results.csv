@@ -72,8 +72,8 @@ amenable_kani::rust_std::char::verify_parse_char_error_occurs_for_empty_or_multi
 amenable_kani::rust_std::char::verify_to_lowercase_maps_an_uppercase_ascii_letter,1787760392,passed
 amenable_kani::rust_std::char::verify_to_uppercase_maps_a_lowercase_ascii_letter,1787760404,passed
 amenable_kani::rust_std::char::verify_try_from_char_error_occurs_exactly_when_out_of_range,1787760413,passed
-amenable_kani::rust_std::cmp::verify_ordering_reverse_involution,1787760422,passed
-amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison,1787760431,passed
+amenable_kani::rust_std::cmp::verify_ordering_reverse_involution,1788024533,passed
+amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison,1788024544,passed
 amenable_kani::rust_std::core_alloc::verify_layout_from_size_align_rejects_a_non_power_of_two_alignment,1787760441,passed
 amenable_kani::rust_std::core_alloc::verify_layout_new_reports_the_types_size_and_alignment,1787760450,passed
 amenable_kani::rust_std::env::verify_args_os_reports_at_least_the_program_path,1787760460,passed
@@ -165,7 +165,7 @@ amenable_kani::rust_std::net::verify_ipv6_addr_segments_round_trip,1787761358,pa
 amenable_kani::rust_std::net::verify_socket_addr_v4_round_trips_ip_and_port,1787761367,passed
 amenable_kani::rust_std::net::verify_socket_addr_v6_round_trips_all_fields,1787761375,passed
 amenable_kani::rust_std::net::verify_socket_addr_variant_matches_its_kind,1787761384,passed
-amenable_kani::rust_std::num::verify_fp_category_matches_the_value_it_classifies,1787761393,passed
+amenable_kani::rust_std::num::verify_fp_category_matches_the_value_it_classifies,1788024521,passed
 amenable_kani::rust_std::num::verify_int_error_kind_classifies_parse_failures,1787761404,passed
 amenable_kani::rust_std::num::verify_nonzero_i128,1787761413,passed
 amenable_kani::rust_std::num::verify_nonzero_i16,1787761422,passed
