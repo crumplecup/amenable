@@ -76,3 +76,36 @@ known_helper_paths = ["amenable_core::init_tracing", "amenable::init_tracing"]
 # whole compiled dependency graph, not just the backend crate itself.
 [cfg_hygiene]
 crate_verifier = { amenable_kani = "kani", amenable_creusot = "creusot", amenable_verus = "verus" }
+
+# [modularity] generated_files -- exempt from MODULARITY-FILE and
+# MODULARITY-MODULE-SIZE (not MODULARITY-TYPES-PER-FILE or
+# MODULARITY-FUNCTION, which stay live even inside these directories).
+# Paths are crate-relative; verified by tracing each `amenable emit-*`
+# command in crates/amenable/src/{verus_export,creusot_export,
+# verus_exchange_export,verus_gaap_tokens_export,paths}.rs to its actual
+# write target, not inferred from file size or name:
+#
+# - amenable_verus/src/derived_witness/ -- `emit-verus-witnesses`
+#   (write_verus_witness_modules). Already known the hard way to be
+#   fully regenerated, never hand-edit (a prior hand-edit was silently
+#   reverted by the very next `just verify-verus` run).
+# - amenable_creusot/src/generated/ -- `emit-creusot-companions`
+#   (write_creusot_exchange_companions), one file per Exchange method.
+# - amenable_verus/src/gallery/generated/ -- `emit-verus-exchange-
+#   companions` (write_verus_exchange_companions, one subdirectory per
+#   self_ty group) and `emit-verus-gaap-tokens`
+#   (write_verus_gaap_token_companion, the single `ledger_tokens.rs`),
+#   both writing into the same parent directory.
+#
+# Deliberately NOT listed: amenable_std/src/verus_witness.rs,
+# amenable_creusot/src/{rust_std_witness,rust_std}.rs. All three are
+# large but hand-written -- no `emit-*` command writes to any of them,
+# and their doc comments are ordinary human design-rationale prose, not
+# templated output. Listing them anyway would hide real modularity
+# signal on real hand-maintained files.
+[modularity]
+generated_files = [
+    "src/derived_witness",
+    "src/generated",
+    "src/gallery/generated",
+]
