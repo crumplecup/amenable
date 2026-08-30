@@ -26,6 +26,7 @@
 mod creusot_export;
 mod error;
 pub mod paths;
+mod registry_dump;
 #[cfg(feature = "verus")]
 mod verus_exchange_export;
 #[cfg(feature = "verus")]
@@ -34,6 +35,7 @@ mod verus_export;
 mod verus_gaap_tokens_export;
 
 pub mod assessment;
+pub mod cli;
 pub mod gallery;
 pub mod kani;
 

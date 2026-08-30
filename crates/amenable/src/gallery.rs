@@ -51,12 +51,21 @@ fn default_results_path() -> PathBuf {
     crate::paths::artifacts_directory().join("kani-gallery-results.csv")
 }
 
-/// Execute a proof-gallery command.
-#[instrument(level = "info", skip(args))]
-pub fn run(args: GalleryArgs) -> AmenableResult<()> {
-    match args.command {
-        GalleryCommand::List => list_cases(),
-        GalleryCommand::Run(args) => run_cases(args),
+impl GalleryArgs {
+    /// Dispatch to the selected [`GalleryCommand`].
+    #[instrument(level = "info", skip(self))]
+    pub(crate) fn act(self) -> AmenableResult<()> {
+        self.command.act()
+    }
+}
+
+impl GalleryCommand {
+    #[instrument(level = "debug", skip(self))]
+    fn act(self) -> AmenableResult<()> {
+        match self {
+            Self::List => list_cases(),
+            Self::Run(args) => run_cases(args),
+        }
     }
 }
 

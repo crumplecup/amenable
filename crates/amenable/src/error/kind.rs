@@ -7,6 +7,9 @@ use crate::error::sources::{
     TimestampTooLargeSource,
 };
 
+#[cfg(feature = "cli")]
+use tracing::instrument;
+
 /// Error kind for `amenable` CLI operations. Every variant is a clean
 /// 1-tuple wrapping a real, named, `Error`-implementing source type --
 /// never a bare struct or `String` -- so `AmenableError::source()`'s
@@ -97,4 +100,35 @@ pub enum AmenableErrorKind {
     /// An assessment count is too large to convert to `u32`.
     #[display("{_0}")]
     AssessmentCount(AssessmentCountSource),
+}
+
+impl AmenableErrorKind {
+    /// Stable, short name for this variant, used as the `miette`
+    /// diagnostic code suffix (`amenable::{name}`) on
+    /// [`crate::AmenableError`]'s `Diagnostic` impl. Kept separate from
+    /// `Display` (which renders the human-readable message, not a
+    /// machine-stable identifier) and gated the same as that impl since
+    /// nothing else calls it.
+    #[cfg(feature = "cli")]
+    #[instrument(level = "debug", ret)]
+    pub(crate) fn code_name(&self) -> &'static str {
+        match self {
+            Self::Io(_) => "Io",
+            Self::JsonLine(_) => "JsonLine",
+            Self::Serde(_) => "Serde",
+            Self::SystemTime(_) => "SystemTime",
+            Self::TimeFormatDescription(_) => "TimeFormatDescription",
+            Self::TimeParse(_) => "TimeParse",
+            Self::InvalidUtcDate(_) => "InvalidUtcDate",
+            Self::TimeComponentRange(_) => "TimeComponentRange",
+            Self::TimeFormat(_) => "TimeFormat",
+            Self::Invariant(_) => "Invariant",
+            Self::Chain(_) => "Chain",
+            Self::Std(_) => "Std",
+            Self::InvalidScore(_) => "InvalidScore",
+            Self::PreEpochDate(_) => "PreEpochDate",
+            Self::TimestampTooLarge(_) => "TimestampTooLarge",
+            Self::AssessmentCount(_) => "AssessmentCount",
+        }
+    }
 }

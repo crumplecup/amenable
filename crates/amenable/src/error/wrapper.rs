@@ -156,6 +156,26 @@ impl From<AmenableErrorKind> for AmenableError {
     }
 }
 
+/// `AmenableError` presented directly, with no bin-only wrapper type: one
+/// error, one place to add a `miette` code/help. `Diagnostic: std::error::Error`
+/// is already satisfied by `derive_more::Error` above, so this only adds
+/// the two `miette`-specific methods on top of the same value the rest of
+/// the crate already constructs and propagates with `?`.
+#[cfg(feature = "cli")]
+impl miette::Diagnostic for AmenableError {
+    #[instrument(level = "trace", skip(self))]
+    fn code<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
+        Some(Box::new(format!("amenable::{}", self.kind.code_name())))
+    }
+
+    #[instrument(level = "trace", skip(self))]
+    fn help<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
+        Some(Box::new(
+            "See the CSV/JSONL ledgers under artifacts/ for verification and assessment history.",
+        ))
+    }
+}
+
 /// Bridge external errors through `*Source` wrappers into
 /// [`AmenableErrorKind`].
 macro_rules! bridge_error {

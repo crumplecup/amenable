@@ -498,16 +498,25 @@ struct ListedVerificationFailure {
     status: ProofStatus,
 }
 
-/// Execute an assessment command.
-#[instrument(level = "info", skip(args))]
-pub fn run(args: AssessArgs) -> AmenableResult<()> {
-    match args.command {
-        AssessCommand::Proof(args) => record(args),
-        AssessCommand::Failures(args) => failures(args),
-        AssessCommand::Summary(args) => summary(args),
-        AssessCommand::List(args) => list(args),
-        AssessCommand::Report(args) => report(args),
-        AssessCommand::Queue(args) => queue(args),
+impl AssessArgs {
+    /// Dispatch to the selected [`AssessCommand`].
+    #[instrument(level = "info", skip(self))]
+    pub(crate) fn act(self) -> AmenableResult<()> {
+        self.command.act()
+    }
+}
+
+impl AssessCommand {
+    #[instrument(level = "debug", skip(self))]
+    fn act(self) -> AmenableResult<()> {
+        match self {
+            Self::Proof(args) => record(args),
+            Self::Failures(args) => failures(args),
+            Self::Summary(args) => summary(args),
+            Self::List(args) => list(args),
+            Self::Report(args) => report(args),
+            Self::Queue(args) => queue(args),
+        }
     }
 }
 
