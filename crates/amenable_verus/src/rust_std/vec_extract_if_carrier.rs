@@ -42,13 +42,18 @@ pub struct VerusExtractIfModel {
     pub extracted: Vec<i32>,
 }
 
+/// Partitioning `[1, 2, 3, 4]` by "is even" keeps the odd elements in
+/// order and extracts the even elements in order.
+pub open spec fn partition_result_matches(result: VerusExtractIfModel) -> bool {
+    result.kept@ == seq![1i32, 3i32] && result.extracted@ == seq![2i32, 4i32]
+}
+
 impl VerusExtractIfModel {
     /// Partitioning `[1, 2, 3, 4]` by "is even" keeps the odd elements
     /// in order and extracts the even elements in order.
     pub fn partition_one_two_three_four_by_even() -> (result: Self)
         ensures
-            result.kept@ == seq![1i32, 3i32],
-            result.extracted@ == seq![2i32, 4i32],
+            partition_result_matches(result),
     {
         Self { kept: vec![1, 3], extracted: vec![2, 4] }
     }

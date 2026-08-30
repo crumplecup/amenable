@@ -34,6 +34,13 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The shared numeric-cast identity both `.bytes()` (`u8`) and
+/// `.encode_utf16()` (`u16`) rely on for an ASCII character: the
+/// yielded code numerically equals the character's own scalar value.
+pub open spec fn numeric_cast_matches_char(result: u32, c: char) -> bool {
+    result == c as u32
+}
+
 /// `.bytes()` yields the UTF-8 encoding of the str, checked for any
 /// single-byte (ASCII) character: the one byte numerically equals the
 /// character.
@@ -41,7 +48,7 @@ pub fn verify_bytes_model_yields_the_utf8_encoding(c: char) -> (result: u8)
     requires
         is_ascii_byte(c as u32),
     ensures
-        (result as u32) == (c as u32),
+        numeric_cast_matches_char(result as u32, c),
 {
     c as u8
 }
@@ -71,7 +78,7 @@ pub fn verify_encode_utf16_model_yields_utf16_code_units(c: char) -> (result: u1
     requires
         is_ascii_byte(c as u32),
     ensures
-        (result as u32) == (c as u32),
+        numeric_cast_matches_char(result as u32, c),
 {
     c as u16
 }

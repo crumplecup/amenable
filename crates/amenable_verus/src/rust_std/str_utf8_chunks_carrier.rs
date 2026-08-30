@@ -69,13 +69,22 @@ pub open spec fn utf8_error_reports_length_and_span(valid_up_to: u8, error_len: 
     valid_up_to == 2 && error_len == 1
 }
 
+/// A singleton precondition: `invalid`'s lower bound, `0xF5` -- never a
+/// valid UTF-8 lead byte anywhere in `0xF5..=0xFF`, so it's a lone
+/// one-byte error regardless of its neighbors. Named, not inlined, so
+/// the assumption has an explicit source even though nothing else calls
+/// it.
+pub open spec fn invalid_byte_is_never_a_valid_utf8_lead_byte(invalid: u8) -> bool {
+    invalid >= 0xF5u8
+}
+
 /// For `[b'a', b'b', invalid, b'c']` with `invalid` in `0xF5..=0xFF`
 /// (never a valid UTF-8 lead byte anywhere, so it's a lone one-byte
 /// error regardless of its neighbors): `valid_up_to() == 2` and
 /// `error_len() == Some(1)`.
 pub fn verify_utf8_error_model_reports_the_valid_prefix_length_and_error_span(invalid: u8) -> (result: (u8, u8))
     requires
-        invalid >= 0xF5u8,
+        invalid_byte_is_never_a_valid_utf8_lead_byte(invalid),
     ensures
         utf8_error_reports_length_and_span(result.0, result.1),
 {

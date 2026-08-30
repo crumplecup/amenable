@@ -46,6 +46,13 @@ pub struct VerusUnorderedPairModel {
     pub second: i32,
 }
 
+/// `drain_in_either_order`'s whole postcondition: yields `(first,
+/// second)` or `(second, first)` depending on which order was
+/// requested.
+pub open spec fn drain_result_matches_order(first_first: bool, first: i32, second: i32, result: (i32, i32)) -> bool {
+    (first_first ==> result == (first, second)) && (!first_first ==> result == (second, first))
+}
+
 impl VerusUnorderedPairModel {
     pub fn new(first: i32, second: i32) -> (result: Self)
         ensures
@@ -58,8 +65,7 @@ impl VerusUnorderedPairModel {
     /// the real type's unspecified internal iteration order.
     pub fn drain_in_either_order(self, first_first: bool) -> (result: (i32, i32))
         ensures
-            first_first ==> result == (self.first, self.second),
-            !first_first ==> result == (self.second, self.first),
+            drain_result_matches_order(first_first, self.first, self.second, result),
     {
         if first_first {
             (self.first, self.second)

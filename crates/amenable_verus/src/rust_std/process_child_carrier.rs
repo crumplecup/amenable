@@ -43,7 +43,7 @@ pub fn verify_child_model_has_a_process_id_and_can_be_waited_on(pid: u32, exit_c
     requires
         process_id_is_nonzero(pid),
     ensures
-        result.0 != 0,
+        process_id_is_nonzero(result.0),
         observed_value_matches_input(result.1 as int, exit_code as int),
 {
     (pid, exit_code)

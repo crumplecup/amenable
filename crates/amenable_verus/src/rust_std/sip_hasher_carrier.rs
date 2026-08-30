@@ -50,19 +50,31 @@ pub uninterp spec fn sip_hasher_view(h: SipHasherAlias) -> Seq<Seq<u8>>;
 /// at all, not an axiom stated separately.
 pub uninterp spec fn sip_hasher_spec_finish(history: Seq<Seq<u8>>) -> u64;
 
+pub open spec fn sip_hasher_new_view_is_empty(result: SipHasherAlias) -> bool {
+    sip_hasher_view(result) == Seq::<Seq<u8>>::empty()
+}
+
 pub assume_specification [SipHasherAlias::new] () -> (result: SipHasherAlias)
     ensures
-        sip_hasher_view(result) == Seq::<Seq<u8>>::empty(),
+        sip_hasher_new_view_is_empty(result),
 ;
+
+pub open spec fn sip_hasher_write_appends_to_view(before: Seq<Seq<u8>>, bytes: Seq<u8>, after: Seq<Seq<u8>>) -> bool {
+    after == before.push(bytes)
+}
 
 pub assume_specification [<SipHasherAlias as Hasher>::write] (h: &mut SipHasherAlias, bytes: &[u8])
     ensures
-        sip_hasher_view(*final(h)) == sip_hasher_view(*old(h)).push(bytes@),
+        sip_hasher_write_appends_to_view(sip_hasher_view(*old(h)), bytes@, sip_hasher_view(*final(h))),
 ;
+
+pub open spec fn sip_hasher_finish_matches_spec(h: SipHasherAlias, result: u64) -> bool {
+    result == sip_hasher_spec_finish(sip_hasher_view(h))
+}
 
 pub assume_specification [<SipHasherAlias as Hasher>::finish] (h: &SipHasherAlias) -> (result: u64)
     ensures
-        result == sip_hasher_spec_finish(sip_hasher_view(*h)),
+        sip_hasher_finish_matches_spec(*h, result),
 ;
 
 /// Same determinism contract as `BuildHasherDefault`: two freshly

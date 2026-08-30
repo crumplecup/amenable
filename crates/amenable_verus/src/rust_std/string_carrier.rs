@@ -9,6 +9,14 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `String::clone`'s (this harness's own identity-passthrough) whole
+/// postcondition: the result is the same content, and (redundantly, but
+/// stated explicitly since the length claim is what the real Creusot/
+/// Kani counterparts settle for) the same length.
+pub open spec fn string_roundtrip_result_matches(result: Seq<char>, s: Seq<char>) -> bool {
+    result == s && result.len() == s.len()
+}
+
 /// `String` round-trips through itself, content and all — a stronger
 /// claim than `elicitation_verus`'s own `strings.rs`, which deliberately
 /// avoids storing a real `String` in its `StringNonEmpty`/`StringBounded`
@@ -28,8 +36,7 @@ verus! {
 /// already implies, without needing a separate byte-level encoding lemma).
 pub fn verify_string_roundtrip(s: String) -> (result: String)
     ensures
-        result@ == s@,
-        result@.len() == s@.len(),
+        string_roundtrip_result_matches(result@, s@),
 {
     s
 }

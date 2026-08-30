@@ -34,11 +34,18 @@ verus! {
 /// `(byte_length, first_byte, second_byte)`.
 type OsStrResult = (u8, u8, u8);
 
+/// A singleton precondition: this model's own two-byte-buffer bound.
+/// Named, not inlined, so the assumption has an explicit source even
+/// though nothing else calls it.
+pub open spec fn os_str_len_fits_the_two_byte_buffer(len: u8) -> bool {
+    len <= 2
+}
+
 /// An `OsStr` built entirely of valid Unicode round-trips exactly
 /// through `.to_str()`, and `.len()` reports its byte length.
 pub fn verify_os_str_model_valid_utf8_content_round_trips_through_to_str(len: u8, b0: u8, b1: u8) -> (result: OsStrResult)
     requires
-        len <= 2,
+        os_str_len_fits_the_two_byte_buffer(len),
     ensures
         observed_value_matches_input(result.0 as int, len as int),
         observed_value_matches_input(result.1 as int, b0 as int),

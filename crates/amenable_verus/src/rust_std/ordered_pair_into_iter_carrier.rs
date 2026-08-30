@@ -62,6 +62,15 @@ pub open spec fn ordered_pair_into_iter_model_starts_at_position_zero(position: 
     position == 0
 }
 
+/// `advance`'s whole postcondition: yields `first` then `second` in
+/// order, advancing the position each time, then `None` once exhausted,
+/// with the position pinned once it reaches or passes `2`.
+pub open spec fn ordered_pair_into_iter_advance_result_matches(old_position: u8, first: i32, second: i32, result: Option<i32>, new_position: u8) -> bool {
+    (old_position == 0 ==> result == Some(first) && new_position == 1)
+        && (old_position == 1 ==> result == Some(second) && new_position == 2)
+        && (old_position >= 2 ==> result is None && new_position == old_position)
+}
+
 /// Models the "yields two owned values in order, then `None`" law —
 /// not `Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::IntoIter`
 /// themselves.
@@ -86,12 +95,9 @@ impl VerusOrderedPairIntoIterModel {
     /// have been yielded.
     pub fn advance(&mut self) -> (result: Option<i32>)
         ensures
-            old(self).position == 0 ==> result == Some(old(self).first) && final(self).position
-                == 1,
-            old(self).position == 1 ==> result == Some(old(self).second) && final(self).position
-                == 2,
-            old(self).position >= 2 ==> result is None && final(self).position
-                == old(self).position,
+            ordered_pair_into_iter_advance_result_matches(
+                old(self).position, old(self).first, old(self).second, result, final(self).position,
+            ),
             value_unchanged(old(self).first as int, final(self).first as int),
             value_unchanged(old(self).second as int, final(self).second as int),
     {

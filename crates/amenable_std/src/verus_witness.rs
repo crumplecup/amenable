@@ -637,6 +637,12 @@ bridge_verus_witness!(RustStdStandard<String>);
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<String>,
+    "amenable_std::rust_std::RustStdStandard<String>",
+    "string_roundtrip_result_matches"
+);
+
 const VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/ordering_carrier.rs");
 
@@ -1380,6 +1386,12 @@ bridge_verus_witness!(RustStdStandard<core::any::TypeId>);
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::any::TypeId>,
+    "amenable_std::rust_std::RustStdStandard<core::any::TypeId>",
+    ["type_id_of_matches_spec", "type_id_eq_matches_identity"]
+);
+
 const VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/try_from_slice_carrier.rs");
 
@@ -1407,6 +1419,20 @@ bridge_verus_witness!(RustStdStandard<std::array::TryFromSliceError>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::array::TryFromSliceError>,
+    "amenable_std::rust_std::RustStdStandard<std::array::TryFromSliceError>",
+    "try_from_slice_result_matches"
+);
+
+// The negative counterpart to `has_length`, registered once here for
+// all its real call sites.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::array::TryFromSliceError>,
+    "amenable_std::rust_std::RustStdStandard<std::array::TryFromSliceError>",
+    "does_not_have_length"
+);
 
 const VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/from_utf16_error_carrier.rs");
@@ -1678,6 +1704,12 @@ bridge_verus_witness!(RustStdStandard<core::char::ParseCharError>);
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<core::char::ParseCharError>,
+    "amenable_std::rust_std::RustStdStandard<core::char::ParseCharError>",
+    "char_from_str_result_matches"
+);
+
 const VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/rc_carrier.rs");
 
@@ -1939,6 +1971,16 @@ bridge_verus_witness!(RustStdStandard<std::hash::SipHasher>);
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::hash::SipHasher>,
+    "amenable_std::rust_std::RustStdStandard<std::hash::SipHasher>",
+    [
+        "sip_hasher_new_view_is_empty",
+        "sip_hasher_write_appends_to_view",
+        "sip_hasher_finish_matches_spec",
+    ]
+);
 
 const VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/cow_carrier.rs");
@@ -3015,7 +3057,10 @@ bridge_verus_witness!(RustStdStandard<std::vec::Drain<'static, i32>>);
 amenable_derive::verus_ensures_predicate!(
     RustStdStandard<std::vec::Drain<'static, i32>>,
     "amenable_std::rust_std::RustStdStandard<std::vec::Drain<'static, i32>>",
-    "ordered_pair_into_iter_model_starts_at_position_zero"
+    [
+        "ordered_pair_into_iter_model_starts_at_position_zero",
+        "ordered_pair_into_iter_advance_result_matches",
+    ]
 );
 
 impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>> {
@@ -3174,6 +3219,12 @@ bridge_verus_witness!(RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut 
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>>",
+    "partition_result_matches"
+);
+
 impl VerusWitness
     for RustStdStandard<
         std::collections::linked_list::ExtractIf<'static, i32, fn(&mut i32) -> bool>,
@@ -3223,6 +3274,12 @@ impl VerusWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIt
 }
 
 bridge_verus_witness!(RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>);
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>,
+    "amenable_std::rust_std::RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>>",
+    "splice_result_matches"
+);
 
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
@@ -5111,6 +5168,12 @@ bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::Drain<'stat
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>,
+    "amenable_std::rust_std::RustStdStandard<std::collections::binary_heap::Drain<'static, i32>>",
+    "drain_result_matches_order"
+);
+
 impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
@@ -5680,6 +5743,12 @@ macro_rules! impl_chunk_by_verus_witness {
 impl_chunk_by_verus_witness!(std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>);
 impl_chunk_by_verus_witness!(std::slice::ChunkByMut<'static, i32, fn(&i32, &i32) -> bool>);
 
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>,
+    "amenable_std::rust_std::RustStdStandard<std::slice::ChunkBy<'static, i32, fn(&i32, &i32) -> bool>>",
+    "chunk_by_result_matches_grouping"
+);
+
 macro_rules! impl_slice_split_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
@@ -5885,6 +5954,14 @@ impl_str_ascii_iter_verus_witness!(
     std::str::Bytes<'static>,
     "verify_bytes_model_yields_the_utf8_encoding",
     VERIFY_BYTES_MODEL_YIELDS_THE_UTF8_ENCODING_SRC
+);
+
+// Shared by `.bytes()`'s (u8) and `.encode_utf16()`'s (u16) own claims,
+// registered once here for all its real call sites.
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::str::Bytes<'static>>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Bytes<'static>>",
+    "numeric_cast_matches_char"
 );
 impl_str_ascii_iter_verus_witness!(
     std::str::CharIndices<'static>,
@@ -6109,6 +6186,13 @@ amenable_derive::verus_ensures_predicate!(
     RustStdStandard<std::str::Utf8Error>,
     "amenable_std::rust_std::RustStdStandard<std::str::Utf8Error>",
     "utf8_error_reports_length_and_span"
+);
+
+// Singleton contract: `invalid`'s lower bound.
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::str::Utf8Error>,
+    "amenable_std::rust_std::RustStdStandard<std::str::Utf8Error>",
+    "invalid_byte_is_never_a_valid_utf8_lead_byte"
 );
 
 macro_rules! impl_str_pattern_split_verus_witness {
@@ -7191,6 +7275,16 @@ bridge_verus_witness!(RustStdStandard<std::process::Child>);
 }
 
 amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::process::Child>,
+    "amenable_std::rust_std::RustStdStandard<std::process::Child>",
+    "process_id_is_nonzero"
+);
+
+// Same predicate, reused as a real `ensures` claim too (the process id
+// is nonzero both before and after waiting) -- a separate registration
+// since Kani/Creusot/Verus's `(verifier, kind)` lookup is keyed
+// separately for `requires` vs `ensures` clauses.
+amenable_derive::verus_ensures_predicate!(
     RustStdStandard<std::process::Child>,
     "amenable_std::rust_std::RustStdStandard<std::process::Child>",
     "process_id_is_nonzero"
@@ -9146,6 +9240,18 @@ bridge_verus_witness!(RustStdStandard<std::time::Duration>);
     )
 }
 
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::time::Duration>,
+    "amenable_std::rust_std::RustStdStandard<Duration>",
+    "duration_new_secs_headroom_holds"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    RustStdStandard<std::time::Duration>,
+    "amenable_std::rust_std::RustStdStandard<Duration>",
+    "duration_new_result_matches"
+);
+
 const VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
 
@@ -9675,6 +9781,12 @@ bridge_verus_witness!(RustStdStandard<std::ffi::OsStr>);
         || { <RustStdStandard<std::ffi::OsStr> as VerusWitness>::proof().to_string() },
     )
 }
+
+amenable_derive::verus_requires_predicate!(
+    RustStdStandard<std::ffi::OsStr>,
+    "amenable_std::rust_std::RustStdStandard<OsStr>",
+    "os_str_len_fits_the_two_byte_buffer"
+);
 
 const VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC: &str =
     include_str!("../../amenable_verus/src/rust_std/std_ffi_carrier.rs");

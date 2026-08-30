@@ -20,11 +20,18 @@ verus! {
 #[verifier::external_body]
 pub struct ExParseCharError(ParseCharError);
 
+/// `char::from_str`'s whole postcondition: an empty or two-character
+/// string fails, and the single-character string `"a"` succeeds,
+/// recovering exactly `'a'`.
+pub open spec fn char_from_str_result_matches(s: &str, result: Result<char, <char as std::str::FromStr>::Err>) -> bool {
+    (s@.len() == 0 ==> result is Err)
+        && (s@.len() == 2 ==> result is Err)
+        && (s == "a" ==> result == Ok('a'))
+}
+
 pub assume_specification [<char as std::str::FromStr>::from_str] (s: &str) -> (result: Result<char, <char as std::str::FromStr>::Err>)
     ensures
-        s@.len() == 0 ==> result is Err,
-        s@.len() == 2 ==> result is Err,
-        s == "a" ==> result == Ok('a'),
+        char_from_str_result_matches(s, result),
 ;
 
 /// A string parses as `char` only when it holds exactly one character;

@@ -22,14 +22,22 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `ChunkBy`'s whole postcondition: two adjacent elements are grouped
+/// into one two-element chunk exactly when `grouped_together` holds
+/// (standing in for the predicate); when it doesn't, they split into a
+/// one-element leading chunk and a one-element trailing chunk.
+pub open spec fn chunk_by_result_matches_grouping(grouped_together: bool, result: (u8, bool)) -> bool {
+    (grouped_together ==> result.0 == 2 && !result.1)
+        && (!grouped_together ==> result.0 == 1 && result.1)
+}
+
 /// Two adjacent elements are grouped into one two-element chunk exactly
 /// when `grouped_together` holds (standing in for the predicate); when it
 /// doesn't, they split into a one-element leading chunk and a
 /// one-element trailing chunk.
 pub fn verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate(grouped_together: bool) -> (result: (u8, bool))
     ensures
-        grouped_together ==> result.0 == 2 && !result.1,
-        !grouped_together ==> result.0 == 1 && result.1,
+        chunk_by_result_matches_grouping(grouped_together, result),
 {
     if grouped_together { (2, false) } else { (1, true) }
 }

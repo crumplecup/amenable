@@ -57,15 +57,29 @@ pub fn verify_system_time_error_model_recovers_how_far_backward_it_went(secs: u6
     secs
 }
 
+/// `Duration::new`'s precondition: `secs` has enough headroom below
+/// `u64::MAX` to absorb `nanos`'s own whole-second carry without
+/// overflowing.
+pub open spec fn duration_new_secs_headroom_holds(secs: u64, nanos: u32) -> bool {
+    secs <= u64::MAX - (nanos as u64) / 1_000_000_000
+}
+
+/// `Duration::new`'s whole postcondition: it does not require
+/// `nanos < 1_000_000_000` — it normalizes, carrying any whole-second
+/// overflow in `nanos` into `secs`, with `subsec_nanos()` reporting the
+/// remainder.
+pub open spec fn duration_new_result_matches(secs: u64, nanos: u32, result: (u64, u32)) -> bool {
+    result.0 == secs + (nanos as u64) / 1_000_000_000 && result.1 == nanos % 1_000_000_000
+}
+
 /// `Duration::new` does not require `nanos < 1_000_000_000` — it
 /// normalizes: any whole-second carry in `nanos` is added to `secs`,
 /// and `subsec_nanos()` reports the remainder.
 pub fn verify_duration_model_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: u32) -> (result: (u64, u32))
     requires
-        secs <= u64::MAX - (nanos as u64) / 1_000_000_000,
+        duration_new_secs_headroom_holds(secs, nanos),
     ensures
-        result.0 == secs + (nanos as u64) / 1_000_000_000,
-        result.1 == nanos % 1_000_000_000,
+        duration_new_result_matches(secs, nanos, result),
 {
     (secs + (nanos as u64) / 1_000_000_000, nanos % 1_000_000_000)
 }

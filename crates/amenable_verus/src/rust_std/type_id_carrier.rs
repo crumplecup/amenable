@@ -27,14 +27,22 @@ pub uninterp spec fn type_id_spec<T: 'static + ?Sized>() -> nat;
 /// `TypeId`s are compared).
 pub uninterp spec fn type_id_identity_spec(id: TypeId) -> nat;
 
+pub open spec fn type_id_of_matches_spec<T: 'static + ?Sized>(result: TypeId) -> bool {
+    type_id_identity_spec(result) == type_id_spec::<T>()
+}
+
 pub assume_specification<T: 'static + ?Sized> [TypeId::of::<T>] () -> (result: TypeId)
     ensures
-        type_id_identity_spec(result) == type_id_spec::<T>(),
+        type_id_of_matches_spec::<T>(result),
 ;
+
+pub open spec fn type_id_eq_matches_identity(a: TypeId, b: TypeId, result: bool) -> bool {
+    result == (type_id_identity_spec(a) == type_id_identity_spec(b))
+}
 
 pub assume_specification [<TypeId as core::cmp::PartialEq>::eq] (a: &TypeId, b: &TypeId) -> (result: bool)
     ensures
-        result == (type_id_identity_spec(*a) == type_id_identity_spec(*b)),
+        type_id_eq_matches_identity(*a, *b, result),
 ;
 
 /// Distinct concrete types get distinct identities — asserted for this

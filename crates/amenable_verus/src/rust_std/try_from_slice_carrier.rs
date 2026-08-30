@@ -28,7 +28,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::primitive_shapes_carrier::has_length;
+use crate::rust_std::primitive_shapes_carrier::{does_not_have_length, has_length};
 
 verus! {
 
@@ -37,10 +37,17 @@ verus! {
 #[verifier::external_body]
 pub struct ExTryFromSliceError(TryFromSliceError);
 
+/// `<[T; N]>::try_from`'s whole postcondition: succeeds and round-trips
+/// the elements when the slice's length matches `N` exactly, otherwise
+/// fails.
+pub open spec fn try_from_slice_result_matches<T: Copy, const N: usize>(slice: Seq<T>, result: Result<[T; N], TryFromSliceError>) -> bool {
+    (slice.len() == N ==> (result is Ok && result->Ok_0@ == slice))
+        && (slice.len() != N ==> result is Err)
+}
+
 pub assume_specification<'a, T: Copy, const N: usize> [<[T; N] as core::convert::TryFrom<&'a [T]>>::try_from] (slice: &[T]) -> (result: Result<[T; N], TryFromSliceError>)
     ensures
-        slice@.len() == N ==> (result is Ok && result->Ok_0@ == slice@),
-        slice@.len() != N ==> result is Err,
+        try_from_slice_result_matches(slice@, result),
 ;
 
 /// `<[T; N]>::try_from` succeeds only when the slice's length matches
@@ -52,7 +59,7 @@ pub assume_specification<'a, T: Copy, const N: usize> [<[T; N] as core::convert:
 pub fn verify_try_from_slice_rejects_a_length_mismatch(matching: &[i32], mismatched: &[i32]) -> (result: (bool, bool))
     requires
         has_length(matching@, 2),
-        mismatched@.len() != 2,
+        does_not_have_length(mismatched@, 2),
     ensures
         result.0,
         result.1,

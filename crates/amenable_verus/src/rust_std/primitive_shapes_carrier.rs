@@ -142,6 +142,12 @@ pub open spec fn has_length<T>(sequence: Seq<T>, expected_len: nat) -> bool {
     sequence.len() == expected_len
 }
 
+/// The negative counterpart to `has_length`: a sequence's length is
+/// exactly anything other than the given one.
+pub open spec fn does_not_have_length<T>(sequence: Seq<T>, excluded_len: nat) -> bool {
+    sequence.len() != excluded_len
+}
+
 /// A shared "exactly once" invocation-count postcondition for
 /// accommodation models whose whole claim is that a callback ran a
 /// single time — `Once::call_once`'s closure, `Waker::wake_by_ref`'s

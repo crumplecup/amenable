@@ -27,6 +27,12 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
+/// The spliced vector's final content: the middle element replaced by
+/// `[x, y]`, the rest untouched.
+pub open spec fn splice_result_matches(result: Seq<i32>, a: i32, x: i32, y: i32, c: i32) -> bool {
+    result == seq![a, x, y, c]
+}
+
 /// Splicing out the middle element of `[a, b, c]` and replacing it with
 /// `[x, y]` yields the removed element `b`, and leaves `[a, x, y, c]`
 /// behind — the replace-and-yield-removed law the real `Splice` is
@@ -34,7 +40,7 @@ verus! {
 pub fn verify_splice_model_replaces_a_range_and_yields_what_it_removed(a: i32, b: i32, c: i32, x: i32, y: i32) -> (result: (i32, Vec<i32>))
     ensures
         observed_value_matches_input(result.0 as int, b as int),
-        result.1@ == seq![a, x, y, c],
+        splice_result_matches(result.1@, a, x, y, c),
 {
     let removed = b;
     let spliced: Vec<i32> = vec![a, x, y, c];
