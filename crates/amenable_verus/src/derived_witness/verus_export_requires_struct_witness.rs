@@ -1,4 +1,4 @@
-//! Derived Verus closure for `amenable_std::verus_derive_canary::VerusExportRequiresStruct`.
+//! Derived Verus closure for `amenable_std::verus_derive_canary::composites::VerusExportRequiresStruct`.
 
 use verus_builtin_macros::verus;
 #[allow(
@@ -14,7 +14,7 @@ use crate::rust_std::escape_ascii_carrier::escape_ascii_result_matches_printable
 
 verus! {
 
-// evidence: amenable_std::verus_derive_canary::VerusExportRequiresStruct
+// evidence: amenable_std::verus_derive_canary::composites::VerusExportRequiresStruct
 // destination: crate::derived_witness::verus_export_requires_struct_witness
 // support: checked (trivial=0, checked=1, trusted=0, opaque=0)
 

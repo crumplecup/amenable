@@ -1,4 +1,4 @@
-//! Derived Verus closure for `amenable_std::verus_derive_canary::VerusExportCanaryEnum<amenable_std::verus_derive_canary::CheckedVerusExportLeaf, amenable_std::verus_derive_canary::TrustedVerusExportLeaf>`.
+//! Derived Verus closure for `amenable_std::verus_derive_canary::composites::VerusExportCanaryEnum<amenable_std::verus_derive_canary::leaves::CheckedVerusExportLeaf, amenable_std::verus_derive_canary::leaves::TrustedVerusExportLeaf>`.
 
 use verus_builtin_macros::verus;
 #[allow(
@@ -14,7 +14,7 @@ use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
 
 verus! {
 
-// evidence: amenable_std::verus_derive_canary::VerusExportCanaryEnum<amenable_std::verus_derive_canary::CheckedVerusExportLeaf, amenable_std::verus_derive_canary::TrustedVerusExportLeaf>
+// evidence: amenable_std::verus_derive_canary::composites::VerusExportCanaryEnum<amenable_std::verus_derive_canary::leaves::CheckedVerusExportLeaf, amenable_std::verus_derive_canary::leaves::TrustedVerusExportLeaf>
 // destination: crate::derived_witness::verus_export_canary_enum_witness
 // support: mixed (trivial=1, checked=1, trusted=2, opaque=0)
 

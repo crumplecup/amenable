@@ -1,4 +1,4 @@
-//! Derived Verus closure for `amenable_std::verus_derive_canary::VerusExportMultiCheckedStruct`.
+//! Derived Verus closure for `amenable_std::verus_derive_canary::composites::VerusExportMultiCheckedStruct`.
 
 use verus_builtin_macros::verus;
 #[allow(
@@ -18,7 +18,7 @@ use crate::rust_std::escape_ascii_carrier::escape_ascii_result_matches_printable
 
 verus! {
 
-// evidence: amenable_std::verus_derive_canary::VerusExportMultiCheckedStruct
+// evidence: amenable_std::verus_derive_canary::composites::VerusExportMultiCheckedStruct
 // destination: crate::derived_witness::verus_export_multi_checked_struct_witness
 // support: checked (trivial=0, checked=2, trusted=0, opaque=0)
 

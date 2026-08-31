@@ -1,4 +1,4 @@
-//! Derived Verus closure for `amenable_std::verus_derive_canary::VerusExportCheckedPlusTrivialStruct<amenable_std::verus_derive_canary::CheckedVerusExportLeaf>`.
+//! Derived Verus closure for `amenable_std::verus_derive_canary::composites::VerusExportCheckedPlusTrivialStruct<amenable_std::verus_derive_canary::leaves::CheckedVerusExportLeaf>`.
 
 use verus_builtin_macros::verus;
 #[allow(
@@ -14,7 +14,7 @@ use crate::rust_std::char_carrier::char_roundtrip_preserves_value;
 
 verus! {
 
-// evidence: amenable_std::verus_derive_canary::VerusExportCheckedPlusTrivialStruct<amenable_std::verus_derive_canary::CheckedVerusExportLeaf>
+// evidence: amenable_std::verus_derive_canary::composites::VerusExportCheckedPlusTrivialStruct<amenable_std::verus_derive_canary::leaves::CheckedVerusExportLeaf>
 // destination: crate::derived_witness::verus_export_checked_plus_trivial_struct_witness
 // support: checked (trivial=1, checked=1, trusted=0, opaque=0)
 

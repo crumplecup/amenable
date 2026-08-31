@@ -1,4 +1,4 @@
-//! Derived Verus closure for `amenable_std::verus_derive_canary::VerusExportRawTemplateStruct`.
+//! Derived Verus closure for `amenable_std::verus_derive_canary::composites::VerusExportRawTemplateStruct`.
 
 use verus_builtin_macros::verus;
 #[allow(
@@ -12,7 +12,7 @@ use crate::rust_std::primitive_shapes_carrier::observed_value_matches_input;
 
 verus! {
 
-// evidence: amenable_std::verus_derive_canary::VerusExportRawTemplateStruct
+// evidence: amenable_std::verus_derive_canary::composites::VerusExportRawTemplateStruct
 // destination: crate::derived_witness::verus_export_raw_template_struct_witness
 // support: checked (trivial=0, checked=1, trusted=0, opaque=0)
 
