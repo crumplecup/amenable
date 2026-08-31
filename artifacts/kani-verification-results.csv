@@ -127,6 +127,12 @@ amenable_kani::rust_std::io::verify_sink_write_reports_full_length_and_discards_
 amenable_kani::rust_std::io::verify_split_segments_on_the_given_byte_and_drops_it,1787761005,passed
 amenable_kani::rust_std::io::verify_take_caps_reads_at_the_remaining_limit,1788028710,passed
 amenable_kani::rust_std::io::verify_writer_panicked_recovers_the_buffered_data,1787761028,passed
+amenable_kani::rust_std::iter::chain_zip_enumerate::verify_chain_sequences_two_iterators_end_to_end,1788144050,passed
+amenable_kani::rust_std::iter::copied_cycle_fuse::verify_cycle_repeats_its_sequence_forever,1788144064,passed
+amenable_kani::rust_std::iter::map_filter_flatten::verify_flat_map_flattens_each_generated_iterator,1788144079,passed
+amenable_kani::rust_std::iter::repeat_empty_successors::verify_successors_generates_from_the_previous_item,1788144100,passed
+amenable_kani::rust_std::iter::scan_skip_step_take::verify_scan_threads_state_through_its_closure,1788144113,passed
+amenable_kani::rust_std::iter::take_while_map_while_once::verify_take_while_yields_items_while_the_predicate_holds,1788144126,passed
 amenable_kani::rust_std::iter::verify_chain_sequences_two_iterators_end_to_end,1788024883,passed
 amenable_kani::rust_std::iter::verify_cloned_clones_each_referenced_item,1787761048,passed
 amenable_kani::rust_std::iter::verify_copied_copies_each_referenced_item,1787761057,passed
@@ -215,7 +221,7 @@ amenable_kani::rust_std::path::verify_prefix_component_pairs_raw_text_with_parse
 amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,1787761870,passed
 amenable_kani::rust_std::path::verify_strip_prefix_error_reports_a_non_matching_prefix,1788030189,passed
 amenable_kani::rust_std::pin::verify_pin_derefs_and_get_mut_round_trip,1787761894,passed
-amenable_kani::rust_std::primitives::verify_array_indexing_and_length,1787761904,passed
+amenable_kani::rust_std::primitives::verify_array_indexing_and_length,1788144142,passed
 amenable_kani::rust_std::primitives::verify_char_unicode_scalar,1788043391,passed
 amenable_kani::rust_std::primitives::verify_const_pointer_cast_is_reproducible,1787761921,passed
 amenable_kani::rust_std::primitives::verify_fn_pointer_calls_the_underlying_function,1788043412,passed
