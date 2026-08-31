@@ -119,11 +119,12 @@ amenable_kani::rust_std::future::verify_poll_fn_dispatches_through_to_its_closur
 amenable_kani::rust_std::future::verify_ready_resolves_immediately_with_its_value,1788026285,passed
 amenable_kani::rust_std::hash::verify_build_hasher_default_produces_consistent_hashers,1787760773,passed
 amenable_kani::rust_std::hash::verify_sip_hasher_produces_consistent_hashes,1787760785,passed
-amenable_kani::rust_std::io::buffered_reader_writer::verify_buf_reader_reads_the_underlying_bytes,1788146855,passed
+amenable_kani::rust_std::io::buffered_reader_writer::verify_buf_reader_reads_the_underlying_bytes,1788149268,passed
 amenable_kani::rust_std::io::cursor_error::verify_cursor_read_advances_position_and_seek_repositions_it,1788146872,passed
 amenable_kani::rust_std::io::error_kind_and_io_slice::verify_error_from_error_kind_preserves_the_kind,1788146884,passed
-amenable_kani::rust_std::io::line_writer_and_lines::verify_line_writer_flushes_on_a_newline_but_not_before_one,1788146895,passed
+amenable_kani::rust_std::io::line_writer_and_lines::verify_line_writer_flushes_on_a_newline_but_not_before_one,1788149293,passed
 amenable_kani::rust_std::io::pipe_and_split::verify_pipe_reader_reads_what_the_paired_writer_wrote,1788146911,passed
+amenable_kani::rust_std::io::pipe_and_split::verify_split_segments_on_the_given_byte_and_drops_it,1788149308,passed
 amenable_kani::rust_std::io::seek_sink_chain::verify_seek_from_round_trips_each_variants_offset,1788146922,passed
 amenable_kani::rust_std::io::verify_buf_reader_reads_the_underlying_bytes,1787760794,passed
 amenable_kani::rust_std::io::verify_buf_writer_flushes_to_the_underlying_writer,1788031380,passed
