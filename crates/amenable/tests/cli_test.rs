@@ -4,6 +4,7 @@ use clap::error::ErrorKind;
 
 #[test]
 fn clap_rejects_a_single_proof_combined_with_a_retry_selector() {
+    amenable::init_tracing();
     let error = Cli::try_parse_from([
         "amenable",
         "verify",
