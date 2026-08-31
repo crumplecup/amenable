@@ -1,5 +1,8 @@
 //! Proc macros for the `amenable` constitutional trait family.
 
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
+
 mod calculation;
 mod capture_exchange_body;
 mod establish;
@@ -78,6 +81,9 @@ pub fn gallery_harness(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Generate a `Provenance` impl (`metadata()` walking every non-`#[provenance(skip)]`
+/// field's own `Provenance::metadata()`), from a `#[derive(Provenance)]` on
+/// a struct or enum.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Provenance, attributes(provenance))]
 pub fn derive_provenance(input: TokenStream) -> TokenStream {
@@ -264,6 +270,9 @@ pub fn derive_state_machine(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Generate bounded Kani-facing constructors by delegating every field to
+/// its own `KaniCompose` implementation -- see [`kani_compose`]'s own doc
+/// comment for the full rationale.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(KaniCompose)]
 pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
@@ -275,6 +284,8 @@ pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Generate a structural closure over already-witnessed members -- see
+/// [`witness`]'s own doc comment for the full rationale.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Witness, attributes(provenance, witness))]
 pub fn derive_witness(input: TokenStream) -> TokenStream {
