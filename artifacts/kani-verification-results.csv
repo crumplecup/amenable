@@ -379,6 +379,11 @@ amenable_kani::rust_std::sync_lock::verify_rwlock_read_guard_derefs_to_the_value
 amenable_kani::rust_std::sync_lock::verify_rwlock_write_guard_writes_through,1788031901,passed
 amenable_kani::rust_std::sync_lock::verify_try_lock_error_distinguishes_poisoned_from_would_block,1787763162,passed
 amenable_kani::rust_std::sync_lock::verify_wait_timeout_result_reports_timed_out,1787763172,passed
+amenable_kani::rust_std::sync_mpsc::iter_and_try_iter::verify_iter_yields_sent_values_then_stops,1788148739,passed
+amenable_kani::rust_std::sync_mpsc::receiver_and_into_iter::verify_into_iter_yields_sent_values_then_stops,1788148724,passed
+amenable_kani::rust_std::sync_mpsc::recv_errors::verify_recv_error_on_an_empty_disconnected_channel,1788148752,passed
+amenable_kani::rust_std::sync_mpsc::send_errors::verify_send_error_recovers_the_unsent_value,1788148765,passed
+amenable_kani::rust_std::sync_mpsc::sender::verify_sender_delivers_to_the_paired_receiver,1788148707,passed
 amenable_kani::rust_std::sync_mpsc::verify_into_iter_yields_sent_values_then_stops,1787763184,passed
 amenable_kani::rust_std::sync_mpsc::verify_iter_yields_sent_values_then_stops,1787763196,passed
 amenable_kani::rust_std::sync_mpsc::verify_receiver_fails_once_every_sender_is_dropped,1787763207,passed
