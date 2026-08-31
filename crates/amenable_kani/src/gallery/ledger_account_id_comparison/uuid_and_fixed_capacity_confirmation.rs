@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::uuid_and_fixed_capacity_confirmation::ensures_closure_with_uuid_shaped_comparison_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Account identity modeled as a UUID's real internal representation ([u8; 16], what uuid::Uuid actually wraps -- fixed-size, stack-allocated, not heap-allocated like String) -- no `uuid` crate dependency needed to test the shape".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -83,7 +83,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::uuid_and_fixed_capacity_confirmation::ensures_closure_with_fixed_capacity_string_comparison_times_out".to_owned(),
             "amenable_kani".to_owned(),
             "Account identity is a fixed-CAPACITY string (stack-allocated [u8; 24] buffer + a used-length field, PartialEq compares only the first `len` bytes -- a bounded variable-length comparison, not a bare fixed-array one, the shape arrayvec::ArrayString/heapless::String actually have) -- still times out".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,

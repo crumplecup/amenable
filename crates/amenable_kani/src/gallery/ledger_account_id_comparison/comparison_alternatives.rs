@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_enum_account_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::comparison_alternatives::ensures_closure_with_enum_account_comparison_passes".to_owned(),
             "amenable_kani".to_owned(),
             "ensures_closure_with_accounts_distinct_string_comparison's exact shape, but account identity is a 2-variant enum (AccountName) instead of a String -- swaps only the comparison operand's own type".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -87,7 +87,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::comparison_alternatives::ensures_closure_with_numeric_id_comparison_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Same shape again, but account identity is a u64 newtype (AccountNumber) instead of a 2-variant enum -- tests whether an arbitrarily-large, non-fixed identity space is also cheap, not just a small closed enum".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -165,7 +165,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::comparison_alternatives::ensures_closure_with_id_plus_name_hybrid_passes".to_owned(),
             "amenable_kani".to_owned(),
             "AccountId carries BOTH a numeric id (compared) and a String display name (never compared, present purely for realism/allocation cost) -- the practically useful shape, not just a bare u64".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,

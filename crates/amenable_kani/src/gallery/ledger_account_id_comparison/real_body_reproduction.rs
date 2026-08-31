@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::three_distinct_error_variants_from_one_function_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::real_body_reproduction::three_distinct_error_variants_from_one_function_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Same combination as full_combination_inline_without_calling_validate, but each check path actually constructs and returns its real TransferError variant (not a bare early return) wrapped in Result<Transfer<Validated,..>, TransferError>".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -70,7 +70,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
-            "gallery::ledger_account_id_comparison::calling_ledger_validate_directly_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::real_body_reproduction::calling_ledger_validate_directly_times_out".to_owned(),
             "amenable_kani".to_owned(),
             "The real Ledger::validate, called directly (bypassing Exchange::exchange's extra dispatch layer)".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -113,7 +113,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::validate_shape_with_uncontracted_helpers_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::real_body_reproduction::validate_shape_with_uncontracted_helpers_passes".to_owned(),
             "amenable_kani".to_owned(),
             "validate's exact &self/self.balance/?/.map_err() shape, calling helper methods with the identical bodies as check_amount_positive/check_sufficient_funds but with no #[kani::ensures] attribute at all".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,

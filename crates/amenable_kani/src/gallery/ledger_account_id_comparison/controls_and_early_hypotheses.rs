@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::account_id_inequality_over_concrete_strings_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::account_id_inequality_over_concrete_strings_passes".to_owned(),
             "amenable_kani".to_owned(),
             "AccountId inequality over two concrete short strings resolves immediately".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -29,7 +29,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::validate_with_concrete_amounts_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::validate_with_concrete_amounts_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Ledger::exchange with fully concrete amount/balance, isolating symbolic-branching cost from structural Sidecar/Establish cost".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
@@ -67,7 +67,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
-            "gallery::ledger_account_id_comparison::validate_with_one_symbolic_field_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::validate_with_one_symbolic_field_times_out".to_owned(),
             "amenable_kani".to_owned(),
             "Ledger::exchange with only `amount` symbolic (balance concrete and always sufficient) -- still times out".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -106,7 +106,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
-            "gallery::ledger_account_id_comparison::validate_without_dfcc_checking_times_out".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::validate_without_dfcc_checking_times_out".to_owned(),
             "amenable_kani".to_owned(),
             "Ledger::validate's own body, called directly with no #[kani::proof_for_contract] checking -- rules out DFCC/stubbing overhead as the cause".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -147,7 +147,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::bare_result_transfer_payload_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::bare_result_transfer_payload_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Bare fn(i64) -> Result<TransferPayload, i64>, symbolic branch, no Sidecar/Establish/Transfer<S,Token> generics at all".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -192,7 +192,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::controls_and_early_hypotheses::symbolic_branch_with_track_caller_and_no_string_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Symbolic branch that calls Establish::establish (its #[track_caller]) in the Ok arm, with no String/heap allocation anywhere".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,

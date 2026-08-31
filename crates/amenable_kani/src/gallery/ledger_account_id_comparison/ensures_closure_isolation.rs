@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
-            "gallery::ledger_account_id_comparison::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_isolation::trivial_ensures_closure_on_the_real_body_fails_fast".to_owned(),
             "amenable_kani".to_owned(),
             "validate's exact real branching+allocation body, #[kani::ensures] attached, but with a TRIVIAL closure (result.is_ok(), matching Stoplight's own claim shape) instead of the real biconditional".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -88,7 +88,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_checking_only_amount_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_isolation::ensures_closure_checking_only_amount_passes".to_owned(),
             "amenable_kani".to_owned(),
             "validate's exact real body, #[kani::ensures] closure that matches on Ok/Err and calls .primary().amount().value() > 0 in the Ok arm -- no accounts-distinct string comparison, no per-Err-variant destructuring".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -176,7 +176,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
-            "gallery::ledger_account_id_comparison::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
+            "gallery::ledger_account_id_comparison::ensures_closure_isolation::ensures_closure_with_accounts_distinct_string_comparison".to_owned(),
             "amenable_kani".to_owned(),
             "ensures_closure_checking_only_amount_passes, plus the accounts-distinct string comparison (payload.from() != payload.to()) in the Ok arm -- Err arms still bare `_ => true`".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,

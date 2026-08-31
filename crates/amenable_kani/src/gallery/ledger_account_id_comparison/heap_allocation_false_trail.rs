@@ -2,7 +2,7 @@
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::heap_allocation_false_trail::symbolic_branch_constructing_real_transfer_validated_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Symbolic branch whose Ok arm constructs the real Transfer<Validated, ValidatedToken> wrapper (pulling in the real, #[amenable_derive::exchange]-generated Witness<KaniVerifier> for Validated)".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -61,7 +61,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::returning_real_result_type_from_a_function_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::heap_allocation_false_trail::returning_real_result_type_from_a_function_passes".to_owned(),
             "amenable_kani".to_owned(),
             "fn(i64) -> Result<Transfer<Validated, ValidatedToken>, TransferError> (validate's exact real types), symbolic amount, result discarded by caller".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -123,7 +123,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
-            "gallery::ledger_account_id_comparison::symbolic_pending_transfer_extraction_passes".to_owned(),
+            "gallery::ledger_account_id_comparison::heap_allocation_false_trail::symbolic_pending_transfer_extraction_passes".to_owned(),
             "amenable_kani".to_owned(),
             "Transfer::pending built from a payload with a symbolic amount, then .primary()/.sidecar() called on it -- no branching downstream at all".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::FalseTrail,
@@ -164,7 +164,7 @@ amenable_derive::gallery_harness! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
             "amenable_kani::gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
-            "gallery::ledger_account_id_comparison::full_combination_inline_without_calling_validate".to_owned(),
+            "gallery::ledger_account_id_comparison::heap_allocation_false_trail::full_combination_inline_without_calling_validate".to_owned(),
             "amenable_kani".to_owned(),
             "Every piece that passed individually (symbolic Transfer::pending extraction, amount-positive check, sufficient-funds check against self.balance, accounts-distinct check, establish, Transfer::new), assembled inline -- not calling Ledger::validate/Exchange::exchange at all".to_owned(),
             ::amenable_kani::KaniGalleryDisposition::Hypothesis,
