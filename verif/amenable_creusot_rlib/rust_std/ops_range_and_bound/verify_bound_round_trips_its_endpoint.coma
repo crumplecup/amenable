@@ -1,0 +1,79 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 137 8 139 38 *)
+
+let%span sops_range_and_bound = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 143 37 143 42
+let%span sops_range_and_bound'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 143 44 143 49
+let%span sops_range_and_bound'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 142 43 142 48
+let%span sops_range_and_bound'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 142 50 142 54
+let%span sops_range_and_bound'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 141 43 141 47
+let%span sops_range_and_bound'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 141 49 141 54
+let%span sops_range_and_bound'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 135 19 135 23
+let%span sops_range_and_bound'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 136 18 136 69
+let%span sops_range_and_bound'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 121 16 125 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Bound_i32 = Included Int32.t | Excluded Int32.t | Unbounded
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup3_bool_bool_Option_i32 = { f0: bool; f1: bool; f2: t_Option_i32 }
+
+let rec elim_Excluded (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
+  [ _k (f0'0: Int32.t) -> {Excluded f0'0 = _x} (! return {f0'0})
+  | _chk -> (! {[@expl:elim Excluded] match _x with
+      | Excluded _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let rec elim_Included (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
+  [ _k (f0'0: Int32.t) -> {Included f0'0 = _x} (! return {f0'0})
+  | _chk -> (! {[@expl:elim Included] match _x with
+      | Included _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate bound_round_trips_its_endpoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 116 8 119 17] (value: t_Bound_i32) (bound_result: tup3_bool_bool_Option_i32) =
+  [%#sops_range_and_bound'7] match value with
+    | Included inner -> bound_result = { f0 = true; f1 = false; f2 = Some inner }
+    | Excluded inner -> bound_result = { f0 = false; f1 = true; f2 = Some inner }
+    | Unbounded -> bound_result = { f0 = false; f1 = false; f2 = None }
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_bound_round_trips_its_endpoint
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 137 8 139 38]
+  (value: t_Bound_i32) (return (x: tup3_bool_bool_Option_i32)) = (! bb0
+  [ bb0 = any
+    [ br0 (x0: Int32.t) -> {value = Included x0} (! bb6)
+    | br1 (x0: Int32.t) -> {value = Excluded x0} (! bb5)
+    | br2 -> {value = Unbounded} (! bb4) ]
+  | bb4 = s0
+    [ s0 = [ &_12 <- None ] s1
+    | s1 = [ &_ret <- { f0 = ([%#sops_range_and_bound] false); f1 = ([%#sops_range_and_bound'0] false); f2 = _12 } ] s2
+    | s2 = return {_ret} ]
+  | bb5 = s0
+    [ s0 = elim_Excluded {value} (fun (r0: Int32.t) -> [ &inner'0 <- r0 ] s1)
+    | s1 = [ &_10 <- Some inner'0 ] s2
+    | s2 = [ &_ret <- { f0 = ([%#sops_range_and_bound'1] false); f1 = ([%#sops_range_and_bound'2] true); f2 = _10 } ] s3
+    | s3 = return {_ret} ]
+  | bb6 = s0
+    [ s0 = elim_Included {value} (fun (r0: Int32.t) -> [ &inner <- r0 ] s1)
+    | s1 = [ &_7 <- Some inner ] s2
+    | s2 = [ &_ret <- { f0 = ([%#sops_range_and_bound'3] true); f1 = ([%#sops_range_and_bound'4] false); f2 = _7 } ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: tup3_bool_bool_Option_i32 = Any.any_l ()
+  | & value: t_Bound_i32 = value
+  | & inner: Int32.t = Any.any_l ()
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & inner'0: Int32.t = Any.any_l ()
+  | & _10: t_Option_i32 = Any.any_l ()
+  | & _12: t_Option_i32 = Any.any_l () ])
+  [ return (result: tup3_bool_bool_Option_i32) ->
+  {[@stop_split] [@expl:verify_bound_round_trips_its_endpoint ensures] [%#sops_range_and_bound'6] bound_round_trips_its_endpoint_holds value result}
+    (! return {result}) ]

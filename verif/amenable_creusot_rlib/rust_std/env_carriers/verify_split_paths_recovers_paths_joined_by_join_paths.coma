@@ -1,0 +1,19 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 157 8 157 75 *)
+
+let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 158 12 158 16
+let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 155 19 155 23
+let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 156 18 156 24
+
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_split_paths_recovers_paths_joined_by_join_paths
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 157 8 157 75] (return (x: bool)) =
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- [%#senv_carriers] true ] s1 | s1 = return {_ret} ] ] [ & _ret: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_split_paths_recovers_paths_joined_by_join_paths ensures] [%#senv_carriers'1] result}
+    (! return {result}) ]

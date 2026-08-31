@@ -1,0 +1,56 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 73 8 73 93 *)
+
+let%span scow_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 71 19 71 23
+let%span scow_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 72 18 72 75
+let%span scow_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 93 16 96 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Cow_i32 = Borrowed Int32.t | Owned Int32.t
+
+let rec elim_Owned (_x: t_Cow_i32) (return (f0: Int32.t)) = any
+  [ _k (f0: Int32.t) -> {Owned f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Owned] match _x with
+      | Owned _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let rec elim_Borrowed (_x: t_Cow_i32) (return (f0: Int32.t)) = any
+  [ _k (f0: Int32.t) -> {Borrowed f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Borrowed] match _x with
+      | Borrowed _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate cow_destructure_recovers_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 88 8 91 17] (value: t_Cow_i32) (cow_result: Int32.t) =
+  [%#scow_carrier'1] match value with
+    | Borrowed borrowed -> cow_result = borrowed
+    | Owned owned -> cow_result = owned
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_cow_destructure_recovers_the_wrapped_value
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 73 8 73 93] (value: t_Cow_i32)
+  (return (x: Int32.t)) = (! bb0
+  [ bb0 = any [ br0 (x0: Int32.t) -> {value = Borrowed x0} (! bb4) | br1 (x0: Int32.t) -> {value = Owned x0} (! bb3) ]
+  | bb3 = s0
+    [ s0 = elim_Owned {value} (fun (r0: Int32.t) -> [ &owned <- r0 ] s1)
+    | s1 = [ &_ret <- owned ] s2
+    | s2 = return {_ret} ]
+  | bb4 = s0
+    [ s0 = elim_Borrowed {value} (fun (r0: Int32.t) -> [ &borrowed <- r0 ] s1)
+    | s1 = [ &_ret <- borrowed ] s2
+    | s2 = return {_ret} ] ]
+  [ & _ret: Int32.t = Any.any_l ()
+  | & value: t_Cow_i32 = value
+  | & borrowed: Int32.t = Any.any_l ()
+  | & owned: Int32.t = Any.any_l () ])
+  [ return (result: Int32.t) ->
+  {[@stop_split] [@expl:verify_cow_destructure_recovers_the_wrapped_value ensures] [%#scow_carrier'0] cow_destructure_recovers_the_wrapped_value value result}
+    (! return {result}) ]

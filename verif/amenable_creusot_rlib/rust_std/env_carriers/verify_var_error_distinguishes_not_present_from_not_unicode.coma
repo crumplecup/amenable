@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 197 8 197 95 *)
+
+let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 198 13 198 17
+let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 198 19 198 23
+let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 198 25 198 31
+let%span senv_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 195 19 195 23
+let%span senv_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 196 18 196 78
+let%span senv_carriers'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 173 16 176 17
+
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+type tup3_bool_bool_usize = { f0: bool; f1: bool; f2: UInt64.t }
+
+predicate var_error_distinguishes_not_present_from_not_unicode [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 169 8 171 17] (var_error_result: tup3_bool_bool_usize) =
+  [%#senv_carriers'4] match var_error_result with
+    | {f0 = not_present_is_distinct; f1 = not_unicode_is_detected; f2 = payload_len} -> not_present_is_distinct
+    /\ not_unicode_is_detected /\ payload_len = (2: UInt64.t)
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_var_error_distinguishes_not_present_from_not_unicode
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 197 8 197 95]
+  (return (x: tup3_bool_bool_usize)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#senv_carriers] true);
+                        f1 = ([%#senv_carriers'0] true);
+                        f2 = ([%#senv_carriers'1] (2: UInt64.t)) } ] s1
+    | s1 = return {_ret} ] ] [ & _ret: tup3_bool_bool_usize = Any.any_l () ])
+  [ return (result: tup3_bool_bool_usize) ->
+  {[@stop_split] [@expl:verify_var_error_distinguishes_not_present_from_not_unicode ensures] [%#senv_carriers'3] var_error_distinguishes_not_present_from_not_unicode result}
+    (! return {result}) ]

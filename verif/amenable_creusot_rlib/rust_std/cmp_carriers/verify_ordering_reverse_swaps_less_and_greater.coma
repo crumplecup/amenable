@@ -1,0 +1,44 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 127 8 127 82 *)
+
+let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 128 12 128 23
+let%span scmp_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 125 19 125 23
+let%span scmp_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 126 18 126 74
+let%span scmp_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 78 18 83 9
+let%span scmp_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 96 16 101 17
+
+use creusot.prelude.Any
+
+type t_Ordering = Less | Equal | Greater
+
+type tup2_Ordering_Ordering = { f0: t_Ordering; f1: t_Ordering }
+
+let rec reverse (self_: t_Ordering) (return (x: t_Ordering)) = any
+  [ return (result: t_Ordering) -> {[@stop_split] [@expl:reverse ensures] [%#scmp_carriers'2] match { f0 = self_;
+                                                                                                      f1 = result } with
+      | {f0 = Less; f1 = Greater} -> true
+      | {f0 = Equal; f1 = Equal} -> true
+      | {f0 = Greater; f1 = Less} -> true
+      | _ -> false
+      end}
+    (! return {result}) ]
+
+predicate ordering_reverse_swaps_less_and_greater_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 94 8 94 103] (o: t_Ordering) (reverse_result: t_Ordering) =
+  [%#scmp_carriers'3] match { f0 = o; f1 = reverse_result } with
+    | {f0 = Less; f1 = Greater} -> true
+    | {f0 = Equal; f1 = Equal} -> true
+    | {f0 = Greater; f1 = Less} -> true
+    | _ -> false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_ordering_reverse_swaps_less_and_greater
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 127 8 127 82] (o: t_Ordering)
+  (return (x: t_Ordering)) = (! bb0
+  [ bb0 = s0 [ s0 = reverse [%#scmp_carriers] {o} (fun (_x: t_Ordering) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]
+  [ & _ret: t_Ordering = Any.any_l () | & o: t_Ordering = o ])
+  [ return (result: t_Ordering) ->
+  {[@stop_split] [@expl:verify_ordering_reverse_swaps_less_and_greater ensures] [%#scmp_carriers'1] ordering_reverse_swaps_less_and_greater_holds o result}
+    (! return {result}) ]

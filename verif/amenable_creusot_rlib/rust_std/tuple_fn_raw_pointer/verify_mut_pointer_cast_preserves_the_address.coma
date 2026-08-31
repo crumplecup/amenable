@@ -1,0 +1,47 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 135 8 135 79 *)
+
+let%span sptr = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 419 18 419 37
+let%span sptr'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 410 18 410 45
+let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 136 23 136 39
+let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 137 12 137 23
+let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 137 27 137 37
+let%span stuple_fn_raw_pointer'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 133 19 133 23
+let%span stuple_fn_raw_pointer'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 134 18 134 24
+
+use creusot.prelude.Opaque
+use creusot.int.UInt64
+use creusot.prelude.Ptr
+use creusot.prelude.Any
+
+let rec cast_i32 (self_: Opaque.ptr) (return (x: Opaque.ptr)) = any
+  [ return (result: Opaque.ptr) -> {[@stop_split] [@expl:cast ensures] [%#sptr] result = self_} (! return {result}) ]
+
+let rec addr_u8 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
+  [ return (result: UInt64.t) -> {[@stop_split] [@expl:addr ensures] [%#sptr'0] result = Ptr.addr_logic_u64 self_}
+    (! return {result}) ]
+
+let rec addr_i32 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
+  [ return (result: UInt64.t) -> {[@stop_split] [@expl:addr ensures] [%#sptr'0] result = Ptr.addr_logic_u64 self_}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_mut_pointer_cast_preserves_the_address
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 135 8 135 79]
+  (ptr: Opaque.ptr) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = cast_i32 [%#stuple_fn_raw_pointer] {ptr} (fun (_x: Opaque.ptr) -> [ &cast <- _x ] s1)
+    | s1 = addr_u8 [%#stuple_fn_raw_pointer'0] {cast} (fun (_x: UInt64.t) -> [ &_6 <- _x ] s2)
+    | s2 = addr_i32 [%#stuple_fn_raw_pointer'1] {ptr} (fun (_x: UInt64.t) -> [ &_8 <- _x ] s3)
+    | s3 = [ &_ret <- _6 = _8 ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & ptr: Opaque.ptr = ptr
+  | & cast: Opaque.ptr = Any.any_l ()
+  | & _6: UInt64.t = Any.any_l ()
+  | & _8: UInt64.t = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_mut_pointer_cast_preserves_the_address ensures] [%#stuple_fn_raw_pointer'3] result}
+    (! return {result}) ]

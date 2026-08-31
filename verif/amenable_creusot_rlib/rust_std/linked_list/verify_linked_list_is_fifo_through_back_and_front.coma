@@ -1,0 +1,39 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 118 8 121 58 *)
+
+let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 122 37 122 41
+let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 116 19 116 23
+let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 117 18 117 70
+let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 89 16 92 37
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
+
+predicate drains_two_values_in_order_and_empties [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 83 8 87 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+  [%#slinked_list'2] drain_result.f0 = Some a /\ drain_result.f1 = Some b /\ drain_result.f2 = None /\ drain_result.f3
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_linked_list_is_fifo_through_back_and_front
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 118 8 121 58] (a: Int32.t)
+  (b: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_7 <- Some a ] s1
+    | s1 = [ &_9 <- Some b ] s2
+    | s2 = [ &_11 <- None ] s3
+    | s3 = [ &_ret <- { f0 = _7; f1 = _9; f2 = _11; f3 = ([%#slinked_list] true) } ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: tup4_Option_i32_Option_i32_Option_i32_bool = Any.any_l ()
+  | & a: Int32.t = a
+  | & b: Int32.t = b
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & _9: t_Option_i32 = Any.any_l ()
+  | & _11: t_Option_i32 = Any.any_l () ])
+  [ return (result: tup4_Option_i32_Option_i32_Option_i32_bool) ->
+  {[@stop_split] [@expl:verify_linked_list_is_fifo_through_back_and_front ensures] [%#slinked_list'1] drains_two_values_in_order_and_empties a b result}
+    (! return {result}) ]

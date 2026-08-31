@@ -1,0 +1,78 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 177 8 179 51 *)
+
+let%span sops_range_and_bound = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 182 46 182 51
+let%span sops_range_and_bound'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 182 53 182 57
+let%span sops_range_and_bound'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 181 49 181 53
+let%span sops_range_and_bound'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 181 55 181 60
+let%span sops_range_and_bound'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 175 19 175 23
+let%span sops_range_and_bound'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 176 18 176 83
+let%span sops_range_and_bound'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 160 16 165 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_ControlFlow_i32_i32 = Continue Int32.t | Break Int32.t
+
+let rec elim_Break (_x: t_ControlFlow_i32_i32) (return (f0: Int32.t)) = any
+  [ _k (f0: Int32.t) -> {Break f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Break] match _x with
+      | Break _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup4_bool_bool_Option_i32_Option_i32 = { f0: bool; f1: bool; f2: t_Option_i32; f3: t_Option_i32 }
+
+let rec elim_Continue (_x: t_ControlFlow_i32_i32) (return (f0'0: Int32.t)) = any
+  [ _k (f0'0: Int32.t) -> {Continue f0'0 = _x} (! return {f0'0})
+  | _chk -> (! {[@expl:elim Continue] match _x with
+      | Continue _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate control_flow_continue_and_break_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 155 8 158 17] (value: t_ControlFlow_i32_i32) (control_flow_result: tup4_bool_bool_Option_i32_Option_i32) =
+  [%#sops_range_and_bound'5] match value with
+    | Continue inner -> control_flow_result = { f0 = true; f1 = false; f2 = Some inner; f3 = None }
+    | Break inner -> control_flow_result = { f0 = false; f1 = true; f2 = None; f3 = Some inner }
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_control_flow_continue_and_break_are_disjoint
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 177 8 179 51]
+  (value: t_ControlFlow_i32_i32) (return (x: tup4_bool_bool_Option_i32_Option_i32)) = (! bb0
+  [ bb0 = any [ br0 (x0: Int32.t) -> {value = Continue x0} (! bb4) | br1 (x0: Int32.t) -> {value = Break x0} (! bb3) ]
+  | bb3 = s0
+    [ s0 = elim_Break {value} (fun (r0: Int32.t) -> [ &inner'0 <- r0 ] s1)
+    | s1 = [ &_11 <- None ] s2
+    | s2 = [ &_12 <- Some inner'0 ] s3
+    | s3 = [ &_ret <- { f0 = ([%#sops_range_and_bound] false);
+                        f1 = ([%#sops_range_and_bound'0] true);
+                        f2 = _11;
+                        f3 = _12 } ] s4
+    | s4 = return {_ret} ]
+  | bb4 = s0
+    [ s0 = elim_Continue {value} (fun (r0: Int32.t) -> [ &inner <- r0 ] s1)
+    | s1 = [ &_7 <- Some inner ] s2
+    | s2 = [ &_9 <- None ] s3
+    | s3 = [ &_ret <- { f0 = ([%#sops_range_and_bound'1] true);
+                        f1 = ([%#sops_range_and_bound'2] false);
+                        f2 = _7;
+                        f3 = _9 } ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: tup4_bool_bool_Option_i32_Option_i32 = Any.any_l ()
+  | & value: t_ControlFlow_i32_i32 = value
+  | & inner: Int32.t = Any.any_l ()
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & _9: t_Option_i32 = Any.any_l ()
+  | & inner'0: Int32.t = Any.any_l ()
+  | & _11: t_Option_i32 = Any.any_l ()
+  | & _12: t_Option_i32 = Any.any_l () ])
+  [ return (result: tup4_bool_bool_Option_i32_Option_i32) ->
+  {[@stop_split] [@expl:verify_control_flow_continue_and_break_are_disjoint ensures] [%#sops_range_and_bound'4] control_flow_continue_and_break_are_disjoint_holds value result}
+    (! return {result}) ]

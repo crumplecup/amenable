@@ -1,0 +1,58 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 140 8 140 90 *)
+
+let%span soption_and_result = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 143 13 143 24
+let%span soption_and_result'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 143 26 143 42
+let%span soption_and_result'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 138 19 138 23
+let%span soption_and_result'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 139 18 139 80
+let%span soption_and_result'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 125 24 125 80
+let%span sresult = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 50 19 50 45
+let%span sresult'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 51 18 51 36
+let%span sresult'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 64 19 64 46
+let%span sresult'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/result.rs" 65 18 65 37
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Result_i32_i32 = Ok Int32.t | Err Int32.t
+
+let rec unwrap_i32 (self_: t_Result_i32_i32) (return (x: Int32.t)) =
+  {[@stop_split] [@expl:unwrap requires] [%#sresult] exists t: Int32.t. self_ = Ok t}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:unwrap ensures] [%#sresult'0] Ok result = self_}
+    (! return {result}) ]
+
+let rec unwrap_err_i32 (self_: t_Result_i32_i32) (return (x: Int32.t)) =
+  {[@stop_split] [@expl:unwrap_err requires] [%#sresult'1] exists e: Int32.t. self_ = Err e}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:unwrap_err ensures] [%#sresult'2] Err result = self_}
+    (! return {result}) ]
+
+type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
+
+predicate result_ok_and_err_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 120 8 124 17] (value: Int32.t) (err_value: Int32.t) (result_result: tup2_i32_i32) =
+  [%#soption_and_result'3] result_result.f0 = value /\ result_result.f1 = err_value
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_result_ok_and_err_are_disjoint
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 140 8 140 90] (value: Int32.t)
+  (err_value: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &ok <- Ok value ] s1
+    | s1 = [ &err <- Err err_value ] s2
+    | s2 = unwrap_i32 [%#soption_and_result] {ok} (fun (_x: Int32.t) -> [ &_11 <- _x ] s3)
+    | s3 = unwrap_err_i32 [%#soption_and_result'0] {err} (fun (_x: Int32.t) -> [ &_13 <- _x ] s4)
+    | s4 = [ &_ret <- { f0 = _11; f1 = _13 } ] s5
+    | s5 = return {_ret} ] ]
+  [ & _ret: tup2_i32_i32 = Any.any_l ()
+  | & value: Int32.t = value
+  | & err_value: Int32.t = err_value
+  | & ok: t_Result_i32_i32 = Any.any_l ()
+  | & err: t_Result_i32_i32 = Any.any_l ()
+  | & _11: Int32.t = Any.any_l ()
+  | & _13: Int32.t = Any.any_l () ])
+  [ return (result: tup2_i32_i32) ->
+  {[@stop_split] [@expl:verify_result_ok_and_err_are_disjoint ensures] [%#soption_and_result'2] result_ok_and_err_are_disjoint_holds value err_value result}
+    (! return {result}) ]

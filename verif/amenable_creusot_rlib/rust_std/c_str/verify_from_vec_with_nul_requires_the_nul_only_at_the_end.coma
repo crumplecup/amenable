@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 152 8 154 31 *)
+
+let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 156 13 156 17
+let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 156 19 156 23
+let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 156 25 156 29
+let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 150 19 150 43
+let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 151 18 151 55
+let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 84 24 84 34
+let%span sc_str'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 139 24 139 71
+
+use creusot.prelude.Any
+use creusot.int.UInt8
+
+type tup3_bool_bool_bool = { f0: bool; f1: bool; f2: bool }
+
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 83 8 83 47] (byte: UInt8.t) =
+  [%#sc_str'4] UInt8.t'int byte <> 0
+
+predicate nul_only_at_the_end_validates [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 138 8 138 81] (disposition: tup3_bool_bool_bool) =
+  [%#sc_str'5] disposition.f0 /\ disposition.f1 /\ disposition.f2
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_from_vec_with_nul_requires_the_nul_only_at_the_end
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 152 8 154 31] (byte: UInt8.t)
+  (return (x: tup3_bool_bool_bool)) =
+  {[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end requires] [%#sc_str'2] non_nul_byte_holds byte}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- { f0 = ([%#sc_str] true); f1 = ([%#sc_str'0] true); f2 = ([%#sc_str'1] true) } ] s1
+    | s1 = return {_ret} ] ] [ & _ret: tup3_bool_bool_bool = Any.any_l () ])
+  [ return (result: tup3_bool_bool_bool) ->
+  {[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end ensures] [%#sc_str'3] nul_only_at_the_end_validates result}
+    (! return {result}) ]

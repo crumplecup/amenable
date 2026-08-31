@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 297 8 297 94 *)
+
+let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 299 13 299 17
+let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 299 19 299 23
+let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 295 19 295 43
+let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 296 18 296 82
+let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 84 24 84 34
+let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 281 16 283 17
+
+use creusot.prelude.Any
+use creusot.int.UInt8
+
+type tup2_bool_bool = { f0: bool; f1: bool }
+
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 83 8 83 47] (byte: UInt8.t) =
+  [%#sc_str'3] UInt8.t'int byte <> 0
+
+predicate from_bytes_until_nul_requires_a_nul_byte_somewhere_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 277 8 279 17] (from_bytes_until_nul_result: tup2_bool_bool) =
+  [%#sc_str'4] match from_bytes_until_nul_result with
+    | {f0 = accepted; f1 = rejected} -> accepted /\ rejected
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_from_bytes_until_nul_requires_a_nul_byte_somewhere
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 297 8 297 94] (byte: UInt8.t)
+  (return (x: tup2_bool_bool)) =
+  {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere requires] [%#sc_str'1] non_nul_byte_holds byte}
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- { f0 = ([%#sc_str] true); f1 = ([%#sc_str'0] true) } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: tup2_bool_bool = Any.any_l () ])
+  [ return (result: tup2_bool_bool) ->
+  {[@stop_split] [@expl:verify_from_bytes_until_nul_requires_a_nul_byte_somewhere ensures] [%#sc_str'2] from_bytes_until_nul_requires_a_nul_byte_somewhere_holds result}
+    (! return {result}) ]

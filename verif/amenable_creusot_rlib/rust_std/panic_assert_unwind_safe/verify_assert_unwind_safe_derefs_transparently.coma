@@ -1,0 +1,37 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 67 8 70 23 *)
+
+let%span spanic_assert_unwind_safe = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 65 19 65 23
+let%span spanic_assert_unwind_safe'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 66 18 66 81
+let%span spanic_assert_unwind_safe'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 90 24 90 80
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_AssertUnwindSafe_i32 = { f0: Int32.t }
+
+type tup2_i32_i32 = { f0'0: Int32.t; f1'0: Int32.t }
+
+predicate assert_unwind_safe_derefs_transparently [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 85 8 89 17] (value: Int32.t) (updated: Int32.t) (wrapper_result: tup2_i32_i32) =
+  [%#spanic_assert_unwind_safe'1] wrapper_result.f0'0 = value /\ wrapper_result.f1'0 = updated
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_assert_unwind_safe_derefs_transparently
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/panic_assert_unwind_safe.rs" 67 8 70 23]
+  (value: Int32.t) (updated: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &wrapped <- { f0 = value } ] s1
+    | s1 = [ &first <- wrapped.f0 ] s2
+    | s2 = [ &wrapped <- { f0 = updated } ] s3
+    | s3 = [ &_ret <- { f0'0 = first; f1'0 = wrapped.f0 } ] s4
+    | s4 = return {_ret} ] ]
+  [ & _ret: tup2_i32_i32 = Any.any_l ()
+  | & value: Int32.t = value
+  | & updated: Int32.t = updated
+  | & wrapped: t_AssertUnwindSafe_i32 = Any.any_l ()
+  | & first: Int32.t = Any.any_l () ])
+  [ return (result: tup2_i32_i32) ->
+  {[@stop_split] [@expl:verify_assert_unwind_safe_derefs_transparently ensures] [%#spanic_assert_unwind_safe'0] assert_unwind_safe_derefs_transparently value updated result}
+    (! return {result}) ]

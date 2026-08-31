@@ -1,0 +1,53 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 175 8 178 84 *)
+
+let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 179 55 179 59
+let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 173 19 173 23
+let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 174 18 174 81
+let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 147 16 155 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
+  f0: t_Option_i32;
+  f1: t_Option_i32;
+  f2: t_Option_i32;
+  f3: t_Option_i32;
+  f4: t_Option_i32;
+  f5: bool }
+
+predicate linked_list_iter_yields_references_in_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 134 8 145 17] (a: Int32.t) (b: Int32.t) (iter_result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+  [%#slinked_list'2] match iter_result with
+    | {f0 = first; f1 = second; f2 = exhausted; f3 = front_after_iter; f4 = next_after_iter; f5 = empty} -> first
+      = Some a
+    /\ second = Some b /\ exhausted = None /\ front_after_iter = Some a /\ next_after_iter = Some b /\ empty
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_linked_list_iter_yields_references_in_order
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 175 8 178 84] (a: Int32.t)
+  (b: Int32.t) (return (x: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_7 <- Some a ] s1
+    | s1 = [ &_9 <- Some b ] s2
+    | s2 = [ &_11 <- None ] s3
+    | s3 = [ &_12 <- Some a ] s4
+    | s4 = [ &_14 <- Some b ] s5
+    | s5 = [ &_ret <- { f0 = _7; f1 = _9; f2 = _11; f3 = _12; f4 = _14; f5 = ([%#slinked_list] true) } ] s6
+    | s6 = return {_ret} ] ]
+  [ & _ret: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool = Any.any_l ()
+  | & a: Int32.t = a
+  | & b: Int32.t = b
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & _9: t_Option_i32 = Any.any_l ()
+  | & _11: t_Option_i32 = Any.any_l ()
+  | & _12: t_Option_i32 = Any.any_l ()
+  | & _14: t_Option_i32 = Any.any_l () ])
+  [ return (result: tup6_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_bool) ->
+  {[@stop_split] [@expl:verify_linked_list_iter_yields_references_in_order ensures] [%#slinked_list'1] linked_list_iter_yields_references_in_order_holds a b result}
+    (! return {result}) ]

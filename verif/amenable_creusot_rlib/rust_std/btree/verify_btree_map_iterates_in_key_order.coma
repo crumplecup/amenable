@@ -1,0 +1,130 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 141 8 152 9 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
+let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
+let%span sord'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 180 41 180 102
+let%span sord'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 186 41 186 83
+let%span sord'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 192 42 192 59
+let%span sord'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 193 42 193 59
+let%span sord'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 194 41 194 58
+let%span sord'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 200 42 200 83
+let%span sord'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 201 41 201 85
+let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 207 42 207 86
+let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
+let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
+let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
+let%span sbtree = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 157 24 157 28
+let%span sbtree'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 139 19 139 48
+let%span sbtree'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 140 18 140 79
+let%span sbtree'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 80 24 80 31
+let%span sbtree'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 105 16 115 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
+
+type t_Option_tup2_i32_i32 = None | Some tup2_i32_i32
+
+type t_Option_i32 = None'0 | Some'0 Int32.t
+
+type tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool = {
+  f0'0: t_Option_tup2_i32_i32;
+  f1'0: t_Option_tup2_i32_i32;
+  f2'0: t_Option_i32;
+  f3'0: t_Option_i32;
+  f4'0: bool }
+
+type t_Ordering = Less | Equal | Greater
+
+function cmp_log_i32 (self: Int32.t) (o: Int32.t) : t_Ordering = [%#sord'12] if Int32.lt self o then
+    Less
+  else
+    if self = o then Equal else Greater
+
+
+function eq_cmp_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom eq_cmp_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'11] (x = y) = (cmp_log_i32 x y = Equal)
+
+function antisym2_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom antisym2_i32_spec: forall x: Int32.t, y: Int32.t. ([%#sord'9] cmp_log_i32 x y = Greater)
+    -> ([%#sord'10] cmp_log_i32 y x = Less)
+
+function antisym1_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom antisym1_i32_spec: forall x: Int32.t, y: Int32.t. ([%#sord'7] cmp_log_i32 x y = Less)
+    -> ([%#sord'8] cmp_log_i32 y x = Greater)
+
+function trans_i32 (x: Int32.t) (y: Int32.t) (z: Int32.t) (o: t_Ordering) : ()
+
+axiom trans_i32_spec: forall x: Int32.t, y: Int32.t, z: Int32.t, o: t_Ordering. ([%#sord'4] cmp_log_i32 x y = o)
+    -> ([%#sord'5] cmp_log_i32 y z = o) -> ([%#sord'6] cmp_log_i32 x z = o)
+
+function refl_i32 (x: Int32.t) : ()
+
+axiom refl_i32_spec: forall x: Int32.t. [%#sord'3] cmp_log_i32 x x = Equal
+
+function cmp_gt_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_gt_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'2] Int32.gt x y = (cmp_log_i32 x y = Greater)
+
+function cmp_ge_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_ge_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'1] Int32.ge x y = (cmp_log_i32 x y <> Less)
+
+function cmp_lt_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_lt_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'0] Int32.lt x y = (cmp_log_i32 x y = Less)
+
+function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
+
+predicate k1_less_than_k2_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 79 8 79 58] (k1: Int32.t) (k2: Int32.t) =
+  [%#sbtree'2] Int32.lt k1 k2
+
+predicate btree_map_iterates_in_key_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 91 8 103 17] (k1: Int32.t) (k2: Int32.t) (v1: Int32.t) (v2: Int32.t) (btree_map_result: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool) =
+  [%#sbtree'3] match btree_map_result with
+    | {f0'0 = Some {f0 = first_k; f1 = first_v}; f1'0 = Some {f0 = second_k; f1 = second_v}; f2'0 = Some'0 removed_first; f3'0 = Some'0 removed_second; f4'0 = empty} -> first_k
+      = k1
+    /\ first_v = v1 /\ second_k = k2 /\ second_v = v2 /\ removed_first = v1 /\ removed_second = v2 /\ empty
+    | _ -> false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_btree_map_iterates_in_key_order
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 141 8 152 9] (k1: Int32.t) (k2: Int32.t)
+  (v1: Int32.t) (v2: Int32.t) (return (x: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool)) =
+  {[@stop_split] [@expl:verify_btree_map_iterates_in_key_order requires] [%#sbtree'0] k1_less_than_k2_holds k1 k2}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_14 <- { f0 = k1; f1 = v1 } ] s1
+    | s1 = [ &first <- Some _14 ] s2
+    | s2 = [ &_18 <- { f0 = k2; f1 = v2 } ] s3
+    | s3 = [ &second <- Some _18 ] s4
+    | s4 = [ &removed_first <- Some'0 v1 ] s5
+    | s5 = [ &removed_second <- Some'0 v2 ] s6
+    | s6 = [ &empty <- [%#sbtree] true ] s7
+    | s7 = [ &_ret <- { f0'0 = first; f1'0 = second; f2'0 = removed_first; f3'0 = removed_second; f4'0 = empty } ] s8
+    | s8 = return {_ret} ] ]
+  [ & _ret: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool = Any.any_l ()
+  | & k1: Int32.t = k1
+  | & k2: Int32.t = k2
+  | & v1: Int32.t = v1
+  | & v2: Int32.t = v2
+  | & first: t_Option_tup2_i32_i32 = Any.any_l ()
+  | & _14: tup2_i32_i32 = Any.any_l ()
+  | & second: t_Option_tup2_i32_i32 = Any.any_l ()
+  | & _18: tup2_i32_i32 = Any.any_l ()
+  | & removed_first: t_Option_i32 = Any.any_l ()
+  | & removed_second: t_Option_i32 = Any.any_l ()
+  | & empty: bool = Any.any_l () ])
+  [ return (result: tup5_Option_tup2_i32_i32_Option_tup2_i32_i32_Option_i32_Option_i32_bool) ->
+  {[@stop_split] [@expl:verify_btree_map_iterates_in_key_order ensures] [%#sbtree'1] btree_map_iterates_in_key_order_holds k1 k2 v1 v2 result}
+    (! return {result}) ]

@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 71 8 71 72 *)
+
+let%span sboxed_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 73 13 73 27
+let%span sboxed_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 69 19 69 23
+let%span sboxed_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 70 18 70 68
+let%span sboxed_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 85 24 85 43
+let%span sboxed = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/boxed.rs" 77 18 77 35
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+let rec as_ref_Box_i32_Global (self_: Int32.t) (return (x: Int32.t)) = any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:as_ref ensures] [%#sboxed] self_ = result} (! return {result}) ]
+
+predicate box_new_preserves_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 84 8 84 83] (value: Int32.t) (box_result: Int32.t) =
+  [%#sboxed_carrier'2] box_result = value
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_box_new_preserves_the_wrapped_value
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/boxed_carrier.rs" 71 8 71 72] (value: Int32.t)
+  (return (x: Int32.t)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &boxed <- value ] s1
+    | s1 = as_ref_Box_i32_Global [%#sboxed_carrier] {boxed} (fun (_x: Int32.t) -> [ &_7 <- _x ] s2)
+    | s2 = [ &_ret <- _7 ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: Int32.t = Any.any_l ()
+  | & value: Int32.t = value
+  | & boxed: Int32.t = Any.any_l ()
+  | & _7: Int32.t = Any.any_l () ])
+  [ return (result: Int32.t) ->
+  {[@stop_split] [@expl:verify_box_new_preserves_the_wrapped_value ensures] [%#sboxed_carrier'1] box_new_preserves_the_wrapped_value value result}
+    (! return {result}) ]

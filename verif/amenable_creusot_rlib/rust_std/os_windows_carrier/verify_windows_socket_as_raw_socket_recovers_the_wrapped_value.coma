@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 199 8 199 92 *)
+
+let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 197 19 197 23
+let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 198 18 198 94
+let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 185 24 185 46
+
+use creusot.int.UInt64
+use creusot.prelude.Any
+
+predicate windows_socket_as_raw_socket_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 181 8 184 17] (value: UInt64.t) (socket_result: UInt64.t) =
+  [%#sos_windows_carrier'1] socket_result = value
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_windows_socket_as_raw_socket_recovers_the_wrapped_value
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 199 8 199 92]
+  (value: UInt64.t) (return (x: UInt64.t)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: UInt64.t = Any.any_l () | & value: UInt64.t = value ])
+  [ return (result: UInt64.t) ->
+  {[@stop_split] [@expl:verify_windows_socket_as_raw_socket_recovers_the_wrapped_value ensures] [%#sos_windows_carrier'0] windows_socket_as_raw_socket_recovers_the_wrapped_value_holds value result}
+    (! return {result}) ]

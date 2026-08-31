@@ -1,0 +1,80 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 343 8 354 9 *)
+
+let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 356 21 356 22
+let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 357 21 357 22
+let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 359 21 359 22
+let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 360 21 360 22
+let%span slinked_list'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 362 21 362 22
+let%span slinked_list'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 363 21 363 22
+let%span slinked_list'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 364 21 364 22
+let%span slinked_list'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 341 19 341 23
+let%span slinked_list'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 342 18 342 82
+let%span slinked_list'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 299 16 322 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32 = {
+  f0: t_Option_i32;
+  f1: t_Option_i32;
+  f2: t_Option_i32;
+  f3: t_Option_i32;
+  f4: t_Option_i32;
+  f5: t_Option_i32;
+  f6: t_Option_i32;
+  f7: t_Option_i32;
+  f8: t_Option_i32;
+  f9: t_Option_i32 }
+
+predicate linked_list_extract_if_partitions_by_the_predicate_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 284 8 297 17] (extract_if_result: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32) =
+  [%#slinked_list'8] match extract_if_result with
+    | {f0 = first; f1 = second; f2 = exhausted; f3 = remaining_first; f4 = remaining_second; f5 = remaining_exhausted; f6 = early_drop_first; f7 = early_drop_second; f8 = early_drop_third; f9 = early_drop_exhausted} -> first
+      = Some (2: Int32.t)
+    /\ second = Some (4: Int32.t)
+    /\ exhausted = None
+    /\ remaining_first = Some (1: Int32.t)
+    /\ remaining_second = Some (3: Int32.t)
+    /\ remaining_exhausted = None
+    /\ early_drop_first = Some (1: Int32.t)
+    /\ early_drop_second = Some (3: Int32.t) /\ early_drop_third = Some (4: Int32.t) /\ early_drop_exhausted = None
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_linked_list_extract_if_partitions_by_the_predicate
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 343 8 354 9]
+  (return (x: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32)) =
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_3 <- Some ([%#slinked_list] (2: Int32.t)) ] s1
+    | s1 = [ &_4 <- Some ([%#slinked_list'0] (4: Int32.t)) ] s2
+    | s2 = [ &_5 <- None ] s3
+    | s3 = [ &_6 <- Some ([%#slinked_list'1] (1: Int32.t)) ] s4
+    | s4 = [ &_7 <- Some ([%#slinked_list'2] (3: Int32.t)) ] s5
+    | s5 = [ &_8 <- None ] s6
+    | s6 = [ &_9 <- Some ([%#slinked_list'3] (1: Int32.t)) ] s7
+    | s7 = [ &_10 <- Some ([%#slinked_list'4] (3: Int32.t)) ] s8
+    | s8 = [ &_11 <- Some ([%#slinked_list'5] (4: Int32.t)) ] s9
+    | s9 = [ &_12 <- None ] s10
+    | s10 = [ &_ret <- { f0 = _3; f1 = _4; f2 = _5; f3 = _6; f4 = _7; f5 = _8; f6 = _9; f7 = _10; f8 = _11; f9 = _12 } ]
+      s11
+    | s11 = return {_ret} ] ]
+  [ & _ret: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32 = Any.any_l ()
+  | & _3: t_Option_i32 = Any.any_l ()
+  | & _4: t_Option_i32 = Any.any_l ()
+  | & _5: t_Option_i32 = Any.any_l ()
+  | & _6: t_Option_i32 = Any.any_l ()
+  | & _7: t_Option_i32 = Any.any_l ()
+  | & _8: t_Option_i32 = Any.any_l ()
+  | & _9: t_Option_i32 = Any.any_l ()
+  | & _10: t_Option_i32 = Any.any_l ()
+  | & _11: t_Option_i32 = Any.any_l ()
+  | & _12: t_Option_i32 = Any.any_l () ])
+  [ return
+    (result: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32) ->
+  {[@stop_split] [@expl:verify_linked_list_extract_if_partitions_by_the_predicate ensures] [%#slinked_list'7] linked_list_extract_if_partitions_by_the_predicate_holds result}
+    (! return {result}) ]

@@ -1,0 +1,110 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 120 8 123 39 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
+let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
+let%span sord'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 180 41 180 102
+let%span sord'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 186 41 186 83
+let%span sord'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 192 42 192 59
+let%span sord'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 193 42 193 59
+let%span sord'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 194 41 194 58
+let%span sord'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 200 42 200 83
+let%span sord'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 201 41 201 85
+let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 207 42 207 86
+let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
+let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
+let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
+let%span sbinary_heap = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 118 19 118 23
+let%span sbinary_heap'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 119 18 119 78
+let%span sbinary_heap'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 103 16 107 17
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Option_i32 = None | Some Int32.t
+
+type tup2_Option_i32_Option_i32 = { f0: t_Option_i32; f1: t_Option_i32 }
+
+type t_Ordering = Less | Equal | Greater
+
+function cmp_log_i32 (self: Int32.t) (o: Int32.t) : t_Ordering = [%#sord'12] if Int32.lt self o then
+    Less
+  else
+    if self = o then Equal else Greater
+
+
+function eq_cmp_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom eq_cmp_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'11] (x = y) = (cmp_log_i32 x y = Equal)
+
+function antisym2_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom antisym2_i32_spec: forall x: Int32.t, y: Int32.t. ([%#sord'9] cmp_log_i32 x y = Greater)
+    -> ([%#sord'10] cmp_log_i32 y x = Less)
+
+function antisym1_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom antisym1_i32_spec: forall x: Int32.t, y: Int32.t. ([%#sord'7] cmp_log_i32 x y = Less)
+    -> ([%#sord'8] cmp_log_i32 y x = Greater)
+
+function trans_i32 (x: Int32.t) (y: Int32.t) (z: Int32.t) (o: t_Ordering) : ()
+
+axiom trans_i32_spec: forall x: Int32.t, y: Int32.t, z: Int32.t, o: t_Ordering. ([%#sord'4] cmp_log_i32 x y = o)
+    -> ([%#sord'5] cmp_log_i32 y z = o) -> ([%#sord'6] cmp_log_i32 x z = o)
+
+function refl_i32 (x: Int32.t) : ()
+
+axiom refl_i32_spec: forall x: Int32.t. [%#sord'3] cmp_log_i32 x x = Equal
+
+function cmp_gt_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_gt_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'2] Int32.gt x y = (cmp_log_i32 x y = Greater)
+
+function cmp_ge_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_ge_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'1] Int32.ge x y = (cmp_log_i32 x y <> Less)
+
+function cmp_lt_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_lt_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord'0] Int32.lt x y = (cmp_log_i32 x y = Less)
+
+function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
+
+axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
+
+predicate binary_heap_pop_yields_the_maximum_first_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 97 8 101 17] (a: Int32.t) (b: Int32.t) (pop_result: tup2_Option_i32_Option_i32) =
+  [%#sbinary_heap'1] match pop_result with
+    | {f0 = first; f1 = second} -> first = Some (if Int32.ge a b then a else b)
+    /\ second = Some (if Int32.ge a b then b else a)
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_binary_heap_pop_yields_the_maximum_first
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 120 8 123 39] (a: Int32.t)
+  (b: Int32.t) (return (x: tup2_Option_i32_Option_i32)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_9 <- Int32.ge a b ] s1 | s1 = any [ br0 -> {_9 = false} (! bb2) | br1 -> {_9} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_8 <- a ] s1 | s1 = bb3 ]
+  | bb2 = s0 [ s0 = [ &_8 <- b ] s1 | s1 = bb3 ]
+  | bb3 = s0
+    [ s0 = [ &first <- Some _8 ] s1
+    | s1 = [ &_14 <- Int32.ge a b ] s2
+    | s2 = any [ br0 -> {_14 = false} (! bb5) | br1 -> {_14} (! bb4) ] ]
+  | bb4 = s0 [ s0 = [ &_13 <- b ] s1 | s1 = bb6 ]
+  | bb5 = s0 [ s0 = [ &_13 <- a ] s1 | s1 = bb6 ]
+  | bb6 = s0
+    [ s0 = [ &second <- Some _13 ] s1 | s1 = [ &_ret <- { f0 = first; f1 = second } ] s2 | s2 = return {_ret} ] ]
+  [ & _ret: tup2_Option_i32_Option_i32 = Any.any_l ()
+  | & a: Int32.t = a
+  | & b: Int32.t = b
+  | & first: t_Option_i32 = Any.any_l ()
+  | & _8: Int32.t = Any.any_l ()
+  | & _9: bool = Any.any_l ()
+  | & second: t_Option_i32 = Any.any_l ()
+  | & _13: Int32.t = Any.any_l ()
+  | & _14: bool = Any.any_l () ])
+  [ return (result: tup2_Option_i32_Option_i32) ->
+  {[@stop_split] [@expl:verify_binary_heap_pop_yields_the_maximum_first ensures] [%#sbinary_heap'0] binary_heap_pop_yields_the_maximum_first_holds a b result}
+    (! return {result}) ]

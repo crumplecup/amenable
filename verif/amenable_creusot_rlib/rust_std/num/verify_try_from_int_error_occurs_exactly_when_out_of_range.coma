@@ -1,0 +1,58 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 487 8 489 40 *)
+
+let%span snum = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 490 12 490 31
+let%span snum'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 485 19 485 23
+let%span snum'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 489 13 489 40
+let%span snum'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 486 18 486 90
+let%span snum'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 444 18 447 9
+let%span snum'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 463 16 466 17
+
+use creusot.int.Int32
+use creusot.int.UInt8
+use creusot.prelude.Any
+use int.Int
+
+type t_TryFromIntError
+
+type t_Result_u8_TryFromIntError = Ok UInt8.t | Err t_TryFromIntError
+
+predicate inv_TryFromIntError (_1: t_TryFromIntError)
+
+predicate inv_Result_u8_TryFromIntError (_1: t_Result_u8_TryFromIntError)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Result_u8_TryFromIntError [inv_Result_u8_TryFromIntError x]. inv_Result_u8_TryFromIntError x
+    = match x with
+      | Ok f0 -> true
+      | Err f0 -> inv_TryFromIntError f0
+      end
+
+let rec try_from_u8 (value: Int32.t) (return (x: t_Result_u8_TryFromIntError)) = any
+  [ return (result: t_Result_u8_TryFromIntError) ->
+  {[@stop_split] [@expl:try_from_u8 ensures] ([@stop_split] [@expl:try_from result type invariant] inv_Result_u8_TryFromIntError result)
+    /\ ([@stop_split] [@expl:try_from ensures] [%#snum'3] match result with
+      | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
+      | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
+      end)}
+    (! return {result}) ]
+
+predicate try_from_int_error_occurs_exactly_when_out_of_range_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 458 8 461 17] (value: Int32.t) (try_from_result: t_Result_u8_TryFromIntError) =
+  [%#snum'4] match try_from_result with
+    | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
+    | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_try_from_int_error_occurs_exactly_when_out_of_range
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 487 8 489 40] (value: Int32.t)
+  (return (x: t_Result_u8_TryFromIntError)) = (! bb0
+  [ bb0 = s0
+    [ s0 = try_from_u8 [%#snum] {value} (fun (_x: t_Result_u8_TryFromIntError) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ] [ & _ret: t_Result_u8_TryFromIntError = Any.any_l () | & value: Int32.t = value ])
+  [ return (result: t_Result_u8_TryFromIntError) ->
+  {[@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range ensures] ([@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range result type invariant] [%#snum'1] inv_Result_u8_TryFromIntError result)
+    /\ ([@stop_split] [@expl:verify_try_from_int_error_occurs_exactly_when_out_of_range ensures] [%#snum'2] try_from_int_error_occurs_exactly_when_out_of_range_holds value result)}
+    (! return {result}) ]
