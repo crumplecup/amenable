@@ -1,0 +1,46 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33 *)
+
+(* ledger::transfer_and_types::Transfer<S, Token> *)
+
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 171 8 171 13
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_Token
+
+type t_Transfer_S_Token = { payload: t_TransferPayload; token: t_Token; _state: () }
+
+predicate inv_Token (_1: t_Token)
+
+predicate inv_Transfer_S_Token (_1: t_Transfer_S_Token)
+
+axiom inv_axiom [@rewrite]: forall x: t_Transfer_S_Token [inv_Transfer_S_Token x]. inv_Transfer_S_Token x
+    = inv_Token x.token
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec new_S [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33]
+  (payload'0: t_TransferPayload) (token'0: t_Token) (return (x: t_Transfer_S_Token)) =
+  {[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types] inv_Token token'0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_7 <- () ] s1
+    | s1 = [ &_ret <- { payload = payload'0; token = token'0; _state = _7 } ] s2
+    | s2 = return {_ret} ] ]
+  [ & _ret: t_Transfer_S_Token = Any.any_l ()
+  | & payload'0: t_TransferPayload = payload'0
+  | & token'0: t_Token = token'0
+  | & _7: () = Any.any_l () ])
+  [ return (result: t_Transfer_S_Token) ->
+  {[@stop_split] [@expl:new_S ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types'0] inv_Transfer_S_Token result)
+    /\ ([@stop_split] [@expl:new ensures] [%#stransfer_and_types'0] result.payload = payload'0)}
+    (! return {result}) ]

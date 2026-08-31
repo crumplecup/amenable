@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Some": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_iter_i32": { "prover": "alt-ergo", "time": 0.016 },
+      "vc_next_Iter_i32": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_verify_slice_iter_yields_shared_references_in_order": {
+        "prover": "z3",
+        "time": 0.11
+      }
+    }
+  }
+}

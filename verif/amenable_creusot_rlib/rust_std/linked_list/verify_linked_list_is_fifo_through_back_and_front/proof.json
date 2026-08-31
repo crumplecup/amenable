@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_linked_list_is_fifo_through_back_and_front": {
+        "prover": "alt-ergo",
+        "time": 0.017
+      }
+    }
+  }
+}

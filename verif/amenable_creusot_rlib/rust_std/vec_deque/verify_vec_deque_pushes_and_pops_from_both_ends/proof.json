@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_vec_deque_pushes_and_pops_from_both_ends": {
+        "prover": "alt-ergo",
+        "time": 0.021
+      }
+    }
+  }
+}

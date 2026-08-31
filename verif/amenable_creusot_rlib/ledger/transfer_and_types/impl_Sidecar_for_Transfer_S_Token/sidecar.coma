@@ -1,0 +1,79 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33 *)
+
+(* <ledger::transfer_and_types::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
+
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/clone.rs" 14 26 14 30
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_Token
+
+type t_Transfer_S_Token = { payload: t_TransferPayload; token: t_Token; _state: () }
+
+predicate inv_Token (_1: t_Token)
+
+predicate invariant_ref_Token [@inline:trivial] (self: t_Token) = [%#sinvariant] inv_Token self
+
+meta "rewrite_def" predicate invariant_ref_Token
+
+predicate inv_ref_Token [@inline:trivial] (_1: t_Token) = invariant_ref_Token _1
+
+meta "rewrite_def" predicate inv_ref_Token
+
+predicate precondition_clone (self: ()) (args: t_Token)
+
+axiom precondition_fndef:
+  forall args: t_Token [precondition_clone () args]. (let self_ = args in [%#sclone] inv_ref_Token self_)
+    -> precondition_clone () args
+
+predicate postcondition_once_clone (self: ()) (args: t_Token) (result: t_Token)
+
+axiom postcondition_fndef:
+  forall args: t_Token, res: t_Token [postcondition_once_clone () args res]. postcondition_once_clone () args res
+    -> (let self_ = args in inv_Token res)
+
+let rec clone_Token (self_: t_Token) (return (x: t_Token)) =
+  {[@stop_split] [@expl:clone requires] precondition_clone () self_}
+  any
+  [ return (result: t_Token) -> {[@stop_split] [@expl:clone ensures] postcondition_once_clone () self_ result}
+    (! return {result}) ]
+
+predicate inv_Transfer_S_Token (_1: t_Transfer_S_Token)
+
+axiom inv_axiom [@rewrite]: forall x: t_Transfer_S_Token [inv_Transfer_S_Token x]. inv_Transfer_S_Token x
+    = inv_Token x.token
+
+predicate invariant_ref_Transfer_S_Token [@inline:trivial] (self: t_Transfer_S_Token) =
+  [%#sinvariant] inv_Transfer_S_Token self
+
+meta "rewrite_def" predicate invariant_ref_Transfer_S_Token
+
+predicate inv_ref_Transfer_S_Token [@inline:trivial] (_1: t_Transfer_S_Token) = invariant_ref_Transfer_S_Token _1
+
+meta "rewrite_def" predicate inv_ref_Transfer_S_Token
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec sidecar_Transfer_S_Token
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33]
+  (self: t_Transfer_S_Token) (return (x: t_Token)) =
+  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_S_Token self}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_3 <- self.token ] s1
+    | s1 = clone_Token [%#stransfer_and_types] {_3} (fun (_x: t_Token) -> [ &_ret <- _x ] s2)
+    | s2 = return {_ret} ] ]
+  [ & _ret: t_Token = Any.any_l () | & self: t_Transfer_S_Token = self | & _3: t_Token = Any.any_l () ])
+  [ return (result: t_Token) ->
+  {[@stop_split] [@expl:sidecar result type invariant] [%#stransfer_and_types] inv_Token result}
+    (! return {result}) ]

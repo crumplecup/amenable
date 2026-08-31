@@ -1,0 +1,44 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 197 4 197 74 *)
+
+(* ledger::ledger_validate::Ledger *)
+
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 198 20 198 21
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 195 15 195 19
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 196 14 196 64
+let%span sledger_validate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 64 16 67 17
+let%span sledger_validate'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
+
+use creusot.int.Int64
+use creusot.prelude.Any
+use int.Int
+
+type t_Result_unit_i64 = Ok () | Err Int64.t
+
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount: Int64.t) (outcome: bool) =
+  [%#sledger_validate'3] outcome = (Int64.to_int amount > 0)
+
+predicate check_amount_positive_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 62 8 62 103] (amount: Int64.t) (outcome: t_Result_unit_i64) =
+  [%#sledger_validate'2] match outcome with
+    | Ok () -> amount_positive_holds amount true
+    | Err bad -> bad = amount /\ amount_positive_holds amount false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec check_amount_positive_V
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 197 4 197 74] (amount: Int64.t)
+  (return (x: t_Result_unit_i64)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- Int64.gt amount ([%#sledger_validate] (0: Int64.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_ret <- Ok _7 ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- Err amount ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_unit_i64 = Any.any_l ()
+  | & amount: Int64.t = amount
+  | & _5: bool = Any.any_l ()
+  | & _7: () = Any.any_l () ])
+  [ return (result: t_Result_unit_i64) ->
+  {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger_validate'1] check_amount_positive_result_holds amount result}
+    (! return {result}) ]

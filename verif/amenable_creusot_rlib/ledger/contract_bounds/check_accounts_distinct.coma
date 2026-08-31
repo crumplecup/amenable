@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 146 8 146 62 *)
+
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 144 19 144 23
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 145 18 145 59
+let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 124 24 124 47
+
+use creusot.prelude.Any
+use creusot.int.UInt64
+
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 123 8 123 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+  [%#scontract_bounds'1] outcome = (from <> to')
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec check_accounts_distinct
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 146 8 146 62] (from: UInt64.t)
+  (to': UInt64.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- from <> to' ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & from: UInt64.t = from | & to': UInt64.t = to' ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_accounts_distinct ensures] [%#scontract_bounds'0] accounts_distinct_holds from to' result}
+    (! return {result}) ]

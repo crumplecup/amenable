@@ -1,0 +1,129 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 63 4 66 80 *)
+
+(* <ledger::ledger_validate::Ledger as amenable_core::Exchange<ledger::transfer_and_types::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>, ledger::transfer_and_types::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, witness::CreusotVerifier>> *)
+
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 124 24 124 47
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 65 24 65 56
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 245 16 255 17
+let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 67 8 67 47
+let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 65 8 65 13
+let%span svalidate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 61 15 61 19
+let%span svalidate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 66 9 66 80
+let%span svalidate'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 62 14 62 44
+let%span svalidate'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 17 34 17 39
+let%span svalidate'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 15 23 15 27
+let%span svalidate'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 17 77 17 135
+let%span svalidate'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 16 22 16 52
+
+use creusot.int.Int64
+use creusot.int.UInt64
+use creusot.prelude.Any
+use int.Int
+
+type t_Ledger = { balance: Int64.t }
+
+type t_Transfer__private
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_PendingToken
+
+type t_Transfer_Pending_PendingToken = {
+  payload: t_TransferPayload;
+  token: t_PendingToken;
+  t_Transfer__private: t_Transfer__private }
+
+type t_Transfer__private'0
+
+type t_ValidatedToken
+
+type t_Transfer_Validated_ValidatedToken = {
+  payload'0: t_TransferPayload;
+  token'0: t_ValidatedToken;
+  t_Transfer__private'0: t_Transfer__private'0 }
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+type t_Result_Transfer_Validated_ValidatedToken_TransferError =
+  | Ok t_Transfer_Validated_ValidatedToken
+  | Err t_TransferError
+
+predicate inv_PendingToken (_1: t_PendingToken)
+
+predicate inv__private (x: t_Transfer__private)
+
+predicate inv_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken x]. inv_Transfer_Pending_PendingToken x
+    = (inv_PendingToken x.token /\ inv__private x.t_Transfer__private)
+
+predicate inv_ValidatedToken (_1: t_ValidatedToken)
+
+predicate inv__private'0 (x: t_Transfer__private'0)
+
+predicate inv_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall x: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken x]. inv_Transfer_Validated_ValidatedToken x
+    = (inv_ValidatedToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
+
+predicate inv_Result_Transfer_Validated_ValidatedToken_TransferError (_1: t_Result_Transfer_Validated_ValidatedToken_TransferError)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall x: t_Result_Transfer_Validated_ValidatedToken_TransferError [inv_Result_Transfer_Validated_ValidatedToken_TransferError x]. inv_Result_Transfer_Validated_ValidatedToken_TransferError x
+    = match x with
+      | Ok f0'0 -> inv_Transfer_Validated_ValidatedToken f0'0
+      | Err f0'0 -> true
+      end
+
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount'0: Int64.t) (outcome: bool) =
+  [%#sledger_validate] outcome = (Int64.to_int amount'0 > 0)
+
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 123 8 123 81] (from'0: UInt64.t) (to''0: UInt64.t) (outcome: bool) =
+  [%#scontract_bounds] outcome = (from'0 <> to''0)
+
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 64 8 64 87] (balance'0: Int64.t) (amount'0: Int64.t) (outcome: bool) =
+  [%#scontract_bounds'0] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'0)
+
+predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 241 8 243 17] (outcome: t_Result_Transfer_Validated_ValidatedToken_TransferError) =
+  [%#svalidated_committed_rejected] match outcome with
+    | Ok validated -> amount_positive_holds validated.payload'0.amount.f0 true
+    /\ accounts_distinct_holds validated.payload'0.from validated.payload'0.to' true
+    | Err (NegativeAmount bad) -> amount_positive_holds bad false
+    | Err (InsufficientFunds balance'0 required) -> sufficient_funds_holds balance'0 required false
+    | Err (SameAccount) -> true
+    end
+
+let rec validate_CreusotVerifier (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
+  (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
+  {[@stop_split] [@expl:validate 'input' type invariant] [%#svalidate'4] inv_Transfer_Pending_PendingToken input}
+  any
+  [ return (result: t_Result_Transfer_Validated_ValidatedToken_TransferError) ->
+  {[@stop_split] [@expl:validate_CreusotVerifier ensures] ([@stop_split] [@expl:validate result type invariant] [%#svalidate'6] inv_Result_Transfer_Validated_ValidatedToken_TransferError result)
+    /\ ([@stop_split] [@expl:validate ensures] [%#svalidate'7] validated_result_holds result)}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec exchange_Ledger
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 63 4 66 80] (self: t_Ledger)
+  (input: t_Transfer_Pending_PendingToken) (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
+  {[@stop_split] [@expl:exchange 'input' type invariant] [%#svalidate'0] inv_Transfer_Pending_PendingToken input}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = validate_CreusotVerifier [%#svalidate] {self} {input}
+        (fun (_x: t_Result_Transfer_Validated_ValidatedToken_TransferError) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_Transfer_Validated_ValidatedToken_TransferError = Any.any_l ()
+  | & self: t_Ledger = self
+  | & input: t_Transfer_Pending_PendingToken = input ])
+  [ return (result: t_Result_Transfer_Validated_ValidatedToken_TransferError) ->
+  {[@stop_split] [@expl:exchange_Ledger ensures] ([@stop_split] [@expl:exchange result type invariant] [%#svalidate'2] inv_Result_Transfer_Validated_ValidatedToken_TransferError result)
+    /\ ([@stop_split] [@expl:exchange ensures] [%#svalidate'3] validated_result_holds result)}
+    (! return {result}) ]

@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Current": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_elim_End": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_elim_Start": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_verify_seek_from_round_trips_each_variants_offset": {
+        "prover": "alt-ergo",
+        "time": 0.017
+      }
+    }
+  }
+}

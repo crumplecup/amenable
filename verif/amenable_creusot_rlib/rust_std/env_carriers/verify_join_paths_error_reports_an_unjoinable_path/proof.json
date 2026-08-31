@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_join_paths_error_reports_an_unjoinable_path": {
+        "prover": "alt-ergo",
+        "time": 0.01
+      }
+    }
+  }
+}

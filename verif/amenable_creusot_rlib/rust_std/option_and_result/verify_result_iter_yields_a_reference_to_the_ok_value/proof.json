@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_result_iter_yields_a_reference_to_the_ok_value": {
+        "prover": "alt-ergo",
+        "time": 0.024
+      }
+    }
+  }
+}

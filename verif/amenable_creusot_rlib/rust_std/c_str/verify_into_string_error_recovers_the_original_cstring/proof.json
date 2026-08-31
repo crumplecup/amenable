@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_into_string_error_recovers_the_original_cstring": {
+        "prover": "alt-ergo",
+        "time": 0.017
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_binary_heap_drain_yields_every_pushed_element_once": {
+        "prover": "alt-ergo",
+        "time": 0.015
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 229 4 229 70 *)
+
+(* ledger::ledger_validate::Ledger *)
+
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 227 15 227 19
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 228 14 228 51
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 158 16 163 17
+
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+predicate insufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 156 8 156 95] (bad: tup2_i64_i64) (outcome: t_TransferError) =
+  [%#sledger_validate'1] match outcome with
+    | InsufficientFunds balance required -> balance = bad.f0 /\ required = bad.f1
+    | _ -> false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec insufficient_funds
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 229 4 229 70] (bad: tup2_i64_i64)
+  (return (x: t_TransferError)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- InsufficientFunds (bad.f0) (bad.f1) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_TransferError = Any.any_l () | & bad: tup2_i64_i64 = bad ])
+  [ return (result: t_TransferError) ->
+  {[@stop_split] [@expl:insufficient_funds ensures] [%#sledger_validate'0] insufficient_funds_holds bad result}
+    (! return {result}) ]

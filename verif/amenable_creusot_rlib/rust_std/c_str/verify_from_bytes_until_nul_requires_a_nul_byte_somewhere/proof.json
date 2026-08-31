@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_from_bytes_until_nul_requires_a_nul_byte_somewhere": {
+        "prover": "alt-ergo",
+        "time": 0.015
+      }
+    }
+  }
+}

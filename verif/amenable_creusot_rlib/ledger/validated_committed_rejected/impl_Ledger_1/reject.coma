@@ -1,0 +1,167 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 12 17 148 *)
+
+(* ledger::ledger_validate::Ledger *)
+
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 112 21 112 31
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 111 18 111 22
+let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 171 8 171 13
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 109 0 109 93
+let%span sreject = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 45
+let%span sreject'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 53
+let%span sreject'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 19 59 19 74
+let%span sreject'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 19 28 19 75
+let%span sreject'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 20 19 20 48
+let%span sreject'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 29 17 34
+let%span sreject'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 15 23 15 27
+let%span sreject'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 72 17 148
+let%span sreject'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 16 22 16 26
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Transfer__private
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_PendingToken
+
+type t_Transfer_Pending_PendingToken = {
+  payload: t_TransferPayload;
+  token: t_PendingToken;
+  t_Transfer__private: t_Transfer__private }
+
+predicate inv_PendingToken (_1: t_PendingToken)
+
+predicate inv__private (x: t_Transfer__private)
+
+predicate inv_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken x]. inv_Transfer_Pending_PendingToken x
+    = (inv_PendingToken x.token /\ inv__private x.t_Transfer__private)
+
+predicate invariant_ref_Transfer_Pending_PendingToken [@inline:trivial] (self: t_Transfer_Pending_PendingToken) =
+  [%#sinvariant] inv_Transfer_Pending_PendingToken self
+
+meta "rewrite_def" predicate invariant_ref_Transfer_Pending_PendingToken
+
+predicate inv_ref_Transfer_Pending_PendingToken [@inline:trivial] (_1: t_Transfer_Pending_PendingToken) =
+  invariant_ref_Transfer_Pending_PendingToken _1
+
+meta "rewrite_def" predicate inv_ref_Transfer_Pending_PendingToken
+
+let rec primary_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_TransferPayload)) =
+  {[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
+  any
+  [ return (result: t_TransferPayload) -> {[@stop_split] [@expl:primary ensures] [%#stransfer_and_types] result
+    = self.payload}
+    (! return {result}) ]
+
+let rec clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
+  [ return (result: t_TransferPayload) -> (! return {result}) ]
+
+predicate resolve_PendingToken (_1: t_PendingToken)
+
+predicate resolve__private (x: t_Transfer__private)
+
+predicate resolve_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
+
+axiom resolve_axiom [@rewrite]:
+  forall x: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken x]. resolve_Transfer_Pending_PendingToken x
+    = (resolve_PendingToken x.token /\ resolve__private x.t_Transfer__private)
+
+let rec sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_PendingToken)) =
+  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
+  any
+  [ return (result: t_PendingToken) ->
+  {[@stop_split] [@expl:sidecar result type invariant] [%#stransfer_and_types] inv_PendingToken result}
+    (! return {result}) ]
+
+type t_RejectedFromPendingToken
+
+predicate inv_RejectedFromPendingToken (_1: t_RejectedFromPendingToken)
+
+let rec establish_Rejected_Pending (credential: t_PendingToken) (return (x: t_RejectedFromPendingToken)) =
+  {[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_PendingToken credential}
+  any
+  [ return (result: t_RejectedFromPendingToken) ->
+  {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_RejectedFromPendingToken result}
+    (! return {result}) ]
+
+type t_Transfer__private'0
+
+type t_Transfer_Rejected_Pending_RejectedFromPendingToken = {
+  payload'0: t_TransferPayload;
+  token'0: t_RejectedFromPendingToken;
+  t_Transfer__private'0: t_Transfer__private'0 }
+
+predicate inv__private'0 (x: t_Transfer__private'0)
+
+predicate inv_Transfer_Rejected_Pending_RejectedFromPendingToken (_1: t_Transfer_Rejected_Pending_RejectedFromPendingToken)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall x: t_Transfer_Rejected_Pending_RejectedFromPendingToken [inv_Transfer_Rejected_Pending_RejectedFromPendingToken x]. inv_Transfer_Rejected_Pending_RejectedFromPendingToken x
+    = (inv_RejectedFromPendingToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
+
+let rec new_Rejected_Pending (payload'1: t_TransferPayload) (token'1: t_RejectedFromPendingToken)
+  (return (x: t_Transfer_Rejected_Pending_RejectedFromPendingToken)) =
+  {[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_RejectedFromPendingToken token'1}
+  any
+  [ return (result: t_Transfer_Rejected_Pending_RejectedFromPendingToken) ->
+  {[@stop_split] [@expl:new_Rejected_Pending ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types] inv_Transfer_Rejected_Pending_RejectedFromPendingToken result)
+    /\ ([@stop_split] [@expl:new ensures] [%#stransfer_and_types] result.payload'0 = payload'1)}
+    (! return {result}) ]
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+type t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError =
+  | Ok t_Transfer_Rejected_Pending_RejectedFromPendingToken
+  | Err t_TransferError
+
+type t_Ledger = { balance: Int64.t }
+
+predicate inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError (_1: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError [inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError x]. inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError x
+    = match x with
+      | Ok f0'0 -> inv_Transfer_Rejected_Pending_RejectedFromPendingToken f0'0
+      | Err f0'0 -> true
+      end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec reject [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 12 17 148]
+  (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
+  (return (x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)) =
+  {[@stop_split] [@expl:reject 'input' type invariant] [%#sreject'4] inv_Transfer_Pending_PendingToken input}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = primary_Transfer_Pending_PendingToken [%#sreject] {input} (fun (_x: t_TransferPayload) -> [ &_7 <- _x ] s1)
+    | s1 = clone_TransferPayload [%#sreject'0] {_7} (fun (_x: t_TransferPayload) -> [ &payload'1 <- _x ] s2)
+    | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_Transfer_Pending_PendingToken input} any) ]
+    | s3 = -{resolve_Transfer_Pending_PendingToken input}- s4
+    | s4 = sidecar_Transfer_Pending_PendingToken [%#sreject'1] {input} (fun (_x: t_PendingToken) -> [ &_10 <- _x ] s5)
+    | s5 = establish_Rejected_Pending [%#sreject'2] {_10}
+        (fun (_x: t_RejectedFromPendingToken) -> [ &token'1 <- _x ] s6)
+    | s6 = new_Rejected_Pending [%#sreject'3] {payload'1} {token'1}
+        (fun (_x: t_Transfer_Rejected_Pending_RejectedFromPendingToken) -> [ &_12 <- _x ] s7)
+    | s7 = [ &_ret <- Ok _12 ] s8
+    | s8 = return {_ret} ] ]
+  [ & _ret: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError = Any.any_l ()
+  | & input: t_Transfer_Pending_PendingToken = input
+  | & payload'1: t_TransferPayload = Any.any_l ()
+  | & _7: t_TransferPayload = Any.any_l ()
+  | & token'1: t_RejectedFromPendingToken = Any.any_l ()
+  | & _10: t_PendingToken = Any.any_l ()
+  | & _12: t_Transfer_Rejected_Pending_RejectedFromPendingToken = Any.any_l () ])
+  [ return (result: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError) ->
+  {[@stop_split] [@expl:reject result type invariant] [%#sreject'6] inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError result}
+    (! return {result}) ]

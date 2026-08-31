@@ -1,0 +1,31 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 223 4 223 60 *)
+
+(* ledger::ledger_validate::Ledger *)
+
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 221 15 221 19
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 222 14 222 48
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 130 16 133 17
+
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_TransferError = NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
+
+predicate negative_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 128 8 128 85] (bad: Int64.t) (outcome: t_TransferError) =
+  [%#sledger_validate'1] match outcome with
+    | NegativeAmount actual -> actual = bad
+    | _ -> false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec negative_amount
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 223 4 223 60] (bad: Int64.t)
+  (return (x: t_TransferError)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- NegativeAmount bad ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_TransferError = Any.any_l () | & bad: Int64.t = bad ])
+  [ return (result: t_TransferError) ->
+  {[@stop_split] [@expl:negative_amount ensures] [%#sledger_validate'0] negative_amount_holds bad result}
+    (! return {result}) ]

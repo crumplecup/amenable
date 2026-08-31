@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_shared_reference_dereferences_to_the_referent": {
+        "prover": "alt-ergo",
+        "time": 0.012
+      }
+    }
+  }
+}

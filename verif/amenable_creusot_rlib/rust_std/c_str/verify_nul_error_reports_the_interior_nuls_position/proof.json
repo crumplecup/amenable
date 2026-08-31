@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_nul_error_reports_the_interior_nuls_position": {
+        "prover": "alt-ergo",
+        "time": 0.016
+      }
+    }
+  }
+}
