@@ -6,138 +6,29 @@
 //! `claim`, the same one-claim-per-carrier granularity `amenable_kani`/
 //! `amenable_creusot` get from `amenable_derive::harness!` capturing one
 //! function at a time.
+//!
+//! Grouped into thematic subdirectories by real std module family
+//! (mirroring `amenable_kani::rust_std`'s own directory shape) rather
+//! than left as 133 files flat under one directory: [`io`], [`str_and_char`],
+//! [`ffi`], [`collections`], [`sync`], [`cell_and_ref`], [`path_and_fs`],
+//! [`process_and_net`], [`iter`], [`num`], [`task_and_thread`], and
+//! [`misc`] (single-carrier std modules with no sibling in this crate --
+//! `Box`, `Cow`, `Discriminant`, `Layout`, `ManuallyDrop`, a handful of
+//! zero-invariant singletons, `ops`, `Option`, `Result`, `panic`,
+//! primitive-shape carriers, `TypeId`, `env`, `fmt`, the Windows-handle
+//! cluster, `SystemTime`). The one-file-per-carrier granularity inside
+//! each subdirectory is unchanged -- this only adds a middle layer, it
+//! never merges or renames a carrier file.
 
-pub mod arc_carrier;
-pub mod array_into_iter_carrier;
-pub mod ascii_escape_carrier;
-pub mod atomic_ptr_carrier;
-pub mod binary_heap_carrier;
-pub mod box_carrier;
-pub mod btree_carrier;
-pub mod cell_carrier;
-pub mod char_carrier;
-pub mod char_transform_carrier;
-pub mod char_try_from_carrier;
-pub mod chars_carrier;
-pub mod cow_carrier;
-pub mod cstr_carrier;
-pub mod cstring_carrier;
-pub mod decode_utf16_carrier;
-pub mod discriminant_carrier;
-pub mod env_carrier;
-pub mod escape_ascii_carrier;
-pub mod fmt_carrier;
-pub mod fp_category_carrier;
-pub mod from_utf16_error_carrier;
-pub mod from_utf8_error_carrier;
-pub mod from_vec_with_nul_carrier;
-pub mod fs_boolean_laws_carrier;
-pub mod fs_content_carrier;
-pub mod fs_path_carrier;
-pub mod future_carrier;
-pub mod get_disjoint_mut_carrier;
-pub mod hash_carrier;
-pub mod int_error_kind_carrier;
-pub mod into_string_error_carrier;
-pub mod io_buf_writer_carrier;
-pub mod io_buffered_read_carrier;
-pub mod io_bytes_carrier;
-pub mod io_chain_carrier;
-pub mod io_cursor_carrier;
-pub mod io_empty_repeat_sink_carrier;
-pub mod io_error_carrier;
-pub mod io_into_inner_error_carrier;
-pub mod io_line_writer_carrier;
-pub mod io_lines_carrier;
-pub mod io_pipe_carrier;
-pub mod io_seek_from_carrier;
-pub mod io_slice_carrier;
-pub mod io_split_carrier;
-pub mod io_take_carrier;
-pub mod io_writer_panicked_carrier;
-pub mod iter_generator_carrier;
-pub mod iter_sequence_carrier;
-pub mod iter_stateful_carrier;
-pub mod iter_transform_carrier;
-pub mod iter_window_carrier;
-pub mod layout_carrier;
-pub mod lazy_cell_carrier;
-pub mod linked_list_carrier;
-pub mod manually_drop_carrier;
-pub mod misc_singletons_carrier;
-pub mod net_carrier;
-pub mod non_zero_carrier;
-pub mod once_cell_carrier;
-pub mod ops_carrier;
-pub mod option_carrier;
-pub mod option_result_iter_carrier;
-pub mod ordered_pair_into_iter_carrier;
-pub mod ordered_pair_iter_mut_carrier;
-pub mod ordering_carrier;
-#[cfg(windows)]
-pub mod os_windows_carrier;
-pub mod panic_carrier;
-pub mod parse_char_error_carrier;
-pub mod parse_float_error_carrier;
-pub mod path_ancestors_carrier;
-pub mod path_buf_carrier;
-pub mod path_carrier;
-pub mod path_components_carrier;
-pub mod path_display_carrier;
-pub mod path_prefix_carrier;
-pub mod path_strip_prefix_carrier;
-pub mod primitive_shapes_carrier;
-pub mod process_child_carrier;
-pub mod process_command_carrier;
-pub mod process_exit_carrier;
-pub mod process_stdio_carrier;
-pub mod rc_carrier;
-pub mod ref_carrier;
-pub mod ref_cell_carrier;
-pub mod ref_mut_carrier;
-pub mod result_carrier;
-pub mod reverse_carrier;
-pub mod saturating_carrier;
-pub mod sip_hasher_carrier;
-pub mod slice_chunk_by_carrier;
-pub mod slice_chunks_carrier;
-pub mod slice_iter_carrier;
-pub mod slice_split_carrier;
-pub mod std_collections_carrier;
-pub mod std_ffi_carrier;
-pub mod std_hash_carrier;
-pub mod std_net_carrier;
-pub mod std_time_carrier;
-pub mod str_ascii_iter_carrier;
-pub mod str_escape_carrier;
-pub mod str_lines_carrier;
-pub mod str_pattern_match_carrier;
-pub mod str_pattern_reverse_carrier;
-pub mod str_pattern_split_carrier;
-pub mod str_pattern_terminator_carrier;
-pub mod str_utf8_chunks_carrier;
-pub mod str_whitespace_carrier;
-pub mod string_carrier;
-pub mod sync_atomic_carrier;
-pub mod sync_atomic_ordering_carrier;
-pub mod sync_barrier_carrier;
-pub mod sync_mpsc_carrier;
-pub mod sync_once_carrier;
-pub mod sync_wait_timeout_carrier;
-pub mod task_carrier;
-pub mod thread_current_carrier;
-pub mod thread_local_key_carrier;
-pub mod try_from_int_error_carrier;
-pub mod try_from_slice_carrier;
-pub mod try_reserve_error_carrier;
-pub mod type_id_carrier;
-pub mod unordered_pair_carrier;
-pub mod unsafe_cell_carrier;
-pub mod vec_carrier;
-pub mod vec_deque_carrier;
-pub mod vec_deque_iter_carrier;
-pub mod vec_extract_if_carrier;
-pub mod vec_into_iter_carrier;
-pub mod vec_splice_carrier;
-pub mod weak_carrier;
-pub mod wrapping_carrier;
+pub mod cell_and_ref;
+pub mod collections;
+pub mod ffi;
+pub mod io;
+pub mod iter;
+pub mod misc;
+pub mod num;
+pub mod path_and_fs;
+pub mod process_and_net;
+pub mod str_and_char;
+pub mod sync;
+pub mod task_and_thread;

@@ -7,7 +7,7 @@ use crate::{RustStdStandard, ValidUnicodeScalar};
 use amenable_core::Evidence;
 
 const VERIFY_CHAR_ROUNDTRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_carrier.rs");
 
 // `verify_char_roundtrip`'s real VerusCallShape (params/requires/ensures/
 // imports) is no longer registered by hand here -- `verus_call_shape`
@@ -81,7 +81,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_STRING_ROUNDTRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/string_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/string_carrier.rs");
 
 impl VerusWitness for RustStdStandard<String> {
     type SupportingEvidence = Self;
@@ -113,7 +113,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_ORDERING_REVERSE_SWAPS_LESS_AND_GREATER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ordering_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/ordering_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cmp::Ordering> {
     type SupportingEvidence = Self;
@@ -150,7 +150,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_OPTION_UNWRAP_RETURNS_THE_WRAPPED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/option_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/option_carrier.rs");
 
 impl VerusWitness for RustStdStandard<Option<i32>> {
     type SupportingEvidence = Self;
@@ -182,7 +182,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_RESULT_UNWRAP_RETURNS_THE_OK_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/result_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/result_carrier.rs");
 
 impl VerusWitness for RustStdStandard<Result<i32, i32>> {
     type SupportingEvidence = Self;
@@ -219,7 +219,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_WRAPPING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/wrapping_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/wrapping_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::num::Wrapping<i32>> {
     type SupportingEvidence = Self;
@@ -247,7 +247,7 @@ bridge_verus_witness!(RustStdStandard<std::num::Wrapping<i32>>);
 }
 
 const VERIFY_SATURATING_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/saturating_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/saturating_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::num::Saturating<i32>> {
     type SupportingEvidence = Self;
@@ -275,7 +275,7 @@ bridge_verus_witness!(RustStdStandard<std::num::Saturating<i32>>);
 }
 
 const VERIFY_REVERSE_FIELD_ROUNDTRIPS_THE_CONSTRUCTED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/reverse_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/reverse_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cmp::Reverse<i32>> {
     type SupportingEvidence = Self;
@@ -303,7 +303,7 @@ bridge_verus_witness!(RustStdStandard<std::cmp::Reverse<i32>>);
 }
 
 const VERIFY_MANUALLY_DROP_DEREFS_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/manually_drop_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/manually_drop_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::mem::ManuallyDrop<i32>> {
     type SupportingEvidence = Self;
@@ -331,7 +331,7 @@ bridge_verus_witness!(RustStdStandard<std::mem::ManuallyDrop<i32>>);
 }
 
 pub(super) const VERIFY_FP_CATEGORY_MATCHES_THE_VALUE_IT_CLASSIFIES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fp_category_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/fp_category_carrier.rs");
 pub(super) const FP_CATEGORY_CLASSIFY_RESULT_MATCHES_SPECIAL_VALUE_CATEGORIES_VERUS_FRAGMENT: &str = r#"pub open spec fn fp_category_classify_result_matches_special_value_categories(
     value: f64,
     result: FpCategory,

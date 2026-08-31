@@ -54,7 +54,7 @@ macro_rules! impl_non_zero_verus_witness {
                 fn proof() -> Self::ProofArtifact {
                     VerusCheckedProof::new(
                         $harness.to_owned(),
-                        include_str!("../../../amenable_verus/src/rust_std/non_zero_carrier.rs").to_owned(),
+                        include_str!("../../../amenable_verus/src/rust_std/num/non_zero_carrier.rs").to_owned(),
                         <Self::SupportingEvidence as Evidence>::basis().audit(),
                     )
                 }
@@ -80,7 +80,7 @@ macro_rules! impl_non_zero_verus_witness {
 }
 
 const VERIFY_ITER_MODEL_YIELDS_SHARED_REFERENCES_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/slice_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/slice_iter_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -108,7 +108,7 @@ bridge_verus_witness!(RustStdStandard<std::slice::Iter<'static, i32>>);
 }
 
 const VERIFY_ITER_MUT_MODEL_YIELDS_MUTABLE_REFERENCES_THAT_WRITE_THROUGH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/slice_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/slice_iter_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
@@ -137,7 +137,7 @@ bridge_verus_witness!(RustStdStandard<std::slice::IterMut<'static, i32>>);
 }
 
 const VERIFY_IPV4_ADDR_MODEL_OCTETS_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::Ipv4Addr> {
     type SupportingEvidence = Self;
@@ -165,7 +165,7 @@ bridge_verus_witness!(RustStdStandard<std::net::Ipv4Addr>);
 }
 
 const VERIFY_IPV6_ADDR_MODEL_SEGMENTS_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::Ipv6Addr> {
     type SupportingEvidence = Self;
@@ -193,7 +193,7 @@ bridge_verus_witness!(RustStdStandard<std::net::Ipv6Addr>);
 }
 
 const VERIFY_IP_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::IpAddr> {
     type SupportingEvidence = Self;
@@ -229,7 +229,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_SOCKET_ADDR_V4_MODEL_ROUND_TRIPS_IP_AND_PORT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::SocketAddrV4> {
     type SupportingEvidence = Self;
@@ -257,7 +257,7 @@ bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV4>);
 }
 
 const VERIFY_SOCKET_ADDR_V6_MODEL_ROUND_TRIPS_ALL_FIELDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::SocketAddrV6> {
     type SupportingEvidence = Self;
@@ -285,7 +285,7 @@ bridge_verus_witness!(RustStdStandard<std::net::SocketAddrV6>);
 }
 
 const VERIFY_SOCKET_ADDR_MODEL_VARIANT_MATCHES_ITS_KIND_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::SocketAddr> {
     type SupportingEvidence = Self;
@@ -328,4 +328,4 @@ impl_non_zero_verus_witness!(
 );
 
 pub(super) const VERIFY_ORDERED_PAIR_ITER_MUT_MODEL_WRITES_THROUGH_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ordered_pair_iter_mut_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/ordered_pair_iter_mut_carrier.rs");

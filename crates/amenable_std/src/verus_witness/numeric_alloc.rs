@@ -64,7 +64,7 @@ bridge_verus_witness!(RustStdStandard<core::num::FpCategory>);
 }
 
 const VERIFY_INT_ERROR_KIND_CLASSIFIES_PARSE_FAILURES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/int_error_kind_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/int_error_kind_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::num::IntErrorKind> {
     type SupportingEvidence = Self;
@@ -101,7 +101,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_PARSE_INT_ERROR_MODEL_REPORTS_THE_KIND_OF_THE_FAILURE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/int_error_kind_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/int_error_kind_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::num::ParseIntError> {
     type SupportingEvidence = Self;
@@ -152,7 +152,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_PARSE_FLOAT_ERROR_OCCURS_ONLY_FOR_UNPARSEABLE_INPUT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/parse_float_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/parse_float_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::num::ParseFloatError> {
     type SupportingEvidence = Self;
@@ -187,7 +187,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_TRY_FROM_INT_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/try_from_int_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/try_from_int_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::num::TryFromIntError> {
     type SupportingEvidence = Self;
@@ -215,7 +215,7 @@ bridge_verus_witness!(RustStdStandard<core::num::TryFromIntError>);
 }
 
 const VERIFY_BOX_DEREFS_AND_WRITES_THROUGH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/box_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/box_carrier.rs");
 
 impl VerusWitness for RustStdStandard<Box<i32>> {
     type SupportingEvidence = Self;
@@ -247,7 +247,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_LAYOUT_FROM_SIZE_ALIGN_REJECTS_A_NON_POWER_OF_TWO_ALIGNMENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/layout_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/layout_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::alloc::Layout> {
     type SupportingEvidence = Self;
@@ -310,7 +310,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_VEC_PUSH_POP_ROUND_TRIPS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_carrier.rs");
 
 impl VerusWitness for RustStdStandard<Vec<i32>> {
     type SupportingEvidence = Self;
@@ -347,7 +347,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 pub(super) const VERIFY_CHAR_TRY_FROM_FAILS_EXACTLY_FOR_SURROGATES_AND_OUT_OF_RANGE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_try_from_carrier.rs");
 
 pub(super) const U32_IS_VALID_UNICODE_SCALAR_VERUS_FRAGMENT: &str = r#"pub open spec fn u32_is_valid_unicode_scalar(value: u32) -> bool {
     value <= 0x0010_FFFF && !(0xD800 <= value && value <= 0xDFFF)

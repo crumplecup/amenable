@@ -139,8 +139,8 @@ pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
     None
 }
 
-/// `.../amenable_verus/src/rust_std/char_carrier.rs` (relative to
-/// `root`) to `crate::rust_std::char_carrier`.
+/// `.../amenable_verus/src/rust_std/str_and_char/char_carrier.rs`
+/// (relative to `root`) to `crate::rust_std::str_and_char::char_carrier`.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
 fn module_path_for(root: &Path, path: &Path) -> Result<String, std::path::StripPrefixError> {
     let relative = path.strip_prefix(root)?.with_extension("");

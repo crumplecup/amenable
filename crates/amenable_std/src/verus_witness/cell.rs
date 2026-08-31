@@ -107,7 +107,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_ARRAY_INTO_ITER_MODEL_YIELDS_ELEMENTS_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/array_into_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/array_into_iter_carrier.rs");
 
 /// [`ArrayIntoIterStartsAtFirstPosition`] reuses the array `IntoIter`
 /// harness rather than adding a new Verus proof: it names the model's
@@ -207,7 +207,7 @@ bridge_verus_witness!(RustStdStandard<std::array::IntoIter<i32, 3>>);
 }
 
 pub(super) const VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ref_cell_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/ref_cell_carrier.rs");
 
 // `verify_ref_cell_model_dynamic_borrow_rules`'s real VerusCallShape is
 // no longer registered by hand here -- `verus_call_shape` derives it by
@@ -271,7 +271,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_ONCE_CELL_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/once_cell_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/once_cell_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cell::OnceCell<i32>> {
     type SupportingEvidence = Self;
@@ -318,7 +318,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_UNSAFE_CELL_MODEL_GET_MUT_AND_INTO_INNER_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/unsafe_cell_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/unsafe_cell_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cell::UnsafeCell<i32>> {
     type SupportingEvidence = Self;
@@ -352,7 +352,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_LAZY_CELL_MODEL_CACHES_ITS_INITIALIZER_RESULT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/lazy_cell_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/lazy_cell_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> {
     type SupportingEvidence = Self;
@@ -417,7 +417,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>>);
 }
 
 const VERIFY_WEAK_MODEL_UPGRADE_FAILS_ONCE_THE_STRONG_COUNT_HITS_ZERO_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/weak_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/weak_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::rc::Weak<i32>> {
     type SupportingEvidence = Self;
@@ -485,7 +485,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::Weak<i32>>);
 }
 
 pub(super) const VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/from_utf8_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/from_utf8_error_carrier.rs");
 
 pub(super) const FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_new_preserves_bytes(
     bytes: Vec<u8>,

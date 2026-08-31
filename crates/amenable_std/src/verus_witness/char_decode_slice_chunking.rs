@@ -149,7 +149,7 @@ amenable_derive::verus_requires_witness!(
 }
 
 const VERIFY_TO_LOWERCASE_MODEL_MAPS_AN_UPPERCASE_ASCII_LETTER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::char::ToLowercase> {
     type SupportingEvidence = Self;
@@ -177,7 +177,7 @@ bridge_verus_witness!(RustStdStandard<std::char::ToLowercase>);
 }
 
 const VERIFY_TO_UPPERCASE_MODEL_MAPS_A_LOWERCASE_ASCII_LETTER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::char::ToUppercase> {
     type SupportingEvidence = Self;
@@ -205,7 +205,7 @@ bridge_verus_witness!(RustStdStandard<std::char::ToUppercase>);
 }
 
 const VERIFY_CHAR_ESCAPE_DEBUG_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::char::EscapeDebug> {
     type SupportingEvidence = Self;
@@ -233,7 +233,7 @@ bridge_verus_witness!(RustStdStandard<std::char::EscapeDebug>);
 }
 
 const VERIFY_CHAR_ESCAPE_DEFAULT_MODEL_ESCAPES_A_NEWLINE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::char::EscapeDefault> {
     type SupportingEvidence = Self;
@@ -261,7 +261,7 @@ bridge_verus_witness!(RustStdStandard<std::char::EscapeDefault>);
 }
 
 const VERIFY_CHAR_ESCAPE_UNICODE_MODEL_RENDERS_THE_CODEPOINT_ESCAPE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::char::EscapeUnicode> {
     type SupportingEvidence = Self;
@@ -291,7 +291,7 @@ bridge_verus_witness!(RustStdStandard<std::char::EscapeUnicode>);
 macro_rules! impl_slice_chunks_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/slice_chunks_carrier.rs");
+            include_str!("../../../amenable_verus/src/rust_std/iter/slice_chunks_carrier.rs");
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -391,7 +391,7 @@ register_slice_chunks_increment_fragment!(std::slice::RChunksExactMut<'static, i
 register_slice_chunks_increment_fragment!(std::slice::RChunksMut<'static, i32>);
 
 const VERIFY_CHUNK_BY_MODEL_GROUPS_ADJACENT_ELEMENTS_MATCHING_THE_PREDICATE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/slice_chunk_by_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/slice_chunk_by_carrier.rs");
 
 macro_rules! impl_chunk_by_verus_witness {
     ($ty:ty) => {
@@ -434,7 +434,7 @@ amenable_derive::verus_ensures_predicate!(
 macro_rules! impl_slice_split_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/slice_split_carrier.rs");
+            include_str!("../../../amenable_verus/src/rust_std/iter/slice_split_carrier.rs");
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -513,7 +513,7 @@ impl_slice_split_verus_witness!(
 );
 
 const VERIFY_ESCAPE_ASCII_MODEL_LEAVES_PRINTABLE_BYTES_UNESCAPED_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/escape_ascii_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/escape_ascii_carrier.rs");
 const ESCAPE_ASCII_INPUT_IS_PRINTABLE_ASCII_VERUS_FRAGMENT: &str = r#"pub open spec fn escape_ascii_input_is_printable_ascii(printable: u8) -> bool {
     32 <= printable && printable <= 126
 }"#;
@@ -575,7 +575,7 @@ bridge_verus_witness!(RustStdStandard<std::slice::EscapeAscii<'static>>);
 }
 
 const VERIFY_GET_DISJOINT_MUT_MODEL_REJECTS_OVERLAP_AND_OUT_OF_BOUNDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/get_disjoint_mut_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/get_disjoint_mut_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::slice::GetDisjointMutError> {
     type SupportingEvidence = Self;

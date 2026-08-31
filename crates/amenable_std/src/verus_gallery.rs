@@ -817,9 +817,9 @@ pub open spec fn increment_headroom_holds(a: i32) -> bool {
     a < i32::MAX - 1
 }
 // ... in iter_sequence_carrier.rs, called from a requires clause in
-// THAT same file, AND (via `use crate::rust_std::iter_sequence_carrier
-// ::increment_headroom_holds;`) from iter_stateful_carrier.rs, a
-// different file:
+// THAT same file, AND (via `use crate::rust_std::iter::
+// iter_sequence_carrier::increment_headroom_holds;`) from
+// iter_stateful_carrier.rs, a different file:
 pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32, i32, i32, i32))
     requires
         increment_headroom_holds(a),

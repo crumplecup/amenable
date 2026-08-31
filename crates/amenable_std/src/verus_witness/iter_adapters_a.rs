@@ -32,7 +32,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i3
 }
 
 const VERIFY_FILTER_MODEL_YIELDS_ONLY_ITEMS_MATCHING_THE_PREDICATE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::Filter<std::array::IntoIter<i32, 1>, fn(&i32) -> bool>>
@@ -73,7 +73,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_FILTER_MAP_MODEL_APPLIES_AND_FILTERS_IN_ONE_STEP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::FilterMap<std::array::IntoIter<i32, 1>, fn(i32) -> Option<i32>>>
@@ -106,7 +106,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_MAP_WHILE_MODEL_MAPS_ITEMS_WHILE_THE_CLOSURE_RETURNS_SOME_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::MapWhile<std::ops::Range<i32>, fn(i32) -> Option<i32>>>
@@ -151,7 +151,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_CLONED_MODEL_CLONES_EACH_REFERENCED_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Cloned<std::slice::Iter<'static, i32>>> {
     type SupportingEvidence = Self;
@@ -180,7 +180,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Cloned<std::slice::Iter<'static
 }
 
 const VERIFY_COPIED_MODEL_COPIES_EACH_REFERENCED_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Copied<std::slice::Iter<'static, i32>>> {
     type SupportingEvidence = Self;
@@ -209,7 +209,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Copied<std::slice::Iter<'static
 }
 
 const VERIFY_CHAIN_MODEL_SEQUENCES_TWO_ITERATORS_END_TO_END_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_sequence_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::Chain<std::ops::Range<i32>, std::ops::Range<i32>>>
@@ -242,7 +242,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_ZIP_MODEL_PAIRS_ITEMS_FROM_TWO_ITERATORS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_sequence_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -273,7 +273,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::
 // Reused by IncrementHeadroom in the next file, iter_adapters_b.rs -- see
 // that impl's own doc comment.
 pub(super) const VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_sequence_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;

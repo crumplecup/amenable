@@ -176,7 +176,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_REV_MODEL_REVERSES_ITERATION_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_sequence_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_sequence_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -205,7 +205,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Rev<std::ops::Range<i32>>>);
 }
 
 const VERIFY_SKIP_MODEL_DISCARDS_THE_FIRST_N_ITEMS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_window_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -234,7 +234,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Skip<std::ops::Range<i32>>>);
 }
 
 const VERIFY_SKIP_WHILE_MODEL_DISCARDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_window_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::SkipWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
@@ -267,7 +267,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_STEP_BY_MODEL_YIELDS_EVERY_NTH_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_window_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -296,7 +296,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>>);
 }
 
 const VERIFY_TAKE_MODEL_YIELDS_AT_MOST_N_ITEMS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_window_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Take<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -325,7 +325,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Take<std::ops::Range<i32>>>);
 }
 
 const VERIFY_TAKE_WHILE_MODEL_YIELDS_ITEMS_WHILE_THE_PREDICATE_HOLDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_window_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_window_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::TakeWhile<std::ops::Range<i32>, fn(&i32) -> bool>>
@@ -358,7 +358,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
     type SupportingEvidence = Self;
@@ -386,7 +386,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Once<i32>>);
 }
 
 const VERIFY_ONCE_WITH_MODEL_CALLS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::OnceWith<fn() -> i32>> {
     type SupportingEvidence = Self;
@@ -414,7 +414,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::OnceWith<fn() -> i32>>);
 }
 
 const VERIFY_REPEAT_MODEL_YIELDS_THE_SAME_VALUE_FOREVER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Repeat<i32>> {
     type SupportingEvidence = Self;
@@ -442,7 +442,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Repeat<i32>>);
 }
 
 const VERIFY_REPEAT_WITH_MODEL_CALLS_ITS_CLOSURE_ONCE_PER_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::RepeatWith<fn() -> i32>> {
     type SupportingEvidence = Self;
@@ -470,7 +470,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::RepeatWith<fn() -> i32>>);
 }
 
 const VERIFY_REPEAT_N_MODEL_YIELDS_THE_VALUE_EXACTLY_N_TIMES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::RepeatN<i32>> {
     type SupportingEvidence = Self;
@@ -498,7 +498,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::RepeatN<i32>>);
 }
 
 const VERIFY_EMPTY_MODEL_YIELDS_NOTHING_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_generator_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Empty<i32>> {
     type SupportingEvidence = Self;
@@ -526,7 +526,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Empty<i32>>);
 }
 
 const VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -555,7 +555,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>>);
 }
 
 const VERIFY_FUSE_MODEL_KEEPS_RETURNING_NONE_ONCE_EXHAUSTED_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -584,7 +584,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>>);
 }
 
 const VERIFY_INSPECT_MODEL_CALLS_ONCE_PER_ITEM_WITHOUT_CHANGING_VALUES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, fn(&i32)>> {
     type SupportingEvidence = Self;
@@ -613,7 +613,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, f
 }
 
 const VERIFY_PEEKABLE_MODEL_PEEK_DOES_NOT_CONSUME_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
@@ -642,7 +642,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>
 }
 
 const VERIFY_SCAN_MODEL_THREADS_STATE_THROUGH_ITS_CLOSURE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<
@@ -683,7 +683,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_FLAT_MAP_MODEL_FLATTENS_EACH_GENERATED_ITERATOR_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<
@@ -728,7 +728,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_FLATTEN_MODEL_CONCATENATES_THE_INNER_ITERATORS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::iter::Flatten<std::vec::IntoIter<std::ops::Range<i32>>>>
@@ -761,4 +761,4 @@ bridge_verus_witness!(
 }
 
 pub(super) const VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");

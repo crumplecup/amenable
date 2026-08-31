@@ -38,7 +38,7 @@ impl_io_pipe_verus_witness!(std::io::PipeReader);
 impl_io_pipe_verus_witness!(std::io::PipeWriter);
 
 const VERIFY_SPLIT_MODEL_SEGMENTS_ON_THE_GIVEN_BYTE_AND_DROPS_IT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_split_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_split_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -75,7 +75,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_WRITER_PANICKED_MODEL_RECOVERS_THE_BUFFERED_DATA_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_writer_panicked_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_writer_panicked_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::WriterPanicked> {
     type SupportingEvidence = Self;
@@ -105,7 +105,7 @@ bridge_verus_witness!(RustStdStandard<std::io::WriterPanicked>);
 macro_rules! impl_io_empty_repeat_sink_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/io_empty_repeat_sink_carrier.rs");
+            include_str!("../../../amenable_verus/src/rust_std/io/io_empty_repeat_sink_carrier.rs");
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -166,7 +166,7 @@ impl_io_empty_repeat_sink_verus_witness!(
 );
 
 const VERIFY_SEEK_FROM_MODEL_ROUND_TRIPS_EACH_VARIANTS_OFFSET_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_seek_from_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_seek_from_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::SeekFrom> {
     type SupportingEvidence = Self;
@@ -194,7 +194,7 @@ bridge_verus_witness!(RustStdStandard<std::io::SeekFrom>);
 }
 
 const VERIFY_CHAIN_MODEL_READS_THE_FIRST_SOURCE_THEN_THE_SECOND_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_chain_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_chain_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]>> {
     type SupportingEvidence = Self;
@@ -223,7 +223,7 @@ bridge_verus_witness!(RustStdStandard<std::io::Chain<&'static [u8], &'static [u8
 }
 
 const VERIFY_CURSOR_MODEL_READ_ADVANCES_POSITION_AND_SEEK_REPOSITIONS_IT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_cursor_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_cursor_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Cursor<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -260,7 +260,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_ERROR_MODEL_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Error> {
     type SupportingEvidence = Self;
@@ -296,7 +296,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_IO_SLICE_MODEL_DEREFS_TO_THE_WRAPPED_BYTES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_slice_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_slice_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::IoSlice<'static>> {
     type SupportingEvidence = Self;
@@ -324,7 +324,7 @@ bridge_verus_witness!(RustStdStandard<std::io::IoSlice<'static>>);
 }
 
 const VERIFY_IO_SLICE_MUT_MODEL_DEREFS_TO_AND_PERMITS_MUTATING_THE_WRAPPED_BYTES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_slice_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_slice_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::IoSliceMut<'static>> {
     type SupportingEvidence = Self;
@@ -353,7 +353,7 @@ bridge_verus_witness!(RustStdStandard<std::io::IoSliceMut<'static>>);
 }
 
 const VERIFY_TAKE_MODEL_CAPS_READS_AT_THE_REMAINING_LIMIT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_take_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_take_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -402,7 +402,7 @@ macro_rules! impl_sync_atomic_verus_witness {
         // VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC constant rather than
         // adding a new Verus proof -- see that impl's own doc comment.
         pub(super) const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/sync_atomic_carrier.rs");
+            include_str!("../../../amenable_verus/src/rust_std/sync/sync_atomic_carrier.rs");
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -496,7 +496,7 @@ impl_sync_atomic_verus_witness!(
 );
 
 pub(super) const VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/atomic_ptr_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/atomic_ptr_carrier.rs");
 
 pub(super) const ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT: &str = r#"pub open spec fn atomic_ptr_model_load_store_swap_and_compare_exchange(
     load_after_new: int,

@@ -63,7 +63,7 @@ bridge_verus_witness!(RustStdStandard<core::char::CharTryFromError>);
 }
 
 const VERIFY_TRY_FROM_CHAR_ERROR_OCCURS_EXACTLY_WHEN_OUT_OF_RANGE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/char_try_from_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/char_try_from_carrier.rs");
 
 const CHAR_FITS_IN_U8_VERUS_FRAGMENT: &str = r#"pub open spec fn char_fits_in_u8(value: char) -> bool {
     (value as u32) <= 0xFF
@@ -136,7 +136,7 @@ bridge_verus_witness!(RustStdStandard<core::char::TryFromCharError>);
 }
 
 const VERIFY_TYPE_ID_IS_REFLEXIVE_AND_DISTINGUISHES_DISTINCT_TYPES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/type_id_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/type_id_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::any::TypeId> {
     type SupportingEvidence = Self;
@@ -168,7 +168,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/try_from_slice_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/num/try_from_slice_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::array::TryFromSliceError> {
     type SupportingEvidence = Self;
@@ -210,7 +210,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_FROM_UTF16_REJECTS_A_LONE_SURROGATE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/from_utf16_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/from_utf16_error_carrier.rs");
 const FROM_UTF16_RESULT_MATCHES_SINGLE_UNIT_EXAMPLES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf16_result_matches_single_unit_examples(
     units: &[u16],
     result: Result<String, FromUtf16Error>,
@@ -288,7 +288,7 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf16Error>);
 }
 
 const VERIFY_CSTRING_EXCLUDES_THE_TERMINATOR_AND_REJECTS_INTERIOR_NUL_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cstring_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/cstring_carrier.rs");
 
 const INTO_VEC_U8_SPEC_MATCHES_INPUT_VEC_VERUS_FRAGMENT: &str = r#"pub open spec fn into_vec_u8_spec_matches_input_vec(v: Vec<u8>) -> bool {
     into_vec_u8_spec(v) == v@
@@ -398,7 +398,7 @@ amenable_derive::verus_requires_witness!(
 }
 
 const VERIFY_FROM_VEC_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/from_vec_with_nul_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/from_vec_with_nul_carrier.rs");
 
 const FROM_VEC_WITH_NUL_RESULT_MATCHES_NUL_PLACEMENT_VERUS_FRAGMENT: &str = r#"pub open spec fn from_vec_with_nul_result_matches_nul_placement(
     bytes: Vec<u8>,
@@ -452,7 +452,7 @@ amenable_derive::verus_requires_witness!(
 }
 
 const VERIFY_PARSE_CHAR_ERROR_OCCURS_FOR_EMPTY_OR_MULTI_CHARACTER_STRINGS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/parse_char_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/parse_char_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::char::ParseCharError> {
     type SupportingEvidence = Self;
@@ -486,4 +486,4 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 pub(super) const VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/rc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/rc_carrier.rs");

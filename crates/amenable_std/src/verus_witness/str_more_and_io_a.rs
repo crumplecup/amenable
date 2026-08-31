@@ -37,7 +37,7 @@ bridge_verus_witness!(AsciiByte);
 amenable_derive::verus_requires_predicate!(AsciiByte, "amenable_std::AsciiByte", "is_ascii_byte");
 
 const VERIFY_STR_MATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/str_pattern_match_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_pattern_match_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::str::MatchIndices<'static, char>> {
     type SupportingEvidence = Self;
@@ -66,7 +66,8 @@ bridge_verus_witness!(RustStdStandard<std::str::MatchIndices<'static, char>>);
 }
 
 const VERIFY_STR_RMATCH_INDICES_MODEL_PAIRS_EACH_MATCH_WITH_ITS_BYTE_OFFSET_FROM_THE_BACK_SRC:
-    &str = include_str!("../../../amenable_verus/src/rust_std/str_pattern_match_carrier.rs");
+    &str =
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_pattern_match_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::str::RMatchIndices<'static, char>> {
     type SupportingEvidence = Self;
@@ -97,7 +98,7 @@ bridge_verus_witness!(RustStdStandard<std::str::RMatchIndices<'static, char>>);
 }
 
 const VERIFY_BUF_READER_MODEL_READS_THE_UNDERLYING_BYTES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_buffered_read_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_buffered_read_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::BufReader<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -126,7 +127,7 @@ bridge_verus_witness!(RustStdStandard<std::io::BufReader<&'static [u8]>>);
 }
 
 const VERIFY_BUF_WRITER_MODEL_FLUSHES_TO_THE_UNDERLYING_WRITER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_buf_writer_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_buf_writer_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::BufWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
@@ -154,7 +155,7 @@ bridge_verus_witness!(RustStdStandard<std::io::BufWriter<Vec<u8>>>);
 }
 
 const VERIFY_BYTES_MODEL_YIELDS_ONE_BYTE_AT_A_TIME_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_bytes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_bytes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -182,7 +183,7 @@ bridge_verus_witness!(RustStdStandard<std::io::Bytes<&'static [u8]>>);
 }
 
 const VERIFY_INTO_INNER_ERROR_MODEL_RECOVERS_THE_WRITER_AND_THE_FLUSH_ERROR_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_into_inner_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_into_inner_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::IntoInnerError<std::io::BufWriter<Vec<u8>>>> {
     type SupportingEvidence = Self;
@@ -211,7 +212,7 @@ bridge_verus_witness!(RustStdStandard<std::io::IntoInnerError<std::io::BufWriter
 }
 
 const VERIFY_LINE_WRITER_MODEL_FLUSHES_ON_A_NEWLINE_BUT_NOT_BEFORE_ONE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_line_writer_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_line_writer_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::LineWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
@@ -253,7 +254,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_LINES_MODEL_SPLITS_ON_NEWLINES_AND_DROPS_THE_TERMINATOR_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_lines_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_lines_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
     type SupportingEvidence = Self;
@@ -287,4 +288,4 @@ amenable_derive::verus_requires_predicate!(
 );
 
 pub(super) const VERIFY_PIPE_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_PAIRED_READER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/io_pipe_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/io/io_pipe_carrier.rs");

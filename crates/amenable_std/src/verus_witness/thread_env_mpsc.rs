@@ -41,7 +41,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_THREAD_CURRENT_MODEL_IS_STABLE_ACROSS_REPEATED_CALLS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/thread_current_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/thread_current_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::thread::Thread> {
     type SupportingEvidence = Self;
@@ -94,7 +94,7 @@ bridge_verus_witness!(RustStdStandard<std::thread::ThreadId>);
 }
 
 const VERIFY_ARGS_MODEL_REPORTS_AT_LEAST_THE_PROGRAM_PATH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/env_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/env_carrier.rs");
 
 const ARGS_MODEL_COUNT_MATCHES_PROGRAM_PLUS_EXTRA_VERUS_FRAGMENT: &str = r#"pub open spec fn args_model_count_matches_program_plus_extra(
     extra_count: u8,
@@ -143,7 +143,7 @@ impl_env_args_verus_witness!(std::env::Args);
 impl_env_args_verus_witness!(std::env::ArgsOs);
 
 const VERIFY_JOIN_PATHS_ERROR_MODEL_REPORTS_AN_UNJOINABLE_PATH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/env_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/env_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::env::JoinPathsError> {
     type SupportingEvidence = Self;
@@ -171,7 +171,7 @@ bridge_verus_witness!(RustStdStandard<std::env::JoinPathsError>);
 }
 
 const VERIFY_SPLIT_PATHS_MODEL_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/env_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/env_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::env::SplitPaths<'static>> {
     type SupportingEvidence = Self;
@@ -199,7 +199,7 @@ bridge_verus_witness!(RustStdStandard<std::env::SplitPaths<'static>>);
 }
 
 const VERIFY_CHANNEL_MODEL_DELIVERS_TO_THE_PAIRED_RECEIVER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_mpsc_carrier.rs");
 
 macro_rules! impl_mpsc_channel_verus_witness {
     ($ty:ty) => {
@@ -232,7 +232,7 @@ impl_mpsc_channel_verus_witness!(std::sync::mpsc::Sender<i32>);
 impl_mpsc_channel_verus_witness!(std::sync::mpsc::SyncSender<i32>);
 
 const VERIFY_RECEIVER_MODEL_FAILS_ONCE_EVERY_SENDER_IS_DROPPED_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_mpsc_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type SupportingEvidence = Self;
@@ -260,7 +260,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::mpsc::Receiver<i32>>);
 }
 
 const VERIFY_CHANNEL_ITER_MODEL_YIELDS_SENT_VALUES_THEN_STOPS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_mpsc_carrier.rs");
 
 macro_rules! impl_mpsc_iter_verus_witness {
     ($ty:ty) => {
@@ -293,7 +293,7 @@ impl_mpsc_iter_verus_witness!(std::sync::mpsc::IntoIter<i32>);
 impl_mpsc_iter_verus_witness!(std::sync::mpsc::Iter<'static, i32>);
 
 const VERIFY_TRY_ITER_MODEL_DOES_NOT_BLOCK_ON_AN_EMPTY_OPEN_CHANNEL_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_mpsc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_mpsc_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -322,4 +322,4 @@ bridge_verus_witness!(RustStdStandard<std::sync::mpsc::TryIter<'static, i32>>);
 }
 
 pub(super) const VERIFY_ONCE_MODEL_RUNS_ITS_CLOSURE_EXACTLY_ONCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_once_carrier.rs");

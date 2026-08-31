@@ -22,8 +22,9 @@ use amenable_core::Evidence;
 
 macro_rules! impl_str_ascii_iter_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_ascii_iter_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_ascii_iter_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -85,7 +86,7 @@ impl_str_ascii_iter_verus_witness!(
 macro_rules! impl_str_escape_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
         const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_escape_carrier.rs");
+            include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_escape_carrier.rs");
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -129,7 +130,7 @@ impl_str_escape_verus_witness!(
 );
 
 const VERIFY_LINES_MODEL_SPLITS_ON_LINE_ENDINGS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/str_lines_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_lines_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::str::Lines<'static>> {
     type SupportingEvidence = Self;
@@ -157,7 +158,7 @@ bridge_verus_witness!(RustStdStandard<std::str::Lines<'static>>);
 }
 
 const VERIFY_LINES_ANY_MODEL_SPLITS_ON_ANY_LINE_ENDING_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/str_lines_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_lines_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::str::LinesAny<'static>> {
     type SupportingEvidence = Self;
@@ -186,8 +187,9 @@ bridge_verus_witness!(RustStdStandard<std::str::LinesAny<'static>>);
 
 macro_rules! impl_str_whitespace_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_whitespace_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_whitespace_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -227,8 +229,9 @@ impl_str_whitespace_verus_witness!(
 
 macro_rules! impl_str_utf8_chunks_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_utf8_chunks_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_utf8_chunks_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -297,8 +300,9 @@ amenable_derive::verus_requires_predicate!(
 
 macro_rules! impl_str_pattern_split_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_pattern_split_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_pattern_split_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -343,8 +347,9 @@ impl_str_pattern_split_verus_witness!(
 
 macro_rules! impl_str_pattern_reverse_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_pattern_reverse_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_pattern_reverse_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -397,8 +402,9 @@ amenable_derive::verus_requires_predicate!(
 
 macro_rules! impl_str_pattern_terminator_verus_witness {
     ($ty:ty, $harness:literal, $const_name:ident) => {
-        const $const_name: &str =
-            include_str!("../../../amenable_verus/src/rust_std/str_pattern_terminator_carrier.rs");
+        const $const_name: &str = include_str!(
+            "../../../amenable_verus/src/rust_std/str_and_char/str_pattern_terminator_carrier.rs"
+        );
 
         impl VerusWitness for RustStdStandard<$ty> {
             type SupportingEvidence = Self;
@@ -452,7 +458,7 @@ amenable_derive::verus_requires_predicate!(
 // Reused by AsciiByte in the next file, str_more_and_io_a.rs -- see that
 // impl's own doc comment.
 pub(super) const VERIFY_STR_MATCHES_MODEL_YIELDS_EVERY_NON_OVERLAPPING_OCCURRENCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/str_pattern_match_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/str_pattern_match_carrier.rs");
 
 macro_rules! impl_str_matches_verus_witness {
     ($ty:ty) => {

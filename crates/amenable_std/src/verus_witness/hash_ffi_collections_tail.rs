@@ -35,7 +35,7 @@ bridge_verus_witness!(RustStdStandard<[i32; 3]>);
 }
 
 const VERIFY_SLICE_MODEL_INDEXING_AND_LENGTH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<[i32]> {
     type SupportingEvidence = Self;
@@ -61,7 +61,7 @@ bridge_verus_witness!(RustStdStandard<[i32]>);
 }
 
 const VERIFY_STR_MODEL_BYTE_LENGTH_AND_CONTENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<str> {
     type SupportingEvidence = Self;
@@ -96,7 +96,7 @@ amenable_derive::verus_ensures_predicate!(
 }
 
 const VERIFY_TUPLE_MODEL_FIELD_ACCESS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
@@ -122,7 +122,7 @@ bridge_verus_witness!(RustStdStandard<(i32, i32)>);
 }
 
 const VERIFY_FN_POINTER_MODEL_CALLS_THE_UNDERLYING_FUNCTION_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<fn(i32) -> i32> {
     type SupportingEvidence = Self;
@@ -148,7 +148,7 @@ bridge_verus_witness!(RustStdStandard<fn(i32) -> i32>);
 }
 
 const VERIFY_CONST_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<*const i32> {
     type SupportingEvidence = Self;
@@ -174,7 +174,7 @@ bridge_verus_witness!(RustStdStandard<*const i32>);
 }
 
 const VERIFY_MUT_POINTER_MODEL_CAST_IS_REPRODUCIBLE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<*mut i32> {
     type SupportingEvidence = Self;
@@ -223,7 +223,7 @@ bridge_verus_witness!(RustStdStandard<&'static i32>);
 }
 
 const VERIFY_MUTABLE_REFERENCE_MODEL_DEREFERENCES_TO_AND_UPDATES_THE_REFERENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 impl VerusWitness for RustStdStandard<&'static mut i32> {
     type SupportingEvidence = Self;
@@ -249,7 +249,7 @@ bridge_verus_witness!(RustStdStandard<&'static mut i32>);
 }
 
 const VERIFY_DEFAULT_HASHER_MODEL_IS_DETERMINISTIC_ACROSS_FRESH_INSTANCES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_hash_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/std_hash_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::hash::DefaultHasher> {
     type SupportingEvidence = Self;
@@ -286,7 +286,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_RANDOM_STATE_MODEL_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_hash_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/std_hash_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::hash::RandomState> {
     type SupportingEvidence = Self;
@@ -314,7 +314,7 @@ bridge_verus_witness!(RustStdStandard<std::hash::RandomState>);
 }
 
 const VERIFY_OS_STR_MODEL_VALID_UTF8_CONTENT_ROUND_TRIPS_THROUGH_TO_STR_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/std_ffi_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ffi::OsStr> {
     type SupportingEvidence = Self;
@@ -346,7 +346,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_OS_STRING_MODEL_PUSH_APPENDS_TO_THE_EXISTING_CONTENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/std_ffi_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ffi::OsString> {
     type SupportingEvidence = Self;
@@ -374,7 +374,7 @@ bridge_verus_witness!(RustStdStandard<std::ffi::OsString>);
 }
 
 const VERIFY_OS_STR_DISPLAY_MODEL_RENDERS_VALID_UTF8_CONTENT_UNCHANGED_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_ffi_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/std_ffi_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
     type SupportingEvidence = Self;
@@ -403,7 +403,7 @@ bridge_verus_witness!(RustStdStandard<std::ffi::os_str::Display<'static>>);
 }
 
 const VERIFY_HASH_MAP_MODEL_INSERT_THEN_GET_RECOVERS_THE_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_collections_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/std_collections_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::HashMap<i32, i32>> {
     type SupportingEvidence = Self;
@@ -432,7 +432,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::HashMap<i32, i32>>);
 }
 
 const VERIFY_HASH_SET_MODEL_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_collections_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/std_collections_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::HashSet<i32>> {
     type SupportingEvidence = Self;
@@ -460,7 +460,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::HashSet<i32>>);
 }
 
 const VERIFY_PIN_MODEL_DEREFS_AND_GET_MUT_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::pin::Pin<Box<i32>>> {
     type SupportingEvidence = Self;
@@ -488,7 +488,7 @@ bridge_verus_witness!(RustStdStandard<std::pin::Pin<Box<i32>>>);
 }
 
 const VERIFY_NON_NULL_MODEL_REJECTS_THE_NULL_POINTER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ptr::NonNull<i32>> {
     type SupportingEvidence = Self;
@@ -516,7 +516,7 @@ bridge_verus_witness!(RustStdStandard<std::ptr::NonNull<i32>>);
 }
 
 const VERIFY_SYSTEM_MODEL_ALLOCATES_AND_DEALLOCATES_A_LAYOUT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::alloc::System> {
     type SupportingEvidence = Self;
@@ -542,7 +542,7 @@ bridge_verus_witness!(RustStdStandard<std::alloc::System>);
 }
 
 const VERIFY_BACKTRACE_MODEL_FORCE_CAPTURE_ALWAYS_ACTUALLY_CAPTURES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::backtrace::Backtrace> {
     type SupportingEvidence = Self;
@@ -595,7 +595,7 @@ bridge_verus_witness!(RustStdStandard<std::backtrace::BacktraceStatus>);
 }
 
 const VERIFY_PANIC_HOOK_INFO_MODEL_REPORTS_THE_PANICS_OWN_MESSAGE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::panic::PanicHookInfo<'static>> {
     type SupportingEvidence = Self;
@@ -624,7 +624,7 @@ bridge_verus_witness!(RustStdStandard<std::panic::PanicHookInfo<'static>>);
 }
 
 const VERIFY_VEC_DEQUE_DRAIN_MODEL_REMOVES_AND_YIELDS_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc_singletons_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/misc_singletons_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::vec_deque::Drain<'static, i32>> {
     type SupportingEvidence = Self;
@@ -663,7 +663,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Drain<'static
 
 #[cfg(windows)]
 const VERIFY_ENCODE_WIDE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<EncodeWide<'static>> {
@@ -700,7 +700,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[cfg(windows)]
 const VERIFY_BORROWED_HANDLE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<BorrowedHandle<'static>> {
@@ -737,7 +737,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[cfg(windows)]
 const VERIFY_BORROWED_SOCKET_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<BorrowedSocket<'static>> {
@@ -774,7 +774,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[cfg(windows)]
 const VERIFY_HANDLE_OR_INVALID_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<HandleOrInvalid> {
@@ -811,7 +811,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[cfg(windows)]
 const VERIFY_OWNED_HANDLE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<OwnedHandle> {
@@ -848,7 +848,7 @@ amenable_derive::verus_ensures_predicate!(
 
 #[cfg(windows)]
 const VERIFY_OWNED_SOCKET_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/os_windows_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
 #[cfg(windows)]
 impl VerusWitness for RustStdStandard<OwnedSocket> {

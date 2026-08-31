@@ -51,7 +51,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_ATOMIC_ORDERING_MODEL_RELAXED_STORE_IS_OBSERVABLE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_atomic_ordering_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_atomic_ordering_carrier.rs");
 
 // Bare `Ordering`, matching `amenable_std::rust_std::sync_atomic`'s own
 // registration and the Kani/Creusot witnesses' evidence strings for the
@@ -84,7 +84,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::atomic::Ordering>);
 }
 
 const VERIFY_CHILD_MODEL_HAS_A_PROCESS_ID_AND_CAN_BE_WAITED_ON_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_child_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_child_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::Child> {
     type SupportingEvidence = Self;
@@ -128,7 +128,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_CHILD_STDERR_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDERR_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_child_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_child_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::ChildStderr> {
     type SupportingEvidence = Self;
@@ -156,7 +156,7 @@ bridge_verus_witness!(RustStdStandard<std::process::ChildStderr>);
 }
 
 const VERIFY_CHILD_STDIN_MODEL_IS_READABLE_BY_THE_CHILD_PROCESS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_child_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_child_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::ChildStdin> {
     type SupportingEvidence = Self;
@@ -184,7 +184,7 @@ bridge_verus_witness!(RustStdStandard<std::process::ChildStdin>);
 }
 
 const VERIFY_CHILD_STDOUT_MODEL_CAPTURES_WHAT_THE_CHILD_WROTE_TO_STDOUT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_child_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_child_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::ChildStdout> {
     type SupportingEvidence = Self;
@@ -212,7 +212,7 @@ bridge_verus_witness!(RustStdStandard<std::process::ChildStdout>);
 }
 
 const VERIFY_COMMAND_MODEL_ENV_OVERRIDE_IS_VISIBLE_TO_THE_SPAWNED_PROCESS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_command_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_command_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::Command> {
     type SupportingEvidence = Self;
@@ -240,7 +240,7 @@ bridge_verus_witness!(RustStdStandard<std::process::Command>);
 }
 
 const VERIFY_COMMAND_ARGS_MODEL_REPORTS_THE_CONFIGURED_ARGUMENTS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_command_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_command_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::CommandArgs<'static>> {
     type SupportingEvidence = Self;
@@ -269,7 +269,7 @@ bridge_verus_witness!(RustStdStandard<std::process::CommandArgs<'static>>);
 }
 
 const VERIFY_COMMAND_ENVS_MODEL_REPORTS_THE_CONFIGURED_OVERRIDES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_command_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_command_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::CommandEnvs<'static>> {
     type SupportingEvidence = Self;
@@ -298,7 +298,7 @@ bridge_verus_witness!(RustStdStandard<std::process::CommandEnvs<'static>>);
 }
 
 const VERIFY_EXIT_STATUS_MODEL_REPORTS_A_NONZERO_EXIT_CODE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_exit_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_exit_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::ExitStatus> {
     type SupportingEvidence = Self;
@@ -332,7 +332,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_OUTPUT_MODEL_CAPTURES_STDOUT_AND_THE_EXIT_STATUS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_exit_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_exit_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::Output> {
     type SupportingEvidence = Self;
@@ -368,7 +368,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_STDIO_MODEL_NULL_DISCARDS_THE_CHILDS_OUTPUT_HANDLE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/process_stdio_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/process_stdio_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::process::Stdio> {
     type SupportingEvidence = Self;
@@ -396,4 +396,4 @@ bridge_verus_witness!(RustStdStandard<std::process::Stdio>);
 }
 
 pub(super) const VERIFY_ANCESTORS_MODEL_YIELDS_SELF_THEN_EACH_PARENT_UP_TO_ROOT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_ancestors_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_ancestors_carrier.rs");

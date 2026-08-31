@@ -43,7 +43,7 @@ bridge_verus_witness!(RustStdStandard<std::rc::Rc<i32>>);
 }
 
 const VERIFY_ARC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/arc_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/arc_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::Arc<i32>> {
     type SupportingEvidence = Self;
@@ -69,7 +69,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::Arc<i32>>);
 }
 
 const VERIFY_INTO_STRING_ERROR_RECOVERS_THE_ORIGINAL_CSTRING_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/into_string_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/into_string_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ffi::IntoStringError> {
     type SupportingEvidence = Self;
@@ -117,7 +117,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_FROM_BYTES_UNTIL_NUL_REQUIRES_A_NUL_BYTE_SOMEWHERE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cstr_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/cstr_carrier.rs");
 
 const CSTR_FROM_BYTES_UNTIL_NUL_RESULT_MATCHES_NUL_PRESENCE_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_from_bytes_until_nul_result_matches_nul_presence<'a>(
     bytes: &'a [u8],
@@ -168,7 +168,7 @@ amenable_derive::verus_requires_witness!(
 }
 
 const VERIFY_FROM_BYTES_WITH_NUL_REQUIRES_THE_NUL_ONLY_AT_THE_END_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cstr_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/cstr_carrier.rs");
 
 const CSTR_FROM_BYTES_WITH_NUL_RESULT_MATCHES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_from_bytes_with_nul_result_matches_bytes<'a>(
     bytes: &'a [u8],
@@ -216,7 +216,7 @@ bridge_verus_witness!(RustStdStandard<core::ffi::FromBytesWithNulError>);
 }
 
 const VERIFY_BUILD_HASHER_DEFAULT_PRODUCES_CONSISTENT_HASHERS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/hash_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/hash_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>>
@@ -251,7 +251,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_SIP_HASHER_PRODUCES_CONSISTENT_HASHES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sip_hasher_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/sip_hasher_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::hash::SipHasher> {
     type SupportingEvidence = Self;
@@ -289,7 +289,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_COW_BORROWED_AND_OWNED_AGREE_ON_THEIR_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cow_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/cow_carrier.rs");
 
 const I32_TO_OWNED_SPEC_IS_IDENTITY_VERUS_FRAGMENT: &str = r#"pub open spec fn i32_to_owned_spec_is_identity(value: i32) -> bool {
     to_owned_spec(&value) == value
@@ -349,4 +349,4 @@ bridge_verus_witness!(RustStdStandard<std::borrow::Cow<'static, i32>>);
 }
 
 pub(super) const VERIFY_BTREE_MAP_INSERT_GET_REMOVE_ROUND_TRIPS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/btree_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/btree_carrier.rs");

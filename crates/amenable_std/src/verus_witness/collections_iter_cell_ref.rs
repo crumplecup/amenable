@@ -60,7 +60,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::linked_list::IterMut<'st
 }
 
 const VERIFY_UNORDERED_PAIR_MODEL_YIELDS_EVERY_ELEMENT_ONCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/unordered_pair_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/unordered_pair_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> {
     type SupportingEvidence = Self;
@@ -173,7 +173,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::binary_heap::PeekMut<'st
 }
 
 const VERIFY_REF_MODEL_DEREFS_TO_THE_BORROWED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ref_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/ref_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
     type SupportingEvidence = Self;
@@ -201,7 +201,7 @@ bridge_verus_witness!(RustStdStandard<std::cell::Ref<'static, i32>>);
 }
 
 const VERIFY_REF_MUT_MODEL_DEREFS_AND_WRITES_THROUGH_TO_THE_CELL_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ref_mut_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/ref_mut_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
     type SupportingEvidence = Self;
@@ -229,7 +229,7 @@ bridge_verus_witness!(RustStdStandard<std::cell::RefMut<'static, i32>>);
 }
 
 pub(super) const VERIFY_DECODE_UTF16_MODEL_ROUND_TRIPS_AND_REPORTS_LONE_SURROGATES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/decode_utf16_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/decode_utf16_carrier.rs");
 
 pub(super) const DECODE_UTF16_UNIT_IS_NON_SURROGATE_VERUS_FRAGMENT: &str = r#"pub open spec fn decode_utf16_unit_is_non_surrogate(unit: u16) -> bool {
     unit < 0xD800 || unit > 0xDFFF

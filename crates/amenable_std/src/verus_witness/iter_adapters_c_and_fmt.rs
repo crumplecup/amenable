@@ -33,7 +33,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Opt
 }
 
 const VERIFY_FROM_FN_MODEL_YIELDS_UNTIL_THE_CLOSURE_RETURNS_NONE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_stateful_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
     type SupportingEvidence = Self;
@@ -62,7 +62,7 @@ bridge_verus_witness!(RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>>);
 }
 
 const VERIFY_ALIGNMENT_MODEL_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::Alignment> {
     type SupportingEvidence = Self;
@@ -90,7 +90,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Alignment>);
 }
 
 const VERIFY_FORMATTER_MODEL_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::Formatter<'static>> {
     type SupportingEvidence = Self;
@@ -118,7 +118,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Formatter<'static>>);
 }
 
 const VERIFY_ARGUMENTS_MODEL_RENDERS_THE_SAME_AS_THE_VALUE_ITSELF_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 const FMT_ARGUMENTS_RESULT_MATCHES_DISPLAY_TOKEN_VERUS_FRAGMENT: &str = r#"pub open spec fn fmt_arguments_result_matches_display_token(display_token: i32, result: i32) -> bool {
     result == display_token
 }"#;
@@ -197,7 +197,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::Arguments<'static>>);
 }
 
 const VERIFY_FROM_FN_MODEL_FORWARDS_DISPLAY_TO_THE_SUPPLIED_CLOSURE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<std::fmt::FromFn<fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>>
@@ -239,7 +239,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_DEBUG_STRUCT_MODEL_RENDERS_NAMED_FIELDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::DebugStruct<'static, 'static>> {
     type SupportingEvidence = Self;
@@ -277,7 +277,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugStruct<'static, 'static>>);
 }
 
 const VERIFY_DEBUG_TUPLE_MODEL_RENDERS_POSITIONAL_FIELDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::DebugTuple<'static, 'static>> {
     type SupportingEvidence = Self;
@@ -315,7 +315,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugTuple<'static, 'static>>);
 }
 
 const VERIFY_DEBUG_LIST_MODEL_RENDERS_ENTRIES_IN_BRACKETS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::DebugList<'static, 'static>> {
     type SupportingEvidence = Self;
@@ -353,7 +353,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugList<'static, 'static>>);
 }
 
 const VERIFY_DEBUG_SET_MODEL_RENDERS_ENTRIES_IN_BRACES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::DebugSet<'static, 'static>> {
     type SupportingEvidence = Self;
@@ -391,7 +391,7 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugSet<'static, 'static>>);
 }
 
 const VERIFY_DEBUG_MAP_MODEL_RENDERS_KEY_VALUE_PAIRS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fmt_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/fmt_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::fmt::DebugMap<'static, 'static>> {
     type SupportingEvidence = Self;
@@ -429,4 +429,4 @@ bridge_verus_witness!(RustStdStandard<std::fmt::DebugMap<'static, 'static>>);
 }
 
 pub(super) const VERIFY_DISCRIMINANT_MODEL_IDENTIFIES_VARIANT_NOT_PAYLOAD_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/discriminant_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/discriminant_carrier.rs");

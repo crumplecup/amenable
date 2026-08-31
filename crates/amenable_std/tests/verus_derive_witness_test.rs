@@ -163,7 +163,7 @@ fn derive_witness_supports_concrete_generic_enums_for_verus() {
     assert_eq!(checked.harness(), "verify_char_roundtrip");
     assert_eq!(
         checked.claim(),
-        include_str!("../../amenable_verus/src/rust_std/char_carrier.rs")
+        include_str!("../../amenable_verus/src/rust_std/str_and_char/char_carrier.rs")
     );
     assert_eq!(*checked.provenance(), <char as RustStdType>::provenance());
     assert_eq!(

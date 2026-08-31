@@ -64,7 +64,7 @@ bridge_verus_witness!(RustStdStandard<std::string::FromUtf8Error>);
 }
 
 const VERIFY_ESCAPE_DEFAULT_MODEL_ESCAPES_A_CONTROL_BYTE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ascii_escape_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/ascii_escape_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::ascii::EscapeDefault> {
     type SupportingEvidence = Self;
@@ -92,7 +92,7 @@ bridge_verus_witness!(RustStdStandard<core::ascii::EscapeDefault>);
 }
 
 const VERIFY_CSTR_EXCLUDES_THE_TERMINATING_NUL_FROM_TO_BYTES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cstr_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/ffi/cstr_carrier.rs");
 
 const CSTR_TO_BYTES_MATCHES_MODEL_VERUS_FRAGMENT: &str = r#"pub open spec fn cstr_to_bytes_matches_model(cstr: &CStr, result: &[u8]) -> bool {
     result@ == cstr_bytes_spec(cstr)
@@ -157,7 +157,7 @@ amenable_derive::verus_requires_witness!(
 );
 
 const VERIFY_ORDERED_PAIR_INTO_ITER_MODEL_YIELDS_OWNED_VALUES_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ordered_pair_into_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/ordered_pair_into_iter_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type SupportingEvidence = Self;
@@ -324,7 +324,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_VEC_EXTRACT_IF_MODEL_PARTITIONS_BY_THE_PREDICATE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_extract_if_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_extract_if_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i32) -> bool>> {
     type SupportingEvidence = Self;
@@ -391,7 +391,7 @@ bridge_verus_witness!(
 }
 
 const VERIFY_SPLICE_MODEL_REPLACES_A_RANGE_AND_YIELDS_WHAT_IT_REMOVED_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_splice_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_splice_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIter<i32>>> {
     type SupportingEvidence = Self;
@@ -426,4 +426,4 @@ amenable_derive::verus_ensures_predicate!(
 }
 
 pub(super) const VERIFY_MAP_MODEL_APPLIES_ITS_CLOSURE_TO_EACH_ITEM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/iter_transform_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/iter_transform_carrier.rs");

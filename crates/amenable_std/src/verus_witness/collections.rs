@@ -45,7 +45,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_BTREE_SET_INSERT_CONTAINS_REMOVE_ROUND_TRIPS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/btree_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/btree_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
     type SupportingEvidence = Self;
@@ -85,7 +85,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_VEC_DEQUE_PUSHES_AND_POPS_FROM_BOTH_ENDS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_deque_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_deque_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::VecDeque<i32>> {
     type SupportingEvidence = Self;
@@ -113,7 +113,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::VecDeque<i32>>);
 }
 
 const VERIFY_TRY_RESERVE_PRESERVES_VEC_CONTENTS_REGARDLESS_OF_OUTCOME_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/try_reserve_error_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/try_reserve_error_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::TryReserveError> {
     type SupportingEvidence = Self;
@@ -141,7 +141,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::TryReserveError>);
 }
 
 const VERIFY_VEC_INTO_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_into_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_into_iter_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type SupportingEvidence = Self;
@@ -169,7 +169,7 @@ bridge_verus_witness!(RustStdStandard<std::vec::IntoIter<i32>>);
 }
 
 const VERIFY_VEC_DEQUE_ITER_ROUND_TRIPS_VIA_COLLECT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/vec_deque_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/vec_deque_iter_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::vec_deque::Iter<'static, i32>> {
     type SupportingEvidence = Self;
@@ -198,7 +198,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Iter<'static,
 }
 
 const VERIFY_CHARS_YIELDS_CHARACTERS_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/chars_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/str_and_char/chars_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
     type SupportingEvidence = Self;
@@ -238,7 +238,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 pub(super) const VERIFY_MAX_HEAP_PAIR_POPS_THE_MAXIMUM_FIRST_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/binary_heap_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/binary_heap_carrier.rs");
 
 const BINARY_HEAP_MODEL_RECORDS_VALUES_IN_HEAP_ORDER_VERUS_FRAGMENT: &str = r#"pub open spec fn binary_heap_model_records_values_in_heap_order(
     observed_max: i32,
@@ -308,7 +308,7 @@ amenable_derive::verus_ensures_witness!(
 }
 
 const VERIFY_FIFO_QUEUE_PAIR_POPS_IN_PUSH_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/linked_list_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/collections/linked_list_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::collections::LinkedList<i32>> {
     type SupportingEvidence = Self;
@@ -336,7 +336,7 @@ bridge_verus_witness!(RustStdStandard<std::collections::LinkedList<i32>>);
 }
 
 pub(super) const VERIFY_CELL_MODEL_GET_SET_REPLACE_ROUND_TRIP_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/cell_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/cell_and_ref/cell_carrier.rs");
 
 pub(super) const CELL_MODEL_NEW_STORES_INITIAL_VALUE_VERUS_FRAGMENT: &str = r#"pub open spec fn cell_model_new_stores_initial_value(observed: int, initial: int) -> bool {
     observed == initial

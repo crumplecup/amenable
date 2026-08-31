@@ -290,7 +290,7 @@ pub struct VerusParam {
 /// `observed_value_matches_input`, which is *defined* in
 /// `primitive_shapes_carrier` and only privately `use`d by
 /// `ref_cell_carrier` — importing it via the harness's own module path
-/// (`crate::rust_std::ref_cell_carrier::observed_value_matches_input`)
+/// (`crate::rust_std::cell_and_ref::ref_cell_carrier::observed_value_matches_input`)
 /// failed with `E0603: function import ... is private`.
 #[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
 pub struct VerusImport {
@@ -448,7 +448,7 @@ pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
 /// ```ignore
 /// register_verus_call_shape! {
 ///     harness = "verify_char_roundtrip",
-///     module_path = "crate::rust_std::char_carrier",
+///     module_path = "crate::rust_std::str_and_char::char_carrier",
 ///     params = [("c", "char")],
 ///     returns = "char",
 ///     requires = [],
@@ -457,8 +457,8 @@ pub fn verus_call_shape(harness: &str) -> Option<VerusCallShape> {
 ///         "char_is_valid_unicode_scalar($c)",
 ///     ],
 ///     imports = [
-///         ("crate::rust_std::char_carrier", "char_roundtrip_preserves_value"),
-///         ("crate::rust_std::char_carrier", "char_is_valid_unicode_scalar"),
+///         ("crate::rust_std::str_and_char::char_carrier", "char_roundtrip_preserves_value"),
+///         ("crate::rust_std::str_and_char::char_carrier", "char_is_valid_unicode_scalar"),
 ///     ],
 /// }
 /// ```

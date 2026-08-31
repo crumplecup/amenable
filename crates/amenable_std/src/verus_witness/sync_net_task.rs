@@ -38,7 +38,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_ONCE_STATE_MODEL_REPORTS_NOT_POISONED_ON_A_CLEAN_RUN_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_once_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::OnceState> {
     type SupportingEvidence = Self;
@@ -66,7 +66,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::OnceState>);
 }
 
 const VERIFY_ONCE_LOCK_MODEL_INITIALIZES_EXACTLY_ONCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_once_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_once_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::OnceLock<i32>> {
     type SupportingEvidence = Self;
@@ -94,7 +94,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::OnceLock<i32>>);
 }
 
 const VERIFY_BARRIER_MODEL_OF_ONE_IS_ITS_OWN_LEADER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_barrier_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_barrier_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::Barrier> {
     type SupportingEvidence = Self;
@@ -147,7 +147,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::BarrierWaitResult>);
 }
 
 const VERIFY_WAIT_TIMEOUT_RESULT_MODEL_REPORTS_TIMED_OUT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/sync_wait_timeout_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/sync/sync_wait_timeout_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::sync::WaitTimeoutResult> {
     type SupportingEvidence = Self;
@@ -175,7 +175,7 @@ bridge_verus_witness!(RustStdStandard<std::sync::WaitTimeoutResult>);
 }
 
 const VERIFY_INCOMING_MODEL_YIELDS_AN_ALREADY_QUEUED_CONNECTION_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/std_net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::Incoming<'static>> {
     type SupportingEvidence = Self;
@@ -203,7 +203,7 @@ bridge_verus_witness!(RustStdStandard<std::net::Incoming<'static>>);
 }
 
 const VERIFY_SHUTDOWN_MODEL_WRITE_PREVENTS_FURTHER_WRITES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/std_net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::Shutdown> {
     type SupportingEvidence = Self;
@@ -231,7 +231,7 @@ bridge_verus_witness!(RustStdStandard<std::net::Shutdown>);
 }
 
 const VERIFY_TCP_LISTENER_MODEL_ACCEPTS_A_CONNECTING_STREAM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/std_net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::TcpListener> {
     type SupportingEvidence = Self;
@@ -259,7 +259,7 @@ bridge_verus_witness!(RustStdStandard<std::net::TcpListener>);
 }
 
 const VERIFY_TCP_STREAM_MODEL_DELIVERS_WRITTEN_BYTES_TO_THE_ACCEPTED_PEER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/std_net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::TcpStream> {
     type SupportingEvidence = Self;
@@ -287,7 +287,7 @@ bridge_verus_witness!(RustStdStandard<std::net::TcpStream>);
 }
 
 const VERIFY_UDP_SOCKET_MODEL_SEND_TO_RECV_FROM_ROUND_TRIPS_A_DATAGRAM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_net_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/process_and_net/std_net_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::net::UdpSocket> {
     type SupportingEvidence = Self;
@@ -315,7 +315,7 @@ bridge_verus_witness!(RustStdStandard<std::net::UdpSocket>);
 }
 
 const VERIFY_CONTEXT_MODEL_FROM_WAKER_EXPOSES_THE_SAME_WAKER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/task_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/task_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::task::Context<'static>> {
     type SupportingEvidence = Self;
@@ -343,7 +343,7 @@ bridge_verus_witness!(RustStdStandard<std::task::Context<'static>>);
 }
 
 const VERIFY_POLL_MODEL_READY_AND_PENDING_ARE_DISJOINT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/task_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/task_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::task::Poll<i32>> {
     type SupportingEvidence = Self;
@@ -371,7 +371,7 @@ bridge_verus_witness!(RustStdStandard<std::task::Poll<i32>>);
 }
 
 const VERIFY_WAKER_MODEL_WAKE_BY_REF_INVOKES_THE_WAKE_IMPL_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/task_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/task_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::task::Waker> {
     type SupportingEvidence = Self;
@@ -405,4 +405,4 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 pub(super) const VERIFY_ASSERT_UNWIND_SAFE_MODEL_DEREFS_TRANSPARENTLY_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/panic_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/panic_carrier.rs");

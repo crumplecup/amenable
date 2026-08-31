@@ -34,7 +34,7 @@ bridge_verus_witness!(RustStdStandard<std::panic::AssertUnwindSafe<i32>>);
 }
 
 const VERIFY_LOCATION_MODEL_CALLER_REFLECTS_THE_IMMEDIATE_CALL_SITE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/panic_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/panic_carrier.rs");
 
 impl VerusWitness for RustStdStandard<core::panic::Location<'static>> {
     type SupportingEvidence = Self;
@@ -68,7 +68,7 @@ amenable_derive::verus_requires_predicate!(
 );
 
 const VERIFY_RANGE_TO_MODEL_CONTAINS_MATCHES_BOUND_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ops_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/ops_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ops::RangeTo<i32>> {
     type SupportingEvidence = Self;
@@ -96,7 +96,7 @@ bridge_verus_witness!(RustStdStandard<std::ops::RangeTo<i32>>);
 }
 
 const VERIFY_RANGE_FULL_MODEL_CONTAINS_EVERYTHING_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ops_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/ops_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ops::RangeFull> {
     type SupportingEvidence = Self;
@@ -124,7 +124,7 @@ bridge_verus_witness!(RustStdStandard<std::ops::RangeFull>);
 }
 
 const VERIFY_BOUND_MODEL_ROUND_TRIPS_ITS_ENDPOINT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ops_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/ops_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ops::Bound<i32>> {
     type SupportingEvidence = Self;
@@ -152,7 +152,7 @@ bridge_verus_witness!(RustStdStandard<std::ops::Bound<i32>>);
 }
 
 const VERIFY_CONTROL_FLOW_MODEL_CONTINUE_AND_BREAK_ARE_DISJOINT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/ops_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/ops_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::ops::ControlFlow<i32, i32>> {
     type SupportingEvidence = Self;
@@ -180,7 +180,7 @@ bridge_verus_witness!(RustStdStandard<std::ops::ControlFlow<i32, i32>>);
 }
 
 const VERIFY_INSTANT_MODEL_IS_MONOTONICALLY_NONDECREASING_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_time_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/std_time_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::time::Instant> {
     type SupportingEvidence = Self;
@@ -208,7 +208,7 @@ bridge_verus_witness!(RustStdStandard<std::time::Instant>);
 }
 
 const VERIFY_SYSTEM_TIME_MODEL_DURATION_SINCE_COMPUTES_THE_ELAPSED_SPAN_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_time_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/std_time_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::time::SystemTime> {
     type SupportingEvidence = Self;
@@ -236,7 +236,7 @@ bridge_verus_witness!(RustStdStandard<std::time::SystemTime>);
 }
 
 const VERIFY_SYSTEM_TIME_ERROR_MODEL_RECOVERS_HOW_FAR_BACKWARD_IT_WENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_time_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/std_time_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::time::SystemTimeError> {
     type SupportingEvidence = Self;
@@ -264,7 +264,7 @@ bridge_verus_witness!(RustStdStandard<std::time::SystemTimeError>);
 }
 
 const VERIFY_DURATION_MODEL_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/std_time_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/std_time_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::time::Duration> {
     type SupportingEvidence = Self;
@@ -304,7 +304,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_INTO_ITER_MODEL_YIELDS_ZERO_OR_ONE_OWNED_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/option_result_iter_carrier.rs");
 
 macro_rules! impl_option_result_into_iter_verus_witness {
     ($ty:ty) => {
@@ -343,7 +343,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_ITER_MODEL_YIELDS_ZERO_OR_ONE_REFERENCE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/option_result_iter_carrier.rs");
 
 macro_rules! impl_option_result_iter_verus_witness {
     ($ty:ty) => {
@@ -376,7 +376,7 @@ impl_option_result_iter_verus_witness!(core::option::Iter<'static, i32>);
 impl_option_result_iter_verus_witness!(core::result::Iter<'static, i32>);
 
 const VERIFY_ITER_MUT_MODEL_WRITES_THROUGH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/option_result_iter_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/iter/option_result_iter_carrier.rs");
 
 macro_rules! impl_option_result_iter_mut_verus_witness {
     ($ty:ty) => {
@@ -409,7 +409,7 @@ impl_option_result_iter_mut_verus_witness!(core::option::IterMut<'static, i32>);
 impl_option_result_iter_mut_verus_witness!(core::result::IterMut<'static, i32>);
 
 const VERIFY_PENDING_MODEL_NEVER_RESOLVES_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/future_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/future_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::future::Pending<i32>> {
     type SupportingEvidence = Self;
@@ -437,7 +437,7 @@ bridge_verus_witness!(RustStdStandard<std::future::Pending<i32>>);
 }
 
 const VERIFY_READY_MODEL_RESOLVES_IMMEDIATELY_WITH_ITS_VALUE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/future_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/future_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::future::Ready<i32>> {
     type SupportingEvidence = Self;
@@ -465,7 +465,7 @@ bridge_verus_witness!(RustStdStandard<std::future::Ready<i32>>);
 }
 
 const VERIFY_POLL_FN_MODEL_DISPATCHES_THROUGH_TO_ITS_CLOSURE_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/future_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/task_and_thread/future_carrier.rs");
 
 impl VerusWitness
     for RustStdStandard<
@@ -500,7 +500,7 @@ bridge_verus_witness!(
 }
 
 pub(super) const VERIFY_ARRAY_MODEL_INDEXING_AND_LENGTH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");
 
 pub(super) const VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/primitive_shapes_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/misc/primitive_shapes_carrier.rs");

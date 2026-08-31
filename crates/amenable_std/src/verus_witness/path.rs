@@ -31,7 +31,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Ancestors<'static>>);
 }
 
 const VERIFY_COMPONENT_MODEL_DISTINGUISHES_ROOT_FROM_NORMAL_SEGMENTS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_components_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_components_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Component<'static>> {
     type SupportingEvidence = Self;
@@ -59,7 +59,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Component<'static>>);
 }
 
 const VERIFY_COMPONENTS_MODEL_YIELDS_ROOT_THEN_NAMED_SEGMENTS_IN_ORDER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_components_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_components_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Components<'static>> {
     type SupportingEvidence = Self;
@@ -87,7 +87,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Components<'static>>);
 }
 
 const VERIFY_ITER_MODEL_YIELDS_THE_NAMED_SEGMENTS_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_components_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_components_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Iter<'static>> {
     type SupportingEvidence = Self;
@@ -123,7 +123,7 @@ amenable_derive::verus_ensures_predicate!(
 );
 
 const VERIFY_DISPLAY_MODEL_RENDERS_A_VALID_UTF8_PATH_VERBATIM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_display_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_display_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Display<'static>> {
     type SupportingEvidence = Self;
@@ -151,7 +151,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Display<'static>>);
 }
 
 const VERIFY_PATH_MODEL_DERIVES_EXTENSION_FILE_NAME_AND_PARENT_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Path> {
     type SupportingEvidence = Self;
@@ -179,7 +179,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Path>);
 }
 
 const VERIFY_PATH_BUF_MODEL_PUSH_POP_AND_JOIN_BUILD_THE_EXPECTED_PATH_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_buf_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_buf_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::PathBuf> {
     type SupportingEvidence = Self;
@@ -207,7 +207,7 @@ bridge_verus_witness!(RustStdStandard<std::path::PathBuf>);
 }
 
 const VERIFY_PREFIX_MODEL_DISK_IDENTIFIES_THE_DRIVE_LETTER_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_prefix_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_prefix_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::Prefix<'static>> {
     type SupportingEvidence = Self;
@@ -235,7 +235,7 @@ bridge_verus_witness!(RustStdStandard<std::path::Prefix<'static>>);
 }
 
 const VERIFY_PREFIX_COMPONENT_MODEL_PAIRS_RAW_TEXT_WITH_PARSED_PREFIX_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_prefix_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_prefix_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::PrefixComponent<'static>> {
     type SupportingEvidence = Self;
@@ -264,7 +264,7 @@ bridge_verus_witness!(RustStdStandard<std::path::PrefixComponent<'static>>);
 }
 
 const VERIFY_STRIP_PREFIX_ERROR_MODEL_REPORTS_A_NON_MATCHING_PREFIX_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/path_strip_prefix_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/path_strip_prefix_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::path::StripPrefixError> {
     type SupportingEvidence = Self;
@@ -292,7 +292,7 @@ bridge_verus_witness!(RustStdStandard<std::path::StripPrefixError>);
 }
 
 pub(super) const VERIFY_DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/fs_path_carrier.rs");
+    include_str!("../../../amenable_verus/src/rust_std/path_and_fs/fs_path_carrier.rs");
 
 pub(super) const DIR_BUILDER_MODEL_CREATES_NESTED_DIRECTORIES_RECURSIVELY_VERUS_FRAGMENT: &str = r#"pub open spec fn dir_builder_model_creates_nested_directories_recursively(
     a: char,
