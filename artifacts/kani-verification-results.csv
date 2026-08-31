@@ -253,6 +253,9 @@ amenable_kani::rust_std::primitives::verify_slice_indexing_and_length,1787761966
 amenable_kani::rust_std::primitives::verify_str_byte_length_and_content,1788043403,passed
 amenable_kani::rust_std::primitives::verify_string_utf8_valid,1788027316,passed
 amenable_kani::rust_std::primitives::verify_tuple_field_access,1787761989,passed
+amenable_kani::rust_std::process::child_and_streams::verify_child_has_a_process_id_and_can_be_waited_on,1788148907,passed
+amenable_kani::rust_std::process::command::verify_command_args_reports_the_configured_arguments,1788148920,passed
+amenable_kani::rust_std::process::exit_status_output_stdio::verify_exit_status_reports_a_nonzero_exit_code,1788148942,passed
 amenable_kani::rust_std::process::verify_child_has_a_process_id_and_can_be_waited_on,1787761998,passed
 amenable_kani::rust_std::process::verify_child_stderr_captures_what_the_child_wrote_to_stderr,1787762014,passed
 amenable_kani::rust_std::process::verify_child_stdin_is_readable_by_the_child_process,1787762024,passed
