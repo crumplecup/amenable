@@ -157,40 +157,10 @@ pub fn expand_capture_exchange_body(
     args: &CaptureExchangeBodyArgs,
     item_impl: &ItemImpl,
 ) -> syn::Result<TokenStream> {
-    if item_impl.trait_.is_some() {
-        return Err(Error::new_spanned(
-            item_impl,
-            "capture_exchange_body must be applied to an inherent impl block, not a trait impl",
-        ));
-    }
-    if !item_impl.generics.params.is_empty() {
-        return Err(Error::new_spanned(
-            &item_impl.generics,
-            "capture_exchange_body does not yet support generic impl blocks",
-        ));
-    }
-
-    let method = match item_impl.items.as_slice() {
-        [ImplItem::Fn(method)] => method,
-        _ => {
-            return Err(Error::new_spanned(
-                item_impl,
-                "capture_exchange_body requires exactly one method in the impl block",
-            ));
-        }
-    };
-
+    validate_inherent_impl(item_impl)?;
+    let method = single_method(item_impl)?;
     let method_ident = &method.sig.ident;
-    let input_ty = match method.sig.inputs.iter().collect::<Vec<_>>().as_slice() {
-        [FnArg::Receiver(_), FnArg::Typed(pat_type)] => (*pat_type.ty).clone(),
-        _ => {
-            return Err(Error::new_spanned(
-                &method.sig.inputs,
-                "capture_exchange_body requires a method of the shape `fn method(&self, input: \
-                 Input) -> Result<Output, Error>`",
-            ));
-        }
-    };
+    let input_ty = method_input_type(method)?;
 
     let ReturnType::Type(_, return_ty) = &method.sig.output else {
         return Err(Error::new_spanned(
@@ -200,24 +170,7 @@ pub fn expand_capture_exchange_body(
     };
     let (output_ty, error_ty) = extract_result_generics(return_ty)?;
     let method_where_clause = &method.sig.generics.where_clause;
-    match method
-        .sig
-        .generics
-        .params
-        .iter()
-        .collect::<Vec<_>>()
-        .as_slice()
-    {
-        [syn::GenericParam::Type(type_param)] if type_param.ident == "V" => {}
-        _ => {
-            return Err(Error::new_spanned(
-                &method.sig.generics,
-                "capture_exchange_body requires a method generic over exactly one type \
-                 parameter, named `V` -- the generated `Exchange<Input, Output, V>` impl below \
-                 assumes that name, matching this macro family's existing convention",
-            ));
-        }
-    }
+    validate_single_v_generic(method)?;
 
     let self_ty = &item_impl.self_ty;
     let CaptureExchangeBodyArgs {
@@ -238,94 +191,17 @@ pub fn expand_capture_exchange_body(
         .as_ref()
         .is_some_and(|flag| flag.value() == "true");
 
-    // Verbatim source of the method's own body -- identical technique to
-    // `#[exchange(..)]`'s own capture (`exchange.rs`'s own doc comment),
-    // shared via `trim_braces`/`extract_result_generics` rather than
-    // duplicated. Captured *before* any attribute injection below --
-    // `Span::source_text()` reads the real file, unaffected by tokens
-    // this macro adds to a cloned copy afterward.
-    let body_source = method
-        .block
-        .brace_token
-        .span
-        .join()
-        .source_text()
-        .map(|text| trim_braces(&text).to_owned())
-        .unwrap_or_else(|| method.block.to_token_stream().to_string());
+    let body_source = capture_body_source(method);
 
-    // Inject the mechanical Kani contract onto a clone of the method,
-    // the identical `contracted_method.attrs.push(..)` technique
-    // `#[exchange(..)]`'s own `expand_exchange` uses -- see this
-    // module's own doc comment for why this specific shape (delegate to
-    // the target evidence type's own `Ensures<V>` impl) is safe to
-    // generate mechanically now, and why `kani_requires` stays a real,
-    // hand-authored string instead. `#[cfg_attr(kani, kani::requires(
-    // ..))]` is pushed before `#[cfg_attr(kani, kani::ensures(..))]` to
-    // match every hand-written call site's own existing convention
-    // (`Ledger::commit`'s real precedent). The bare identifier `V`
-    // (below) is a real, unchecked assumption -- this macro doesn't
-    // read the method's own generic parameter list, it just names the
-    // one every real caller so far already uses, matching `method_
-    // generics = "V"`'s own identical hardcoded convention; a caller
-    // whose sole generic parameter is spelled differently should write
-    // the contract by hand instead of setting `kani_ensures = "true"`.
-    let contracted_impl = if generate_kani_ensures {
-        let mut contracted_impl = item_impl.clone();
-        let Some(ImplItem::Fn(contracted_method)) = contracted_impl.items.first_mut() else {
-            return Err(Error::new_spanned(
-                item_impl,
-                "capture_exchange_body requires exactly one method in the impl block",
-            ));
-        };
-        if let Some(requires_expr) = kani_requires {
-            contracted_method.attrs.push(syn::parse_quote! {
-                #[cfg_attr(kani, kani::requires(#requires_expr))]
-            });
-        }
-        if let Some(requires_evidence) = kani_requires_evidence {
-            contracted_method.attrs.push(syn::parse_quote! {
-                #[cfg_attr(
-                    kani,
-                    kani::requires(
-                        <#requires_evidence as ::amenable_core::Requires<V>>::requires(
-                            ::std::clone::Clone::clone(&input)
-                        )
-                    )
-                )]
-            });
-        }
-        contracted_method.attrs.push(syn::parse_quote! {
-            #[cfg_attr(
-                kani,
-                kani::ensures(
-                    |result: &::std::result::Result<#output_ty, #error_ty>|
-                        <#evidence as ::amenable_core::Ensures<V>>::ensures(
-                            ::std::clone::Clone::clone(result)
-                        )
-                )
-            )]
-        });
-        // `kani` here is meaningless to a downstream consumer that
-        // never declares that cfg name -- the `allow`+`const` wrapper
-        // is the only placement that suppresses `unexpected_cfgs`
-        // there without affecting what actually compiles under a real
-        // `kani` build. The method stays resolvable at its original
-        // `#self_ty::#method_ident` path regardless of the enclosing
-        // impl block's own `const` nesting (confirmed with a real
-        // external call site in an isolated scratch crate for
-        // `#[exchange(..)]`'s identical shape; see `docs/
-        // CFG_HYGIENE_PLAN.md`'s Step 1 -- this macro's only structural
-        // difference is the method's own extra `V` type parameter,
-        // which the impl block itself doesn't carry).
-        quote! {
-            #[allow(unexpected_cfgs)]
-            const _: () = {
-                #contracted_impl
-            };
-        }
-    } else {
-        item_impl.clone().to_token_stream()
-    };
+    let contracted_impl = contracted_impl_tokens(
+        item_impl,
+        generate_kani_ensures,
+        kani_requires,
+        kani_requires_evidence,
+        evidence,
+        &output_ty,
+        &error_ty,
+    )?;
 
     Ok(quote! {
         #contracted_impl
@@ -380,5 +256,197 @@ pub fn expand_capture_exchange_body(
             .with_creusot_ensures(#creusot_ensures_lit)
             .with_method_generics(#method_generics_lit)
         }
+    })
+}
+
+/// Reject a trait impl or a generic impl block -- the same shape check
+/// `#[exchange(..)]` requires (see that macro's own doc comment for why
+/// generics on the *impl block* itself aren't supported).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(item_impl)))]
+fn validate_inherent_impl(item_impl: &ItemImpl) -> syn::Result<()> {
+    if item_impl.trait_.is_some() {
+        return Err(Error::new_spanned(
+            item_impl,
+            "capture_exchange_body must be applied to an inherent impl block, not a trait impl",
+        ));
+    }
+    if !item_impl.generics.params.is_empty() {
+        return Err(Error::new_spanned(
+            &item_impl.generics,
+            "capture_exchange_body does not yet support generic impl blocks",
+        ));
+    }
+
+    Ok(())
+}
+
+/// Extract the impl block's one required method.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(item_impl)))]
+fn single_method(item_impl: &ItemImpl) -> syn::Result<&syn::ImplItemFn> {
+    match item_impl.items.as_slice() {
+        [ImplItem::Fn(method)] => Ok(method),
+        _ => Err(Error::new_spanned(
+            item_impl,
+            "capture_exchange_body requires exactly one method in the impl block",
+        )),
+    }
+}
+
+/// Extract `Input` from a method of the required shape `fn method(&self,
+/// input: Input) -> Result<Output, Error>`.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(method)))]
+fn method_input_type(method: &syn::ImplItemFn) -> syn::Result<syn::Type> {
+    match method.sig.inputs.iter().collect::<Vec<_>>().as_slice() {
+        [FnArg::Receiver(_), FnArg::Typed(pat_type)] => Ok((*pat_type.ty).clone()),
+        _ => Err(Error::new_spanned(
+            &method.sig.inputs,
+            "capture_exchange_body requires a method of the shape `fn method(&self, input: \
+             Input) -> Result<Output, Error>`",
+        )),
+    }
+}
+
+/// Confirm the method is generic over exactly one type parameter, named
+/// `V` -- the generated `Exchange<Input, Output, V>` impl assumes that
+/// name, matching this macro family's existing convention.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(method)))]
+fn validate_single_v_generic(method: &syn::ImplItemFn) -> syn::Result<()> {
+    match method
+        .sig
+        .generics
+        .params
+        .iter()
+        .collect::<Vec<_>>()
+        .as_slice()
+    {
+        [syn::GenericParam::Type(type_param)] if type_param.ident == "V" => Ok(()),
+        _ => Err(Error::new_spanned(
+            &method.sig.generics,
+            "capture_exchange_body requires a method generic over exactly one type \
+             parameter, named `V` -- the generated `Exchange<Input, Output, V>` impl below \
+             assumes that name, matching this macro family's existing convention",
+        )),
+    }
+}
+
+/// Verbatim source of the method's own body -- identical technique to
+/// `#[exchange(..)]`'s own capture (`exchange.rs`'s own doc comment),
+/// shared via `trim_braces`/`extract_result_generics` rather than
+/// duplicated. Captured *before* any attribute injection
+/// [`contracted_impl_tokens`] performs below -- `Span::source_text()`
+/// reads the real file, unaffected by tokens this macro adds to a cloned
+/// copy afterward.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(method)))]
+fn capture_body_source(method: &syn::ImplItemFn) -> String {
+    method
+        .block
+        .brace_token
+        .span
+        .join()
+        .source_text()
+        .map(|text| trim_braces(&text).to_owned())
+        .unwrap_or_else(|| method.block.to_token_stream().to_string())
+}
+
+/// Build the impl block downstream code sees: with the mechanical Kani
+/// contract injected onto a clone of the method when `kani_ensures =
+/// "true"` was requested, or the original impl block's tokens unchanged
+/// otherwise.
+///
+/// Injects onto a clone of the method, the identical
+/// `contracted_method.attrs.push(..)` technique `#[exchange(..)]`'s own
+/// `expand_exchange` uses -- see this module's own doc comment for why
+/// this specific shape (delegate to the target evidence type's own
+/// `Ensures<V>` impl) is safe to generate mechanically now, and why
+/// `kani_requires` stays a real, hand-authored string instead.
+/// `#[cfg_attr(kani, kani::requires(..))]` is pushed before
+/// `#[cfg_attr(kani, kani::ensures(..))]` to match every hand-written
+/// call site's own existing convention (`Ledger::commit`'s real
+/// precedent). The bare identifier `V` (below) is a real, unchecked
+/// assumption -- this macro doesn't read the method's own generic
+/// parameter list, it just names the one every real caller so far
+/// already uses, matching `method_generics = "V"`'s own identical
+/// hardcoded convention; a caller whose sole generic parameter is
+/// spelled differently should write the contract by hand instead of
+/// setting `kani_ensures = "true"`.
+///
+/// `kani` here is meaningless to a downstream consumer that never
+/// declares that cfg name -- the `allow`+`const` wrapper is the only
+/// placement that suppresses `unexpected_cfgs` there without affecting
+/// what actually compiles under a real `kani` build. The method stays
+/// resolvable at its original `#self_ty::#method_ident` path regardless
+/// of the enclosing impl block's own `const` nesting (confirmed with a
+/// real external call site in an isolated scratch crate for
+/// `#[exchange(..)]`'s identical shape; see `docs/CFG_HYGIENE_PLAN.md`'s
+/// Step 1 -- this macro's only structural difference is the method's own
+/// extra `V` type parameter, which the impl block itself doesn't carry).
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(
+        level = "trace",
+        skip(
+            item_impl,
+            kani_requires,
+            kani_requires_evidence,
+            evidence,
+            output_ty,
+            error_ty
+        )
+    )
+)]
+fn contracted_impl_tokens(
+    item_impl: &ItemImpl,
+    generate_kani_ensures: bool,
+    kani_requires: &Option<Expr>,
+    kani_requires_evidence: &Option<Path>,
+    evidence: &Path,
+    output_ty: &syn::Type,
+    error_ty: &syn::Type,
+) -> syn::Result<TokenStream> {
+    if !generate_kani_ensures {
+        return Ok(item_impl.clone().to_token_stream());
+    }
+
+    let mut contracted_impl = item_impl.clone();
+    let Some(ImplItem::Fn(contracted_method)) = contracted_impl.items.first_mut() else {
+        return Err(Error::new_spanned(
+            item_impl,
+            "capture_exchange_body requires exactly one method in the impl block",
+        ));
+    };
+    if let Some(requires_expr) = kani_requires {
+        contracted_method.attrs.push(syn::parse_quote! {
+            #[cfg_attr(kani, kani::requires(#requires_expr))]
+        });
+    }
+    if let Some(requires_evidence) = kani_requires_evidence {
+        contracted_method.attrs.push(syn::parse_quote! {
+            #[cfg_attr(
+                kani,
+                kani::requires(
+                    <#requires_evidence as ::amenable_core::Requires<V>>::requires(
+                        ::std::clone::Clone::clone(&input)
+                    )
+                )
+            )]
+        });
+    }
+    contracted_method.attrs.push(syn::parse_quote! {
+        #[cfg_attr(
+            kani,
+            kani::ensures(
+                |result: &::std::result::Result<#output_ty, #error_ty>|
+                    <#evidence as ::amenable_core::Ensures<V>>::ensures(
+                        ::std::clone::Clone::clone(result)
+                    )
+            )
+        )]
+    });
+
+    Ok(quote! {
+        #[allow(unexpected_cfgs)]
+        const _: () = {
+            #contracted_impl
+        };
     })
 }
