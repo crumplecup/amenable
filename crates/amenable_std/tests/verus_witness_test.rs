@@ -5202,10 +5202,7 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
     let shape = verus_call_shape("verify_char_roundtrip")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
-    assert_eq!(
-        shape.module_path(),
-        "crate::rust_std::str_and_char::char_carrier"
-    );
+    assert_eq!(shape.module_path(), "crate::rust_std::str_and_char");
     assert_eq!(shape.name(), "verify_char_roundtrip");
     assert_eq!(shape.params().len(), 1);
     assert_eq!(shape.params()[0].name(), "c");
@@ -5222,11 +5219,11 @@ fn verus_call_shape_is_registered_for_char_roundtrip() -> miette::Result<()> {
         *shape.imports(),
         vec![
             VerusImport::new(
-                "crate::rust_std::str_and_char::char_carrier".to_owned(),
+                "crate::rust_std::str_and_char".to_owned(),
                 "char_roundtrip_preserves_value".to_owned(),
             ),
             VerusImport::new(
-                "crate::rust_std::str_and_char::char_carrier".to_owned(),
+                "crate::rust_std::str_and_char".to_owned(),
                 "char_is_valid_unicode_scalar".to_owned(),
             ),
         ]
@@ -5246,10 +5243,7 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
     let shape = verus_call_shape("verify_ref_cell_model_dynamic_borrow_rules")
         .ok_or_else(|| miette::miette!("expected a registered call shape"))?;
 
-    assert_eq!(
-        shape.module_path(),
-        "crate::rust_std::cell_and_ref::ref_cell_carrier"
-    );
+    assert_eq!(shape.module_path(), "crate::rust_std::cell_and_ref");
     assert_eq!(shape.params().len(), 2);
     assert_eq!(shape.params()[0].name(), "initial");
     assert_eq!(shape.params()[1].name(), "updated");
@@ -5268,7 +5262,7 @@ fn verus_call_shape_is_registered_for_ref_cell_with_raw_templates() -> miette::R
     assert_eq!(
         *shape.imports(),
         vec![VerusImport::new(
-            "crate::rust_std::misc::primitive_shapes_carrier".to_owned(),
+            "crate::rust_std::misc".to_owned(),
             "observed_value_matches_input".to_owned(),
         )]
     );

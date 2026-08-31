@@ -21,11 +21,11 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
+use crate::rust_std::misc::{
     is_ascii_byte, observed_pair_matches_input, observed_triple_matches_input, values_are_distinct,
 };
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::str_and_char::char_carrier::char_roundtrip_preserves_value;
+use crate::rust_std::str_and_char::char_roundtrip_preserves_value;
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,

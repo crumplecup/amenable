@@ -148,7 +148,7 @@ impl Ledger {
     /// content -- it exists only so `V` is genuinely used, not just
     /// declared, matching a real clippy lint this project can't
     /// `#[allow]` away (`clippy::extra_unused_type_parameters`).
-    pub(crate) fn check_amount_positive<V>(amount: i64) -> (result: Result<(), i64>)
+    pub fn check_amount_positive<V>(amount: i64) -> (result: Result<(), i64>)
         ensures
             match result {
                 Ok(()) => amount > 0,
@@ -160,7 +160,7 @@ impl Ledger {
     }
 
     /// `<V>`: see [`Ledger::check_amount_positive`]'s own doc comment.
-    pub(crate) fn check_sufficient_funds<V>(&self, amount: i64) -> (result: Result<(), (i64, i64)>)
+    pub fn check_sufficient_funds<V>(&self, amount: i64) -> (result: Result<(), (i64, i64)>)
         ensures
             match result {
                 Ok(()) => self.balance >= amount,
@@ -185,7 +185,7 @@ impl Ledger {
     /// own postcondition could not be proven at its `Err` exit points
     /// (confirmed the hard way: a real `postcondition not satisfied`
     /// failure pointing at exactly this `?` exit, before this was added).
-    pub(crate) fn negative_amount(bad: i64) -> (result: TransferError)
+    pub fn negative_amount(bad: i64) -> (result: TransferError)
         ensures
             result == TransferError::NegativeAmount(bad),
     {
@@ -199,7 +199,7 @@ impl Ledger {
     /// general pattern in a closure parameter position either. `ensures`
     /// for the same real reason `negative_amount`'s own doc comment
     /// explains.
-    pub(crate) fn insufficient_funds(bad: (i64, i64)) -> (result: TransferError)
+    pub fn insufficient_funds(bad: (i64, i64)) -> (result: TransferError)
         ensures
             result == (TransferError::InsufficientFunds { balance: bad.0, required: bad.1 }),
     {

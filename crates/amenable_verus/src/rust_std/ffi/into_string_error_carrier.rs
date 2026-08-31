@@ -21,7 +21,7 @@ use vstd::prelude::*;
 #[cfg(verus_keep_ghost)]
 use super::cstring_carrier::cstring_bytes_spec;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{has_length, values_are_equal};
+use crate::rust_std::misc::{has_length, values_are_equal};
 
 verus! {
 

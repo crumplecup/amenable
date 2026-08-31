@@ -35,7 +35,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_pair_matches_input;
+use crate::rust_std::misc::observed_pair_matches_input;
 
 verus! {
 

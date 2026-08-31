@@ -17,7 +17,7 @@
 use std::alloc::Layout;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::values_are_equal;
+use crate::rust_std::misc::values_are_equal;
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,

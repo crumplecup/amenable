@@ -19,7 +19,7 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
-use crate::rust_std::cell_and_ref::ref_cell_carrier::VerusRefCellModel;
+use crate::rust_std::cell_and_ref::VerusRefCellModel;
 
 verus! {
 

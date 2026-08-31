@@ -29,9 +29,9 @@ use vstd::prelude::*;
 // registers for several plain value-box models. Imported only when
 // Verus keeps ghost/spec items.
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::cell_and_ref::cell_carrier::write_stores_new_value;
+use crate::rust_std::cell_and_ref::write_stores_new_value;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::misc::observed_value_matches_input;
 
 verus! {
 

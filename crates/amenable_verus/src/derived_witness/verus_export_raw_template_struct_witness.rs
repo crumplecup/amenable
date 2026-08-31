@@ -8,7 +8,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_value_matches_input;
+use crate::rust_std::misc::observed_value_matches_input;
 
 verus! {
 
@@ -16,7 +16,7 @@ verus! {
 // destination: crate::derived_witness::verus_export_raw_template_struct_witness
 // support: checked (trivial=0, checked=1, trusted=0, opaque=0)
 
-// checked leaf at member checked: calls crate::rust_std::cell_and_ref::ref_cell_carrier::verify_ref_cell_model_dynamic_borrow_rules
+// checked leaf at member checked: calls crate::rust_std::cell_and_ref::verify_ref_cell_model_dynamic_borrow_rules
 
 pub fn verify_verus_export_raw_template_struct_witness(initial: i32, updated: i32) -> (result: (bool, bool, bool, bool, bool, i32))
     ensures
@@ -27,7 +27,7 @@ pub fn verify_verus_export_raw_template_struct_witness(initial: i32, updated: i3
         !result.4,
         observed_value_matches_input(result.5 as int, updated as int),
 {
-    crate::rust_std::cell_and_ref::ref_cell_carrier::verify_ref_cell_model_dynamic_borrow_rules(initial, updated)
+    crate::rust_std::cell_and_ref::verify_ref_cell_model_dynamic_borrow_rules(initial, updated)
 }
 
 } // verus!

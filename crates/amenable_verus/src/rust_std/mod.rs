@@ -19,6 +19,27 @@
 //! cluster, `SystemTime`). The one-file-per-carrier granularity inside
 //! each subdirectory is unchanged -- this only adds a middle layer, it
 //! never merges or renames a carrier file.
+//!
+//! Every leaf carrier's own `mod` declaration (in its group's `mod.rs`)
+//! is private, with its real items re-exported explicitly via `pub use`
+//! -- the standard `mod core; pub use core::{Type1, Type2};` idiom, not
+//! a blanket `pub mod` per file. `pub` here isn't over-promising to an
+//! external consumer this crate doesn't have (confirmed: `amenable_
+//! verus` is never a Cargo dependency of anything); it's the mechanism
+//! that keeps `cargo build`'s `dead_code` lint honest for the many
+//! carriers whose only real "caller" is `verus`'s own traversal, not
+//! any Rust call site. `amenable_core::verus_carrier::find_fn`'s own
+//! path derivation (`module_path_for`) understands this: given a
+//! function name, it walks up from the file that declares it and stops
+//! climbing at the first level whose own `mod` is genuinely `pub`,
+//! re-deriving the real, shorter reachable path automatically -- so
+//! `amenable_std`'s `register_verus_call_shape!`/derived-witness codegen
+//! never needs manual patching after a carrier moves or a group gets
+//! reorganized. Spec fns (`open spec fn`, which Verus itself requires
+//! stay `pub` unconditionally) and every already-`#[cfg(verus_keep_
+//! ghost)]`-gated item (the `#[verifier::external_type_specification]`
+//! markers) are re-exported under that same cfg, matching how every
+//! existing cross-file reference to one already gates itself.
 
 pub mod cell_and_ref;
 pub mod collections;

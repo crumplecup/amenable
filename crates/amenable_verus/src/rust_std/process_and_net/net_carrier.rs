@@ -18,7 +18,7 @@
 //! identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
+use crate::rust_std::misc::{
     observed_pair_matches_input, observed_quad_matches_input, observed_triple_matches_input,
     observed_value_matches_input,
 };

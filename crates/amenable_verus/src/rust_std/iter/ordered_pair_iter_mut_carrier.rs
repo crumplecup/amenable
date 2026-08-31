@@ -30,11 +30,9 @@ use vstd::prelude::*;
 // The shared write-through postcondition `amenable_std::verus_witness`
 // registers for plain slot-update laws across several carriers.
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::cell_and_ref::cell_carrier::write_stores_new_value;
+use crate::rust_std::cell_and_ref::write_stores_new_value;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
-    observed_pair_matches_input, value_unchanged,
-};
+use crate::rust_std::misc::{observed_pair_matches_input, value_unchanged};
 
 verus! {
 

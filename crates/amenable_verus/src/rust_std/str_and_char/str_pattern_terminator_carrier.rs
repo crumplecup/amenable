@@ -21,9 +21,7 @@
 //! `primitive_shapes_carrier`).
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
-    is_ascii_byte, observed_pair_matches_input, values_are_distinct,
-};
+use crate::rust_std::misc::{is_ascii_byte, observed_pair_matches_input, values_are_distinct};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,

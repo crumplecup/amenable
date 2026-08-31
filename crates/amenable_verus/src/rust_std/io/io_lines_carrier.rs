@@ -19,9 +19,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
-    is_ascii_byte, observed_triple_matches_input,
-};
+use crate::rust_std::misc::{is_ascii_byte, observed_triple_matches_input};
 
 verus! {
 

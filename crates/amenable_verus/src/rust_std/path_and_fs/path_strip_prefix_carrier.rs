@@ -15,7 +15,7 @@
 //! for the identical example.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::text_view_matches_expected;
+use crate::rust_std::misc::text_view_matches_expected;
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,

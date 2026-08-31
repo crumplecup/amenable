@@ -33,9 +33,9 @@ use vstd::prelude::*;
 // resolves when Verus's own ghost content is retained, not under
 // ordinary `cargo check`.
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::iter::iter_sequence_carrier::single_increment_headroom_holds;
+use crate::rust_std::iter::single_increment_headroom_holds;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::values_are_equal;
+use crate::rust_std::misc::values_are_equal;
 
 verus! {
 

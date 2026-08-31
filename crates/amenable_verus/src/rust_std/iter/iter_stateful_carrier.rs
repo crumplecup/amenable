@@ -23,9 +23,7 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{
-    observed_option_matches_input, observed_value_matches_input,
-};
+use crate::rust_std::misc::{observed_option_matches_input, observed_value_matches_input};
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
@@ -45,9 +43,7 @@ use vstd::prelude::*;
 // representation, so this import only resolves when Verus's own ghost
 // content is retained, not under ordinary `cargo check`.
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::iter::iter_sequence_carrier::{
-    increment_headroom_holds, single_increment_headroom_holds,
-};
+use crate::rust_std::iter::{increment_headroom_holds, single_increment_headroom_holds};
 
 verus! {
 

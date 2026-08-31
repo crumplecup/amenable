@@ -22,11 +22,11 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_pair_matches_input;
+use crate::rust_std::misc::observed_pair_matches_input;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::text_view_matches_expected;
+use crate::rust_std::misc::text_view_matches_expected;
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::values_are_distinct;
+use crate::rust_std::misc::values_are_distinct;
 
 verus! {
 

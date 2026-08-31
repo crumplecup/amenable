@@ -30,7 +30,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_option_matches_input;
+use crate::rust_std::misc::observed_option_matches_input;
 
 verus! {
 

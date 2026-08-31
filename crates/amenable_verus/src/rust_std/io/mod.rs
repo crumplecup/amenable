@@ -1,16 +1,49 @@
-pub mod io_buf_writer_carrier;
-pub mod io_buffered_read_carrier;
-pub mod io_bytes_carrier;
-pub mod io_chain_carrier;
-pub mod io_cursor_carrier;
-pub mod io_empty_repeat_sink_carrier;
-pub mod io_error_carrier;
-pub mod io_into_inner_error_carrier;
-pub mod io_line_writer_carrier;
-pub mod io_lines_carrier;
-pub mod io_pipe_carrier;
-pub mod io_seek_from_carrier;
-pub mod io_slice_carrier;
-pub mod io_split_carrier;
-pub mod io_take_carrier;
-pub mod io_writer_panicked_carrier;
+mod io_buf_writer_carrier;
+pub use io_buf_writer_carrier::verify_buf_writer_model_flushes_to_the_underlying_writer;
+mod io_buffered_read_carrier;
+pub use io_buffered_read_carrier::verify_buf_reader_model_reads_the_underlying_bytes;
+mod io_bytes_carrier;
+pub use io_bytes_carrier::verify_bytes_model_yields_one_byte_at_a_time;
+mod io_chain_carrier;
+pub use io_chain_carrier::verify_chain_model_reads_the_first_source_then_the_second;
+mod io_cursor_carrier;
+#[cfg(verus_keep_ghost)]
+pub use io_cursor_carrier::cursor_positions_after_read_then_seek;
+pub use io_cursor_carrier::verify_cursor_model_read_advances_position_and_seek_repositions_it;
+mod io_empty_repeat_sink_carrier;
+#[cfg(verus_keep_ghost)]
+pub use io_empty_repeat_sink_carrier::empty_read_reports_zero_bytes;
+pub use io_empty_repeat_sink_carrier::{
+    verify_empty_model_read_reports_end_of_file,
+    verify_repeat_model_fills_the_buffer_with_the_given_byte,
+    verify_sink_model_write_reports_full_length_and_discards_content,
+};
+mod io_error_carrier;
+#[cfg(verus_keep_ghost)]
+pub use io_error_carrier::error_kind_index_is_representative;
+pub use io_error_carrier::verify_error_model_from_error_kind_preserves_the_kind;
+mod io_into_inner_error_carrier;
+pub use io_into_inner_error_carrier::verify_into_inner_error_model_recovers_the_writer_and_the_flush_error;
+mod io_line_writer_carrier;
+pub use io_line_writer_carrier::verify_line_writer_model_flushes_on_a_newline_but_not_before_one;
+mod io_lines_carrier;
+pub use io_lines_carrier::verify_lines_model_splits_on_newlines_and_drops_the_terminator;
+#[cfg(verus_keep_ghost)]
+pub use io_lines_carrier::{is_not_a_line_terminator_byte, is_not_a_newline_byte};
+mod io_pipe_carrier;
+pub use io_pipe_carrier::verify_pipe_model_delivers_written_bytes_to_the_paired_reader;
+mod io_seek_from_carrier;
+pub use io_seek_from_carrier::verify_seek_from_model_round_trips_each_variants_offset;
+mod io_slice_carrier;
+pub use io_slice_carrier::{
+    verify_io_slice_model_derefs_to_the_wrapped_bytes,
+    verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes,
+};
+mod io_split_carrier;
+pub use io_split_carrier::verify_split_model_segments_on_the_given_byte_and_drops_it;
+mod io_take_carrier;
+#[cfg(verus_keep_ghost)]
+pub use io_take_carrier::take_allowance_is_exhausted;
+pub use io_take_carrier::verify_take_model_caps_reads_at_the_remaining_limit;
+mod io_writer_panicked_carrier;
+pub use io_writer_panicked_carrier::verify_writer_panicked_model_recovers_the_buffered_data;

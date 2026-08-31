@@ -28,7 +28,7 @@ use verus_builtin_macros::verus;
 use vstd::prelude::*;
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::{does_not_have_length, has_length};
+use crate::rust_std::misc::{does_not_have_length, has_length};
 
 verus! {
 

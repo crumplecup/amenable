@@ -15,11 +15,9 @@
 //! confirms independently, for the identical claim.
 
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::iter::iter_sequence_carrier::{
-    four_increment_headroom_holds, two_increment_headroom_holds,
-};
+use crate::rust_std::iter::{four_increment_headroom_holds, two_increment_headroom_holds};
 #[cfg(verus_keep_ghost)]
-use crate::rust_std::misc::primitive_shapes_carrier::observed_option_matches_input;
+use crate::rust_std::misc::observed_option_matches_input;
 use verus_builtin_macros::verus;
 #[allow(
     unused_imports,
