@@ -11,6 +11,8 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding `TypeId` to
+/// Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
@@ -27,6 +29,7 @@ pub uninterp spec fn type_id_spec<T: 'static + ?Sized>() -> nat;
 /// `TypeId`s are compared).
 pub uninterp spec fn type_id_identity_spec(id: TypeId) -> nat;
 
+/// `TypeId::of::<T>()`'s whole postcondition: carries `T`'s own identity.
 pub open spec fn type_id_of_matches_spec<T: 'static + ?Sized>(result: TypeId) -> bool {
     type_id_identity_spec(result) == type_id_spec::<T>()
 }
@@ -36,6 +39,8 @@ pub assume_specification<T: 'static + ?Sized> [TypeId::of::<T>] () -> (result: T
         type_id_of_matches_spec::<T>(result),
 ;
 
+/// `TypeId::eq`'s whole postcondition: compares the two carried
+/// identities.
 pub open spec fn type_id_eq_matches_identity(a: TypeId, b: TypeId, result: bool) -> bool {
     result == (type_id_identity_spec(a) == type_id_identity_spec(b))
 }

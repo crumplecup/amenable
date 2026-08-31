@@ -108,6 +108,7 @@ use super::support::GalleryVerifier;
 
 verus! {
 
+/// The stoplight's own root: `Basis = Self`, the cycle's entry point.
 pub struct Green;
 
 impl Evidence for Green {
@@ -125,6 +126,7 @@ impl Evidence for Green {
     }
 }
 
+/// The stoplight's second state, established from [`Green`].
 pub struct Yellow;
 
 impl Evidence for Yellow {
@@ -138,6 +140,8 @@ impl Evidence for Yellow {
     fn audit(&self) -> Self::Audit {}
 }
 
+/// The stoplight's third state, established from [`Yellow`], cycling
+/// back to a fresh [`Green`].
 pub struct Red;
 
 impl Evidence for Red {
@@ -151,6 +155,7 @@ impl Evidence for Red {
     fn audit(&self) -> Self::Audit {}
 }
 
+/// The proof token witnessing [`Green`].
 #[derive(Clone, Copy)]
 pub struct GreenToken;
 
@@ -158,6 +163,7 @@ impl ProofToken for GreenToken {
     type Proposition = Green;
 }
 
+/// The proof token witnessing [`Yellow`].
 #[derive(Clone, Copy)]
 pub struct YellowToken;
 
@@ -165,6 +171,7 @@ impl ProofToken for YellowToken {
     type Proposition = Yellow;
 }
 
+/// The proof token witnessing [`Red`].
 #[derive(Clone, Copy)]
 pub struct RedToken;
 
@@ -196,6 +203,8 @@ impl Establish<RedToken, GalleryVerifier> for Green {
     }
 }
 
+/// The type the three `verus_exchange!` edges below (`Green -> Yellow ->
+/// Red -> Green`) attach `Exchange` impls to.
 pub struct Stoplight;
 
 /// Sanitized mirror of `amenable_kani::stoplight::StoplightError` --

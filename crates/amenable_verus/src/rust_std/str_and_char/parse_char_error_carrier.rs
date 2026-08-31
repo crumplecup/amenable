@@ -15,6 +15,8 @@ use crate::rust_std::misc::has_length;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `ParseCharError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]

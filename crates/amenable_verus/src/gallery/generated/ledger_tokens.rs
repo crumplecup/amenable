@@ -11,6 +11,7 @@
 
 verus_builtin_macros::verus! {
 
+/// The proof token witnessing `Pending`.
 #[derive(Clone, Copy)]
 pub struct PendingToken;
 
@@ -18,6 +19,7 @@ impl ProofToken for PendingToken {
     type Proposition = Pending;
 }
 
+/// The proof token witnessing `Validated`.
 #[derive(Clone, Copy)]
 pub struct ValidatedToken;
 
@@ -33,6 +35,7 @@ impl Establish<PendingToken, GalleryVerifier> for Validated {
     }
 }
 
+/// The proof token witnessing `Committed`.
 #[derive(Clone, Copy)]
 pub struct CommittedToken;
 
@@ -48,6 +51,7 @@ impl Establish<ValidatedToken, GalleryVerifier> for Committed {
     }
 }
 
+/// The proof token witnessing `Rejected<Pending>`.
 #[derive(Clone, Copy)]
 pub struct RejectedFromPendingToken;
 
@@ -63,6 +67,7 @@ impl Establish<PendingToken, GalleryVerifier> for Rejected<Pending> {
     }
 }
 
+/// The proof token witnessing `Rejected<Validated>`.
 #[derive(Clone, Copy)]
 pub struct RejectedFromValidatedToken;
 

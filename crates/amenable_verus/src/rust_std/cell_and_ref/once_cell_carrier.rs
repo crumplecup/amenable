@@ -25,6 +25,7 @@ verus! {
 
 /// Models `OnceCell`'s set-exactly-once rule — not `OnceCell` itself.
 pub struct VerusOnceCellModel {
+    /// The stored value, once set; `None` before the first `set`.
     pub value: Option<i32>,
 }
 

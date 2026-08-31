@@ -49,8 +49,11 @@ impl Amount {
 /// `Copy` here too would make that same, legitimate `.clone()` trip a
 /// real, un-`#[allow]`-able `clippy::clone_on_copy` failure.
 pub struct TransferPayload {
+    /// The paying account's identity.
     pub from: u64,
+    /// The receiving account's identity.
     pub to: u64,
+    /// The transfer amount.
     pub amount: Amount,
 }
 
@@ -86,6 +89,7 @@ impl TransferPayload {
         self.from
     }
 
+    /// `ensures`: same real reason as [`Amount::value`].
     pub fn to(&self) -> (result: u64)
         ensures
             result == self.to,
@@ -93,6 +97,7 @@ impl TransferPayload {
         self.to
     }
 
+    /// `ensures`: same real reason as [`Amount::value`].
     pub fn amount(&self) -> (result: Amount)
         ensures
             result.0 == self.amount.0,
@@ -127,8 +132,16 @@ impl Evidence for TransferPayload {
 /// Sanitized mirror of `amenable_kani::ledger::TransferError`.
 #[derive(Debug, Clone, Copy)]
 pub enum TransferError {
+    /// The transfer amount wasn't positive.
     NegativeAmount(i64),
-    InsufficientFunds { balance: i64, required: i64 },
+    /// The paying account's balance can't cover the transfer.
+    InsufficientFunds {
+        /// The paying account's actual balance.
+        balance: i64,
+        /// The amount that was required.
+        required: i64,
+    },
+    /// The paying and receiving accounts were the same.
     SameAccount,
 }
 
@@ -147,10 +160,12 @@ pub enum TransferError {
 /// own `ensures` (`validated_ensures_spec`, below) could not be
 /// proven at all.
 pub struct Ledger {
+    /// The ledger's current balance.
     pub balance: i64,
 }
 
 impl Ledger {
+    /// Builds a ledger starting at `balance`.
     pub fn new(balance: i64) -> Self {
         Self { balance }
     }

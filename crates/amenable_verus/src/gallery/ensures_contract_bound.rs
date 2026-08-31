@@ -84,6 +84,8 @@ use super::support::GalleryVerifier;
 
 verus! {
 
+/// The minimal self-referential root this file's `Ensures<GalleryVerifier>`
+/// finding is exercised against.
 pub struct EnsuresGreen;
 
 impl Evidence for EnsuresGreen {

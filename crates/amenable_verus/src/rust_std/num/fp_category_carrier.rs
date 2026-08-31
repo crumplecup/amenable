@@ -27,10 +27,15 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `FpCategory` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 pub struct ExFpCategory(FpCategory);
 
+/// `f64::classify`'s whole postcondition, for the two special values this
+/// file tests: NaN classifies as `Nan`, an infinite value classifies as
+/// `Infinite`.
 pub open spec fn fp_category_classify_result_matches_special_value_categories(
     value: f64,
     result: FpCategory,
@@ -39,10 +44,13 @@ pub open spec fn fp_category_classify_result_matches_special_value_categories(
         && (value.is_infinite_spec() ==> result == FpCategory::Infinite)
 }
 
+/// Precondition shared by this file's test inputs: `nan` genuinely is
+/// NaN, `infinite` genuinely is infinite.
 pub open spec fn fp_category_inputs_cover_nan_and_infinite_cases(nan: f64, infinite: f64) -> bool {
     nan.is_nan_spec() && infinite.is_infinite_spec()
 }
 
+/// Both of this file's example classifications resolved as expected.
 pub open spec fn fp_category_results_match_nan_and_infinite_cases(
     result: (FpCategory, FpCategory),
 ) -> bool {

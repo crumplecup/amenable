@@ -40,6 +40,7 @@ verus! {
 /// Models `LazyCell`'s run-once, cache-the-result law — not `LazyCell`
 /// itself, and not real deferred closure invocation.
 pub struct VerusLazyCellModel {
+    /// The cached result, once forced; `None` before the first `force`.
     pub cached: Option<i32>,
 }
 

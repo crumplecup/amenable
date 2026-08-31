@@ -33,10 +33,13 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The concrete-`i32` case: `i32`'s `to_owned_spec` is the identity.
 pub open spec fn i32_to_owned_spec_is_identity(value: i32) -> bool {
     to_owned_spec(&value) == value
 }
 
+/// `Cow::into_owned`'s whole postcondition: a borrowed variant clones via
+/// `to_owned_spec`, an owned variant passes through unchanged.
 pub open spec fn cow_into_owned_preserves_variant_value<'a, B: ToOwned + ?Sized>(
     cow: Cow<'a, B>,
     result: <B as ToOwned>::Owned,

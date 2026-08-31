@@ -52,17 +52,22 @@ pub(super) fn render_enum_module(
 
     let selector_variants = per_variant
         .iter()
-        .map(|(name, _)| format!("    {name},"))
+        .map(|(name, _)| format!("    /// Selects `{name}`'s own composed claim.\n    {name},"))
         .collect::<Vec<_>>()
         .join("\n");
     source.push_str(&format!(
-        "pub enum {selector_ty} {{\n{selector_variants}\n}}\n\n"
+        "/// Selects which of `{module_stem}`'s composed variant claims a call to\n/// `verify_{module_stem}` proves.\npub enum {selector_ty} {{\n{selector_variants}\n}}\n\n"
     ));
 
     let arms = build_variant_arms(&selector_ty, &result_ty, &per_variant);
+    let result_variant_decls = per_variant
+        .iter()
+        .zip(arms.result_variant_decls.iter())
+        .map(|((name, _), decl)| format!("    /// `{name}`'s own result shape.\n{decl}"))
+        .collect::<Vec<_>>()
+        .join("\n");
     source.push_str(&format!(
-        "pub enum {result_ty} {{\n{}\n}}\n\n",
-        arms.result_variant_decls.join("\n")
+        "/// The result of the `{selector_ty}` variant a `verify_{module_stem}` call\n/// selected.\npub enum {result_ty} {{\n{result_variant_decls}\n}}\n\n"
     ));
 
     let param_lists = render_param_lists(&selector_ty, &per_variant);
@@ -74,21 +79,21 @@ pub(super) fn render_enum_module(
     // arms are -- naming this the same way every hand-written carrier's
     // own multi-arm postcondition already does.
     source.push_str(&format!(
-        "pub open spec fn {module_stem}_ensures_holds(selector: {selector_ty}, result: {result_ty}{}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
+        "/// `verify_{module_stem}`'s whole postcondition: the selected variant's\n/// own composed claim.\npub open spec fn {module_stem}_ensures_holds(selector: {selector_ty}, result: {result_ty}{}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
         param_lists.params_suffix,
         arms.ensures_arms.join("\n")
     ));
 
     if arms.any_requires {
         source.push_str(&format!(
-            "pub open spec fn {module_stem}_requires_holds(selector: {selector_ty}{}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
+            "/// `verify_{module_stem}`'s whole precondition: the selected variant's\n/// own composed requirement.\npub open spec fn {module_stem}_requires_holds(selector: {selector_ty}{}) -> bool {{\n    match selector {{\n{}\n    }}\n}}\n\n",
             param_lists.params_suffix,
             arms.requires_arms.join("\n")
         ));
     }
 
     source.push_str(&format!(
-        "pub fn verify_{module_stem}({}) -> (result: {result_ty})\n",
+        "/// Proves `{module_stem}`'s own selected-variant claim -- see this crate's\n/// own doc comment.\npub fn verify_{module_stem}({}) -> (result: {result_ty})\n",
         param_lists.full_params
     ));
 

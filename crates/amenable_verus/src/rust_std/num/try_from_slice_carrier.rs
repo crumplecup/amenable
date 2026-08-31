@@ -32,6 +32,8 @@ use crate::rust_std::misc::{does_not_have_length, has_length};
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `TryFromSliceError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]

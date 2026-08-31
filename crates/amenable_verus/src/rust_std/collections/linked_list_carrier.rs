@@ -33,7 +33,9 @@ verus! {
 /// Models the FIFO push-back/pop-front order law a queue must satisfy —
 /// not `LinkedList` itself.
 pub struct VerusFifoQueuePair {
+    /// The first value pushed -- pops first.
     pub first: i32,
+    /// The second value pushed -- pops second.
     pub second: i32,
 }
 

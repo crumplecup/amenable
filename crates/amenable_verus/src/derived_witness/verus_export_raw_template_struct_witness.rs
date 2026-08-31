@@ -18,6 +18,8 @@ verus! {
 
 // checked leaf at member checked: calls crate::rust_std::cell_and_ref::verify_ref_cell_model_dynamic_borrow_rules
 
+/// Proves `verus_export_raw_template_struct_witness`'s own composed claim -- see this file's own
+/// header comment.
 pub fn verify_verus_export_raw_template_struct_witness(initial: i32, updated: i32) -> (result: (bool, bool, bool, bool, bool, i32))
     ensures
         result.0,

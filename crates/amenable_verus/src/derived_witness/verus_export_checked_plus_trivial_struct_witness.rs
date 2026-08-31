@@ -20,6 +20,8 @@ verus! {
 
 // checked leaf at member checked: calls crate::rust_std::str_and_char::verify_char_roundtrip
 
+/// Proves `verus_export_checked_plus_trivial_struct_witness`'s own composed claim -- see this file's own
+/// header comment.
 pub fn verify_verus_export_checked_plus_trivial_struct_witness(c: char) -> (result: char)
     ensures
         char_roundtrip_preserves_value(result, c),

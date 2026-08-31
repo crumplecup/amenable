@@ -35,10 +35,13 @@ verus! {
 /// a single code unit — not `DecodeUtf16`/`DecodeUtf16Error` themselves.
 pub struct VerusDecodeUtf16Model;
 
+/// Whether `unit` is a non-surrogate BMP code unit.
 pub open spec fn decode_utf16_unit_is_non_surrogate(unit: u16) -> bool {
     unit < 0xD800 || unit > 0xDFFF
 }
 
+/// `decode_bmp_unit`'s whole postcondition: decodes to the scalar value
+/// equal to the code unit itself.
 pub open spec fn decode_utf16_bmp_unit_decodes_to_same_scalar(
     unit: u16,
     result: Option<u32>,
@@ -46,10 +49,13 @@ pub open spec fn decode_utf16_bmp_unit_decodes_to_same_scalar(
     result == Some(unit as u32)
 }
 
+/// Whether `unit` is a surrogate code unit.
 pub open spec fn decode_utf16_unit_is_surrogate(unit: u16) -> bool {
     0xD800 <= unit <= 0xDFFF
 }
 
+/// `decode_lone_surrogate`'s whole postcondition: fails, reporting the
+/// exact unpaired code unit.
 pub open spec fn decode_utf16_lone_surrogate_reports_same_unit(
     unit: u16,
     result: Result<u32, u16>,
@@ -81,6 +87,8 @@ impl VerusDecodeUtf16Model {
     }
 }
 
+/// Precondition shared by this file's test inputs: `bmp_unit` is
+/// genuinely non-surrogate, `lone_surrogate` genuinely is a surrogate.
 pub open spec fn decode_utf16_test_inputs_cover_both_cases(
     bmp_unit: u16,
     lone_surrogate: u16,

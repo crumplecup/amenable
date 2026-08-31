@@ -40,14 +40,20 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `Arguments`'s whole postcondition: rendering reproduces the display
+/// token verbatim.
 pub open spec fn fmt_arguments_result_matches_display_token(display_token: i32, result: i32) -> bool {
     result == display_token
 }
 
+/// `format_args_fn`/`from_fn`'s whole postcondition: rendering reproduces
+/// the display token verbatim.
 pub open spec fn fmt_from_fn_result_matches_display_token(display_token: i32, result: i32) -> bool {
     result == display_token
 }
 
+/// `DebugStruct`'s whole postcondition: the rendered result reproduces
+/// the type label, field label, and value token verbatim.
 pub open spec fn fmt_debug_struct_result_matches_named_fields(
     type_label: u8,
     field_label: u8,
@@ -57,6 +63,8 @@ pub open spec fn fmt_debug_struct_result_matches_named_fields(
     result == (type_label, field_label, value_token)
 }
 
+/// `DebugTuple`'s whole postcondition: the rendered result reproduces the
+/// type label and value token verbatim.
 pub open spec fn fmt_debug_tuple_result_matches_positional_fields(
     type_label: u8,
     value_token: i32,
@@ -65,6 +73,8 @@ pub open spec fn fmt_debug_tuple_result_matches_positional_fields(
     result == (type_label, value_token)
 }
 
+/// `DebugList`'s whole postcondition: the rendered result reproduces both
+/// entries verbatim, in order.
 pub open spec fn fmt_debug_list_result_matches_entries_in_brackets(
     first_token: i32,
     second_token: i32,
@@ -73,6 +83,8 @@ pub open spec fn fmt_debug_list_result_matches_entries_in_brackets(
     result == (first_token, second_token)
 }
 
+/// `DebugSet`'s whole postcondition: the rendered result reproduces both
+/// entries verbatim, in order.
 pub open spec fn fmt_debug_set_result_matches_entries_in_braces(
     first_token: i32,
     second_token: i32,
@@ -81,6 +93,8 @@ pub open spec fn fmt_debug_set_result_matches_entries_in_braces(
     result == (first_token, second_token)
 }
 
+/// `DebugMap`'s whole postcondition: the rendered result reproduces the
+/// key and value tokens verbatim.
 pub open spec fn fmt_debug_map_result_matches_key_value_pair(
     key_label: u8,
     value_token: i32,

@@ -16,10 +16,14 @@ use crate::rust_std::misc::{has_length, values_are_equal};
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `IntErrorKind` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 pub struct ExIntErrorKind(IntErrorKind);
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `ParseIntError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]

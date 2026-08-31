@@ -30,6 +30,9 @@ use crate::rust_std::misc::text_view_matches_expected;
 
 verus! {
 
+/// `verify_args_model_reports_at_least_the_program_path`'s whole
+/// postcondition: `args()` yields at least the program path, plus one
+/// entry per extra argument.
 pub open spec fn args_model_count_matches_program_plus_extra(
     extra_count: u8,
     result: u32,

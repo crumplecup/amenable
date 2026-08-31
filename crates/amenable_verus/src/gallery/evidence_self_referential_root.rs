@@ -128,6 +128,7 @@ impl Witness<GalleryVerifier> for Yellow {
     fn proof() -> Self::ProofArtifact {}
 }
 
+/// The proof token witnessing `Green`.
 #[derive(Clone, Copy)]
 pub struct GreenToken;
 
@@ -135,6 +136,7 @@ impl ProofToken for GreenToken {
     type Proposition = Green;
 }
 
+/// The proof token witnessing `Yellow`.
 #[derive(Clone, Copy)]
 pub struct YellowToken;
 

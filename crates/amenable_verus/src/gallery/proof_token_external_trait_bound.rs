@@ -102,6 +102,7 @@ verus! {
 /// against ordinary Rust name resolution.
 #[verifier::external_trait_specification]
 pub trait ExVerifier: 'static {
+    /// The real trait this specification stands in for.
     type ExternalTraitSpecificationFor: Verifier;
 }
 
@@ -113,6 +114,7 @@ pub trait ExVerifier: 'static {
 /// `evidence_self_referential_root`).
 #[verifier::external_trait_specification]
 pub trait ExEvidence {
+    /// The real trait this specification stands in for.
     type ExternalTraitSpecificationFor: Evidence;
 }
 
@@ -124,7 +126,10 @@ pub trait ExEvidence {
 /// Proposition` against instead of crashing its own AIR backend.
 #[verifier::external_trait_specification]
 pub trait ExProofToken {
+    /// The real trait this specification stands in for.
     type ExternalTraitSpecificationFor: ProofToken;
+    /// Mirrors `ProofToken::Proposition`, bound on `Evidence` to match the
+    /// real trait's own declaration exactly.
     type Proposition: Evidence;
 }
 
@@ -134,11 +139,15 @@ pub trait ExProofToken {
 /// warning alongside `ExEvidence`/`ExProofToken` above.
 #[verifier::external_trait_specification]
 pub trait ExWitness<V: Verifier> {
+    /// The real trait this specification stands in for.
     type ExternalTraitSpecificationFor: Witness<V>;
+    /// Mirrors `Witness::SupportingEvidence`.
     type SupportingEvidence: Evidence;
+    /// Mirrors `Witness::ProofArtifact`.
     type ProofArtifact;
 }
 
+/// The minimal self-referential root: `Basis = Self`.
 pub struct Green;
 
 impl Evidence for Green {
@@ -163,6 +172,7 @@ impl Witness<GalleryVerifier> for Green {
     fn proof() -> Self::ProofArtifact {}
 }
 
+/// The proof token witnessing [`Green`].
 #[derive(Clone, Copy)]
 pub struct GreenToken;
 
@@ -170,6 +180,8 @@ impl ProofToken for GreenToken {
     type Proposition = Green;
 }
 
+/// The real, load-bearing check's own carrier: `Sidecar<V>`'s generic
+/// shape, exercised via [`use_sidecar`].
 pub struct Established<T, Token> {
     primary: T,
     token: Token,
@@ -196,6 +208,10 @@ where
     }
 }
 
+/// The real, load-bearing check itself: `Sidecar<V>`'s generic impl,
+/// including the `ProofToken<Proposition = T>` associated-type-equality
+/// bound that crashed Verus without `ExProofToken` above -- see this
+/// file's own doc comment.
 pub fn use_sidecar(established: &Established<Green, GreenToken>) -> (token: GreenToken)
     ensures
         true,

@@ -25,6 +25,8 @@ verus! {
 // checked leaf at member first: calls crate::rust_std::str_and_char::verify_char_roundtrip
 // checked leaf at member second: calls crate::rust_std::str_and_char::verify_escape_ascii_model_leaves_printable_bytes_unescaped
 
+/// Proves `verus_export_multi_checked_struct_witness`'s own composed claim -- see this file's own
+/// header comment.
 pub fn verify_verus_export_multi_checked_struct_witness(c: char, printable: u8) -> (result: (char, (u8, u8, u8)))
     requires
         escape_ascii_input_is_printable_ascii(printable),

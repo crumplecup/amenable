@@ -25,6 +25,8 @@ use crate::rust_std::misc::{has_length, values_are_equal};
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `IntoStringError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
@@ -40,10 +42,14 @@ pub uninterp spec fn into_cstring_spec(err: IntoStringError) -> CString;
 // valid range entirely) -- a real, sufficient condition for this
 // claim's specific input, not a full UTF-8 validity check over
 // arbitrary byte content.
+/// `CString::into_string`'s failure half: a leading `0xFF` byte (never
+/// valid at the start of a UTF-8 sequence) rejects.
 pub open spec fn into_string_rejects_a_leading_0xff_byte(s: CString, result: Result<String, IntoStringError>) -> bool {
     (cstring_bytes_spec(s).len() > 0 && cstring_bytes_spec(s)[0] == 0xFFu8) ==> result is Err
 }
 
+/// `CString::into_string`'s failure half: the returned error recovers the
+/// original bytes verbatim via `into_cstring`.
 pub open spec fn into_string_error_recovers_the_original_bytes(s: CString, result: Result<String, IntoStringError>) -> bool {
     result is Err ==> cstring_bytes_spec(into_cstring_spec(result->Err_0)) == cstring_bytes_spec(s)
 }
@@ -59,6 +65,8 @@ pub assume_specification [IntoStringError::into_cstring] (err: IntoStringError) 
         values_are_equal(result, into_cstring_spec(err)),
 ;
 
+/// `CString::as_bytes`'s whole postcondition: recovers exactly
+/// `cstring_bytes_spec`'s own abstract content.
 pub open spec fn as_bytes_matches_cstring_bytes_spec(result: Seq<u8>, s: CString) -> bool {
     result == cstring_bytes_spec(s)
 }

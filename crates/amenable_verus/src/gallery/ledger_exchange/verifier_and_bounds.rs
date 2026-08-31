@@ -60,6 +60,8 @@ impl Witness<GalleryVerifier> for AmountPositive {
     fn proof() -> Self::ProofArtifact {}
 }
 
+/// Backs `Ledger::check_sufficient_funds`'s own claim -- see this file's
+/// own doc comment.
 pub struct SufficientFunds;
 
 impl Evidence for SufficientFunds {
@@ -84,6 +86,8 @@ impl Witness<GalleryVerifier> for SufficientFunds {
     fn proof() -> Self::ProofArtifact {}
 }
 
+/// Backs `Ledger::validate`'s own same-account check -- see this file's
+/// own doc comment.
 pub struct AccountsDistinct;
 
 impl Evidence for AccountsDistinct {
@@ -108,6 +112,7 @@ impl Witness<GalleryVerifier> for AccountsDistinct {
     fn proof() -> Self::ProofArtifact {}
 }
 
+/// Backs `Ledger::commit`'s own claim -- see this file's own doc comment.
 pub struct BalancedEntries;
 
 impl Evidence for BalancedEntries {

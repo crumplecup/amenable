@@ -80,9 +80,13 @@ pub open spec fn yields_three_values_in_order_then_ends(
 /// Models the yields-elements-by-value-in-order law a three-element
 /// owned array iterator must satisfy — not `array::IntoIter` itself.
 pub struct VerusArrayIntoIterModel {
+    /// The array's first element.
     pub first: i32,
+    /// The array's second element.
     pub second: i32,
+    /// The array's third element.
     pub third: i32,
+    /// The next index `next()` yields.
     pub position: u8,
 }
 

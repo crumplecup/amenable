@@ -39,11 +39,14 @@ verus! {
 /// Models the "writes through both positions, in order" law — not
 /// `VecDeque::IterMut`/`LinkedList::IterMut` themselves.
 pub struct VerusOrderedPairIterMutModel {
+    /// The first position, writable through the iterator.
     pub first: i32,
+    /// The second position, writable through the iterator.
     pub second: i32,
 }
 
 impl VerusOrderedPairIterMutModel {
+    /// Builds a model from an initial `(first, second)` pair.
     pub fn from_pair(first: i32, second: i32) -> (result: Self)
         ensures
             observed_pair_matches_input((result.first, result.second), (first, second)),

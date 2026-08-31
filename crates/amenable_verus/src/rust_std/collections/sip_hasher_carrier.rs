@@ -33,6 +33,8 @@ type SipHasherAlias = std::hash::SipHasher;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `SipHasher`/`DefaultHasher` (aliased as `SipHasherAlias`) to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
@@ -50,6 +52,8 @@ pub uninterp spec fn sip_hasher_view(h: SipHasherAlias) -> Seq<Seq<u8>>;
 /// at all, not an axiom stated separately.
 pub uninterp spec fn sip_hasher_spec_finish(history: Seq<Seq<u8>>) -> u64;
 
+/// `SipHasherAlias::new`'s whole postcondition: starts with an empty
+/// write history.
 pub open spec fn sip_hasher_new_view_is_empty(result: SipHasherAlias) -> bool {
     sip_hasher_view(result) == Seq::<Seq<u8>>::empty()
 }
@@ -59,6 +63,8 @@ pub assume_specification [SipHasherAlias::new] () -> (result: SipHasherAlias)
         sip_hasher_new_view_is_empty(result),
 ;
 
+/// `Hasher::write`'s whole postcondition: appends the written bytes to
+/// the write history.
 pub open spec fn sip_hasher_write_appends_to_view(before: Seq<Seq<u8>>, bytes: Seq<u8>, after: Seq<Seq<u8>>) -> bool {
     after == before.push(bytes)
 }
@@ -68,6 +74,8 @@ pub assume_specification [<SipHasherAlias as Hasher>::write] (h: &mut SipHasherA
         sip_hasher_write_appends_to_view(sip_hasher_view(*old(h)), bytes@, sip_hasher_view(*final(h))),
 ;
 
+/// `Hasher::finish`'s whole postcondition: the result is a pure function
+/// of the write history.
 pub open spec fn sip_hasher_finish_matches_spec(h: SipHasherAlias, result: u64) -> bool {
     result == sip_hasher_spec_finish(sip_hasher_view(h))
 }

@@ -21,6 +21,8 @@ verus! {
 // checked leaf at member 0: calls crate::rust_std::str_and_char::verify_char_roundtrip
 // trusted leaf at member trusted; rust.authority_kind = external_standard, rust.authority = Rust Project Developers, rust.source_crate = core, rust.source_module = core::primitive, source_url = https://doc.rust-lang.org/std/primitive.bool.html, type_name = bool, semantic_summary = The boolean carrier admits exactly the truth values false and true.
 
+/// Proves `verus_export_tuple_struct_witness`'s own composed claim -- see this file's own
+/// header comment.
 pub fn verify_verus_export_tuple_struct_witness(c: char) -> (result: char)
     ensures
         char_roundtrip_preserves_value(result, c),

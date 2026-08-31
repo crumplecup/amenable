@@ -45,7 +45,7 @@ pub(super) fn render_verus_module(
         .join(", ");
     let return_ty = render_return_type(&rendered.checked_calls);
     source.push_str(&format!(
-        "pub fn verify_{module_stem}({params}){return_ty}\n"
+        "/// Proves `{module_stem}`'s own composed claim -- see this file's own\n/// header comment.\npub fn verify_{module_stem}({params}){return_ty}\n"
     ));
 
     push_clause_block(

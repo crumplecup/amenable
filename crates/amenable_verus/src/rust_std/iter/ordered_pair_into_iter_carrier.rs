@@ -75,8 +75,11 @@ pub open spec fn ordered_pair_into_iter_advance_result_matches(old_position: u8,
 /// not `Vec::Drain`/`VecDeque::IntoIter`/`LinkedList::IntoIter`
 /// themselves.
 pub struct VerusOrderedPairIntoIterModel {
+    /// The first element yielded.
     pub first: i32,
+    /// The second element yielded.
     pub second: i32,
+    /// The next index `next()` yields.
     pub position: u8,
 }
 

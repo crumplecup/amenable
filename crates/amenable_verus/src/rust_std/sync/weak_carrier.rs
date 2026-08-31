@@ -37,7 +37,11 @@ verus! {
 /// Models `Weak`'s defining law — upgrades while a strong reference is
 /// alive, fails once the strong count hits zero — not `Weak` itself.
 pub struct VerusWeakModel {
+    /// The stored value, readable while at least one strong reference is
+    /// alive.
     pub value: i32,
+    /// The live strong-reference count; `upgrade` fails once this hits
+    /// zero.
     pub strong_count: u32,
 }
 

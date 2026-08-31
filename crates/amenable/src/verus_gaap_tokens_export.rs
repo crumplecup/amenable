@@ -176,7 +176,7 @@ fn render_companion(specs: &[&TokenSpec]) -> String {
     for spec in specs {
         let proposition = tidy_stringified_type(&spec.proposition);
         out.push_str(&format!(
-            "#[derive(Clone, Copy)]\npub struct {token};\n\nimpl ProofToken for {token} {{\n    type Proposition = {proposition};\n}}\n\n",
+            "/// The proof token witnessing `{proposition}`.\n#[derive(Clone, Copy)]\npub struct {token};\n\nimpl ProofToken for {token} {{\n    type Proposition = {proposition};\n}}\n\n",
             token = spec.token,
         ));
 

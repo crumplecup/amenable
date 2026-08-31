@@ -45,6 +45,7 @@ pub open spec fn non_zero_new_rejects_zero(value: int, result: bool) -> bool {
     value == 0 ==> !result
 }
 
+/// The `NonZero<i8>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_i8_model_round_trips_iff_nonzero(value: i8) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -53,6 +54,7 @@ pub fn verify_non_zero_i8_model_round_trips_iff_nonzero(value: i8) -> (result: b
     value != 0
 }
 
+/// The `NonZero<i16>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_i16_model_round_trips_iff_nonzero(value: i16) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -61,6 +63,7 @@ pub fn verify_non_zero_i16_model_round_trips_iff_nonzero(value: i16) -> (result:
     value != 0
 }
 
+/// The `NonZero<i32>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_i32_model_round_trips_iff_nonzero(value: i32) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -69,6 +72,7 @@ pub fn verify_non_zero_i32_model_round_trips_iff_nonzero(value: i32) -> (result:
     value != 0
 }
 
+/// The `NonZero<i64>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_i64_model_round_trips_iff_nonzero(value: i64) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -77,6 +81,7 @@ pub fn verify_non_zero_i64_model_round_trips_iff_nonzero(value: i64) -> (result:
     value != 0
 }
 
+/// The `NonZero<i128>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_i128_model_round_trips_iff_nonzero(value: i128) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -85,6 +90,7 @@ pub fn verify_non_zero_i128_model_round_trips_iff_nonzero(value: i128) -> (resul
     value != 0
 }
 
+/// The `NonZero<isize>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_isize_model_round_trips_iff_nonzero(value: isize) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -93,6 +99,7 @@ pub fn verify_non_zero_isize_model_round_trips_iff_nonzero(value: isize) -> (res
     value != 0
 }
 
+/// The `NonZero<u8>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_u8_model_round_trips_iff_nonzero(value: u8) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -101,6 +108,7 @@ pub fn verify_non_zero_u8_model_round_trips_iff_nonzero(value: u8) -> (result: b
     value != 0
 }
 
+/// The `NonZero<u16>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_u16_model_round_trips_iff_nonzero(value: u16) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -109,6 +117,7 @@ pub fn verify_non_zero_u16_model_round_trips_iff_nonzero(value: u16) -> (result:
     value != 0
 }
 
+/// The `NonZero<u32>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_u32_model_round_trips_iff_nonzero(value: u32) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -117,6 +126,7 @@ pub fn verify_non_zero_u32_model_round_trips_iff_nonzero(value: u32) -> (result:
     value != 0
 }
 
+/// The `NonZero<u64>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_u64_model_round_trips_iff_nonzero(value: u64) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -125,6 +135,7 @@ pub fn verify_non_zero_u64_model_round_trips_iff_nonzero(value: u64) -> (result:
     value != 0
 }
 
+/// The `NonZero<u128>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_u128_model_round_trips_iff_nonzero(value: u128) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),
@@ -133,6 +144,7 @@ pub fn verify_non_zero_u128_model_round_trips_iff_nonzero(value: u128) -> (resul
     value != 0
 }
 
+/// The `NonZero<usize>` instantiation of the shared round-trip-iff-nonzero claim above.
 pub fn verify_non_zero_usize_model_round_trips_iff_nonzero(value: usize) -> (result: bool)
     ensures
         non_zero_new_accepts_nonzero(value as int, result),

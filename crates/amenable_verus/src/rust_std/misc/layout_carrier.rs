@@ -27,16 +27,21 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `LayoutError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExLayoutError(std::alloc::LayoutError);
 
+/// `#[verifier::external_type_specification]` marker binding `Layout` to
+/// Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExLayout(Layout);
 
+/// Whether `value` is a power of two.
 pub open spec fn is_power_of_two_spec(value: usize) -> bool {
     value > 0 && (value & ((value - 1) as usize)) == 0
 }
@@ -47,6 +52,8 @@ pub assume_specification [usize::is_power_of_two] (value: usize) -> (result: boo
         values_are_equal(result, is_power_of_two_spec(value)),
 ;
 
+/// `Layout::from_size_align`'s failure half: a non-power-of-two alignment
+/// rejects.
 pub open spec fn from_size_align_rejects_a_non_power_of_two_alignment(align: usize, result: Result<Layout, std::alloc::LayoutError>) -> bool {
     !is_power_of_two_spec(align) ==> result is Err
 }

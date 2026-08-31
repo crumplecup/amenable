@@ -21,10 +21,14 @@ use vstd::prelude::*;
 
 verus! {
 
+/// Whether `printable` is in the printable ASCII range (`0x20..=0x7e`).
 pub open spec fn escape_ascii_input_is_printable_ascii(printable: u8) -> bool {
     32 <= printable && printable <= 126
 }
 
+/// This file's whole postcondition: a printable ASCII byte passes
+/// through unchanged, followed by the newline byte's `\n` escape
+/// (`\`, `n`).
 pub open spec fn escape_ascii_result_matches_printable_plus_newline_escape(
     printable: u8,
     result: (u8, u8, u8),

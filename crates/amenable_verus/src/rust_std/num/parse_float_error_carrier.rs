@@ -18,6 +18,8 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `ParseFloatError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]

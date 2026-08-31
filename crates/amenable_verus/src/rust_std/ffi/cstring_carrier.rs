@@ -13,11 +13,16 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding `CString`
+/// to Verus -- never constructed by real code, only discovered by
+/// Verus's own attribute processing.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExCString(CString);
 
+/// `#[verifier::external_type_specification]` marker binding `NulError`
+/// to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
@@ -28,6 +33,8 @@ pub struct ExNulError(NulError);
 /// the concrete `Vec<u8>` case by the broadcast axiom below.
 pub uninterp spec fn into_vec_u8_spec<T: Into<Vec<u8>>>(bytes: T) -> Seq<u8>;
 
+/// [`into_vec_u8_spec`]'s concrete-`Vec<u8>` case: `into` is the
+/// identity.
 pub open spec fn into_vec_u8_spec_matches_input_vec(v: Vec<u8>) -> bool {
     into_vec_u8_spec(v) == v@
 }
@@ -46,14 +53,19 @@ pub broadcast proof fn axiom_vec_u8_into_vec_u8_is_identity(v: Vec<u8>)
 /// `into_string_error_carrier.rs`.
 pub uninterp spec fn cstring_bytes_spec(s: CString) -> Seq<u8>;
 
+/// Whether `bytes` has a nul byte before its final position.
 pub open spec fn cstring_input_has_a_preterminal_nul<T: Into<Vec<u8>>>(bytes: T) -> bool {
     exists|i: int| 0 <= i < into_vec_u8_spec(bytes).len() - 1 && into_vec_u8_spec(bytes)[i] == 0
 }
 
+/// Whether `bytes` has no nul byte before its final position.
 pub open spec fn cstring_input_has_no_preterminal_nul<T: Into<Vec<u8>>>(bytes: T) -> bool {
     !cstring_input_has_a_preterminal_nul(bytes)
 }
 
+/// `CString::new`'s whole postcondition: succeeds (recovering the input
+/// bytes via [`cstring_bytes_spec`]) unless a nul byte appears before the
+/// final position, in which case it fails.
 pub open spec fn cstring_new_result_matches_input_bytes<T: Into<Vec<u8>>>(
     bytes: T,
     result: Result<CString, NulError>,
@@ -68,6 +80,8 @@ pub assume_specification<T: Into<Vec<u8>>> [CString::new::<T>] (bytes: T) -> (re
         cstring_new_result_matches_input_bytes(bytes, result),
 ;
 
+/// Precondition shared by this file's test inputs: `byte` itself is never
+/// the nul byte.
 pub open spec fn cstring_test_byte_is_nonzero(byte: u8) -> bool {
     byte != 0
 }

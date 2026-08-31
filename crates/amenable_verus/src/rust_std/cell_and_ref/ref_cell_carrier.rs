@@ -38,6 +38,7 @@ verus! {
 /// count vs. exclusive borrow state machine layered over a plain value —
 /// not `RefCell` itself.
 pub struct VerusRefCellModel {
+    /// The cell's current value.
     pub value: i32,
     /// `0` = unborrowed, positive = that many live shared borrows, `-1`
     /// = one live exclusive borrow.
@@ -78,6 +79,7 @@ pub open spec fn release_shared_decrements_borrow_state(old_state: i32, new_stat
 }
 
 impl VerusRefCellModel {
+    /// Builds an unborrowed cell holding `initial`.
     pub fn new(initial: i32) -> (result: Self)
         ensures
             observed_value_matches_input(result.value as int, initial as int),

@@ -26,6 +26,9 @@ verus! {
 
 #[verifier::reject_recursive_types(T)]
 #[verifier::external_type_specification]
+/// `#[verifier::external_type_specification]` marker binding
+/// `Saturating<T>` to Verus -- never constructed by real code, only
+/// discovered by Verus's own attribute processing.
 pub struct ExSaturating<T>(Saturating<T>);
 
 /// `Saturating(value).0` recovers exactly `value` — the real tuple

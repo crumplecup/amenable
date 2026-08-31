@@ -14,10 +14,14 @@ use vstd::prelude::*;
 
 verus! {
 
+/// Whether `value` is a valid Unicode scalar value: at most `U+10FFFF`,
+/// excluding the surrogate range.
 pub open spec fn u32_is_valid_unicode_scalar(value: u32) -> bool {
     value <= 0x0010_FFFF && !(0xD800 <= value && value <= 0xDFFF)
 }
 
+/// `char::try_from(u32)`'s success half: a valid scalar value succeeds,
+/// preserving the value.
 pub open spec fn char_try_from_u32_succeeds_with_same_scalar(
     value: u32,
     result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
@@ -25,6 +29,7 @@ pub open spec fn char_try_from_u32_succeeds_with_same_scalar(
     u32_is_valid_unicode_scalar(value) ==> (result is Ok && (result->Ok_0 as u32) == value)
 }
 
+/// `char::try_from(u32)`'s failure half: an invalid scalar value fails.
 pub open spec fn char_try_from_u32_rejects_invalid_scalar(
     value: u32,
     result: Result<char, <char as core::convert::TryFrom<u32>>::Error>,
@@ -32,10 +37,13 @@ pub open spec fn char_try_from_u32_rejects_invalid_scalar(
     !u32_is_valid_unicode_scalar(value) ==> result is Err
 }
 
+/// Whether `value`'s scalar value fits in a `u8`.
 pub open spec fn char_fits_in_u8(value: char) -> bool {
     (value as u32) <= 0xFF
 }
 
+/// `u8::try_from(char)`'s success half: a char whose scalar value fits in
+/// `u8` succeeds, preserving the value.
 pub open spec fn u8_try_from_char_succeeds_with_same_scalar(
     value: char,
     result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
@@ -43,6 +51,8 @@ pub open spec fn u8_try_from_char_succeeds_with_same_scalar(
     char_fits_in_u8(value) ==> (result is Ok && (result->Ok_0 as u32) == (value as u32))
 }
 
+/// `u8::try_from(char)`'s failure half: a char whose scalar value doesn't
+/// fit in `u8` fails.
 pub open spec fn u8_try_from_char_rejects_out_of_range_scalar(
     value: char,
     result: Result<u8, <u8 as core::convert::TryFrom<char>>::Error>,
@@ -50,11 +60,15 @@ pub open spec fn u8_try_from_char_rejects_out_of_range_scalar(
     !char_fits_in_u8(value) ==> result is Err
 }
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `CharTryFromError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExCharTryFromError(core::char::CharTryFromError);
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `TryFromCharError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]

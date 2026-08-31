@@ -62,6 +62,7 @@ pub open spec fn cell_model_get_set_replace_round_trip_holds(
 /// Models `Cell`'s whole interface — get/set-by-value, nothing more —
 /// not `Cell` itself.
 pub struct VerusCellModel {
+    /// The cell's current value.
     pub value: i32,
 }
 

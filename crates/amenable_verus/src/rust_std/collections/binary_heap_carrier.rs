@@ -55,7 +55,9 @@ verus! {
 /// Models the max-first pop-order law a two-element max-heap must
 /// satisfy, regardless of push order — not `BinaryHeap` itself.
 pub struct VerusMaxHeapPair {
+    /// The larger of the two pushed values -- pops first.
     pub max: i32,
+    /// The smaller of the two pushed values -- pops second.
     pub min: i32,
 }
 

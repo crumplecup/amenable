@@ -31,6 +31,8 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `BuildHasherDefault<H>` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::reject_recursive_types(H)]
 #[verifier::external_type_specification]
@@ -50,6 +52,8 @@ pub assume_specification<H: core::default::Default + Hasher> [<BuildHasherDefaul
         H::default.ensures((), result),
 ;
 
+/// `DefaultHasher::new`'s whole postcondition: starts with an empty
+/// write history.
 pub open spec fn default_hasher_new_view_is_empty(result: DefaultHasher) -> bool {
     result@ == Seq::<Seq<u8>>::empty()
 }

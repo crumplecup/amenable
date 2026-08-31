@@ -13,11 +13,16 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `FromVecWithNulError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExFromVecWithNulError(FromVecWithNulError);
 
+/// `CString::from_vec_with_nul`'s whole postcondition: succeeds only when
+/// the nul byte is exactly the last byte, fails otherwise (no nul at all,
+/// or a nul before the end).
 pub open spec fn from_vec_with_nul_result_matches_nul_placement(
     bytes: Vec<u8>,
     result: Result<CString, FromVecWithNulError>,
@@ -70,6 +75,8 @@ pub fn verify_from_vec_with_nul_requires_the_nul_only_at_the_end(byte: u8) -> (r
     (accepted, rejected_no_nul, rejected_early_nul)
 }
 
+/// Precondition shared by this file's `[byte, 0]`-shaped test inputs:
+/// `byte` itself is never the nul byte.
 pub open spec fn from_vec_with_nul_test_byte_is_nonzero(byte: u8) -> bool {
     byte != 0
 }

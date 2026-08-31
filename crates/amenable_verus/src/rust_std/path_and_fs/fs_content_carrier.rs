@@ -20,6 +20,8 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `verify_file_model_write_then_read_round_trips_the_bytes`'s whole
+/// postcondition: the read-back bytes match the written bytes verbatim.
 pub open spec fn file_model_write_then_read_round_trips_the_bytes(
     a: u8,
     b: u8,
@@ -39,6 +41,9 @@ pub fn verify_file_model_write_then_read_round_trips_the_bytes(a: u8, b: u8, c: 
     (a, b, c, d)
 }
 
+/// `verify_file_times_model_sets_the_recorded_modification_time`'s whole
+/// postcondition: the recorded modification time matches the target
+/// verbatim.
 pub open spec fn file_times_model_sets_the_recorded_modification_time(
     target_unix_seconds: u64,
     result: u64,
@@ -55,6 +60,9 @@ pub fn verify_file_times_model_sets_the_recorded_modification_time(target_unix_s
     target_unix_seconds
 }
 
+/// `.len()`/`.is_empty()`'s whole postcondition: `.len()` reports exactly
+/// the written byte count, and `.is_empty()` agrees with whether that
+/// count is zero.
 pub open spec fn metadata_model_reports_the_written_length(
     byte_count: u8,
     result: (u64, bool),

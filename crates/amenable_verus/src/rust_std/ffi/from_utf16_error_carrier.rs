@@ -12,11 +12,16 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `FromUtf16Error` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExFromUtf16Error(FromUtf16Error);
 
+/// The three single-unit example inputs this file tests: a valid `'a'`
+/// unit succeeds, a lone high surrogate fails, a lone low surrogate
+/// fails.
 pub open spec fn from_utf16_result_matches_single_unit_examples(
     units: &[u16],
     result: Result<String, FromUtf16Error>,
@@ -26,6 +31,9 @@ pub open spec fn from_utf16_result_matches_single_unit_examples(
         && ((units@.len() == 1 && units@[0] == 0xDC00) ==> result is Err)
 }
 
+/// Precondition shared by this file's test inputs: each is exactly the
+/// single-unit example [`from_utf16_result_matches_single_unit_examples`]
+/// checks.
 pub open spec fn from_utf16_inputs_cover_valid_and_lone_surrogate_cases(
     valid: &[u16],
     lone_surrogate: &[u16],
@@ -39,6 +47,7 @@ pub open spec fn from_utf16_inputs_cover_valid_and_lone_surrogate_cases(
         && lone_low_surrogate@[0] == 0xDC00
 }
 
+/// All three of this file's example cases resolved as expected.
 pub open spec fn from_utf16_case_results_match_accept_reject_triple(result: (bool, bool, bool)) -> bool {
     result.0 && result.1 && result.2
 }

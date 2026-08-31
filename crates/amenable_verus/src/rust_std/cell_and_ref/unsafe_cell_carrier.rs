@@ -38,10 +38,12 @@ verus! {
 /// Models `UnsafeCell`'s safe-accessor interface — a plain value box —
 /// not `UnsafeCell` itself.
 pub struct VerusUnsafeCellModel {
+    /// The cell's current value.
     pub value: i32,
 }
 
 impl VerusUnsafeCellModel {
+    /// Builds a cell holding `initial`.
     pub fn new(initial: i32) -> (result: Self)
         ensures
             observed_value_matches_input(result.value as int, initial as int),

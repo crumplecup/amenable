@@ -22,10 +22,13 @@ use vstd::string::group_string_axioms;
 
 verus! {
 
+/// Precondition shared by this file's test inputs: `s` is exactly `"ab"`.
 pub open spec fn chars_input_is_ab(s: &str) -> bool {
     s@.len() == 2 && s@[0] == 'a' && s@[1] == 'b'
 }
 
+/// This file's whole postcondition: `"ab"`'s `.chars()` iterator yields
+/// `'a'`, then `'b'`, then exhausts.
 pub open spec fn chars_iteration_yields_a_then_b_then_none(
     result: (Option<char>, Option<char>, Option<char>),
 ) -> bool {

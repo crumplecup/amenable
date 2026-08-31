@@ -42,7 +42,9 @@ verus! {
 /// Models the "yields every element exactly once, order unspecified"
 /// law — not `binary_heap::Drain`/`IntoIter`/`Iter` themselves.
 pub struct VerusUnorderedPairModel {
+    /// One of the two elements this model yields.
     pub first: i32,
+    /// The other of the two elements this model yields.
     pub second: i32,
 }
 
@@ -54,6 +56,7 @@ pub open spec fn drain_result_matches_order(first_first: bool, first: i32, secon
 }
 
 impl VerusUnorderedPairModel {
+    /// Builds a model holding `first` and `second`.
     pub fn new(first: i32, second: i32) -> (result: Self)
         ensures
             observed_pair_matches_input((result.first, result.second), (first, second)),

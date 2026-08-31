@@ -41,15 +41,31 @@
 //! markers) are re-exported under that same cfg, matching how every
 //! existing cross-file reference to one already gates itself.
 
+/// `Cell`/`RefCell`/`UnsafeCell`/`OnceCell`/`LazyCell` carriers.
 pub mod cell_and_ref;
+/// `BTree*`/`BinaryHeap`/`LinkedList`/`Vec*`/`VecDeque*`/`Hash*` carriers.
 pub mod collections;
+/// `CStr`/`CString`/`OsStr`-family carriers.
 pub mod ffi;
+/// `std::io` reader/writer/cursor/error carriers.
 pub mod io;
+/// Iterator-adapter and slice-iteration carriers.
 pub mod iter;
+/// Single-carrier std modules with no sibling in this crate --
+/// `Box`, `Cow`, `Discriminant`, `Layout`, `ManuallyDrop`, a handful of
+/// zero-invariant singletons, `ops`, `Option`, `Result`, `panic`,
+/// primitive-shape carriers, `TypeId`, `env`, `fmt`, the Windows-handle
+/// cluster, `SystemTime`.
 pub mod misc;
+/// `NonZero*`/`Wrapping`/`Saturating`/floating-point-category carriers.
 pub mod num;
+/// `Path`/`PathBuf`/`fs` carriers.
 pub mod path_and_fs;
+/// `process`/`net` carriers.
 pub mod process_and_net;
+/// `char`/`str`/`String` carriers.
 pub mod str_and_char;
+/// `sync::atomic`/`Arc`/`Rc`/`Weak`/`mpsc`/`Once`/`Barrier` carriers.
 pub mod sync;
+/// `Future`/`task`/thread-local carriers.
 pub mod task_and_thread;

@@ -20,6 +20,8 @@ verus! {
 
 // checked leaf at member checked: calls crate::rust_std::str_and_char::verify_escape_ascii_model_leaves_printable_bytes_unescaped
 
+/// Proves `verus_export_requires_struct_witness`'s own composed claim -- see this file's own
+/// header comment.
 pub fn verify_verus_export_requires_struct_witness(printable: u8) -> (result: (u8, u8, u8))
     requires
         escape_ascii_input_is_printable_ascii(printable),

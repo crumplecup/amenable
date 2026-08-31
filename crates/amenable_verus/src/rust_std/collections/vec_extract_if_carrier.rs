@@ -38,7 +38,9 @@ verus! {
 /// Models the partition-by-predicate result for a fixed input — not
 /// `ExtractIf` itself.
 pub struct VerusExtractIfModel {
+    /// Elements the predicate rejected -- stay in the original collection.
     pub kept: Vec<i32>,
+    /// Elements the predicate accepted -- removed into this collection.
     pub extracted: Vec<i32>,
 }
 

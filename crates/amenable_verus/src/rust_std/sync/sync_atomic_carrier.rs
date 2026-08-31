@@ -36,6 +36,7 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The `AtomicBool` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_bool_model_load_store(initial: bool, next: bool) -> (result: (bool, bool))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -43,6 +44,7 @@ pub fn verify_atomic_bool_model_load_store(initial: bool, next: bool) -> (result
     (initial, next)
 }
 
+/// The `AtomicI8` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_i8_model_load_store(initial: i8, next: i8) -> (result: (i8, i8))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -50,6 +52,7 @@ pub fn verify_atomic_i8_model_load_store(initial: i8, next: i8) -> (result: (i8,
     (initial, next)
 }
 
+/// The `AtomicI16` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_i16_model_load_store(initial: i16, next: i16) -> (result: (i16, i16))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -57,6 +60,7 @@ pub fn verify_atomic_i16_model_load_store(initial: i16, next: i16) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicI32` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_i32_model_load_store(initial: i32, next: i32) -> (result: (i32, i32))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -64,6 +68,7 @@ pub fn verify_atomic_i32_model_load_store(initial: i32, next: i32) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicI64` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_i64_model_load_store(initial: i64, next: i64) -> (result: (i64, i64))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -71,6 +76,7 @@ pub fn verify_atomic_i64_model_load_store(initial: i64, next: i64) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicIsize` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_isize_model_load_store(initial: isize, next: isize) -> (result: (isize, isize))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -78,6 +84,7 @@ pub fn verify_atomic_isize_model_load_store(initial: isize, next: isize) -> (res
     (initial, next)
 }
 
+/// The `AtomicU8` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_u8_model_load_store(initial: u8, next: u8) -> (result: (u8, u8))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -85,6 +92,7 @@ pub fn verify_atomic_u8_model_load_store(initial: u8, next: u8) -> (result: (u8,
     (initial, next)
 }
 
+/// The `AtomicU16` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_u16_model_load_store(initial: u16, next: u16) -> (result: (u16, u16))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -92,6 +100,7 @@ pub fn verify_atomic_u16_model_load_store(initial: u16, next: u16) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicU32` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_u32_model_load_store(initial: u32, next: u32) -> (result: (u32, u32))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -99,6 +108,7 @@ pub fn verify_atomic_u32_model_load_store(initial: u32, next: u32) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicU64` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_u64_model_load_store(initial: u64, next: u64) -> (result: (u64, u64))
     ensures
         observed_pair_matches_input(result, (initial, next)),
@@ -106,6 +116,7 @@ pub fn verify_atomic_u64_model_load_store(initial: u64, next: u64) -> (result: (
     (initial, next)
 }
 
+/// The `AtomicUsize` instantiation of the shared new/store/load claim above.
 pub fn verify_atomic_usize_model_load_store(initial: usize, next: usize) -> (result: (usize, usize))
     ensures
         observed_pair_matches_input(result, (initial, next)),

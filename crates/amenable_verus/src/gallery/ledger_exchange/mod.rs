@@ -153,7 +153,14 @@
 //! `evidence_and_tokens`'s `Validated` naming `verifier_and_bounds`'s
 //! `GalleryVerifier`) verify cleanly.
 
+/// `Pending`/`Validated`/`Committed`/`Rejected<T>`.
 pub mod evidence_and_tokens;
+/// The `V` alias, `verus_sidecar!`, every `verus_ensures!` call, and the
+/// `generated/*.rs` `include!`s.
 pub mod exchange_wiring;
+/// `Amount`, `TransferPayload`, `TransferError`, `Ledger`.
 pub mod transfer_and_ledger;
+/// The `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
+/// `BalancedEntries` contract-bound markers (re-exports `GalleryVerifier`
+/// from `gallery::support` for its own sibling files).
 pub mod verifier_and_bounds;

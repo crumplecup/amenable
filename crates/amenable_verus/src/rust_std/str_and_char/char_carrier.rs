@@ -9,10 +9,14 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `verify_char_roundtrip`'s whole postcondition: the round trip
+/// preserves the value verbatim.
 pub open spec fn char_roundtrip_preserves_value(result: char, input: char) -> bool {
     result == input
 }
 
+/// Whether `value` is a valid Unicode scalar value: not in the surrogate
+/// range.
 pub open spec fn char_is_valid_unicode_scalar(value: char) -> bool {
     (value as u32) <= 0xD7FFu32
         || ((value as u32) >= 0xE000u32 && (value as u32) <= 0x10FFFFu32)

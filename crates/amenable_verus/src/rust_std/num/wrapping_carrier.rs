@@ -26,6 +26,9 @@ verus! {
 
 #[verifier::reject_recursive_types(T)]
 #[verifier::external_type_specification]
+/// `#[verifier::external_type_specification]` marker binding `Wrapping<T>`
+/// to Verus -- never constructed by real code, only discovered by
+/// Verus's own attribute processing.
 pub struct ExWrapping<T>(Wrapping<T>);
 
 /// `Wrapping(value).0` recovers exactly `value` — the real tuple

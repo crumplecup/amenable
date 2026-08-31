@@ -12,39 +12,54 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `#[verifier::external_type_specification]` marker binding `CStr` to
+/// Verus -- never constructed by real code, only discovered by Verus's
+/// own attribute processing.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExCStr(CStr);
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `FromBytesUntilNulError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExFromBytesUntilNulError(std::ffi::FromBytesUntilNulError);
 
+/// `#[verifier::external_type_specification]` marker binding
+/// `FromBytesWithNulError` to Verus.
 #[cfg(verus_keep_ghost)]
 #[verifier::external_type_specification]
 #[verifier::external_body]
 pub struct ExFromBytesWithNulError(std::ffi::FromBytesWithNulError);
 
+/// Whether `bytes` contains a nul byte anywhere.
 pub open spec fn cstr_bytes_contain_a_nul(bytes: &[u8]) -> bool {
     exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0
 }
 
+/// Whether `bytes` contains no nul byte at all.
 pub open spec fn cstr_bytes_contain_no_nul(bytes: &[u8]) -> bool {
     !exists|i: int| 0 <= i < bytes@.len() && bytes@[i] == 0
 }
 
+/// Whether `bytes` has a nul byte before its final position.
 pub open spec fn cstr_bytes_have_an_interior_nul(bytes: &[u8]) -> bool {
     exists|i: int| 0 <= i < bytes@.len() - 1 && bytes@[i] == 0
 }
 
+/// Whether `bytes` is non-empty, ends with a nul byte, and has no other
+/// nul byte before it.
 pub open spec fn cstr_bytes_have_only_a_trailing_nul(bytes: &[u8]) -> bool {
     bytes@.len() > 0
         && bytes@[bytes@.len() - 1] == 0
         && !cstr_bytes_have_an_interior_nul(bytes)
 }
 
+/// `CStr::from_bytes_until_nul`'s whole postcondition: succeeds whenever
+/// `bytes` contains a nul byte anywhere, fails only when it contains
+/// none.
 pub open spec fn cstr_from_bytes_until_nul_result_matches_nul_presence<'a>(
     bytes: &'a [u8],
     result: Result<&'a CStr, std::ffi::FromBytesUntilNulError>,
@@ -64,6 +79,9 @@ pub assume_specification<'a> [CStr::from_bytes_until_nul] (bytes: &'a [u8]) -> (
 /// below, mirroring `cstring_carrier.rs`'s `cstring_bytes_spec` pattern.
 pub uninterp spec fn cstr_bytes_spec(cstr: &CStr) -> Seq<u8>;
 
+/// `CStr::from_bytes_with_nul`'s whole postcondition: succeeds (recovering
+/// the input minus its trailing nul via [`cstr_bytes_spec`]) only when
+/// `bytes` has a nul solely at its end, otherwise fails.
 pub open spec fn cstr_from_bytes_with_nul_result_matches_bytes<'a>(
     bytes: &'a [u8],
     result: Result<&'a CStr, std::ffi::FromBytesWithNulError>,
@@ -80,6 +98,8 @@ pub assume_specification<'a> [CStr::from_bytes_with_nul] (bytes: &'a [u8]) -> (r
         cstr_from_bytes_with_nul_result_matches_bytes(bytes, result),
 ;
 
+/// `CStr::to_bytes`'s whole postcondition: recovers exactly
+/// [`cstr_bytes_spec`]'s own abstract content.
 pub open spec fn cstr_to_bytes_matches_model(cstr: &CStr, result: &[u8]) -> bool {
     result@ == cstr_bytes_spec(cstr)
 }
@@ -89,6 +109,9 @@ pub assume_specification<'a> [CStr::to_bytes] (cstr: &'a CStr) -> (result: &'a [
         cstr_to_bytes_matches_model(cstr, result),
 ;
 
+/// `verify_from_bytes_until_nul_requires_a_nul_byte_somewhere`'s
+/// precondition: `with_nul` genuinely contains a nul byte, `without_nul`
+/// genuinely doesn't.
 pub open spec fn cstr_until_nul_test_inputs_cover_both_cases(
     with_nul: &[u8],
     without_nul: &[u8],
@@ -96,6 +119,8 @@ pub open spec fn cstr_until_nul_test_inputs_cover_both_cases(
     cstr_bytes_contain_a_nul(with_nul) && cstr_bytes_contain_no_nul(without_nul)
 }
 
+/// Precondition shared by this file's `[byte, 0]`-shaped test inputs:
+/// `byte` itself is never the nul byte.
 pub open spec fn non_nul_byte_value_is_nonzero(byte: u8) -> bool {
     byte != 0
 }

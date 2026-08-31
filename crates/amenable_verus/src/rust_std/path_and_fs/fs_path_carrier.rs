@@ -28,6 +28,9 @@ verus! {
 /// `(first_ancestor, second_ancestor, leaf)`.
 type DirBuilderResult = ((char,), (char, char), (char, char, char));
 
+/// `verify_dir_builder_model_creates_nested_directories_recursively`'s
+/// whole postcondition: each ancestor joins the path labels seen so far,
+/// preserved exactly.
 pub open spec fn dir_builder_model_creates_nested_directories_recursively(
     a: char,
     b: char,
@@ -49,6 +52,9 @@ pub fn verify_dir_builder_model_creates_nested_directories_recursively(a: char, 
     ((a,), (a, b), (a, b, c))
 }
 
+/// `verify_dir_entry_model_reports_the_created_files_name_and_path`'s
+/// whole postcondition: reports the file's own name and the joined
+/// `(parent, name)` path.
 pub open spec fn dir_entry_model_reports_the_created_files_name_and_path(
     parent: char,
     name: char,
@@ -67,6 +73,8 @@ pub fn verify_dir_entry_model_reports_the_created_files_name_and_path(parent: ch
     (name, (parent, name))
 }
 
+/// `verify_read_dir_model_iterates_every_entry_in_the_directory`'s whole
+/// postcondition: yields both entries, in order.
 pub open spec fn read_dir_model_iterates_every_entry_in_the_directory(
     first_name: char,
     second_name: char,

@@ -33,9 +33,12 @@ verus! {
 /// that failed validation are recoverable exactly, via either accessor
 /// — not `FromUtf8Error` itself.
 pub struct VerusFromUtf8ErrorModel {
+    /// The invalid bytes that failed UTF-8 validation.
     pub bytes: Vec<u8>,
 }
 
+/// `new`'s whole postcondition: the constructed model recovers `bytes`
+/// verbatim.
 pub open spec fn from_utf8_error_model_new_preserves_bytes(
     bytes: Vec<u8>,
     result: VerusFromUtf8ErrorModel,
@@ -43,6 +46,8 @@ pub open spec fn from_utf8_error_model_new_preserves_bytes(
     result.bytes@ == bytes@
 }
 
+/// The `as_bytes` accessor's whole postcondition: recovers the model's
+/// own bytes verbatim.
 pub open spec fn from_utf8_error_model_as_bytes_preserves_bytes(
     model: &VerusFromUtf8ErrorModel,
     result: &Vec<u8>,
@@ -50,6 +55,8 @@ pub open spec fn from_utf8_error_model_as_bytes_preserves_bytes(
     result@ == model.bytes@
 }
 
+/// The `into_bytes` accessor's whole postcondition: recovers the model's
+/// own bytes verbatim.
 pub open spec fn from_utf8_error_model_into_bytes_preserves_bytes(
     model: VerusFromUtf8ErrorModel,
     result: Vec<u8>,
@@ -58,6 +65,7 @@ pub open spec fn from_utf8_error_model_into_bytes_preserves_bytes(
 }
 
 impl VerusFromUtf8ErrorModel {
+    /// Builds a model holding the invalid `bytes`.
     pub fn new(bytes: Vec<u8>) -> (result: Self)
         ensures
             from_utf8_error_model_new_preserves_bytes(bytes, result),
