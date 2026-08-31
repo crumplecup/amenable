@@ -129,6 +129,13 @@ pub trait Evidence {
     }
 }
 
+// `#[cfg(not(verus_keep_ghost))]`: every invocation below is already
+// gated the same way (load-bearing for ordinary builds, never needed
+// under Verus -- see that gate's own comment), so the definition itself
+// needs the identical gate, or Verus's own compile sees a macro that's
+// declared but never invoked (a real "unused macro definition" warning,
+// confirmed against the real toolchain).
+#[cfg(not(verus_keep_ghost))]
 macro_rules! impl_tuple_evidence {
     ($(($member:ident, $index:tt)),+) => {
         impl<$($member),+> Evidence for ($($member,)+)

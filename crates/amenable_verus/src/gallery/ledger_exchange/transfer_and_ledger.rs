@@ -48,11 +48,32 @@ impl Amount {
 /// own `.clone()` call needs a `Clone` type to land on -- deriving
 /// `Copy` here too would make that same, legitimate `.clone()` trip a
 /// real, un-`#[allow]`-able `clippy::clone_on_copy` failure.
-#[derive(Clone)]
 pub struct TransferPayload {
     pub from: u64,
     pub to: u64,
     pub amount: Amount,
+}
+
+impl Clone for TransferPayload {
+    /// Same real reason every accessor in this file carries an `ensures`:
+    /// a hand-written impl, not `#[derive(Clone)]` -- Verus does not
+    /// (yet) support adding a specification to an autoderived `Clone`
+    /// impl when the type isn't also `Copy` (confirmed against the real
+    /// toolchain: a real, if benign, compiler warning without this),
+    /// leaving the real captured body's `.clone()` call opaque to any
+    /// caller that needs to know the clone's fields match the original.
+    fn clone(&self) -> (result: Self)
+        ensures
+            result.from == self.from,
+            result.to == self.to,
+            result.amount.0 == self.amount.0,
+    {
+        Self {
+            from: self.from,
+            to: self.to,
+            amount: self.amount,
+        }
+    }
 }
 
 impl TransferPayload {
