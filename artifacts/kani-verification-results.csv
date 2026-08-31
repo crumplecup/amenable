@@ -358,6 +358,12 @@ amenable_kani::rust_std::sync_atomic::verify_atomic_u64,1787762964,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_u8,1787762973,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_usize,1787762982,passed
 amenable_kani::rust_std::sync_atomic::verify_relaxed_ordering_still_makes_a_store_observable,1787762990,passed
+amenable_kani::rust_std::sync_lock::barrier::verify_barrier_of_one_is_its_own_leader,1788148104,passed
+amenable_kani::rust_std::sync_lock::condvar::verify_condvar_wait_timeout_reports_timing_out,1788148115,passed
+amenable_kani::rust_std::sync_lock::mutex::verify_mutex_guard_writes_through,1788148057,passed
+amenable_kani::rust_std::sync_lock::once_and_lazy::verify_once_runs_its_closure_exactly_once,1788148093,passed
+amenable_kani::rust_std::sync_lock::poison_and_timeout_errors::verify_wait_timeout_result_reports_timed_out,1788148126,passed
+amenable_kani::rust_std::sync_lock::rwlock::verify_rwlock_read_guard_derefs_to_the_value,1788148074,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_of_one_is_its_own_leader,1787762999,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_wait_result_reports_the_sole_participant_as_leader,1787763008,passed
 amenable_kani::rust_std::sync_lock::verify_condvar_wait_timeout_reports_timing_out,1787763017,passed
