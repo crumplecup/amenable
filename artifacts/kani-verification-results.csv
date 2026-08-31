@@ -237,6 +237,13 @@ amenable_kani::rust_std::process::verify_exit_status_reports_a_nonzero_exit_code
 amenable_kani::rust_std::process::verify_output_captures_stdout_and_the_exit_status,1787762095,passed
 amenable_kani::rust_std::process::verify_stdio_null_discards_the_childs_output_handle,1787762103,passed
 amenable_kani::rust_std::ptr::verify_non_null_rejects_the_null_pointer,1788043421,passed
+amenable_kani::rust_std::slice::chunk_by::verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate,1788143614,passed
+amenable_kani::rust_std::slice::chunks::verify_windows_yields_overlapping_slices,1788143600,passed
+amenable_kani::rust_std::slice::iter::verify_iter_yields_shared_references_in_order,1788143580,passed
+amenable_kani::rust_std::slice::misc::verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds,1788143674,passed
+amenable_kani::rust_std::slice::split::verify_split_yields_subslices_between_matches,1788143627,passed
+amenable_kani::rust_std::slice::split_inclusive::verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece,1788143642,passed
+amenable_kani::rust_std::slice::split_n_and_rsplit::verify_split_n_caps_the_number_of_pieces,1788143658,passed
 amenable_kani::rust_std::slice::verify_chunk_by_groups_adjacent_elements_matching_the_predicate,1788043058,failed
 amenable_kani::rust_std::slice::verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate,1787762132,passed
 amenable_kani::rust_std::slice::verify_chunks_exact_discards_a_short_remainder,1788027733,passed
