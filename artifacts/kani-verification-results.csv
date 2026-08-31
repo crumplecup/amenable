@@ -228,6 +228,11 @@ amenable_kani::rust_std::path::verify_prefix_component_pairs_raw_text_with_parse
 amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,1787761870,passed
 amenable_kani::rust_std::path::verify_strip_prefix_error_reports_a_non_matching_prefix,1788030189,passed
 amenable_kani::rust_std::pin::verify_pin_derefs_and_get_mut_round_trip,1787761894,passed
+amenable_kani::rust_std::primitives::array_slice_str::verify_str_byte_length_and_content,1788145415,passed
+amenable_kani::rust_std::primitives::char_string::verify_char_unicode_scalar,1788145428,passed
+amenable_kani::rust_std::primitives::raw_pointers::verify_const_pointer_cast_is_reproducible,1788145440,passed
+amenable_kani::rust_std::primitives::references::verify_mutable_reference_dereferences_to_and_updates_the_referent,1788145452,passed
+amenable_kani::rust_std::primitives::tuple_fn_ptr::verify_tuple_field_access,1788145464,passed
 amenable_kani::rust_std::primitives::verify_array_indexing_and_length,1788144142,passed
 amenable_kani::rust_std::primitives::verify_char_unicode_scalar,1788043391,passed
 amenable_kani::rust_std::primitives::verify_const_pointer_cast_is_reproducible,1787761921,passed
