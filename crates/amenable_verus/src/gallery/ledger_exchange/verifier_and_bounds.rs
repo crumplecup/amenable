@@ -5,7 +5,9 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
-use crate::{Evidence, Verifier, Witness};
+use crate::{Evidence, Witness};
+
+pub use super::super::support::GalleryVerifier;
 // `#[cfg(verus_keep_ghost)]`-gated, matching `amenable_core::evidence`'s
 // own precedent: `AmountPositive::ensures(..)` (etc., below) resolves
 // fine under ordinary `cargo check`/clippy without this import (`Type::
@@ -18,28 +20,6 @@ use crate::{Evidence, Verifier, Witness};
 use crate::Ensures;
 
 verus! {
-
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 /// Local mirrors of `amenable_gaap::contracts::{AmountPositive,
 /// SufficientFunds, AccountsDistinct, BalancedEntries}` -- `verus

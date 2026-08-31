@@ -98,7 +98,9 @@
 
 use verus_builtin_macros::verus;
 
-use crate::{Ensures, Evidence, Verifier, Witness};
+use crate::{Ensures, Evidence, Witness};
+
+use super::support::GalleryVerifier;
 
 /// The real Verus-side counterpart to `amenable_kani::rust_std::macros::
 /// kani_ensures!`: generates the mechanical `Ensures<$verifier>` wiring
@@ -135,28 +137,6 @@ macro_rules! verus_ensures {
 }
 
 verus! {
-
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 pub struct EnsuresBlue;
 

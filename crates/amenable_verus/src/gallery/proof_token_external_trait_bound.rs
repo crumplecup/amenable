@@ -91,6 +91,8 @@ use vstd::prelude::*;
 
 use crate::{Evidence, ProofToken, Verifier, Witness};
 
+use super::support::GalleryVerifier;
+
 verus! {
 
 /// Companion specification for the real, mod-included `Verifier` trait
@@ -135,28 +137,6 @@ pub trait ExWitness<V: Verifier> {
     type ExternalTraitSpecificationFor: Witness<V>;
     type SupportingEvidence: Evidence;
     type ProofArtifact;
-}
-
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
 }
 
 pub struct Green;

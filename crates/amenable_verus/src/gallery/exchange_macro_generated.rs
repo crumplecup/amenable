@@ -71,7 +71,9 @@
 
 use verus_builtin_macros::verus;
 
-use crate::{Establish, Evidence, ProofToken, Sidecar, Verifier, Witness};
+use crate::{Establish, Evidence, ProofToken, Sidecar, Witness};
+
+use super::support::GalleryVerifier;
 
 /// Local copy of `exchange_support::verus_ensures!` -- see this crate's
 /// `gallery::ensures_macro_generated` for where this shape was
@@ -133,28 +135,6 @@ macro_rules! verus_exchange {
 }
 
 verus! {
-
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 pub struct ExchangeRoot;
 

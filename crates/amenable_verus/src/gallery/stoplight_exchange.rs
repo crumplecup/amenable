@@ -102,31 +102,11 @@ use crate::exchange_support::{verus_ensures, verus_sidecar, verus_state_machine}
 // `exchange_support`'s `external_trait_specification`s apply crate-wide
 // once compiled in, via `lib.rs`'s own `pub mod exchange_support;` --
 // no explicit import needed here for Verus to pick them up.
-use crate::{Establish, Evidence, Exchange, ProofToken, Sidecar, Verifier};
+use crate::{Establish, Evidence, Exchange, ProofToken, Sidecar};
+
+use super::support::GalleryVerifier;
 
 verus! {
-
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 pub struct Green;
 

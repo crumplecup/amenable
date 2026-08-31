@@ -71,36 +71,11 @@ use verus_builtin_macros::verus;
 )]
 use vstd::prelude::*;
 
-use crate::{Establish, Evidence, ProofToken, Verifier, Witness};
+use crate::{Establish, Evidence, ProofToken, Witness};
+
+use super::support::GalleryVerifier;
 
 verus! {
-
-/// Local marker, standing in for what would be `crate::VerusVerifier` in
-/// a real design (mirroring `amenable_kani::KaniVerifier`/
-/// `amenable_creusot::CreusotVerifier`).
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-// Incidental plumbing (`Verifier::Metadata` needs *some* `Provenance`
-// impl to exist, but nothing in this case's own claim calls into it).
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 /// The genuine self-referential root: `Basis = Self`, exactly the real
 /// `amenable_kani::stoplight::Green`/`amenable_creusot::stoplight::Green`

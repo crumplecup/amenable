@@ -78,35 +78,11 @@
 
 use verus_builtin_macros::verus;
 
-use crate::{Ensures, Evidence, Verifier, Witness};
+use crate::{Ensures, Evidence, Witness};
+
+use super::support::GalleryVerifier;
 
 verus! {
-
-/// Local marker, standing in for what would be `crate::VerusVerifier` in
-/// a real design — see `gallery::evidence_self_referential_root`'s
-/// identical copy for why each gallery case owns one rather than sharing
-/// a single crate-wide type.
-pub struct GalleryVerifier;
-
-impl Verifier for GalleryVerifier {
-    type Metadata = GalleryVerifierMetadata;
-
-    fn name() -> &'static str {
-        "gallery"
-    }
-}
-
-#[derive(Default)]
-pub struct GalleryVerifierMetadata;
-
-#[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
 
 pub struct EnsuresGreen;
 

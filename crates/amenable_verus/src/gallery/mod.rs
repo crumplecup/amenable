@@ -29,14 +29,21 @@
 //! a `mod` anyway with an explicit "known broken, do not un-gate"
 //! marker.
 
-// `pub mod`, matching `rust_std`'s own carriers (not `amenable_kani::
-// gallery`'s private `mod`): Kani's gallery avoids dead-code lint issues
-// because `harness!` gates each proof function behind `#[cfg(kani)]`,
-// invisible to ordinary `cargo clippy` entirely. Nothing here is
-// cfg-gated -- this crate's whole point is compiling under both plain
-// rustc and Verus's driver -- so every item needs a real, public,
-// reachable path from the crate root the same way `rust_std`'s carriers
-// already have, or `-D warnings` flags it as dead code.
+// `pub mod` for each case (not `amenable_kani::gallery`'s private
+// `mod`): Kani's gallery avoids dead-code lint issues because
+// `harness!` gates each proof function behind `#[cfg(kani)]`, invisible
+// to ordinary `cargo clippy` entirely. Nothing here is cfg-gated --
+// this crate's whole point is compiling under both plain rustc and
+// Verus's driver -- so every item needs a real, public, reachable path
+// from the crate root, or `-D warnings` flags it as dead code. Each
+// case's own type names stay independent by design (`GalleryVerifier`,
+// `Green`, etc. mean the same *shape* in every case, but each case is a
+// standalone investigation, not a shared library) -- so, unlike
+// `rust_std`'s carriers, these stay flat `pub mod` rather than hidden
+// behind a `pub use` re-export, which would collide on name the moment
+// two cases share one. `support` is the one real exception: the pieces
+// that turned out to be genuinely identical, not just same-shaped, are
+// factored out there instead of copy-pasted -- see its own doc comment.
 pub mod ensures_contract_bound;
 pub mod ensures_macro_generated;
 pub mod evidence_self_referential_root;
@@ -44,3 +51,4 @@ pub mod exchange_macro_generated;
 pub mod ledger_exchange;
 pub mod proof_token_external_trait_bound;
 pub mod stoplight_exchange;
+mod support;
