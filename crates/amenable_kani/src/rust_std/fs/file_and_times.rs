@@ -43,7 +43,7 @@ impl ProofToken for KaniFileContentWitnessToken {
 impl KaniFileContentObservation {
     /// Assert the bytes read back match what was written. Consumes
     /// `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, bytes)))]
     #[must_use]
@@ -100,6 +100,7 @@ impl KaniWitness for RustStdStandard<FileTimes> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_file_times_sets_the_recorded_modification_time".to_owned(),
@@ -131,7 +132,7 @@ impl ProofToken for KaniFileTimesWitnessToken {
 impl KaniFileTimesObservation {
     /// Assert the recorded modification time matches the target exactly.
     /// Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
@@ -160,6 +161,7 @@ impl ProofToken for RustStdFileTimesToken {
 impl Establish<KaniFileTimesWitnessToken, KaniVerifier> for RustStdStandard<FileTimes> {
     type Token = RustStdFileTimesToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniFileTimesWitnessToken) -> Self::Token {
         RustStdFileTimesToken(())
     }

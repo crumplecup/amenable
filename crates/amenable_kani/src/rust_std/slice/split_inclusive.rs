@@ -5,28 +5,10 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::SplitOperandsAreDistinctFromThePattern;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniSplitObservation, KaniVerifier};
 
@@ -136,6 +118,7 @@ impl KaniWitness for RustStdStandard<SplitInclusiveMut<'static, i32, fn(&i32) ->
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece".to_owned(),
@@ -198,6 +181,7 @@ impl Establish<KaniSplitInclusiveLengthsWitnessToken, KaniVerifier>
 {
     type Token = RustStdSplitInclusiveMutToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniSplitInclusiveLengthsWitnessToken) -> Self::Token {
         RustStdSplitInclusiveMutToken(())
     }

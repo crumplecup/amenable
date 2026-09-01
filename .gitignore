@@ -1,4 +1,10 @@
-/target
+# Unanchored, not just `/target`: `cargo check -p <crate>`/`cargo kani`/
+# `cross check` invocations from inside a crate's own directory (or with
+# a scoped `--target-dir`) have left real per-crate `target/` build
+# output at `crates/*/target/` alongside the shared workspace-root one --
+# the same kind of throwaway artifact either way, just at a different
+# path than the anchored pattern originally assumed.
+target/
 
 # Creusot: local why3find scratch state and crash reports; `verif/` (the
 # proof cache) and `why3find.json` ARE tracked, matching elicitation's own

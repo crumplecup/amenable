@@ -1,14 +1,14 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 137 8 139 38 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 82 8 84 38 *)
 
-let%span sops_range_and_bound = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 143 37 143 42
-let%span sops_range_and_bound'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 143 44 143 49
-let%span sops_range_and_bound'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 142 43 142 48
-let%span sops_range_and_bound'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 142 50 142 54
-let%span sops_range_and_bound'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 141 43 141 47
-let%span sops_range_and_bound'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 141 49 141 54
-let%span sops_range_and_bound'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 135 19 135 23
-let%span sops_range_and_bound'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 136 18 136 69
-let%span sops_range_and_bound'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 121 16 125 17
+let%span sops_range_and_bound = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 88 37 88 42
+let%span sops_range_and_bound'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 88 44 88 49
+let%span sops_range_and_bound'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 87 43 87 48
+let%span sops_range_and_bound'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 87 50 87 54
+let%span sops_range_and_bound'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 86 43 86 47
+let%span sops_range_and_bound'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 86 49 86 54
+let%span sops_range_and_bound'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 80 19 80 23
+let%span sops_range_and_bound'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 81 18 81 69
+let%span sops_range_and_bound'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 66 16 70 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -35,7 +35,7 @@ let rec elim_Included (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
       end}
     any) ]
 
-predicate bound_round_trips_its_endpoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 116 8 119 17] (value: t_Bound_i32) (bound_result: tup3_bool_bool_Option_i32) =
+predicate bound_round_trips_its_endpoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 61 8 64 17] (value: t_Bound_i32) (bound_result: tup3_bool_bool_Option_i32) =
   [%#sops_range_and_bound'7] match value with
     | Included inner -> bound_result = { f0 = true; f1 = false; f2 = Some inner }
     | Excluded inner -> bound_result = { f0 = false; f1 = true; f2 = Some inner }
@@ -47,7 +47,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_bound_round_trips_its_endpoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 137 8 139 38]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 82 8 84 38]
   (value: t_Bound_i32) (return (x: tup3_bool_bool_Option_i32)) = (! bb0
   [ bb0 = any
     [ br0 (x0: Int32.t) -> {value = Included x0} (! bb6)

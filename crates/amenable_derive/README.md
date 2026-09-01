@@ -111,8 +111,8 @@ walks the same macros in the order you'd actually reach for them.
   "...")]`) — generates `impl ProofToken for X { type Proposition = Y;
   }`. Every hand-written `ProofToken` impl in this workspace is this
   identical one-line shape; this collapses it and registers a
-  `ProofTokenMintRecord` (read by codegen tools like `amenable
-  emit-verus-gaap-tokens`) unconditionally, at no cost to callers that
+  `ProofTokenMintRecord` (read by codegen tools like `amenable verus
+  emit-gaap-tokens`) unconditionally, at no cost to callers that
   don't care.
 
   ```rust

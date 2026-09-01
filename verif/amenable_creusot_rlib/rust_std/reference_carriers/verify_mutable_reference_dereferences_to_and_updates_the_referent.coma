@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 94 8 97 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 37 8 40 23 *)
 
-let%span sreference_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 92 19 92 23
-let%span sreference_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 93 18 93 99
-let%span sreference_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 118 24 118 83
+let%span sreference_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 35 19 35 23
+let%span sreference_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 36 18 36 99
+let%span sreference_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 61 24 61 83
 
 use creusot.prelude.MutBorrow
 use creusot.int.Int32
@@ -14,7 +14,7 @@ meta "rewrite_def" predicate resolve_refmut_i32
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
-predicate mutable_reference_dereferences_to_and_updates_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 113 8 117 17] (initial: Int32.t) (next: Int32.t) (reference_result: tup2_i32_i32) =
+predicate mutable_reference_dereferences_to_and_updates_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 56 8 60 17] (initial: Int32.t) (next: Int32.t) (reference_result: tup2_i32_i32) =
   [%#sreference_carriers'1] reference_result.f0 = initial /\ reference_result.f1 = next
 
 meta "compute_max_steps" 1000000
@@ -22,7 +22,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_mutable_reference_dereferences_to_and_updates_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 94 8 97 23]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 37 8 40 23]
   (initial: Int32.t) (next: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &value <- initial ] s1

@@ -5,19 +5,7 @@ use amenable_core::Evidence;
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
@@ -141,6 +129,7 @@ impl KaniWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8]
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chain_reads_the_first_source_then_the_second".to_owned(),

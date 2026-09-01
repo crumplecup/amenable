@@ -1,15 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 103 8 103 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 46 8 46 93 *)
 
-let%span sarray_and_slice = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 13 106 24
-let%span sarray_and_slice'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 32 106 33
-let%span sarray_and_slice'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 26 106 34
-let%span sarray_and_slice'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 42 106 43
-let%span sarray_and_slice'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 36 106 44
-let%span sarray_and_slice'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 52 106 53
-let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 46 106 54
-let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 101 19 101 23
-let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 102 18 102 60
-let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 75 16 78 46
+let%span sarray_and_slice = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 13 49 24
+let%span sarray_and_slice'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 32 49 33
+let%span sarray_and_slice'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 26 49 34
+let%span sarray_and_slice'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 42 49 43
+let%span sarray_and_slice'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 36 49 44
+let%span sarray_and_slice'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 52 49 53
+let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 49 46 49 54
+let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 44 19 44 23
+let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 45 18 45 60
+let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 18 16 21 46
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 288 18 288 40
 
 use creusot.slice.Slice64
@@ -26,7 +26,7 @@ let rec len_i32 (self_: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
 
 type tup4_usize_i32_i32_i32 = { f0: UInt64.t; f1: Int32.t; f2: Int32.t; f3: Int32.t }
 
-predicate indexing_and_length_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 68 8 73 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (container_result: tup4_usize_i32_i32_i32) =
+predicate indexing_and_length_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 11 8 16 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (container_result: tup4_usize_i32_i32_i32) =
   [%#sarray_and_slice'8] container_result.f0 = (3: UInt64.t)
   /\ container_result.f1 = a /\ container_result.f2 = b /\ container_result.f3 = c
 
@@ -35,7 +35,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_slice_indexing_and_length
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 103 8 103 93] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 46 8 46 93] (a: Int32.t)
   (b: Int32.t) (c: Int32.t) (return (x: tup4_usize_i32_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = any

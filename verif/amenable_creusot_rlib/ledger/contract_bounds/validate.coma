@@ -1,20 +1,20 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 236 8 236 85 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 237 8 237 85 *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 237 16 237 45
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 240 16 240 55
-let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 243 16 243 49
-let%span scontract_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 234 19 234 23
-let%span scontract_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 235 18 235 59
-let%span scontract_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 84 19 84 23
-let%span scontract_bounds'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 85 18 85 65
-let%span scontract_bounds'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 144 19 144 23
-let%span scontract_bounds'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 145 18 145 59
-let%span scontract_bounds'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 208 16 213 17
-let%span scontract_bounds'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 65 24 65 56
-let%span scontract_bounds'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 124 24 124 47
-let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 281 19 281 23
-let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 282 18 282 55
-let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 238 16 238 45
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 241 16 241 55
+let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 244 16 244 49
+let%span scontract_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 235 19 235 23
+let%span scontract_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 236 18 236 59
+let%span scontract_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 133 19 133 23
+let%span scontract_bounds'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 134 18 134 65
+let%span scontract_bounds'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 169 19 169 23
+let%span scontract_bounds'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 170 18 170 59
+let%span scontract_bounds'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 209 16 214 17
+let%span scontract_bounds'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
+let%span scontract_bounds'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 149 24 149 47
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 290 19 290 23
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 291 18 291 55
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
 let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
@@ -35,7 +35,7 @@ use creusot.int.UInt64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger_validate'1] outcome = (Int64.to_int amount > 0)
 
 let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
@@ -43,7 +43,7 @@ let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
   {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger_validate'0] amount_positive_holds amount result}
     (! return {result}) ]
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 64 8 64 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#scontract_bounds'9] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = any
@@ -51,7 +51,7 @@ let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: 
   {[@stop_split] [@expl:check_sufficient_funds ensures] [%#scontract_bounds'5] sufficient_funds_holds balance amount result}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 123 8 123 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 148 8 148 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#scontract_bounds'10] outcome = (from <> to')
 
 let rec check_accounts_distinct (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = any
@@ -108,7 +108,7 @@ function cmp_le_log_i64 (x: Int64.t) (y: Int64.t) : ()
 
 axiom cmp_le_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord] Int64.le x y = (cmp_log_i64 x y <> Greater)
 
-predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 206 8 206 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
+predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 207 8 207 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
   [%#scontract_bounds'8] match outcome with
     | Ok -> amount_positive_holds amount true /\ accounts_distinct_holds from to' true
     | NegativeAmount bad -> bad = amount /\ Int64.to_int amount <= 0
@@ -120,7 +120,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 236 8 236 85]
+let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 237 8 237 85]
   (balance: Int64.t) (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (return (x: t_TransferOutcome)) = (! bb0
   [ bb0 = s0
     [ s0 = check_amount_positive [%#scontract_bounds] {amount} (fun (_x: bool) -> [ &_11 <- _x ] s1)

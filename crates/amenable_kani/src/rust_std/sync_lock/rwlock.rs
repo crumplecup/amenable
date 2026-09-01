@@ -4,17 +4,11 @@ use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
-#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::GetterRecoversTheStoredReference;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -113,6 +107,7 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockWriteGuard<'static, i32>> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rwlock_write_guard_writes_through".to_owned(),

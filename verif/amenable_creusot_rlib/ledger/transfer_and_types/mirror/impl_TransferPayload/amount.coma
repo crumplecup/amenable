@@ -1,0 +1,30 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 266 8 266 45 *)
+
+(* ledger::transfer_and_types::mirror::TransferPayload *)
+
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 264 19 264 23
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 265 18 265 69
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 332 24 332 41
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+predicate amount_value_matches_field [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 331 8 331 76] (observed: Int64.t) (field: Int64.t) =
+  [%#stransfer_and_types'1] observed = field
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec amount'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 266 8 266 45]
+  (self: t_TransferPayload) (return (x: t_Amount)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- self.amount ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Amount = Any.any_l () | & self: t_TransferPayload = self ])
+  [ return (result: t_Amount) ->
+  {[@stop_split] [@expl:amount ensures] [%#stransfer_and_types'0] amount_value_matches_field result.f0 self.amount.f0}
+    (! return {result}) ]

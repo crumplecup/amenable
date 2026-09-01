@@ -3,8 +3,6 @@ use std::str::{ParseBoolError, Utf8Chunk, Utf8Error};
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 use super::whitespace_utf8::AccessorRecoversTheExpectedValue;
@@ -35,6 +33,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for AccessorRecoversTheExpec
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -188,6 +187,7 @@ impl KaniWitness for RustStdStandard<LinesAnyStatic> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_lines_any_splits_on_any_line_ending".to_owned(),

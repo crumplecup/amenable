@@ -1,4 +1,5 @@
 use amenable_kani::{KaniChunkByObservation, KaniSplitNObservationBuilder, KaniSplitObservation};
+use miette::IntoDiagnostic;
 
 #[test]
 fn split_observation_recovers_split_inclusive_and_reverse_views() {
@@ -20,7 +21,7 @@ fn split_observation_write_through_updates_the_underlying_data() {
 }
 
 #[test]
-fn split_n_observation_preserves_the_capped_second_piece() {
+fn split_n_observation_preserves_the_capped_second_piece() -> miette::Result<()> {
     let observation = KaniSplitNObservationBuilder::default()
         .first(1)
         .first_delimiter(0)
@@ -28,10 +29,12 @@ fn split_n_observation_preserves_the_capped_second_piece() {
         .second_delimiter(0)
         .last(3)
         .build()
-        .expect("all fields set");
+        .into_diagnostic()?;
 
     assert_eq!(observation.splitn_two(), ([1], [2, 0, 3]));
     assert_eq!(observation.rsplitn_two(), ([3], [1, 0, 2]));
+
+    Ok(())
 }
 
 #[test]

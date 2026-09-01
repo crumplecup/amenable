@@ -97,6 +97,7 @@ impl KaniWitness for CowConstructsOwnedVariant {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),

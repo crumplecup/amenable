@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 139 8 139 71 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 82 8 82 71 *)
 
-let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 140 12 140 16
-let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 137 19 137 23
-let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 138 18 138 24
+let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 83 12 83 16
+let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 80 19 80 23
+let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 81 18 81 24
 
 use creusot.prelude.Any
 
@@ -11,7 +11,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_join_paths_error_reports_an_unjoinable_path
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 139 8 139 71] (return (x: bool)) =
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 82 8 82 71] (return (x: bool)) =
   (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#senv_carriers] true ] s1 | s1 = return {_ret} ] ] [ & _ret: bool = Any.any_l () ])
   [ return (result: bool) ->

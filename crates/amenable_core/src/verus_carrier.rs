@@ -166,8 +166,9 @@ fn module_path_for(
         .collect::<Vec<_>>();
 
     while segments.len() > 1 {
-        let leaf = segments.last().expect("checked len() > 1 above").clone();
-        let parent_segments = &segments[..segments.len() - 1];
+        let Some((leaf, parent_segments)) = segments.split_last() else {
+            break;
+        };
         let declaring_file = if parent_segments.is_empty() {
             root.join("lib.rs")
         } else {
@@ -175,7 +176,7 @@ fn module_path_for(
                 .join("mod.rs")
         };
 
-        match leaf_reachability(&declaring_file, &leaf, name) {
+        match leaf_reachability(&declaring_file, leaf, name) {
             LeafReachability::HiddenAndReexported => {
                 segments.pop();
             }

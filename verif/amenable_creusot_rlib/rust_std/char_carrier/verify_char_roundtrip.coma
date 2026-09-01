@@ -1,19 +1,19 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 89 8 89 49 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 32 8 32 49 *)
 
-let%span schar_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 86 19 86 23
-let%span schar_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 87 18 87 44
-let%span schar_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 88 18 88 52
-let%span schar_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 102 24 102 40
-let%span schar_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 114 24 114 72
+let%span schar_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 29 19 29 23
+let%span schar_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 30 18 30 44
+let%span schar_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 31 18 31 52
+let%span schar_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 45 24 45 40
+let%span schar_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 57 24 57 72
 
 use creusot.prelude.Char
 use creusot.prelude.Any
 use int.Int
 
-predicate char_roundtrips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 101 8 101 62] (c: Char.t) (char_result: Char.t) =
+predicate char_roundtrips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 44 8 44 62] (c: Char.t) (char_result: Char.t) =
   [%#schar_carrier'2] char_result = c
 
-predicate valid_unicode_scalar_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 113 8 113 54] (c: Char.t) =
+predicate valid_unicode_scalar_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 56 8 56 54] (c: Char.t) =
   [%#schar_carrier'3] Char.to_int c <= 55295 \/ Char.to_int c >= 57344 /\ Char.to_int c <= 1114111
 
 meta "compute_max_steps" 1000000
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_char_roundtrip
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 89 8 89 49] (c: Char.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/char_carrier.rs" 32 8 32 49] (c: Char.t)
   (return (x: Char.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- c ] s1 | s1 = return {_ret} ] ] [ & _ret: Char.t = Any.any_l () | & c: Char.t = c ])
   [ return (result: Char.t) ->

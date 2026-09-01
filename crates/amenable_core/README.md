@@ -43,7 +43,7 @@ never a silent third option:
 - `ExchangeEdgeRecord` / `ProofTokenMintRecord` / `ContractRecord` — the
   codegen-facing registry types `amenable_derive`'s macros populate via
   `inventory::submit!`, and a per-backend codegen tool (`amenable
-  emit-creusot-companions`, and friends — see the top-level `amenable`
+  creusot emit-companions`, and friends — see the top-level `amenable`
   crate's own README) reads to generate a real, checked-in companion
   file for a translator-based backend that can't tolerate `inventory`
   in its own compiled output.

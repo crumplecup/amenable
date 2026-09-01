@@ -5,19 +5,11 @@ use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::FirstValueIsLessThanTheSecond;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PeekRevealsTheStoredReference;
 #[cfg(kani)]
 use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -226,6 +218,7 @@ impl KaniWitness for IteratorYieldsAValue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_with_calls_its_closure_exactly_once".to_owned(),

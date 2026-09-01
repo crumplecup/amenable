@@ -12,9 +12,6 @@
 //! - if the real builder/rendering path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-#[cfg(kani)]
-use crate::KaniCompose;
-
 /// Modeled leaf value with opaque display and debug tokens.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct KaniFormatAtom(char, char);
@@ -283,43 +280,56 @@ impl KaniFmt {
     }
 }
 
+/// The `#[cfg(kani)]` import and `KaniCompose` impls this file needs,
+/// consolidated into one gate on this `mod` instead of one per item --
+/// see `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. `KaniCompose` is re-exported `pub(super)`: `mod
+/// proofs`'s own `use super::{KaniCompose, KaniFormatAtom};` (below)
+/// needs it in scope at this file's own top level.
 #[cfg(kani)]
-impl KaniCompose for KaniFormatAtom {
-    fn kani_depth0() -> Self {
-        Self::new('0', '0')
+mod mirror {
+    pub(super) use crate::KaniCompose;
+
+    use super::{KaniFormatAtom, KaniFormatLabel};
+
+    impl KaniCompose for KaniFormatAtom {
+        fn kani_depth0() -> Self {
+            Self::new('0', '0')
+        }
+
+        fn kani_depth1() -> Self {
+            Self::new('1', '1')
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new('a', 'A')
+        }
+
+        fn kani_any() -> Self {
+            Self::new(char::kani_any(), char::kani_any())
+        }
     }
 
-    fn kani_depth1() -> Self {
-        Self::new('1', '1')
-    }
+    impl KaniCompose for KaniFormatLabel {
+        fn kani_depth0() -> Self {
+            Self::new('n')
+        }
 
-    fn kani_depth2() -> Self {
-        Self::new('a', 'A')
-    }
+        fn kani_depth1() -> Self {
+            Self::new('t')
+        }
 
-    fn kani_any() -> Self {
-        Self::new(char::kani_any(), char::kani_any())
+        fn kani_depth2() -> Self {
+            Self::new('k')
+        }
+
+        fn kani_any() -> Self {
+            Self::new(char::kani_any())
+        }
     }
 }
-
 #[cfg(kani)]
-impl KaniCompose for KaniFormatLabel {
-    fn kani_depth0() -> Self {
-        Self::new('n')
-    }
-
-    fn kani_depth1() -> Self {
-        Self::new('t')
-    }
-
-    fn kani_depth2() -> Self {
-        Self::new('k')
-    }
-
-    fn kani_any() -> Self {
-        Self::new(char::kani_any())
-    }
-}
+use mirror::KaniCompose;
 
 // Self-test of KaniCompose's own contract for KaniFormatAtom, not a
 // production proof -- same reasoning as compose.rs's own `mod proofs`:

@@ -10,17 +10,7 @@ use amenable_std::RustStdStandard;
 use super::error_kind_and_io_slice::VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
 
@@ -90,6 +80,7 @@ impl KaniWitness for RustStdStandard<std::io::Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_error_from_error_kind_preserves_the_kind".to_owned(),

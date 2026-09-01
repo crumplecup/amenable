@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 119 8 119 91 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 62 8 62 91 *)
 
-let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 120 29 120 30
-let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 120 29 120 38
-let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 117 19 117 51
-let%span senv_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 118 18 118 59
-let%span senv_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 68 24 68 44
-let%span senv_carriers'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 82 24 82 75
+let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 63 29 63 30
+let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 63 29 63 38
+let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 60 19 60 51
+let%span senv_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 61 18 61 59
+let%span senv_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 11 24 11 44
+let%span senv_carriers'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 25 24 25 75
 
 use creusot.int.UInt64
 use creusot.prelude.Any
@@ -15,10 +15,10 @@ type tup2_usize_usize = { f0: UInt64.t; f1: UInt64.t }
 
 constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
 
-predicate argv_extra_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 67 8 67 58] (extra: UInt64.t) =
+predicate argv_extra_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 10 8 10 58] (extra: UInt64.t) =
   [%#senv_carriers'3] UInt64.t'int extra < UInt64.t'int const_MAX
 
-predicate argv_includes_program_path [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 81 8 81 88] (extra: UInt64.t) (args_result: tup2_usize_usize) =
+predicate argv_includes_program_path [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 24 8 24 88] (extra: UInt64.t) (args_result: tup2_usize_usize) =
   [%#senv_carriers'4] UInt64.t'int args_result.f0 >= 1 /\ UInt64.t'int args_result.f0 = 1 + UInt64.t'int extra
 
 meta "compute_max_steps" 1000000
@@ -26,7 +26,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_args_os_reports_at_least_the_program_path
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 119 8 119 91] (extra: UInt64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 62 8 62 91] (extra: UInt64.t)
   (return (x: tup2_usize_usize)) =
   {[@stop_split] [@expl:verify_args_os_reports_at_least_the_program_path requires] [%#senv_carriers'1] argv_extra_headroom_holds extra}
   (! bb0

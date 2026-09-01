@@ -20,7 +20,7 @@ use syn::{DeriveInput, Error, LitStr, Type};
 /// `#[proof_token(proposition = "...")]`.
 ///
 /// Also registers an `amenable_core::ProofTokenMintRecord` unconditionally
-/// -- a codegen consumer (e.g. `amenable::emit-verus-gaap-tokens`, see
+/// -- a codegen consumer (e.g. `amenable verus emit-gaap-tokens`, see
 /// that record's own doc comment) filters down to whichever tokens it
 /// actually cares about; every `ProofToken`-derived type in the workspace
 /// registering here costs nothing unused.

@@ -76,7 +76,7 @@ creusot_env := "PATH=" + home_directory() + "/.local/share/creusot/bin:${PATH} D
 # declared, and `cargo fmt`'s file discovery walks the module tree, not
 # the literal file tree.
 generate-creusot:
-    cargo run -p amenable --features creusot -- emit-creusot-companions
+    cargo run -p amenable --features creusot -- creusot emit-companions
     rustfmt crates/amenable_creusot/src/generated/*.rs
 
 check-creusot:
@@ -122,7 +122,7 @@ verify-creusot:
 # dependency of anything (see `amenable_std::verus_witness`'s own doc
 # comment for why), so it has no feature to turn on.
 emit-verus-witnesses:
-    cargo run -p amenable --features verus -- emit-verus-witnesses
+    cargo run -p amenable --features verus -- verus emit-witnesses
 
 # Regenerates `amenable_verus::gallery::stoplight_exchange`'s derived
 # `Exchange`-edge companions from `amenable_core::ExchangeEdgeRecord` --
@@ -132,7 +132,7 @@ emit-verus-witnesses:
 # discover `include!`d files (only walks the `mod` tree), so `rustfmt`
 # runs directly on the generated files, matching `generate-creusot`.
 generate-verus-exchange:
-    cargo run -p amenable --features verus -- emit-verus-exchange-companions
+    cargo run -p amenable --features verus -- verus emit-exchange-companions
     rustfmt crates/amenable_verus/src/gallery/generated/*/*.rs
 
 # Regenerates `amenable_verus::gallery::ledger_exchange`'s derived
@@ -140,13 +140,13 @@ generate-verus-exchange:
 # core::ProofTokenMintRecord` -- the token-layer counterpart to
 # `generate-verus-exchange` (`GAAP_LEDGER_PLAN.md`'s Step 8). Previously
 # only ever run by hand via `cargo run -p amenable --features verus --
-# emit-verus-gaap-tokens`, with no `just` recipe wrapping it at all -- a
+# verus emit-gaap-tokens`, with no `just` recipe wrapping it at all -- a
 # real gap (`CLAUDE.md`'s own "reference `just` recipes, never raw
 # `cargo` commands" rule), closed here rather than left in place once
 # `reject`'s/`rollback`'s own tokens needed regenerating too (`GAAP_
 # LEDGER_PLAN.md`'s Step 7, revisited).
 generate-verus-gaap-tokens:
-    cargo run -p amenable --features verus -- emit-verus-gaap-tokens
+    cargo run -p amenable --features verus -- verus emit-gaap-tokens
     rustfmt crates/amenable_verus/src/gallery/generated/ledger_tokens.rs
 
 check-verus:

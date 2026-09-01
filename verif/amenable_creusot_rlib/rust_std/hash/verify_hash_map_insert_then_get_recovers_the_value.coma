@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 149 8 152 45 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 94 8 97 45 *)
 
-let%span shash = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 154 39 154 43
-let%span shash'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 147 19 147 23
-let%span shash'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 148 18 148 76
-let%span shash'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 122 16 125 17
+let%span shash = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 99 39 99 43
+let%span shash'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 92 19 92 23
+let%span shash'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 93 18 93 76
+let%span shash'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 67 16 70 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: bool }
 
-predicate hash_map_insert_then_get_recovers_the_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 117 8 120 17] (value: Int32.t) (map_result: tup3_Option_i32_Option_i32_bool) =
+predicate hash_map_insert_then_get_recovers_the_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 62 8 65 17] (value: Int32.t) (map_result: tup3_Option_i32_Option_i32_bool) =
   [%#shash'2] match map_result with
     | {f0 = Some got; f1 = Some removed; f2 = empty} -> got = value /\ removed = value /\ empty
     | _ -> false
@@ -23,8 +23,8 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_hash_map_insert_then_get_recovers_the_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 149 8 152 45] (key: Int32.t)
-  (value: Int32.t) (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 94 8 97 45] (key: Int32.t) (value: Int32.t)
+  (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some value ] s1
     | s1 = [ &_8 <- Some value ] s2

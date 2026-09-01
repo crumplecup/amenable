@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 135 8 135 79 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 78 8 78 79 *)
 
 let%span sptr = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 419 18 419 37
 let%span sptr'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 410 18 410 45
-let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 136 23 136 39
-let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 137 12 137 23
-let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 137 27 137 37
-let%span stuple_fn_raw_pointer'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 133 19 133 23
-let%span stuple_fn_raw_pointer'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 134 18 134 24
+let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 79 23 79 39
+let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 80 12 80 23
+let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 80 27 80 37
+let%span stuple_fn_raw_pointer'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 76 19 76 23
+let%span stuple_fn_raw_pointer'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 77 18 77 24
 
 use creusot.prelude.Opaque
 use creusot.int.UInt64
@@ -29,7 +29,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_mut_pointer_cast_preserves_the_address
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 135 8 135 79]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 78 8 78 79]
   (ptr: Opaque.ptr) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = cast_i32 [%#stuple_fn_raw_pointer] {ptr} (fun (_x: Opaque.ptr) -> [ &cast <- _x ] s1)

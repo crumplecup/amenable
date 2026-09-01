@@ -663,7 +663,7 @@ with their `creusot` feature) clean; full workspace `cargo check
 --workspace --all-features` clean.
 
 **A real, recurring papercut fixed along the way, not scope creep**:
-`amenable emit-creusot-companions` reads the shared `ExchangeEdgeRecord`
+`amenable creusot emit-companions` reads the shared `ExchangeEdgeRecord`
 registry, which `#[amenable_derive::exchange(..)]` populates
 unconditionally — so it was also picking up `amenable_kani::ledger`'s
 own edges (`validate`/`commit`/`reject`/`rollback`) and writing dead,

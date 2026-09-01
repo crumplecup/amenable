@@ -1,11 +1,7 @@
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use super::array_slice_str::VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC;
 use super::tuple_fn_ptr::VERIFY_TUPLE_FIELD_ACCESS_SRC;

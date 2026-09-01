@@ -1,32 +1,30 @@
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
-#[cfg(kani)]
-use std::collections::BinaryHeap;
 
 use super::shared_markers::VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC;
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FirstValueIsLessThanTheSecond;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PopRecoversTheStoredValue;
 use crate::rust_std::macros::bridge_kani_witness;
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use std::cell::Cell;
+    pub(super) use std::collections::BinaryHeap;
+
+    pub(super) use crate::EmptiedContainerReportsEmpty;
+    pub(super) use crate::PopRecoversTheStoredValue;
+}
+#[cfg(kani)]
+use mirror::{
+    BinaryHeap, Cell, EmptiedContainerReportsEmpty, Ensures, PopRecoversTheStoredValue, Requires,
+};
 
 impl KaniWitness for RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> {
     type SupportingEvidence = Self;
@@ -324,6 +322,7 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'sta
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
@@ -361,6 +360,7 @@ pub struct PeekRevealsTheStoredReference<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for PeekRevealsTheStoredReference<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -370,14 +370,17 @@ impl<T> Evidence for PeekRevealsTheStoredReference<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }

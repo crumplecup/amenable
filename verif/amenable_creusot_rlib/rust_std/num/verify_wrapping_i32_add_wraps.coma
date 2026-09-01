@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 182 8 182 93 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 168 8 168 93 *)
 
-let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 150 18 150 44
-let%span snum = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 183 12 183 17
-let%span snum'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 180 19 180 23
-let%span snum'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 181 18 181 60
-let%span snum'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 165 24 165 49
+let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 100 18 100 44
+let%span snum = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 169 12 169 17
+let%span snum'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 166 19 166 23
+let%span snum'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 167 18 167 60
+let%span snum'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 151 24 151 49
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -16,7 +16,7 @@ let rec add_Wrapping_i32 (self_: t_Wrapping_i32) (rhs: t_Wrapping_i32) (return (
     = Int32.add self_.f0 rhs.f0}
     (! return {result}) ]
 
-predicate wrapping_i32_add_wraps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 160 8 164 17] (a: t_Wrapping_i32) (b: t_Wrapping_i32) (add_result: t_Wrapping_i32) =
+predicate wrapping_i32_add_wraps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 146 8 150 17] (a: t_Wrapping_i32) (b: t_Wrapping_i32) (add_result: t_Wrapping_i32) =
   [%#snum'2] add_result.f0 = Int32.add a.f0 b.f0
 
 meta "compute_max_steps" 1000000
@@ -24,7 +24,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_wrapping_i32_add_wraps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 182 8 182 93] (a: t_Wrapping_i32)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num.rs" 168 8 168 93] (a: t_Wrapping_i32)
   (b: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Wrapping_i32 [%#snum] {a} {b} (fun (_x: t_Wrapping_i32) -> [ &_ret <- _x ] s1) | s1 = return {_ret} ] ]

@@ -52,15 +52,15 @@ directly — see [`justfile`](../../justfile). Each reads a real
 can't tolerate in its own compiled output) and writes a checked-in,
 proc-macro-free companion file:
 
-- `amenable emit-creusot-companions` — Creusot `Exchange`-edge
+- `amenable creusot emit-companions` — Creusot `Exchange`-edge
   companions from `amenable_core::ExchangeEdgeRecord` (`just
   generate-creusot`).
-- `amenable emit-verus-exchange-companions` — the Verus equivalent
+- `amenable verus emit-exchange-companions` — the Verus equivalent
   (`just generate-verus-exchange`).
-- `amenable emit-verus-gaap-tokens` — Verus proof-token companions from
+- `amenable verus emit-gaap-tokens` — Verus proof-token companions from
   `amenable_core::ProofTokenMintRecord` (`just
   generate-verus-gaap-tokens`).
-- `amenable emit-verus-witnesses` — Verus witness-composition companions
+- `amenable verus emit-witnesses` — Verus witness-composition companions
   (`just emit-verus-witnesses`).
 
 See [`amenable_derive`](../amenable_derive/README.md) for the macros

@@ -1,17 +1,17 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 93 8 93 89 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 36 8 36 89 *)
 
-let%span sos_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 94 13 94 17
-let%span sos_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 94 19 94 25
-let%span sos_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 91 19 91 23
-let%span sos_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 92 18 92 78
-let%span sos_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 70 16 72 17
+let%span sos_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 37 13 37 17
+let%span sos_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 37 19 37 25
+let%span sos_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 34 19 34 23
+let%span sos_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 35 18 35 78
+let%span sos_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 13 16 15 17
 
 use creusot.int.UInt64
 use creusot.prelude.Any
 
 type tup2_bool_usize = { f0: bool; f1: UInt64.t }
 
-predicate os_str_valid_utf8_content_round_trips_through_to_str [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 66 8 68 17] (os_str_result: tup2_bool_usize) =
+predicate os_str_valid_utf8_content_round_trips_through_to_str [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 9 8 11 17] (os_str_result: tup2_bool_usize) =
   [%#sos_str'3] match os_str_result with
     | {f0 = round_trips; f1 = byte_len} -> round_trips /\ byte_len = (2: UInt64.t)
     end
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_os_str_valid_utf8_content_round_trips_through_to_str
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 93 8 93 89]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 36 8 36 89]
   (return (x: tup2_bool_usize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#sos_str] true); f1 = ([%#sos_str'0] (2: UInt64.t)) } ] s1 | s1 = return {_ret} ] ]

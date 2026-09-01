@@ -1,5 +1,5 @@
 proof_id,timestamp,status
-amenable_kani::calculator::add_impl_computes_exact_sum,1788043176,passed
+amenable_kani::calculator::add_impl_computes_exact_sum,1788279108,passed
 amenable_kani::calculator::verify_credit_access_preserves_value,1787759144,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1787759153,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1787759163,passed
@@ -15,7 +15,7 @@ amenable_kani::os_windows_model::verify_windows_handle_or_invalid_rejects_only_t
 amenable_kani::os_windows_model::verify_windows_socket_as_raw_socket_recovers_the_wrapped_value,1788026801,passed
 amenable_kani::rust_std::alloc_borrow::verify_cow_borrowed_and_owned_agree_on_their_value,1788043207,passed
 amenable_kani::rust_std::alloc_boxed::verify_box_derefs_and_writes_through,1787759681,passed
-amenable_kani::rust_std::alloc_collections::binary_heap::verify_binary_heap_pop_yields_the_maximum_first,1788144705,passed
+amenable_kani::rust_std::alloc_collections::binary_heap::verify_binary_heap_pop_yields_the_maximum_first,1788279146,passed
 amenable_kani::rust_std::alloc_collections::binary_heap_iterators::verify_binary_heap_drain_yields_every_pushed_element_once,1788144729,passed
 amenable_kani::rust_std::alloc_collections::btree::verify_btree_map_iterates_in_key_order,1788144686,passed
 amenable_kani::rust_std::alloc_collections::linked_list_iterators::verify_linked_list_iter_yields_references_in_order,1788144742,passed
@@ -372,6 +372,7 @@ amenable_kani::rust_std::sync_lock::condvar::verify_condvar_wait_timeout_reports
 amenable_kani::rust_std::sync_lock::mutex::verify_mutex_guard_writes_through,1788148057,passed
 amenable_kani::rust_std::sync_lock::once_and_lazy::verify_once_runs_its_closure_exactly_once,1788148093,passed
 amenable_kani::rust_std::sync_lock::poison_and_timeout_errors::verify_wait_timeout_result_reports_timed_out,1788148126,passed
+amenable_kani::rust_std::sync_lock::rwlock::verify_rwlock_allows_concurrent_reads_but_not_a_write,1788279163,passed
 amenable_kani::rust_std::sync_lock::rwlock::verify_rwlock_read_guard_derefs_to_the_value,1788148074,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_of_one_is_its_own_leader,1787762999,passed
 amenable_kani::rust_std::sync_lock::verify_barrier_wait_result_reports_the_sole_participant_as_leader,1787763008,passed

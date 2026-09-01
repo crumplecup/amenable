@@ -1,11 +1,11 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 12 17 148 *)
 
-(* ledger::ledger_validate::Ledger *)
+(* ledger::ledger_validate::mirror::Ledger *)
 
-let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
-let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 112 21 112 31
-let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 111 18 111 22
-let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 171 8 171 13
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 122 25 122 35
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 121 22 121 26
+let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 109 0 109 93
 let%span sreject = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 45

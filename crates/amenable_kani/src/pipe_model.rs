@@ -12,10 +12,6 @@
 //! - if the real std/libc path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-#[cfg(kani)]
-use crate::KaniCompose;
-#[cfg(kani)]
-use crate::compose::{kani_assume, symbolic_any};
 use crate::fd_model::KaniFd;
 
 /// Modeled anonymous-pipe reader endpoint.
@@ -84,7 +80,8 @@ impl KaniPipeWriter {
 
 impl KaniPipe {
     /// Construct a fixed, deterministic open reader/writer pair backed by
-    /// resource id 0 -- unlike [`Self::fresh`], no non-deterministic
+    /// resource id 0 -- unlike `Self::fresh` (only available under
+    /// `#[cfg(kani)]`, so not linkable here), no non-deterministic
     /// construction, so (unlike `fresh`) this has nothing Kani-specific
     /// about it and stays available outside `cfg(kani)`.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
@@ -92,23 +89,6 @@ impl KaniPipe {
         Self {
             reader: KaniPipeReader(KaniFd::live(0, 0)),
             writer: KaniPipeWriter(KaniFd::live(1, 0)),
-            buffered: Vec::new(),
-            reader_open: true,
-            writer_open: true,
-        }
-    }
-
-    /// Construct a fresh open reader/writer pair backed by one modeled resource.
-    #[cfg(kani)]
-    pub fn fresh() -> Self {
-        let resource_id: u64 = symbolic_any();
-        let reader_raw: u16 = symbolic_any();
-        let writer_raw: u16 = symbolic_any();
-        kani_assume(reader_raw != writer_raw);
-
-        Self {
-            reader: KaniPipeReader(KaniFd::live(i32::from(reader_raw), resource_id)),
-            writer: KaniPipeWriter(KaniFd::live(i32::from(writer_raw), resource_id)),
             buffered: Vec::new(),
             reader_open: true,
             writer_open: true,
@@ -224,66 +204,99 @@ impl KaniPipe {
     }
 }
 
+/// The `#[cfg(kani)]` imports, extra inherent methods, and `KaniCompose`
+/// impls this file needs, consolidated into one gate on this `mod`
+/// instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. No bridging re-export needed: `KaniPipe::fresh`
+/// attaches to its type regardless of which module the `impl` block
+/// lives in, and the `KaniCompose` impls are likewise globally visible
+/// the moment they're compiled. `pipe.buffered` (a private field defined
+/// at this file's own top level) stays reachable from here the same way
+/// a private item always is from any descendant module.
 #[cfg(kani)]
-impl KaniCompose for KaniPipeReader {
-    fn kani_depth0() -> Self {
-        KaniPipe::kani_depth0().reader()
+mod mirror {
+    use crate::KaniCompose;
+    use crate::compose::{kani_assume, symbolic_any};
+
+    use super::{KaniFd, KaniPipe, KaniPipeReader, KaniPipeWriter};
+
+    impl KaniPipe {
+        /// Construct a fresh open reader/writer pair backed by one modeled resource.
+        pub fn fresh() -> Self {
+            let resource_id: u64 = symbolic_any();
+            let reader_raw: u16 = symbolic_any();
+            let writer_raw: u16 = symbolic_any();
+            kani_assume(reader_raw != writer_raw);
+
+            Self {
+                reader: KaniPipeReader(KaniFd::live(i32::from(reader_raw), resource_id)),
+                writer: KaniPipeWriter(KaniFd::live(i32::from(writer_raw), resource_id)),
+                buffered: Vec::new(),
+                reader_open: true,
+                writer_open: true,
+            }
+        }
     }
 
-    fn kani_depth1() -> Self {
-        KaniPipe::kani_depth1().reader()
+    impl KaniCompose for KaniPipeReader {
+        fn kani_depth0() -> Self {
+            KaniPipe::kani_depth0().reader()
+        }
+
+        fn kani_depth1() -> Self {
+            KaniPipe::kani_depth1().reader()
+        }
+
+        fn kani_depth2() -> Self {
+            KaniPipe::kani_depth2().reader()
+        }
+
+        fn kani_any() -> Self {
+            KaniPipe::kani_any().reader()
+        }
     }
 
-    fn kani_depth2() -> Self {
-        KaniPipe::kani_depth2().reader()
+    impl KaniCompose for KaniPipeWriter {
+        fn kani_depth0() -> Self {
+            KaniPipe::kani_depth0().writer()
+        }
+
+        fn kani_depth1() -> Self {
+            KaniPipe::kani_depth1().writer()
+        }
+
+        fn kani_depth2() -> Self {
+            KaniPipe::kani_depth2().writer()
+        }
+
+        fn kani_any() -> Self {
+            KaniPipe::kani_any().writer()
+        }
     }
 
-    fn kani_any() -> Self {
-        KaniPipe::kani_any().reader()
-    }
-}
+    impl KaniCompose for KaniPipe {
+        fn kani_depth0() -> Self {
+            Self::minimal()
+        }
 
-#[cfg(kani)]
-impl KaniCompose for KaniPipeWriter {
-    fn kani_depth0() -> Self {
-        KaniPipe::kani_depth0().writer()
-    }
+        fn kani_depth1() -> Self {
+            let mut pipe = Self::kani_depth0();
+            pipe.buffered.push(0);
+            pipe
+        }
 
-    fn kani_depth1() -> Self {
-        KaniPipe::kani_depth1().writer()
-    }
+        fn kani_depth2() -> Self {
+            let mut pipe = Self::kani_depth0();
+            pipe.buffered.push(0);
+            pipe.buffered.push(0);
+            pipe
+        }
 
-    fn kani_depth2() -> Self {
-        KaniPipe::kani_depth2().writer()
-    }
-
-    fn kani_any() -> Self {
-        KaniPipe::kani_any().writer()
-    }
-}
-
-#[cfg(kani)]
-impl KaniCompose for KaniPipe {
-    fn kani_depth0() -> Self {
-        Self::minimal()
-    }
-
-    fn kani_depth1() -> Self {
-        let mut pipe = Self::kani_depth0();
-        pipe.buffered.push(0);
-        pipe
-    }
-
-    fn kani_depth2() -> Self {
-        let mut pipe = Self::kani_depth0();
-        pipe.buffered.push(0);
-        pipe.buffered.push(0);
-        pipe
-    }
-
-    fn kani_any() -> Self {
-        let mut pipe = Self::fresh();
-        pipe.buffered = <Vec<u8> as KaniCompose>::kani_any();
-        pipe
+        fn kani_any() -> Self {
+            let mut pipe = Self::fresh();
+            pipe.buffered = <Vec<u8> as KaniCompose>::kani_any();
+            pipe
+        }
     }
 }

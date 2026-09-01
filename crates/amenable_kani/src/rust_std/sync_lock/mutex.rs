@@ -4,17 +4,7 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
-#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::GetterRecoversTheStoredReference;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniMutexExclusionObservation, KaniVerifier, KaniWitness};
@@ -86,6 +76,7 @@ impl Establish<KaniMutexExclusionWitnessToken, KaniVerifier>
 {
     type Token = RustStdMutexToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniMutexExclusionWitnessToken) -> Self::Token {
         RustStdMutexToken(())
     }
@@ -116,6 +107,7 @@ impl KaniWitness for RustStdStandard<std::sync::MutexGuard<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_mutex_guard_writes_through".to_owned(),

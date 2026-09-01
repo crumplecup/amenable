@@ -3,8 +3,6 @@ use std::str::{MatchIndices, RMatchIndices};
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]

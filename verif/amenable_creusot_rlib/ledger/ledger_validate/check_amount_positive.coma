@@ -1,15 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 283 8 283 64 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 292 8 292 64 *)
 
-let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 284 21 284 22
-let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 281 19 281 23
-let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 282 18 282 55
-let%span sledger_validate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 293 21 293 22
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 290 19 290 23
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 291 18 291 55
+let%span sledger_validate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger_validate'2] outcome = (Int64.to_int amount > 0)
 
 meta "compute_max_steps" 1000000
@@ -17,7 +17,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec check_amount_positive
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 283 8 283 64] (amount: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 292 8 292 64] (amount: Int64.t)
   (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int64.gt amount ([%#sledger_validate] (0: Int64.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & amount: Int64.t = amount ])

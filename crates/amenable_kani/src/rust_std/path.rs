@@ -12,24 +12,35 @@ use std::path::{
     Ancestors, Component, Components, Path, PathBuf, Prefix, PrefixComponent, StripPrefixError,
 };
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniPathDisplayObservation, KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::Ensures;
+
+    pub(super) use crate::AccessorRecoversTheExpectedValue;
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::FallibleOperationReportsFailure;
+    pub(super) use crate::IndexRecoversTheStoredElement;
+    pub(super) use crate::IteratorYieldsNoneWhenExhausted;
+}
+#[cfg(kani)]
+use mirror::{
+    AccessorRecoversTheExpectedValue, CollectedSequenceMatchesExpected, Ensures,
+    FallibleOperationReportsFailure, IndexRecoversTheStoredElement,
+    IteratorYieldsNoneWhenExhausted,
+};
 
 impl KaniWitness for RustStdStandard<Ancestors<'static>> {
     type SupportingEvidence = Self;

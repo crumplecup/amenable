@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 133 8 136 21 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 80 8 83 21 *)
 
-let%span sduration_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 137 12 137 38
-let%span sduration_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 131 19 131 59
-let%span sduration_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 136 13 136 21
-let%span sduration_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 132 18 132 96
-let%span sduration_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 67 24 67 69
-let%span sduration_carrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 88 16 89 81
+let%span sduration_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 84 12 84 38
+let%span sduration_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 78 19 78 59
+let%span sduration_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 83 13 83 21
+let%span sduration_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 79 18 79 96
+let%span sduration_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 14 24 14 69
+let%span sduration_carrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 35 16 36 81
 let%span stime = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 72 19 72 61
 let%span stime'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 73 18 73 58
 let%span stime'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/time.rs" 39 4 39 25
@@ -43,11 +43,11 @@ let rec new (secs: UInt64.t) (nanos: UInt32.t) (return (x: t_Duration)) =
     = secs_to_nanos (UInt64.t'int secs) + UInt32.t'int nanos)}
     (! return {result}) ]
 
-predicate duration_new_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 66 8 66 69] (secs: UInt64.t) (nanos: UInt32.t) =
+predicate duration_new_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 13 8 13 69] (secs: UInt64.t) (nanos: UInt32.t) =
   [%#sduration_carrier'3] UInt64.t'int secs + ComputerDivision.div (UInt32.t'int nanos) 1000000000
   <= UInt64.t'int const_MAX
 
-predicate duration_new_normalizes_nanos_and_carries_into_secs_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 82 8 86 17] (secs: UInt64.t) (nanos: UInt32.t) (duration_result: t_Duration) =
+predicate duration_new_normalizes_nanos_and_carries_into_secs_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 29 8 33 17] (secs: UInt64.t) (nanos: UInt32.t) (duration_result: t_Duration) =
   [%#sduration_carrier'4] nanos_to_secs (view_Duration duration_result)
     = UInt64.t'int secs + ComputerDivision.div (UInt32.t'int nanos) 1000000000
   /\ ComputerDivision.mod (view_Duration duration_result) 1000000000
@@ -58,7 +58,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_duration_new_normalizes_nanos_and_carries_into_secs
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 133 8 136 21] (secs: UInt64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/duration_carrier.rs" 80 8 83 21] (secs: UInt64.t)
   (nanos: UInt32.t) (return (x: t_Duration)) =
   {[@stop_split] [@expl:verify_duration_new_normalizes_nanos_and_carries_into_secs requires] [%#sduration_carrier'0] duration_new_headroom_holds secs nanos}
   (! bb0

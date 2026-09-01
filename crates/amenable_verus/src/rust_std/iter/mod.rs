@@ -2,11 +2,6 @@ mod array_into_iter_carrier;
 pub use array_into_iter_carrier::{
     VerusArrayIntoIterModel, verify_array_into_iter_model_yields_elements_in_order,
 };
-#[cfg(verus_keep_ghost)]
-pub use array_into_iter_carrier::{
-    array_into_iter_advance_matches_position, array_into_iter_model_starts_at_first_position,
-    yields_three_values_in_order_then_ends,
-};
 mod iter_generator_carrier;
 pub use iter_generator_carrier::{
     verify_empty_model_yields_nothing, verify_once_model_yields_exactly_one_value,
@@ -16,19 +11,12 @@ pub use iter_generator_carrier::{
     verify_repeat_with_model_calls_its_closure_once_per_item,
 };
 mod iter_sequence_carrier;
-#[cfg(verus_keep_ghost)]
-pub use iter_sequence_carrier::{
-    four_increment_headroom_holds, increment_headroom_holds, single_increment_headroom_holds,
-    ten_increment_headroom_holds, two_increment_headroom_holds,
-};
 pub use iter_sequence_carrier::{
     verify_chain_model_sequences_two_iterators_end_to_end,
     verify_enumerate_model_pairs_each_item_with_its_index,
     verify_rev_model_reverses_iteration_order, verify_zip_model_pairs_items_from_two_iterators,
 };
 mod iter_stateful_carrier;
-#[cfg(verus_keep_ghost)]
-pub use iter_stateful_carrier::is_within_scan_sum_headroom;
 pub use iter_stateful_carrier::{
     verify_cycle_model_repeats_its_sequence_forever,
     verify_flat_map_model_flattens_each_generated_iterator,
@@ -41,11 +29,6 @@ pub use iter_stateful_carrier::{
     verify_successors_model_generates_from_the_previous_item,
 };
 mod iter_transform_carrier;
-#[cfg(verus_keep_ghost)]
-pub use iter_transform_carrier::{
-    is_within_map_while_doubling_headroom, map_while_closure_result_matches,
-    nonzero_item_survives_filtering,
-};
 pub use iter_transform_carrier::{
     verify_cloned_model_clones_each_referenced_item,
     verify_copied_model_copies_each_referenced_item,
@@ -62,8 +45,6 @@ pub use iter_window_carrier::{
     verify_take_while_model_yields_items_while_the_predicate_holds,
 };
 mod option_result_iter_carrier;
-#[cfg(verus_keep_ghost)]
-pub use option_result_iter_carrier::into_iter_yields_zero_or_one_owned_value;
 pub use option_result_iter_carrier::{
     verify_into_iter_model_yields_zero_or_one_owned_value,
     verify_iter_model_yields_zero_or_one_reference, verify_iter_mut_model_writes_through,
@@ -72,22 +53,13 @@ mod ordered_pair_into_iter_carrier;
 pub use ordered_pair_into_iter_carrier::{
     VerusOrderedPairIntoIterModel, verify_ordered_pair_into_iter_model_yields_owned_values_in_order,
 };
-#[cfg(verus_keep_ghost)]
-pub use ordered_pair_into_iter_carrier::{
-    ordered_pair_into_iter_advance_result_matches,
-    ordered_pair_into_iter_model_starts_at_position_zero,
-};
 mod ordered_pair_iter_mut_carrier;
 pub use ordered_pair_iter_mut_carrier::{
     VerusOrderedPairIterMutModel, verify_ordered_pair_iter_mut_model_writes_through_in_order,
 };
 mod slice_chunk_by_carrier;
-#[cfg(verus_keep_ghost)]
-pub use slice_chunk_by_carrier::chunk_by_result_matches_grouping;
 pub use slice_chunk_by_carrier::verify_chunk_by_model_groups_adjacent_elements_matching_the_predicate;
 mod slice_chunks_carrier;
-#[cfg(verus_keep_ghost)]
-pub use slice_chunks_carrier::ten_increment_write_through;
 pub use slice_chunks_carrier::{
     verify_chunks_exact_model_discards_a_short_remainder,
     verify_chunks_exact_mut_model_leaves_the_remainder_untouched,
@@ -115,8 +87,36 @@ pub use slice_split_carrier::{
     verify_split_n_model_caps_the_number_of_pieces,
 };
 mod unordered_pair_carrier;
-#[cfg(verus_keep_ghost)]
-pub use unordered_pair_carrier::drain_result_matches_order;
 pub use unordered_pair_carrier::{
     VerusUnorderedPairModel, verify_unordered_pair_model_yields_every_element_once,
 };
+
+/// Ghost/spec-only re-exports, one `#[cfg(verus_keep_ghost)]` gate on this
+/// `mod` instead of scattered per-carrier ones -- see `misc::mod`'s own
+/// doc comment for the full rationale.
+#[cfg(verus_keep_ghost)]
+mod ghost_reexports {
+    pub use super::array_into_iter_carrier::{
+        array_into_iter_advance_matches_position, array_into_iter_model_starts_at_first_position,
+        yields_three_values_in_order_then_ends,
+    };
+    pub use super::iter_sequence_carrier::{
+        four_increment_headroom_holds, increment_headroom_holds, single_increment_headroom_holds,
+        ten_increment_headroom_holds, two_increment_headroom_holds,
+    };
+    pub use super::iter_stateful_carrier::is_within_scan_sum_headroom;
+    pub use super::iter_transform_carrier::{
+        is_within_map_while_doubling_headroom, map_while_closure_result_matches,
+        nonzero_item_survives_filtering,
+    };
+    pub use super::option_result_iter_carrier::into_iter_yields_zero_or_one_owned_value;
+    pub use super::ordered_pair_into_iter_carrier::{
+        ordered_pair_into_iter_advance_result_matches,
+        ordered_pair_into_iter_model_starts_at_position_zero,
+    };
+    pub use super::slice_chunk_by_carrier::chunk_by_result_matches_grouping;
+    pub use super::slice_chunks_carrier::ten_increment_write_through;
+    pub use super::unordered_pair_carrier::drain_result_matches_order;
+}
+#[cfg(verus_keep_ghost)]
+pub use ghost_reexports::*;

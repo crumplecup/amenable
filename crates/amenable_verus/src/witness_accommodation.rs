@@ -22,18 +22,6 @@
 
 use crate::{Evidence, Verifier};
 
-/// Stand-in for the real `WitnessSupportSummary` (a richer struct in
-/// `amenable_core::witness`) -- only `support()`'s default return type
-/// matters here, not its real fields.
-pub struct WitnessSupportSummary;
-
-impl WitnessSupportSummary {
-    /// Mirrors the real `WitnessSupportSummary::opaque_leaf()`.
-    pub fn opaque_leaf() -> Self {
-        Self
-    }
-}
-
 /// Verbatim copy of the real `Witness<V>` trait's own definition (no
 /// inventory-dependent code included).
 pub trait Witness<V: Verifier> {
@@ -55,5 +43,17 @@ pub trait Witness<V: Verifier> {
     /// Produce the basis behind this proof's supporting evidence.
     fn basis() -> <Self::SupportingEvidence as Evidence>::Basis {
         <Self::SupportingEvidence as Evidence>::basis()
+    }
+}
+
+/// Stand-in for the real `WitnessSupportSummary` (a richer struct in
+/// `amenable_core::witness`) -- only `support()`'s default return type
+/// matters here, not its real fields.
+pub struct WitnessSupportSummary;
+
+impl WitnessSupportSummary {
+    /// Mirrors the real `WitnessSupportSummary::opaque_leaf()`.
+    pub fn opaque_leaf() -> Self {
+        Self
     }
 }

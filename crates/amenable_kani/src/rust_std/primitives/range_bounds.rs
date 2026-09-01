@@ -1,11 +1,5 @@
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use super::ascii::ValueIsWithinInclusiveRange;
 use crate::CheckedProof;
@@ -271,6 +265,7 @@ pub struct ValueIsBelow<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for ValueIsBelow<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -280,14 +275,17 @@ impl<T> Evidence for ValueIsBelow<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -297,6 +295,7 @@ impl<T> KaniWitness for ValueIsBelow<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
@@ -311,6 +310,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsBelow<T> {
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }

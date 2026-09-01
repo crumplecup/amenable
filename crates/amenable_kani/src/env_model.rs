@@ -11,11 +11,6 @@
 //! - if the real process argv conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-#[cfg(kani)]
-use crate::KaniCompose;
-#[cfg(kani)]
-use crate::compose::{kani_assume, symbolic_any};
-
 /// Modeled process argv with one guaranteed program slot.
 #[derive(
     Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters, derive_new::new,
@@ -42,23 +37,35 @@ impl KaniArgv {
     }
 }
 
+/// The `#[cfg(kani)]` imports and `KaniCompose` impl this file needs,
+/// consolidated into one gate on this `mod` instead of one per item --
+/// see `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. No bridging re-export needed: the impl is globally
+/// visible the moment it's compiled.
 #[cfg(kani)]
-impl KaniCompose for KaniArgv {
-    fn kani_depth0() -> Self {
-        Self::new(String::new(), 0)
-    }
+mod mirror {
+    use crate::KaniCompose;
+    use crate::compose::{kani_assume, symbolic_any};
 
-    fn kani_depth1() -> Self {
-        Self::new("program".to_owned(), 0)
-    }
+    use super::KaniArgv;
 
-    fn kani_depth2() -> Self {
-        Self::new("program".to_owned(), 1)
-    }
+    impl KaniCompose for KaniArgv {
+        fn kani_depth0() -> Self {
+            Self::new(String::new(), 0)
+        }
 
-    fn kani_any() -> Self {
-        let extra_count: u8 = symbolic_any();
-        kani_assume(extra_count <= 2);
-        Self::new(String::new(), extra_count)
+        fn kani_depth1() -> Self {
+            Self::new("program".to_owned(), 0)
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new("program".to_owned(), 1)
+        }
+
+        fn kani_any() -> Self {
+            let extra_count: u8 = symbolic_any();
+            kani_assume(extra_count <= 2);
+            Self::new(String::new(), extra_count)
+        }
     }
 }

@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 301 8 304 75 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 244 8 247 75 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
@@ -14,10 +14,10 @@ let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
 let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
 let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
-let%span sbinary_heap = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 299 19 299 44
-let%span sbinary_heap'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 300 18 300 78
-let%span sbinary_heap'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 275 16 283 17
-let%span sbtree = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 68 24 68 29
+let%span sbinary_heap = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 242 19 242 44
+let%span sbinary_heap'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 243 18 243 78
+let%span sbinary_heap'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 218 16 226 17
+let%span sbtree = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 11 24 11 29
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -79,10 +79,10 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
-predicate a_less_than_b_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 67 8 67 65] (a: Int32.t) (b: Int32.t) =
+predicate a_less_than_b_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 10 8 10 65] (a: Int32.t) (b: Int32.t) =
   [%#sbtree] Int32.lt a b
 
-predicate binary_heap_peek_mut_exposes_the_maximum_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 269 8 273 17] (a: Int32.t) (b: Int32.t) (peek_mut_result: tup6_i32_Option_i32_i32_Option_i32_Option_i32_Option_i32) =
+predicate binary_heap_peek_mut_exposes_the_maximum_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 212 8 216 17] (a: Int32.t) (b: Int32.t) (peek_mut_result: tup6_i32_Option_i32_i32_Option_i32_Option_i32_Option_i32) =
   [%#sbinary_heap'1] match peek_mut_result with
     | {f0 = before_mutation; f1 = top_after_observing; f2 = after_mutation; f3 = top_after_mutation; f4 = first_pop; f5 = second_pop} -> before_mutation
       = b
@@ -95,7 +95,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_peek_mut_exposes_the_maximum
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 301 8 304 75] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 244 8 247 75] (a: Int32.t)
   (b: Int32.t) (return (x: tup6_i32_Option_i32_i32_Option_i32_Option_i32_Option_i32)) =
   {[@stop_split] [@expl:verify_binary_heap_peek_mut_exposes_the_maximum requires] [%#sbinary_heap] a_less_than_b_holds a b}
   (! bb0

@@ -1,30 +1,31 @@
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
-#[cfg(kani)]
-use std::collections::BinaryHeap;
 
 use super::binary_heap_iterators::PeekRevealsTheStoredReference;
 use super::linked_list_iterators::VERIFY_LINKED_LIST_ITER_YIELDS_REFERENCES_IN_ORDER_SRC;
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FirstValueIsLessThanTheSecond;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// block below needs all of them, unqualified, at this file's own top
+/// level.
 #[cfg(kani)]
-use crate::PopRecoversTheStoredValue;
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use std::collections::BinaryHeap;
+
+    pub(super) use crate::DerefReflectsTheStoredValue;
+    pub(super) use crate::FirstValueIsLessThanTheSecond;
+    pub(super) use crate::PopRecoversTheStoredValue;
+}
+#[cfg(kani)]
+use mirror::{
+    BinaryHeap, DerefReflectsTheStoredValue, Ensures, FirstValueIsLessThanTheSecond,
+    PopRecoversTheStoredValue, Requires,
+};
 
 impl<T> KaniWitness for PeekRevealsTheStoredReference<T> {
     type SupportingEvidence = Self;
@@ -177,6 +178,7 @@ impl<T> KaniWitness for IteratorYieldsAReferenceToTheStoredValue<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_linked_list_iter_yields_references_in_order".to_owned(),

@@ -1,9 +1,0 @@
-{
-  "profile": [],
-  "proofs": {
-    "Coma": {
-      "vc_audit_surface_Stoplight": { "prover": "alt-ergo", "time": 0.013 },
-      "vc_new_TransitionAudit": { "prover": "alt-ergo", "time": 0.012 }
-    }
-  }
-}

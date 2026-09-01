@@ -1,8 +1,0 @@
-{
-  "profile": [],
-  "proofs": {
-    "Coma": {
-      "vc_verify_tuple_field_access": { "prover": "alt-ergo", "time": 0.013 }
-    }
-  }
-}

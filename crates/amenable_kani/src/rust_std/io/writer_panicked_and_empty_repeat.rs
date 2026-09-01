@@ -5,18 +5,6 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniVerifier, KaniWitness, KaniWriterPanickedObservation};
@@ -56,7 +44,7 @@ impl ProofToken for KaniWriterPanickedWitnessToken {
 impl KaniWriterPanickedObservation {
     /// Assert the panic was captured and the buffered bytes are
     /// recoverable unchanged. Consumes `self` for the same reason
-    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    /// [`crate::KaniBufferedReadObservation::demonstrate_read_through`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_recovery(self, buffered: [u8; 2]) -> KaniWriterPanickedWitnessToken {
@@ -160,6 +148,7 @@ impl KaniWitness for RustStdStandard<std::io::Repeat> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_repeat_fills_the_buffer_with_the_given_byte".to_owned(),

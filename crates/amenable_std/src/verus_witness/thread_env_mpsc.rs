@@ -299,6 +299,7 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::TryIter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_iter_model_does_not_block_on_an_empty_open_channel".to_owned(),

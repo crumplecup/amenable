@@ -5,26 +5,8 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniChunkByObservation, KaniVerifier};
 
@@ -114,6 +96,7 @@ impl Establish<KaniChunkByWitnessToken, KaniVerifier>
 {
     type Token = RustStdChunkByToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChunkByWitnessToken) -> Self::Token {
         RustStdChunkByToken(())
     }
@@ -153,6 +136,7 @@ impl KaniWitness for RustStdStandard<ChunkByMut<'static, i32, fn(&i32, &i32) -> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunk_by_mut_groups_adjacent_elements_matching_the_predicate".to_owned(),

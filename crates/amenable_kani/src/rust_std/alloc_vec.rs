@@ -2,25 +2,35 @@
 
 use std::vec::Vec;
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_derive::Standard;
 use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
-#[cfg(kani)]
-use std::cell::Cell;
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::Ensures;
+    pub(super) use std::cell::Cell;
+
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::EmptiedContainerReportsEmpty;
+    pub(super) use crate::IndexRecoversTheStoredElement;
+    pub(super) use crate::IteratorYieldsNoneWhenExhausted;
+}
+#[cfg(kani)]
+use mirror::{
+    Cell, CollectedSequenceMatchesExpected, EmptiedContainerReportsEmpty, Ensures,
+    IndexRecoversTheStoredElement, IteratorYieldsNoneWhenExhausted,
+};
 
 impl KaniWitness for RustStdStandard<Vec<i32>> {
     type SupportingEvidence = Self;
@@ -121,6 +131,7 @@ pub struct PopRecoversTheStoredValue<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for PopRecoversTheStoredValue<T> {
     type Provenance = RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as RustStdType>::provenance()
     }
@@ -130,14 +141,17 @@ impl<T> Evidence for PopRecoversTheStoredValue<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -160,6 +174,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for PopRecoversTheStoredValu
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }

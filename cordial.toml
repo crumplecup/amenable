@@ -109,3 +109,8 @@ generated_files = [
     "src/generated",
     "src/gallery/generated",
 ]
+
+# Disabled by explicit request, not a false-positive/tooling-gap finding
+# like the other exceptions in this file.
+[proof_patterns]
+enabled = false

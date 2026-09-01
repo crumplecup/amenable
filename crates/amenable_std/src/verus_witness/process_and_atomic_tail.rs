@@ -374,6 +374,7 @@ impl VerusWitness for RustStdStandard<std::process::Stdio> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_stdio_model_null_discards_the_childs_output_handle".to_owned(),

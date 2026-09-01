@@ -475,6 +475,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_poll_fn_model_dispatches_through_to_its_closure".to_owned(),

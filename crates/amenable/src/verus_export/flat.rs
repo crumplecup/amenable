@@ -32,18 +32,18 @@ pub(super) fn render_verus_module(
     }
 
     let rendered = render_node(export.artifact(), &[], &mut names)?;
-    let checked_call_count = rendered.checked_calls.len();
+    let checked_call_count = rendered.checked_calls().len();
 
     let mut source = String::new();
-    write_module_header(&mut source, export, &rendered.imports, &rendered.comments);
+    write_module_header(&mut source, export, rendered.imports(), rendered.comments());
 
     let params = rendered
-        .params
+        .params()
         .iter()
-        .map(|param| format!("{}: {}", param.local_name, param.ty))
+        .map(|param| format!("{}: {}", param.local_name(), param.ty()))
         .collect::<Vec<_>>()
         .join(", ");
-    let return_ty = render_return_type(&rendered.checked_calls);
+    let return_ty = render_return_type(rendered.checked_calls());
     source.push_str(&format!(
         "/// Proves `{module_stem}`'s own composed claim -- see this file's own\n/// header comment.\npub fn verify_{module_stem}({params}){return_ty}\n"
     ));
@@ -51,17 +51,17 @@ pub(super) fn render_verus_module(
     push_clause_block(
         &mut source,
         "requires",
-        &rendered.requires,
+        rendered.requires(),
         checked_call_count,
     );
     push_clause_block(
         &mut source,
         "ensures",
-        &rendered.ensures,
+        rendered.ensures(),
         checked_call_count,
     );
 
-    let body = render_body(&rendered.checked_calls);
+    let body = render_body(rendered.checked_calls());
     source.push_str(&format!("{{\n    {body}\n}}\n"));
     source.push_str("\n} // verus!\n");
     Ok(source)
@@ -74,11 +74,11 @@ pub(super) fn render_verus_module(
 fn render_return_type(checked_calls: &[CheckedCall]) -> String {
     match checked_calls {
         [] => String::new(),
-        [only] => format!(" -> (result: {})", only.ty),
+        [only] => format!(" -> (result: {})", only.ty()),
         many => format!(
             " -> (result: ({}))",
             many.iter()
-                .map(|call| call.ty.clone())
+                .map(|call| call.ty().clone())
                 .collect::<Vec<_>>()
                 .join(", ")
         ),
@@ -94,11 +94,11 @@ fn render_return_type(checked_calls: &[CheckedCall]) -> String {
 fn render_body(checked_calls: &[CheckedCall]) -> String {
     match checked_calls {
         [] => String::new(),
-        [only] => only.expr.clone(),
+        [only] => only.expr().clone(),
         many => format!(
             "({})",
             many.iter()
-                .map(|call| call.expr.clone())
+                .map(|call| call.expr().clone())
                 .collect::<Vec<_>>()
                 .join(", ")
         ),

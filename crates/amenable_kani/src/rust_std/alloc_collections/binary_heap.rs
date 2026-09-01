@@ -7,19 +7,7 @@ use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use std::cell::Cell;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FirstValueIsLessThanTheSecond;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::PopRecoversTheStoredValue;
@@ -29,6 +17,7 @@ impl KaniWitness for RustStdStandard<BinaryHeap<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_pop_yields_the_maximum_first".to_owned(),

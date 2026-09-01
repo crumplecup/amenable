@@ -1,15 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 343 8 354 9 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 286 8 297 9 *)
 
-let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 356 21 356 22
-let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 357 21 357 22
-let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 359 21 359 22
-let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 360 21 360 22
-let%span slinked_list'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 362 21 362 22
-let%span slinked_list'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 363 21 363 22
-let%span slinked_list'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 364 21 364 22
-let%span slinked_list'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 341 19 341 23
-let%span slinked_list'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 342 18 342 82
-let%span slinked_list'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 299 16 322 17
+let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 299 21 299 22
+let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 300 21 300 22
+let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 302 21 302 22
+let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 303 21 303 22
+let%span slinked_list'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 305 21 305 22
+let%span slinked_list'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 306 21 306 22
+let%span slinked_list'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 307 21 307 22
+let%span slinked_list'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 284 19 284 23
+let%span slinked_list'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 285 18 285 82
+let%span slinked_list'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 242 16 265 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -28,7 +28,7 @@ type tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Opt
   f8: t_Option_i32;
   f9: t_Option_i32 }
 
-predicate linked_list_extract_if_partitions_by_the_predicate_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 284 8 297 17] (extract_if_result: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32) =
+predicate linked_list_extract_if_partitions_by_the_predicate_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 227 8 240 17] (extract_if_result: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32) =
   [%#slinked_list'8] match extract_if_result with
     | {f0 = first; f1 = second; f2 = exhausted; f3 = remaining_first; f4 = remaining_second; f5 = remaining_exhausted; f6 = early_drop_first; f7 = early_drop_second; f8 = early_drop_third; f9 = early_drop_exhausted} -> first
       = Some (2: Int32.t)
@@ -46,7 +46,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_linked_list_extract_if_partitions_by_the_predicate
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 343 8 354 9]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 286 8 297 9]
   (return (x: tup10_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32_Option_i32)) =
   (! bb0
   [ bb0 = s0

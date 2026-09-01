@@ -309,6 +309,7 @@ impl VerusWitness for RustStdStandard<std::borrow::Cow<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cow_borrowed_and_owned_agree_on_their_value".to_owned(),

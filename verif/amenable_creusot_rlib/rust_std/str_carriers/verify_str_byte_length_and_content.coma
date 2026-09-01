@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 89 8 89 70 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 32 8 32 70 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
@@ -14,11 +14,11 @@ let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
 let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
 let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
-let%span sstr_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 90 13 90 19
-let%span sstr_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 87 19 87 41
-let%span sstr_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 88 18 88 65
-let%span sstr_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 66 24 66 36
-let%span sstr_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 102 24 102 70
+let%span sstr_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 33 13 33 19
+let%span sstr_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 30 19 30 41
+let%span sstr_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 31 18 31 65
+let%span sstr_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 9 24 9 36
+let%span sstr_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 45 24 45 70
 
 use creusot.int.UInt64
 use creusot.int.UInt8
@@ -73,10 +73,10 @@ function cmp_le_log_u8 (x: UInt8.t) (y: UInt8.t) : ()
 
 axiom cmp_le_log_u8_spec: forall x: UInt8.t, y: UInt8.t. [%#sord] UInt8.le x y = (cmp_log_u8 x y <> Greater)
 
-predicate ascii_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 65 8 65 45] (byte: UInt8.t) =
+predicate ascii_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 8 8 8 45] (byte: UInt8.t) =
   [%#sstr_carriers'2] UInt8.lt byte (128: UInt8.t)
 
-predicate str_byte_length_and_content_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 101 8 101 87] (byte: UInt8.t) (str_result: tup2_usize_u8) =
+predicate str_byte_length_and_content_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 44 8 44 87] (byte: UInt8.t) (str_result: tup2_usize_u8) =
   [%#sstr_carriers'3] str_result.f0 = (1: UInt64.t) /\ str_result.f1 = byte
 
 meta "compute_max_steps" 1000000
@@ -84,7 +84,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_str_byte_length_and_content
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 89 8 89 70] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/str_carriers.rs" 32 8 32 70] (byte: UInt8.t)
   (return (x: tup2_usize_u8)) =
   {[@stop_split] [@expl:verify_str_byte_length_and_content requires] [%#sstr_carriers'0] ascii_byte_holds byte}
   (! bb0

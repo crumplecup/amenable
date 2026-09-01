@@ -1,20 +1,20 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 139 8 139 53 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 235 8 235 53 *)
 
-let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 142 12 142 26
-let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 142 30 142 31
-let%span svalidated_committed_rejected'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 137 19 137 54
-let%span svalidated_committed_rejected'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 138 18 138 65
-let%span svalidated_committed_rejected'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 92 24 92 58
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 238 12 238 26
+let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 238 30 238 31
+let%span svalidated_committed_rejected'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 233 19 233 54
+let%span svalidated_committed_rejected'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 234 18 234 65
+let%span svalidated_committed_rejected'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 188 24 188 58
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount: Int64.t) (outcome: bool) =
   [%#sledger_validate] outcome = (Int64.to_int amount > 0)
 
-predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 91 8 91 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
+predicate balanced_entries_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 187 8 187 85] (debit: Int64.t) (credit: Int64.t) (outcome: bool) =
   [%#svalidated_committed_rejected'3] outcome = (Int64.to_int debit + Int64.to_int credit = 0)
 
 meta "compute_max_steps" 1000000
@@ -22,7 +22,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec check_commit_balances
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 139 8 139 53]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 235 8 235 53]
   (amount: Int64.t) (return (x: bool)) =
   {[@stop_split] [@expl:check_commit_balances requires] [%#svalidated_committed_rejected'1] amount_positive_holds amount true}
   (! bb0

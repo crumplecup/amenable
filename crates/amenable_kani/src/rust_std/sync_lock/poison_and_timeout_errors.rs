@@ -1,23 +1,9 @@
 use std::sync::{MutexGuard, PoisonError, WaitTimeoutResult};
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::condvar::KaniWaitTimeoutWitnessToken;
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::GetterRecoversTheStoredReference;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 #[cfg(kani)]
 use crate::KaniWaitTimeoutObservation;
 use crate::rust_std::CheckedProof;
@@ -60,7 +46,7 @@ impl ProofToken for KaniMutexPoisonedRecoveryWitnessToken {
 impl KaniMutexFailureObservation {
     /// Assert `into_inner` still recovers the guard's value in the
     /// poisoned case. Consumes `self` for the same reason
-    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    /// [`crate::KaniMutexExclusionObservation::demonstrate_exclusion`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_poisoned_recovery(
@@ -159,7 +145,7 @@ impl KaniMutexFailureObservation {
     /// Assert the poisoned case reports `Poisoned` and preserves the
     /// guarded value, and the already-held case reports `WouldBlock` and
     /// keeps the wrapped value. Consumes `self` for the same reason
-    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    /// [`crate::KaniMutexExclusionObservation::demonstrate_exclusion`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_failure_classes(

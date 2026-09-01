@@ -359,6 +359,7 @@ impl VerusWitness for RustStdStandard<std::io::Take<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_take_model_caps_reads_at_the_remaining_limit".to_owned(),

@@ -9,12 +9,12 @@
 //! extracted so every future real `Exchange`-shaped proof doesn't have
 //! to duplicate it.
 //!
-//! Also carries [`verus_ensures!`] — the Verus-side counterpart to
+//! Also carries `verus_ensures!` — the Verus-side counterpart to
 //! `amenable_kani::rust_std::macros::kani_ensures!`, discovered and fully
 //! documented (including a real, rejected first attempt) in
 //! `gallery::ensures_macro_generated`; extracted here for the identical
 //! "future real proof shouldn't have to duplicate this" reason. And
-//! [`verus_exchange!`] — the Verus-side counterpart to `#[amenable_derive
+//! `verus_exchange!` — the Verus-side counterpart to `#[amenable_derive
 //! ::exchange(..)]` (`EXCHANGE_PROOF_DERIVATION_PLAN.md`'s Step 3/7),
 //! discovered and fully documented (including a real macro-hygiene fix)
 //! in `gallery::exchange_macro_generated`.

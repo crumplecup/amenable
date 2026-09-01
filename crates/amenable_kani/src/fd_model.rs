@@ -14,11 +14,6 @@
 use amenable_derive::Standard;
 use amenable_std::{RustStdProvenance, RustStdStandard, RustStdType};
 
-#[cfg(kani)]
-use crate::KaniCompose;
-#[cfg(kani)]
-use crate::compose::{kani_assume, symbolic_any};
-
 /// Modeled owned Unix file descriptor.
 ///
 /// Field meaning, in order:
@@ -95,14 +90,6 @@ impl KaniFd {
         Self(-1, false, resource_id)
     }
 
-    /// Bounded symbolic live descriptor representative.
-    #[cfg(kani)]
-    pub fn kani_live_any() -> Self {
-        let raw_fd: u16 = symbolic_any();
-        let resource_id: u64 = symbolic_any();
-        Self::live(i32::from(raw_fd), resource_id)
-    }
-
     /// Report the raw fd value.
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     pub fn raw_fd(&self) -> i32 {
@@ -147,20 +134,6 @@ impl KaniBorrowedFd {
     pub fn resource_id(&self) -> u64 {
         self.2
     }
-
-    /// Duplicate the borrowed descriptor into a fresh owned descriptor.
-    ///
-    /// The duplicate is assumed to stay live and refer to the same underlying
-    /// resource, but it may carry a different raw fd value.
-    #[cfg(kani)]
-    pub fn duplicate_as_owned_with_raw(&self, duplicated_raw_fd: i32) -> KaniFd {
-        assert!(
-            self.is_live(),
-            "only live borrowed descriptors can be duplicated"
-        );
-        kani_assume(duplicated_raw_fd >= 0);
-        KaniFd::live(duplicated_raw_fd, self.resource_id())
-    }
 }
 
 impl KaniFile {
@@ -195,47 +168,88 @@ impl KaniFile {
     }
 }
 
+/// The `#[cfg(kani)]` imports, extra inherent methods, and `KaniCompose`
+/// impls this file needs, consolidated into one gate on this `mod`
+/// instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. No bridging re-export needed at all: inherent
+/// methods (`KaniFd::kani_live_any`, `KaniBorrowedFd::
+/// duplicate_as_owned_with_raw`) attach to their type regardless of which
+/// module the `impl` block lives in, so `rust_std::os_unix`'s own
+/// `crate::KaniFd::kani_live_any()` call keeps resolving unchanged; trait
+/// impls (`KaniCompose for KaniFd`/`for KaniFile`) are likewise globally
+/// visible the moment they're compiled.
 #[cfg(kani)]
-impl KaniCompose for KaniFd {
-    fn kani_depth0() -> Self {
-        Self::live(0, 0)
-    }
+mod mirror {
+    use crate::KaniCompose;
+    use crate::compose::{kani_assume, symbolic_any};
 
-    fn kani_depth1() -> Self {
-        Self::live(1, 1)
-    }
+    use super::{KaniBorrowedFd, KaniFd, KaniFile};
 
-    fn kani_depth2() -> Self {
-        Self::live(2, 2)
-    }
-
-    fn kani_any() -> Self {
-        let live: bool = symbolic_any();
-        let resource_id: u64 = symbolic_any();
-        if live {
+    impl KaniFd {
+        /// Bounded symbolic live descriptor representative.
+        pub fn kani_live_any() -> Self {
             let raw_fd: u16 = symbolic_any();
+            let resource_id: u64 = symbolic_any();
             Self::live(i32::from(raw_fd), resource_id)
-        } else {
-            Self::dead(resource_id)
         }
     }
-}
 
-#[cfg(kani)]
-impl KaniCompose for KaniFile {
-    fn kani_depth0() -> Self {
-        Self::from_owned_fd(KaniFd::kani_depth0())
+    impl KaniBorrowedFd {
+        /// Duplicate the borrowed descriptor into a fresh owned descriptor.
+        ///
+        /// The duplicate is assumed to stay live and refer to the same underlying
+        /// resource, but it may carry a different raw fd value.
+        pub fn duplicate_as_owned_with_raw(&self, duplicated_raw_fd: i32) -> KaniFd {
+            assert!(
+                self.is_live(),
+                "only live borrowed descriptors can be duplicated"
+            );
+            kani_assume(duplicated_raw_fd >= 0);
+            KaniFd::live(duplicated_raw_fd, self.resource_id())
+        }
     }
 
-    fn kani_depth1() -> Self {
-        Self::from_owned_fd(KaniFd::kani_depth1())
+    impl KaniCompose for KaniFd {
+        fn kani_depth0() -> Self {
+            Self::live(0, 0)
+        }
+
+        fn kani_depth1() -> Self {
+            Self::live(1, 1)
+        }
+
+        fn kani_depth2() -> Self {
+            Self::live(2, 2)
+        }
+
+        fn kani_any() -> Self {
+            let live: bool = symbolic_any();
+            let resource_id: u64 = symbolic_any();
+            if live {
+                let raw_fd: u16 = symbolic_any();
+                Self::live(i32::from(raw_fd), resource_id)
+            } else {
+                Self::dead(resource_id)
+            }
+        }
     }
 
-    fn kani_depth2() -> Self {
-        Self::from_owned_fd(KaniFd::kani_depth2())
-    }
+    impl KaniCompose for KaniFile {
+        fn kani_depth0() -> Self {
+            Self::from_owned_fd(KaniFd::kani_depth0())
+        }
 
-    fn kani_any() -> Self {
-        Self::from_owned_fd(KaniFd::kani_live_any())
+        fn kani_depth1() -> Self {
+            Self::from_owned_fd(KaniFd::kani_depth1())
+        }
+
+        fn kani_depth2() -> Self {
+            Self::from_owned_fd(KaniFd::kani_depth2())
+        }
+
+        fn kani_any() -> Self {
+            Self::from_owned_fd(KaniFd::kani_live_any())
+        }
     }
 }

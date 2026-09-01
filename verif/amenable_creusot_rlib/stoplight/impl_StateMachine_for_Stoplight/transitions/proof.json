@@ -1,9 +1,0 @@
-{
-  "profile": [],
-  "proofs": {
-    "Coma": {
-      "vc_set_TRANSITIONS": { "prover": "alt-ergo", "time": 0.01 },
-      "vc_transitions_Stoplight": { "prover": "alt-ergo", "time": 0.014 }
-    }
-  }
-}

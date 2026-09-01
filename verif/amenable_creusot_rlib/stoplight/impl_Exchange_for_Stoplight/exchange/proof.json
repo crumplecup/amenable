@@ -2,7 +2,7 @@
   "profile": [],
   "proofs": {
     "Coma": {
-      "vc_exchange_Stoplight": { "prover": "alt-ergo", "time": 0.011 },
+      "vc_exchange_Stoplight": { "prover": "alt-ergo", "time": 0.022 },
       "vc_green_to_yellow": { "prover": "alt-ergo", "time": 0.017 }
     }
   }

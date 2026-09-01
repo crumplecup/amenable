@@ -1,8 +1,8 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 87 8 91 28 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 32 8 36 28 *)
 
-let%span sio_seek_from = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 85 19 85 23
-let%span sio_seek_from'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 86 18 86 110
-let%span sio_seek_from'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 73 16 75 54
+let%span sio_seek_from = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 30 19 30 23
+let%span sio_seek_from'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 31 18 31 110
+let%span sio_seek_from'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 18 16 20 54
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -36,7 +36,7 @@ let rec elim_Current (_x: t_SeekFrom) (return (f0: Int64.t)) = any
 
 type tup3_u64_i64_i64 = { f0: UInt64.t; f1: Int64.t; f2: Int64.t }
 
-predicate seek_from_round_trips_each_variants_offset [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 66 8 71 17] (start_offset: UInt64.t) (end_offset: Int64.t) (current_offset: Int64.t) (seek_result: tup3_u64_i64_i64) =
+predicate seek_from_round_trips_each_variants_offset [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 11 8 16 17] (start_offset: UInt64.t) (end_offset: Int64.t) (current_offset: Int64.t) (seek_result: tup3_u64_i64_i64) =
   [%#sio_seek_from'1] seek_result.f0 = start_offset /\ seek_result.f1 = end_offset /\ seek_result.f2 = current_offset
 
 meta "compute_max_steps" 1000000
@@ -44,7 +44,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_seek_from_round_trips_each_variants_offset
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 87 8 91 28]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 32 8 36 28]
   (start_offset: UInt64.t) (end_offset: Int64.t) (current_offset: Int64.t) (return (x: tup3_u64_i64_i64)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_10 <- Start start_offset ] s1

@@ -31,47 +31,47 @@ pub struct ProofAssessment {
 }
 
 impl ProofAssessment {
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn assessment_id(&self) -> Option<&str> {
         self.assessment_id.as_deref()
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn version(&self) -> &str {
         &self.version
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn proof_id(&self) -> &str {
         &self.proof_id
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn reviewer(&self) -> &str {
         &self.reviewer
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn timestamp(&self) -> u64 {
         self.timestamp
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn rubric(&self) -> Rubric {
         self.rubric
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn recommendation(&self) -> Recommendation {
         self.recommendation
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn resolution_path(&self) -> Option<ResolutionPath> {
         self.resolution_path
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub(super) fn comment(&self) -> &str {
         &self.comment
     }
@@ -239,7 +239,7 @@ impl From<&ProofAssessment> for StoredProofAssessment {
 ///
 /// # Errors
 ///
-/// Returns an [`amenable::AmenableError`] if the artifact can't be read,
+/// Returns an [`AmenableError`] if the artifact can't be read,
 /// or if any line is invalid JSON or fails assessment validation.
 #[instrument(level = "debug", skip(path))]
 pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {

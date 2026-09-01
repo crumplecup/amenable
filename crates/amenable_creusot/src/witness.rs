@@ -3,6 +3,19 @@
 use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
 use creusot_std::macros::trusted;
 
+/// Creusot-specific witness: identifies the Creusot contract (if any) behind
+/// a piece of evidence, without ever running it.
+pub trait CreusotWitness {
+    /// Evidence this witness backs.
+    type SupportingEvidence: Evidence;
+
+    /// Descriptor of the Creusot proof relevant to this evidence.
+    type ProofArtifact;
+
+    /// Identify the Creusot proof artifact for this evidence.
+    fn proof() -> Self::ProofArtifact;
+}
+
 /// The Creusot verifier, local to this crate: there is only one verifier
 /// Creusot works with — Creusot. `CreusotVerifier` belongs here rather
 /// than `amenable_core`: it's what makes each per-type `Witness<
@@ -77,60 +90,56 @@ impl Verifier for CreusotVerifier {
     }
 }
 
-/// Creusot-specific witness: identifies the Creusot contract (if any) behind
-/// a piece of evidence, without ever running it.
-pub trait CreusotWitness {
-    /// Evidence this witness backs.
-    type SupportingEvidence: Evidence;
-
-    /// Descriptor of the Creusot proof relevant to this evidence.
-    type ProofArtifact;
-
-    /// Identify the Creusot proof artifact for this evidence.
-    fn proof() -> Self::ProofArtifact;
-}
-
-/// Proof artifact for a claim that rests on one or more real Creusot
-/// contract functions — used wherever a `Witness<CreusotVerifier>` impl
-/// targets a *real* evidence type directly (no accommodation-model
-/// mirror), naming each backing harness and its own verbatim source.
-/// Owned strings, not `&'static str` — matching `amenable_kani::
-/// CalculationProof`'s own precedent, this crate's proof-artifact
-/// convention, not `rust_std_witness::CheckedProof`'s (which carries an
-/// extra chain-derived `provenance` field specific to `RustStdStandard<T>`
-/// carriers).
+/// `MultiCheckProof` and its `Display` impl, consolidated into one gate on
+/// this `mod` instead of one per item -- see `stoplight::mirror`'s own doc
+/// comment for the general rationale. `pub`, not `pub(super)`: `lib.rs`
+/// re-exports `MultiCheckProof` at the crate's own public boundary (`pub
+/// use witness::MultiCheckProof;`), and a re-export can never be more
+/// visible than what it re-exports -- the same real constraint
+/// `stoplight::mirror`'s own split re-export hit first.
 ///
-/// `#[cfg(not(creusot))]` on the type itself, not just at each call
-/// site: the `Vec<(String, String)>`/`Display` machinery is exactly the
-/// kind of ordinary Rust infrastructure `creusot-rustc`'s translator
-/// chokes on when it's *local* to the crate being translated — confirmed
-/// the hard way, twice. First building `ledger.rs`'s own `Witness<
-/// CreusotVerifier>` bridge (an ungated `impl Display` there caused a
-/// real internal compiler panic); then again here, the *second* time
-/// around, gating only this struct's re-export in `lib.rs` and not the
-/// struct's own definition — the derived `Clone` for the `Vec<(String,
-/// String)>` field still got swept and panicked (`Cannot handle builtin
-/// implementation of std::clone::Clone for (String, String)`) even
-/// though nothing under `#[cfg(creusot)]` ever constructs one. The gate
-/// has to live at the definition site itself, not downstream of it.
-/// Every caller keeps its `#[cfg(creusot)]`-gated `Witness` impl trivial
-/// (`ProofArtifact = ()`) and only builds one of these on the
-/// `#[cfg(not(creusot))]` side.
+/// `#[cfg(not(creusot))]` on the module, not just at each item inside it:
+/// the `Vec<(String, String)>`/`Display` machinery is exactly the kind of
+/// ordinary Rust infrastructure `creusot-rustc`'s translator chokes on
+/// when it's *local* to the crate being translated — confirmed the hard
+/// way, twice. First building `ledger.rs`'s own `Witness<CreusotVerifier>`
+/// bridge (an ungated `impl Display` there caused a real internal
+/// compiler panic); then again here, the *second* time around, gating
+/// only this struct's re-export in `lib.rs` and not the struct's own
+/// definition — the derived `Clone` for the `Vec<(String, String)>` field
+/// still got swept and panicked (`Cannot handle builtin implementation of
+/// std::clone::Clone for (String, String)`) even though nothing under
+/// `#[cfg(creusot)]` ever constructs one. The gate has to live at the
+/// definition site itself, not downstream of it. Every caller keeps its
+/// `#[cfg(creusot)]`-gated `Witness` impl trivial (`ProofArtifact = ()`)
+/// and only builds one of these on the `#[cfg(not(creusot))]` side.
 #[cfg(not(creusot))]
-#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
-pub struct MultiCheckProof {
-    /// Each real Creusot contract function backing this claim, and its
-    /// own verbatim source.
-    checks: Vec<(String, String)>,
-}
+mod mirror {
+    /// Proof artifact for a claim that rests on one or more real Creusot
+    /// contract functions — used wherever a `Witness<CreusotVerifier>` impl
+    /// targets a *real* evidence type directly (no accommodation-model
+    /// mirror), naming each backing harness and its own verbatim source.
+    /// Owned strings, not `&'static str` — matching `amenable_kani::
+    /// CalculationProof`'s own precedent, this crate's proof-artifact
+    /// convention, not `rust_std_witness::CheckedProof`'s (which carries an
+    /// extra chain-derived `provenance` field specific to `RustStdStandard<T>`
+    /// carriers).
+    #[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_new::new)]
+    pub struct MultiCheckProof {
+        /// Each real Creusot contract function backing this claim, and its
+        /// own verbatim source.
+        checks: Vec<(String, String)>,
+    }
 
-#[cfg(not(creusot))]
-impl std::fmt::Display for MultiCheckProof {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (harness, claim) in &self.checks {
-            writeln!(f, "harness: {harness}")?;
-            writeln!(f, "claim: {claim}")?;
+    impl std::fmt::Display for MultiCheckProof {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            for (harness, claim) in &self.checks {
+                writeln!(f, "harness: {harness}")?;
+                writeln!(f, "claim: {claim}")?;
+            }
+            Ok(())
         }
-        Ok(())
     }
 }
+#[cfg(not(creusot))]
+pub use mirror::MultiCheckProof;

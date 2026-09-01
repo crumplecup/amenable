@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 164 8 167 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 107 8 110 58 *)
 
-let%span sbinary_heap = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 171 24 171 28
-let%span sbinary_heap'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 162 19 162 23
-let%span sbinary_heap'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 163 18 163 88
-let%span sbinary_heap'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 144 16 147 17
+let%span sbinary_heap = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 114 24 114 28
+let%span sbinary_heap'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 105 19 105 23
+let%span sbinary_heap'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 106 18 106 88
+let%span sbinary_heap'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 87 16 90 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
-predicate binary_heap_drain_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 138 8 142 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+predicate binary_heap_drain_yields_every_pushed_element_once_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 81 8 85 17] (a: Int32.t) (b: Int32.t) (drain_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
   [%#sbinary_heap'2] match drain_result with
     | {f0 = first; f1 = second; f2 = exhausted; f3 = empty} -> first = Some a
     /\ second = Some b /\ exhausted = None /\ empty
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_binary_heap_drain_yields_every_pushed_element_once
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 164 8 167 58] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 107 8 110 58] (a: Int32.t)
   (b: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &first <- Some a ] s1

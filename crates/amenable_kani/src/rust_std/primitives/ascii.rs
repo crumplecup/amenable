@@ -1,10 +1,4 @@
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 use amenable_std::{AsciiByte, RustStdStandard};
 
 use super::array_slice_str::VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC;
@@ -108,6 +102,7 @@ impl KaniWitness for ThreeBytesAreEachAscii {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_str_byte_length_and_content".to_owned(),
@@ -152,6 +147,7 @@ pub struct ValueIsWithinInclusiveRange<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for ValueIsWithinInclusiveRange<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -161,14 +157,17 @@ impl<T> Evidence for ValueIsWithinInclusiveRange<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }

@@ -11,11 +11,6 @@
 //! - if the real backtrace capture path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-#[cfg(kani)]
-use crate::KaniCompose;
-#[cfg(kani)]
-use crate::compose::{kani_assume, symbolic_any};
-
 /// Modeled backtrace status observed from Rust.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum KaniBacktraceStatus {
@@ -46,18 +41,6 @@ pub struct KaniBacktrace {
     status: KaniBacktraceStatus,
 }
 
-impl KaniBacktraceStatus {
-    #[cfg(kani)]
-    fn from_index(index: u8) -> Self {
-        match index {
-            0 => Self::Disabled,
-            1 => Self::Captured,
-            2 => Self::Unsupported,
-            _ => unreachable!("bounded backtrace status index"),
-        }
-    }
-}
-
 impl KaniBacktrace {
     /// Model `Backtrace::force_capture()` as a guaranteed captured backtrace.
     pub fn force_capture() -> Self {
@@ -65,45 +48,72 @@ impl KaniBacktrace {
     }
 }
 
+/// The `#[cfg(kani)]` imports, extra inherent method, and `KaniCompose`
+/// impls this file needs, consolidated into one gate on this `mod`
+/// instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. No bridging re-export needed: `from_index` is
+/// private and only ever called from `kani_any`, right beside it here;
+/// the `KaniCompose` impls are globally visible the moment they're
+/// compiled.
 #[cfg(kani)]
-impl KaniCompose for KaniBacktraceStatus {
-    fn kani_depth0() -> Self {
-        Self::Disabled
+mod mirror {
+    pub(super) use crate::KaniCompose;
+    use crate::compose::{kani_assume, symbolic_any};
+
+    use super::{KaniBacktrace, KaniBacktraceStatus};
+
+    impl KaniBacktraceStatus {
+        fn from_index(index: u8) -> Self {
+            match index {
+                0 => Self::Disabled,
+                1 => Self::Captured,
+                2 => Self::Unsupported,
+                _ => unreachable!("bounded backtrace status index"),
+            }
+        }
     }
 
-    fn kani_depth1() -> Self {
-        Self::Captured
+    impl KaniCompose for KaniBacktraceStatus {
+        fn kani_depth0() -> Self {
+            Self::Disabled
+        }
+
+        fn kani_depth1() -> Self {
+            Self::Captured
+        }
+
+        fn kani_depth2() -> Self {
+            Self::Unsupported
+        }
+
+        fn kani_any() -> Self {
+            let index: u8 = symbolic_any();
+            kani_assume(index <= 2);
+            Self::from_index(index)
+        }
     }
 
-    fn kani_depth2() -> Self {
-        Self::Unsupported
-    }
+    impl KaniCompose for KaniBacktrace {
+        fn kani_depth0() -> Self {
+            Self::new(KaniBacktraceStatus::kani_depth0())
+        }
 
-    fn kani_any() -> Self {
-        let index: u8 = symbolic_any();
-        kani_assume(index <= 2);
-        Self::from_index(index)
+        fn kani_depth1() -> Self {
+            Self::force_capture()
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new(KaniBacktraceStatus::kani_depth2())
+        }
+
+        fn kani_any() -> Self {
+            Self::new(KaniBacktraceStatus::kani_any())
+        }
     }
 }
-
 #[cfg(kani)]
-impl KaniCompose for KaniBacktrace {
-    fn kani_depth0() -> Self {
-        Self::new(KaniBacktraceStatus::kani_depth0())
-    }
-
-    fn kani_depth1() -> Self {
-        Self::force_capture()
-    }
-
-    fn kani_depth2() -> Self {
-        Self::new(KaniBacktraceStatus::kani_depth2())
-    }
-
-    fn kani_any() -> Self {
-        Self::new(KaniBacktraceStatus::kani_any())
-    }
-}
+use mirror::KaniCompose;
 
 // Self-test of KaniCompose's own contract for KaniBacktraceStatus, not a
 // production proof -- same reasoning as compose.rs's own `mod proofs`:

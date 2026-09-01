@@ -12,12 +12,6 @@ use super::lines_and_markers::CollectedSequenceMatchesExpected;
 use crate::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
-#[cfg(kani)]
-use crate::{
-    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
-};
 
 impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type SupportingEvidence = Self;
@@ -312,6 +306,7 @@ impl KaniWitness for RustStdStandard<std::str::EscapeUnicode<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_escape_unicode_renders_the_codepoint_escape".to_owned(),

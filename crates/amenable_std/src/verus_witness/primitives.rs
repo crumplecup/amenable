@@ -309,6 +309,7 @@ impl VerusWitness for RustStdStandard<std::mem::ManuallyDrop<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_manually_drop_derefs_and_into_inner_round_trip".to_owned(),

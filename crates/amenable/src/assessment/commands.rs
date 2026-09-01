@@ -6,7 +6,7 @@ use super::cli::{
     RecordAssessmentArgs, VerificationFailuresArgs,
 };
 use super::record::{self, CURRENT_ASSESSMENT_VERSION, ProofAssessment, ProofAssessmentBuilder};
-use super::vocabulary::{Recommendation, ResolutionPath, Rubric, SummaryDimension};
+use super::vocabulary::{Recommendation, ResolutionPath, Rubric, RubricBuilder, SummaryDimension};
 use crate::kani::{self, ProofStatus};
 use crate::{AmenableError, AmenableResult};
 use clap::ValueEnum;
@@ -61,14 +61,15 @@ struct ListedVerificationFailure {
 pub(super) fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
     catalog::ensure_registered(&args.proof)?;
     let comment = read_comment(args.comment, args.comment_file)?;
-    let rubric = Rubric::new(
-        args.claim_alignment,
-        args.assumption_adequacy,
-        args.model_fidelity,
-        args.assertion_strength,
-        args.adversarial_coverage,
-        args.clarity,
-    );
+    let rubric = RubricBuilder::default()
+        .claim_alignment(args.claim_alignment)
+        .assumption_adequacy(args.assumption_adequacy)
+        .model_fidelity(args.model_fidelity)
+        .assertion_strength(args.assertion_strength)
+        .adversarial_coverage(args.adversarial_coverage)
+        .clarity(args.clarity)
+        .build()
+        .map_err(|error| AmenableError::invariant(error.to_string()))?;
     let assessment = ProofAssessmentBuilder::default()
         .version(CURRENT_ASSESSMENT_VERSION.to_owned())
         .assessment_id(Some(assessment_id()?))
@@ -84,12 +85,12 @@ pub(super) fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
     assessment.validate()?;
     record::append(&args.assessments, &assessment)?;
 
-    println!(
+    crate::write_stdout_line(format!(
         "Recorded {} assessment for {} in {}",
         assessment.recommendation().as_str(),
         assessment.proof_id(),
         args.assessments.display()
-    );
+    ))?;
     Ok(())
 }
 
@@ -164,14 +165,21 @@ pub(super) fn summary(args: AssessmentSummaryArgs) -> AmenableResult<()> {
         .unwrap_or(1)
         .max("count".len());
 
-    println!(
+    crate::write_stdout_line(format!(
         "{:<label_width$} {:>count_width$}",
         args.by.as_str(),
         "count"
-    );
-    println!("{} {}", "-".repeat(label_width), "-".repeat(count_width));
+    ))?;
+    crate::write_stdout_line(format!(
+        "{} {}",
+        "-".repeat(label_width),
+        "-".repeat(count_width)
+    ))?;
     for label in counts.keys() {
-        println!("{:<label_width$} {:>count_width$}", label, counts[label]);
+        crate::write_stdout_line(format!(
+            "{:<label_width$} {:>count_width$}",
+            label, counts[label]
+        ))?;
     }
 
     Ok(())
@@ -198,10 +206,10 @@ pub(super) fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
 
     for result in kani::load_results(&args.results)? {
         if !registered.contains(result.proof_id()) {
-            eprintln!(
+            crate::write_stderr_line(format!(
                 "Verification result is no longer registered and will be skipped: {}",
                 result.proof_id()
-            );
+            ))?;
             continue;
         }
 
@@ -225,7 +233,7 @@ pub(super) fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
     }
 
     if failures.is_empty() {
-        println!("No Kani verification results matched the selection.");
+        crate::write_stdout_line("No Kani verification results matched the selection.")?;
         return Ok(());
     }
 
@@ -247,11 +255,11 @@ pub(super) fn failures(args: VerificationFailuresArgs) -> AmenableResult<()> {
 
     for result in failures {
         let recorded_at = format_timestamp(result.timestamp())?;
-        println!(
+        crate::write_stdout_line(format!(
             "{}\t{recorded_at}\t{}",
             result.status().as_str(),
             result.proof_id()
-        );
+        ))?;
     }
 
     Ok(())
@@ -289,7 +297,7 @@ pub(super) fn list(args: AssessmentListArgs) -> AmenableResult<()> {
     );
 
     if assessments.is_empty() {
-        println!("No proof assessments matched the selection.");
+        crate::write_stdout_line("No proof assessments matched the selection.")?;
         return Ok(());
     }
 
@@ -316,7 +324,7 @@ pub(super) fn list(args: AssessmentListArgs) -> AmenableResult<()> {
 
     for assessment in assessments {
         let recorded_at = format_timestamp(assessment.timestamp())?;
-        println!(
+        crate::write_stdout_line(format!(
             "{}\t{recorded_at}\t{}\t{}\t{}\t{}",
             assessment.assessment_id().unwrap_or("legacy-unidentified"),
             assessment.recommendation().as_str(),
@@ -326,7 +334,7 @@ pub(super) fn list(args: AssessmentListArgs) -> AmenableResult<()> {
                 .unwrap_or("legacy_unspecified"),
             assessment.proof_id(),
             assessment.reviewer()
-        );
+        ))?;
     }
 
     Ok(())
@@ -352,7 +360,7 @@ pub(super) fn report(args: AssessmentReportArgs) -> AmenableResult<()> {
     }
 
     if by_proof.is_empty() {
-        println!("No proof assessments matched the selection.");
+        crate::write_stdout_line("No proof assessments matched the selection.")?;
         return Ok(());
     }
 
@@ -384,13 +392,13 @@ pub(super) fn queue(args: AssessmentQueueArgs) -> AmenableResult<()> {
     }
 
     if unassessed.is_empty() {
-        println!("Every registered proof has at least one assessment.");
+        crate::write_stdout_line("Every registered proof has at least one assessment.")?;
         return Ok(());
     }
 
-    println!("Unassessed proofs: {}", unassessed.len());
+    crate::write_stdout_line(format!("Unassessed proofs: {}", unassessed.len()))?;
     for proof in unassessed {
-        println!("{}", proof.id());
+        crate::write_stdout_line(proof.id())?;
     }
     Ok(())
 }
@@ -442,7 +450,7 @@ fn matches_failure_filter(status: ProofStatus, filter: Option<ProofStatus>) -> b
 
 #[instrument(level = "debug", skip(entries))]
 fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<()> {
-    println!("{proof_id}: {} assessment(s)", entries.len());
+    crate::write_stdout_line(format!("{proof_id}: {} assessment(s)", entries.len()))?;
 
     for (index, (name, _)) in entries[0].rubric().values().into_iter().enumerate() {
         let scores: Vec<_> = entries
@@ -461,7 +469,7 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<
             })
             .collect::<Vec<_>>()
             .join(" ");
-        println!("  {name}: mean {mean:.2}; {distribution}");
+        crate::write_stdout_line(format!("  {name}: mean {mean:.2}; {distribution}"))?;
     }
 
     let mut recommendations: BTreeMap<Recommendation, usize> = BTreeMap::new();
@@ -473,7 +481,7 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<
         .map(|(recommendation, count)| format!("{}:{count}", recommendation.as_str()))
         .collect::<Vec<_>>()
         .join(" ");
-    println!("  recommendations: {recommendations}");
+    crate::write_stdout_line(format!("  recommendations: {recommendations}"))?;
 
     let mut resolution_paths: BTreeMap<String, usize> = BTreeMap::new();
     for entry in entries {
@@ -489,7 +497,7 @@ fn print_summary(proof_id: &str, entries: &[ProofAssessment]) -> AmenableResult<
         .map(|(resolution_path, count)| format!("{resolution_path}:{count}"))
         .collect::<Vec<_>>()
         .join(" ");
-    println!("  resolution paths: {resolution_paths}");
+    crate::write_stdout_line(format!("  resolution paths: {resolution_paths}"))?;
     Ok(())
 }
 
@@ -521,6 +529,5 @@ fn format_timestamp(timestamp: u64) -> AmenableResult<String> {
 #[instrument(level = "debug", skip(value))]
 fn print_json<T: Serialize>(value: &T) -> AmenableResult<()> {
     let json = serde_json::to_string_pretty(value)?;
-    println!("{json}");
-    Ok(())
+    crate::write_stdout_line(json)
 }

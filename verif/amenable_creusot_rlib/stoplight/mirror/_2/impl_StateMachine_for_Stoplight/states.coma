@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42 *)
+
+(* <stoplight::mirror::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
+
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 290 14 290 21
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 14 291 22
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 292 14 292 19
+
+use creusot.slice.Slice64
+use creusot.prelude.Any
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec states_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42]
+  (return (x: Slice64.slice string)) = (! bb0
+  [ bb0 = s0
+    [ s0 = bb0'0
+      [ bb0'0 = s0'0
+        [ s0'0 = any
+          [ any_ (__arr_temp: Slice64.array string) -> (! -{Seq.get __arr_temp.Slice64.elts 0 = ([%#sstoplight] "Green")
+            /\ Seq.get __arr_temp.Slice64.elts 1 = ([%#sstoplight'0] "Yellow")
+            /\ Seq.get __arr_temp.Slice64.elts 2 = ([%#sstoplight'1] "Red") /\ Seq.length __arr_temp.Slice64.elts = 3}-
+            [ &_1 <- __arr_temp ] s1'0) ]
+        | s1'0 = [ &_ret'0 <- _1 ] s2'0
+        | s2'0 = _const_ret {_ret'0} ] ]
+      [ & _ret'0: Slice64.array string = Any.any_l () | & _1: Slice64.array string = Any.any_l () ]
+      [ _const_ret (_const: Slice64.array string) -> [ &_4 <- _const ] s1 ]
+    | s1 = [ &_2 <- _4 ] s2
+    | s2 = [ &_ret <- _2 ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: Slice64.slice string = Any.any_l ()
+  | & _2: Slice64.array string = Any.any_l ()
+  | & _4: Slice64.array string = Any.any_l () ]) [ return (result: Slice64.slice string) -> (! return {result}) ]

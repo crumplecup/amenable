@@ -164,6 +164,7 @@ impl VerusWitness for RustStdStandard<std::str::LinesAny<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_lines_any_model_splits_on_any_line_ending".to_owned(),

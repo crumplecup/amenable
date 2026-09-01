@@ -1,40 +1,40 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 17 12 17 135 *)
 
-(* ledger::ledger_validate::Ledger *)
+(* ledger::ledger_validate::mirror::Ledger *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 124 24 124 47
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 65 24 65 56
-let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 195 15 195 19
-let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 196 14 196 64
-let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 202 15 202 19
-let%span sledger_validate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 203 14 203 79
-let%span sledger_validate'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 64 16 67 17
-let%span sledger_validate'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 223 4 223 60
-let%span sledger_validate'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 222 14 222 48
-let%span sledger_validate'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 99 16 106 17
-let%span sledger_validate'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 229 4 229 70
-let%span sledger_validate'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 228 14 228 51
-let%span sledger_validate'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 244 24 244 48
-let%span sledger_validate'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 130 16 133 17
-let%span sledger_validate'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 158 16 163 17
-let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
-let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 312 15 312 19
-let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 313 14 313 65
-let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 244 15 244 19
-let%span stransfer_and_types'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 245 14 245 56
-let%span stransfer_and_types'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 38 19 41 9
-let%span stransfer_and_types'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 42 18 45 9
-let%span stransfer_and_types'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 300 15 300 19
-let%span stransfer_and_types'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 301 14 301 63
-let%span stransfer_and_types'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 306 15 306 19
-let%span stransfer_and_types'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 307 14 307 61
-let%span stransfer_and_types'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 91 21 91 31
-let%span stransfer_and_types'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 90 18 90 22
-let%span stransfer_and_types'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 171 8 171 13
-let%span stransfer_and_types'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 185 24 185 41
-let%span stransfer_and_types'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 260 24 260 41
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 149 24 149 47
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
+let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 74 19 74 23
+let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 75 18 75 68
+let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 81 19 81 23
+let%span sledger_validate'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 82 18 82 83
+let%span sledger_validate'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 131 16 134 17
+let%span sledger_validate'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 102 8 102 64
+let%span sledger_validate'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 101 18 101 52
+let%span sledger_validate'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 166 16 173 17
+let%span sledger_validate'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 108 8 108 74
+let%span sledger_validate'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 107 18 107 55
+let%span sledger_validate'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
+let%span sledger_validate'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 197 16 200 17
+let%span sledger_validate'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 225 16 230 17
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 264 19 264 23
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 265 18 265 69
+let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 221 19 221 23
+let%span stransfer_and_types'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 222 18 222 60
+let%span stransfer_and_types'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 49 23 52 13
+let%span stransfer_and_types'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 53 22 56 13
+let%span stransfer_and_types'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 252 19 252 23
+let%span stransfer_and_types'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 253 18 253 67
+let%span stransfer_and_types'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 258 19 258 23
+let%span stransfer_and_types'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 259 18 259 65
+let%span stransfer_and_types'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 101 25 101 35
+let%span stransfer_and_types'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 100 22 100 26
+let%span stransfer_and_types'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
+let%span stransfer_and_types'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 332 24 332 41
+let%span stransfer_and_types'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 356 24 356 41
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 245 16 255 17
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 277 16 287 17
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 45
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 53
 let%span svalidate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 19 29 19 45
@@ -120,7 +120,7 @@ let rec primary_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingT
 let rec clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
   [ return (result: t_TransferPayload) -> (! return {result}) ]
 
-predicate amount_value_matches_field [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 184 8 184 76] (observed: Int64.t) (field: Int64.t) =
+predicate amount_value_matches_field [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 331 8 331 76] (observed: Int64.t) (field: Int64.t) =
   [%#stransfer_and_types'13] observed = field
 
 let rec amount'0 (self: t_TransferPayload) (return (x: t_Amount)) = any
@@ -135,10 +135,10 @@ let rec value (self: t_Amount) (return (x: Int64.t)) = any
 
 type t_Result_unit_i64 = Ok () | Err Int64.t
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 243 8 243 72] (amount'1: Int64.t) (outcome: bool) =
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount'1: Int64.t) (outcome: bool) =
   [%#sledger_validate'9] outcome = (Int64.to_int amount'1 > 0)
 
-predicate check_amount_positive_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 62 8 62 103] (amount'1: Int64.t) (outcome: t_Result_unit_i64) =
+predicate check_amount_positive_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 129 8 129 103] (amount'1: Int64.t) (outcome: t_Result_unit_i64) =
   [%#sledger_validate'3] match outcome with
     | Ok () -> amount_positive_holds amount'1 true
     | Err bad -> bad = amount'1 /\ amount_positive_holds amount'1 false
@@ -158,7 +158,7 @@ predicate precondition_negative_amount [@inline:trivial] (self: ()) (args: Int64
 
 meta "rewrite_def" predicate precondition_negative_amount
 
-predicate negative_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 128 8 128 85] (bad: Int64.t) (outcome: t_TransferError) =
+predicate negative_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 195 8 195 85] (bad: Int64.t) (outcome: t_TransferError) =
   [%#sledger_validate'10] match outcome with
     | NegativeAmount actual -> actual = bad
     | _ -> false
@@ -356,10 +356,10 @@ type tup2_i64_i64 = { f0'1: Int64.t; f1'1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok'3 () | Err'3 tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 64 8 64 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: bool) =
   [%#scontract_bounds'0] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'1)
 
-predicate check_sufficient_funds_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 93 8 97 17] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: t_Result_unit_tup2_i64_i64) =
+predicate check_sufficient_funds_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 160 8 164 17] (balance'0: Int64.t) (amount'1: Int64.t) (outcome: t_Result_unit_tup2_i64_i64) =
   [%#sledger_validate'6] match outcome with
     | Ok'3 () -> sufficient_funds_holds balance'0 amount'1 true
     | Err'3 {f0'1 = observed_balance; f1'1 = required} -> observed_balance = balance'0
@@ -376,7 +376,7 @@ predicate precondition_insufficient_funds [@inline:trivial] (self: ()) (args: tu
 
 meta "rewrite_def" predicate precondition_insufficient_funds
 
-predicate insufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 156 8 156 95] (bad: tup2_i64_i64) (outcome: t_TransferError) =
+predicate insufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 223 8 223 95] (bad: tup2_i64_i64) (outcome: t_TransferError) =
   [%#sledger_validate'11] match outcome with
     | InsufficientFunds balance'0 required -> balance'0 = bad.f0'1 /\ required = bad.f1'1
     | _ -> false
@@ -400,7 +400,7 @@ let rec map_err_unit'0 (self_: t_Result_unit_tup2_i64_i64) (op: ()) (return (x: 
       end}
     (! return {result}) ]
 
-predicate transfer_payload_field_matches [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 259 8 259 80] (observed: UInt64.t) (field: UInt64.t) =
+predicate transfer_payload_field_matches [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 355 8 355 80] (observed: UInt64.t) (field: UInt64.t) =
   [%#stransfer_and_types'14] observed = field
 
 let rec from'0 (self: t_TransferPayload) (return (x: UInt64.t)) = any
@@ -436,10 +436,10 @@ let rec new_Validated (payload'1: t_TransferPayload) (token'1: t_ValidatedToken)
     /\ ([@stop_split] [@expl:new ensures] [%#stransfer_and_types] result.payload'0 = payload'1)}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 123 8 123 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 148 8 148 81] (from'1: UInt64.t) (to''1: UInt64.t) (outcome: bool) =
   [%#scontract_bounds] outcome = (from'1 <> to''1)
 
-predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 241 8 243 17] (outcome: t_Result_Transfer_Validated_ValidatedToken_TransferError) =
+predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 273 8 275 17] (outcome: t_Result_Transfer_Validated_ValidatedToken_TransferError) =
   [%#svalidated_committed_rejected] match outcome with
     | Ok'2 validated -> amount_positive_holds validated.payload'0.amount.f0 true
     /\ accounts_distinct_holds validated.payload'0.from validated.payload'0.to' true

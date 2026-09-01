@@ -60,25 +60,34 @@
 //!   already uses elsewhere in this crate: encoding is exactly the code
 //!   point cast to `u16`.
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::{
-    RustLanguageProvenance, RustStdProvenance, RustStdProvenanceBuilder,
-    WindowsHandleOrInvalidRejectsOnlyTheSentinel,
+    RustLanguageProvenance, RustStdProvenance, WindowsHandleOrInvalidRejectsOnlyTheSentinel,
 };
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsBelow;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Requires};
+
+    pub(super) use crate::AccessorRecoversTheExpectedValue;
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::ValueIsBelow;
+}
+#[cfg(kani)]
+use mirror::{
+    AccessorRecoversTheExpectedValue, CollectedSequenceMatchesExpected, Ensures, Requires,
+    ValueIsBelow,
+};
 
 /// Modeled raw HANDLE value -- see the module doc for why this is a plain
 /// `isize`, not a real pointer.
@@ -175,13 +184,12 @@ fn windows_provenance(
     type_name: &str,
     summary: &str,
 ) -> RustStdProvenance {
-    RustStdProvenanceBuilder::default()
-        .rust(RustLanguageProvenance::for_source("std", source_module))
-        .source_url(url)
-        .type_name(type_name)
-        .semantic_summary(summary)
-        .build()
-        .expect("all fields set")
+    RustStdProvenance::new(
+        RustLanguageProvenance::for_source("std", source_module),
+        url,
+        type_name,
+        summary,
+    )
 }
 
 amenable_derive::harness! {

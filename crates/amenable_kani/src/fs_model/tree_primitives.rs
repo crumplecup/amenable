@@ -103,10 +103,14 @@ pub enum KaniFsNodeKind {
     File,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters)]
 pub(super) struct KaniFsNode {
-    pub(super) path: KaniFsPath,
-    pub(super) kind: KaniFsNodeKind,
+    /// The modeled node's full path.
+    #[getter(copy)]
+    path: KaniFsPath,
+    /// The modeled node's kind (directory or file).
+    #[getter(copy)]
+    kind: KaniFsNodeKind,
 }
 
 impl KaniFsNode {

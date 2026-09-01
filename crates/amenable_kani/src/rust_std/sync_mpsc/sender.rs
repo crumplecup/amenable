@@ -118,6 +118,7 @@ impl KaniWitness for RustStdStandard<SyncSender<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_sync_sender_delivers_to_the_paired_receiver".to_owned(),
@@ -149,6 +150,7 @@ impl ProofToken for RustStdSyncSenderToken {
 impl Establish<KaniChannelDeliveryToken, KaniVerifier> for RustStdStandard<SyncSender<i32>> {
     type Token = RustStdSyncSenderToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelDeliveryToken) -> Self::Token {
         RustStdSyncSenderToken(())
     }

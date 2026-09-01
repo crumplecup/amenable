@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 223 8 228 45 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 166 8 171 45 *)
 
-let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 230 13 230 17
-let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 221 19 221 23
-let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 222 18 222 98
-let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 197 16 202 17
+let%span slinked_list = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 173 13 173 17
+let%span slinked_list'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 164 19 164 23
+let%span slinked_list'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 165 18 165 98
+let%span slinked_list'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 140 16 145 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_bool_Option_i32_Option_i32 = { f0: bool; f1: t_Option_i32; f2: t_Option_i32 }
 
-predicate linked_list_iter_mut_writes_through_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 191 8 195 17] (updated_first: Int32.t) (updated_second: Int32.t) (iter_mut_result: tup3_bool_Option_i32_Option_i32) =
+predicate linked_list_iter_mut_writes_through_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 134 8 138 17] (updated_first: Int32.t) (updated_second: Int32.t) (iter_mut_result: tup3_bool_Option_i32_Option_i32) =
   [%#slinked_list'2] match iter_mut_result with
     | {f0 = exhausted; f1 = front_after_write; f2 = next_after_write} -> exhausted
     /\ front_after_write = Some updated_first /\ next_after_write = Some updated_second
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_linked_list_iter_mut_writes_through
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 223 8 228 45] (first: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 166 8 171 45] (first: Int32.t)
   (second: Int32.t) (updated_first: Int32.t) (updated_second: Int32.t) (return (x: tup3_bool_Option_i32_Option_i32)) =
   (! bb0
   [ bb0 = s0

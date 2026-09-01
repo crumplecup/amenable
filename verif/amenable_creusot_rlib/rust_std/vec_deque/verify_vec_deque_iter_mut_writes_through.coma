@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 309 8 314 45 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 254 8 259 45 *)
 
-let%span svec_deque = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 316 56 316 60
-let%span svec_deque'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 307 19 307 23
-let%span svec_deque'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 308 18 308 96
-let%span svec_deque'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 284 16 289 17
+let%span svec_deque = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 261 56 261 60
+let%span svec_deque'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 252 19 252 23
+let%span svec_deque'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 253 18 253 96
+let%span svec_deque'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 229 16 234 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -12,7 +12,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: bool }
 
-predicate vec_deque_iter_mut_writes_through_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 278 8 282 17] (updated_first: Int32.t) (updated_second: Int32.t) (iter_mut_result: tup3_Option_i32_Option_i32_bool) =
+predicate vec_deque_iter_mut_writes_through_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 223 8 227 17] (updated_first: Int32.t) (updated_second: Int32.t) (iter_mut_result: tup3_Option_i32_Option_i32_bool) =
   [%#svec_deque'2] match iter_mut_result with
     | {f0 = first_after; f1 = second_after; f2 = empty} -> first_after = Some updated_first
     /\ second_after = Some updated_second /\ empty
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_iter_mut_writes_through
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 309 8 314 45] (first: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 254 8 259 45] (first: Int32.t)
   (second: Int32.t) (updated_first: Int32.t) (updated_second: Int32.t) (return (x: tup3_Option_i32_Option_i32_bool)) =
   (! bb0
   [ bb0 = s0

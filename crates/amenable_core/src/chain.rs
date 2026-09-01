@@ -20,7 +20,7 @@
 //! it. Presenting mixed-completeness proofs in one tree would make an
 //! incomplete chain look uniformly proven at a glance. So reconstruction
 //! is all-or-nothing per requested verifier set: [`proof_chain`] and
-//! [`proof_chain_for_verifiers`] return [`ChainError::Incomplete`],
+//! [`proof_chain_for_verifiers`] return [`ChainErrorKind::Incomplete`],
 //! listing every gap, rather than a partial [`ProofChainReport`].
 
 use std::{
@@ -303,8 +303,8 @@ impl ChainError {
 /// [`EvidenceLink::name`] ends with `subject`, requiring a complete proof
 /// at every node for every verifier that appears *anywhere* in the tree.
 ///
-/// Returns [`ChainError::NotFound`] if no registered evidence link
-/// matches `subject`, or [`ChainError::Incomplete`] — naming every gap —
+/// Returns [`ChainErrorKind::NotFound`] if no registered evidence link
+/// matches `subject`, or [`ChainErrorKind::Incomplete`] — naming every gap —
 /// if any node lacks a proof for any verifier present elsewhere in the
 /// tree. Only ever reads statically-registered descriptors — never
 /// constructs a value, evaluates a calculation, or runs a verifier.

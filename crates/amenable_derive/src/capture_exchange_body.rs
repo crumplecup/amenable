@@ -152,7 +152,7 @@ impl Parse for CaptureExchangeBodyArgs {
 /// supported; generics on the *method* -- `Ledger::validate<V: Verifier>`
 /// -- are unaffected, since only the impl block's own generics are
 /// checked here).
-#[cfg_attr(not(kani), tracing::instrument(level = "info", skip(args, item_impl)))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(args, item_impl)))]
 pub fn expand_capture_exchange_body(
     args: &CaptureExchangeBodyArgs,
     item_impl: &ItemImpl,

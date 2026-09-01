@@ -82,6 +82,7 @@ impl KaniFileTypeObservation {
 }
 
 impl Default for KaniFileTypeObservation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }
@@ -217,6 +218,7 @@ pub struct KaniFileTimesObservation {
 impl Provenance for KaniFileTimesObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

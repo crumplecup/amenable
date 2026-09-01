@@ -2,6 +2,19 @@
 
 use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
 
+/// Kani-specific witness: identifies the Kani proof harness (if any) behind
+/// a piece of evidence, without ever running it.
+pub trait KaniWitness {
+    /// Evidence this witness backs.
+    type SupportingEvidence: Evidence;
+
+    /// Descriptor of the Kani proof relevant to this evidence.
+    type ProofArtifact;
+
+    /// Identify the Kani proof artifact for this evidence.
+    fn proof() -> Self::ProofArtifact;
+}
+
 /// The Kani verifier, local to this crate: there is only one verifier Kani
 /// works with — Kani. Being local here (not imported from `amenable_core`)
 /// is what makes the per-type bridges in `rust_std.rs` legal under Rust's
@@ -46,17 +59,4 @@ impl Verifier for KaniVerifier {
     fn name() -> &'static str {
         "kani"
     }
-}
-
-/// Kani-specific witness: identifies the Kani proof harness (if any) behind
-/// a piece of evidence, without ever running it.
-pub trait KaniWitness {
-    /// Evidence this witness backs.
-    type SupportingEvidence: Evidence;
-
-    /// Descriptor of the Kani proof relevant to this evidence.
-    type ProofArtifact;
-
-    /// Identify the Kani proof artifact for this evidence.
-    fn proof() -> Self::ProofArtifact;
 }

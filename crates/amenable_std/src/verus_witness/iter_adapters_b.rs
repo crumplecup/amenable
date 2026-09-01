@@ -736,6 +736,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_flatten_model_concatenates_the_inner_iterators".to_owned(),

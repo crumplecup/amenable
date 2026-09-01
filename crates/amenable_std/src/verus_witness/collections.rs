@@ -314,6 +314,7 @@ impl VerusWitness for RustStdStandard<std::collections::LinkedList<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_fifo_queue_pair_pops_in_push_order".to_owned(),

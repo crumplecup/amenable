@@ -23,7 +23,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    /// Dispatch the selected [`Commands`] variant, or run the default
+    /// Dispatch the selected `Commands` variant, or run the default
     /// (no-subcommand) certify behavior.
     #[instrument(level = "debug", skip(self), err(level = "warn"))]
     pub fn act(self) -> AmenableResult<()> {

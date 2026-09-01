@@ -316,6 +316,7 @@ impl VerusWitness for RustStdStandard<Vec<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_push_pop_round_trips".to_owned(),

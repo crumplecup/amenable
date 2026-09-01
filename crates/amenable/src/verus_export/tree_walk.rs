@@ -49,10 +49,9 @@ fn render_leaf_node(
 ) -> AmenableResult<RenderedNode> {
     match node.kind() {
         WitnessSupportKind::Trivial => Ok(RenderedNode::default()),
-        WitnessSupportKind::Trusted => Ok(RenderedNode {
-            comments: vec![render_trust_comment(node, route)],
-            ..RenderedNode::default()
-        }),
+        WitnessSupportKind::Trusted => {
+            Ok(RenderedNode::default().with_comments(vec![render_trust_comment(node, route)]))
+        }
         WitnessSupportKind::Checked => render_checked_leaf(node, route, names),
         WitnessSupportKind::Mixed | WitnessSupportKind::Opaque => {
             Err(AmenableError::invariant(format!(
@@ -117,14 +116,13 @@ fn render_checked_leaf(
         shape.name()
     );
 
-    Ok(RenderedNode {
-        params,
-        checked_calls: vec![call],
-        requires,
-        ensures,
-        imports,
-        comments: vec![comment],
-    })
+    Ok(RenderedNode::default()
+        .with_params(params)
+        .with_checked_calls(vec![call])
+        .with_requires(requires)
+        .with_ensures(ensures)
+        .with_imports(imports)
+        .with_comments(vec![comment]))
 }
 
 /// Allocate a collision-resolved local name for each of a checked leaf's
@@ -143,10 +141,7 @@ fn allocate_params(
     for param in shape.params() {
         let local = names.allocate(param.name(), route_hint);
         local_names.insert(param.name().clone(), local.clone());
-        params.push(RenderedParam {
-            local_name: local,
-            ty: param.ty().clone(),
-        });
+        params.push(RenderedParam::new(local, param.ty().clone()));
     }
 
     (params, local_names)
@@ -156,7 +151,7 @@ fn allocate_params(
 /// local parameter names, and pair it with the harness's real return
 /// type -- rejecting a bare-predicate shape, which isn't wired up as a
 /// callable function yet.
-#[instrument(level = "debug", skip(shape, local_names))]
+#[instrument(level = "debug", skip(shape, route, local_names))]
 fn build_checked_call(
     shape: &VerusCallShape,
     harness: &str,
@@ -181,10 +176,10 @@ fn build_checked_call(
         }
     };
 
-    Ok(CheckedCall {
-        expr: format!("{}::{}({call_args})", shape.module_path(), shape.name()),
+    Ok(CheckedCall::new(
+        format!("{}::{}({call_args})", shape.module_path(), shape.name()),
         ty,
-    })
+    ))
 }
 
 /// Substitute every `$paramname` placeholder (i.e. every placeholder
@@ -201,10 +196,7 @@ fn pending_clause(template: &str, local_names: &HashMap<String, String>) -> Pend
         }
     }
 
-    PendingClause {
-        template: resolved,
-        result_index: 0,
-    }
+    PendingClause::new(resolved, 0)
 }
 
 #[instrument(level = "debug", skip(node, route))]

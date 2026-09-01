@@ -1,4 +1,5 @@
 use amenable_kani::{KaniTcpListener, KaniUdpSocket};
+use miette::IntoDiagnostic;
 
 #[test]
 fn connect_then_accept_pairs_client_and_server_by_address() {
@@ -24,13 +25,17 @@ fn incoming_next_yields_an_already_queued_connection() {
 }
 
 #[test]
-fn write_then_read_round_trips_buffered_bytes() {
+fn write_then_read_round_trips_buffered_bytes() -> miette::Result<()> {
     let mut listener = KaniTcpListener::minimal();
     let client = listener.connect(1);
     let (server, _peer_addr) = listener.accept();
 
-    listener.client_write(client, b"hello".to_vec()).unwrap();
+    listener
+        .client_write(client, b"hello".to_vec())
+        .into_diagnostic()?;
     assert_eq!(listener.server_read(server), b"hello");
+
+    Ok(())
 }
 
 #[test]

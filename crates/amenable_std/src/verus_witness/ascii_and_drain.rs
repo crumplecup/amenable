@@ -397,6 +397,7 @@ impl VerusWitness for RustStdStandard<std::vec::Splice<'static, std::vec::IntoIt
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_splice_model_replaces_a_range_and_yields_what_it_removed".to_owned(),

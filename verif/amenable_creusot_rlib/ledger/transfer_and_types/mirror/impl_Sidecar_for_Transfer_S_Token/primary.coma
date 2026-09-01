@@ -1,0 +1,51 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37 *)
+
+(* <ledger::transfer_and_types::mirror::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
+
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+
+use creusot.int.UInt64
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Amount = { f0: Int64.t }
+
+type t_TransferPayload = { from: UInt64.t; to': UInt64.t; amount: t_Amount }
+
+type t_Token
+
+type t_Transfer_S_Token = { payload: t_TransferPayload; token: t_Token; _state: () }
+
+predicate inv_Token (_1: t_Token)
+
+predicate inv_Transfer_S_Token (_1: t_Transfer_S_Token)
+
+axiom inv_axiom [@rewrite]: forall x: t_Transfer_S_Token [inv_Transfer_S_Token x]. inv_Transfer_S_Token x
+    = inv_Token x.token
+
+predicate invariant_ref_Transfer_S_Token [@inline:trivial] (self: t_Transfer_S_Token) =
+  [%#sinvariant] inv_Transfer_S_Token self
+
+meta "rewrite_def" predicate invariant_ref_Transfer_S_Token
+
+predicate inv_ref_Transfer_S_Token [@inline:trivial] (_1: t_Transfer_S_Token) = invariant_ref_Transfer_S_Token _1
+
+meta "rewrite_def" predicate inv_ref_Transfer_S_Token
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec primary_Transfer_S_Token
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37]
+  (self: t_Transfer_S_Token) (return (x: t_TransferPayload)) =
+  {[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_S_Token self}
+  (! bb0
+  [ bb0 = s0 [ s0 = [ &_4 <- self.payload ] s1 | s1 = [ &_ret <- _4 ] s2 | s2 = return {_ret} ] ]
+  [ & _ret: t_TransferPayload = Any.any_l ()
+  | & self: t_Transfer_S_Token = self
+  | & _4: t_TransferPayload = Any.any_l () ])
+  [ return (result: t_TransferPayload) -> {[@stop_split] [@expl:primary ensures] [%#stransfer_and_types] result
+    = self.payload}
+    (! return {result}) ]

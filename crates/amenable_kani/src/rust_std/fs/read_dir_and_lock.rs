@@ -43,7 +43,7 @@ impl ProofToken for KaniReadDirWitnessToken {
 impl KaniReadDirObservation {
     /// Assert `.entries()` yields exactly the two created entries, in
     /// order. Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(
         not(kani),
@@ -146,7 +146,7 @@ impl ProofToken for KaniLockWitnessToken {
 impl KaniLockObservation {
     /// Assert the first `.try_lock()` succeeds and a second fails while
     /// the lock is still held. Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]

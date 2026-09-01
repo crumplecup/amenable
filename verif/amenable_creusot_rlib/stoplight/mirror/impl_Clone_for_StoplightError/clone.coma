@@ -1,0 +1,17 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 312 20 312 25 *)
+
+(* <stoplight::mirror::StoplightError as std::clone::Clone> *)
+
+use creusot.prelude.Any
+
+type t_StoplightError = NotUsed
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec clone_StoplightError [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 312 20 312 25]
+  (self: t_StoplightError) (return (x: t_StoplightError)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_StoplightError = Any.any_l () | & self: t_StoplightError = self ])
+  [ return (result: t_StoplightError) -> (! return {result}) ]

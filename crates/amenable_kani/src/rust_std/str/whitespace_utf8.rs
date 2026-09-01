@@ -3,8 +3,6 @@ use std::str::{SplitAsciiWhitespace, SplitWhitespace, Utf8Chunks};
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
@@ -103,6 +101,7 @@ impl KaniWitness for RustStdStandard<Utf8Chunks<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input".to_owned(),
@@ -160,6 +159,7 @@ pub struct AccessorRecoversTheExpectedValue<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for AccessorRecoversTheExpectedValue<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -169,14 +169,17 @@ impl<T> Evidence for AccessorRecoversTheExpectedValue<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }

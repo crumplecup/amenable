@@ -3,26 +3,14 @@ use amenable_core::Evidence;
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
 #[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
 use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
@@ -69,6 +57,7 @@ impl KaniWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_iter_mut_yields_mutable_references_that_write_through".to_owned(),

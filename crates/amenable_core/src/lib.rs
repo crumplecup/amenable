@@ -62,15 +62,11 @@ pub use stoplight::{Green, Red, Yellow};
 pub use tracing_init::init_tracing;
 pub use verifier::Verifier;
 #[cfg(feature = "verus")]
-pub use verus_carrier::PredicateBodyError;
-#[cfg(feature = "verus")]
-pub use verus_carrier::predicate_body as verus_predicate_body;
-#[cfg(feature = "verus")]
-pub use verus_carrier::predicate_signature as verus_predicate_signature;
-#[cfg(feature = "verus")]
-pub use verus_carrier::{find_fn as verus_find_fn, literal_clauses as verus_literal_clauses};
-#[cfg(feature = "verus")]
-pub use verus_carrier::{param_name as verus_param_name, walk_tokens as verus_walk_tokens};
+pub use verus_carrier::{
+    PredicateBodyError, find_fn as verus_find_fn, literal_clauses as verus_literal_clauses,
+    param_name as verus_param_name, predicate_body as verus_predicate_body,
+    predicate_signature as verus_predicate_signature, walk_tokens as verus_walk_tokens,
+};
 pub use witness::{
     ClassifiedWitness, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
     WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,

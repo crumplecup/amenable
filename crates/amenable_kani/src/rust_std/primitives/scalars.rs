@@ -1,10 +1,4 @@
-#[cfg(kani)]
-use amenable_core::Ensures;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use crate::rust_std::macros::{impl_kani_witness_trusted, kani_ensures, kani_requires};
 

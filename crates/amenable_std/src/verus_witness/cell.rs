@@ -463,6 +463,7 @@ impl VerusWitness for RustStdStandard<std::sync::Weak<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),

@@ -8,18 +8,22 @@ use tracing::instrument;
 
 /// One real typed parameter a composite's generated proof function
 /// needs, already collision-resolved to a unique local name.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_getters::Getters, derive_new::new)]
 pub(super) struct RenderedParam {
-    pub(super) local_name: String,
-    pub(super) ty: String,
+    /// The collision-resolved local name this parameter is bound to.
+    local_name: String,
+    /// The real parameter's own type, as written.
+    ty: String,
 }
 
 /// One checked leaf's real call expression and its real return type —
 /// becomes one component of the composite's own return value.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_getters::Getters, derive_new::new)]
 pub(super) struct CheckedCall {
-    pub(super) expr: String,
-    pub(super) ty: String,
+    /// The real call expression, fully resolved against local parameter names.
+    expr: String,
+    /// The call's real return type, as written.
+    ty: String,
 }
 
 /// One not-yet-finalized `requires`/`ensures` clause: the harness's own
@@ -30,19 +34,20 @@ pub(super) struct CheckedCall {
 /// which point [`RenderedNode::merge`] rebases it — by the time
 /// rendering reaches the module root, it's a direct, global index into
 /// the root's own `checked_calls`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_getters::Getters, derive_new::new)]
 pub(super) struct PendingClause {
-    pub(super) template: String,
-    pub(super) result_index: usize,
+    /// The harness's own real clause text, with every `$paramname`
+    /// placeholder already substituted for this leaf's local names.
+    template: String,
+    /// This clause's checked-call index, relative to the owning subtree
+    /// until [`RenderedNode::merge`] rebases it.
+    result_index: usize,
 }
 
 impl PendingClause {
     #[instrument(level = "debug", skip(self))]
     pub(super) fn rebase(self, base: usize) -> Self {
-        PendingClause {
-            template: self.template,
-            result_index: base + self.result_index,
-        }
+        Self::new(self.template, base + self.result_index)
     }
 
     /// Resolve to real Verus source, once the final checked-call count
@@ -76,17 +81,23 @@ impl PendingClause {
 /// The composed contribution of one artifact subtree: real parameters,
 /// real checked-leaf calls, real cited predicates, and audit comments —
 /// never an assumed boolean.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, derive_getters::Getters, derive_setters::Setters)]
+#[setters(prefix = "with_")]
 pub(super) struct RenderedNode {
-    pub(super) params: Vec<RenderedParam>,
-    pub(super) checked_calls: Vec<CheckedCall>,
-    pub(super) requires: Vec<PendingClause>,
-    pub(super) ensures: Vec<PendingClause>,
+    /// This subtree's real, already-collision-resolved parameters.
+    params: Vec<RenderedParam>,
+    /// This subtree's real checked-leaf call expressions.
+    checked_calls: Vec<CheckedCall>,
+    /// This subtree's not-yet-finalized `requires` clauses.
+    requires: Vec<PendingClause>,
+    /// This subtree's not-yet-finalized `ensures` clauses.
+    ensures: Vec<PendingClause>,
     /// `(module_path, name)` pairs needing a `use` — a leaf's own
     /// `VerusCallShape::imports`, carried through unchanged (no need to
     /// rebase; imports aren't indexed by checked-call position).
-    pub(super) imports: Vec<(String, String)>,
-    pub(super) comments: Vec<String>,
+    imports: Vec<(String, String)>,
+    /// Audit comments accumulated from trusted leaves and checked calls.
+    comments: Vec<String>,
 }
 
 impl RenderedNode {

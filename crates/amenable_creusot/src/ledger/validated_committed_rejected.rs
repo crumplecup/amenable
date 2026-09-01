@@ -1,66 +1,162 @@
+/// The `#[cfg(creusot)]` imports and `Witness<CreusotVerifier>` impls this
+/// file needs, consolidated into one gate on this `mod` instead of one per
+/// item -- see `stoplight::mirror`'s own doc comment for the general
+/// rationale. A real structural difference from `stoplight::mirror`'s own
+/// content, though: every name re-exported below (`Transfer`/`TransferError`
+/// /`Ledger`/`Sidecar`/`Establish`/`ensures`/`requires`/`logic`, the GAAP
+/// evidence types and their tokens) is needed verbatim, unqualified, by the
+/// `harness! { .. }` blocks and the `include!`d `generated/*.rs` files
+/// below, at *this file's own* top level, not merely inside this module --
+/// so unlike `transfer_and_types.rs`'s own mirror, this one re-exports
+/// nearly everything it imports. Still a real, worthwhile consolidation:
+/// one gate here, one gate on the bridging `use` below, in place of eight
+/// separately gated `use`/`impl` items.
 #[cfg(creusot)]
-use amenable_core::{Establish, Evidence, Sidecar, Witness};
+mod mirror {
+    use amenable_core::Witness;
+    pub(super) use amenable_core::{Establish, Sidecar};
+    pub(super) use amenable_gaap::{
+        Committed, CommittedToken, Pending, PendingToken, Rejected, RejectedFromPendingToken,
+        RejectedFromValidatedToken, Validated, ValidatedToken,
+    };
+    pub(super) use creusot_std::macros::{ensures, logic, requires};
+
+    pub(super) use super::super::contract_bounds::{
+        accounts_distinct_holds, sufficient_funds_holds,
+    };
+    pub(super) use super::super::ledger_validate::{Ledger, TransferError, amount_positive_holds};
+    pub(super) use super::super::transfer_and_types::Transfer;
+    pub(super) use crate::CreusotVerifier;
+
+    impl Witness<CreusotVerifier> for Validated {
+        type SupportingEvidence = Self;
+        type ProofArtifact = ();
+
+        fn proof() -> Self::ProofArtifact {}
+    }
+
+    impl Witness<CreusotVerifier> for Committed {
+        type SupportingEvidence = Self;
+        type ProofArtifact = ();
+
+        fn proof() -> Self::ProofArtifact {}
+    }
+
+    // `reject`'s/`rollback`'s own claims are legitimately trivial (`result.
+    // is_ok()`, matching every `Stoplight` edge's own shape) -- no isolated
+    // Pearlite predicate to name here the way `Validated`'s/`Committed`'s
+    // own combined claims do, matching `Pending`'s/`AccountsDistinct`'s/
+    // `BalancedEntries`'s own trivial `Witness<CreusotVerifier>` impls
+    // above. `GAAP_LEDGER_PLAN.md`'s Step 7, revisited: connected on
+    // Creusot/Verus for the first time, closing the asymmetry `Stoplight`'s
+    // own equally trivial edges never had.
+    impl Witness<CreusotVerifier> for Rejected<Pending> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = ();
+
+        fn proof() -> Self::ProofArtifact {}
+    }
+
+    impl Witness<CreusotVerifier> for Rejected<Validated> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = ();
+
+        fn proof() -> Self::ProofArtifact {}
+    }
+}
 #[cfg(creusot)]
-use amenable_gaap::{
-    Committed, CommittedToken, Pending, PendingToken, Rejected, RejectedFromPendingToken,
-    RejectedFromValidatedToken, Validated, ValidatedToken,
+use mirror::{
+    Committed, CommittedToken, CreusotVerifier, Establish, Ledger, Pending, PendingToken, Rejected,
+    RejectedFromPendingToken, RejectedFromValidatedToken, Sidecar, Transfer, TransferError,
+    Validated, ValidatedToken, accounts_distinct_holds, amount_positive_holds, ensures, logic,
+    requires, sufficient_funds_holds,
 };
-#[cfg(creusot)]
-use creusot_std::macros::{ensures, extern_spec, logic, requires};
-#[cfg(creusot)]
-use creusot_std::std::ops::FnOnceExt;
 
 use super::contract_bounds::{
     VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC, VERIFY_CHECK_SUFFICIENT_FUNDS_SRC,
 };
-#[cfg(creusot)]
-use super::contract_bounds::{accounts_distinct_holds, sufficient_funds_holds};
 use super::ledger_validate::VERIFY_CHECK_AMOUNT_POSITIVE_SRC;
-#[cfg(creusot)]
-use super::ledger_validate::{Ledger, TransferError, amount_positive_holds};
-#[cfg(creusot)]
-use super::transfer_and_types::Transfer;
-#[cfg(creusot)]
-use crate::CreusotVerifier;
+/// The `#[cfg(not(creusot))]` counterpart content this file needs
+/// (`BalancedEntries`'s own `Witness`/`Ensures` impls, and the two
+/// `MultiCheckProof`-building functions the `::inventory::submit!` blocks
+/// below call into), consolidated the same way `mirror`'s own doc comment
+/// explains for the `#[cfg(creusot)]` side. `validated_proof`/
+/// `committed_proof` are `pub(super)`, not private: each is called by
+/// name from a `::inventory::submit!` block that stays at this file's own
+/// top level (that macro invocation is itself invisible to the cfg-scatter
+/// scanner, so there is no consolidation benefit to moving it in too, only
+/// a real cost to the interleaved reading order next to the proof
+/// functions/consts each submission names).
 #[cfg(not(creusot))]
-use crate::CreusotVerifier;
-#[cfg(not(creusot))]
-use amenable_gaap::BalancedEntries;
-/// Proof artifact for a `Validated`/`Committed` claim that currently
-/// rests on more than one isolated Creusot check (`Validated` on
-/// `AmountPositive`/`SufficientFunds`/`AccountsDistinct`, each proven
-/// separately — see this module's own doc comment for why there is no
-/// single composed claim yet, matching `Ledger::check_amount_positive`/
-/// `::check_sufficient_funds` being proven separately on the Kani side
-/// too). Uses `crate::witness::MultiCheckProof` — see that type's own
-/// doc comment for why it's `#[cfg(not(creusot))]` at its definition
-/// site, not here (a real internal compiler panic, confirmed the hard
-/// way, building this very module).
-#[cfg(not(creusot))]
-fn validated_proof() -> crate::witness::MultiCheckProof {
-    crate::witness::MultiCheckProof::new(vec![
-        (
-            "check_amount_positive".to_owned(),
-            VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
-        ),
-        (
-            "check_sufficient_funds".to_owned(),
-            VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
-        ),
-        (
-            "check_accounts_distinct".to_owned(),
-            VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
-        ),
-    ])
-}
+mod not_creusot_mirror {
+    use amenable_gaap::BalancedEntries;
 
-#[cfg(creusot)]
-impl Witness<CreusotVerifier> for Validated {
-    type SupportingEvidence = Self;
-    type ProofArtifact = ();
+    use crate::CreusotVerifier;
 
-    fn proof() -> Self::ProofArtifact {}
+    use super::{
+        BALANCED_ENTRIES_HOLDS_SRC, VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC,
+        VERIFY_CHECK_AMOUNT_POSITIVE_SRC, VERIFY_CHECK_COMMIT_BALANCES_SRC,
+        VERIFY_CHECK_SUFFICIENT_FUNDS_SRC,
+    };
+
+    /// Proof artifact for a `Validated`/`Committed` claim that currently
+    /// rests on more than one isolated Creusot check (`Validated` on
+    /// `AmountPositive`/`SufficientFunds`/`AccountsDistinct`, each proven
+    /// separately — see this module's own doc comment for why there is no
+    /// single composed claim yet, matching `Ledger::check_amount_positive`/
+    /// `::check_sufficient_funds` being proven separately on the Kani side
+    /// too). Uses `crate::witness::MultiCheckProof` — see that type's own
+    /// doc comment for why it's `#[cfg(not(creusot))]` at its definition
+    /// site, not here (a real internal compiler panic, confirmed the hard
+    /// way, building this very module).
+    pub(super) fn validated_proof() -> crate::witness::MultiCheckProof {
+        crate::witness::MultiCheckProof::new(vec![
+            (
+                "check_amount_positive".to_owned(),
+                VERIFY_CHECK_AMOUNT_POSITIVE_SRC.to_owned(),
+            ),
+            (
+                "check_sufficient_funds".to_owned(),
+                VERIFY_CHECK_SUFFICIENT_FUNDS_SRC.to_owned(),
+            ),
+            (
+                "check_accounts_distinct".to_owned(),
+                VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC.to_owned(),
+            ),
+        ])
+    }
+
+    // See `AmountPositive`'s own impls, above, for the full rationale.
+    impl amenable_core::Witness<CreusotVerifier> for BalancedEntries {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_commit_balances".to_owned(),
+                VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for BalancedEntries {
+        type Input = ();
+        type Bound = &'static str;
+
+        fn ensures((): ()) -> Self::Bound {
+            BALANCED_ENTRIES_HOLDS_SRC
+        }
+    }
+
+    pub(super) fn committed_proof() -> crate::witness::MultiCheckProof {
+        crate::witness::MultiCheckProof::new(vec![(
+            "check_commit_balances".to_owned(),
+            VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
+        )])
+    }
 }
+#[cfg(not(creusot))]
+use not_creusot_mirror::{committed_proof, validated_proof};
 
 #[cfg(not(creusot))]
 ::inventory::submit! {
@@ -144,46 +240,6 @@ amenable_derive::harness! {
     }
 }
 
-// See `AmountPositive`'s own impls, above, for the full rationale.
-#[cfg(not(creusot))]
-impl amenable_core::Witness<CreusotVerifier> for BalancedEntries {
-    type SupportingEvidence = Self;
-    type ProofArtifact = crate::witness::MultiCheckProof;
-
-    fn proof() -> Self::ProofArtifact {
-        crate::witness::MultiCheckProof::new(vec![(
-            "check_commit_balances".to_owned(),
-            VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
-        )])
-    }
-}
-
-#[cfg(not(creusot))]
-impl amenable_core::Ensures<CreusotVerifier> for BalancedEntries {
-    type Input = ();
-    type Bound = &'static str;
-
-    fn ensures((): ()) -> Self::Bound {
-        BALANCED_ENTRIES_HOLDS_SRC
-    }
-}
-
-#[cfg(not(creusot))]
-fn committed_proof() -> crate::witness::MultiCheckProof {
-    crate::witness::MultiCheckProof::new(vec![(
-        "check_commit_balances".to_owned(),
-        VERIFY_CHECK_COMMIT_BALANCES_SRC.to_owned(),
-    )])
-}
-
-#[cfg(creusot)]
-impl Witness<CreusotVerifier> for Committed {
-    type SupportingEvidence = Self;
-    type ProofArtifact = ();
-
-    fn proof() -> Self::ProofArtifact {}
-}
-
 #[cfg(not(creusot))]
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
@@ -191,30 +247,6 @@ impl Witness<CreusotVerifier> for Committed {
         "creusot",
         || committed_proof().to_string(),
     )
-}
-
-// `reject`'s/`rollback`'s own claims are legitimately trivial (`result.
-// is_ok()`, matching every `Stoplight` edge's own shape) -- no isolated
-// Pearlite predicate to name here the way `Validated`'s/`Committed`'s
-// own combined claims do, matching `Pending`'s/`AccountsDistinct`'s/
-// `BalancedEntries`'s own trivial `Witness<CreusotVerifier>` impls
-// above. `GAAP_LEDGER_PLAN.md`'s Step 7, revisited: connected on
-// Creusot/Verus for the first time, closing the asymmetry `Stoplight`'s
-// own equally trivial edges never had.
-#[cfg(creusot)]
-impl Witness<CreusotVerifier> for Rejected<Pending> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = ();
-
-    fn proof() -> Self::ProofArtifact {}
-}
-
-#[cfg(creusot)]
-impl Witness<CreusotVerifier> for Rejected<Validated> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = ();
-
-    fn proof() -> Self::ProofArtifact {}
 }
 
 amenable_derive::harness! {

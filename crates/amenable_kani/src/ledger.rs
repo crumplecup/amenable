@@ -23,21 +23,13 @@
 //! helped. `Uuid`'s 16-byte, fixed-length comparison is cheap in the
 //! identical position.
 
-#[cfg(kani)]
-use amenable_core::Establish;
 use amenable_core::{Ensures, Sidecar, Witness};
-#[cfg(kani)]
-use amenable_gaap::{Account, Amount, PendingToken, TransferPayload};
 use amenable_gaap::{
     AccountId, AccountsDistinct, AmountPositive, BalancedEntries, Committed, CommittedToken,
     Pending, Rejected, RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds,
     Transfer, TransferError, Validated, ValidatedToken,
 };
-#[cfg(kani)]
-use uuid::Uuid;
 
-#[cfg(kani)]
-use crate::KaniCompose;
 use crate::gaap_ledger::{
     VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC, VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC,
 };
@@ -57,185 +49,198 @@ use crate::{CalculationProof, KaniVerifier};
 /// boundary -- `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s "Reusing
 /// `KaniCompose` for non-trivial carriers" follow-on.
 ///
-/// `id: Uuid` is cheap to carry fully symbolic at every depth
-/// (fixed-size, and the only thing `AccountId`'s derived `PartialEq`
-/// compares at all now -- see that type's own doc comment).
+/// The `#[cfg(kani)]` imports, `KaniCompose` impls, and `validated_from`
+/// helper this file needs, consolidated into one gate on this `mod`
+/// instead of one per item -- see `amenable_creusot::stoplight::mirror`'s
+/// own doc comment for the general rationale. No bridging re-export
+/// needed: nothing below this module (the `kani_ensures!`/`kani_requires!`
+/// calls and `Witness<KaniVerifier>` impls, all unconditional) names any
+/// of `Establish`/`Account`/`Amount`/`PendingToken`/`TransferPayload`/
+/// `Uuid`/`KaniCompose`/`validated_from`, and the `KaniCompose` trait
+/// impls are globally visible the moment they're compiled.
 #[cfg(kani)]
-impl KaniCompose for AccountId {
-    fn kani_depth0() -> Self {
-        Self::new(Uuid::kani_depth0())
+mod mirror {
+    use amenable_core::Establish;
+    use amenable_gaap::{Account, Amount, PendingToken, TransferPayload};
+    use uuid::Uuid;
+
+    use crate::KaniCompose;
+
+    use super::{AccountId, KaniVerifier, Pending, Sidecar, Transfer, Validated, ValidatedToken};
+
+    /// `id: Uuid` is cheap to carry fully symbolic at every depth
+    /// (fixed-size, and the only thing `AccountId`'s derived `PartialEq`
+    /// compares at all now -- see that type's own doc comment).
+    impl KaniCompose for AccountId {
+        fn kani_depth0() -> Self {
+            Self::new(Uuid::kani_depth0())
+        }
+
+        fn kani_depth1() -> Self {
+            Self::new(Uuid::kani_depth1())
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new(Uuid::kani_depth2())
+        }
+
+        fn kani_any() -> Self {
+            Self::new(Uuid::kani_any())
+        }
     }
 
-    fn kani_depth1() -> Self {
-        Self::new(Uuid::kani_depth1())
+    /// `name: String` is a real, separate CBMC-cost finding, not the free
+    /// pass a first pass at this impl assumed: field-by-field delegation
+    /// (`String::kani_depth1/2/any()`, a real heap-backed, bounded-loop
+    /// construction) made `gaap_ledger::
+    /// verify_gaap_validate_accepts_a_lawful_transfer` (two independently-
+    /// constructed accounts) time out, confirmed by isolating the change to
+    /// exactly this field: swapping `kani_any()` for `kani_depth0()` (empty
+    /// name, `id` still fully symbolic) took that harness from a CBMC
+    /// timeout to `0 of 507 failed` in ~97s, with nothing else touched.
+    /// `name` is never compared (display-only, see `Account`'s own doc
+    /// comment) and participates in zero real claim this worked example
+    /// checks, so a constant empty name at every depth is exactly as strong
+    /// a proof as a varying one here -- `id`'s own depth still governs real
+    /// identity variation, matching `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s
+    /// "Reusing `KaniCompose`" follow-on without reintroducing the
+    /// construction cost `AccountId`'s own history already paid once to
+    /// avoid.
+    impl KaniCompose for Account {
+        fn kani_depth0() -> Self {
+            Self::new(AccountId::kani_depth0(), String::new())
+        }
+
+        fn kani_depth1() -> Self {
+            Self::new(AccountId::kani_depth1(), String::new())
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new(AccountId::kani_depth2(), String::new())
+        }
+
+        fn kani_any() -> Self {
+            Self::new(AccountId::kani_any(), String::new())
+        }
     }
 
-    fn kani_depth2() -> Self {
-        Self::new(Uuid::kani_depth2())
+    impl KaniCompose for Amount {
+        fn kani_depth0() -> Self {
+            Self::new(i64::kani_depth0())
+        }
+
+        fn kani_depth1() -> Self {
+            Self::new(i64::kani_depth1())
+        }
+
+        fn kani_depth2() -> Self {
+            Self::new(i64::kani_depth2())
+        }
+
+        fn kani_any() -> Self {
+            Self::new(i64::kani_any())
+        }
     }
 
-    fn kani_any() -> Self {
-        Self::new(Uuid::kani_any())
-    }
-}
+    impl KaniCompose for TransferPayload {
+        fn kani_depth0() -> Self {
+            Self::new(
+                Account::kani_depth0(),
+                Account::kani_depth0(),
+                Amount::kani_depth0(),
+            )
+        }
 
-/// `name: String` is a real, separate CBMC-cost finding, not the free
-/// pass a first pass at this impl assumed: field-by-field delegation
-/// (`String::kani_depth1/2/any()`, a real heap-backed, bounded-loop
-/// construction) made `gaap_ledger::
-/// verify_gaap_validate_accepts_a_lawful_transfer` (two independently-
-/// constructed accounts) time out, confirmed by isolating the change to
-/// exactly this field: swapping `kani_any()` for `kani_depth0()` (empty
-/// name, `id` still fully symbolic) took that harness from a CBMC
-/// timeout to `0 of 507 failed` in ~97s, with nothing else touched.
-/// `name` is never compared (display-only, see `Account`'s own doc
-/// comment) and participates in zero real claim this worked example
-/// checks, so a constant empty name at every depth is exactly as strong
-/// a proof as a varying one here -- `id`'s own depth still governs real
-/// identity variation, matching `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s
-/// "Reusing `KaniCompose`" follow-on without reintroducing the
-/// construction cost `AccountId`'s own history already paid once to
-/// avoid.
-#[cfg(kani)]
-impl KaniCompose for Account {
-    fn kani_depth0() -> Self {
-        Self::new(AccountId::kani_depth0(), String::new())
-    }
+        fn kani_depth1() -> Self {
+            Self::new(
+                Account::kani_depth1(),
+                Account::kani_depth1(),
+                Amount::kani_depth1(),
+            )
+        }
 
-    fn kani_depth1() -> Self {
-        Self::new(AccountId::kani_depth1(), String::new())
+        fn kani_depth2() -> Self {
+            Self::new(
+                Account::kani_depth2(),
+                Account::kani_depth2(),
+                Amount::kani_depth2(),
+            )
+        }
+
+        fn kani_any() -> Self {
+            Self::new(Account::kani_any(), Account::kani_any(), Amount::kani_any())
+        }
     }
 
-    fn kani_depth2() -> Self {
-        Self::new(AccountId::kani_depth2(), String::new())
+    /// `Transfer<Pending, PendingToken>` isn't pure data the way the three
+    /// impls above are: a lawful `Transfer` needs a real token, minted
+    /// through the real chain, not conjured field-by-field the way a
+    /// mechanical derive would (exactly the `Established::assert()`-style
+    /// bypass `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s own Motivation
+    /// section already rejected as prior art). `Pending` is the easy case:
+    /// [`Transfer::pending`] *is* the real, lawful root constructor, so
+    /// there is no chain to route through at all -- unlike `Validated`
+    /// below.
+    impl KaniCompose for Transfer<Pending, PendingToken> {
+        fn kani_depth0() -> Self {
+            Transfer::pending(TransferPayload::kani_depth0())
+        }
+
+        fn kani_depth1() -> Self {
+            Transfer::pending(TransferPayload::kani_depth1())
+        }
+
+        fn kani_depth2() -> Self {
+            Transfer::pending(TransferPayload::kani_depth2())
+        }
+
+        fn kani_any() -> Self {
+            Transfer::pending(TransferPayload::kani_any())
+        }
     }
 
-    fn kani_any() -> Self {
-        Self::new(AccountId::kani_any(), String::new())
-    }
-}
+    /// Unlike `Pending`, `Validated` has no root constructor -- the only
+    /// lawful way to a `ValidatedToken` is `Establish::establish`, called
+    /// on a real `Pending` credential, the same chain `verify_gaap_commit_
+    /// always_balances`'s own hand-written setup already uses. `Transfer::
+    /// diagnostic_new` (not the lawful `Sidecar`/`validate()` round trip)
+    /// assembles the final value from the already-honestly-minted token --
+    /// matching that harness's own documented reasoning: the *token* comes
+    /// from the real chain, only the wrapping `Transfer` struct itself
+    /// skips re-running `validate()`, which is a separate proof target,
+    /// not something this construction helper needs to re-check.
+    ///
+    /// No further `#[cfg(kani)]` needed here, unlike its own previous
+    /// top-level form: `Transfer::diagnostic_new` itself only exists under
+    /// `cfg(kani)` (see its own doc comment), so there is no
+    /// universally-compiling body to write here the way the other impls'
+    /// `symbolic_any()`-based bodies manage (those compile everywhere,
+    /// only panicking at runtime if actually called outside a real Kani
+    /// run) -- this whole `mod` already only exists under `cfg(kani)`.
+    impl KaniCompose for Transfer<Validated, ValidatedToken> {
+        fn kani_depth0() -> Self {
+            validated_from(TransferPayload::kani_depth0())
+        }
 
-#[cfg(kani)]
-impl KaniCompose for Amount {
-    fn kani_depth0() -> Self {
-        Self::new(i64::kani_depth0())
-    }
+        fn kani_depth1() -> Self {
+            validated_from(TransferPayload::kani_depth1())
+        }
 
-    fn kani_depth1() -> Self {
-        Self::new(i64::kani_depth1())
-    }
+        fn kani_depth2() -> Self {
+            validated_from(TransferPayload::kani_depth2())
+        }
 
-    fn kani_depth2() -> Self {
-        Self::new(i64::kani_depth2())
-    }
-
-    fn kani_any() -> Self {
-        Self::new(i64::kani_any())
-    }
-}
-
-#[cfg(kani)]
-impl KaniCompose for TransferPayload {
-    fn kani_depth0() -> Self {
-        Self::new(
-            Account::kani_depth0(),
-            Account::kani_depth0(),
-            Amount::kani_depth0(),
-        )
-    }
-
-    fn kani_depth1() -> Self {
-        Self::new(
-            Account::kani_depth1(),
-            Account::kani_depth1(),
-            Amount::kani_depth1(),
-        )
+        fn kani_any() -> Self {
+            validated_from(TransferPayload::kani_any())
+        }
     }
 
-    fn kani_depth2() -> Self {
-        Self::new(
-            Account::kani_depth2(),
-            Account::kani_depth2(),
-            Amount::kani_depth2(),
-        )
+    fn validated_from(payload: TransferPayload) -> Transfer<Validated, ValidatedToken> {
+        let pending = Transfer::pending(payload.clone());
+        let credential = Sidecar::sidecar(&pending);
+        let validated_token = <Validated as Establish<_, KaniVerifier>>::establish(credential);
+        Transfer::diagnostic_new(payload, validated_token)
     }
-
-    fn kani_any() -> Self {
-        Self::new(Account::kani_any(), Account::kani_any(), Amount::kani_any())
-    }
-}
-
-/// `Transfer<Pending, PendingToken>` isn't pure data the way the three
-/// impls above are: a lawful `Transfer` needs a real token, minted
-/// through the real chain, not conjured field-by-field the way a
-/// mechanical derive would (exactly the `Established::assert()`-style
-/// bypass `docs/STATE_MACHINE_DERIVATION_PLAN.md`'s own Motivation
-/// section already rejected as prior art). `Pending` is the easy case:
-/// [`Transfer::pending`] *is* the real, lawful root constructor, so
-/// there is no chain to route through at all -- unlike `Validated`
-/// below.
-#[cfg(kani)]
-impl KaniCompose for Transfer<Pending, PendingToken> {
-    fn kani_depth0() -> Self {
-        Transfer::pending(TransferPayload::kani_depth0())
-    }
-
-    fn kani_depth1() -> Self {
-        Transfer::pending(TransferPayload::kani_depth1())
-    }
-
-    fn kani_depth2() -> Self {
-        Transfer::pending(TransferPayload::kani_depth2())
-    }
-
-    fn kani_any() -> Self {
-        Transfer::pending(TransferPayload::kani_any())
-    }
-}
-
-/// Unlike `Pending`, `Validated` has no root constructor -- the only
-/// lawful way to a `ValidatedToken` is `Establish::establish`, called
-/// on a real `Pending` credential, the same chain `verify_gaap_commit_
-/// always_balances`'s own hand-written setup already uses. `Transfer::
-/// diagnostic_new` (not the lawful `Sidecar`/`validate()` round trip)
-/// assembles the final value from the already-honestly-minted token --
-/// matching that harness's own documented reasoning: the *token* comes
-/// from the real chain, only the wrapping `Transfer` struct itself
-/// skips re-running `validate()`, which is a separate proof target,
-/// not something this construction helper needs to re-check.
-///
-/// `#[cfg(kani)]`, unlike every other `KaniCompose` impl in this file:
-/// `Transfer::diagnostic_new` itself only exists under `cfg(kani)` (see
-/// its own doc comment), so there is no universally-compiling body to
-/// write here the way the other impls' `symbolic_any()`-based bodies
-/// manage (those compile everywhere, only panicking at runtime if
-/// actually called outside a real Kani run) -- this one simply can't
-/// exist outside `cfg(kani)` at all.
-#[cfg(kani)]
-impl KaniCompose for Transfer<Validated, ValidatedToken> {
-    fn kani_depth0() -> Self {
-        validated_from(TransferPayload::kani_depth0())
-    }
-
-    fn kani_depth1() -> Self {
-        validated_from(TransferPayload::kani_depth1())
-    }
-
-    fn kani_depth2() -> Self {
-        validated_from(TransferPayload::kani_depth2())
-    }
-
-    fn kani_any() -> Self {
-        validated_from(TransferPayload::kani_any())
-    }
-}
-
-#[cfg(kani)]
-fn validated_from(payload: TransferPayload) -> Transfer<Validated, ValidatedToken> {
-    let pending = Transfer::pending(payload.clone());
-    let credential = Sidecar::sidecar(&pending);
-    let validated_token = <Validated as Establish<_, KaniVerifier>>::establish(credential);
-    Transfer::diagnostic_new(payload, validated_token)
 }
 
 /// `Pending`'s own trivial witness. Unlike `stoplight::Green`, which

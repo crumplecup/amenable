@@ -44,7 +44,7 @@ impl ProofToken for KaniExitStatusWitnessToken {
 
 impl KaniExitStatusObservation {
     /// Assert `!success()` and the expected exit code. Consumes `self`
-    /// for the same reason [`KaniChildObservation::demonstrate_waitable`]
+    /// for the same reason [`crate::KaniChildObservation::demonstrate_waitable`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
@@ -127,7 +127,7 @@ impl ProofToken for KaniOutputWitnessToken {
 impl KaniOutputObservation {
     /// Assert success, the expected status code, and captured stdout.
     /// Consumes `self` for the same reason
-    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    /// [`crate::KaniChildObservation::demonstrate_waitable`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_bundle(self, exit_code: i32) -> KaniOutputWitnessToken {
@@ -210,7 +210,7 @@ impl ProofToken for KaniStdioWitnessToken {
 impl KaniStdioObservation {
     /// Assert `Stdio::null()` leaves no handle while `Stdio::piped()`
     /// exposes one. Consumes `self` for the same reason
-    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    /// [`crate::KaniChildObservation::demonstrate_waitable`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_handle_policy(self) -> KaniStdioWitnessToken {

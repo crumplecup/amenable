@@ -1,22 +1,8 @@
 use std::sync::{Barrier, BarrierWaitResult};
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::GetterRecoversTheStoredReference;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniBarrierLeaderObservation, KaniVerifier, KaniWitness};
@@ -59,7 +45,7 @@ impl ProofToken for KaniBarrierLeaderWitnessToken {
 impl KaniBarrierLeaderObservation {
     /// Assert the sole participant is the leader. Consumes `self` for
     /// the same reason
-    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    /// [`crate::KaniMutexExclusionObservation::demonstrate_exclusion`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_leadership(self) -> KaniBarrierLeaderWitnessToken {
@@ -108,6 +94,7 @@ impl KaniWitness for RustStdStandard<BarrierWaitResult> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_barrier_wait_result_reports_the_sole_participant_as_leader".to_owned(),
@@ -138,6 +125,7 @@ impl ProofToken for RustStdBarrierWaitResultToken {
 impl Establish<KaniBarrierLeaderWitnessToken, KaniVerifier> for RustStdStandard<BarrierWaitResult> {
     type Token = RustStdBarrierWaitResultToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniBarrierLeaderWitnessToken) -> Self::Token {
         RustStdBarrierWaitResultToken(())
     }

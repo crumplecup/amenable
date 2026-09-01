@@ -1,13 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 124 8 124 96 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 67 8 67 96 *)
 
-let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 122 19 122 23
-let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 123 18 123 94
-let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 110 24 110 46
+let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 65 19 65 23
+let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 66 18 66 94
+let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 53 24 53 46
 
 use creusot.int.Int64
 use creusot.prelude.Any
 
-predicate windows_handle_as_raw_handle_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 106 8 109 17] (value: Int64.t) (handle_result: Int64.t) =
+predicate windows_handle_as_raw_handle_recovers_the_wrapped_value_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 49 8 52 17] (value: Int64.t) (handle_result: Int64.t) =
   [%#sos_windows_carrier'1] handle_result = value
 
 meta "compute_max_steps" 1000000
@@ -15,8 +15,8 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_as_raw_handle_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 124 8 124 96]
-  (value: Int64.t) (return (x: Int64.t)) = (! bb0
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 67 8 67 96] (value: Int64.t)
+  (return (x: Int64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
   [ & _ret: Int64.t = Any.any_l () | & value: Int64.t = value ])
   [ return (result: Int64.t) ->

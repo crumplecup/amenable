@@ -5,12 +5,6 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
@@ -717,7 +711,7 @@ impl_nonzero_ensures_kani!(
 );
 
 /// `NonZero<T>::get()` round-trips its wrapped value — a distinct claim
-/// from [`impl_nonzero_ensures_kani`]'s `RustStdStandard<NonZero<T>>`
+/// from `impl_nonzero_ensures_kani`'s `RustStdStandard<NonZero<T>>`
 /// impls above (those check `NonZero::new`'s *construction*
 /// precondition, `value != 0`; this checks the *accessor*
 /// postcondition), so it can't reuse that carrier's slot:
@@ -769,6 +763,7 @@ impl<T> KaniWitness for NonZeroGetRoundTrips<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i8".to_owned(),

@@ -98,6 +98,7 @@ pub struct KaniDirEntryObservation {
 impl Provenance for KaniDirEntryObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -133,6 +134,7 @@ pub struct KaniFileSystem {
 }
 
 impl Default for KaniFileSystem {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self {
             nodes: vec![KaniFsNode::directory(KaniFsPath::root())],
@@ -197,7 +199,7 @@ impl KaniFileSystem {
     #[must_use]
     pub fn is_dir(&self, path: &KaniFsPath) -> bool {
         self.node(path)
-            .is_some_and(|node| node.kind == KaniFsNodeKind::Directory)
+            .is_some_and(|node| node.kind() == KaniFsNodeKind::Directory)
     }
 
     /// Return whether the path currently names a file.
@@ -205,7 +207,7 @@ impl KaniFileSystem {
     #[must_use]
     pub fn is_file(&self, path: &KaniFsPath) -> bool {
         self.node(path)
-            .is_some_and(|node| node.kind == KaniFsNodeKind::File)
+            .is_some_and(|node| node.kind() == KaniFsNodeKind::File)
     }
 
     /// Return the immediate entries of a modeled directory.
@@ -215,10 +217,10 @@ impl KaniFileSystem {
         self.nodes
             .iter()
             .filter_map(|node| {
-                if node.path == *dir {
+                if node.path() == *dir {
                     None
-                } else if node.path.parent() == Some(*dir) {
-                    Some(KaniFsDirEntry::new(node.path))
+                } else if node.path().parent() == Some(*dir) {
+                    Some(KaniFsDirEntry::new(node.path()))
                 } else {
                     None
                 }
@@ -233,6 +235,6 @@ impl KaniFileSystem {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, path)))]
     fn node_index(&self, path: &KaniFsPath) -> Option<usize> {
-        self.nodes.iter().position(|node| node.path == *path)
+        self.nodes.iter().position(|node| node.path() == *path)
     }
 }

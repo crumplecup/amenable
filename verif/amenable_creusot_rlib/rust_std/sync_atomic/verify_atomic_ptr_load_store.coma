@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 188 8 188 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 160 8 160 90 *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
 let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 126 15 126 59
@@ -8,32 +8,32 @@ let%span sops'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sops'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 138 15 138 28
 let%span sops'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 139 14 139 30
 let%span sops'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ops.rs" 144 14 145 104
-let%span ssync_atomic = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 189 36 189 66
-let%span ssync_atomic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 190 47 192 13
-let%span ssync_atomic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 190 47 192 13
-let%span ssync_atomic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 190 35 192 14
-let%span ssync_atomic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 195 16 197 17
-let%span ssync_atomic'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 195 16 197 17
-let%span ssync_atomic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 193 12 198 13
-let%span ssync_atomic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 199 44 201 13
-let%span ssync_atomic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 199 44 201 13
-let%span ssync_atomic'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 199 32 201 14
-let%span ssync_atomic'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 202 13 202 36
-let%span ssync_atomic'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 202 40 202 54
-let%span ssync_atomic'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 202 56 202 76
-let%span ssync_atomic'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 202 80 202 91
-let%span ssync_atomic'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 185 19 185 23
-let%span ssync_atomic'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 186 18 186 26
-let%span ssync_atomic'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 187 18 187 26
-let%span ssync_atomic'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 191 106 191 110
-let%span ssync_atomic'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 191 91 191 111
-let%span ssync_atomic'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 196 119 196 123
-let%span ssync_atomic'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 196 99 196 124
-let%span ssync_atomic'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 200 106 200 110
-let%span ssync_atomic'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 200 91 200 111
-let%span ssync_atomic'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 196 20 196 98
-let%span ssync_atomic'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 191 16 191 90
-let%span ssync_atomic'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 200 16 200 90
+let%span ssync_atomic = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 161 36 161 66
+let%span ssync_atomic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 162 47 164 13
+let%span ssync_atomic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 162 47 164 13
+let%span ssync_atomic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 162 35 164 14
+let%span ssync_atomic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 167 16 169 17
+let%span ssync_atomic'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 167 16 169 17
+let%span ssync_atomic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 165 12 170 13
+let%span ssync_atomic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 171 44 173 13
+let%span ssync_atomic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 171 44 173 13
+let%span ssync_atomic'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 171 32 173 14
+let%span ssync_atomic'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 174 13 174 36
+let%span ssync_atomic'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 174 40 174 54
+let%span ssync_atomic'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 174 56 174 76
+let%span ssync_atomic'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 174 80 174 91
+let%span ssync_atomic'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 157 19 157 23
+let%span ssync_atomic'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 158 18 158 26
+let%span ssync_atomic'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 159 18 159 26
+let%span ssync_atomic'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 163 106 163 110
+let%span ssync_atomic'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 163 91 163 111
+let%span ssync_atomic'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 168 119 168 123
+let%span ssync_atomic'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 168 99 168 124
+let%span ssync_atomic'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 172 106 172 110
+let%span ssync_atomic'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 172 91 172 111
+let%span ssync_atomic'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 168 20 168 98
+let%span ssync_atomic'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 163 16 163 90
+let%span ssync_atomic'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 172 16 172 90
 let%span satomic_sc = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 32 12 32 87
 let%span satomic_sc'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 28 22 28 44
 let%span satomic_sc'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/sync/atomic_sc.rs" 29 22 29 50
@@ -113,7 +113,7 @@ let rec shoot_load_AtomicPtr_i32 (self: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst
     = val_AtomicPtr_i32 own}
     (! return {result}) ]
 
-let rec closure3 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 191 16 191 90]
+let rec closure3 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 163 16 163 90]
   [@coma:extspec] (self: closure3) (c: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst_None) (return (x: ())) = bb0
   [ bb0 = s0
     [ s0 = deref_Ghost_Box_Perm_AtomicPtr_i32_Global [%#ssync_atomic'16] {self.c0}
@@ -253,7 +253,7 @@ predicate hist_inv_closure4 [@inline:trivial] (self: closure4) (result_state: cl
 
 meta "rewrite_def" predicate hist_inv_closure4
 
-let rec closure4 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 196 20 196 98]
+let rec closure4 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 168 20 168 98]
   [@coma:extspec] (self: MutBorrow.t closure4) (c: MutBorrow.t t_Committer_AtomicPtr_i32_ptr_i32_None_SeqCst)
   (return (x: ())) = bb0
   [ bb0 = s0
@@ -395,7 +395,7 @@ meta "rewrite_def" predicate resolve_Ghost_Box_Perm_AtomicPtr_i32_Global
 
 type closure5 = { c0'1: t_Perm_AtomicPtr_i32 }
 
-let rec closure5 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 200 16 200 90]
+let rec closure5 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 172 16 172 90]
   [@coma:extspec] (self: closure5) (c: t_Committer_AtomicPtr_i32_ptr_i32_SeqCst_None) (return (x: ())) = bb0
   [ bb0 = s0
     [ s0 = deref_Ghost_Box_Perm_AtomicPtr_i32_Global [%#ssync_atomic'20] {self.c0'1}
@@ -465,7 +465,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_atomic_ptr_load_store
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 188 8 188 90] (initial: Opaque.ptr)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/sync_atomic.rs" 160 8 160 90] (initial: Opaque.ptr)
   (next: Opaque.ptr) (return (x: tup2_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = new_i32 [%#ssync_atomic] {initial}

@@ -7,9 +7,6 @@ use crate::error::sources::{
     TimestampTooLargeSource,
 };
 
-#[cfg(feature = "cli")]
-use tracing::instrument;
-
 /// Error kind for `amenable` CLI operations. Every variant is a clean
 /// 1-tuple wrapping a real, named, `Error`-implementing source type --
 /// never a bare struct or `String` -- so `AmenableError::source()`'s
@@ -28,7 +25,7 @@ pub enum AmenableErrorKind {
     #[display("{_0}")]
     Io(IoSource),
 
-    /// Failed to parse one line of a JSON Lines artifact -- [`JsonLineSource`]
+    /// Failed to parse one line of a JSON Lines artifact -- `JsonLineSource`
     /// carries the artifact path and the 1-indexed line that failed.
     #[display("{_0}")]
     JsonLine(JsonLineSource),
@@ -54,7 +51,7 @@ pub enum AmenableErrorKind {
     TimeParse(TimeParseSource),
 
     /// A date string didn't match the expected `YYYY-MM-DD` format --
-    /// [`InvalidUtcDateSource`] carries the rejected string.
+    /// `InvalidUtcDateSource` carries the rejected string.
     #[display("{_0}")]
     InvalidUtcDate(InvalidUtcDateSource),
 
@@ -70,7 +67,7 @@ pub enum AmenableErrorKind {
 
     /// A business-rule invariant was violated (bad input, unknown ID,
     /// mismatched counts, and similar non-foreign validation failures) --
-    /// [`InvariantSource`] is a real `Error`-implementing leaf, not a
+    /// `InvariantSource` is a real `Error`-implementing leaf, not a
     /// bare `String`.
     #[display("{_0}")]
     Invariant(InvariantSource),
@@ -110,7 +107,7 @@ impl AmenableErrorKind {
     /// machine-stable identifier) and gated the same as that impl since
     /// nothing else calls it.
     #[cfg(feature = "cli")]
-    #[instrument(level = "debug", ret)]
+    #[tracing::instrument(level = "trace", skip(self))]
     pub(crate) fn code_name(&self) -> &'static str {
         match self {
             Self::Io(_) => "Io",

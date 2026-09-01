@@ -1,30 +1,63 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 53 4 56 77 *)
 
-(* <stoplight::Stoplight as amenable_core::Exchange<stoplight::Established<stoplight::Green, stoplight::GreenToken>, stoplight::Established<stoplight::Yellow, stoplight::YellowToken>, witness::CreusotVerifier>> *)
+(* <stoplight::mirror::Stoplight as amenable_core::Exchange<stoplight::mirror::Established<stoplight::mirror::Green, stoplight::mirror::GreenToken>, stoplight::mirror::Established<stoplight::mirror::Yellow, stoplight::mirror::YellowToken>, witness::CreusotVerifier>> *)
 
 let%span sgreen_to_yellow = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 57 8 57 35
-let%span sgreen_to_yellow'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 51 15 51 19
-let%span sgreen_to_yellow'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 52 14 52 18
-let%span sgreen_to_yellow'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 15 23 15 27
-let%span sgreen_to_yellow'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 16 22 16 26
+let%span sgreen_to_yellow'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 55 8 55 13
+let%span sgreen_to_yellow'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 51 15 51 19
+let%span sgreen_to_yellow'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 56 9 56 77
+let%span sgreen_to_yellow'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 52 14 52 18
+let%span sgreen_to_yellow'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 17 38 17 43
+let%span sgreen_to_yellow'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 15 23 15 27
+let%span sgreen_to_yellow'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 17 80 17 136
+let%span sgreen_to_yellow'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 16 22 16 26
 
 use creusot.prelude.Any
 
-type t_GreenToken = { f0: () }
+type t_Established__private
 
-type t_Established_Green_GreenToken = { primary: (); token: t_GreenToken }
+type t_Established_Green_GreenToken = { primary: (); t_Established__private: t_Established__private }
 
-type t_YellowToken = { f0'0: () }
+type t_Established__private'0
 
-type t_Established_Yellow_YellowToken = { primary'0: (); token'0: t_YellowToken }
+type t_Established_Yellow_YellowToken = { primary'0: (); t_Established__private'0: t_Established__private'0 }
 
 type t_StoplightError = NotUsed
 
 type t_Result_Established_Yellow_YellowToken_StoplightError = Ok t_Established_Yellow_YellowToken | Err t_StoplightError
 
+predicate inv__private (x: t_Established__private)
+
+predicate inv_Established_Green_GreenToken (_1: t_Established_Green_GreenToken)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Established_Green_GreenToken [inv_Established_Green_GreenToken x]. inv_Established_Green_GreenToken x
+    = inv__private x.t_Established__private
+
+predicate inv__private'0 (x: t_Established__private'0)
+
+predicate inv_Established_Yellow_YellowToken (_1: t_Established_Yellow_YellowToken)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall x: t_Established_Yellow_YellowToken [inv_Established_Yellow_YellowToken x]. inv_Established_Yellow_YellowToken x
+    = inv__private'0 x.t_Established__private'0
+
+predicate inv_Result_Established_Yellow_YellowToken_StoplightError (_1: t_Result_Established_Yellow_YellowToken_StoplightError)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall x: t_Result_Established_Yellow_YellowToken_StoplightError [inv_Result_Established_Yellow_YellowToken_StoplightError x]. inv_Result_Established_Yellow_YellowToken_StoplightError x
+    = match x with
+      | Ok f0 -> inv_Established_Yellow_YellowToken f0
+      | Err f0 -> true
+      end
+
 let rec green_to_yellow (self: ()) (input: t_Established_Green_GreenToken)
-  (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) = any
-  [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) -> (! return {result}) ]
+  (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) =
+  {[@stop_split] [@expl:green_to_yellow 'input' type invariant] [%#sgreen_to_yellow'4] inv_Established_Green_GreenToken input}
+  any
+  [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) ->
+  {[@stop_split] [@expl:green_to_yellow result type invariant] [%#sgreen_to_yellow'6] inv_Result_Established_Yellow_YellowToken_StoplightError result}
+    (! return {result}) ]
 
 meta "compute_max_steps" 1000000
 
@@ -32,7 +65,9 @@ meta "select_lsinst" "all"
 
 let rec exchange_Stoplight
   [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 53 4 56 77] (self: ())
-  (input: t_Established_Green_GreenToken) (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) = (! bb0
+  (input: t_Established_Green_GreenToken) (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) =
+  {[@stop_split] [@expl:exchange 'input' type invariant] [%#sgreen_to_yellow'0] inv_Established_Green_GreenToken input}
+  (! bb0
   [ bb0 = s0
     [ s0 = green_to_yellow [%#sgreen_to_yellow] {self} {input}
         (fun (_x: t_Result_Established_Yellow_YellowToken_StoplightError) -> [ &_ret <- _x ] s1)
@@ -40,4 +75,6 @@ let rec exchange_Stoplight
   [ & _ret: t_Result_Established_Yellow_YellowToken_StoplightError = Any.any_l ()
   | & self: () = self
   | & input: t_Established_Green_GreenToken = input ])
-  [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) -> (! return {result}) ]
+  [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) ->
+  {[@stop_split] [@expl:exchange result type invariant] [%#sgreen_to_yellow'2] inv_Result_Established_Yellow_YellowToken_StoplightError result}
+    (! return {result}) ]

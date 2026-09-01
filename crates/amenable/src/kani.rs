@@ -54,7 +54,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     let records = registered_proofs();
     if args.list {
         for record in records {
-            println!("{}", record.id());
+            crate::write_stdout_line(record.id())?;
         }
         return Ok(());
     }
@@ -62,30 +62,35 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     let mut ledger = Ledger::load(&args.results)?;
     let selected = select_records(&records, &ledger, &args)?;
     if selected.is_empty() {
-        println!("No Kani harnesses matched the selection.");
+        crate::write_stdout_line("No Kani harnesses matched the selection.")?;
         return Ok(());
     }
 
-    println!("Kani verification: {} harness(es)", selected.len());
-    println!("Results: {}", args.results.display());
-    println!("Per-harness timeout: {}", args.harness_timeout);
+    crate::write_stdout_line(format!("Kani verification: {} harness(es)", selected.len()))?;
+    crate::write_stdout_line(format!("Results: {}", args.results.display()))?;
+    crate::write_stdout_line(format!("Per-harness timeout: {}", args.harness_timeout))?;
 
     let mut unsuccessful = 0;
     for (index, record) in selected.iter().enumerate() {
-        println!("[{}/{}] Running {}", index + 1, selected.len(), record.id());
+        crate::write_stdout_line(format!(
+            "[{}/{}] Running {}",
+            index + 1,
+            selected.len(),
+            record.id()
+        ))?;
         let result = run_proof(record, &args.harness_timeout);
         if let Some(message) = &result.message {
-            eprintln!("    {message}");
+            crate::write_stderr_line(format!("    {message}"))?;
         }
 
         match result.status {
-            ProofStatus::Passed => println!("    passed"),
+            ProofStatus::Passed => crate::write_stdout_line("    passed")?,
             ProofStatus::Failed => {
-                println!("    failed");
+                crate::write_stdout_line("    failed")?;
                 unsuccessful += 1;
             }
             ProofStatus::Timeout => {
-                println!("    timeout");
+                crate::write_stdout_line("    timeout")?;
                 unsuccessful += 1;
             }
         }
@@ -142,7 +147,9 @@ fn select_records<'a>(
     let registered_ids: BTreeSet<_> = records.iter().map(|record| record.id().as_str()).collect();
 
     for id in retry_ids.difference(&registered_ids) {
-        eprintln!("Ledger proof is no longer registered and will be skipped: {id}");
+        crate::write_stderr_line(format!(
+            "Ledger proof is no longer registered and will be skipped: {id}"
+        ))?;
     }
 
     Ok(records

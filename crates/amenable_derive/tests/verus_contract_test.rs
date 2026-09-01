@@ -254,7 +254,7 @@ fn predicate_witness_derives_from_the_predicates_own_declaration() {
 }
 
 #[test]
-fn predicate_registration_carries_a_real_fn_signature_not_the_bare_clause() {
+fn predicate_registration_carries_a_real_fn_signature_not_the_bare_clause() -> miette::Result<()> {
     amenable_core::init_tracing();
     // `verus_ensures_witness!`'s own registration (`CharRoundtrip`, see
     // `one_contract_record_is_registered_per_real_clause` above) stays
@@ -271,7 +271,9 @@ fn predicate_registration_carries_a_real_fn_signature_not_the_bare_clause() {
             record.evidence() == "verus_contract_test::WriteStoresNewValueLike"
                 && record.kind() == "ensures"
         })
-        .expect("WriteStoresNewValueLike registers a real ContractRecord");
+        .ok_or_else(|| {
+            miette::miette!("WriteStoresNewValueLike registers a real ContractRecord")
+        })?;
     let fragment = (record.fragment())();
 
     assert!(
@@ -283,6 +285,8 @@ fn predicate_registration_carries_a_real_fn_signature_not_the_bare_clause() {
         fragment.contains("observed == new_value"),
         "registered fragment {fragment:?} should still carry the real clause body"
     );
+
+    Ok(())
 }
 
 #[test]

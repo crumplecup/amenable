@@ -3,6 +3,13 @@
 use super::support::{WitnessSupportKind, WitnessSupportSummary};
 use crate::MetadataEntry;
 
+/// Shape-reporting surface for a witness proof artifact.
+pub trait WitnessArtifact {
+    /// Reify this proof artifact as a structured tree for audit and
+    /// backend-specific scaffold generation.
+    fn witness_artifact(&self) -> WitnessArtifactNode;
+}
+
 /// Structural shape classification for one witness artifact node.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WitnessArtifactShape {
@@ -174,11 +181,4 @@ impl WitnessArtifactNode {
             variants,
         }
     }
-}
-
-/// Shape-reporting surface for a witness proof artifact.
-pub trait WitnessArtifact {
-    /// Reify this proof artifact as a structured tree for audit and
-    /// backend-specific scaffold generation.
-    fn witness_artifact(&self) -> WitnessArtifactNode;
 }

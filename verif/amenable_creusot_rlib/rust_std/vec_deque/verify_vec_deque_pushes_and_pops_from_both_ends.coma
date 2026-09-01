@@ -1,9 +1,9 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 159 8 162 71 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 104 8 107 71 *)
 
-let%span svec_deque = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 163 43 163 47
-let%span svec_deque'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 157 19 157 23
-let%span svec_deque'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 158 18 158 78
-let%span svec_deque'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 129 16 136 17
+let%span svec_deque = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 108 43 108 47
+let%span svec_deque'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 102 19 102 23
+let%span svec_deque'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 103 18 103 78
+let%span svec_deque'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 74 16 81 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -17,7 +17,7 @@ type tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool = {
   f3: t_Option_i32;
   f4: bool }
 
-predicate vec_deque_pushes_and_pops_from_both_ends_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 123 8 127 17] (a: Int32.t) (b: Int32.t) (deque_result: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
+predicate vec_deque_pushes_and_pops_from_both_ends_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 68 8 72 17] (a: Int32.t) (b: Int32.t) (deque_result: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool) =
   [%#svec_deque'2] match deque_result with
     | {f0 = front; f1 = back; f2 = exhausted_front; f3 = exhausted_back; f4 = empty} -> front = Some b
     /\ back = Some a /\ exhausted_front = None /\ exhausted_back = None /\ empty
@@ -28,7 +28,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_vec_deque_pushes_and_pops_from_both_ends
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 159 8 162 71] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 104 8 107 71] (a: Int32.t)
   (b: Int32.t) (return (x: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some b ] s1

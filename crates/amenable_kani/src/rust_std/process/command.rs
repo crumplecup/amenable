@@ -45,7 +45,7 @@ impl ProofToken for KaniCommandEnvWitnessToken {
 impl KaniCommandEnvObservation {
     /// Assert the configured key and the visible stdout match. Consumes
     /// `self` for the same reason
-    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    /// [`crate::KaniChildObservation::demonstrate_waitable`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_visibility(self, expected_key: &'static str) -> KaniCommandEnvWitnessToken {
@@ -130,7 +130,7 @@ impl ProofToken for KaniCommandArgsWitnessToken {
 impl KaniCommandArgsObservation {
     /// Assert `.args()` reports the expected arguments in order. Consumes
     /// `self` for the same reason
-    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    /// [`crate::KaniChildObservation::demonstrate_waitable`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_configured_arguments(
@@ -185,6 +185,7 @@ impl KaniWitness for RustStdStandard<CommandEnvs<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_command_envs_reports_the_configured_overrides".to_owned(),
@@ -217,7 +218,7 @@ impl ProofToken for KaniCommandEnvsWitnessToken {
 impl KaniCommandEnvsObservation {
     /// Assert `.get_envs()` reports back the configured key and value.
     /// Consumes `self` for the same reason
-    /// [`KaniChildObservation::demonstrate_waitable`] does.
+    /// [`crate::KaniChildObservation::demonstrate_waitable`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_configured_override(
@@ -245,6 +246,7 @@ impl Establish<KaniCommandEnvsWitnessToken, KaniVerifier>
 {
     type Token = RustStdCommandEnvsToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCommandEnvsWitnessToken) -> Self::Token {
         RustStdCommandEnvsToken(())
     }

@@ -7,26 +7,8 @@ use amenable_std::RustStdStandard;
 
 use super::split_n_and_rsplit::VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniSplitObservation, KaniVerifier};
 
@@ -316,6 +298,7 @@ impl KaniWitness for RustStdStandard<SplitMut<'static, i32, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_mut_yields_writable_subslices_between_matches".to_owned(),
@@ -388,6 +371,7 @@ impl Establish<KaniSplitMutWitnessToken, KaniVerifier>
 {
     type Token = RustStdSplitMutToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniSplitMutWitnessToken) -> Self::Token {
         RustStdSplitMutToken(())
     }

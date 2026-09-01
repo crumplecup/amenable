@@ -122,6 +122,7 @@ impl KaniWitness for RustStdStandard<Permissions> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_permissions_readonly_round_trips_through_set_permissions".to_owned(),
@@ -154,7 +155,7 @@ impl KaniPermissionsObservation {
     /// Assert a fresh file isn't readonly, then assert setting and
     /// clearing readonly are each reflected the next time permissions are
     /// read. Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
@@ -185,6 +186,7 @@ impl ProofToken for RustStdPermissionsToken {
 impl Establish<KaniPermissionsWitnessToken, KaniVerifier> for RustStdStandard<Permissions> {
     type Token = RustStdPermissionsToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniPermissionsWitnessToken) -> Self::Token {
         RustStdPermissionsToken(())
     }

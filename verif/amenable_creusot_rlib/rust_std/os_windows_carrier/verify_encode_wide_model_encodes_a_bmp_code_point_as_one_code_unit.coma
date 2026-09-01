@@ -1,19 +1,19 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 244 8 244 101 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 187 8 187 101 *)
 
-let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 242 19 242 57
-let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 243 18 243 97
-let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 212 24 212 45
-let%span sos_windows_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 227 24 227 58
+let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 185 19 185 57
+let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 186 18 186 97
+let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 155 24 155 45
+let%span sos_windows_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 170 24 170 58
 
 use creusot.int.UInt32
 use creusot.int.UInt16
 use creusot.prelude.Any
 use int.Int
 
-predicate encode_wide_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 211 8 211 62] (code_point: UInt32.t) =
+predicate encode_wide_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 154 8 154 62] (code_point: UInt32.t) =
   [%#sos_windows_carrier'1] UInt32.t'int code_point < 65536
 
-predicate encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 223 8 226 17] (code_point: UInt32.t) (encode_result: UInt16.t) =
+predicate encode_wide_encodes_a_bmp_code_point_as_one_code_unit_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 166 8 169 17] (code_point: UInt32.t) (encode_result: UInt16.t) =
   [%#sos_windows_carrier'2] encode_result = UInt16.of_int (UInt32.t'int code_point)
 
 meta "compute_max_steps" 1000000
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 244 8 244 101]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 187 8 187 101]
   (code_point: UInt32.t) (return (x: UInt16.t)) =
   {[@stop_split] [@expl:verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit requires] [%#sos_windows_carrier] encode_wide_headroom_holds code_point}
   (! bb0

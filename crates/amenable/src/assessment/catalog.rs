@@ -8,16 +8,10 @@ use tracing::instrument;
 /// reviewer could meaningfully score, whether it's a Kani harness, a
 /// Creusot contract, or a Verus spec function. Deliberately thinner than
 /// [`KaniProof`]: `queue`/`ensure_registered` only ever need the ID.
+#[derive(derive_getters::Getters)]
 pub(super) struct RegisteredProof {
-    id: String,
-}
-
-impl RegisteredProof {
     /// The fully-qualified registered proof ID.
-    #[instrument(level = "debug", skip(self))]
-    pub(super) fn id(&self) -> &str {
-        &self.id
-    }
+    id: String,
 }
 
 #[instrument(level = "debug")]

@@ -1,11 +1,7 @@
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
@@ -64,6 +60,7 @@ impl KaniWitness for RustStdStandard<*mut i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_mut_pointer_cast_is_reproducible".to_owned(),

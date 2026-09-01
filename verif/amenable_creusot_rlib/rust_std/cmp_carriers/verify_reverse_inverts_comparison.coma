@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 214 8 214 79 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 164 8 164 79 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
@@ -14,11 +14,11 @@ let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
 let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
 let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
-let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 215 13 215 40
-let%span scmp_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 212 19 212 23
-let%span scmp_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 213 18 213 64
-let%span scmp_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 176 18 180 9
-let%span scmp_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 193 16 197 39
+let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 165 13 165 40
+let%span scmp_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 162 19 162 23
+let%span scmp_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 163 18 163 64
+let%span scmp_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 126 18 130 9
+let%span scmp_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 143 16 147 39
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -82,7 +82,7 @@ let rec cmp_Reverse_i32 (self_: t_Reverse_i32) (other: t_Reverse_i32) (return (x
 
 type tup2_Ordering_i32 = { f0'0: t_Ordering; f1'0: Int32.t }
 
-predicate reverse_inverts_comparison_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 191 8 191 96] (a: Int32.t) (b: Int32.t) (cmp_result: tup2_Ordering_i32) =
+predicate reverse_inverts_comparison_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 141 8 141 96] (a: Int32.t) (b: Int32.t) (cmp_result: tup2_Ordering_i32) =
   [%#scmp_carriers'3] match cmp_result.f0'0 with
       | Less -> Int32.gt b a
       | Equal -> b = a
@@ -95,7 +95,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_reverse_inverts_comparison
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 214 8 214 79] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 164 8 164 79] (a: Int32.t)
   (b: Int32.t) (return (x: tup2_Ordering_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_9 <- { f0 = a } ] s1

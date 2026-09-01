@@ -4,8 +4,6 @@ use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
 #[cfg(kani)]
 use crate::AtomicLoadReflectsTheLastWrite;
@@ -13,10 +11,6 @@ use crate::CheckedProof;
 #[cfg(kani)]
 use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PeekRevealsTheStoredReference;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::iter::Repeat<i32>> {

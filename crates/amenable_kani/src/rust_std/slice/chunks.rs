@@ -4,31 +4,32 @@ use std::slice::{
 };
 
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::bridge_kani_witness;
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Requires};
+
+    pub(super) use crate::AccessorRecoversTheExpectedValue;
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::IteratorYieldsAReferenceToTheStoredValue;
+    pub(super) use crate::IteratorYieldsNoneWhenExhausted;
+}
+#[cfg(kani)]
+use mirror::{
+    AccessorRecoversTheExpectedValue, CollectedSequenceMatchesExpected, Ensures,
+    IteratorYieldsAReferenceToTheStoredValue, IteratorYieldsNoneWhenExhausted, Requires,
+};
 
 impl KaniWitness for RustStdStandard<Chunks<'static, i32>> {
     type SupportingEvidence = Self;
@@ -411,6 +412,7 @@ impl KaniWitness for RustStdStandard<Windows<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_windows_yields_overlapping_slices".to_owned(),

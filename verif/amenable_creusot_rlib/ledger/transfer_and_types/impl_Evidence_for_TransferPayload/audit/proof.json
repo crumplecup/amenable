@@ -1,8 +1,0 @@
-{
-  "profile": [],
-  "proofs": {
-    "Coma": {
-      "vc_audit_TransferPayload": { "prover": "alt-ergo", "time": 0.012 }
-    }
-  }
-}

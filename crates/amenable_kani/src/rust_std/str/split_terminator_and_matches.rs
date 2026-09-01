@@ -3,8 +3,6 @@ use std::str::{Matches, RMatches, RSplitTerminator, SplitTerminator};
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
@@ -200,6 +198,7 @@ impl KaniWitness for RustStdStandard<RMatches<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rmatches_yields_every_non_overlapping_occurrence".to_owned(),

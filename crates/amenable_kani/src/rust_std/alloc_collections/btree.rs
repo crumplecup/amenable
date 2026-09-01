@@ -5,20 +5,10 @@ use amenable_core::Evidence;
 use amenable_core::{Ensures, Requires};
 use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::PopRecoversTheStoredValue;
@@ -236,6 +226,7 @@ impl KaniWitness for RemoveReportsElementWasPresent {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_btree_set_iterates_in_sorted_order".to_owned(),

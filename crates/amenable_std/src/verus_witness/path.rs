@@ -270,6 +270,7 @@ impl VerusWitness for RustStdStandard<std::path::StripPrefixError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_strip_prefix_error_model_reports_a_non_matching_prefix".to_owned(),

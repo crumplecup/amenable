@@ -6,21 +6,13 @@ use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
 use crate::CheckedProof;
 #[cfg(kani)]
 use crate::FirstValueIsLessThanTheSecond;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PeekRevealsTheStoredReference;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> {
@@ -254,6 +246,7 @@ impl KaniWitness for RustStdStandard<Cloned<Iter<'static, i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cloned_clones_each_referenced_item".to_owned(),

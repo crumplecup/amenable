@@ -581,6 +581,7 @@ impl VerusWitness for RustStdStandard<std::slice::GetDisjointMutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_get_disjoint_mut_model_rejects_overlap_and_out_of_bounds".to_owned(),

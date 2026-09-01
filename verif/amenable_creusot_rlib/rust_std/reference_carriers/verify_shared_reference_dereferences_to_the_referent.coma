@@ -1,13 +1,13 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 66 8 66 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 9 8 9 82 *)
 
-let%span sreference_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 64 19 64 23
-let%span sreference_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 65 18 65 78
-let%span sreference_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 83 24 83 49
+let%span sreference_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 7 19 7 23
+let%span sreference_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 8 18 8 78
+let%span sreference_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 26 24 26 49
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
-predicate shared_reference_dereferences_to_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 79 8 82 17] (value: Int32.t) (reference_result: Int32.t) =
+predicate shared_reference_dereferences_to_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 22 8 25 17] (value: Int32.t) (reference_result: Int32.t) =
   [%#sreference_carriers'1] reference_result = value
 
 meta "compute_max_steps" 1000000
@@ -15,7 +15,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_shared_reference_dereferences_to_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 66 8 66 82] (value: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 9 8 9 82] (value: Int32.t)
   (return (x: Int32.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &reference <- value ] s1 | s1 = [ &_ret <- reference ] s2 | s2 = return {_ret} ] ]
   [ & _ret: Int32.t = Any.any_l () | & value: Int32.t = value | & reference: Int32.t = Any.any_l () ])

@@ -397,6 +397,7 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugMap<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_debug_map_model_renders_key_value_pairs".to_owned(),

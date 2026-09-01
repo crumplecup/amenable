@@ -291,6 +291,7 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_socket_addr_model_variant_matches_its_kind".to_owned(),

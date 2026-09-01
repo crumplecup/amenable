@@ -7,18 +7,6 @@ use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
 use super::line_writer_and_lines::ByteIsDistinctFromTheMarker;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 use crate::{KaniBufReadSplitObservation, KaniVerifier, KaniWitness};
@@ -143,6 +131,7 @@ impl KaniWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_segments_on_the_given_byte_and_drops_it".to_owned(),
@@ -174,7 +163,7 @@ impl ProofToken for KaniBufReadSplitWitnessToken {
 impl KaniBufReadSplitObservation {
     /// Assert `.segments()` yields the three segments with the delimiter
     /// dropped. Consumes `self` for the same reason
-    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    /// [`crate::KaniBufferedReadObservation::demonstrate_read_through`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_segments(
@@ -202,6 +191,7 @@ impl Establish<KaniBufReadSplitWitnessToken, KaniVerifier>
 {
     type Token = RustStdBufReadSplitToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniBufReadSplitWitnessToken) -> Self::Token {
         RustStdBufReadSplitToken(())
     }

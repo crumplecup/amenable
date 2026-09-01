@@ -86,7 +86,7 @@ impl SummaryDimension {
 }
 
 /// Six independently scored dimensions of proof quality.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, derive_builder::Builder)]
 pub(super) struct Rubric {
     claim_alignment: u8,
     assumption_adequacy: u8,
@@ -97,27 +97,6 @@ pub(super) struct Rubric {
 }
 
 impl Rubric {
-    /// Assemble the six rubric scores, exactly as recorded by
-    /// `--claim-alignment` and its five sibling flags.
-    #[instrument(level = "debug")]
-    pub(super) fn new(
-        claim_alignment: u8,
-        assumption_adequacy: u8,
-        model_fidelity: u8,
-        assertion_strength: u8,
-        adversarial_coverage: u8,
-        clarity: u8,
-    ) -> Self {
-        Self {
-            claim_alignment,
-            assumption_adequacy,
-            model_fidelity,
-            assertion_strength,
-            adversarial_coverage,
-            clarity,
-        }
-    }
-
     #[instrument(level = "debug", skip(self))]
     pub(super) fn validate(self) -> AmenableResult<()> {
         for (name, score) in [

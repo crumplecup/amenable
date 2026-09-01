@@ -1,14 +1,14 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 17 12 17 134 *)
 
-(* ledger::ledger_validate::Ledger *)
+(* ledger::ledger_validate::mirror::Ledger *)
 
-let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 146 9 146 33
-let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 99 21 99 31
-let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 98 18 98 22
-let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 171 8 171 13
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 109 25 109 35
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 108 22 108 26
+let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 285 16 288 17
-let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 126 24 126 49
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 317 16 320 17
+let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 222 24 222 49
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 95 0 95 87
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 18 30 18 45
 let%span scommit'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 18 30 18 53
@@ -139,10 +139,10 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 125 8 125 58] (amount'0: Int64.t) =
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 221 8 221 58] (amount'0: Int64.t) =
   [%#svalidated_committed_rejected'0] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
 
-predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 281 8 283 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
+predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 313 8 315 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
   [%#svalidated_committed_rejected] match outcome with
     | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
     | Err _ -> false

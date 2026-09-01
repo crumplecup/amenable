@@ -245,7 +245,7 @@ aren't re-derived:
 
 - **`AmenableResult::Err` from `write_verus_witness_modules`** (the
   original proposal): only surfaces when someone manually runs
-  `cargo run -p amenable -- emit-verus-witnesses`; silent otherwise.
+  `cargo run -p amenable -- verus emit-witnesses`; silent otherwise.
   Rejected — doesn't fail `cargo check`, doesn't fail `cargo test`, easy
   to never encounter.
 - **`const _: () = assert!(cond, msg);`** in the `register_witness_exports!`

@@ -260,6 +260,7 @@ impl VerusWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_lines_model_splits_on_newlines_and_drops_the_terminator".to_owned(),

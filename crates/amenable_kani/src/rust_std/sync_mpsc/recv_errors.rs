@@ -95,6 +95,7 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::RecvTimeoutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_recv_timeout_error_distinguishes_timeout_from_disconnected".to_owned(),
@@ -165,6 +166,7 @@ impl Establish<KaniChannelRecvTimeoutToken, KaniVerifier>
 {
     type Token = RustStdRecvTimeoutErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelRecvTimeoutToken) -> Self::Token {
         RustStdRecvTimeoutErrorToken(())
     }

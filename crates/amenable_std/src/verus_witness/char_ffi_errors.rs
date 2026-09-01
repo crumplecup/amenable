@@ -458,6 +458,7 @@ impl VerusWitness for RustStdStandard<core::char::ParseCharError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_parse_char_error_occurs_for_empty_or_multi_character_strings".to_owned(),

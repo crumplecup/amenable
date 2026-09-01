@@ -5,23 +5,11 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 #[cfg(kani)]
 use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::ValueIsWithinInclusiveRange;

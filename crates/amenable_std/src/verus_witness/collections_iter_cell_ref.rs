@@ -207,6 +207,7 @@ impl VerusWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ref_mut_model_derefs_and_writes_through_to_the_cell".to_owned(),

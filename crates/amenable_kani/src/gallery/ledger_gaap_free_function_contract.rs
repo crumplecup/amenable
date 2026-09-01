@@ -136,38 +136,97 @@
     )
 }
 
+/// The `#[cfg(kani)]` imports, `commit_checked`, and the two local
+/// contract-carrying wrapper types this file needs, consolidated into
+/// one gate on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `gallery_harness!
+/// { .. }` blocks below (macro invocations, invisible to the
+/// cfg-scatter scanner) and the `#[kani::proof_for_contract(..)]`
+/// attributes inside them reference all of it, unqualified, from this
+/// file's own top level.
 #[cfg(kani)]
-use crate::KaniVerifier;
-#[cfg(kani)]
-use amenable_core::{Ensures, Sidecar};
-#[cfg(kani)]
-use amenable_gaap::{
-    BalancedEntries, Committed, CommittedToken, Ledger, Transfer, TransferError, Validated,
-    ValidatedToken,
-};
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Sidecar};
+    pub(super) use amenable_gaap::{
+        BalancedEntries, Committed, CommittedToken, Ledger, Transfer, TransferError, Validated,
+        ValidatedToken,
+    };
 
-/// `#[cfg(kani)]`, not left to go dead-code-unused under an ordinary
-/// build: this wrapper's only role is carrying a Kani contract for
-/// verification -- it has no production caller, unlike `amenable_kani::
-/// ledger`'s own real helpers, which real (non-cfg-gated) logic calls
-/// into too. Real, not decorative, otherwise: `Ledger::commit`'s own
-/// `#[kani::requires]` precondition, moved here verbatim from
-/// `amenable_kani::ledger::Ledger::commit`'s own doc comment (real
-/// overflow finding, `GAAP_LEDGER_PLAN.md`'s Step 2) -- `commit` is only
-/// ever meant to be called on an already-`validate`d transfer, which
-/// already established `AmountPositive`.
-#[cfg(kani)]
-#[kani::requires(input.primary().amount().value() > 0)]
-#[kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| match result {
-    Ok(committed) => BalancedEntries::ensures(committed.primary().amount().value()),
-    Err(_) => false,
-})]
-fn commit_checked(
-    ledger: &Ledger,
-    input: Transfer<Validated, ValidatedToken>,
-) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
-    ledger.commit::<KaniVerifier>(input)
+    pub(super) use crate::KaniVerifier;
+
+    /// Not left to go dead-code-unused under an ordinary build: this
+    /// whole module only exists under `#[cfg(kani)]`, and this wrapper's
+    /// only role is carrying a Kani contract for verification -- it has
+    /// no production caller, unlike `amenable_kani::ledger`'s own real
+    /// helpers, which real (non-cfg-gated) logic calls into too. Real,
+    /// not decorative, otherwise: `Ledger::commit`'s own `#[kani::
+    /// requires]` precondition, moved here verbatim from `amenable_kani::
+    /// ledger::Ledger::commit`'s own doc comment (real overflow finding,
+    /// `GAAP_LEDGER_PLAN.md`'s Step 2) -- `commit` is only ever meant to
+    /// be called on an already-`validate`d transfer, which already
+    /// established `AmountPositive`.
+    #[kani::requires(input.primary().amount().value() > 0)]
+    #[kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| match result {
+        Ok(committed) => BalancedEntries::ensures(committed.primary().amount().value()),
+        Err(_) => false,
+    })]
+    pub(super) fn commit_checked(
+        ledger: &Ledger,
+        input: Transfer<Validated, ValidatedToken>,
+    ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
+        ledger.commit::<KaniVerifier>(input)
+    }
+
+    /// Zero-sized local wrapper: `Ledger` itself lives in `amenable_gaap` now,
+    /// so an inherent impl for it can't be written here at all (inherent
+    /// impls require the *type* to be local, no orphan-rule loophole the way
+    /// trait impls have one) -- this local type exists purely so `commit`
+    /// below can be an *associated function on a type this crate owns*,
+    /// matching the shape (`Type::function`) every other real Kani contract
+    /// in this workspace uses, rather than a bare free function.
+    pub(super) struct KaniLedgerCommit;
+
+    impl KaniLedgerCommit {
+        /// Identical real contract and body to `commit_checked`, above --
+        /// only the *shape* of what carries it differs (associated function
+        /// on a local type vs. a bare free function).
+        #[kani::requires(input.primary().amount().value() > 0)]
+        #[kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| match result {
+            Ok(committed) => BalancedEntries::ensures(committed.primary().amount().value()),
+            Err(_) => false,
+        })]
+        pub(super) fn commit(
+            ledger: &Ledger,
+            input: Transfer<Validated, ValidatedToken>,
+        ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
+            ledger.commit::<KaniVerifier>(input)
+        }
+    }
+
+    /// Trivial contract, same real delegating body as `KaniLedgerCommit::
+    /// commit`/`commit_checked` -- isolates contract content from
+    /// delegation structure as the cause of the confirmed `free.frees.1`
+    /// failure.
+    pub(super) struct KaniLedgerCommitTrivial;
+
+    impl KaniLedgerCommitTrivial {
+        #[kani::requires(true)]
+        #[kani::ensures(|_result: &Result<Transfer<Committed, CommittedToken>, TransferError>| true)]
+        pub(super) fn commit(
+            ledger: &Ledger,
+            input: Transfer<Validated, ValidatedToken>,
+        ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
+            ledger.commit::<KaniVerifier>(input)
+        }
+    }
 }
+#[cfg(kani)]
+use mirror::{
+    BalancedEntries, Committed, CommittedToken, Ensures, KaniLedgerCommit, KaniLedgerCommitTrivial,
+    KaniVerifier, Ledger, Sidecar, Transfer, TransferError, Validated, ValidatedToken,
+    commit_checked,
+};
 
 amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_FREE_FUNCTION_WRAPPER_SRC, {
@@ -206,34 +265,6 @@ amenable_derive::gallery_harness! {
     )
 }
 
-/// Zero-sized local wrapper: `Ledger` itself lives in `amenable_gaap` now,
-/// so an inherent impl for it can't be written here at all (inherent
-/// impls require the *type* to be local, no orphan-rule loophole the way
-/// trait impls have one) -- this local type exists purely so `commit`
-/// below can be an *associated function on a type this crate owns*,
-/// matching the shape (`Type::function`) every other real Kani contract
-/// in this workspace uses, rather than a bare free function.
-#[cfg(kani)]
-struct KaniLedgerCommit;
-
-#[cfg(kani)]
-impl KaniLedgerCommit {
-    /// Identical real contract and body to `commit_checked`, above --
-    /// only the *shape* of what carries it differs (associated function
-    /// on a local type vs. a bare free function).
-    #[kani::requires(input.primary().amount().value() > 0)]
-    #[kani::ensures(|result: &Result<Transfer<Committed, CommittedToken>, TransferError>| match result {
-        Ok(committed) => BalancedEntries::ensures(committed.primary().amount().value()),
-        Err(_) => false,
-    })]
-    fn commit(
-        ledger: &Ledger,
-        input: Transfer<Validated, ValidatedToken>,
-    ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
-        ledger.commit::<KaniVerifier>(input)
-    }
-}
-
 amenable_derive::gallery_harness! {
     kani, COMMIT_CONTRACT_LOCAL_TYPE_WRAPPER_SRC, {
         #[kani::proof_for_contract(KaniLedgerCommit::commit)]
@@ -269,25 +300,6 @@ amenable_derive::gallery_harness! {
             ::amenable_kani::KaniGalleryExpectation::Timeout,
         ),
     )
-}
-
-#[cfg(kani)]
-struct KaniLedgerCommitTrivial;
-
-#[cfg(kani)]
-impl KaniLedgerCommitTrivial {
-    /// Trivial contract, same real delegating body as `KaniLedgerCommit::
-    /// commit`/`commit_checked` -- isolates contract content from
-    /// delegation structure as the cause of the confirmed `free.frees.1`
-    /// failure.
-    #[kani::requires(true)]
-    #[kani::ensures(|_result: &Result<Transfer<Committed, CommittedToken>, TransferError>| true)]
-    fn commit(
-        ledger: &Ledger,
-        input: Transfer<Validated, ValidatedToken>,
-    ) -> Result<Transfer<Committed, CommittedToken>, TransferError> {
-        ledger.commit::<KaniVerifier>(input)
-    }
 }
 
 amenable_derive::gallery_harness! {

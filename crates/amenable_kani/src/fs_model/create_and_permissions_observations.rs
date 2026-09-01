@@ -198,6 +198,7 @@ impl KaniPermissionsObservation {
 }
 
 impl Default for KaniPermissionsObservation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }
@@ -226,6 +227,7 @@ pub struct KaniReadDirObservation {
 impl Provenance for KaniReadDirObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

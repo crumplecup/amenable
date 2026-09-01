@@ -6,6 +6,38 @@ use amenable_derive::{
 };
 use strum::EnumIter;
 
+pub trait FixtureCase:
+    Clone
+    + Default
+    + PartialEq
+    + Eq
+    + std::fmt::Debug
+    + Provenance
+    + Standard<Provenance = Self>
+    + Evidence<Basis = Self, Audit = Self>
+    + 'static
+{
+    const KIND: DeriveFixtureKind;
+
+    fn instances() -> Vec<FixtureInstance<Self>>;
+
+    fn expected_support() -> WitnessSupportSummary;
+}
+
+pub trait FixtureWitnessMember:
+    Clone
+    + Default
+    + PartialEq
+    + Eq
+    + std::fmt::Debug
+    + Provenance
+    + Standard<Provenance = Self>
+    + Evidence<Basis = Self, Audit = Self>
+    + Witness<FixtureVerifier>
+    + 'static
+{
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, StandardDerive)]
 #[standard(basis = "Self", provenance = "self.clone()", provenance_type = "Self")]
 pub struct WitnessLeaf(String);
@@ -91,38 +123,6 @@ pub struct FixtureInstance<F> {
     pub label: &'static str,
     pub value: F,
     pub expected_entries: &'static [(&'static str, &'static str)],
-}
-
-pub trait FixtureCase:
-    Clone
-    + Default
-    + PartialEq
-    + Eq
-    + std::fmt::Debug
-    + Provenance
-    + Standard<Provenance = Self>
-    + Evidence<Basis = Self, Audit = Self>
-    + 'static
-{
-    const KIND: DeriveFixtureKind;
-
-    fn instances() -> Vec<FixtureInstance<Self>>;
-
-    fn expected_support() -> WitnessSupportSummary;
-}
-
-pub trait FixtureWitnessMember:
-    Clone
-    + Default
-    + PartialEq
-    + Eq
-    + std::fmt::Debug
-    + Provenance
-    + Standard<Provenance = Self>
-    + Evidence<Basis = Self, Audit = Self>
-    + Witness<FixtureVerifier>
-    + 'static
-{
 }
 
 impl<T> FixtureWitnessMember for T where

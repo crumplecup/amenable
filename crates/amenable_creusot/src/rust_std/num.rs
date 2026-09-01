@@ -1,72 +1,58 @@
+/// The `#[cfg(creusot)]` imports and trusted logic-wrapper functions this
+/// file needs, consolidated into one gate on this `mod` instead of one per
+/// item -- see `stoplight::mirror`'s own doc comment for the general
+/// rationale. Every import and every function is re-exported: the
+/// `extern_spec! { .. }`/`harness! { .. }` blocks below (both macro
+/// invocations, invisible to the cfg-scatter scanner the same way
+/// `include!`'s own content is, so there's no consolidation benefit to
+/// moving them in too) reference all of it, unqualified, from this file's
+/// own top level.
 #[cfg(creusot)]
-use creusot_std::logic::Int;
-#[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-#[cfg(creusot)]
-use creusot_std::prelude::ghost;
-#[cfg(creusot)]
-use creusot_std::std::sync::atomic::Ordering::{None as AtomicNone, SeqCst as AtomicSeqCst};
-#[cfg(creusot)]
-use creusot_std::std::sync::atomic_sc::{
-    AtomicBool as CreusotAtomicBool, AtomicI8 as CreusotAtomicI8, AtomicI16 as CreusotAtomicI16,
-    AtomicI32 as CreusotAtomicI32, AtomicI64 as CreusotAtomicI64,
-    AtomicIsize as CreusotAtomicIsize, AtomicPtr as CreusotAtomicPtr, AtomicU8 as CreusotAtomicU8,
-    AtomicU16 as CreusotAtomicU16, AtomicU32 as CreusotAtomicU32, AtomicU64 as CreusotAtomicU64,
-    AtomicUsize as CreusotAtomicUsize,
-};
-#[cfg(creusot)]
-use creusot_std::std::sync::committer::Committer;
-#[cfg(creusot)]
-use creusot_std::std::time::nanos_to_secs;
-#[cfg(creusot)]
-use std::alloc::System;
-#[cfg(creusot)]
-use std::backtrace::{Backtrace, BacktraceStatus};
-#[cfg(creusot)]
-use std::borrow::Cow;
-#[cfg(creusot)]
-use std::boxed::Box;
-#[cfg(creusot)]
-use std::cmp::{Ordering, Reverse};
-#[cfg(creusot)]
-use std::collections::TryReserveError;
-#[cfg(creusot)]
-use std::future::{Pending, PollFn, Ready};
-#[cfg(creusot)]
-use std::hash::{BuildHasher, DefaultHasher, Hash, Hasher, RandomState};
-#[cfg(creusot)]
-use std::io::SeekFrom;
-#[cfg(creusot)]
-use std::mem::ManuallyDrop;
-#[cfg(creusot)]
-use std::net::Shutdown;
-#[cfg(creusot)]
-use std::num::{
-    FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
-    Wrapping,
-};
-#[cfg(creusot)]
-use std::ops::{Bound, ControlFlow};
-#[cfg(creusot)]
-use std::panic::AssertUnwindSafe;
-#[cfg(creusot)]
-use std::sync::atomic::Ordering as AtomicOrdering;
-#[cfg(creusot)]
-use std::task::Waker;
-#[cfg(creusot)]
-use std::task::{Context, Poll};
-#[cfg(creusot)]
-use std::time::Duration;
-// `NonZero::get` is a plain program function too — same restriction as
-// `String::len`, no `#[check(ghost)]` contract to trip over this time
-// since creusot-std has no extern_spec for `NonZero<T>` at all. Trusted
-// wrapper, same shape as `string_len`.
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn nonzero_i16_get(_nz: &NonZero<i16>) -> i16 {
-    dead
+mod mirror {
+    pub(super) use creusot_std::logic::Int;
+    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+    pub(super) use std::num::{
+        FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating,
+        TryFromIntError, Wrapping,
+    };
+
+    // `NonZero::get` is a plain program function too — same restriction as
+    // `String::len`, no `#[check(ghost)]` contract to trip over this time
+    // since creusot-std has no extern_spec for `NonZero<T>` at all. Trusted
+    // wrapper, same shape as `string_len`.
+    #[trusted]
+    #[logic(opaque)]
+    pub(super) fn nonzero_i16_get(_nz: &NonZero<i16>) -> i16 {
+        dead
+    }
+
+    // Trusted logic wrapper for `ParseIntError::kind()` — same shape as
+    // `nonzero_i16_get`/`string_len`: an ordinary getter, modeled as an
+    // axiom tying a real method's result to a logic-context-callable
+    // value. Used both by the `FromStr` extern_spec below (to state what
+    // error kind a given input produces) and by the harness itself (to
+    // check the result).
+    #[trusted]
+    #[logic(opaque)]
+    pub(super) fn parse_int_error_kind(_e: &ParseIntError) -> IntErrorKind {
+        dead
+    }
+
+    // Real, computable (`#[logic(open)]`, not opaque) — whether a char is
+    // an ASCII digit. `c@` is char's own View (Unicode scalar value as
+    // `Int`, same operator the char contract above uses); 48/57 are
+    // `'0'`/`'9'`.
+    #[logic(open)]
+    pub(super) fn is_ascii_digit(c: char) -> bool {
+        pearlite! { c@ >= 48 && c@ <= 57 }
+    }
 }
+#[cfg(creusot)]
+use mirror::{
+    FpCategory, Int, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating,
+    TryFromIntError, Wrapping, check, ensures, extern_spec, is_ascii_digit, logic, nonzero_i16_get,
+    parse_int_error_kind, requires, trusted,
+};
 
 amenable_derive::harness! {
     creusot, NONZERO_I16_NEW_SUCCEEDS_EXACTLY_WHEN_NONZERO_SRC, {
@@ -244,27 +230,6 @@ amenable_derive::harness! {
             a + b
         }
     }
-}
-
-// Trusted logic wrapper for `ParseIntError::kind()` — same shape as
-// `nonzero_i16_get`/`string_len`: an ordinary getter, modeled as an axiom
-// tying a real method's result to a logic-context-callable value. Used
-// both by the `FromStr` extern_spec below (to state what error kind a
-// given input produces) and by the harness itself (to check the result).
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn parse_int_error_kind(_e: &ParseIntError) -> IntErrorKind {
-    dead
-}
-
-// Real, computable (`#[logic(open)]`, not opaque) — whether a char is an
-// ASCII digit. `c@` is char's own View (Unicode scalar value as `Int`,
-// same operator the char contract above uses); 48/57 are `'0'`/`'9'`.
-#[cfg(creusot)]
-#[logic(open)]
-fn is_ascii_digit(c: char) -> bool {
-    pearlite! { c@ >= 48 && c@ <= 57 }
 }
 
 // `str::parse::<i32>()` (`FromStr::from_str`) is uncontracted everywhere

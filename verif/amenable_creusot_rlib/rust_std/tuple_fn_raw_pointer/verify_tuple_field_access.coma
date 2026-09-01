@@ -1,15 +1,15 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 66 8 66 66 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 9 8 9 66 *)
 
-let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 64 19 64 23
-let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 65 18 65 56
-let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 80 24 80 66
+let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 7 19 7 23
+let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 8 18 8 56
+let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 23 24 23 66
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
-predicate tuple_field_access_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 79 8 79 85] (a: Int32.t) (b: Int32.t) (tuple_result: tup2_i32_i32) =
+predicate tuple_field_access_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 22 8 22 85] (a: Int32.t) (b: Int32.t) (tuple_result: tup2_i32_i32) =
   [%#stuple_fn_raw_pointer'1] tuple_result.f0 = a /\ tuple_result.f1 = b
 
 meta "compute_max_steps" 1000000
@@ -17,7 +17,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_tuple_field_access
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 66 8 66 66] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 9 8 9 66] (a: Int32.t)
   (b: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &tuple <- { f0 = a; f1 = b } ] s1

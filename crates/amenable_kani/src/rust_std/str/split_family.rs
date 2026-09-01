@@ -3,8 +3,6 @@ use std::str::{RSplit, RSplitN, Split, SplitInclusive, SplitN};
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
@@ -196,6 +194,7 @@ impl KaniWitness for RustStdStandard<RSplitN<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplitn_limits_to_n_substrings_from_the_back".to_owned(),

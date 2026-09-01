@@ -17,7 +17,7 @@ pub struct AssessArgs {
 
 impl AssessArgs {
     /// Dispatch to the selected [`AssessCommand`].
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "debug", skip(self))]
     pub(crate) fn act(self) -> AmenableResult<()> {
         self.command.act()
     }

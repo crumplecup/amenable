@@ -8,15 +8,7 @@ use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
 use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniBufferedReadObservation, KaniFlushErrorObservation, KaniVerifier, KaniWitness};
@@ -196,6 +188,7 @@ impl KaniWitness for RustStdStandard<IntoInnerError<BufWriter<Vec<u8>>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_into_inner_error_recovers_the_writer_and_the_flush_error".to_owned(),
@@ -252,6 +245,7 @@ impl Establish<KaniFlushErrorWitnessToken, KaniVerifier>
 {
     type Token = RustStdIntoInnerErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniFlushErrorWitnessToken) -> Self::Token {
         RustStdIntoInnerErrorToken(())
     }

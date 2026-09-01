@@ -1,24 +1,35 @@
 //! `KaniWitness` impls for `core::option` and `core::result`.
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::Ensures;
+
+    pub(super) use crate::AccessorRecoversTheExpectedValue;
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::DerefReflectsTheStoredValue;
+    pub(super) use crate::IteratorYieldsAReferenceToTheStoredValue;
+    pub(super) use crate::IteratorYieldsNoneWhenExhausted;
+}
+#[cfg(kani)]
+use mirror::{
+    AccessorRecoversTheExpectedValue, CollectedSequenceMatchesExpected,
+    DerefReflectsTheStoredValue, Ensures, IteratorYieldsAReferenceToTheStoredValue,
+    IteratorYieldsNoneWhenExhausted,
+};
 
 impl KaniWitness for RustStdStandard<Option<i32>> {
     type SupportingEvidence = Self;

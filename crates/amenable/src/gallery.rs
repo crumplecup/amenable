@@ -53,7 +53,7 @@ fn default_results_path() -> PathBuf {
 
 impl GalleryArgs {
     /// Dispatch to the selected [`GalleryCommand`].
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "debug", skip(self))]
     pub(crate) fn act(self) -> AmenableResult<()> {
         self.command.act()
     }
@@ -79,13 +79,13 @@ fn list_cases() -> AmenableResult<()> {
     }
 
     for case in cases {
-        println!(
+        crate::write_stdout_line(format!(
             "{} [{} / {}] {}",
             case.id(),
             case.disposition().as_str(),
             case.expected().as_str(),
             case.title()
-        );
+        ))?;
     }
 
     Ok(())
@@ -96,31 +96,36 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     let cases = registered_cases();
     let selected = select_cases(&cases, args.case.as_deref())?;
     if selected.is_empty() {
-        println!("No proof-gallery cases matched the selection.");
+        crate::write_stdout_line("No proof-gallery cases matched the selection.")?;
         return Ok(());
     }
 
     let mut ledger = Ledger::load(&args.results)?;
-    println!("Kani proof gallery: {} case(s)", selected.len());
-    println!("Results: {}", args.results.display());
-    println!("Per-harness timeout: {}", args.harness_timeout);
+    crate::write_stdout_line(format!("Kani proof gallery: {} case(s)", selected.len()))?;
+    crate::write_stdout_line(format!("Results: {}", args.results.display()))?;
+    crate::write_stdout_line(format!("Per-harness timeout: {}", args.harness_timeout))?;
 
     let mut mismatches = 0;
     for (index, case) in selected.iter().enumerate() {
-        println!("[{}/{}] Running {}", index + 1, selected.len(), case.id());
+        crate::write_stdout_line(format!(
+            "[{}/{}] Running {}",
+            index + 1,
+            selected.len(),
+            case.id()
+        ))?;
         let run = run_case(case, &args.harness_timeout);
         if let Some(message) = &run.message {
-            eprintln!("    {message}");
+            crate::write_stderr_line(format!("    {message}"))?;
         }
 
         if run.observed == case.expected() {
-            println!("    observed {}", run.observed.as_str());
+            crate::write_stdout_line(format!("    observed {}", run.observed.as_str()))?;
         } else {
-            println!(
+            crate::write_stdout_line(format!(
                 "    observed {} (expected {})",
                 run.observed.as_str(),
                 case.expected().as_str()
-            );
+            ))?;
             mismatches += 1;
         }
 

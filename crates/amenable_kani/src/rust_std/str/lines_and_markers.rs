@@ -1,8 +1,6 @@
 use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
-#[cfg(kani)]
-use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
 
 use super::whitespace_utf8::VERIFY_SPLIT_ASCII_WHITESPACE_COLLAPSES_RUNS_OF_WHITESPACE_SRC;
@@ -113,6 +111,7 @@ impl<T> KaniWitness for CollectedSequenceMatchesExpected<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),

@@ -1,16 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 152 8 156 58 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 95 8 99 58 *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
-let%span sarray_and_slice = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 158 25 158 36
-let%span sarray_and_slice'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 159 35 159 44
-let%span sarray_and_slice'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 163 36 163 45
-let%span sarray_and_slice'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 167 35 167 44
-let%span sarray_and_slice'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 171 34 171 43
-let%span sarray_and_slice'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 172 27 172 32
-let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 173 24 173 28
-let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 150 19 150 23
-let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 151 18 151 79
-let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 134 16 140 17
+let%span sarray_and_slice = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 101 25 101 36
+let%span sarray_and_slice'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 102 35 102 44
+let%span sarray_and_slice'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 106 36 106 45
+let%span sarray_and_slice'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 110 35 110 44
+let%span sarray_and_slice'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 114 34 114 43
+let%span sarray_and_slice'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 115 27 115 32
+let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 116 24 116 28
+let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 93 19 93 23
+let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 94 18 94 79
+let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 77 16 83 17
 let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 348 18 348 33
 let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 491 20 491 62
 let%span sslice'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 497 12 497 66
@@ -114,7 +114,7 @@ predicate resolve_Iter_i32 (_1: t_Iter_i32)
 
 type tup4_Option_i32_Option_i32_Option_i32_bool = { f0: t_Option_i32; f1: t_Option_i32; f2: t_Option_i32; f3: bool }
 
-predicate slice_iter_yields_shared_references_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 127 8 132 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (slice_iter_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
+predicate slice_iter_yields_shared_references_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 70 8 75 17] (a: Int32.t) (b: Int32.t) (c: Int32.t) (slice_iter_result: tup4_Option_i32_Option_i32_Option_i32_bool) =
   [%#sarray_and_slice'8] match slice_iter_result with
     | {f0 = first_seen; f1 = second_seen; f2 = third_seen; f3 = exhausted} -> first_seen = Some'0 a
     /\ second_seen = Some'0 b /\ third_seen = Some'0 c /\ exhausted
@@ -125,7 +125,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_slice_iter_yields_shared_references_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 152 8 156 58] (a: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 95 8 99 58] (a: Int32.t)
   (b: Int32.t) (c: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = any

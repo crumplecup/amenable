@@ -77,6 +77,7 @@ pub struct KaniLinesWindow;
 impl Provenance for KaniLinesWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -115,10 +116,12 @@ impl Evidence for KaniLinesObservation {
     type Basis = KaniLinesWindow;
     type Audit = [u8; 5];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniLinesWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [self.first, b'\n', self.second, b'\n', self.third]
     }

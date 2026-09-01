@@ -66,7 +66,7 @@ pub fn harness(input: TokenStream) -> TokenStream {
 
 /// Identical grammar and `#[cfg(...)]`-gating to [`harness!`], for
 /// proof-gallery cases specifically: never registers the contained
-/// function as a tracked [`amenable_kani::KaniProof`], since gallery
+/// function as a tracked `amenable_kani::KaniProof`, since gallery
 /// cases are explicitly *not* part of the tracked "does the suite still
 /// pass" sweep (`amenable verify kani`) -- they get their own,
 /// separately-registered `KaniGalleryRegistration` and run only via the
@@ -123,6 +123,7 @@ pub fn calculation(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// every call site. Deliberately does not touch or generate the
 /// `harness! { .. }` invocation itself, since that macro's verbatim-source
 /// capture only works when written directly at its own call site.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr, item)))]
 #[proc_macro_attribute]
 pub fn exchange(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(attr as ExchangeArgs);
@@ -145,6 +146,7 @@ pub fn exchange(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// `Ensures<V>` bound, so there is no concrete verifier left for
 /// `#[exchange(..)]`'s own contract/`Witness<V>`/`Exchange<..>` bundle to
 /// name.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr, item)))]
 #[proc_macro_attribute]
 pub fn capture_exchange_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(attr as CaptureExchangeBodyArgs);
@@ -211,7 +213,7 @@ pub fn derive_standard(input: TokenStream) -> TokenStream {
 }
 
 /// Generate `impl ProofToken for X { type Proposition = Y; }` from a
-/// `#[proof_token(proposition = "Y")]` attribute -- see [`proof_token`]'s
+/// `#[proof_token(proposition = "Y")]` attribute -- see `proof_token`'s
 /// own doc comment.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(ProofToken, attributes(proof_token))]
@@ -243,7 +245,7 @@ pub fn establish(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Generate `impl Sidecar<V> for X { .. }` plus a `new(..)` constructor
 /// from `#[sidecar(verifier = .., proposition = .., constructor = ..)]`
 /// and `#[sidecar(primary)]`/`#[sidecar(token)]` field markers -- see
-/// [`sidecar`]'s own doc comment.
+/// `sidecar`'s own doc comment.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Sidecar, attributes(sidecar))]
 pub fn derive_sidecar(input: TokenStream) -> TokenStream {
@@ -255,7 +257,7 @@ pub fn derive_sidecar(input: TokenStream) -> TokenStream {
     }
 }
 
-/// `#[derive(StateMachine)]` -- see [`state_machine`]'s own doc comment
+/// `#[derive(StateMachine)]` -- see `state_machine`'s own doc comment
 /// for the full `#[state_machine(verifier = .., state(..), edge(..))]`
 /// syntax. Step 1 of `docs/STATE_MACHINE_DERIVATION_PLAN.md`: emits only
 /// the compiler-enforced static assertions, one per declared edge.
@@ -271,7 +273,7 @@ pub fn derive_state_machine(input: TokenStream) -> TokenStream {
 }
 
 /// Generate bounded Kani-facing constructors by delegating every field to
-/// its own `KaniCompose` implementation -- see [`kani_compose`]'s own doc
+/// its own `KaniCompose` implementation -- see `kani_compose`'s own doc
 /// comment for the full rationale.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(KaniCompose)]
@@ -285,7 +287,7 @@ pub fn derive_kani_compose(input: TokenStream) -> TokenStream {
 }
 
 /// Generate a structural closure over already-witnessed members -- see
-/// [`witness`]'s own doc comment for the full rationale.
+/// `witness`'s own doc comment for the full rationale.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Witness, attributes(provenance, witness))]
 pub fn derive_witness(input: TokenStream) -> TokenStream {
@@ -327,7 +329,7 @@ pub fn verus_requires_fragments(input: TokenStream) -> TokenStream {
 /// real `impl Ensures<crate::VerusVerifier> for Type` (`Bound =
 /// &'static [&'static str]`, one real clause per element) plus one
 /// `ContractRecord` registration per clause -- see
-/// [`verus_contract`]'s own doc comment for why `Bound` is a slice
+/// `verus_contract`'s own doc comment for why `Bound` is a slice
 /// and why the registration is generated rather than hand-written.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
@@ -354,7 +356,7 @@ pub fn verus_requires_witness(input: TokenStream) -> TokenStream {
 /// like [`verus_ensures_witness!`], but for a claim that's a real,
 /// named `pub open spec fn`'s own declaration (shared across several
 /// different harnesses/carrier files) rather than any one harness's own
-/// clause list. See [`verus_contract`]'s own doc comment.
+/// clause list. See `verus_contract`'s own doc comment.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[cfg(feature = "verus")]
 #[proc_macro]

@@ -652,234 +652,223 @@ bridge_verus_witness!(RustStdStandard<std::collections::vec_deque::Drain<'static
     )
 }
 
-// `std::os::windows::*` witnesses: `#[cfg(windows)]`-gated per item,
-// mirroring `rust_std::os_windows`'s own gating. Unlike every other
-// `VerusWitness` impl in this file, `amenable_verus::rust_std::
-// os_windows_carrier` (the `claim` these `include_str!` in) has never
-// been checked by `verus` on this crate's primary development host
-// (Linux) — only the `verus-windows` GitHub Actions workflow
-// (`workflow_dispatch`, `windows-latest`) can. See that carrier's own
-// module doc comment for the full reasoning.
-
+/// `std::os::windows::*` witnesses, one `#[cfg(windows)]` gate on this
+/// `mod` instead of scattered per-item ones -- mirroring `rust_std::
+/// os_windows`'s own gating. Unlike every other `VerusWitness` impl in
+/// this file, `amenable_verus::rust_std::os_windows_carrier` (the
+/// `claim` these `include_str!` in) has never been checked by `verus`
+/// on this crate's primary development host (Linux) — only the
+/// `verus-windows` GitHub Actions workflow (`workflow_dispatch`,
+/// `windows-latest`) can. See that carrier's own module doc comment for
+/// the full reasoning. Nothing here is `pub`, so the whole section
+/// collapses into one private nested module with no re-export needed:
+/// trait impls are visible crate-wide regardless of which module
+/// defines them.
+///
+/// `EncodeWide`/`BorrowedHandle`/`BorrowedSocket`/`HandleOrInvalid`/
+/// `OwnedHandle`/`OwnedSocket` need their own real `use` here -- a real,
+/// pre-existing gap this module had before this consolidation (`cannot
+/// find type` for all six, confirmed via a genuine `cross check --target
+/// x86_64-pc-windows-gnu` run, not previously caught since the
+/// `verus-windows` workflow is `workflow_dispatch`-only).
 #[cfg(windows)]
-const VERIFY_ENCODE_WIDE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+mod windows_witnesses {
+    use super::{Evidence, RustStdStandard, VerusCheckedProof, VerusWitness, bridge_verus_witness};
+    use std::os::windows::ffi::EncodeWide;
+    use std::os::windows::io::{
+        BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
+    };
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<EncodeWide<'static>> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+    const VERIFY_ENCODE_WIDE_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<EncodeWide<'_> as Iterator>::next".to_owned(),
-            VERIFY_ENCODE_WIDE_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    impl VerusWitness for RustStdStandard<EncodeWide<'static>> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
+
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<EncodeWide<'_> as Iterator>::next".to_owned(),
+                VERIFY_ENCODE_WIDE_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
+
+    bridge_verus_witness!(RustStdStandard<EncodeWide<'static>>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+            "verus",
+            || { <RustStdStandard<EncodeWide<'static>> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<EncodeWide<'static>>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<EncodeWide<'static>>,
         "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-        "verus",
-        || { <RustStdStandard<EncodeWide<'static>> as VerusWitness>::proof().to_string() },
-    )
-}
+        "encode_wide_next_matches"
+    );
 
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<EncodeWide<'static>>,
-    "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
-    "encode_wide_next_matches"
-);
+    const VERIFY_BORROWED_HANDLE_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-#[cfg(windows)]
-const VERIFY_BORROWED_HANDLE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+    impl VerusWitness for RustStdStandard<BorrowedHandle<'static>> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<BorrowedHandle<'static>> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle".to_owned(),
+                VERIFY_BORROWED_HANDLE_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
 
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle".to_owned(),
-            VERIFY_BORROWED_HANDLE_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    bridge_verus_witness!(RustStdStandard<BorrowedHandle<'static>>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+            "verus",
+            || { <RustStdStandard<BorrowedHandle<'static>> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<BorrowedHandle<'static>>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<BorrowedHandle<'static>>,
         "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-        "verus",
-        || { <RustStdStandard<BorrowedHandle<'static>> as VerusWitness>::proof().to_string() },
-    )
-}
+        "as_raw_handle_addr_matches"
+    );
 
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<BorrowedHandle<'static>>,
-    "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
-    "as_raw_handle_addr_matches"
-);
+    const VERIFY_BORROWED_SOCKET_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-#[cfg(windows)]
-const VERIFY_BORROWED_SOCKET_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+    impl VerusWitness for RustStdStandard<BorrowedSocket<'static>> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<BorrowedSocket<'static>> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket".to_owned(),
+                VERIFY_BORROWED_SOCKET_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
 
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket".to_owned(),
-            VERIFY_BORROWED_SOCKET_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    bridge_verus_witness!(RustStdStandard<BorrowedSocket<'static>>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+            "verus",
+            || { <RustStdStandard<BorrowedSocket<'static>> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<BorrowedSocket<'static>>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<BorrowedSocket<'static>>,
         "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-        "verus",
-        || { <RustStdStandard<BorrowedSocket<'static>> as VerusWitness>::proof().to_string() },
-    )
-}
+        "as_raw_socket_matches"
+    );
 
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<BorrowedSocket<'static>>,
-    "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
-    "as_raw_socket_matches"
-);
+    const VERIFY_HANDLE_OR_INVALID_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-#[cfg(windows)]
-const VERIFY_HANDLE_OR_INVALID_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+    impl VerusWitness for RustStdStandard<HandleOrInvalid> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<HandleOrInvalid> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from".to_owned(),
+                VERIFY_HANDLE_OR_INVALID_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
 
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from".to_owned(),
-            VERIFY_HANDLE_OR_INVALID_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    bridge_verus_witness!(RustStdStandard<HandleOrInvalid>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+            "verus",
+            || { <RustStdStandard<HandleOrInvalid> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<HandleOrInvalid>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<HandleOrInvalid>,
         "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-        "verus",
-        || { <RustStdStandard<HandleOrInvalid> as VerusWitness>::proof().to_string() },
-    )
-}
+        "handle_or_invalid_try_from_matches"
+    );
 
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<HandleOrInvalid>,
-    "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
-    "handle_or_invalid_try_from_matches"
-);
+    const VERIFY_OWNED_HANDLE_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-#[cfg(windows)]
-const VERIFY_OWNED_HANDLE_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+    impl VerusWitness for RustStdStandard<OwnedHandle> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<OwnedHandle> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<OwnedHandle as AsRawHandle>::as_raw_handle".to_owned(),
+                VERIFY_OWNED_HANDLE_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
 
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<OwnedHandle as AsRawHandle>::as_raw_handle".to_owned(),
-            VERIFY_OWNED_HANDLE_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    bridge_verus_witness!(RustStdStandard<OwnedHandle>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+            "verus",
+            || { <RustStdStandard<OwnedHandle> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<OwnedHandle>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<OwnedHandle>,
         "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-        "verus",
-        || { <RustStdStandard<OwnedHandle> as VerusWitness>::proof().to_string() },
-    )
-}
+        "owned_as_raw_handle_addr_matches"
+    );
 
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<OwnedHandle>,
-    "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
-    "owned_as_raw_handle_addr_matches"
-);
+    const VERIFY_OWNED_SOCKET_AXIOM_SRC: &str =
+        include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
 
-#[cfg(windows)]
-const VERIFY_OWNED_SOCKET_AXIOM_SRC: &str =
-    include_str!("../../../amenable_verus/src/rust_std/misc/os_windows_carrier.rs");
+    impl VerusWitness for RustStdStandard<OwnedSocket> {
+        type SupportingEvidence = Self;
+        type ProofArtifact = VerusCheckedProof;
 
-#[cfg(windows)]
-impl VerusWitness for RustStdStandard<OwnedSocket> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = VerusCheckedProof;
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+        fn proof() -> Self::ProofArtifact {
+            VerusCheckedProof::new(
+                "<OwnedSocket as AsRawSocket>::as_raw_socket".to_owned(),
+                VERIFY_OWNED_SOCKET_AXIOM_SRC.to_owned(),
+                <Self::SupportingEvidence as Evidence>::basis().audit(),
+            )
+        }
+    }
 
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-    fn proof() -> Self::ProofArtifact {
-        VerusCheckedProof::new(
-            "<OwnedSocket as AsRawSocket>::as_raw_socket".to_owned(),
-            VERIFY_OWNED_SOCKET_AXIOM_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
+    bridge_verus_witness!(RustStdStandard<OwnedSocket>);
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+            "verus",
+            || { <RustStdStandard<OwnedSocket> as VerusWitness>::proof().to_string() },
         )
     }
-}
 
-#[cfg(windows)]
-bridge_verus_witness!(RustStdStandard<OwnedSocket>);
-
-#[cfg(windows)]
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
+    amenable_derive::verus_ensures_predicate!(
+        RustStdStandard<OwnedSocket>,
         "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-        "verus",
-        || { <RustStdStandard<OwnedSocket> as VerusWitness>::proof().to_string() },
-    )
+        "owned_as_raw_socket_matches"
+    );
 }
-
-#[cfg(windows)]
-amenable_derive::verus_ensures_predicate!(
-    RustStdStandard<OwnedSocket>,
-    "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
-    "owned_as_raw_socket_matches"
-);

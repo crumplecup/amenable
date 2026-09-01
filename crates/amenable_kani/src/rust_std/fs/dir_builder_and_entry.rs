@@ -123,6 +123,7 @@ impl KaniWitness for RustStdStandard<DirEntry> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_dir_entry_reports_the_created_files_name_and_path".to_owned(),
@@ -185,6 +186,7 @@ impl ProofToken for RustStdDirEntryToken {
 impl Establish<KaniDirEntryWitnessToken, KaniVerifier> for RustStdStandard<DirEntry> {
     type Token = RustStdDirEntryToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniDirEntryWitnessToken) -> Self::Token {
         RustStdDirEntryToken(())
     }

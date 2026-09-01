@@ -27,6 +27,40 @@
 
 use crate::Verifier;
 
+/// A closed, proof-bearing state machine. Every method here is backed by
+/// data the `#[derive(amenable_derive::StateMachine)]` macro either
+/// echoes directly from its own `#[state_machine(..)]` declarations
+/// (`states`/`transitions`) or reads from a real, compiler-populated
+/// registry (`audit_surface`) — never a hand-typed string a human could
+/// let drift from reality.
+pub trait StateMachine<V: Verifier> {
+    /// Every declared state's name.
+    fn states() -> &'static [&'static str];
+
+    /// Every declared transition between two states.
+    fn transitions() -> &'static [Transition];
+
+    /// Real, registry-backed audit content for this system's real
+    /// `Exchange` edges. Not necessarily one entry per declared
+    /// transition in either direction — a declared edge with no matching
+    /// registration, or a real registration nobody declared, is exactly
+    /// what the separate declared-vs-registered cross-check (a
+    /// runtime/test-time check, not this method) exists to catch.
+    fn audit_surface() -> Vec<TransitionAudit>;
+
+    /// Every declared state that can be entered lawfully with no prior
+    /// state, the real function that does it, and (via each entry's own
+    /// `seed`) whether that function needs real external data to call.
+    /// Honestly empty for a state machine with no declared root worth
+    /// this way at all, not for one whose only root needs an argument —
+    /// see `RootEntry::seed`'s own doc comment for why a data-needing
+    /// root (`amenable_gaap::Ledger`'s `Pending`) is a real entry here
+    /// too, not a gap.
+    fn root_entries() -> &'static [RootEntry] {
+        &[]
+    }
+}
+
 /// One declared transition between two named states.
 ///
 /// Hand-written `const fn new`/getters, not derived: every real
@@ -189,39 +223,5 @@ impl RootEntry {
     #[must_use]
     pub const fn seed(&self) -> &'static str {
         self.seed
-    }
-}
-
-/// A closed, proof-bearing state machine. Every method here is backed by
-/// data the `#[derive(amenable_derive::StateMachine)]` macro either
-/// echoes directly from its own `#[state_machine(..)]` declarations
-/// (`states`/`transitions`) or reads from a real, compiler-populated
-/// registry (`audit_surface`) — never a hand-typed string a human could
-/// let drift from reality.
-pub trait StateMachine<V: Verifier> {
-    /// Every declared state's name.
-    fn states() -> &'static [&'static str];
-
-    /// Every declared transition between two states.
-    fn transitions() -> &'static [Transition];
-
-    /// Real, registry-backed audit content for this system's real
-    /// `Exchange` edges. Not necessarily one entry per declared
-    /// transition in either direction — a declared edge with no matching
-    /// registration, or a real registration nobody declared, is exactly
-    /// what the separate declared-vs-registered cross-check (a
-    /// runtime/test-time check, not this method) exists to catch.
-    fn audit_surface() -> Vec<TransitionAudit>;
-
-    /// Every declared state that can be entered lawfully with no prior
-    /// state, the real function that does it, and (via each entry's own
-    /// `seed`) whether that function needs real external data to call.
-    /// Honestly empty for a state machine with no declared root worth
-    /// this way at all, not for one whose only root needs an argument —
-    /// see `RootEntry::seed`'s own doc comment for why a data-needing
-    /// root (`amenable_gaap::Ledger`'s `Pending`) is a real entry here
-    /// too, not a gap.
-    fn root_entries() -> &'static [RootEntry] {
-        &[]
     }
 }

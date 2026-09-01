@@ -5,18 +5,6 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::ValueIsAtLeast;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::{bridge_kani_witness, kani_requires};
 use crate::{KaniLineWriterObservation, KaniLinesObservation, KaniVerifier, KaniWitness};
@@ -57,7 +45,7 @@ impl KaniLineWriterObservation {
     /// Assert a newline-terminated write reaches the underlying writer
     /// immediately, a trailing partial line stays buffered until flush,
     /// and flush then delivers it. Consumes `self` for the same reason
-    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    /// [`crate::KaniBufferedReadObservation::demonstrate_read_through`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_flush_behavior(
@@ -206,7 +194,7 @@ impl ProofToken for KaniLinesWitnessToken {
 impl KaniLinesObservation {
     /// Assert `.lines()` yields the three lines with their terminators
     /// dropped. Consumes `self` for the same reason
-    /// [`KaniBufferedReadObservation::demonstrate_read_through`] does.
+    /// [`crate::KaniBufferedReadObservation::demonstrate_read_through`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_line_split(self, first: u8, second: u8, third: u8) -> KaniLinesWitnessToken {
@@ -228,6 +216,7 @@ impl Establish<KaniLinesWitnessToken, KaniVerifier>
 {
     type Token = RustStdLinesToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniLinesWitnessToken) -> Self::Token {
         RustStdLinesToken(())
     }
@@ -253,6 +242,7 @@ impl KaniWitness for ByteIsAsciiAndNotALineTerminator {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),

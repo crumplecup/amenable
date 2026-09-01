@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 203 8 206 57 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 146 8 149 57 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
@@ -14,13 +14,13 @@ let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b55
 let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
 let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
 let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
-let%span sbtree = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 209 32 209 36
-let%span sbtree'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 210 33 210 37
-let%span sbtree'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 211 24 211 28
-let%span sbtree'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 201 19 201 44
-let%span sbtree'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 202 18 202 72
-let%span sbtree'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 68 24 68 29
-let%span sbtree'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 175 16 183 17
+let%span sbtree = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 152 32 152 36
+let%span sbtree'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 153 33 153 37
+let%span sbtree'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 154 24 154 28
+let%span sbtree'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 144 19 144 44
+let%span sbtree'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 145 18 145 72
+let%span sbtree'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 11 24 11 29
+let%span sbtree'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 118 16 126 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -76,10 +76,10 @@ function cmp_le_log_i32 (x: Int32.t) (y: Int32.t) : ()
 
 axiom cmp_le_log_i32_spec: forall x: Int32.t, y: Int32.t. [%#sord] Int32.le x y = (cmp_log_i32 x y <> Greater)
 
-predicate a_less_than_b_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 67 8 67 65] (a: Int32.t) (b: Int32.t) =
+predicate a_less_than_b_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 10 8 10 65] (a: Int32.t) (b: Int32.t) =
   [%#sbtree'4] Int32.lt a b
 
-predicate btree_set_iterates_in_sorted_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 169 8 173 17] (a: Int32.t) (b: Int32.t) (btree_set_result: tup5_Option_i32_Option_i32_bool_bool_bool) =
+predicate btree_set_iterates_in_sorted_order_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 112 8 116 17] (a: Int32.t) (b: Int32.t) (btree_set_result: tup5_Option_i32_Option_i32_bool_bool_bool) =
   [%#sbtree'5] match btree_set_result with
     | {f0 = Some first; f1 = Some second; f2 = removed_first; f3 = removed_second; f4 = empty} -> first = a
     /\ second = b /\ removed_first /\ removed_second /\ empty
@@ -91,7 +91,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_btree_set_iterates_in_sorted_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 203 8 206 57] (a: Int32.t) (b: Int32.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/btree.rs" 146 8 149 57] (a: Int32.t) (b: Int32.t)
   (return (x: tup5_Option_i32_Option_i32_bool_bool_bool)) =
   {[@stop_split] [@expl:verify_btree_set_iterates_in_sorted_order requires] [%#sbtree'2] a_less_than_b_holds a b}
   (! bb0

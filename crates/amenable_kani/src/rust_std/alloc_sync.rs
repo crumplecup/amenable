@@ -2,22 +2,33 @@
 
 use std::sync::Arc;
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
 use super::CheckedProof;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::StrongCountTracksLiveReferences;
-#[cfg(kani)]
-use crate::WeakUpgradeReturnsNone;
 use crate::rust_std::macros::bridge_kani_witness;
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::Ensures;
+    pub(super) use std::cell::Cell;
+
+    pub(super) use crate::DerefReflectsTheStoredValue;
+    pub(super) use crate::StrongCountTracksLiveReferences;
+    pub(super) use crate::WeakUpgradeReturnsNone;
+}
+#[cfg(kani)]
+use mirror::{
+    Cell, DerefReflectsTheStoredValue, Ensures, StrongCountTracksLiveReferences,
+    WeakUpgradeReturnsNone,
+};
 
 impl KaniWitness for RustStdStandard<Arc<i32>> {
     type SupportingEvidence = Self;

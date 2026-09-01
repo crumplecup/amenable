@@ -257,6 +257,7 @@ impl KaniWitness for RustStdStandard<ChildStdout> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_child_stdout_captures_what_the_child_wrote_to_stdout".to_owned(),
@@ -307,6 +308,7 @@ impl ProofToken for RustStdChildStdoutToken {
 impl Establish<KaniChildStdoutWitnessToken, KaniVerifier> for RustStdStandard<ChildStdout> {
     type Token = RustStdChildStdoutToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChildStdoutWitnessToken) -> Self::Token {
         RustStdChildStdoutToken(())
     }

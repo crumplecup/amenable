@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 224 8 224 90 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 167 8 167 90 *)
 
-let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 226 13 226 19
-let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 226 21 226 27
-let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 222 19 222 43
-let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 223 18 223 76
-let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 84 24 84 34
-let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 207 16 210 17
+let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 169 13 169 19
+let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 169 21 169 27
+let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 165 19 165 43
+let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 166 18 166 76
+let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 27 24 27 34
+let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 150 16 153 17
 
 use creusot.int.UInt64
 use creusot.prelude.Any
@@ -13,10 +13,10 @@ use creusot.int.UInt8
 
 type tup2_usize_usize = { f0: UInt64.t; f1: UInt64.t }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 83 8 83 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 26 8 26 47] (byte: UInt8.t) =
   [%#sc_str'3] UInt8.t'int byte <> 0
 
-predicate nul_error_reports_the_interior_nuls_position_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 203 8 205 17] (nul_error_result: tup2_usize_usize) =
+predicate nul_error_reports_the_interior_nuls_position_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 146 8 148 17] (nul_error_result: tup2_usize_usize) =
   [%#sc_str'4] match nul_error_result with
     | {f0 = single_nul_index; f1 = first_of_two_index} -> single_nul_index = (1: UInt64.t)
     /\ first_of_two_index = (1: UInt64.t)
@@ -27,7 +27,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_nul_error_reports_the_interior_nuls_position
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 224 8 224 90] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 167 8 167 90] (byte: UInt8.t)
   (return (x: tup2_usize_usize)) =
   {[@stop_split] [@expl:verify_nul_error_reports_the_interior_nuls_position requires] [%#sc_str'1] non_nul_byte_holds byte}
   (! bb0

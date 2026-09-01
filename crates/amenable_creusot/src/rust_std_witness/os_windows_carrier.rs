@@ -12,7 +12,7 @@ use crate::{
     WINDOWS_SOCKET_AS_RAW_SOCKET_RECOVERS_THE_WRAPPED_VALUE_HOLDS_SRC,
 };
 
-use amenable_std::{RustLanguageProvenance, RustStdProvenance, RustStdProvenanceBuilder};
+use amenable_std::{RustLanguageProvenance, RustStdProvenance};
 
 // `std::os::windows::{ffi::EncodeWide, io::{BorrowedHandle, BorrowedSocket,
 // HandleOrInvalid, OwnedHandle, OwnedSocket}}`: unlike every other type in
@@ -43,13 +43,12 @@ fn windows_provenance(
     type_name: &str,
     summary: &str,
 ) -> RustStdProvenance {
-    RustStdProvenanceBuilder::default()
-        .rust(RustLanguageProvenance::for_source("std", source_module))
-        .source_url(url)
-        .type_name(type_name)
-        .semantic_summary(summary)
-        .build()
-        .expect("all fields set")
+    RustStdProvenance::new(
+        RustLanguageProvenance::for_source("std", source_module),
+        url,
+        type_name,
+        summary,
+    )
 }
 
 ::inventory::submit! {

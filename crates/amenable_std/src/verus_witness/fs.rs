@@ -360,6 +360,7 @@ impl VerusWitness for RustStdStandard<std::fs::TryLockError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_lock_error_model_reports_a_lock_already_held".to_owned(),

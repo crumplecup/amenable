@@ -68,7 +68,4 @@ mod time;
 mod types;
 
 pub use certificate::write_rust_std_certificate_artifacts;
-pub use types::{
-    RustLanguageProvenance, RustLanguageProvenanceBuilder, RustStdProvenance,
-    RustStdProvenanceBuilder, RustStdStandard, RustStdType,
-};
+pub use types::{RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType};

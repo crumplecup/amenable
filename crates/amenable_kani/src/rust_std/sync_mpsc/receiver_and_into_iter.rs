@@ -99,6 +99,7 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_into_iter_yields_sent_values_then_stops".to_owned(),
@@ -164,6 +165,7 @@ impl Establish<KaniChannelYieldThenStopToken, KaniVerifier>
 {
     type Token = RustStdIntoIterToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelYieldThenStopToken) -> Self::Token {
         RustStdIntoIterToken(())
     }

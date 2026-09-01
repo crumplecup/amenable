@@ -1,14 +1,14 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 86 8 86 68 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 135 8 135 68 *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 84 19 84 23
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 85 18 85 65
-let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 65 24 65 56
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 133 19 133 23
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 134 18 134 65
+let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
 
 use creusot.int.Int64
 use creusot.prelude.Any
 use int.Int
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 64 8 64 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
   [%#scontract_bounds'1] outcome = (Int64.to_int balance >= Int64.to_int amount)
 
 meta "compute_max_steps" 1000000
@@ -16,7 +16,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec check_sufficient_funds
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 86 8 86 68] (balance: Int64.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 135 8 135 68] (balance: Int64.t)
   (amount: Int64.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int64.ge balance amount ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & balance: Int64.t = balance | & amount: Int64.t = amount ])

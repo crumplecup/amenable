@@ -1,11 +1,7 @@
 #[cfg(kani)]
 use amenable_core::Ensures;
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::Requires;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use crate::CheckedProof;
 #[cfg(kani)]
@@ -55,6 +51,7 @@ impl KaniWitness for RustStdStandard<fn(i32) -> i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_fn_pointer_calls_the_underlying_function".to_owned(),

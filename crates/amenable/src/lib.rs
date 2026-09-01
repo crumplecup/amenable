@@ -22,6 +22,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod cli_output;
 #[cfg(feature = "creusot")]
 mod creusot_export;
 mod error;
@@ -39,6 +40,7 @@ pub mod cli;
 pub mod gallery;
 pub mod kani;
 
+pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
 #[cfg(feature = "creusot")]
 pub use creusot_export::write_creusot_exchange_companions;
 pub use error::{

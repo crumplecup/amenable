@@ -6,8 +6,6 @@ use amenable_core::Requires;
 #[cfg(kani)]
 use amenable_std::AsciiByte;
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use amenable_std::ValidUnicodeScalar;
 
 use crate::CheckedProof;
 #[cfg(kani)]
@@ -128,6 +126,7 @@ impl KaniWitness for RustStdStandard<str> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_str_byte_length_and_content".to_owned(),

@@ -1,20 +1,6 @@
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::GetterRecoversTheStoredReference;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniVerifier, KaniWaitTimeoutObservation, KaniWitness};
@@ -23,6 +9,7 @@ impl KaniWitness for RustStdStandard<std::sync::Condvar> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_condvar_wait_timeout_reports_timing_out".to_owned(),
@@ -57,7 +44,7 @@ impl ProofToken for KaniWaitTimeoutWitnessToken {
 impl KaniWaitTimeoutObservation {
     /// Assert a never-notified wait times out. Consumes `self` for the
     /// same reason
-    /// [`KaniMutexExclusionObservation::demonstrate_exclusion`] does.
+    /// [`crate::KaniMutexExclusionObservation::demonstrate_exclusion`] does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
     pub fn demonstrate_timeout(self) -> KaniWaitTimeoutWitnessToken {
@@ -77,6 +64,7 @@ impl ProofToken for RustStdCondvarToken {
 impl Establish<KaniWaitTimeoutWitnessToken, KaniVerifier> for RustStdStandard<std::sync::Condvar> {
     type Token = RustStdCondvarToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniWaitTimeoutWitnessToken) -> Self::Token {
         RustStdCondvarToken(())
     }

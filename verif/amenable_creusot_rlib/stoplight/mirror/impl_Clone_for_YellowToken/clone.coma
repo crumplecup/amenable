@@ -1,0 +1,17 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 192 8 192 31 *)
+
+(* <stoplight::mirror::YellowToken as std::clone::Clone> *)
+
+use creusot.prelude.Any
+
+type t_YellowToken = { f0: () }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec clone_YellowToken [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 192 8 192 31]
+  (self: t_YellowToken) (return (x: t_YellowToken)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- { f0 = _2 } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_YellowToken = Any.any_l () | & _2: () = Any.any_l () ])
+  [ return (result: t_YellowToken) -> (! return {result}) ]

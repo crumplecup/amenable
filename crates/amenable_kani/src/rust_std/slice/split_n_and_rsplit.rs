@@ -5,26 +5,8 @@ use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
-#[cfg(kani)]
-use crate::IndexRecoversTheStoredElement;
-#[cfg(kani)]
-use crate::IteratorYieldsAReferenceToTheStoredValue;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::bridge_kani_witness;
 use crate::{KaniSplitNObservation, KaniSplitObservation, KaniVerifier};
 #[cfg(kani)]
@@ -522,6 +504,7 @@ impl KaniWitness for RustStdStandard<RSplitNMut<'static, i32, fn(&i32) -> bool>>
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back".to_owned(),
@@ -557,6 +540,7 @@ impl Establish<KaniRSplitNWitnessToken, KaniVerifier>
 {
     type Token = RustStdRSplitNMutToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniRSplitNWitnessToken) -> Self::Token {
         RustStdRSplitNMutToken(())
     }

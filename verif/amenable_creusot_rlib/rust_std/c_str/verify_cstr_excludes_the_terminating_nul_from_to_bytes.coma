@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 263 8 265 51 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 206 8 208 51 *)
 
-let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 266 46 266 49
-let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 266 13 266 19
-let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 266 33 266 39
-let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 261 19 261 43
-let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 262 18 262 85
-let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 84 24 84 34
-let%span sc_str'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 242 16 248 17
+let%span sc_str = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 209 46 209 49
+let%span sc_str'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 209 13 209 19
+let%span sc_str'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 209 33 209 39
+let%span sc_str'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 204 19 204 43
+let%span sc_str'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 205 18 205 85
+let%span sc_str'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 27 24 27 34
+let%span sc_str'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 185 16 191 17
 
 use creusot.int.UInt8
 use creusot.int.UInt64
@@ -16,10 +16,10 @@ type t_Option_u8 = None | Some UInt8.t
 
 type tup4_usize_Option_u8_usize_Option_u8 = { f0: UInt64.t; f1: t_Option_u8; f2: UInt64.t; f3: t_Option_u8 }
 
-predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 83 8 83 47] (byte: UInt8.t) =
+predicate non_nul_byte_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 26 8 26 47] (byte: UInt8.t) =
   [%#sc_str'4] UInt8.t'int byte <> 0
 
-predicate cstr_excludes_the_terminating_nul_from_to_bytes_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 237 8 240 17] (byte: UInt8.t) (cstr_result: tup4_usize_Option_u8_usize_Option_u8) =
+predicate cstr_excludes_the_terminating_nul_from_to_bytes_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 180 8 183 17] (byte: UInt8.t) (cstr_result: tup4_usize_Option_u8_usize_Option_u8) =
   [%#sc_str'5] match cstr_result with
     | {f0 = payload_len; f1 = observed_byte; f2 = borrowed_len; f3 = terminator} -> payload_len = (1: UInt64.t)
     /\ observed_byte = Some byte /\ borrowed_len = (2: UInt64.t) /\ terminator = Some (0: UInt8.t)
@@ -30,7 +30,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_cstr_excludes_the_terminating_nul_from_to_bytes
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 263 8 265 51] (byte: UInt8.t)
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 206 8 208 51] (byte: UInt8.t)
   (return (x: tup4_usize_Option_u8_usize_Option_u8)) =
   {[@stop_split] [@expl:verify_cstr_excludes_the_terminating_nul_from_to_bytes requires] [%#sc_str'2] non_nul_byte_holds byte}
   (! bb0

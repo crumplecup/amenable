@@ -43,8 +43,8 @@ pub(super) fn render_enum_module(
     let mut imports = Vec::new();
     let mut comments = Vec::new();
     for (_, rendered) in &per_variant {
-        imports.extend(rendered.imports.iter().cloned());
-        comments.extend(rendered.comments.iter().cloned());
+        imports.extend(rendered.imports().iter().cloned());
+        comments.extend(rendered.comments().iter().cloned());
     }
 
     let mut source = String::new();
@@ -166,7 +166,7 @@ fn build_variant_arms(
     let mut any_requires = false;
 
     for (name, rendered) in per_variant {
-        let call_count = rendered.checked_calls.len();
+        let call_count = rendered.checked_calls().len();
         let bind_names: Vec<String> = match call_count {
             0 => Vec::new(),
             1 => vec!["r".to_owned()],
@@ -177,15 +177,15 @@ fn build_variant_arms(
             (name.clone(), name.clone(), name.clone())
         } else {
             let types = rendered
-                .checked_calls
+                .checked_calls()
                 .iter()
-                .map(|call| call.ty.clone())
+                .map(|call| call.ty().clone())
                 .collect::<Vec<_>>()
                 .join(", ");
             let exprs = rendered
-                .checked_calls
+                .checked_calls()
                 .iter()
-                .map(|call| call.expr.clone())
+                .map(|call| call.expr().clone())
                 .collect::<Vec<_>>()
                 .join(", ");
             (
@@ -199,13 +199,13 @@ fn build_variant_arms(
             "        {selector_ty}::{name} => {result_ty}::{result_ctor},"
         ));
 
-        let claim = if rendered.ensures.is_empty() {
+        let claim = if rendered.ensures().is_empty() {
             "true".to_owned()
         } else {
             rendered
-                .ensures
+                .ensures()
                 .iter()
-                .map(|clause| clause.render_with(&bind_names[clause.result_index]))
+                .map(|clause| clause.render_with(&bind_names[*clause.result_index()]))
                 .collect::<Vec<_>>()
                 .join(" && ")
         };
@@ -214,14 +214,14 @@ fn build_variant_arms(
              {result_ty}::{result_pattern} => {claim},\n                _ => false,\n            }},"
         ));
 
-        if !rendered.requires.is_empty() {
+        if !rendered.requires().is_empty() {
             any_requires = true;
         }
-        let requires_claim = if rendered.requires.is_empty() {
+        let requires_claim = if rendered.requires().is_empty() {
             "true".to_owned()
         } else {
             rendered
-                .requires
+                .requires()
                 .iter()
                 .map(|clause| clause.render_with("result"))
                 .collect::<Vec<_>>()
@@ -258,13 +258,13 @@ struct ParamLists {
 fn render_param_lists(selector_ty: &str, per_variant: &[(String, RenderedNode)]) -> ParamLists {
     let param_names = per_variant
         .iter()
-        .flat_map(|(_, rendered)| rendered.params.iter())
-        .map(|param| param.local_name.clone())
+        .flat_map(|(_, rendered)| rendered.params().iter())
+        .map(|param| param.local_name().clone())
         .collect::<Vec<_>>();
     let params = per_variant
         .iter()
-        .flat_map(|(_, rendered)| rendered.params.iter())
-        .map(|param| format!("{}: {}", param.local_name, param.ty))
+        .flat_map(|(_, rendered)| rendered.params().iter())
+        .map(|param| format!("{}: {}", param.local_name(), param.ty()))
         .collect::<Vec<_>>()
         .join(", ");
 

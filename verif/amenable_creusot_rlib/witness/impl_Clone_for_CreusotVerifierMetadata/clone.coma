@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 16 26 21 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 39 16 39 21 *)
 
 (* <witness::CreusotVerifierMetadata as std::clone::Clone> *)
 
@@ -8,7 +8,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 26 16 26 21]
+let rec clone_CreusotVerifierMetadata [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 39 16 39 21]
   (self: ()) (return (x: ())) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ] [ & _ret: () = Any.any_l () | & self: () = self ])
   [ return (result: ()) -> (! return {result}) ]

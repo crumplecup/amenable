@@ -43,7 +43,7 @@ impl ProofToken for KaniFileTypeWitnessToken {
 impl KaniFileTypeObservation {
     /// Assert a file reports `is_file()` but not `is_dir()`, and a
     /// directory the reverse. Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
@@ -99,6 +99,7 @@ impl KaniWitness for RustStdStandard<Metadata> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_metadata_reports_the_written_length".to_owned(),
@@ -130,7 +131,7 @@ impl ProofToken for KaniFileLenWitnessToken {
 impl KaniFileLenObservation {
     /// Assert `.len()`/`.is_empty()` report exactly the written byte
     /// count. Consumes `self` for the same reason
-    /// [`KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
+    /// [`crate::KaniRecursiveDirObservation::demonstrate_ancestor_preservation`]
     /// does.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
     #[must_use]
@@ -157,6 +158,7 @@ impl ProofToken for RustStdMetadataLenToken {
 impl Establish<KaniFileLenWitnessToken, KaniVerifier> for RustStdStandard<Metadata> {
     type Token = RustStdMetadataLenToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniFileLenWitnessToken) -> Self::Token {
         RustStdMetadataLenToken(())
     }

@@ -6,17 +6,11 @@ use amenable_core::Evidence;
 #[cfg(kani)]
 use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
-#[cfg(kani)]
-use crate::AtomicLoadReflectsTheLastWrite;
 use crate::CheckedProof;
 #[cfg(kani)]
 use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PeekRevealsTheStoredReference;
 #[cfg(kani)]
 use crate::ValueIsWithinInclusiveRange;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
@@ -297,6 +291,7 @@ pub struct IteratorMatchesReferenceStepByStep<T>(std::marker::PhantomData<T>);
 impl<T> amenable_core::Standard for IteratorMatchesReferenceStepByStep<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -306,14 +301,17 @@ impl<T> Evidence for IteratorMatchesReferenceStepByStep<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -336,6 +334,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for IteratorMatchesReference
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -373,6 +372,7 @@ impl KaniWitness for RustStdStandard<Flatten<IntoIter<Range<i32>>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_flatten_concatenates_the_inner_iterators".to_owned(),

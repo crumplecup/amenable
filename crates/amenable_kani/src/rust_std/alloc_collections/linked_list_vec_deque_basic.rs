@@ -1,31 +1,32 @@
 use std::collections::{LinkedList, TryReserveError, VecDeque};
 
 use amenable_core::Evidence;
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
 use amenable_std::RustStdStandard;
-#[cfg(kani)]
-use std::cell::Cell;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
-#[cfg(kani)]
-use crate::CollectedSequenceMatchesExpected;
-#[cfg(kani)]
-use crate::DerefReflectsTheStoredValue;
-#[cfg(kani)]
-use crate::EmptiedContainerReportsEmpty;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FirstValueIsLessThanTheSecond;
-#[cfg(kani)]
-use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-#[cfg(kani)]
-use crate::PopRecoversTheStoredValue;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use std::cell::Cell;
+
+    pub(super) use crate::CollectedSequenceMatchesExpected;
+    pub(super) use crate::EmptiedContainerReportsEmpty;
+    pub(super) use crate::FallibleOperationReportsFailure;
+}
+#[cfg(kani)]
+use mirror::{
+    Cell, CollectedSequenceMatchesExpected, EmptiedContainerReportsEmpty, Ensures,
+    FallibleOperationReportsFailure, Requires,
+};
 
 impl KaniWitness for RustStdStandard<LinkedList<i32>> {
     type SupportingEvidence = Self;
@@ -224,6 +225,7 @@ impl KaniWitness for RustStdStandard<TryReserveError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_reserve_rejects_an_impossible_capacity".to_owned(),

@@ -12,21 +12,28 @@
 //! - if the real owned UTF-8 conversion path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
 use amenable_core::{Establish, Evidence, MetadataEntry, ProofToken, Provenance, Witness};
 use amenable_derive::Standard;
 
+use crate::rust_std::macros::{kani_ensures, kani_requires};
+use crate::{CalculationProof, KaniVerifier};
+
+// `Ensures`/`Requires`/`EmptinessTracksZeroLength`/`IndexRecoversTheStoredElement`,
+// not folded into `mirror`'s own import list: the `harness! { .. }` block
+// below is pasted at this file's own top level, but its generated
+// function body -- the only thing here that actually names them -- is
+// itself `#[cfg(kani)]`-gated internally by `harness!`'s own expansion
+// (`#[cfg(#cfg_name)] #item`, alongside the always-visible `..._SRC`
+// const), so under a plain build that body doesn't exist and these
+// imports are genuinely unused there -- confirmed the hard way: dropping
+// the gate here produced a real "unused import" error under `cargo
+// check` (no `--cfg kani`).
 #[cfg(kani)]
 use crate::EmptinessTracksZeroLength;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 #[cfg(kani)]
-use crate::KaniCompose;
-#[cfg(kani)]
-use crate::compose::{kani_assume, symbolic_any};
-use crate::rust_std::macros::{kani_ensures, kani_requires};
-use crate::{CalculationProof, KaniVerifier};
+use amenable_core::{Ensures, Requires};
 
 const MAX_KANI_UTF8_BYTES: usize = 4;
 
@@ -44,20 +51,6 @@ pub struct KaniAssumedUtf8Validity {
 }
 
 impl KaniAssumedUtf8Validity {
-    /// Decide validity for the given bytes: assumed symbolically
-    /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
-    /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
-    /// before this assumption had a name. Two `#[cfg]`-gated definitions,
-    /// not one with a single shared parameter name, since `bytes` is
-    /// genuinely read under `not(kani)` but genuinely unused under
-    /// `kani` -- no single name is honest for both.
-    #[cfg(kani)]
-    #[must_use]
-    pub fn decide(_bytes: &[u8]) -> Self {
-        let valid: bool = kani::any();
-        Self { valid }
-    }
-
     /// Decide validity for the given bytes: assumed symbolically
     /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
     /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
@@ -196,54 +189,93 @@ impl KaniFromUtf8Error {
     }
 }
 
+/// The `#[cfg(kani)]` imports, the symbolic `decide` branch, the
+/// `KaniCompose` impls, and `symbolic_ascii_byte`, consolidated into one
+/// gate on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. `decide` attaches to `KaniAssumedUtf8Validity`
+/// regardless of which module the `impl` block lives in, and the
+/// `KaniCompose` impls are globally visible the moment they're compiled
+/// -- so no bridging re-export needed. `Ensures`/`Requires`/
+/// `EmptinessTracksZeroLength`/`IndexRecoversTheStoredElement` stay a
+/// separate, unconditional top-level import: the `harness! { .. }` block
+/// below (unconditional, at this file's own top level) needs them too,
+/// but nothing outside this file ever does.
 #[cfg(kani)]
-impl KaniCompose for KaniUtf8String {
-    fn kani_depth0() -> Self {
-        Self(Vec::new())
-    }
+mod mirror {
+    use crate::KaniCompose;
+    use crate::compose::{kani_assume, symbolic_any};
 
-    fn kani_depth1() -> Self {
-        Self(vec![symbolic_ascii_byte()])
-    }
+    use super::{KaniAssumedUtf8Validity, KaniFromUtf8Error, KaniUtf8String, MAX_KANI_UTF8_BYTES};
 
-    fn kani_depth2() -> Self {
-        Self(vec![symbolic_ascii_byte(), symbolic_ascii_byte()])
-    }
-
-    fn kani_any() -> Self {
-        let len: usize = symbolic_any();
-        kani_assume(len <= MAX_KANI_UTF8_BYTES);
-        let mut bytes = Vec::new();
-        for _ in 0..len {
-            bytes.push(symbolic_ascii_byte());
+    impl KaniAssumedUtf8Validity {
+        /// Decide validity for the given bytes: assumed symbolically
+        /// (`kani::any()`) under Kani, computed for real (`is_valid_utf8`)
+        /// otherwise -- the same split `KaniUtf8Buffer::new` used inline
+        /// before this assumption had a name. Two `#[cfg]`-gated definitions,
+        /// not one with a single shared parameter name, since `bytes` is
+        /// genuinely read under `not(kani)` but genuinely unused under
+        /// `kani` -- no single name is honest for both.
+        #[must_use]
+        pub fn decide(_bytes: &[u8]) -> Self {
+            let valid: bool = kani::any();
+            Self { valid }
         }
-        Self(bytes)
-    }
-}
-
-#[cfg(kani)]
-impl KaniCompose for KaniFromUtf8Error {
-    fn kani_depth0() -> Self {
-        Self(vec![0xFFu8])
     }
 
-    fn kani_depth1() -> Self {
-        Self(vec![b'x', 0xFFu8])
+    fn symbolic_ascii_byte() -> u8 {
+        let byte: u8 = symbolic_any();
+        kani_assume(byte < 0x80);
+        byte
     }
 
-    fn kani_depth2() -> Self {
-        Self(vec![b'x', b'y', 0xFFu8])
-    }
-
-    fn kani_any() -> Self {
-        let prefix_len: usize = symbolic_any();
-        kani_assume(prefix_len < MAX_KANI_UTF8_BYTES);
-        let mut bytes = Vec::new();
-        for _ in 0..prefix_len {
-            bytes.push(symbolic_ascii_byte());
+    impl KaniCompose for KaniUtf8String {
+        fn kani_depth0() -> Self {
+            Self(Vec::new())
         }
-        bytes.push(0xFFu8);
-        Self(bytes)
+
+        fn kani_depth1() -> Self {
+            Self(vec![symbolic_ascii_byte()])
+        }
+
+        fn kani_depth2() -> Self {
+            Self(vec![symbolic_ascii_byte(), symbolic_ascii_byte()])
+        }
+
+        fn kani_any() -> Self {
+            let len: usize = symbolic_any();
+            kani_assume(len <= MAX_KANI_UTF8_BYTES);
+            let mut bytes = Vec::new();
+            for _ in 0..len {
+                bytes.push(symbolic_ascii_byte());
+            }
+            Self(bytes)
+        }
+    }
+
+    impl KaniCompose for KaniFromUtf8Error {
+        fn kani_depth0() -> Self {
+            Self(vec![0xFFu8])
+        }
+
+        fn kani_depth1() -> Self {
+            Self(vec![b'x', 0xFFu8])
+        }
+
+        fn kani_depth2() -> Self {
+            Self(vec![b'x', b'y', 0xFFu8])
+        }
+
+        fn kani_any() -> Self {
+            let prefix_len: usize = symbolic_any();
+            kani_assume(prefix_len < MAX_KANI_UTF8_BYTES);
+            let mut bytes = Vec::new();
+            for _ in 0..prefix_len {
+                bytes.push(symbolic_ascii_byte());
+            }
+            bytes.push(0xFFu8);
+            Self(bytes)
+        }
     }
 }
 
@@ -585,13 +617,6 @@ impl Establish<KaniUtf8Buffer<2>, KaniVerifier> for KaniUtf8Buffer<2> {
     fn establish(_credential: KaniUtf8Buffer<2>) -> Self::Token {
         KaniUtf8BufferToken(())
     }
-}
-
-#[cfg(kani)]
-fn symbolic_ascii_byte() -> u8 {
-    let byte: u8 = symbolic_any();
-    kani_assume(byte < 0x80);
-    byte
 }
 
 #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(bytes)))]

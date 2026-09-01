@@ -279,6 +279,7 @@ impl VerusWitness for RustStdStandard<std::iter::Enumerate<std::ops::Range<i32>>
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),

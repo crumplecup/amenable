@@ -12,6 +12,23 @@ use amenable_core::{
 
 use crate::{RustStdProvenance, RustStdStandard};
 
+/// Verus-specific witness: identifies the Verus spec (if any) behind a
+/// piece of evidence, without ever running it.
+pub trait VerusWitness {
+    /// Evidence this witness backs.
+    type SupportingEvidence: Evidence;
+
+    /// Descriptor of the Verus proof relevant to this evidence.
+    type ProofArtifact;
+
+    /// Identify the Verus proof artifact for this evidence.
+    fn proof() -> Self::ProofArtifact;
+}
+
+pub(crate) trait VerusProofArtifactSupport {
+    fn support() -> WitnessSupportSummary;
+}
+
 /// The Verus verifier, local to this crate: there is only one verifier
 /// Verus works with — Verus. Being local here (not imported from
 /// `amenable_core`) is what makes the per-type bridges below legal under
@@ -61,19 +78,6 @@ impl Verifier for VerusVerifier {
     }
 }
 
-/// Verus-specific witness: identifies the Verus spec (if any) behind a
-/// piece of evidence, without ever running it.
-pub trait VerusWitness {
-    /// Evidence this witness backs.
-    type SupportingEvidence: Evidence;
-
-    /// Descriptor of the Verus proof relevant to this evidence.
-    type ProofArtifact;
-
-    /// Identify the Verus proof artifact for this evidence.
-    fn proof() -> Self::ProofArtifact;
-}
-
 /// Register explicit Verus witness exports for concrete instantiated
 /// types.
 ///
@@ -89,10 +93,6 @@ macro_rules! emit_verus_witnesses {
             $($ty),*
         );
     };
-}
-
-pub(crate) trait VerusProofArtifactSupport {
-    fn support() -> WitnessSupportSummary;
 }
 
 // Every path below is fully qualified, not a bare name relying on

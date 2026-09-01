@@ -1,23 +1,35 @@
-#[cfg(kani)]
-use std::num::NonZero;
 use std::num::{
     FpCategory, IntErrorKind, ParseFloatError, ParseIntError, Saturating, TryFromIntError, Wrapping,
 };
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
-#[cfg(kani)]
-use crate::AccessorRecoversTheExpectedValue;
-#[cfg(kani)]
-use crate::FallibleOperationReportsFailure;
-#[cfg(kani)]
-use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
 use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+
+/// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
+/// on this `mod` instead of one per item -- see
+/// `amenable_creusot::stoplight::mirror`'s own doc comment for the
+/// general rationale. Every name is re-exported: the `harness! { .. }`
+/// blocks below need all of them, unqualified, at this file's own top
+/// level.
+#[cfg(kani)]
+mod mirror {
+    pub(super) use std::num::NonZero;
+
+    pub(super) use amenable_core::Ensures;
+
+    pub(super) use crate::AccessorRecoversTheExpectedValue;
+    pub(super) use crate::FallibleOperationReportsFailure;
+    pub(super) use crate::FallibleOperationReportsSuccess;
+}
+#[cfg(kani)]
+use mirror::{
+    AccessorRecoversTheExpectedValue, Ensures, FallibleOperationReportsFailure,
+    FallibleOperationReportsSuccess, NonZero,
+};
 
 impl KaniWitness for RustStdStandard<Wrapping<i32>> {
     type SupportingEvidence = Self;

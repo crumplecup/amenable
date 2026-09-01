@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 161 8 161 100 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 104 8 104 100 *)
 
-let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 162 24 162 26
-let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 163 17 163 21
-let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 163 23 163 24
-let%span sos_windows_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 165 17 165 22
-let%span sos_windows_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 159 19 159 23
-let%span sos_windows_carrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 160 18 160 90
-let%span sos_windows_carrier'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 141 16 142 94
+let%span sos_windows_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 105 24 105 26
+let%span sos_windows_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 106 17 106 21
+let%span sos_windows_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 106 23 106 24
+let%span sos_windows_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 108 17 108 22
+let%span sos_windows_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 102 19 102 23
+let%span sos_windows_carrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 103 18 103 90
+let%span sos_windows_carrier'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 84 16 85 94
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -14,7 +14,7 @@ use int.Int
 
 type tup2_bool_isize = { f0: bool; f1: Int64.t }
 
-predicate windows_handle_or_invalid_rejects_only_the_sentinel_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 136 8 139 17] (value: Int64.t) (conversion_result: tup2_bool_isize) =
+predicate windows_handle_or_invalid_rejects_only_the_sentinel_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 79 8 82 17] (value: Int64.t) (conversion_result: tup2_bool_isize) =
   [%#sos_windows_carrier'5] (Int64.to_int value = - 1 -> conversion_result.f0)
   /\ (Int64.to_int value <> - 1 -> not conversion_result.f0 /\ conversion_result.f1 = value)
 
@@ -23,7 +23,7 @@ meta "compute_max_steps" 1000000
 meta "select_lsinst" "all"
 
 let rec verify_windows_handle_or_invalid_rejects_only_the_sentinel
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 161 8 161 100]
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 104 8 104 100]
   (value: Int64.t) (return (x: tup2_bool_isize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- value = ([%#sos_windows_carrier] (-1: Int64.t)) ] s1
