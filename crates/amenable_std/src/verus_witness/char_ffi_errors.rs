@@ -164,7 +164,11 @@ bridge_verus_witness!(RustStdStandard<core::any::TypeId>);
 amenable_derive::verus_ensures_predicate!(
     RustStdStandard<core::any::TypeId>,
     "amenable_std::rust_std::RustStdStandard<core::any::TypeId>",
-    ["type_id_of_matches_spec", "type_id_eq_matches_identity"]
+    [
+        "type_id_of_matches_spec",
+        "type_id_eq_matches_identity",
+        "i32_and_bool_type_ids_differ"
+    ]
 );
 
 const VERIFY_TRY_FROM_SLICE_REJECTS_A_LENGTH_MISMATCH_SRC: &str =

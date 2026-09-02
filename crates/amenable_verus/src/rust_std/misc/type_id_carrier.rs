@@ -53,10 +53,25 @@ pub assume_specification [<TypeId as core::cmp::PartialEq>::eq] (a: &TypeId, b: 
 /// Distinct concrete types get distinct identities — asserted for this
 /// one representative pair (the same pair Kani's harness checks), not a
 /// general injectivity claim over every possible `T`.
+pub open spec fn i32_and_bool_type_ids_differ() -> bool {
+    type_id_spec::<i32>() != type_id_spec::<bool>()
+}
+
 #[verifier::external_body]
 pub broadcast proof fn axiom_i32_and_bool_type_ids_differ()
     ensures
+        // Verus's own automatic broadcast/trigger instantiation needs
+        // the literal comparison present as its own `#[trigger]`ed
+        // clause -- a call wrapping it inside a named predicate gives
+        // the solver nothing to pattern-match on (same idiom as
+        // `cstring_carrier.rs`'s `axiom_vec_u8_into_vec_u8_is_identity`
+        // and `cow_carrier.rs`'s `axiom_i32_to_owned_is_identity`). The
+        // clause right below states the identical fact through the real
+        // named predicate above, so the claim itself is still named
+        // once; this raw clause exists only to give the solver
+        // something to pattern-match on.
         #[trigger] type_id_spec::<i32>() != #[trigger] type_id_spec::<bool>(),
+        i32_and_bool_type_ids_differ(),
 {
 }
 
