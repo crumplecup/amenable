@@ -59,6 +59,7 @@ impl KaniAssumedUtf8Validity {
     /// genuinely read under `not(kani)` but genuinely unused under
     /// `kani` -- no single name is honest for both.
     #[cfg(not(kani))]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(bytes)))]
     #[must_use]
     pub fn decide(bytes: &[u8]) -> Self {
         let valid = is_valid_utf8(bytes);

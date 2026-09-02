@@ -630,6 +630,7 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Drain<'static
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_deque_drain_model_removes_and_yields_in_order".to_owned(),
