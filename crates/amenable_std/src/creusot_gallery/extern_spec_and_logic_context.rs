@@ -55,7 +55,7 @@ fn verify_duration_new_normalizes_nanos_and_carries_into_secs(secs: u64, nanos: 
 // These are the exact terms as_secs/subsec_nanos's own postconditions are
 // stated in, so this proves the same underlying fact their (untouchable)
 // contracts would give, without ever invoking the methods themselves.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -109,7 +109,7 @@ extern_spec! {
 fn verify_nonzero_i16_roundtrips(value: i16) -> Option<NonZero<i16>> {
     NonZero::new(value)
 }
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -170,7 +170,7 @@ extern_spec! {
         fn reverse(self) -> Ordering;
     }
 }
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -215,7 +215,7 @@ fn is_ascii_digit(c: char) -> bool {
 fn is_ascii_digit(c: char) -> bool {
     pearlite! { c@ >= 48 && c@ <= 57 }
 }
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -263,7 +263,7 @@ fn verify_int_error_kind_classifies_parse_failures() -> ... {
         // ...
     )
 }
-"#,
+"#.to_owned(),
         ),
     )
 }

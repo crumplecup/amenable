@@ -43,7 +43,7 @@ impl Provenance for CreusotVerifierMetadata {
 // Fix: replace with an associated type (`type MetadataIter: Iterator<Item
 // = MetadataEntry>; fn metadata(&self) -> Self::MetadataIter;`) — an
 // ordinary named item, not an opaque one. See amenable_core::Provenance.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -82,7 +82,7 @@ impl Provenance for CreusotVerifierMetadata {
 // amenable_std::creusot_witness — legal under the orphan rule because
 // RustStdStandard<T>, not the verifier marker, is the local type there.
 // amenable_creusot now contains zero inventory calls.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -160,7 +160,7 @@ impl HasIter for Boxed {
 // ..>` associated type), is a real, confirmed, working alternative --
 // worth real consideration next time this class of tradeoff comes up,
 // not assumed away by this gallery's own earlier, narrower test.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -190,7 +190,7 @@ fn verify_char_roundtrip(c: char) -> char { c }
 // `Int` via a builtin (`creusot.prelude.Char.to_int`) — `@` is the intended
 // way to reach a char's ordinal value in logic context, not a program-level
 // cast.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -225,7 +225,7 @@ fn verify_string_roundtrip(s: String) -> String { s }
 // inside a contract: a #[trusted] #[logic(opaque)] wrapper axiomatizing the
 // relationship (never proven, just asserted) so the real method becomes
 // referenceable from logic context at all.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -266,7 +266,7 @@ fn metadata(&self) -> Self::MetadataIter {
 // creusot-translated crate — everywhere else in this workspace, `Box<dyn
 // Iterator<...>>` is the right, general answer (see
 // amenable_core::provenance's impl_scalar_provenance! macro).
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -303,7 +303,7 @@ pub struct CreusotVerifierMetadata;
 // confirmed here specifically (Verifier::Metadata only requires Provenance
 // + Default; nothing compares two CreusotVerifierMetadata values anywhere
 // in this workspace) before dropping them, not as a blanket rule.
-"#,
+"#.to_owned(),
         ),
     )
 }

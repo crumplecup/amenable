@@ -58,7 +58,7 @@ impl Provenance for WitnessLeaf {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WitnessLeafProof {
-    pub evidence: &'static str,
+    pub evidence: String,
 }
 
 impl std::fmt::Display for WitnessLeafProof {
@@ -94,7 +94,7 @@ impl Witness<FixtureVerifier> for WitnessLeaf {
 
     fn proof() -> Self::ProofArtifact {
         WitnessLeafProof {
-            evidence: std::any::type_name::<Self>(),
+            evidence: std::any::type_name::<Self>().to_owned(),
         }
     }
 
@@ -120,9 +120,18 @@ pub enum DeriveFixtureKind {
 }
 
 pub struct FixtureInstance<F> {
-    pub label: &'static str,
+    pub label: String,
     pub value: F,
-    pub expected_entries: &'static [(&'static str, &'static str)],
+    pub expected_entries: Vec<(String, String)>,
+}
+
+/// Convert a literal `(&str, &str)` array into the owned pairs
+/// `FixtureInstance::expected_entries` stores.
+fn owned_entries(entries: &[(&str, &str)]) -> Vec<(String, String)> {
+    entries
+        .iter()
+        .map(|&(key, value)| (key.to_owned(), value.to_owned()))
+        .collect()
 }
 
 impl<T> FixtureWitnessMember for T where
@@ -139,7 +148,7 @@ impl<T> FixtureWitnessMember for T where
 {
 }
 
-pub fn expected_report(entries: &[(&str, &str)]) -> String {
+pub fn expected_report(entries: &[(String, String)]) -> String {
     if entries.is_empty() {
         return "(no provenance metadata)".to_string();
     }
@@ -151,15 +160,12 @@ pub fn expected_report(entries: &[(&str, &str)]) -> String {
         .join("\n")
 }
 
-pub fn expected_keys(entries: &[(&str, &str)]) -> Vec<String> {
-    entries.iter().map(|(key, _)| (*key).to_string()).collect()
+pub fn expected_keys(entries: &[(String, String)]) -> Vec<String> {
+    entries.iter().map(|(key, _)| key.clone()).collect()
 }
 
-pub fn expected_values(entries: &[(&str, &str)]) -> Vec<String> {
-    entries
-        .iter()
-        .map(|(_, value)| (*value).to_string())
-        .collect()
+pub fn expected_values(entries: &[(String, String)]) -> Vec<String> {
+    entries.iter().map(|(_, value)| value.clone()).collect()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, ProvenanceDerive, StandardDerive, WitnessDerive)]
@@ -172,9 +178,9 @@ impl FixtureCase for UnitStructFixture {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "unit",
+            label: "unit".to_owned(),
             value: Self,
-            expected_entries: &[],
+            expected_entries: owned_entries(&[]),
         }]
     }
 
@@ -213,16 +219,16 @@ impl FixtureCase for NamedStructFixture {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "named",
+            label: "named".to_owned(),
             value: Self::new(
                 "UI Working Group",
                 "layout-12",
                 "not for metadata projection",
             ),
-            expected_entries: &[
+            expected_entries: owned_entries(&[
                 ("authority", "UI Working Group"),
                 ("decision_id", "layout-12"),
-            ],
+            ]),
         }]
     }
 
@@ -262,13 +268,16 @@ impl FixtureCase for TupleStructFixture {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "tuple",
+            label: "tuple".to_owned(),
             value: Self::new(
                 "UI Working Group",
                 "layout-12",
                 "not for metadata projection",
             ),
-            expected_entries: &[("authority", "UI Working Group"), ("1", "layout-12")],
+            expected_entries: owned_entries(&[
+                ("authority", "UI Working Group"),
+                ("1", "layout-12"),
+            ]),
         }]
     }
 
@@ -302,9 +311,9 @@ impl FixtureCase for CheckedPlusTrivialStructFixture {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "checked_plus_trivial",
+            label: "checked_plus_trivial".to_owned(),
             value: Self::new("UI Working Group"),
-            expected_entries: &[("authority", "UI Working Group")],
+            expected_entries: owned_entries(&[("authority", "UI Working Group")]),
         }]
     }
 
@@ -337,14 +346,14 @@ impl FixtureCase for UnitEnumFixture {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "internal_only",
+                label: "internal_only".to_owned(),
                 value: Self::InternalOnly,
-                expected_entries: &[("authority_kind", "InternalOnly")],
+                expected_entries: owned_entries(&[("authority_kind", "InternalOnly")]),
             },
             FixtureInstance {
-                label: "external_standard",
+                label: "external_standard".to_owned(),
                 value: Self::external_standard(),
-                expected_entries: &[("authority_kind", "ExternalStandard")],
+                expected_entries: owned_entries(&[("authority_kind", "ExternalStandard")]),
             },
         ]
     }
@@ -392,32 +401,32 @@ impl FixtureCase for NamedEnumFixture {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "rust_project",
+                label: "rust_project".to_owned(),
                 value: Self::rust_project(
                     "Rust Project Developers",
                     "https://doc.rust-lang.org/std/primitive.i32.html",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "RustProject"),
                     ("authority", "Rust Project Developers"),
                     (
                         "source_url",
                         "https://doc.rust-lang.org/std/primitive.i32.html",
                     ),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "local",
+                label: "local".to_owned(),
                 value: Self::local("UI Working Group"),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "local_design"),
                     ("owner", "UI Working Group"),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "internal_only",
+                label: "internal_only".to_owned(),
                 value: Self::InternalOnly,
-                expected_entries: &[("authority_kind", "InternalOnly")],
+                expected_entries: owned_entries(&[("authority_kind", "InternalOnly")]),
             },
         ]
     }
@@ -464,29 +473,29 @@ impl FixtureCase for TupleEnumFixture {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "rust_project",
+                label: "rust_project".to_owned(),
                 value: Self::rust_project(
                     "Rust Project Developers",
                     "https://doc.rust-lang.org/std/primitive.i32.html",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "RustProject"),
                     ("authority", "Rust Project Developers"),
                     ("1", "https://doc.rust-lang.org/std/primitive.i32.html"),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "local",
+                label: "local".to_owned(),
                 value: Self::local("UI Working Group", "not for metadata projection"),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "local_design"),
                     ("owner", "UI Working Group"),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "internal_only",
+                label: "internal_only".to_owned(),
                 value: Self::InternalOnly,
-                expected_entries: &[("authority_kind", "InternalOnly")],
+                expected_entries: owned_entries(&[("authority_kind", "InternalOnly")]),
             },
         ]
     }
@@ -526,22 +535,22 @@ impl FixtureCase for NestedStructFixture {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "nested_local",
+                label: "nested_local".to_owned(),
                 value: Self::new(
                     NamedEnumFixture::local("UI Working Group"),
                     "Layout invariants are selected by the application author.",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_source.authority_kind", "local_design"),
                     ("authority_source.owner", "UI Working Group"),
                     (
                         "semantic_summary",
                         "Layout invariants are selected by the application author.",
                     ),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "nested_rust_project",
+                label: "nested_rust_project".to_owned(),
                 value: Self::new(
                     NamedEnumFixture::rust_project(
                         "Rust Project Developers",
@@ -549,7 +558,7 @@ impl FixtureCase for NestedStructFixture {
                     ),
                     "Layout invariants defer to the upstream primitive contract.",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_source.authority_kind", "RustProject"),
                     ("authority_source.authority", "Rust Project Developers"),
                     (
@@ -560,7 +569,7 @@ impl FixtureCase for NestedStructFixture {
                         "semantic_summary",
                         "Layout invariants defer to the upstream primitive contract.",
                     ),
-                ],
+                ]),
             },
         ]
     }
@@ -593,22 +602,22 @@ impl FixtureCase for NestedTupleStructFixture {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "nested_local",
+                label: "nested_local".to_owned(),
                 value: Self::new(
                     TupleEnumFixture::local("UI Working Group", "not for metadata projection"),
                     "Layout invariants are selected by the application author.",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_source.authority_kind", "local_design"),
                     ("authority_source.owner", "UI Working Group"),
                     (
                         "semantic_summary",
                         "Layout invariants are selected by the application author.",
                     ),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "nested_rust_project",
+                label: "nested_rust_project".to_owned(),
                 value: Self::new(
                     TupleEnumFixture::rust_project(
                         "Rust Project Developers",
@@ -616,7 +625,7 @@ impl FixtureCase for NestedTupleStructFixture {
                     ),
                     "Layout invariants defer to the upstream primitive contract.",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_source.authority_kind", "RustProject"),
                     ("authority_source.authority", "Rust Project Developers"),
                     (
@@ -627,7 +636,7 @@ impl FixtureCase for NestedTupleStructFixture {
                         "semantic_summary",
                         "Layout invariants defer to the upstream primitive contract.",
                     ),
-                ],
+                ]),
             },
         ]
     }
@@ -665,15 +674,15 @@ impl FixtureCase for GenericStructFixture<WitnessLeaf, WitnessLeaf> {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "generic_named",
+            label: "generic_named".to_owned(),
             value: Self::new(
                 WitnessLeaf::new("UI Working Group"),
                 WitnessLeaf::new("layout-12"),
             ),
-            expected_entries: &[
+            expected_entries: owned_entries(&[
                 ("authority", "UI Working Group"),
                 ("decision_id", "layout-12"),
-            ],
+            ]),
         }]
     }
 
@@ -709,15 +718,15 @@ impl FixtureCase for GenericTupleStructFixture<WitnessLeaf, WitnessLeaf> {
 
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![FixtureInstance {
-            label: "generic_tuple",
+            label: "generic_tuple".to_owned(),
             value: Self::new(
                 WitnessLeaf::new("UI Working Group"),
                 WitnessLeaf::new("layout-12"),
             ),
-            expected_entries: &[
+            expected_entries: owned_entries(&[
                 ("authority", "UI Working Group"),
                 ("decision_id", "layout-12"),
-            ],
+            ]),
         }]
     }
 
@@ -767,35 +776,35 @@ impl FixtureCase for GenericEnumFixture<WitnessLeaf, WitnessLeaf> {
     fn instances() -> Vec<FixtureInstance<Self>> {
         vec![
             FixtureInstance {
-                label: "rust_project",
+                label: "rust_project".to_owned(),
                 value: Self::rust_project(
                     WitnessLeaf::new("Rust Project Developers"),
                     "https://doc.rust-lang.org/std/primitive.i32.html",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "RustProject"),
                     ("authority", "Rust Project Developers"),
                     (
                         "source_url",
                         "https://doc.rust-lang.org/std/primitive.i32.html",
                     ),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "local",
+                label: "local".to_owned(),
                 value: Self::local(
                     WitnessLeaf::new("UI Working Group"),
                     "not for metadata projection",
                 ),
-                expected_entries: &[
+                expected_entries: owned_entries(&[
                     ("authority_kind", "local_design"),
                     ("owner", "UI Working Group"),
-                ],
+                ]),
             },
             FixtureInstance {
-                label: "internal_only",
+                label: "internal_only".to_owned(),
                 value: Self::InternalOnly,
-                expected_entries: &[("authority_kind", "InternalOnly")],
+                expected_entries: owned_entries(&[("authority_kind", "InternalOnly")]),
             },
         ]
     }

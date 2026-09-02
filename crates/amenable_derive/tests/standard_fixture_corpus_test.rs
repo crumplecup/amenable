@@ -66,21 +66,21 @@ where
         );
         assert_eq!(
             Standard::keys(&instance.value).collect::<Vec<_>>(),
-            expected_keys(instance.expected_entries),
+            expected_keys(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
             Standard::values(&instance.value).collect::<Vec<_>>(),
-            expected_values(instance.expected_entries),
+            expected_values(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
             Standard::report(&instance.value).to_string(),
-            expected_report(instance.expected_entries),
+            expected_report(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label

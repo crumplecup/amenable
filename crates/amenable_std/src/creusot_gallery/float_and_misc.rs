@@ -44,7 +44,7 @@ extern_spec! {
 // (`~/repos/creusot`), not assumed. So no float postcondition can use `@`
 // to reach an arbitrary-precision numeric value the way every other
 // harness in this crate does for its own inputs.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -100,7 +100,7 @@ extern_spec! {
 // (`s@ == "not a float"@`, same panic site) — so "Unsupported literal"
 // applies to Pearlite literal kinds more broadly than just floats; only
 // integer/bool/char literals are confirmed to translate.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -180,7 +180,7 @@ fn verify_parse_float_error_occurs_only_for_unparseable_input() -> (...) {
         <f64 as std::str::FromStr>::from_str("3.14"),
     )
 }
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -236,7 +236,7 @@ extern_spec! {
 // logic function, so the harness can connect "the value passed to new"
 // to "what deref/into_inner return" without ever needing `*self` inside
 // deref's own contract.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -277,7 +277,7 @@ fn verify_fn_pointer_calls_the_underlying_function(value: i32) -> i32 {
 // The trusted boundary states the dispatch law explicitly for the carrier,
 // while the gallery preserves the exact translator limitation that blocked
 // a real call-through proof.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -333,7 +333,7 @@ let observed_next = atomic.load(ghost!(
 ));
 // `atomic_sc` is usable, but only if the ghost callback actually "shoots"
 // the committer against the permission token returned by `new`.
-"#,
+"#.to_owned(),
         ),
     )
 }

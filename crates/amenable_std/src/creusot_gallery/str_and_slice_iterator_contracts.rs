@@ -103,7 +103,7 @@ impl CreusotWitness for RustStdStandard<std::str::Bytes<'static>> {
 }
 // The same trusted boundary is used for the rest of the `core::str`
 // iterator family until creusot-std grows the missing contracts.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -177,7 +177,7 @@ impl CreusotWitness for RustStdStandard<EscapeAscii<'static>> {
         <Self::SupportingEvidence as Evidence>::basis().audit()
     }
 }
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -231,7 +231,7 @@ impl CreusotWitness for RustStdStandard<GetDisjointMutError> {
         <Self::SupportingEvidence as Evidence>::basis().audit()
     }
 }
-"#,
+"#.to_owned(),
         ),
     )
 }

@@ -2,12 +2,12 @@
 
 use std::string::{FromUtf8Error, FromUtf16Error};
 
-use amenable_core::{Establish, Evidence, ProofToken};
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
+use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
-use crate::{KaniVerifier, KaniWitness};
 
 /// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
 /// on this `mod` instead of one per item -- see
@@ -17,16 +17,97 @@ use crate::{KaniVerifier, KaniWitness};
 /// level.
 #[cfg(kani)]
 mod mirror {
+    pub(super) use amenable_core::Establish;
+    use amenable_core::ProofToken;
     pub(super) use amenable_core::{Ensures, Requires};
+    use amenable_std::RustStdStandard;
 
     pub(super) use crate::CollectedSequenceMatchesExpected;
     pub(super) use crate::FallibleOperationReportsFailure;
     pub(super) use crate::FallibleOperationReportsSuccess;
     pub(super) use crate::KaniUtf8Buffer;
+    use crate::KaniVerifier;
+
+    /// Witness that a `KaniStringDrainObservation` instance actually
+    /// demonstrated the whole-string drain law, minted only by
+    /// [`crate::KaniStringDrainObservation::demonstrate_whole_string_drain`].
+    /// `KaniStringDrainObservation` itself only exists under `#[cfg(kani)]`
+    /// (see its own module doc comment), so this whole family of types --
+    /// nothing outside this file references any of them -- moves here
+    /// with it.
+    pub(super) struct KaniStringDrainWitnessToken(());
+
+    impl ProofToken for KaniStringDrainWitnessToken {
+        type Proposition = crate::KaniStringDrainObservation;
+    }
+
+    impl crate::KaniStringDrainObservation {
+        /// Assert the drain yields exactly `bytes[..len]` and leaves the
+        /// source empty afterward. Consumes `self`: the only way to obtain
+        /// the token is to have run this check against a real observation
+        /// instance, not to assert it independently.
+        #[must_use]
+        pub(super) fn demonstrate_whole_string_drain(
+            self,
+            bytes: [u8; 2],
+            len: usize,
+        ) -> KaniStringDrainWitnessToken {
+            let yielded = self.yielded_bytes();
+
+            assert_eq!(
+                self.yielded_len(),
+                len,
+                "drain yields exactly the source byte length"
+            );
+            assert_eq!(
+                yielded.len(),
+                len,
+                "drain recovers a byte slice with the source length"
+            );
+            if len >= 1 {
+                assert_eq!(
+                    yielded[0], bytes[0],
+                    "drain preserves the first source byte"
+                );
+            }
+            if len >= 2 {
+                assert_eq!(
+                    yielded[1], bytes[1],
+                    "drain preserves the second source byte"
+                );
+            }
+            assert_eq!(
+                self.source_len_after_drain(),
+                0,
+                "drain leaves the source length at zero"
+            );
+            assert!(self.source_is_empty(), "drain leaves the source empty");
+            KaniStringDrainWitnessToken(())
+        }
+    }
+
+    /// Lawful token minted once `RustStdStandard<std::string::Drain<'static>>`'s
+    /// whole-string drain law has been established from a
+    /// `KaniStringDrainObservation`.
+    pub(super) struct RustStdStringDrainToken(());
+
+    impl ProofToken for RustStdStringDrainToken {
+        type Proposition = RustStdStandard<std::string::Drain<'static>>;
+    }
+
+    impl Establish<KaniStringDrainWitnessToken, KaniVerifier>
+        for RustStdStandard<std::string::Drain<'static>>
+    {
+        type Token = RustStdStringDrainToken;
+
+        fn establish(_credential: KaniStringDrainWitnessToken) -> Self::Token {
+            RustStdStringDrainToken(())
+        }
+    }
 }
 #[cfg(kani)]
 use mirror::{
-    CollectedSequenceMatchesExpected, Ensures, FallibleOperationReportsFailure,
+    CollectedSequenceMatchesExpected, Ensures, Establish, FallibleOperationReportsFailure,
     FallibleOperationReportsSuccess, KaniUtf8Buffer, Requires,
 };
 
@@ -58,81 +139,6 @@ bridge_kani_witness!(RustStdStandard<std::string::Drain<'static>>);
         || <RustStdStandard<std::string::Drain<'static>> as KaniWitness>::proof()
             .to_string(),
     )
-}
-
-/// Witness that a `KaniStringDrainObservation` instance actually
-/// demonstrated the whole-string drain law, minted only by
-/// [`crate::KaniStringDrainObservation::demonstrate_whole_string_drain`].
-pub struct KaniStringDrainWitnessToken(());
-
-impl ProofToken for KaniStringDrainWitnessToken {
-    type Proposition = crate::KaniStringDrainObservation;
-}
-
-impl crate::KaniStringDrainObservation {
-    /// Assert the drain yields exactly `bytes[..len]` and leaves the
-    /// source empty afterward. Consumes `self`: the only way to obtain
-    /// the token is to have run this check against a real observation
-    /// instance, not to assert it independently.
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, bytes)))]
-    #[must_use]
-    pub fn demonstrate_whole_string_drain(
-        self,
-        bytes: [u8; 2],
-        len: usize,
-    ) -> KaniStringDrainWitnessToken {
-        let yielded = self.yielded_bytes();
-
-        assert_eq!(
-            self.yielded_len(),
-            len,
-            "drain yields exactly the source byte length"
-        );
-        assert_eq!(
-            yielded.len(),
-            len,
-            "drain recovers a byte slice with the source length"
-        );
-        if len >= 1 {
-            assert_eq!(
-                yielded[0], bytes[0],
-                "drain preserves the first source byte"
-            );
-        }
-        if len >= 2 {
-            assert_eq!(
-                yielded[1], bytes[1],
-                "drain preserves the second source byte"
-            );
-        }
-        assert_eq!(
-            self.source_len_after_drain(),
-            0,
-            "drain leaves the source length at zero"
-        );
-        assert!(self.source_is_empty(), "drain leaves the source empty");
-        KaniStringDrainWitnessToken(())
-    }
-}
-
-/// Lawful token minted once `RustStdStandard<std::string::Drain<'static>>`'s
-/// whole-string drain law has been established from a
-/// `KaniStringDrainObservation`.
-pub struct RustStdStringDrainToken(());
-
-impl ProofToken for RustStdStringDrainToken {
-    type Proposition = RustStdStandard<std::string::Drain<'static>>;
-}
-
-impl Establish<KaniStringDrainWitnessToken, KaniVerifier>
-    for RustStdStandard<std::string::Drain<'static>>
-{
-    type Token = RustStdStringDrainToken;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
-    fn establish(_credential: KaniStringDrainWitnessToken) -> Self::Token {
-        RustStdStringDrainToken(())
-    }
 }
 
 amenable_derive::harness! {

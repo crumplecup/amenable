@@ -48,6 +48,11 @@ mod slice_escape_ascii_model;
 mod slice_split_model;
 mod stoplight;
 mod str_pattern_model;
+// Kani-only accommodation model (see the module's own doc comment): every
+// real consumer is a `#[kani::proof]` body, confirmed by tracing every
+// call site before gating this -- nothing in an ordinary build ever
+// constructs a `KaniStringDrainObservation`.
+#[cfg(kani)]
 mod string_drain_model;
 mod sync_lock_model;
 mod utf8_model;
@@ -127,6 +132,7 @@ pub use str_pattern_model::{
     KaniStrMatchObservation, KaniStrMatchObservationBuilder, KaniStrRSplitNObservation,
     KaniStrRSplitNObservationBuilder, KaniStrRSplitObservation, KaniStrSplitTerminatorObservation,
 };
+#[cfg(kani)]
 pub use string_drain_model::KaniStringDrainObservation;
 pub use sync_lock_model::{
     KaniBarrierLeaderObservation, KaniMutexExclusionObservation, KaniMutexFailureObservation,

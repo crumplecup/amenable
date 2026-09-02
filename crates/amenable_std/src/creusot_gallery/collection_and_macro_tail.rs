@@ -48,7 +48,7 @@ fn verify_args_reports_at_least_the_program_path(extra: usize) -> (usize, usize)
 // what the literal was already inferred as. This is not specific to
 // `usize`: the same fix applies to `isize`/`u64`/`u32`/any integer type
 // compared against a bare literal in logic context.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -145,7 +145,7 @@ impl creusot_std::model::View for std::collections::BinaryHeap<i32> {
 // real type locally is a genuine dead end (two independent blockers,
 // confirmed above), and an accommodation model was the actual way
 // through, not just the fallback if nothing better turned up.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -191,7 +191,7 @@ impl creusot_std::model::View for std::collections::BinaryHeap<i32> {
 // enough" gap. Worth naming so the next reviewer doesn't re-attempt the
 // same accommodation-model conversion and re-discover the same
 // non-constructible-type blocker.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -254,7 +254,7 @@ fn probe_macro_nesting_in_attribute_position(value: i32) -> i32 {
 // registered fragment) from one shared spec, as a build-time text/codegen
 // step (before rustc ever parses either file), not as a macro nested
 // inside Creusot's own attribute-position parsing.
-"#,
+"#.to_owned(),
         ),
     )
 }

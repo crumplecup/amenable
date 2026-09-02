@@ -115,23 +115,14 @@ pub struct CreusotGalleryCase {
     /// paraphrase — plus a trailing note citing the actual diagnostic
     /// observed, so this can't silently drift into an unverified claim.
     ///
-    /// Hand-written getter, not `#[getter(copy)]`: confirmed via
-    /// `cargo expand` elsewhere in this workspace that `#[getter(copy)]`
-    /// on a `&'static` field generates a `&'static self` receiver, which
-    /// breaks calls through a non-`'static`, short-lived `self` (as every
-    /// real `CreusotGalleryCase` instance here is -- built owned inside a
-    /// closure, not held as `&'static`).
-    #[getter(skip)]
-    claim: &'static str,
-}
-
-impl CreusotGalleryCase {
-    /// The reduced repro/working-alternative source. See the field's own
-    /// doc comment for why this getter is hand-written.
-    #[must_use]
-    pub const fn claim(&self) -> &'static str {
-        self.claim
-    }
+    /// Owned, not `&'static str`: every real instance here is built owned
+    /// inside a closure, not held as `&'static`, and the plain derived
+    /// getter this now gets (no `#[getter(...)]` override needed) sidesteps
+    /// the real `#[getter(copy)]`-on-`&'static`-field bug (confirmed via
+    /// `cargo expand` elsewhere in this workspace: it generates a
+    /// `&'static self` receiver, which breaks calls through a short-lived
+    /// `self`) without hand-writing the getter to route around it.
+    claim: String,
 }
 
 /// Static registration that constructs an owned [`CreusotGalleryCase`] on

@@ -134,23 +134,14 @@ pub struct VerusGalleryCase {
     /// paraphrase — plus a trailing note citing the actual diagnostic
     /// observed, so this can't silently drift into an unverified claim.
     ///
-    /// Hand-written getter, not `#[getter(copy)]`: confirmed via
-    /// `cargo expand` elsewhere in this workspace that `#[getter(copy)]`
-    /// on a `&'static` field generates a `&'static self` receiver, which
-    /// breaks calls through a non-`'static`, short-lived `self` (as every
-    /// real `VerusGalleryCase` instance here is -- built owned inside a
-    /// closure, not held as `&'static`).
-    #[getter(skip)]
-    claim: &'static str,
-}
-
-impl VerusGalleryCase {
-    /// The reduced repro/working-alternative source. See the field's own
-    /// doc comment for why this getter is hand-written.
-    #[must_use]
-    pub const fn claim(&self) -> &'static str {
-        self.claim
-    }
+    /// Owned, not `&'static str`: every real instance here is built owned
+    /// inside a closure, not held as `&'static`, and the plain derived
+    /// getter this now gets (no `#[getter(...)]` override needed) sidesteps
+    /// the real `#[getter(copy)]`-on-`&'static`-field bug (confirmed via
+    /// `cargo expand` elsewhere in this workspace: it generates a
+    /// `&'static self` receiver, which breaks calls through a short-lived
+    /// `self`) without hand-writing the getter to route around it.
+    claim: String,
 }
 
 /// Static registration that constructs an owned [`VerusGalleryCase`] on
@@ -256,7 +247,7 @@ pub assume_specification [<Wrapping<i32> as std::ops::Add>::add] (a: Wrapping<i3
 // machine-checked coverage for Wrapping<i32> exists; the specific
 // operator-overload claim Kani/Creusot check remains unprovable under
 // Verus from this crate.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -303,7 +294,7 @@ pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) ->
 // Real, narrower coverage lands instead, same shape as Wrapping:
 // Saturating(value).0 == value, the tuple constructor/field-access
 // roundtrip, via ExSaturating, without touching Add or saturating_add.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -361,7 +352,7 @@ pub assume_specification<T> [<Reverse<T> as core::cmp::Ord>::cmp] (a: &Reverse<T
 // Real, narrower coverage lands instead, same shape as Wrapping/
 // Saturating: Reverse(value).0 == value, the tuple constructor/field-
 // access roundtrip, via ExReverse, without touching Ord or cmp.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -444,7 +435,7 @@ pub trait ExZeroablePrimitive: Sized + Copy {
 // a Verus-specific gap: NonZero::new cannot be given a real spec by any
 // downstream crate in either verifier until std stabilizes a nameable
 // bound.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -485,7 +476,7 @@ verus! {
 // the proof itself (see option_carrier.rs/result_carrier.rs: take the
 // Option/Result as a `requires`-constrained parameter, not a literal
 // constructed inline).
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -543,7 +534,7 @@ pub assume_specification [<u8 as std::convert::TryFrom<i32>>::try_from] (value: 
 // establish for Creusot's extern_spec! equivalent) — not just to avoid
 // duplicate effort, but because here a duplicate isn't merely wasted
 // work, it crashes the toolchain.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -598,7 +589,7 @@ pub assume_specification [Layout::new::<i32>] () -> (result: Layout)
 // Layout::from_size_align rejects a non-power-of-two alignment — a pure
 // fact about the constructor's own validation logic, provable without
 // ever touching size_of/align_of's opacity.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -665,7 +656,7 @@ pub fn verify_cell_round_trip(initial: i32) -> (result: i32)
 // need vstd itself to ship a real spec module for std::cell::Cell
 // (as it does, differently, for Cell-like PCell) before this becomes
 // provable.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -718,7 +709,7 @@ arr[0] == matching[0] && arr[1] == matching[1]  // verifies cleanly
 // and any proof consuming an assume_specification'd Result should
 // prefer let+assert+unwrap over a bare match when the postcondition
 // needs to be visible inside the branch.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -776,7 +767,7 @@ pub assume_specification<'a, B: ToOwned + ?Sized> [<Cow<'a, B> as core::ops::Der
 // the full into_owned claim (no receiver reference, so no elision
 // ambiguity at all) -- covering two of the claim's three original
 // facts in full, with only the deref half left uncovered.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -852,7 +843,7 @@ pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32,
 // not a fallback: this boundary structurally cannot carry an
 // executable, provable connection across it, unlike the boundary
 // between a Kani contract type and its own crate's proof sites.
-"#,
+"#.to_owned(),
         ),
     )
 }

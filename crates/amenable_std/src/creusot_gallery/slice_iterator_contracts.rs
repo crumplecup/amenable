@@ -83,7 +83,7 @@ impl CreusotWitness for RustStdStandard<Chunks<'static, i32>> {
 // The same trusted boundary is used for ChunksExact, ChunksMut,
 // ChunksExactMut, and Windows until creusot-std grows the missing
 // contracts and creusot-rustc stops ICE-ing on the slice-pattern route.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -175,7 +175,7 @@ impl CreusotWitness for RustStdStandard<RChunks<'static, i32>> {
 }
 // The same trusted boundary is used for RChunksExact, RChunksExactMut, and
 // RChunksMut until creusot-std grows the missing contracts.
-"#,
+"#.to_owned(),
         ),
     )
 }
@@ -268,7 +268,7 @@ impl CreusotWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> 
 // The same trusted boundary is used for ChunkByMut, RSplit, RSplitMut,
 // RSplitN, RSplitNMut, Split, SplitInclusive, SplitInclusiveMut, SplitMut,
 // SplitN, and SplitNMut until creusot-std grows the missing contracts.
-"#,
+"#.to_owned(),
         ),
     )
 }
