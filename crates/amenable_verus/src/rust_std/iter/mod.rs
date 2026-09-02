@@ -119,4 +119,14 @@ mod ghost_reexports {
     pub use super::unordered_pair_carrier::drain_result_matches_order;
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    array_into_iter_advance_matches_position, array_into_iter_model_starts_at_first_position,
+    chunk_by_result_matches_grouping, drain_result_matches_order, four_increment_headroom_holds,
+    increment_headroom_holds, into_iter_yields_zero_or_one_owned_value,
+    is_within_map_while_doubling_headroom, is_within_scan_sum_headroom,
+    map_while_closure_result_matches, nonzero_item_survives_filtering,
+    ordered_pair_into_iter_advance_result_matches,
+    ordered_pair_into_iter_model_starts_at_position_zero, single_increment_headroom_holds,
+    ten_increment_headroom_holds, ten_increment_write_through, two_increment_headroom_holds,
+    yields_three_values_in_order_then_ends,
+};

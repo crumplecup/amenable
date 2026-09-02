@@ -64,4 +64,12 @@ mod ghost_reexports {
     pub use super::vec_splice_carrier::splice_result_matches;
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    ExBuildHasherDefault, ExSipHasher, binary_heap_model_pop_returns_recorded_order,
+    binary_heap_model_records_values_in_heap_order, binary_heap_pop_yields_the_maximum_first,
+    btree_map_insert_get_remove_round_trip_holds, btree_map_round_trip_inputs_are_distinct,
+    btree_set_insert_contains_remove_round_trip_holds, btree_set_round_trip_inputs_are_distinct,
+    default_hasher_new_view_is_empty, partition_result_matches, sip_hasher_finish_matches_spec,
+    sip_hasher_new_view_is_empty, sip_hasher_write_appends_to_view, splice_result_matches,
+    vec_len_after_one_push_is_one,
+};

@@ -50,4 +50,8 @@ mod ghost_reexports {
     pub use super::io_take_carrier::take_allowance_is_exhausted;
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    cursor_positions_after_read_then_seek, empty_read_reports_zero_bytes,
+    error_kind_index_is_representative, is_not_a_line_terminator_byte, is_not_a_newline_byte,
+    take_allowance_is_exhausted,
+};

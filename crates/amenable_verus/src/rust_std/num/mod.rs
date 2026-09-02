@@ -60,4 +60,13 @@ mod ghost_reexports {
     pub use super::try_from_slice_carrier::{ExTryFromSliceError, try_from_slice_result_matches};
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    ExFpCategory, ExIntErrorKind, ExParseFloatError, ExParseIntError, ExTryFromSliceError,
+    fp_category_classify_result_matches_special_value_categories,
+    fp_category_inputs_cover_nan_and_infinite_cases,
+    fp_category_results_match_nan_and_infinite_cases, from_str_empty_reports_empty_kind,
+    from_str_lowercase_reports_invalid_digit_kind, non_zero_new_accepts_nonzero,
+    non_zero_new_rejects_zero, ordering_reverse_swaps_less_and_greater,
+    parse_float_examples_match_expected_outcome, parse_int_error_kind_matches,
+    starts_with_lowercase_ascii_letter, try_from_slice_result_matches,
+};

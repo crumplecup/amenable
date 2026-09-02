@@ -129,4 +129,15 @@ mod ghost_reexports {
     };
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    ExLayout, ExLayoutError, ExTypeId, args_model_count_matches_program_plus_extra,
+    box_derefs_and_writes_through, cow_into_owned_preserves_variant_value,
+    duration_new_result_matches, duration_new_secs_headroom_holds,
+    fmt_arguments_result_matches_display_token, fmt_debug_list_result_matches_entries_in_brackets,
+    fmt_debug_map_result_matches_key_value_pair, fmt_debug_set_result_matches_entries_in_braces,
+    fmt_debug_struct_result_matches_named_fields, fmt_debug_tuple_result_matches_positional_fields,
+    fmt_from_fn_result_matches_display_token, from_size_align_rejects_a_non_power_of_two_alignment,
+    i32_to_owned_spec_is_identity, is_power_of_two_spec, option_is_none,
+    option_wraps_the_given_value, result_wraps_the_given_err_value,
+    result_wraps_the_given_ok_value, type_id_eq_matches_identity, type_id_of_matches_spec,
+};

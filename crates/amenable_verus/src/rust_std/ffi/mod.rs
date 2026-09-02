@@ -62,4 +62,21 @@ mod ghost_reexports {
     pub use super::std_ffi_carrier::os_str_len_fits_the_two_byte_buffer;
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    ExCStr, ExCString, ExFromBytesUntilNulError, ExFromBytesWithNulError, ExFromUtf16Error,
+    ExFromVecWithNulError, ExIntoStringError, ExNulError, as_bytes_matches_cstring_bytes_spec,
+    cstr_bytes_contain_a_nul, cstr_bytes_contain_no_nul, cstr_bytes_have_an_interior_nul,
+    cstr_bytes_have_only_a_trailing_nul, cstr_from_bytes_until_nul_result_matches_nul_presence,
+    cstr_from_bytes_with_nul_result_matches_bytes, cstr_to_bytes_matches_model,
+    cstr_until_nul_test_inputs_cover_both_cases, cstring_input_has_a_preterminal_nul,
+    cstring_input_has_no_preterminal_nul, cstring_new_result_matches_input_bytes,
+    cstring_test_byte_is_nonzero, from_utf8_error_model_as_bytes_preserves_bytes,
+    from_utf8_error_model_into_bytes_preserves_bytes, from_utf8_error_model_new_preserves_bytes,
+    from_utf16_case_results_match_accept_reject_triple,
+    from_utf16_inputs_cover_valid_and_lone_surrogate_cases,
+    from_utf16_result_matches_single_unit_examples, from_vec_with_nul_result_matches_nul_placement,
+    from_vec_with_nul_test_byte_is_nonzero, into_string_error_recovers_the_original_bytes,
+    into_string_rejects_a_leading_0xff_byte, into_vec_u8_spec_matches_input_vec,
+    non_nul_byte_value_is_nonzero, os_str_len_fits_the_two_byte_buffer,
+    probe_starts_with_0xff_and_second_byte_nonzero,
+};

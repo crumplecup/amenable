@@ -112,4 +112,16 @@ mod ghost_reexports {
     pub use super::string_carrier::string_roundtrip_result_matches;
 }
 #[cfg(verus_keep_ghost)]
-pub use ghost_reexports::*;
+pub use ghost_reexports::{
+    ExCharTryFromError, ExParseCharError, ExTryFromCharError, char_fits_in_u8,
+    char_from_str_result_matches, char_indices_first_offset_is_zero,
+    char_try_from_u32_rejects_invalid_scalar, char_try_from_u32_succeeds_with_same_scalar,
+    chars_input_is_ab, chars_iteration_yields_a_then_b_then_none,
+    decode_utf16_bmp_unit_decodes_to_same_scalar, decode_utf16_lone_surrogate_reports_same_unit,
+    decode_utf16_test_inputs_cover_both_cases, decode_utf16_unit_is_non_surrogate,
+    decode_utf16_unit_is_surrogate, invalid_byte_is_never_a_valid_utf8_lead_byte,
+    numeric_cast_matches_char, string_roundtrip_result_matches,
+    u8_try_from_char_rejects_out_of_range_scalar, u8_try_from_char_succeeds_with_same_scalar,
+    u32_is_valid_unicode_scalar, utf8_chunk_invalid_byte_is_0xff,
+    utf8_error_reports_length_and_span,
+};
