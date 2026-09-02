@@ -872,3 +872,81 @@ mod windows_witnesses {
         "owned_as_raw_socket_matches"
     );
 }
+
+/// `windows_witnesses`'s own 6 `verus_ensures_predicate!` calls generate
+/// real `ContractRecord` registrations naming each real `open spec fn` --
+/// but the whole module they live in is `#[cfg(windows)]`, so on this
+/// project's own Linux dev/CI host (where `amenable dump-registry` always
+/// runs) those registrations never fire, and cordial's own
+/// `ANTIPATTERN-UNNAMED-CONTRACT-BOUND-001` check -- which reads that
+/// registry dump, not the source directly -- sees 6 real, named `ensures`
+/// clauses in `amenable_verus::rust_std::os_windows_carrier` as if they
+/// were unnamed raw equations. `ContractRecord::new` takes only string/fn
+/// -pointer data (`evidence: &'static str, verifier: &'static str, kind:
+/// &'static str, fragment: fn() -> &'static str`) -- no dependency on the
+/// real Windows types at all -- so the fix is the same one
+/// `amenable_kani::os_windows_model`'s own doc comment already
+/// established for `ProofRecord` on the Kani side: hand-write the
+/// registration, with `fragment` a verbatim copy of the real spec fn's
+/// own signature and body (`os_windows_carrier.rs`, not paraphrased), so
+/// the registry is honest about what's already true and documented in
+/// the real source, on the one platform this tooling actually runs on.
+/// `#[cfg(not(windows))]`: the real `#[cfg(windows)]` registrations above
+/// already cover a genuine Windows build; this is purely the Linux-side
+/// fallback, never both at once.
+#[cfg(not(windows))]
+mod windows_contract_bounds_linux_fallback {
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<EncodeWide<'static>>",
+            "verus",
+            "ensures",
+            || "pub open spec fn encode_wide_next_matches(before: Seq<u16>, after: Seq<u16>, result: Option<u16>) -> bool { (before.len() == 0 ==> result is None && after == before) && (before.len() > 0 ==> result == Some(before[0]) && after == before.subrange(1, before.len() as int)) }",
+        )
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<BorrowedHandle<'static>>",
+            "verus",
+            "ensures",
+            || "pub open spec fn as_raw_handle_addr_matches(result: RawHandle, h: BorrowedHandle) -> bool { result.addr() == borrowed_handle_addr_spec(h) }",
+        )
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<BorrowedSocket<'static>>",
+            "verus",
+            "ensures",
+            || "pub open spec fn as_raw_socket_matches(result: RawSocket, s: BorrowedSocket) -> bool { result == borrowed_socket_value_spec(s) }",
+        )
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<HandleOrInvalid>",
+            "verus",
+            "ensures",
+            || "pub open spec fn handle_or_invalid_try_from_matches(handle_or_invalid: HandleOrInvalid, result: Result<OwnedHandle, <OwnedHandle as core::convert::TryFrom<HandleOrInvalid>>::Error>) -> bool { (handle_or_invalid_addr_spec(handle_or_invalid) == usize::MAX <==> result is Err) && (result is Ok ==> owned_handle_addr_spec(result->Ok_0) == handle_or_invalid_addr_spec(handle_or_invalid)) }",
+        )
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<OwnedHandle>",
+            "verus",
+            "ensures",
+            || "pub open spec fn owned_as_raw_handle_addr_matches(result: RawHandle, h: OwnedHandle) -> bool { result.addr() == owned_handle_addr_spec(h) }",
+        )
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ContractRecord::new(
+            "amenable_std::rust_std::RustStdStandard<OwnedSocket>",
+            "verus",
+            "ensures",
+            || "pub open spec fn owned_as_raw_socket_matches(result: RawSocket, s: OwnedSocket) -> bool { result == owned_socket_value_spec(s) }",
+        )
+    }
+}
