@@ -1,97 +1,26 @@
-//! Real `Transfer<S, Token>`/`TransferError`/`Ledger` types and logic --
-//! `GAAP_LEDGER_PLAN.md`'s Step 9: closing the `Ledger` mirror on Creusot/
-//! Verus the same way the token mirror was closed (Step 7/8) -- move the
-//! real type *and* its real logic here, and let each backend attach its
-//! own proof separately rather than needing its own copy of the struct or
-//! the logic.
+//! The `Ledger` state machine and its edge methods (`check_amount_positive`/
+//! `check_sufficient_funds`, `validate`, `commit`, `reject`, `rollback`).
+//! The `Transfer<S, Token>` carrier and `TransferError` live in `types`.
 //!
-//! **Scoped to `commit` only, so far.** A deliberate, minimal slice --
-//! `commit` is the simplest real edge (infallible, one real claim) --
-//! chosen to prove the pattern before extending it to `validate`/`check_
-//! amount_positive`/`check_sufficient_funds`/`reject`/`rollback`. Kani has
-//! no `extern_spec!`-style external-contract mechanism the way Creusot
-//! does, so a real `#[kani::requires]`/`#[kani::ensures]` contract has to
-//! sit directly on a function `amenable_kani` itself owns -- the first,
-//! wrong assumption here was that this meant a *wrapper*, since inherent
-//! impls can't reach across a crate boundary the way trait impls can. Real
-//! finding, confirmed three ways via `amenable_kani::gallery::
-//! ledger_gaap_free_function_contract`: a Kani-contracted function whose
-//! body *delegates* to this method from a separate wrapper hits a genuine
-//! Kani 0.67.0 DFCC scaffolding failure (`free.frees.1`), regardless of
-//! the wrapper's shape (bare free function, associated function on a
-//! local type) or the contract's content (real claim, trivial `true`).
-//! The actual fix, confirmed clean (`commit_contract_no_wrapper`, `0 of
-//! 287 failed`): attach the contract *directly* to this method, with zero
-//! delegation, using a fully generic `Ensures<V>` bound rather than
-//! naming any concrete verifier -- see `commit`'s own doc comment below.
+//! Kani has no `extern_spec!`-style external-contract mechanism the way
+//! Creusot does, so a real `#[kani::requires]`/`#[kani::ensures]` contract
+//! has to sit directly on a function `amenable_kani` itself owns. Confirmed
+//! three ways via `amenable_kani::gallery::ledger_gaap_free_function_contract`:
+//! a Kani-contracted function whose body *delegates* to one of these methods
+//! from a separate wrapper hits a genuine Kani 0.67.0 DFCC scaffolding
+//! failure (`free.frees.1`), regardless of the wrapper's shape or the
+//! contract's content. The fix, confirmed clean: attach the contract
+//! *directly* to the method, zero delegation, with a fully generic
+//! `Ensures<V>` bound rather than naming any concrete verifier -- see
+//! `commit`'s own doc comment below.
 
 use amenable_core::{Establish, Sidecar};
 
 use crate::{
     AmountPositive, Committed, CommittedToken, Pending, PendingToken, Rejected,
-    RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds, TransferPayload,
-    Validated, ValidatedToken,
+    RejectedFromPendingToken, RejectedFromValidatedToken, SufficientFunds, Transfer, TransferError,
+    TransferPayload, Validated, ValidatedToken,
 };
-
-/// A transfer payload bundled with the specific proof token minted for
-/// its current state. `constructor = "pub(crate)"`: lawful construction
-/// still requires a real token (this crate's own `Establish`-minted, or
-/// [`Transfer::pending`]'s root case), so external crates can't
-/// disconnect a token from a real `establish()` call the way a fully
-/// `pub` constructor would allow.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
-#[sidecar(proposition = "S", constructor = "pub(crate)")]
-pub struct Transfer<S, Token> {
-    #[sidecar(primary)]
-    payload: TransferPayload,
-    #[sidecar(token)]
-    token: Token,
-    _state: std::marker::PhantomData<S>,
-}
-
-impl<S, Token> Transfer<S, Token> {
-    /// Diagnostic-only construction, bypassing the lawful `Establish`/
-    /// `Sidecar` chain -- matches `ValidatedToken::diagnostic_only`'s own
-    /// precedent and reasoning (`GAAP_LEDGER_PLAN.md`'s Step 1): real,
-    /// structural CBMC cost from constructing a `Transfer` via the
-    /// lawful chain in a harness's own setup code, independent of the
-    /// contract actually being checked. `#[cfg(kani)]`, not privacy-
-    /// gated further: the crate calling this (`amenable_kani`'s own
-    /// experiments/gallery) is no longer the crate defining `Transfer`
-    /// (`GAAP_LEDGER_PLAN.md`'s Step 9) -- `#[cfg(kani)]` is the real
-    /// gate instead, relying on the same global-`--cfg` scoping
-    /// `ValidatedToken::diagnostic_only`'s own doc comment explains.
-    #[cfg(kani)]
-    pub fn diagnostic_new(payload: TransferPayload, token: Token) -> Self {
-        Self::new(payload, token)
-    }
-}
-
-impl Transfer<Pending, PendingToken> {
-    /// The entry case: every transfer starts `Pending`, asserted rather
-    /// than reached via any transition.
-    #[must_use]
-    pub fn pending(payload: TransferPayload) -> Self {
-        Self::new(payload, PendingToken::new())
-    }
-}
-
-/// Every reason `Ledger::validate` can refuse a transfer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(kani, derive(kani::Arbitrary))]
-pub enum TransferError {
-    /// The transfer amount was not positive.
-    NegativeAmount(i64),
-    /// The source account's balance was less than the transfer amount.
-    InsufficientFunds {
-        /// The source account's actual balance.
-        balance: i64,
-        /// The amount that was required.
-        required: i64,
-    },
-    /// The source and destination accounts were the same.
-    SameAccount,
-}
 
 /// The source account's ledger state a transfer validates against.
 ///
