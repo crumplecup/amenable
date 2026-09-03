@@ -144,7 +144,39 @@ these again)
   - [x] `verus_gallery` 849 → infra + numeric_cases + spec_cases + binder_cases (dir)
   - [x] `verus_witness::hash_ffi_collections_tail` 953 → primitives_and_pointers +
     hash_ffi_collections_tail + os_windows_handles
-- [ ] Phase 5 — `amenable_derive` (0/3)
+- [x] **Phase 5 — `amenable_derive` (3/3)** — all pure code moves, generated macro
+  output identical. Full 3-backend re-verify: kani (stoplight Witness+StateMachine+
+  harness!, atomic_ptr) pass, verify-creusot Proved (150 files), verify-verus 485
+  verified 0 errors, no generated diffs.
+  - [x] `lib.rs` 816 → extracted inline `#[derive(Provenance)]` impl to `provenance.rs`
+    + shared attr parsing to `attr_options.rs`; lib.rs now 378 (entry points only)
+  - [x] `state_machine.rs` 596 → mod / emit / parse
+  - [x] `witness.rs` 811 → mod / product / sum / helpers
+
+## Result
+
+**Zero modules ≥ 500 lines.** cordial's modularity checklist: 13 → 1 (the one
+remaining is `amenable_verus::rust_std` "Rebalance" — 11353 lines, 80% of the
+crate's sibling mass; a directory already subdivided into 12 thematic groups,
+flagged because `rust_std` is genuinely the crate's bulk — a judgment call, not
+one of the 20 files here).
+
+### Follow-on findings the splits surfaced
+
+Regenerating `cordial quality` after Phase 5 shows two secondary areas moved:
+
+- **Tracing instrumentation 0 → 24** — `KaniWitness::proof` / `VerusWitness::proof`
+  methods flagged as missing `#[instrument]`. Not new gaps: the same
+  uninstrumented `fn proof()` methods existed before; cordial reports one
+  representative per module, so splitting one file into N multiplied the count.
+  The underlying code is unchanged.
+- **Derive patterns 0 → 4** — `ProvenanceContainerOptions` / `WitnessContainerOptions`
+  / `MemberOptions` / `ProofField` in `amenable_derive`: private structs that had
+  to become `pub(crate)` / `pub(super)` for cross-submodule access, which lifts
+  cordial's fully-private exemption. Proc-macro-internal plumbing mutated
+  field-by-field during parsing (not a builder fit).
+
+Both are open questions for a follow-up pass, not blockers.
 
 Baseline: the prior uncommitted split batch (compose / process_model /
 utf8_model / char / fmt / option_result / verus_carrier / cli+assessment
