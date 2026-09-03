@@ -13,7 +13,7 @@ use syn::{
     parse_quote,
 };
 
-use crate::{
+use crate::attr_options::{
     collect_field_types_from_fields, field_name, parse_member_options,
     parse_provenance_container_options, parse_witness_container_options,
 };
