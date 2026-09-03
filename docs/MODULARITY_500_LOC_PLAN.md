@@ -163,20 +163,19 @@ one of the 20 files here).
 
 ### Follow-on findings the splits surfaced
 
-Regenerating `cordial quality` after Phase 5 shows two secondary areas moved:
+Regenerating `cordial quality` after Phase 5 showed two secondary areas move:
 
-- **Tracing instrumentation 0 → 24** — `KaniWitness::proof` / `VerusWitness::proof`
-  methods flagged as missing `#[instrument]`. Not new gaps: the same
-  uninstrumented `fn proof()` methods existed before; cordial reports one
-  representative per module, so splitting one file into N multiplied the count.
-  The underlying code is unchanged.
+- **Tracing instrumentation 0 → 24 → 0 (DONE).** `cordial quality --apply` added
+  `#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]` to the 19
+  `KaniWitness::proof` / `Establish::establish` methods in `amenable_kani` and the
+  5 `VerusWitness::proof` methods in `amenable_std` that its census flagged once
+  the module splits multiplied the file count. No behavior change (the attr is
+  stripped under `--cfg kani`). check-all-package clean on both crates.
 - **Derive patterns 0 → 4** — `ProvenanceContainerOptions` / `WitnessContainerOptions`
   / `MemberOptions` / `ProofField` in `amenable_derive`: private structs that had
   to become `pub(crate)` / `pub(super)` for cross-submodule access, which lifts
   cordial's fully-private exemption. Proc-macro-internal plumbing mutated
-  field-by-field during parsing (not a builder fit).
-
-Both are open questions for a follow-up pass, not blockers.
+  field-by-field during parsing (not a builder fit). Still open.
 
 Baseline: the prior uncommitted split batch (compose / process_model /
 utf8_model / char / fmt / option_result / verus_carrier / cli+assessment
