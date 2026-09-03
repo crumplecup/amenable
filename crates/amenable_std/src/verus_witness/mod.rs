@@ -58,6 +58,8 @@ mod io_tail;
 mod iter_adapters_a;
 mod iter_adapters_b;
 mod iter_adapters_c_and_fmt;
+mod iter_adapters_d;
+mod iter_markers;
 mod machinery;
 mod mem_slice_net_non_zero;
 mod numeric_alloc;
