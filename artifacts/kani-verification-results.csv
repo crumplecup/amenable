@@ -330,6 +330,9 @@ amenable_kani::rust_std::os_unix::verify_borrowed_fd_reports_the_same_raw_value_
 amenable_kani::rust_std::os_unix::verify_owned_fd_preserves_the_raw_value_across_conversion,1788386020,passed
 amenable_kani::rust_std::panic::verify_assert_unwind_safe_derefs_transparently,1788386035,passed
 amenable_kani::rust_std::panic::verify_location_caller_reflects_the_immediate_call_site,1788386051,passed
+amenable_kani::rust_std::path::components::verify_ancestors_yields_self_then_each_parent_up_to_root,1788456033,passed
+amenable_kani::rust_std::path::display::verify_display_renders_a_valid_utf8_path_verbatim,1788456047,passed
+amenable_kani::rust_std::path::path_buf::verify_strip_prefix_error_reports_a_non_matching_prefix,1788456017,passed
 amenable_kani::rust_std::path::verify_ancestors_yields_self_then_each_parent_up_to_root,1788386079,passed
 amenable_kani::rust_std::path::verify_component_distinguishes_root_from_normal_segments,1788386094,passed
 amenable_kani::rust_std::path::verify_components_yields_root_then_named_segments_in_order,1788386109,passed
@@ -340,6 +343,7 @@ amenable_kani::rust_std::path::verify_path_derives_extension_file_name_and_paren
 amenable_kani::rust_std::path::verify_prefix_component_pairs_raw_text_with_parsed_prefix,1788386225,passed
 amenable_kani::rust_std::path::verify_prefix_disk_identifies_the_drive_letter,1788386238,passed
 amenable_kani::rust_std::path::verify_strip_prefix_error_reports_a_non_matching_prefix,1788386257,passed
+amenable_kani::rust_std::path::windows_prefix::verify_prefix_disk_identifies_the_drive_letter,1788456056,passed
 amenable_kani::rust_std::pin::verify_pin_derefs_and_get_mut_round_trip,1788386269,passed
 amenable_kani::rust_std::primitives::array_slice_str::verify_array_indexing_and_length,1788386281,passed
 amenable_kani::rust_std::primitives::array_slice_str::verify_slice_indexing_and_length,1788386293,passed
