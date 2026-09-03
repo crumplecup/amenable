@@ -162,6 +162,7 @@ impl VerusWitness for ObservedPairMatchesInput {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_atomic_bool_model_load_store".to_owned(),

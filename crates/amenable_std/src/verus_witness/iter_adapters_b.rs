@@ -339,6 +339,7 @@ impl VerusWitness for RustStdStandard<std::iter::Empty<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_empty_model_yields_nothing".to_owned(),

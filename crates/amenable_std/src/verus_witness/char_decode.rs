@@ -267,6 +267,7 @@ impl VerusWitness for RustStdStandard<std::char::EscapeUnicode> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_escape_unicode_model_renders_the_codepoint_escape".to_owned(),

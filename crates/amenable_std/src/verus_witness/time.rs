@@ -96,6 +96,7 @@ impl VerusWitness for RustStdStandard<std::time::Duration> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_duration_model_new_normalizes_nanos_and_carries_into_secs".to_owned(),

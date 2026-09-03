@@ -228,6 +228,7 @@ impl VerusWitness for RustStdStandard<&'static mut i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_mutable_reference_model_dereferences_to_and_updates_the_referent".to_owned(),
