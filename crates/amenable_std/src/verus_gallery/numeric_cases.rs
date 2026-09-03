@@ -1,0 +1,274 @@
+//! Gallery findings for numeric wrapper types: `Wrapping`/`Saturating`
+//! arithmetic operators blocked by coherence, `Reverse::cmp`, and
+//! `NonZero::new`'s sealed `ZeroablePrimitive` bound.
+
+use crate::{
+    VerusGalleryCase, VerusGalleryDisposition, VerusGalleryExpectation, VerusGalleryRegistration,
+};
+
+::inventory::submit! {
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::wrapping_add_operator_blocked_by_coherence".to_owned(),
+            "Wrapping<i32>'s `+` operator can't be verified from outside vstd (coherence); real, narrower field-roundtrip coverage lands instead".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
+// Attempt 1 (naive): call the real Wrapping<i32> `+` operator directly,
+// the same claim amenable_kani's verify_wrapping_add_matches_the_inner_
+// wrapping_add harness checks.
+use std::num::Wrapping;
+pub fn verify_wrapping_add_matches_the_inner_wrapping_add(a: i32, b: i32) -> (result: Wrapping<i32>)
+    ensures
+        result.0 == a.wrapping_add(b),
+{
+    Wrapping(a) + Wrapping(b)
+}
+
+// Observed under `verus --crate-type=lib`:
+//   error: `core::num::wrapping::Wrapping` is not supported (note: you
+//   may be able to add a Verus specification to this type with the
+//   `external_type_specification` attribute)
+//   error: `core::num::wrapping::impl&%393::add` is not supported (note:
+//   you may be able to add a Verus specification to this function with
+//   `assume_specification`)
+
+// Attempt 2: follow both hints — register the foreign type, then supply
+// a direct axiom for its `Add::add`:
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+pub struct ExWrapping<T>(Wrapping<T>);
+
+pub assume_specification [<Wrapping<i32> as std::ops::Add>::add] (a: Wrapping<i32>, b: Wrapping<i32>) -> (result: Wrapping<i32>)
+    ensures
+        result.0 == a.0.wrapping_add(b.0),
+;
+
+// Observed under `verus --crate-type=lib`:
+//   error: precondition not satisfied
+//     --> Wrapping(a) + Wrapping(b)
+//     ::: vstd/std_specs/ops.rs:68: self.$req(rhs) -- failed precondition
+//   verification results:: 7 verified, 1 errors
+
+// Root cause: registering ExWrapping makes vstd treat Wrapping<i32> as a
+// known external type, which routes its `+` operator through vstd's own
+// generic operator-overload machinery (`external_trait_extension`, see
+// vstd/std_specs/ops.rs's ExAdd/AddSpec/AddSpecImpl trio) INSTEAD of the
+// direct assume_specification above — operator syntax and any `.add()`
+// call dispatch through the trait extension, not straight to the
+// concrete impl. That machinery requires `self.add_req(rhs)` to hold,
+// and add_req/add_spec/obeys_add_spec are uninterpreted spec functions
+// vstd implements AddSpecImpl for only on the primitive integer types
+// (vstd/std_specs/ops.rs's def_bop_impls_check_overflow! instantiation).
+// Rust's coherence rules block this crate from providing its own
+// `impl AddSpecImpl for Wrapping<i32>` (AddSpecImpl and Wrapping are both
+// foreign here), so the precondition can never be discharged this way.
+
+// Checked against vstd's own docs (external_trait_specifications.md,
+// "The obeys_* pattern in vstd"), which name assume_specification as the
+// escape hatch — but on `obeys_add_spec()`/`add_spec`, both SPEC-mode
+// functions. assume_specification's own reference doc (reference-assume-
+// specification.md) is explicit: it only applies to `exec`-mode
+// functions. There's no route to axiomatize a spec fn this way, and
+// AddSpecImpl (the only other route) is coherence-blocked as above — so
+// this is a real dead end, not just an unconfirmed syntax question.
+//
+// Real, narrower coverage lands instead (amenable_verus::rust_std::
+// wrapping_carrier's actual, live proof): Wrapping(value).0 == value, the
+// tuple constructor/field-access roundtrip via the same ExWrapping
+// external_type_specification, WITHOUT going through Add at all. Genuine
+// machine-checked coverage for Wrapping<i32> exists; the specific
+// operator-overload claim Kani/Creusot check remains unprovable under
+// Verus from this crate.
+"#.to_owned(),
+        ),
+    )
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::saturating_add_operator_blocked_by_coherence_and_missing_primitive_spec".to_owned(),
+            "Saturating<i32>'s `+` operator hits Wrapping's same coherence block, plus i32::saturating_add itself has no vstd spec at all".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::NotSupported,
+            r#"
+// Attempt: the same claim amenable_kani's verify_saturating_add_matches_
+// the_inner_saturating_add harness checks, via the same
+// external_type_specification approach that got Wrapping<i32> as far as
+// a real "precondition not satisfied" (see
+// wrapping_add_operator_blocked_by_coherence, above).
+use std::num::Saturating;
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+pub struct ExSaturating<T>(Saturating<T>);
+
+pub fn verify_saturating_add_matches_the_inner_saturating_add(a: i32, b: i32) -> (result: Saturating<i32>)
+    ensures
+        result.0 == a.saturating_add(b),
+{
+    Saturating(a) + Saturating(b)
+}
+
+// Observed under `verus --crate-type=lib`: TWO independent unsupported
+// errors, not one:
+//   error: `core::num::impl&%2::saturating_add` is not supported (note:
+//   you may be able to add a Verus specification to this function with
+//   `assume_specification`)
+//     --> result.0 == a.saturating_add(b),
+//   error: [same AddSpecImpl-routed operator failure Wrapping<i32> hits]
+//     --> Saturating(a) + Saturating(b)
+// Worse than Wrapping's case in one respect: vstd gives `wrapping_add`
+// a real spec for the primitive integer types (referencing it in an
+// `ensures` clause works fine), but `saturating_add` has no vstd spec at
+// all — even stating the claim's right-hand side fails before the
+// left-hand side's operator-coherence problem is reached.
+
+// Real, narrower coverage lands instead, same shape as Wrapping:
+// Saturating(value).0 == value, the tuple constructor/field-access
+// roundtrip, via ExSaturating, without touching Add or saturating_add.
+"#.to_owned(),
+        ),
+    )
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::reverse_cmp_blocked_by_coherence_through_ord_not_add".to_owned(),
+            "Reverse<i32>'s comparison-inversion claim hits the same coherence wall as Wrapping's +, through Ord's OrdSpecImpl instead of Add's AddSpecImpl".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::Unproved,
+            r#"
+// Attempt 1: the same claim amenable_kani's verify_reverse_inverts_
+// comparison harness checks — Reverse<T>'s .cmp() swaps T's ordering.
+use std::cmp::Reverse;
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+pub struct ExReverse<T>(Reverse<T>);
+
+pub assume_specification [<Reverse<i32> as core::cmp::Ord>::cmp] (a: &Reverse<i32>, b: &Reverse<i32>) -> (result: core::cmp::Ordering)
+    ensures
+        a.0 < b.0 ==> result == core::cmp::Ordering::Greater,
+        a.0 == b.0 ==> result == core::cmp::Ordering::Equal,
+        a.0 > b.0 ==> result == core::cmp::Ordering::Less,
+;
+
+// Observed under `verus --crate-type=lib`: signature mismatch — the real
+// `cmp` is generic over T (Reverse<T>: Ord requires T: Ord), so a
+// concrete i32 instantiation is rejected outright:
+//   error: assume_specification requires function type signature to
+//   match `core::cmp::impl&%2::cmp` exactly
+//   expected: `for<T> for<'_, '_> (&Reverse<T>, &Reverse<T>) -> Ordering`
+
+// Attempt 2: match the real generic signature exactly, dropping the
+// concrete i32 ensures (a fully generic T has no comparison result to
+// state one against):
+pub assume_specification<T> [<Reverse<T> as core::cmp::Ord>::cmp] (a: &Reverse<T>, b: &Reverse<T>) -> (result: core::cmp::Ordering)
+    where
+        T: core::cmp::Ord,
+;
+
+// Observed: this compiles (past the signature-match stage this time),
+// but with no ensures clause the caller's own postcondition
+// (result.0 == Greater when a < b, etc.) is now genuinely unproved —
+// `verus` reports real "postcondition not satisfied" errors, not a
+// signature/type error. Adding an ensures clause generic over T would
+// need to reference T's OWN comparison result symbolically (e.g.
+// `result == b.0.cmp(&a.0)`), which regresses into exactly the same
+// obeys_*_spec machinery Wrapping's Add claim is blocked by (see
+// wrapping_add_operator_blocked_by_coherence, above) — Ord is under the
+// identical vstd `external_trait_extension` treatment as Add
+// (OrdSpecImpl instead of AddSpecImpl), so this is confirmed to be the
+// same root cause, not a coincidence of two unrelated blockers.
+
+// Real, narrower coverage lands instead, same shape as Wrapping/
+// Saturating: Reverse(value).0 == value, the tuple constructor/field-
+// access roundtrip, via ExReverse, without touching Ord or cmp.
+"#.to_owned(),
+        ),
+    )
+}
+
+::inventory::submit! {
+    VerusGalleryRegistration::new(
+        || VerusGalleryCase::new(
+            "amenable_std::verus_gallery::nonzero_new_blocked_by_sealed_zeroable_primitive".to_owned(),
+            "NonZero::new can't be given a Verus spec: its real signature bounds on the sealed, unstable ZeroablePrimitive trait".to_owned(),
+            VerusGalleryDisposition::FalseTrail,
+            VerusGalleryExpectation::NotSupported,
+            r#"
+// Attempt 1: axiomatize the real, unmodified std::num::NonZero::<T>::new,
+// generic over T, the same shape amenable_kani/amenable_creusot both
+// check concretely (e.g. for i8).
+pub assume_specification<T> [std::num::NonZero::<T>::new] (value: T) -> (result: Option<std::num::NonZero<T>>)
+    where
+        T: std::num::ZeroablePrimitive,
+    ensures
+        result.is_some() <==> value != T::ZERO,
+;
+
+// Observed under `verus --crate-type=lib`: T::ZERO doesn't exist at all
+// (rustc E0599 — ZeroablePrimitive has no such associated item; wrong
+// guess at its shape) and, separately, Option<NonZero<T>> as a return
+// type isn't a registered external type yet either.
+
+// Attempt 2: drop the guessed T::ZERO postcondition, register NonZero
+// itself via external_type_specification + external_body (its field is
+// private, unlike Wrapping/Saturating's public .0 — plain
+// external_type_specification alone fails with "private fields not
+// supported for transparent datatypes").
+#[verifier::reject_recursive_types(T)]
+#[verifier::external_type_specification]
+#[verifier::external_body]
+pub struct ExNonZero<T: std::num::ZeroablePrimitive>(std::num::NonZero<T>);
+
+pub assume_specification<T> [std::num::NonZero::<T>::new] (value: T) -> (result: Option<std::num::NonZero<T>>)
+    where
+        T: std::num::ZeroablePrimitive,
+;
+
+// Observed: NonZero itself is now accepted, but the ZeroablePrimitive
+// bound produces (for now) only a WARNING ("cannot use external trait ...
+// as a bound without declaring the trait ... this is a warning for now
+// but will eventually be an error") alongside a real, blocking error:
+// Verus synthesizes an internal shadow trait name for the unrecognized
+// bound and then can't resolve it ("cannot find trait
+// `T15_ZeroablePrimitive` in this scope").
+
+// Attempt 3: follow the warning's own advice and declare
+// ZeroablePrimitive via external_trait_specification, reproducing its
+// real (checked directly against std's own source,
+// core::num::nonzero::ZeroablePrimitive) shape: `pub impl(self) unsafe
+// trait ZeroablePrimitive: Sized + Copy { type NonZeroInner: Sized +
+// Copy; }`.
+#[verifier::external_trait_specification]
+pub trait ExZeroablePrimitive: Sized + Copy {
+    type ExternalTraitSpecificationFor: std::num::ZeroablePrimitive;
+    type NonZeroInner: Sized + Copy;
+}
+
+// Observed — the real, final, confirmed dead end:
+//   error: external_trait_specification trait bound mismatch
+//   the external trait bounds are:
+//     - ...ExternalTraitSpecificationFor: std::marker::Sized
+//     - ...ExternalTraitSpecificationFor: std::marker::Copy
+//     - ...ExternalTraitSpecificationFor: core::num::nonzero::private::Sealed
+// ZeroablePrimitive's REAL bound set includes a third supertrait,
+// `core::num::nonzero::private::Sealed` — `impl(self)` (an unstable
+// "sealed impl" restriction) desugars to exactly this: a hidden
+// supertrait in a `mod private` that is not `pub`, so it cannot be named
+// from any downstream crate, amenable_verus included. There is no
+// syntax to declare a bound on a trait we cannot name. This is not a
+// missing-syntax problem to retry differently — it is std deliberately
+// making ZeroablePrimitive unnameable outside `core` itself.
+//
+// Matches the identical wall amenable_creusot's extern_spec! hit for
+// NonZero, confirming this is a genuine cross-verifier limitation, not
+// a Verus-specific gap: NonZero::new cannot be given a real spec by any
+// downstream crate in either verifier until std stabilizes a nameable
+// bound.
+"#.to_owned(),
+        ),
+    )
+}
