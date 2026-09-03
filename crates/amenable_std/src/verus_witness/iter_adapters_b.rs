@@ -190,7 +190,9 @@ bridge_verus_witness!(
     )
 }
 
-const VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC: &str =
+// `pub(super)`: `iter_markers`'s `ObservedOptionMatchesInput` witness reuses
+// this harness's source as its own `claim`.
+pub(super) const VERIFY_ONCE_MODEL_YIELDS_EXACTLY_ONE_VALUE_SRC: &str =
     include_str!("../../../amenable_verus/src/rust_std/iter/iter_generator_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
@@ -357,5 +359,3 @@ bridge_verus_witness!(RustStdStandard<std::iter::Empty<i32>>);
         },
     )
 }
-
-const VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC: &str =

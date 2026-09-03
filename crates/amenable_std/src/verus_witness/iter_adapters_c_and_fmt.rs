@@ -1,7 +1,7 @@
 //! The `Successors`/`FromFn` iterator adapters, and the `std::fmt` formatting
 //! types (`Alignment`, `Formatter`, `Arguments`, the `Debug*` builders).
 
-use super::iter_adapters_b::VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC;
+use super::iter_adapters_d::VERIFY_SUCCESSORS_MODEL_GENERATES_FROM_THE_PREVIOUS_ITEM_SRC;
 use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use crate::RustStdStandard;
 use amenable_core::Evidence;

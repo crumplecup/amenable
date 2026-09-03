@@ -6,6 +6,7 @@ use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use crate::RustStdStandard;
 use amenable_core::Evidence;
 
+const VERIFY_CYCLE_MODEL_REPEATS_ITS_SEQUENCE_FOREVER_SRC: &str =
     include_str!("../../../amenable_verus/src/rust_std/iter/iter_stateful_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> {
