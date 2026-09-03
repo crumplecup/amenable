@@ -48,7 +48,7 @@
 mod ascii_and_drain;
 mod call_shape;
 mod cell;
-mod char_decode_slice_chunking;
+mod char_decode;
 mod char_ffi_errors;
 mod collections;
 mod collections_iter_cell_ref;
@@ -66,6 +66,7 @@ mod path;
 mod primitives;
 mod process_and_atomic_tail;
 mod rc_arc_hash;
+mod slice_chunking;
 mod str_family;
 mod str_more_and_io_a;
 mod sync_atomic;
