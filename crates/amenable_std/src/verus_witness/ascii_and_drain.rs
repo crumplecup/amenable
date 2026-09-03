@@ -1,15 +1,31 @@
 //! UTF-8/ASCII error and escape types, `CStr`, and the draining/extracting
 //! iterators over Vec/VecDeque/LinkedList/String.
 
-use super::cell::{
-    FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
-    FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT,
-    FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT,
-    VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC,
-};
 use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use crate::{NonNulByte, RustStdStandard};
 use amenable_core::Evidence;
+
+const VERIFY_FROM_UTF8_ERROR_MODEL_RECOVERS_THE_ORIGINAL_BYTES_SRC: &str =
+    include_str!("../../../amenable_verus/src/rust_std/ffi/from_utf8_error_carrier.rs");
+
+const FROM_UTF8_ERROR_MODEL_NEW_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_new_preserves_bytes(
+    bytes: Vec<u8>,
+    result: VerusFromUtf8ErrorModel,
+) -> bool {
+    result.bytes@ == bytes@
+}"#;
+const FROM_UTF8_ERROR_MODEL_AS_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_as_bytes_preserves_bytes(
+    model: &VerusFromUtf8ErrorModel,
+    result: &Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}"#;
+const FROM_UTF8_ERROR_MODEL_INTO_BYTES_PRESERVES_BYTES_VERUS_FRAGMENT: &str = r#"pub open spec fn from_utf8_error_model_into_bytes_preserves_bytes(
+    model: VerusFromUtf8ErrorModel,
+    result: Vec<u8>,
+) -> bool {
+    result@ == model.bytes@
+}"#;
 
 impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
     type SupportingEvidence = Self;
