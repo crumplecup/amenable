@@ -136,6 +136,7 @@ impl KaniWitness for RustStdStandard<std::cell::RefMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ref_mut_derefs_and_writes_through_to_the_cell".to_owned(),

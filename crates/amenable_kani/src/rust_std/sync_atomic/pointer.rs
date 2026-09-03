@@ -18,6 +18,7 @@ impl KaniWitness for RustStdStandard<AtomicPtr<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_ptr_load_store_swap_and_compare_exchange".to_owned(),

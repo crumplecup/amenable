@@ -284,6 +284,7 @@ impl KaniWitness for RustStdStandard<std::ops::RangeFull> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_full_contains_everything".to_owned(),

@@ -113,6 +113,7 @@ impl KaniWitness for RustStdStandard<RSplitMut<'static, i32, fn(&i32) -> bool>> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplit_mut_yields_writable_subslices_from_the_back".to_owned(),
@@ -185,6 +186,7 @@ impl Establish<KaniRSplitMutWitnessToken, KaniVerifier>
 {
     type Token = RustStdRSplitMutToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniRSplitMutWitnessToken) -> Self::Token {
         RustStdRSplitMutToken(())
     }

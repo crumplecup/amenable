@@ -300,6 +300,7 @@ impl KaniWitness for RustStdStandard<NonZero<isize>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_isize".to_owned(),

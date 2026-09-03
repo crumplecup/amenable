@@ -125,6 +125,7 @@ impl KaniWitness for RustStdStandard<Cell<usize>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cell_get_set_replace_take_round_trip".to_owned(),

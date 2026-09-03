@@ -173,6 +173,7 @@ impl KaniWitness for RustStdStandard<std::path::Iter<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_iter_yields_the_named_segments".to_owned(),

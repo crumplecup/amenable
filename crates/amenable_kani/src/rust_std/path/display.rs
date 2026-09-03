@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<std::path::Display<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_display_renders_a_valid_utf8_path_verbatim".to_owned(),
@@ -70,6 +71,7 @@ impl Establish<KaniPathDisplayWitnessToken, KaniVerifier>
 {
     type Token = RustStdPathDisplayToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniPathDisplayWitnessToken) -> Self::Token {
         RustStdPathDisplayToken(())
     }

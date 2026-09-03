@@ -105,6 +105,7 @@ impl KaniWitness for RustStdStandard<PrefixComponent<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_prefix_component_pairs_raw_text_with_parsed_prefix".to_owned(),

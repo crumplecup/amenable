@@ -229,6 +229,7 @@ impl KaniWitness for RustStdStandard<AtomicUsize> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_usize".to_owned(),

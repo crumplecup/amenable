@@ -128,6 +128,7 @@ impl<T> KaniWitness for AtomicLoadReflectsTheLastWrite<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_bool".to_owned(),
