@@ -71,6 +71,7 @@ mod str_more_and_io_a;
 mod sync_atomic;
 mod sync_net_task;
 mod thread_env_mpsc;
+mod time;
 
 pub use call_shape::{
     VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusImport, VerusParam, verus_call_shape,
