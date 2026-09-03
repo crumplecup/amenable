@@ -262,6 +262,8 @@ amenable_kani::rust_std::net::verify_ipv6_addr_segments_round_trip,1788385517,pa
 amenable_kani::rust_std::net::verify_socket_addr_v4_round_trips_ip_and_port,1788385530,passed
 amenable_kani::rust_std::net::verify_socket_addr_v6_round_trips_all_fields,1788385543,passed
 amenable_kani::rust_std::net::verify_socket_addr_variant_matches_its_kind,1788385553,passed
+amenable_kani::rust_std::num::nonzero::signed::verify_nonzero_i8,1788455769,passed
+amenable_kani::rust_std::num::nonzero::unsigned::verify_nonzero_usize,1788455777,passed
 amenable_kani::rust_std::num::nonzero::verify_nonzero_i128,1788385563,passed
 amenable_kani::rust_std::num::nonzero::verify_nonzero_i16,1788385574,passed
 amenable_kani::rust_std::num::nonzero::verify_nonzero_i32,1788385584,passed
