@@ -149,7 +149,7 @@ these again)
   harness!, atomic_ptr) pass, verify-creusot Proved (150 files), verify-verus 485
   verified 0 errors, no generated diffs.
   - [x] `lib.rs` 816 → extracted inline `#[derive(Provenance)]` impl to `provenance.rs`
-    + shared attr parsing to `attr_options.rs`; lib.rs now 378 (entry points only)
+    (plus shared attr parsing to `attr_options.rs`); lib.rs now 378, entry points only
   - [x] `state_machine.rs` 596 → mod / emit / parse
   - [x] `witness.rs` 811 → mod / product / sum / helpers
 
