@@ -54,7 +54,7 @@ mod collections;
 mod collections_iter_cell_ref;
 mod fs;
 mod hash_ffi_collections_tail;
-mod io_and_sync_atomic;
+mod io_tail;
 mod iter_adapters_a;
 mod iter_adapters_b;
 mod iter_adapters_c_and_fmt;
@@ -68,6 +68,7 @@ mod process_and_atomic_tail;
 mod rc_arc_hash;
 mod str_family;
 mod str_more_and_io_a;
+mod sync_atomic;
 mod sync_net_task;
 mod thread_env_mpsc;
 

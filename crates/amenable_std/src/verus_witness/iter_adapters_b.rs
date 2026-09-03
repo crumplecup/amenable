@@ -3,10 +3,10 @@
 //! iterator adapters.
 
 use super::cell::VERIFY_REF_CELL_MODEL_DYNAMIC_BORROW_RULES_SRC;
-use super::io_and_sync_atomic::VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC;
 use super::iter_adapters_a::VERIFY_ENUMERATE_MODEL_PAIRS_EACH_ITEM_WITH_ITS_INDEX_SRC;
 use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use super::panic_ops_time_future::VERIFY_SHARED_REFERENCE_MODEL_DEREFERENCES_TO_THE_REFERENT_SRC;
+use super::sync_atomic::VERIFY_ATOMIC_BOOL_MODEL_LOAD_STORE_SRC;
 use crate::{
     IncrementHeadroom, ObservedOptionMatchesInput, ObservedPairMatchesInput,
     ObservedValueMatchesInput, RustStdStandard, ValueUnchanged,

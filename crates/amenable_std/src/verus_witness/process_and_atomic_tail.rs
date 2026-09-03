@@ -1,11 +1,11 @@
 //! The `AtomicPtr`/`atomic::Ordering` stragglers left over from the atomic
 //! family, and the `std::process` types.
 
-use super::io_and_sync_atomic::{
+use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
+use super::sync_atomic::{
     ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_VERUS_FRAGMENT,
     VERIFY_ATOMIC_PTR_MODEL_LOAD_STORE_SWAP_AND_COMPARE_EXCHANGE_SRC,
 };
-use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use crate::RustStdStandard;
 use amenable_core::Evidence;
 
