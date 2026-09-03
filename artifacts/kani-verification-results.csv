@@ -302,6 +302,9 @@ amenable_kani::rust_std::num::wrapping_and_parse_errors::verify_parse_int_error_
 amenable_kani::rust_std::num::wrapping_and_parse_errors::verify_saturating_add_matches_the_inner_saturating_add,1788385755,passed
 amenable_kani::rust_std::num::wrapping_and_parse_errors::verify_try_from_int_error_occurs_exactly_when_out_of_range,1788385767,passed
 amenable_kani::rust_std::num::wrapping_and_parse_errors::verify_wrapping_add_matches_the_inner_wrapping_add,1788385779,passed
+amenable_kani::rust_std::ops::bound::verify_bound_round_trips_its_endpoint,1788456221,passed
+amenable_kani::rust_std::ops::control_flow::verify_control_flow_continue_and_break_are_disjoint,1788456233,passed
+amenable_kani::rust_std::ops::ranges::verify_range_inclusive_contains_and_emptiness,1788456211,passed
 amenable_kani::rust_std::ops::verify_bound_round_trips_its_endpoint,1788385791,passed
 amenable_kani::rust_std::ops::verify_control_flow_continue_and_break_are_disjoint,1788385803,passed
 amenable_kani::rust_std::ops::verify_range_contains_matches_bounds,1788385816,passed
