@@ -62,6 +62,9 @@ amenable_kani::rust_std::alloc_string::verify_from_utf8_error_recovers_the_origi
 amenable_kani::rust_std::alloc_string::verify_string_drain_removes_and_yields_the_content,1788383990,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_strong_count_tracks_clones,1788384002,passed
 amenable_kani::rust_std::alloc_sync::verify_arc_weak_upgrade_fails_once_the_strong_count_hits_zero,1788384015,passed
+amenable_kani::rust_std::alloc_vec::iterators::verify_splice_replaces_a_range_and_yields_what_it_removed,1788456628,passed
+amenable_kani::rust_std::alloc_vec::iterators::verify_vec_drain_removes_and_yields_in_order,1788456610,passed
+amenable_kani::rust_std::alloc_vec::vec_core::verify_vec_push_pop_round_trips,1788456593,passed
 amenable_kani::rust_std::alloc_vec::verify_splice_replaces_a_range_and_yields_what_it_removed,1788384038,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_drain_removes_and_yields_in_order,1788384057,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_extract_if_partitions_by_the_predicate,1788384073,passed
