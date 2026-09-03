@@ -8,10 +8,11 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [MODULARITY_500_LOC_PLAN.md](MODULARITY_500_LOC_PLAN.md)
 
-**Status:** 🔲 Started 2026-09-03. Baseline (prior uncommitted split batch)
-committed in `12fbff0`..`cfd7201`. Targets all 20 modules ≥ 500 lines across
-5 crate-scoped phases (kani → creusot → gaap → verus_std → derive, in
-ascending validation cost). Phase 1 `amenable_kani` (7 files) in progress.
+**Status:** ✅ Started 2026-09-03. All 5 phases done — zero modules ≥ 500
+lines; cordial modularity checklist 13 → 1. Follow-on: tracing instrumentation
+0 → 24 → 704 → 0 (the "24" was a cordial collapse-bug undercount, fixed in
+cordial `d2d8a10`; corrected sweep found 704 real gaps, all applied +
+verified). Derive-patterns 0 → 4 still open.
 
 **Description:** Continuation of cordial's `modularity.checklist.md` work.
 Earlier rounds cleared every file cordial's z-score gate flags; this round

@@ -165,12 +165,27 @@ one of the 20 files here).
 
 Regenerating `cordial quality` after Phase 5 showed two secondary areas move:
 
-- **Tracing instrumentation 0 → 24 → 0 (DONE).** `cordial quality --apply` added
-  `#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]` to the 19
-  `KaniWitness::proof` / `Establish::establish` methods in `amenable_kani` and the
-  5 `VerusWitness::proof` methods in `amenable_std` that its census flagged once
-  the module splits multiplied the file count. No behavior change (the attr is
-  stripped under `--cfg kani`). check-all-package clean on both crates.
+- **Tracing instrumentation 0 → 24 → 704 → 0 (DONE).** The first pass (`0 → 24
+  → 0`) instrumented the 19 `KaniWitness::proof` / `Establish::establish`
+  methods in `amenable_kani` and 5 `VerusWitness::proof` methods in
+  `amenable_std` that the census flagged — but that "24" was itself an
+  undercount. cordial's tracing etiquette recorded every `impl Trait for Type`
+  method under `{Trait}::{method}`, dropping the self type, so N types
+  implementing one trait in a module collapsed to a single IR node: `--apply`
+  fixed one and reported zero, leaving every sibling impl silently
+  uninstrumented. Fixed in cordial `d2d8a10` (record trait-impl methods under
+  `<Type as Trait>::method`, generics kept). The corrected sweep surfaced
+  **704** real gaps — 427 `amenable_kani`, 260 `amenable_std`, 12
+  `amenable_core`, 4 `amenable_gaap`, 1 `amenable_derive`; ~624 the
+  proof-witness family (`KaniWitness`/`VerusWitness`/`Establish`/`KaniCompose`),
+  the rest getters / `Display::fmt` / constructors on the state-marker types.
+  `cordial quality --apply` added `#[cfg_attr(not(kani),
+  tracing::instrument(...))]` to all 704 across 168 files (0 unresolved). No
+  behavior change — the attr is stripped under `--cfg kani` /
+  `--cfg verus_keep_ghost`. Verified: `check-all-package` clean on all 5
+  crates; `verify-creusot` Proved (150 files); `verify-verus` 485 verified, 0
+  errors; 5 canary Kani proofs across 5 touched files pass (full
+  `just verify-kani` deferred to a dedicated run).
 - **Derive patterns 0 → 4** — `ProvenanceContainerOptions` / `WitnessContainerOptions`
   / `MemberOptions` / `ProofField` in `amenable_derive`: private structs that had
   to become `pub(crate)` / `pub(super)` for cross-submodule access, which lifts
