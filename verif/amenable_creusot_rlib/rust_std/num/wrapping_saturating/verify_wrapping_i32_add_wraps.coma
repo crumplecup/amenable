@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 37 8 37 93 *)
+
+let%span scmp_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cmp_carriers.rs" 100 18 100 44
+let%span swrapping_saturating = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 38 12 38 17
+let%span swrapping_saturating'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 35 19 35 23
+let%span swrapping_saturating'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 36 18 36 60
+let%span swrapping_saturating'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 20 24 20 49
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Wrapping_i32 = { f0: Int32.t }
+
+let rec add_Wrapping_i32 (self_: t_Wrapping_i32) (rhs: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = any
+  [ return (result: t_Wrapping_i32) -> {[@stop_split] [@expl:add ensures] [%#scmp_carriers] result.f0
+    = Int32.add self_.f0 rhs.f0}
+    (! return {result}) ]
+
+predicate wrapping_i32_add_wraps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 15 8 19 17] (a: t_Wrapping_i32) (b: t_Wrapping_i32) (add_result: t_Wrapping_i32) =
+  [%#swrapping_saturating'2] add_result.f0 = Int32.add a.f0 b.f0
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_wrapping_i32_add_wraps
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 37 8 37 93]
+  (a: t_Wrapping_i32) (b: t_Wrapping_i32) (return (x: t_Wrapping_i32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = add_Wrapping_i32 [%#swrapping_saturating] {a} {b} (fun (_x: t_Wrapping_i32) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Wrapping_i32 = Any.any_l () | & a: t_Wrapping_i32 = a | & b: t_Wrapping_i32 = b ])
+  [ return (result: t_Wrapping_i32) ->
+  {[@stop_split] [@expl:verify_wrapping_i32_add_wraps ensures] [%#swrapping_saturating'1] wrapping_i32_add_wraps_holds a b result}
+    (! return {result}) ]

@@ -1,0 +1,102 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 298 8 298 97 *)
+
+let%span sparse = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 300 49 300 63
+let%span sparse'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 300 12 300 64
+let%span sparse'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 296 19 296 23
+let%span sparse'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 298 71 298 97
+let%span sparse'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 297 18 297 80
+let%span sparse'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 59 18 62 9
+let%span sparse'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 64 12 70 13
+let%span sparse'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 73 12 79 13
+let%span sparse'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 82 12 89 13
+let%span sparse'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 276 16 279 17
+let%span sparse'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 28 20 28 40
+
+use creusot.int.Int32
+use seq.Seq
+use creusot.prelude.Char
+use creusot.prelude.Any
+use int.Int
+
+type t_ParseIntError
+
+type t_Result_i32_ParseIntError = Ok Int32.t | Err t_ParseIntError
+
+predicate inv_ParseIntError (_1: t_ParseIntError)
+
+predicate inv_Result_i32_ParseIntError (_1: t_Result_i32_ParseIntError)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_Result_i32_ParseIntError [inv_Result_i32_ParseIntError x]. inv_Result_i32_ParseIntError x
+    = match x with
+      | Ok f0 -> true
+      | Err f0 -> inv_ParseIntError f0
+      end
+
+function view_str (self: string) : Seq.seq Char.t
+
+type t_IntErrorKind = Empty | InvalidDigit | PosOverflow | NegOverflow | Zero
+
+function parse_int_error_kind [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 20 4 20 74] (_e: t_ParseIntError) : t_IntErrorKind
+
+predicate is_ascii_digit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 27 4 27 49] (c: Char.t) =
+  [%#sparse'9] Char.to_int c >= 48 /\ Char.to_int c <= 57
+
+let rec from_str_i32 (s: string) (return (x: t_Result_i32_ParseIntError)) = any
+  [ return (result: t_Result_i32_ParseIntError) ->
+  {[@stop_split] [@expl:from_str_i32 ensures] ([@stop_split] [@expl:from_str result type invariant] inv_Result_i32_ParseIntError result)
+    /\ ([@stop_split] [@expl:from_str ensures #0] [%#sparse'4] Seq.length (view_str s) = 0
+      -> match result with
+        | Err e -> parse_int_error_kind e = Empty
+        | Ok _ -> false
+        end)
+    /\ ([@stop_split] [@expl:from_str ensures #1] [%#sparse'5] (exists i: int. 0 <= i
+          /\ i < Seq.length (view_str s)
+          /\ not (i = 0 /\ (Seq.get (view_str s) i = Char.of_int 43 \/ Seq.get (view_str s) i = Char.of_int 45))
+          /\ not is_ascii_digit (Seq.get (view_str s) i))
+      -> match result with
+        | Err e -> parse_int_error_kind e = InvalidDigit
+        | Ok _ -> false
+        end)
+    /\ ([@stop_split] [@expl:from_str ensures #2] [%#sparse'6] Seq.length (view_str s) > 10
+      /\ is_ascii_digit (Seq.get (view_str s) 0)
+      /\ Seq.get (view_str s) 0 <> Char.of_int 48
+      /\ (forall i: int. 0 <= i /\ i < Seq.length (view_str s)
+        -> is_ascii_digit (Seq.get (view_str s) i)
+        -> match result with
+          | Err e -> parse_int_error_kind e = PosOverflow
+          | Ok _ -> false
+          end))
+    /\ ([@stop_split] [@expl:from_str ensures #3] [%#sparse'7] Seq.length (view_str s) > 11
+    /\ Seq.get (view_str s) 0 = Char.of_int 45
+    /\ is_ascii_digit (Seq.get (view_str s) 1)
+    /\ Seq.get (view_str s) 1 <> Char.of_int 48
+    /\ (forall i: int. 1 <= i /\ i < Seq.length (view_str s)
+      -> is_ascii_digit (Seq.get (view_str s) i)
+      -> match result with
+        | Err e -> parse_int_error_kind e = NegOverflow
+        | Ok _ -> false
+        end))}
+    (! return {result}) ]
+
+predicate parse_int_error_reports_the_kind_of_the_failure_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 272 8 274 17] (parse_result: t_Result_i32_ParseIntError) =
+  [%#sparse'8] match parse_result with
+    | Err e -> parse_int_error_kind e = InvalidDigit
+    | Ok _ -> false
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let rec verify_parse_int_error_reports_the_kind_of_the_failure
+  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 298 8 298 97]
+  (return (x: t_Result_i32_ParseIntError)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_4 <- [%#sparse] "not a number" ] s1
+    | s1 = from_str_i32 [%#sparse'0] {_4} (fun (_x: t_Result_i32_ParseIntError) -> [ &_ret <- _x ] s2)
+    | s2 = return {_ret} ] ] [ & _ret: t_Result_i32_ParseIntError = Any.any_l () | & _4: string = Any.any_l () ])
+  [ return (result: t_Result_i32_ParseIntError) ->
+  {[@stop_split] [@expl:verify_parse_int_error_reports_the_kind_of_the_failure ensures] ([@stop_split] [@expl:verify_parse_int_error_reports_the_kind_of_the_failure result type invariant] [%#sparse'2] inv_Result_i32_ParseIntError result)
+    /\ ([@stop_split] [@expl:verify_parse_int_error_reports_the_kind_of_the_failure ensures] [%#sparse'3] parse_int_error_reports_the_kind_of_the_failure_holds result)}
+    (! return {result}) ]
