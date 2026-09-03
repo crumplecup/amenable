@@ -73,6 +73,10 @@ amenable_kani::rust_std::array::verify_try_from_slice_rejects_a_length_mismatch,
 amenable_kani::rust_std::ascii::verify_escape_default_escapes_a_control_byte,1788384153,passed
 amenable_kani::rust_std::backtrace::verify_backtrace_force_capture_always_actually_captures,1788384163,passed
 amenable_kani::rust_std::backtrace::verify_backtrace_status_reports_captured_after_force_capture,1788384175,passed
+amenable_kani::rust_std::cell::cell_family::verify_cell_get_set_replace_take_round_trip,1788456399,passed
+amenable_kani::rust_std::cell::once_lazy_unsafe::verify_lazy_cell_caches_its_initializer_result,1788456428,passed
+amenable_kani::rust_std::cell::once_lazy_unsafe::verify_once_cell_initializes_exactly_once,1788456418,passed
+amenable_kani::rust_std::cell::ref_cell::verify_ref_cell_dynamic_borrow_rules,1788456409,passed
 amenable_kani::rust_std::cell::verify_cell_get_set_replace_take_round_trip,1788384187,passed
 amenable_kani::rust_std::cell::verify_lazy_cell_caches_its_initializer_result,1788384198,passed
 amenable_kani::rust_std::cell::verify_once_cell_initializes_exactly_once,1788384210,passed
