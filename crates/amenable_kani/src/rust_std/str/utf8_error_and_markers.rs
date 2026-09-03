@@ -10,11 +10,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 #[cfg(kani)]
-use crate::{
-    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
-};
+use crate::{IteratorYieldsNoneWhenExhausted, ValueIsAtLeast};
 
 impl<T> KaniWitness for AccessorRecoversTheExpectedValue<T> {
     type SupportingEvidence = Self;

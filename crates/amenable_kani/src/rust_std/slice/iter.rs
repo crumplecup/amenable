@@ -1,6 +1,6 @@
-use amenable_core::Evidence;
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use crate::CheckedProof;

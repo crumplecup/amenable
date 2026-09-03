@@ -1,8 +1,8 @@
 use std::collections::BinaryHeap;
 
-use amenable_core::Evidence;
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use std::cell::Cell;

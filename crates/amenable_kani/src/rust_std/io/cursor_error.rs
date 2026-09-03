@@ -2,9 +2,9 @@ use std::io::Cursor;
 #[cfg(kani)]
 use std::io::SeekFrom;
 
-use amenable_core::Evidence;
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 use super::error_kind_and_io_slice::VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_KIND_SRC;

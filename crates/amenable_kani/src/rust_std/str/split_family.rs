@@ -12,9 +12,8 @@ use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 #[cfg(kani)]
 use crate::{
-    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
+    FourBytesAreEachAscii, SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
+    ThreeSplitOperandsAreDistinctFromThePattern,
 };
 
 impl KaniWitness for RustStdStandard<Split<'static, char>> {

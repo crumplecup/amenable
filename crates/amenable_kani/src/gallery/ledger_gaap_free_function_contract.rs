@@ -223,9 +223,8 @@ mod mirror {
 }
 #[cfg(kani)]
 use mirror::{
-    BalancedEntries, Committed, CommittedToken, Ensures, KaniLedgerCommit, KaniLedgerCommitTrivial,
-    KaniVerifier, Ledger, Sidecar, Transfer, TransferError, Validated, ValidatedToken,
-    commit_checked,
+    KaniLedgerCommit, KaniLedgerCommitTrivial, KaniVerifier, Ledger, Transfer, Validated,
+    ValidatedToken, commit_checked,
 };
 
 amenable_derive::gallery_harness! {

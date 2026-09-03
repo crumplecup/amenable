@@ -250,7 +250,7 @@ amenable_derive::harness! {
         #[kani::proof]
         fn verify_udp_socket_send_to_recv_from_round_trips_a_datagram() {
             let mut socket_a = crate::KaniUdpSocket::bind(0);
-            let mut socket_b = crate::KaniUdpSocket::bind(1);
+            let socket_b = crate::KaniUdpSocket::bind(1);
             let addr_b = socket_b.local_addr();
 
             socket_b.send_to(&mut socket_a, b"ping".to_vec());

@@ -13,7 +13,7 @@ use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 /// level.
 #[cfg(kani)]
 mod mirror {
-    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use amenable_core::Ensures;
     pub(super) use std::cell::Cell;
     pub(super) use std::collections::LinkedList;
 
@@ -26,7 +26,6 @@ mod mirror {
 use mirror::{
     Cell, CollectedSequenceMatchesExpected, EmptiedContainerReportsEmpty, Ensures,
     IteratorYieldsAReferenceToTheStoredValue, IteratorYieldsNoneWhenExhausted, LinkedList,
-    Requires,
 };
 
 impl KaniWitness for RustStdStandard<std::collections::linked_list::Iter<'static, i32>> {

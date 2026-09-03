@@ -1,7 +1,7 @@
 use std::slice::SplitInclusiveMut;
 
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Requires;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 

@@ -14,7 +14,7 @@ use crate::rust_std::macros::bridge_kani_witness;
 /// level.
 #[cfg(kani)]
 mod mirror {
-    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use amenable_core::Ensures;
     pub(super) use std::cell::Cell;
     pub(super) use std::collections::BinaryHeap;
 
@@ -22,9 +22,7 @@ mod mirror {
     pub(super) use crate::PopRecoversTheStoredValue;
 }
 #[cfg(kani)]
-use mirror::{
-    BinaryHeap, Cell, EmptiedContainerReportsEmpty, Ensures, PopRecoversTheStoredValue, Requires,
-};
+use mirror::{BinaryHeap, Cell, EmptiedContainerReportsEmpty, Ensures, PopRecoversTheStoredValue};
 
 impl KaniWitness for RustStdStandard<std::collections::binary_heap::Drain<'static, i32>> {
     type SupportingEvidence = Self;

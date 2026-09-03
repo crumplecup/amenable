@@ -1,8 +1,8 @@
 use std::str::{SplitAsciiWhitespace, SplitWhitespace, Utf8Chunks};
 
-use amenable_core::Evidence;
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Ensures;
+use amenable_core::Evidence;
 use amenable_std::RustStdStandard;
 
 #[cfg(kani)]
@@ -11,11 +11,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 #[cfg(kani)]
-use crate::{
-    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
-};
+use crate::{EmptiedContainerReportsEmpty, IteratorYieldsNoneWhenExhausted};
 
 impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
     type SupportingEvidence = Self;

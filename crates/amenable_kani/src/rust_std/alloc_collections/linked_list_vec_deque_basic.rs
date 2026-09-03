@@ -15,7 +15,7 @@ use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 /// level.
 #[cfg(kani)]
 mod mirror {
-    pub(super) use amenable_core::{Ensures, Requires};
+    pub(super) use amenable_core::Ensures;
     pub(super) use std::cell::Cell;
 
     pub(super) use crate::CollectedSequenceMatchesExpected;
@@ -25,7 +25,7 @@ mod mirror {
 #[cfg(kani)]
 use mirror::{
     Cell, CollectedSequenceMatchesExpected, EmptiedContainerReportsEmpty, Ensures,
-    FallibleOperationReportsFailure, Requires,
+    FallibleOperationReportsFailure,
 };
 
 impl KaniWitness for RustStdStandard<LinkedList<i32>> {

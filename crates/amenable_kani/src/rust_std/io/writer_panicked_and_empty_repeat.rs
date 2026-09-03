@@ -1,7 +1,7 @@
 use std::io::WriterPanicked;
 
 #[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use amenable_core::Ensures;
 use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 

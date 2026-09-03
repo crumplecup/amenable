@@ -11,11 +11,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 use crate::rust_std::macros::bridge_kani_witness;
 #[cfg(kani)]
-use crate::{
-    EmptiedContainerReportsEmpty, FourBytesAreEachAscii, IteratorYieldsNoneWhenExhausted,
-    SplitOperandsAreDistinctFromThePattern, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast,
-};
+use crate::{FourBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern};
 
 impl KaniWitness for RustStdStandard<MatchIndices<'static, char>> {
     type SupportingEvidence = Self;
