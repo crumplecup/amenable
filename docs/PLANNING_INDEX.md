@@ -4,6 +4,21 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Modularity: 500 LOC cap
+
+**Document:** [MODULARITY_500_LOC_PLAN.md](MODULARITY_500_LOC_PLAN.md)
+
+**Status:** 🔲 Started 2026-09-03. Baseline (prior uncommitted split batch)
+committed in `12fbff0`..`cfd7201`. Targets all 20 modules ≥ 500 lines across
+5 crate-scoped phases (kani → creusot → gaap → verus_std → derive, in
+ascending validation cost). Phase 1 `amenable_kani` (7 files) in progress.
+
+**Description:** Continuation of cordial's `modularity.checklist.md` work.
+Earlier rounds cleared every file cordial's z-score gate flags; this round
+holds the line at a flat 500-LOC cap, including the 8 files above 500 that
+don't trip the statistical outlier test. The cap is a forcing function for
+clarity — cohesive modules, real conceptual seams, a legible file tree.
+
 ### cfg Hygiene
 
 **Document:** [CFG_HYGIENE_PLAN.md](CFG_HYGIENE_PLAN.md)
