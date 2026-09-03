@@ -417,6 +417,9 @@ amenable_kani::rust_std::slice::split::verify_split_mut_yields_writable_subslice
 amenable_kani::rust_std::slice::split::verify_split_yields_subslices_between_matches,1788386787,passed
 amenable_kani::rust_std::slice::split_inclusive::verify_split_inclusive_keeps_the_match_at_the_end_of_each_piece,1788386800,passed
 amenable_kani::rust_std::slice::split_inclusive::verify_split_inclusive_mut_keeps_the_match_at_the_end_of_each_piece,1788386811,passed
+amenable_kani::rust_std::slice::split_n_and_rsplit::rsplit::verify_rsplit_yields_subslices_from_the_back,1788456826,passed
+amenable_kani::rust_std::slice::split_n_and_rsplit::rsplit_n::verify_rsplit_n_caps_the_number_of_pieces_from_the_back,1788456839,passed
+amenable_kani::rust_std::slice::split_n_and_rsplit::split_n::verify_split_n_caps_the_number_of_pieces,1788456818,passed
 amenable_kani::rust_std::slice::split_n_and_rsplit::verify_rsplit_mut_yields_writable_subslices_from_the_back,1788386822,passed
 amenable_kani::rust_std::slice::split_n_and_rsplit::verify_rsplit_n_caps_the_number_of_pieces_from_the_back,1788386836,passed
 amenable_kani::rust_std::slice::split_n_and_rsplit::verify_rsplit_n_mut_caps_the_number_of_pieces_from_the_back,1788386851,passed
