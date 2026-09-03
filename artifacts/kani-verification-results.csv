@@ -499,6 +499,9 @@ amenable_kani::rust_std::str::verify_utf8_error_reports_the_valid_prefix_length_
 amenable_kani::rust_std::str::whitespace_utf8::verify_split_ascii_whitespace_collapses_runs_of_whitespace,1788387474,passed
 amenable_kani::rust_std::str::whitespace_utf8::verify_split_whitespace_collapses_runs_of_whitespace,1788387489,passed
 amenable_kani::rust_std::str::whitespace_utf8::verify_utf8_chunks_yields_one_chunk_for_wholly_valid_input,1788387500,passed
+amenable_kani::rust_std::sync_atomic::boolean::verify_atomic_bool,1788455529,passed
+amenable_kani::rust_std::sync_atomic::ordering::verify_relaxed_ordering_still_makes_a_store_observable,1788455537,passed
+amenable_kani::rust_std::sync_atomic::pointer::verify_atomic_ptr_load_store_swap_and_compare_exchange,1788455520,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_bool,1788387511,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_i16,1788387523,passed
 amenable_kani::rust_std::sync_atomic::verify_atomic_i32,1788387535,passed
