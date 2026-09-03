@@ -1,16 +1,3 @@
-//! `KaniWitness` impls for `core::fmt`.
-//!
-//! `Error` is an opaque unit-like marker signaling that a formatting trait
-//! impl failed to write to its `Formatter` — no accessors beyond `Debug`/
-//! `Display`, nothing to build and check. It stays at the trusted
-//! disposition.
-//!
-//! The direct rendering paths for `Arguments`, `FromFn`, and the `Debug*`
-//! builders time out under Kani's formatting machinery. Production proofs
-//! for those shapes therefore use an Amenable-owned formatter model
-//! instead; `Alignment` and `Formatter` remain on the direct observable
-//! std path.
-
 use core::fmt::{Arguments, DebugList, DebugMap, DebugSet, DebugStruct, DebugTuple, Formatter};
 
 #[cfg(kani)]
@@ -19,61 +6,11 @@ use amenable_core::Evidence;
 use amenable_derive::Standard;
 use amenable_std::RustStdStandard;
 
-use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
+use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
-
-impl KaniWitness for RustStdStandard<std::fmt::Alignment> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CheckedProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CheckedProof::new(
-            "verify_alignment_reaches_the_formatter_from_the_format_spec".to_owned(),
-            VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
-        )
-    }
-}
-
-bridge_kani_witness!(RustStdStandard<std::fmt::Alignment>);
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
-        "amenable_std::rust_std::RustStdStandard<std::fmt::Alignment>",
-        "kani",
-        || <RustStdStandard<std::fmt::Alignment> as KaniWitness>::proof().to_string(),
-    )
-}
-
-amenable_derive::harness! {
-    kani, VERIFY_ALIGNMENT_REACHES_THE_FORMATTER_FROM_THE_FORMAT_SPEC_SRC, {
-        /// `Alignment` isn't directly constructible by user code; this
-        /// checks it the only way it's actually observable — a `Left`
-        /// fill-alignment spec (`{:<5}`) makes `Formatter::align()`
-        /// report `Some(Alignment::Left)` inside the trait impl being
-        /// formatted.
-        #[kani::proof]
-        fn verify_alignment_reaches_the_formatter_from_the_format_spec() {
-            struct Probe;
-            impl std::fmt::Display for Probe {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    assert!(
-                        AccessorRecoversTheExpectedValue::ensures((
-                            f.align(),
-                            Some(core::fmt::Alignment::Left)
-                        )),
-                        "the spec's alignment reaches the Formatter"
-                    );
-                    write!(f, "x")
-                }
-            }
-            let _ = format!("{:<5}", Probe);
-        }
-    }
-}
+use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
 
 /// A rendered value's `.kind()` known to match the formatting operation
 /// that actually built it.
@@ -170,58 +107,6 @@ amenable_derive::harness! {
                 rendered.display_token(),
                 Some(atom.display_token())
             )));
-        }
-    }
-}
-
-impl_kani_witness_trusted!(std::fmt::Error);
-
-impl KaniWitness for RustStdStandard<Formatter<'static>> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = CheckedProof;
-
-    fn proof() -> Self::ProofArtifact {
-        CheckedProof::new(
-            "verify_formatter_exposes_the_parsed_width_and_precision".to_owned(),
-            VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
-        )
-    }
-}
-
-bridge_kani_witness!(RustStdStandard<Formatter<'static>>);
-
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
-        "amenable_std::rust_std::RustStdStandard<Formatter<'static>>",
-        "kani",
-        || <RustStdStandard<Formatter<'static>> as KaniWitness>::proof().to_string(),
-    )
-}
-
-amenable_derive::harness! {
-    kani, VERIFY_FORMATTER_EXPOSES_THE_PARSED_WIDTH_AND_PRECISION_SRC, {
-        /// A `{:10.2}` format spec makes `Formatter::width()`/
-        /// `.precision()` report `Some(10)`/`Some(2)` inside the trait
-        /// impl being formatted — the concrete values the spec was
-        /// parsed into, not just that they were provided.
-        #[kani::proof]
-        fn verify_formatter_exposes_the_parsed_width_and_precision() {
-            struct Probe;
-            impl std::fmt::Display for Probe {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    assert!(
-                        AccessorRecoversTheExpectedValue::ensures((f.width(), Some(10))),
-                        "the spec's width reaches the Formatter"
-                    );
-                    assert!(
-                        AccessorRecoversTheExpectedValue::ensures((f.precision(), Some(2))),
-                        "the spec's precision reaches the Formatter"
-                    );
-                    write!(f, "x")
-                }
-            }
-            let _ = format!("{:10.2}", Probe);
         }
     }
 }
