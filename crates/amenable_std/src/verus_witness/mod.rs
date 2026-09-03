@@ -46,6 +46,7 @@
 //! `impl_verus_witness_trusted!` macros, and the `VerusCallShape` family.
 
 mod ascii_and_drain;
+mod call_shape;
 mod cell;
 mod char_decode_slice_chunking;
 mod char_ffi_errors;
@@ -70,7 +71,7 @@ mod str_more_and_io_a;
 mod sync_net_task;
 mod thread_env_mpsc;
 
-pub use machinery::{
-    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusCheckedProof, VerusImport,
-    VerusParam, VerusVerifier, VerusVerifierMetadata, VerusWitness, verus_call_shape,
+pub use call_shape::{
+    VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusImport, VerusParam, verus_call_shape,
 };
+pub use machinery::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
