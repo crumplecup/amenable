@@ -131,7 +131,19 @@ these again)
 - [x] **Phase 3 — `amenable_gaap` (1/1)** — `ledger` 539 → types (64) / machine
   (468). All three backends: 4 kani gaap_ledger harnesses pass, verify-creusot
   Proved (150 files), verify-verus 485 verified 0 errors, no companion diffs.
-- [ ] Phase 4 — `amenable_std` verus (0/8)
+- [x] **Phase 4 — `amenable_std` verus (8/8)** — all peeled as sibling files at
+  the same directory depth so no `include_str!` paths moved (verus_gallery is the
+  one exception — a directory, but its claims are string literals). check-all-package
+  amenable_std clean after each; verify-creusot-translate clean; verify-verus pending.
+  - [x] `verus_witness::machinery` 503 → machinery + call_shape
+  - [x] `verus_witness::cell` 508 → (moved from_utf8 fragments to ascii_and_drain) → 486
+  - [x] `verus_witness::io_and_sync_atomic` 520 → io_tail + sync_atomic
+  - [x] `verus_witness::panic_ops_time_future` 507 → (peeled time.rs) → 383
+  - [x] `verus_witness::char_decode_slice_chunking` 604 → char_decode + slice_chunking
+  - [x] `verus_witness::iter_adapters_b` 765 → iter_markers + iter_adapters_b + iter_adapters_d
+  - [x] `verus_gallery` 849 → infra + numeric_cases + spec_cases + binder_cases (dir)
+  - [x] `verus_witness::hash_ffi_collections_tail` 953 → primitives_and_pointers +
+    hash_ffi_collections_tail + os_windows_handles
 - [ ] Phase 5 — `amenable_derive` (0/3)
 
 Baseline: the prior uncommitted split batch (compose / process_model /
