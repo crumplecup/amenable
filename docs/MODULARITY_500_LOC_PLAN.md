@@ -116,7 +116,15 @@ these again)
 
 ## Status
 
-- [ ] Phase 1 — `amenable_kani` (0/7)
+- [x] **Phase 1 — `amenable_kani` (7/7)** — all under 500, each verified with
+  check-all-package + representative harness re-runs.
+  - [x] `rust_std::sync_atomic` 871 → boolean/signed/unsigned/pointer/ordering (max 282) — `3141457`
+  - [x] `rust_std::num::nonzero` 810 → signed/unsigned/contracts (max 352) — `3883ed4`
+  - [x] `rust_std::path` 765 → components/path_buf/display/windows_prefix (max 265) — `50e3502`
+  - [x] `rust_std::ops` 600 → ranges/bound/control_flow (max 337) — `0ff975a`
+  - [x] `rust_std::cell` 598 → cell_family/ref_cell/once_lazy_unsafe (max 290) — `e22dbe7`
+  - [x] `rust_std::alloc_vec` 575 → vec_core/iterators (max 326) — `1c94010`
+  - [x] `rust_std::slice::split_n_and_rsplit` 574 → split_n/rsplit/rsplit_n (max 218) — `7b0fa5a`
 - [ ] Phase 2 — `amenable_creusot` (0/1)
 - [ ] Phase 3 — `amenable_gaap` (0/1)
 - [ ] Phase 4 — `amenable_std` verus (0/8)
