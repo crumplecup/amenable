@@ -125,8 +125,12 @@ these again)
   - [x] `rust_std::cell` 598 → cell_family/ref_cell/once_lazy_unsafe (max 290) — `e22dbe7`
   - [x] `rust_std::alloc_vec` 575 → vec_core/iterators (max 326) — `1c94010`
   - [x] `rust_std::slice::split_n_and_rsplit` 574 → split_n/rsplit/rsplit_n (max 218) — `7b0fa5a`
-- [ ] Phase 2 — `amenable_creusot` (0/1)
-- [ ] Phase 3 — `amenable_gaap` (0/1)
+- [x] **Phase 2 — `amenable_creusot` (1/1)** — `rust_std::num` 631 →
+  nonzero/wrapping_saturating/parse/float (max 303). `verify-creusot-translate`
+  clean, `verify-creusot` → Proved (150 files). Commit after `cb50d1f`.
+- [x] **Phase 3 — `amenable_gaap` (1/1)** — `ledger` 539 → types (64) / machine
+  (468). All three backends: 4 kani gaap_ledger harnesses pass, verify-creusot
+  Proved (150 files), verify-verus 485 verified 0 errors, no companion diffs.
 - [ ] Phase 4 — `amenable_std` verus (0/8)
 - [ ] Phase 5 — `amenable_derive` (0/3)
 
